@@ -1,0 +1,249 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/thanks-cohn/zig-reference/details.schema.json",
+  "title": "zig-reference module details",
+  "description": "Exhaustive machine-readable contract for one zig-reference module. Fields remain present even when values are blank or unknown.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "module",
+    "purpose",
+    "c_pain",
+    "zig_response",
+    "public_surface",
+    "locations",
+    "inputs",
+    "outputs",
+    "state",
+    "invariants",
+    "failure_behavior",
+    "ownership",
+    "cleanup",
+    "invalidation",
+    "dependencies",
+    "expected_dependents",
+    "composition",
+    "compatibility",
+    "complexity",
+    "limits",
+    "validation",
+    "documentation",
+    "maintenance",
+    "search"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "module": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "directory", "summary", "status", "category", "tags"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "directory": { "type": "string" },
+        "summary": { "type": "string" },
+        "status": { "type": "string" },
+        "category": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "purpose": { "type": "string" },
+    "c_pain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "failure_modes", "why_c_is_attractive", "where_c_degrades"],
+      "properties": {
+        "summary": { "type": "string" },
+        "failure_modes": { "type": "array", "items": { "type": "string" } },
+        "why_c_is_attractive": { "type": "string" },
+        "where_c_degrades": { "type": "string" }
+      }
+    },
+    "zig_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "language_features", "guarantees_made_visible", "remaining_programmer_responsibilities"],
+      "properties": {
+        "summary": { "type": "string" },
+        "language_features": { "type": "array", "items": { "type": "string" } },
+        "guarantees_made_visible": { "type": "array", "items": { "type": "string" } },
+        "remaining_programmer_responsibilities": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "public_surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["root_symbols", "types", "functions", "methods", "errors", "constants"],
+      "properties": {
+        "root_symbols": { "type": "array", "items": { "type": "string" } },
+        "types": { "type": "array", "items": { "type": "object" } },
+        "functions": { "type": "array", "items": { "type": "object" } },
+        "methods": { "type": "array", "items": { "type": "object" } },
+        "errors": { "type": "array", "items": { "type": "string" } },
+        "constants": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "locations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["implementation", "test_source", "readme", "mastery", "details_markdown", "details_json", "examples", "benchmarks", "fixtures", "fuzz"],
+      "properties": {
+        "implementation": { "type": "array", "items": { "type": "string" } },
+        "test_source": { "type": "array", "items": { "type": "string" } },
+        "readme": { "type": "string" },
+        "mastery": { "type": "string" },
+        "details_markdown": { "type": "string" },
+        "details_json": { "type": "string" },
+        "examples": { "type": "array", "items": { "type": "string" } },
+        "benchmarks": { "type": "array", "items": { "type": "string" } },
+        "fixtures": { "type": "array", "items": { "type": "string" } },
+        "fuzz": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "inputs": { "type": "array", "items": { "type": "object" } },
+    "outputs": { "type": "array", "items": { "type": "object" } },
+    "state": { "type": "array", "items": { "type": "object" } },
+    "invariants": { "type": "array", "items": { "type": "string" } },
+    "failure_behavior": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["errors", "optional_empty_results", "failure_atomicity", "partial_effects", "panic_conditions", "undefined_behavior_preconditions"],
+      "properties": {
+        "errors": { "type": "array", "items": { "type": "object" } },
+        "optional_empty_results": { "type": "array", "items": { "type": "object" } },
+        "failure_atomicity": { "type": "string" },
+        "partial_effects": { "type": "array", "items": { "type": "string" } },
+        "panic_conditions": { "type": "array", "items": { "type": "string" } },
+        "undefined_behavior_preconditions": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "ownership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owns", "borrows", "copies", "transfers", "allocator", "element_cleanup"],
+      "properties": {
+        "owns": { "type": "array", "items": { "type": "string" } },
+        "borrows": { "type": "array", "items": { "type": "string" } },
+        "copies": { "type": "array", "items": { "type": "string" } },
+        "transfers": { "type": "array", "items": { "type": "string" } },
+        "allocator": { "type": "string" },
+        "element_cleanup": { "type": "string" }
+      }
+    },
+    "cleanup": { "type": "array", "items": { "type": "object" } },
+    "invalidation": { "type": "array", "items": { "type": "object" } },
+    "dependencies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "standard_library", "external", "conceptual"],
+      "properties": {
+        "repository": { "type": "array", "items": { "type": "object" } },
+        "standard_library": { "type": "array", "items": { "type": "string" } },
+        "external": { "type": "array", "items": { "type": "object" } },
+        "conceptual": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "expected_dependents": { "type": "array", "items": { "type": "object" } },
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["import_name", "import_configuration", "minimal_example", "integration_patterns", "incompatible_combinations", "replacement_options"],
+      "properties": {
+        "import_name": { "type": "string" },
+        "import_configuration": { "type": "string" },
+        "minimal_example": { "type": "string" },
+        "integration_patterns": { "type": "array", "items": { "type": "object" } },
+        "incompatible_combinations": { "type": "array", "items": { "type": "string" } },
+        "replacement_options": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["zig_version", "hosted", "freestanding", "thread_safe", "reentrant", "endianness", "platforms", "architectures", "allocator_assumptions", "ffi", "no_std_equivalent"],
+      "properties": {
+        "zig_version": { "type": "string" },
+        "hosted": { "type": "string" },
+        "freestanding": { "type": "string" },
+        "thread_safe": { "type": "string" },
+        "reentrant": { "type": "string" },
+        "endianness": { "type": "string" },
+        "platforms": { "type": "array", "items": { "type": "string" } },
+        "architectures": { "type": "array", "items": { "type": "string" } },
+        "allocator_assumptions": { "type": "string" },
+        "ffi": { "type": "string" },
+        "no_std_equivalent": { "type": "string" }
+      }
+    },
+    "complexity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operations", "space", "compile_time", "notes"],
+      "properties": {
+        "operations": { "type": "array", "items": { "type": "object" } },
+        "space": { "type": "string" },
+        "compile_time": { "type": "string" },
+        "notes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "limits": { "type": "array", "items": { "type": "object" } },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["build_step", "commands", "compiler_validated", "compiler_version", "last_validated_commit", "unit_tests", "integration_tests", "property_tests", "fuzz_tests", "benchmarks", "known_failures", "notes"],
+      "properties": {
+        "build_step": { "type": "string" },
+        "commands": { "type": "array", "items": { "type": "string" } },
+        "compiler_validated": { "type": "boolean" },
+        "compiler_version": { "type": "string" },
+        "last_validated_commit": { "type": "string" },
+        "unit_tests": { "type": "array", "items": { "type": "string" } },
+        "integration_tests": { "type": "array", "items": { "type": "string" } },
+        "property_tests": { "type": "array", "items": { "type": "string" } },
+        "fuzz_tests": { "type": "array", "items": { "type": "string" } },
+        "benchmarks": { "type": "array", "items": { "type": "string" } },
+        "known_failures": { "type": "array", "items": { "type": "string" } },
+        "notes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "documentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["read_order", "examples_covered", "exercises", "glossary_terms", "related_modules"],
+      "properties": {
+        "read_order": { "type": "array", "items": { "type": "string" } },
+        "examples_covered": { "type": "array", "items": { "type": "string" } },
+        "exercises": { "type": "array", "items": { "type": "string" } },
+        "glossary_terms": { "type": "array", "items": { "type": "string" } },
+        "related_modules": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "maintenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stability", "breaking_change_policy", "known_gaps", "planned_extensions", "review_triggers", "synchronization_requirements"],
+      "properties": {
+        "stability": { "type": "string" },
+        "breaking_change_policy": { "type": "string" },
+        "known_gaps": { "type": "array", "items": { "type": "string" } },
+        "planned_extensions": { "type": "array", "items": { "type": "string" } },
+        "review_triggers": { "type": "array", "items": { "type": "string" } },
+        "synchronization_requirements": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "search": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capabilities", "problems", "inputs", "outputs", "environments", "keywords"],
+      "properties": {
+        "capabilities": { "type": "array", "items": { "type": "string" } },
+        "problems": { "type": "array", "items": { "type": "string" } },
+        "inputs": { "type": "array", "items": { "type": "string" } },
+        "outputs": { "type": "array", "items": { "type": "string" } },
+        "environments": { "type": "array", "items": { "type": "string" } },
+        "keywords": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}
