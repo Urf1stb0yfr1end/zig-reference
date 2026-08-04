@@ -11,11 +11,11 @@ pub const BoundedBinarySubReader = struct {
     policy: AdvancementPolicy,
     committed: bool,
 
-    pub fn create(parent: *bounded.BoundedReader, length: usize, policy: AdvancementPolicy) bounded.BoundedReader.Error!BoundedBinarySubReader {
-        const mark = checkpoints.capture(parent.*);
-        const child = try parent.subReader(length);
-        if (policy == .on_commit) mark.restore(parent) catch unreachable;
-        return .{ .parent = parent, .child = child, .checkpoint = mark, .length = length, .policy = policy, .committed = policy == .immediate };
+    pub fn create(parent_reader: *bounded.BoundedReader, sub_length: usize, advancement_policy: AdvancementPolicy) bounded.BoundedReader.Error!BoundedBinarySubReader {
+        const mark = checkpoints.capture(parent_reader.*);
+        const child_reader = try parent_reader.subReader(sub_length);
+        if (advancement_policy == .on_commit) mark.restore(parent_reader) catch unreachable;
+        return .{ .parent = parent_reader, .child = child_reader, .checkpoint = mark, .length = sub_length, .policy = advancement_policy, .committed = advancement_policy == .immediate };
     }
     pub fn reader(self: *BoundedBinarySubReader) *bounded.BoundedReader { return &self.child; }
     pub fn unread(self: *const BoundedBinarySubReader) usize { return self.child.remaining(); }

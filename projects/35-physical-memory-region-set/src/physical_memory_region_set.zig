@@ -7,7 +7,7 @@ const frames=@import("physical-page-frame-number-and-address-conversion");
 
 pub const RegionKind=enum(u8){ usable=1, reserved=2, firmware=3, device=4 };
 pub const PhysicalMemoryRegion=struct { start:addresses.PhysicalAddress, range:ranges.CheckedRange, kind:RegionKind,
-    pub fn init(start:addresses.PhysicalAddress,length:usize,kind:RegionKind) error{Overflow,ZeroLength}!@This(){ if(length==0)return error.ZeroLength; const range=ranges.CheckedRange.fromStartAndLength(start.raw(),length) catch return error.Overflow; return .{.start=start,.range=range,.kind=kind}; }
+    pub fn init(start_address:addresses.PhysicalAddress,byte_length:usize,region_kind:RegionKind) error{Overflow,ZeroLength}!@This(){ if(byte_length==0)return error.ZeroLength; const checked_range=ranges.CheckedRange.fromStartAndLength(start_address.raw(),byte_length) catch return error.Overflow; return .{.start=start_address,.range=checked_range,.kind=region_kind}; }
     pub fn length(self:@This())usize{return self.range.length();} pub fn contains(self:@This(),address:addresses.PhysicalAddress)bool{return self.range.containsValue(address.raw());}
 };
 pub fn PhysicalMemoryRegionSet(comptime capacity_:usize) type { _=enums; _=frames.PageSize; return struct { regions:vectors.FixedVector(PhysicalMemoryRegion,capacity_)=.{},

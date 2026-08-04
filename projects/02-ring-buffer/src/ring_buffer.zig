@@ -25,8 +25,8 @@ pub fn RingBuffer(comptime T: type, comptime capacity: usize) type {
         }
 
         pub fn push(self: *Self, value: T) Error!void {
+            if (comptime capacity == 0) return error.Full;
             if (self.isFull()) return error.Full;
-            if (capacity == 0) return error.Full;
 
             const tail = (self.head + self.len) % capacity;
             self.storage[tail] = value;
@@ -34,6 +34,7 @@ pub fn RingBuffer(comptime T: type, comptime capacity: usize) type {
         }
 
         pub fn pop(self: *Self) ?T {
+            if (comptime capacity == 0) return null;
             if (self.isEmpty()) return null;
 
             const value = self.storage[self.head];
@@ -49,13 +50,14 @@ pub fn RingBuffer(comptime T: type, comptime capacity: usize) type {
         }
 
         pub fn peek(self: *const Self) ?T {
+            if (comptime capacity == 0) return null;
             if (self.isEmpty()) return null;
             return self.storage[self.head];
         }
 
         pub fn get(self: *const Self, logical_index: usize) ?T {
+            if (comptime capacity == 0) return null;
             if (logical_index >= self.len) return null;
-            if (capacity == 0) return null;
 
             const physical_index = (self.head + logical_index) % capacity;
             return self.storage[physical_index];
