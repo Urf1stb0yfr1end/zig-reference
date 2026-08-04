@@ -1,1 +1,613 @@
-{"schema_version":"1.0.0","module":{"id":"07","name":"bitmap-allocator","directory":"projects/07-bitmap-allocator","summary":"Fixed-capacity integer-slot allocator backed by the repository fixed bit set.","status":"experimental-unverified","category":"allocator","tags":["bitmap","allocator","slots","fixed-capacity","freestanding"]},"purpose":"Allocate and free integer slot indices while detecting exhaustion, out-of-range release, and double free.","c_pain":{"summary":"Raw bitmaps and freelists commonly leave free-versus-used meaning, bounds, and double release as scattered conventions.","failure_modes":["double free","out-of-range release","allocating one slot twice","incorrect full detection"],"why_c_is_attractive":"A bitmap is compact and maps directly to bit operations.","where_c_degrades":"Every caller can reinterpret bit meaning or bypass the allocation transition rules."},"zig_response":{"summary":"Compose the existing checked BitSet behind an allocator API with explicit errors.","language_features":["comptime capacity","error unions","generic type factory","module composition"],"guarantees_made_visible":["set bit means allocated","allocated count equals set-bit count","failed operations preserve allocation state"],"remaining_programmer_responsibilities":["associate returned indices with actual storage","synchronize concurrent access externally","release owned element resources separately"]},"public_surface":{"root_symbols":["BitmapAllocator"],"types":[{"name":"BitmapAllocator(slot_count)","kind":"generic type factory"}],"functions":[],"methods":[{"name":"capacity","signature":"capacity(self: *const Self) usize"},{"name":"allocatedCount","signature":"allocatedCount(self: *const Self) usize"},{"name":"isAllocated","signature":"isAllocated(self: *const Self, index: usize) error{IndexOutOfBounds}!bool"},{"name":"allocate","signature":"allocate(self: *Self) Error!usize"},{"name":"free","signature":"free(self: *Self, index: usize) Error!void"},{"name":"reset","signature":"reset(self: *Self) void"}],"errors":["Full","IndexOutOfBounds","DoubleFree"],"constants":[]},"locations":{"implementation":["projects/07-bitmap-allocator/src/bitmap_allocator.zig"],"test_source":["projects/07-bitmap-allocator/src/bitmap_allocator.zig"],"readme":"projects/07-bitmap-allocator/README.md","mastery":"projects/07-bitmap-allocator/MASTERY.md","details_markdown":"projects/07-bitmap-allocator/DETAILS.md","details_json":"projects/07-bitmap-allocator/details.json","examples":[],"benchmarks":[],"fixtures":[],"fuzz":[]},"inputs":[{"name":"slot_count","type":"usize","ownership":"compile-time","lifetime":"program","constraints":"may be zero"},{"name":"index","type":"usize","ownership":"copied","lifetime":"call","constraints":"must be within capacity and currently allocated for free"}],"outputs":[{"name":"allocated index","type":"usize","ownership":"copied identifier","lifetime":"valid until free or reset","invalidation":"free(index) or reset()","caller_cleanup":"call free when ownership ends"}],"state":[{"name":"used","type":"BitSet(slot_count)","role":"occupancy map"},{"name":"next_hint","type":"usize","role":"search starting point"}],"invariants":["a set bit means allocated","allocatedCount equals set-bit count","next_hint is zero for zero capacity and otherwise in range"],"failure_behavior":{"errors":[{"operation":"allocate","error":"Full","state_change":"none"},{"operation":"free","error":"IndexOutOfBounds","state_change":"none"},{"operation":"free","error":"DoubleFree","state_change":"none"}],"optional_empty_results":[],"failure_atomicity":"all validation precedes occupancy mutation","partial_effects":[],"panic_conditions":[],"undefined_behavior_preconditions":[]},"ownership":{"owns":["inline occupancy bitmap","search hint"],"borrows":[],"copies":["slot indices"],"transfers":["logical ownership of allocated slot index to caller"],"allocator":"none","element_cleanup":"not handled; this module allocates indices only"},"cleanup":[{"operation":"free","responsibility":"release one allocated slot"},{"operation":"reset","responsibility":"release all logical slots without element cleanup"}],"invalidation":[{"reference":"allocated index","trigger":"free or reset","effect":"index no longer denotes an allocated slot"}],"dependencies":{"repository":[{"module":"fixed-bit-set","path":"projects/03-bit-set/src/bit_set.zig","symbol":"BitSet","reason":"checked compact occupancy representation"}],"standard_library":["std.testing"],"external":[],"conceptual":["allocation state transition","double-free detection"]},"expected_dependents":[{"name":"page-frame allocator","reason":"allocate page indices"},{"name":"object pool","reason":"allocate object slots"},{"name":"interrupt-vector allocator","reason":"reserve vector numbers"}],"composition":{"import_name":"bitmap_allocator","import_configuration":"Import projects/07-bitmap-allocator/src/bitmap_allocator.zig.","minimal_example":"const BitmapAllocator = @import(\"bitmap_allocator.zig\").BitmapAllocator; var slots = BitmapAllocator(64){}; const index = try slots.allocate();","integration_patterns":[],"incompatible_combinations":[],"replacement_options":[]},"compatibility":{"zig_version":"0.14.0","hosted":"yes","freestanding":"yes","thread_safe":"no internal synchronization","reentrant":"yes for distinct instances","endianness":"not applicable","platforms":[],"architectures":[],"allocator_assumptions":"none","ffi":"no stable C ABI","no_std_equivalent":"already freestanding-suitable"},"complexity":{"operations":[{"operation":"allocate","time":"O(slot_count) worst case"},{"operation":"free","time":"O(1)"},{"operation":"isAllocated","time":"O(1)"}],"space":"O(slot_count) bits plus one usize","compile_time":"one concrete type per slot_count","notes":[]},"limits":[{"name":"maximum simultaneous allocations","value":"slot_count","source":"compile-time parameter"}],"validation":{"build_step":"test-bitmap-allocator","commands":["zig build test-bitmap-allocator","zig build test"],"compiler_validated":false,"compiler_version":"","last_validated_commit":"","unit_tests":["allocate every slot","full failure","reuse after free","double-free rejection","invalid free","zero capacity"],"integration_tests":[],"property_tests":[],"fuzz_tests":[],"benchmarks":[],"known_failures":[],"notes":["Build step registration still requires verification."]},"documentation":{"read_order":["README.md","MASTERY.md","DETAILS.md","details.json","src/bitmap_allocator.zig"],"examples_covered":[],"exercises":[],"glossary_terms":["bitmap","slot","double free","occupancy"],"related_modules":["fixed-bit-set","generational-handles"]},"maintenance":{"stability":"experimental","breaking_change_policy":"Update source, tests, documents, build, catalog, and dependents together.","known_gaps":["compiler validation pending"],"planned_extensions":[],"review_triggers":["bit meaning changes","allocation search changes","error changes"],"synchronization_requirements":["public signatures must match source","dependency path must remain exact"]},"search":{"capabilities":["fixed-capacity slot allocation","bitmap allocation","double-free detection"],"problems":["slot exhaustion","free-slot tracking","double release"],"inputs":["slot count","slot index"],"outputs":["allocated slot index"],"environments":["hosted","freestanding","kernel","hypervisor"],"keywords":["bitmap allocator","slot allocator","index allocator"]}}
+{
+  "schema_version": "2.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "07",
+    "canonical_name": "bitmap-allocator",
+    "display_name": "Bitmap Allocator",
+    "directory": "projects/07-bitmap-allocator",
+    "summary": "Fixed-capacity integer-slot allocator backed by the repository fixed bit set.",
+    "long_description": "Fixed-capacity integer-slot allocator backed by the repository fixed bit set.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "allocator",
+    "subcategory": "",
+    "tags": [
+      "bitmap",
+      "allocator",
+      "slots",
+      "fixed-capacity",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Allocate and free integer slot indices while detecting exhaustion, out-of-range release, and double free.",
+    "secondary": [],
+    "non_goals": [],
+    "problems_solved": [],
+    "future_role": ""
+  },
+  "c_pain": {
+    "summary": "Raw bitmaps and freelists commonly leave free-versus-used meaning, bounds, and double release as scattered conventions.",
+    "common_failure_modes": [
+      "double free",
+      "out-of-range release",
+      "allocating one slot twice",
+      "incorrect full detection"
+    ],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "A bitmap is compact and maps directly to bit operations.",
+    "where_c_degrades": "Every caller can reinterpret bit meaning or bypass the allocation transition rules."
+  },
+  "zig_response": {
+    "summary": "Compose the existing checked BitSet behind an allocator API with explicit errors.",
+    "language_features": [
+      "comptime capacity",
+      "error unions",
+      "generic type factory",
+      "module composition"
+    ],
+    "guarantees_made_visible": [
+      "set bit means allocated",
+      "allocated count equals set-bit count",
+      "failed operations preserve allocation state"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "associate returned indices with actual storage",
+      "synchronize concurrent access externally",
+      "release owned element resources separately"
+    ],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/07-bitmap-allocator",
+    "implementation": [
+      "projects/07-bitmap-allocator/src/bitmap_allocator.zig"
+    ],
+    "public_entrypoint": "projects/07-bitmap-allocator/src/bitmap_allocator.zig",
+    "tests": [
+      "projects/07-bitmap-allocator/src/bitmap_allocator.zig"
+    ],
+    "readme": "projects/07-bitmap-allocator/README.md",
+    "mastery": "projects/07-bitmap-allocator/MASTERY.md",
+    "details_markdown": "projects/07-bitmap-allocator/DETAILS.md",
+    "details_json": "projects/07-bitmap-allocator/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "BitmapAllocator"
+    ],
+    "types": [
+      {
+        "name": "BitmapAllocator(slot_count)",
+        "kind": "generic type factory"
+      }
+    ],
+    "functions": [],
+    "methods": [
+      {
+        "name": "capacity",
+        "signature": "capacity(self: *const Self) usize"
+      },
+      {
+        "name": "allocatedCount",
+        "signature": "allocatedCount(self: *const Self) usize"
+      },
+      {
+        "name": "isAllocated",
+        "signature": "isAllocated(self: *const Self, index: usize) error{IndexOutOfBounds}!bool"
+      },
+      {
+        "name": "allocate",
+        "signature": "allocate(self: *Self) Error!usize"
+      },
+      {
+        "name": "free",
+        "signature": "free(self: *Self, index: usize) Error!void"
+      },
+      {
+        "name": "reset",
+        "signature": "reset(self: *Self) void"
+      }
+    ],
+    "constants": [],
+    "errors": [
+      "Full",
+      "IndexOutOfBounds",
+      "DoubleFree"
+    ],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": []
+  },
+  "inputs": [
+    {
+      "name": "slot_count",
+      "type": "usize",
+      "ownership": "compile-time",
+      "lifetime": "program",
+      "constraints": "may be zero"
+    },
+    {
+      "name": "index",
+      "type": "usize",
+      "ownership": "copied",
+      "lifetime": "call",
+      "constraints": "must be within capacity and currently allocated for free"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "allocated index",
+      "type": "usize",
+      "ownership": "copied identifier",
+      "lifetime": "valid until free or reset",
+      "invalidation": "free(index) or reset()",
+      "caller_cleanup": "call free when ownership ends"
+    }
+  ],
+  "state": {
+    "fields": [
+      {
+        "name": "used",
+        "type": "BitSet(slot_count)",
+        "role": "occupancy map"
+      },
+      {
+        "name": "next_hint",
+        "type": "usize",
+        "role": "search starting point"
+      }
+    ],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "a set bit means allocated",
+      "allocatedCount equals set-bit count",
+      "next_hint is zero for zero capacity and otherwise in range"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [
+      "inline occupancy bitmap",
+      "search hint"
+    ],
+    "borrows": [],
+    "copies": [
+      "slot indices"
+    ],
+    "transfers": [
+      "logical ownership of allocated slot index to caller"
+    ],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "not handled; this module allocates indices only",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": true,
+    "operations": [
+      {
+        "operation": "free",
+        "responsibility": "release one allocated slot"
+      },
+      {
+        "operation": "reset",
+        "responsibility": "release all logical slots without element cleanup"
+      }
+    ],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [
+      {
+        "operation": "allocate",
+        "error": "Full",
+        "state_change": "none"
+      },
+      {
+        "operation": "free",
+        "error": "IndexOutOfBounds",
+        "state_change": "none"
+      },
+      {
+        "operation": "free",
+        "error": "DoubleFree",
+        "state_change": "none"
+      }
+    ],
+    "optional_empty_results": [],
+    "failure_atomicity": "all validation precedes occupancy mutation",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [
+      {
+        "reference": "allocated index",
+        "trigger": "free or reset",
+        "effect": "index no longer denotes an allocated slot"
+      }
+    ],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [
+      {
+        "module": "bit-set",
+        "path": "projects/03-bit-set/src/bit_set.zig",
+        "symbol": "BitSet",
+        "guarantee": "bounded bit indexing and masked padding bits",
+        "reason": "tracks allocation state using the settled bit structure"
+      }
+    ],
+    "standard_library": [
+      "std.testing"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": [
+      "allocation state transition",
+      "double-free detection"
+    ]
+  },
+  "dependency_contracts": [
+    {
+      "module": "bit-set",
+      "path": "projects/03-bit-set/src/bit_set.zig",
+      "symbol": "BitSet",
+      "guarantee": "bounded bit indexing and masked padding bits",
+      "reason": "tracks allocation state using the settled bit structure"
+    }
+  ],
+  "expected_dependents": [
+    {
+      "name": "page-frame allocator",
+      "reason": "allocate page indices"
+    },
+    {
+      "name": "object pool",
+      "reason": "allocate object slots"
+    },
+    {
+      "name": "interrupt-vector allocator",
+      "reason": "reserve vector numbers"
+    }
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "bitmap_allocator",
+    "import_path": "projects/07-bitmap-allocator/src/bitmap_allocator.zig",
+    "import_configuration": "Import projects/07-bitmap-allocator/src/bitmap_allocator.zig.",
+    "minimal_example": "const BitmapAllocator = @import(\"bitmap_allocator.zig\").BitmapAllocator; var slots = BitmapAllocator(64){}; const index = try slots.allocate();",
+    "integration_patterns": [],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "no internal synchronization",
+    "reentrant": "yes for distinct instances",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "none",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "no stable C ABI",
+    "no_std_equivalent": "already freestanding-suitable"
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-bitmap-allocator",
+    "commands": [
+      "zig build test-bitmap-allocator",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "allocates every slot exactly once",
+      "freed slots are reusable and double free is rejected",
+      "invalid free leaves state unchanged",
+      "zero capacity allocator is valid and full"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [
+      "zero capacity allocator is valid and full"
+    ],
+    "boundary_tests": [
+      "invalid free leaves state unchanged",
+      "zero capacity allocator is valid and full"
+    ],
+    "regression_tests": [],
+    "test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Build step registration still requires verification."
+    ]
+  },
+  "documentation": {
+    "read_order": [
+      "details.json",
+      "DETAILS.md",
+      "README.md",
+      "MASTERY.md",
+      "projects/07-bitmap-allocator/src/bitmap_allocator.zig"
+    ],
+    "examples_covered": [],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [
+      "bitmap",
+      "slot",
+      "double free",
+      "occupancy"
+    ],
+    "related_modules": [
+      "fixed-bit-set",
+      "generational-handles"
+    ],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Update source, tests, documents, build, catalog, and dependents together.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [
+      "compiler validation pending"
+    ],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [
+      "bit meaning changes",
+      "allocation search changes",
+      "error changes"
+    ],
+    "synchronization_requirements": [
+      "public signatures must match source",
+      "dependency path must remain exact"
+    ],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "fixed-capacity slot allocation",
+      "bitmap allocation",
+      "double-free detection"
+    ],
+    "problems": [
+      "slot exhaustion",
+      "free-slot tracking",
+      "double release"
+    ],
+    "inputs": [
+      "slot count",
+      "slot index"
+    ],
+    "outputs": [
+      "allocated slot index"
+    ],
+    "environments": [
+      "hosted",
+      "freestanding",
+      "kernel",
+      "hypervisor"
+    ],
+    "keywords": [
+      "bitmap allocator",
+      "slot allocator",
+      "index allocator"
+    ],
+    "grep_terms": [
+      "bitmap-allocator",
+      "BitmapAllocator"
+    ],
+    "natural_language_queries": [
+      "How do I fixed-capacity integer-slot allocator backed by the repository fixed bit set?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "allocator",
+    "reuses_modules": [
+      "bit-set"
+    ],
+    "guarantees_inherited": [
+      "bounded bit indexing and masked padding bits"
+    ],
+    "future_modules_enabled": [
+      "page-frame allocator",
+      "object pool",
+      "interrupt-vector allocator"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Fixed-capacity integer-slot allocator backed by the repository fixed bit set.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [
+      "slot exhaustion",
+      "free-slot tracking",
+      "double release"
+    ],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-bitmap-allocator"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ]
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "BitmapAllocator",
+        "file": "projects/07-bitmap-allocator/src/bitmap_allocator.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "allocates every slot exactly once",
+        "file": "projects/07-bitmap-allocator/src/bitmap_allocator.zig"
+      },
+      {
+        "test": "freed slots are reusable and double free is rejected",
+        "file": "projects/07-bitmap-allocator/src/bitmap_allocator.zig"
+      },
+      {
+        "test": "invalid free leaves state unchanged",
+        "file": "projects/07-bitmap-allocator/src/bitmap_allocator.zig"
+      },
+      {
+        "test": "zero capacity allocator is valid and full",
+        "file": "projects/07-bitmap-allocator/src/bitmap_allocator.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": [
+      {
+        "module": "bit-set",
+        "path": "projects/03-bit-set/src/bit_set.zig",
+        "symbol": "BitSet",
+        "guarantee": "bounded bit indexing and masked padding bits",
+        "reason": "tracks allocation state using the settled bit structure"
+      }
+    ]
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  }
+}

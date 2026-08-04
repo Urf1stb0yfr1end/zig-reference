@@ -1,249 +1,808 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/thanks-cohn/zig-reference/details.schema.json",
-  "title": "zig-reference module details",
-  "description": "Exhaustive machine-readable contract for one zig-reference module. Fields remain present even when values are blank or unknown.",
+  "title": "zig-reference exhaustive module contract 2.0",
+  "description": "Category-complete machine-readable composition contract. Every listed category and nested field is required.",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "schema_version",
+    "contract_version",
+    "generated_at",
+    "last_reviewed_at",
     "module",
     "purpose",
     "c_pain",
     "zig_response",
-    "public_surface",
     "locations",
+    "public_surface",
     "inputs",
     "outputs",
     "state",
     "invariants",
-    "failure_behavior",
     "ownership",
+    "lifetime",
     "cleanup",
+    "failure_behavior",
     "invalidation",
     "dependencies",
+    "dependency_contracts",
     "expected_dependents",
+    "known_consumers",
     "composition",
+    "data_contracts",
     "compatibility",
-    "complexity",
+    "concurrency",
+    "performance",
     "limits",
+    "security",
+    "testing",
     "validation",
     "documentation",
     "maintenance",
-    "search"
+    "discovery",
+    "snowball",
+    "agent_guidance",
+    "source_map",
+    "provenance"
   ],
   "properties": {
-    "schema_version": { "type": "string" },
+    "schema_version": {
+      "type": "string"
+    },
+    "contract_version": {
+      "type": "string"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "last_reviewed_at": {
+      "type": "string"
+    },
     "module": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "name", "directory", "summary", "status", "category", "tags"],
+      "required": [
+        "id",
+        "canonical_name",
+        "display_name",
+        "directory",
+        "summary",
+        "long_description",
+        "status",
+        "maturity",
+        "category",
+        "subcategory",
+        "tags",
+        "aliases",
+        "deprecated_names"
+      ],
       "properties": {
-        "id": { "type": "string" },
-        "name": { "type": "string" },
-        "directory": { "type": "string" },
-        "summary": { "type": "string" },
-        "status": { "type": "string" },
-        "category": { "type": "string" },
-        "tags": { "type": "array", "items": { "type": "string" } }
-      }
+        "id": {},
+        "canonical_name": {},
+        "display_name": {},
+        "directory": {},
+        "summary": {},
+        "long_description": {},
+        "status": {},
+        "maturity": {},
+        "category": {},
+        "subcategory": {},
+        "tags": {},
+        "aliases": {},
+        "deprecated_names": {}
+      },
+      "additionalProperties": false
     },
-    "purpose": { "type": "string" },
+    "purpose": {
+      "type": "object",
+      "required": [
+        "primary",
+        "secondary",
+        "non_goals",
+        "problems_solved",
+        "future_role"
+      ],
+      "properties": {
+        "primary": {},
+        "secondary": {},
+        "non_goals": {},
+        "problems_solved": {},
+        "future_role": {}
+      },
+      "additionalProperties": false
+    },
     "c_pain": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["summary", "failure_modes", "why_c_is_attractive", "where_c_degrades"],
+      "required": [
+        "summary",
+        "common_failure_modes",
+        "maintenance_burdens",
+        "undefined_or_implementation_defined_behavior",
+        "ownership_ambiguities",
+        "why_c_is_attractive",
+        "where_c_degrades"
+      ],
       "properties": {
-        "summary": { "type": "string" },
-        "failure_modes": { "type": "array", "items": { "type": "string" } },
-        "why_c_is_attractive": { "type": "string" },
-        "where_c_degrades": { "type": "string" }
-      }
+        "summary": {},
+        "common_failure_modes": {},
+        "maintenance_burdens": {},
+        "undefined_or_implementation_defined_behavior": {},
+        "ownership_ambiguities": {},
+        "why_c_is_attractive": {},
+        "where_c_degrades": {}
+      },
+      "additionalProperties": false
     },
     "zig_response": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["summary", "language_features", "guarantees_made_visible", "remaining_programmer_responsibilities"],
+      "required": [
+        "summary",
+        "language_features",
+        "guarantees_made_visible",
+        "invalid_states_removed",
+        "remaining_programmer_responsibilities",
+        "tradeoffs"
+      ],
       "properties": {
-        "summary": { "type": "string" },
-        "language_features": { "type": "array", "items": { "type": "string" } },
-        "guarantees_made_visible": { "type": "array", "items": { "type": "string" } },
-        "remaining_programmer_responsibilities": { "type": "array", "items": { "type": "string" } }
-      }
-    },
-    "public_surface": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["root_symbols", "types", "functions", "methods", "errors", "constants"],
-      "properties": {
-        "root_symbols": { "type": "array", "items": { "type": "string" } },
-        "types": { "type": "array", "items": { "type": "object" } },
-        "functions": { "type": "array", "items": { "type": "object" } },
-        "methods": { "type": "array", "items": { "type": "object" } },
-        "errors": { "type": "array", "items": { "type": "string" } },
-        "constants": { "type": "array", "items": { "type": "object" } }
-      }
+        "summary": {},
+        "language_features": {},
+        "guarantees_made_visible": {},
+        "invalid_states_removed": {},
+        "remaining_programmer_responsibilities": {},
+        "tradeoffs": {}
+      },
+      "additionalProperties": false
     },
     "locations": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["implementation", "test_source", "readme", "mastery", "details_markdown", "details_json", "examples", "benchmarks", "fixtures", "fuzz"],
+      "required": [
+        "module_root",
+        "implementation",
+        "public_entrypoint",
+        "tests",
+        "readme",
+        "mastery",
+        "details_markdown",
+        "details_json",
+        "examples",
+        "benchmarks",
+        "fixtures",
+        "fuzz_targets",
+        "architecture_notes"
+      ],
       "properties": {
-        "implementation": { "type": "array", "items": { "type": "string" } },
-        "test_source": { "type": "array", "items": { "type": "string" } },
-        "readme": { "type": "string" },
-        "mastery": { "type": "string" },
-        "details_markdown": { "type": "string" },
-        "details_json": { "type": "string" },
-        "examples": { "type": "array", "items": { "type": "string" } },
-        "benchmarks": { "type": "array", "items": { "type": "string" } },
-        "fixtures": { "type": "array", "items": { "type": "string" } },
-        "fuzz": { "type": "array", "items": { "type": "string" } }
-      }
+        "module_root": {},
+        "implementation": {},
+        "public_entrypoint": {},
+        "tests": {},
+        "readme": {},
+        "mastery": {},
+        "details_markdown": {},
+        "details_json": {},
+        "examples": {},
+        "benchmarks": {},
+        "fixtures": {},
+        "fuzz_targets": {},
+        "architecture_notes": {}
+      },
+      "additionalProperties": false
     },
-    "inputs": { "type": "array", "items": { "type": "object" } },
-    "outputs": { "type": "array", "items": { "type": "object" } },
-    "state": { "type": "array", "items": { "type": "object" } },
-    "invariants": { "type": "array", "items": { "type": "string" } },
-    "failure_behavior": {
+    "public_surface": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["errors", "optional_empty_results", "failure_atomicity", "partial_effects", "panic_conditions", "undefined_behavior_preconditions"],
+      "required": [
+        "root_symbols",
+        "types",
+        "functions",
+        "methods",
+        "constants",
+        "errors",
+        "callbacks",
+        "interfaces",
+        "compile_time_parameters"
+      ],
       "properties": {
-        "errors": { "type": "array", "items": { "type": "object" } },
-        "optional_empty_results": { "type": "array", "items": { "type": "object" } },
-        "failure_atomicity": { "type": "string" },
-        "partial_effects": { "type": "array", "items": { "type": "string" } },
-        "panic_conditions": { "type": "array", "items": { "type": "string" } },
-        "undefined_behavior_preconditions": { "type": "array", "items": { "type": "string" } }
-      }
+        "root_symbols": {},
+        "types": {},
+        "functions": {},
+        "methods": {},
+        "constants": {},
+        "errors": {},
+        "callbacks": {},
+        "interfaces": {},
+        "compile_time_parameters": {}
+      },
+      "additionalProperties": false
+    },
+    "inputs": {
+      "type": "array"
+    },
+    "outputs": {
+      "type": "array"
+    },
+    "state": {
+      "type": "object",
+      "required": [
+        "fields",
+        "states",
+        "state_transitions",
+        "terminal_states",
+        "initial_state"
+      ],
+      "properties": {
+        "fields": {},
+        "states": {},
+        "state_transitions": {},
+        "terminal_states": {},
+        "initial_state": {}
+      },
+      "additionalProperties": false
+    },
+    "invariants": {
+      "type": "object",
+      "required": [
+        "representation",
+        "ownership",
+        "ordering",
+        "bounds",
+        "lifetime",
+        "concurrency",
+        "cross_module"
+      ],
+      "properties": {
+        "representation": {},
+        "ownership": {},
+        "ordering": {},
+        "bounds": {},
+        "lifetime": {},
+        "concurrency": {},
+        "cross_module": {}
+      },
+      "additionalProperties": false
     },
     "ownership": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["owns", "borrows", "copies", "transfers", "allocator", "element_cleanup"],
+      "required": [
+        "owns",
+        "borrows",
+        "copies",
+        "transfers",
+        "shared",
+        "allocator",
+        "allocator_lifetime",
+        "element_cleanup",
+        "resource_release_order"
+      ],
       "properties": {
-        "owns": { "type": "array", "items": { "type": "string" } },
-        "borrows": { "type": "array", "items": { "type": "string" } },
-        "copies": { "type": "array", "items": { "type": "string" } },
-        "transfers": { "type": "array", "items": { "type": "string" } },
-        "allocator": { "type": "string" },
-        "element_cleanup": { "type": "string" }
-      }
+        "owns": {},
+        "borrows": {},
+        "copies": {},
+        "transfers": {},
+        "shared": {},
+        "allocator": {},
+        "allocator_lifetime": {},
+        "element_cleanup": {},
+        "resource_release_order": {}
+      },
+      "additionalProperties": false
     },
-    "cleanup": { "type": "array", "items": { "type": "object" } },
-    "invalidation": { "type": "array", "items": { "type": "object" } },
+    "lifetime": {
+      "type": "object",
+      "required": [
+        "instance",
+        "inputs",
+        "outputs",
+        "borrowed_views",
+        "escaped_references",
+        "shutdown_requirements"
+      ],
+      "properties": {
+        "instance": {},
+        "inputs": {},
+        "outputs": {},
+        "borrowed_views": {},
+        "escaped_references": {},
+        "shutdown_requirements": {}
+      },
+      "additionalProperties": false
+    },
+    "cleanup": {
+      "type": "object",
+      "required": [
+        "required",
+        "operations",
+        "automatic_cleanup",
+        "manual_cleanup",
+        "partial_construction_cleanup",
+        "failure_cleanup",
+        "cleanup_order"
+      ],
+      "properties": {
+        "required": {},
+        "operations": {},
+        "automatic_cleanup": {},
+        "manual_cleanup": {},
+        "partial_construction_cleanup": {},
+        "failure_cleanup": {},
+        "cleanup_order": {}
+      },
+      "additionalProperties": false
+    },
+    "failure_behavior": {
+      "type": "object",
+      "required": [
+        "errors",
+        "optional_empty_results",
+        "failure_atomicity",
+        "state_after_failure",
+        "partial_effects",
+        "rollback",
+        "panic_conditions",
+        "assertion_conditions",
+        "undefined_behavior_preconditions"
+      ],
+      "properties": {
+        "errors": {},
+        "optional_empty_results": {},
+        "failure_atomicity": {},
+        "state_after_failure": {},
+        "partial_effects": {},
+        "rollback": {},
+        "panic_conditions": {},
+        "assertion_conditions": {},
+        "undefined_behavior_preconditions": {}
+      },
+      "additionalProperties": false
+    },
+    "invalidation": {
+      "type": "object",
+      "required": [
+        "rules",
+        "mutation_invalidation",
+        "growth_invalidation",
+        "move_invalidation",
+        "reset_invalidation",
+        "deinit_invalidation"
+      ],
+      "properties": {
+        "rules": {},
+        "mutation_invalidation": {},
+        "growth_invalidation": {},
+        "move_invalidation": {},
+        "reset_invalidation": {},
+        "deinit_invalidation": {}
+      },
+      "additionalProperties": false
+    },
     "dependencies": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["repository", "standard_library", "external", "conceptual"],
+      "required": [
+        "repository",
+        "standard_library",
+        "external",
+        "platform",
+        "architecture",
+        "conceptual"
+      ],
       "properties": {
-        "repository": { "type": "array", "items": { "type": "object" } },
-        "standard_library": { "type": "array", "items": { "type": "string" } },
-        "external": { "type": "array", "items": { "type": "object" } },
-        "conceptual": { "type": "array", "items": { "type": "string" } }
-      }
+        "repository": {},
+        "standard_library": {},
+        "external": {},
+        "platform": {},
+        "architecture": {},
+        "conceptual": {}
+      },
+      "additionalProperties": false
     },
-    "expected_dependents": { "type": "array", "items": { "type": "object" } },
+    "dependency_contracts": {
+      "type": "array"
+    },
+    "expected_dependents": {
+      "type": "array"
+    },
+    "known_consumers": {
+      "type": "array"
+    },
     "composition": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["import_name", "import_configuration", "minimal_example", "integration_patterns", "incompatible_combinations", "replacement_options"],
+      "required": [
+        "import_name",
+        "import_path",
+        "import_configuration",
+        "minimal_example",
+        "integration_patterns",
+        "pipeline_position",
+        "common_combinations",
+        "incompatible_combinations",
+        "replacement_options",
+        "extension_points"
+      ],
       "properties": {
-        "import_name": { "type": "string" },
-        "import_configuration": { "type": "string" },
-        "minimal_example": { "type": "string" },
-        "integration_patterns": { "type": "array", "items": { "type": "object" } },
-        "incompatible_combinations": { "type": "array", "items": { "type": "string" } },
-        "replacement_options": { "type": "array", "items": { "type": "object" } }
-      }
+        "import_name": {},
+        "import_path": {},
+        "import_configuration": {},
+        "minimal_example": {},
+        "integration_patterns": {},
+        "pipeline_position": {},
+        "common_combinations": {},
+        "incompatible_combinations": {},
+        "replacement_options": {},
+        "extension_points": {}
+      },
+      "additionalProperties": false
+    },
+    "data_contracts": {
+      "type": "object",
+      "required": [
+        "input_formats",
+        "output_formats",
+        "binary_layouts",
+        "endianness",
+        "alignment",
+        "serialization_stability",
+        "abi_stability"
+      ],
+      "properties": {
+        "input_formats": {},
+        "output_formats": {},
+        "binary_layouts": {},
+        "endianness": {},
+        "alignment": {},
+        "serialization_stability": {},
+        "abi_stability": {}
+      },
+      "additionalProperties": false
     },
     "compatibility": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["zig_version", "hosted", "freestanding", "thread_safe", "reentrant", "endianness", "platforms", "architectures", "allocator_assumptions", "ffi", "no_std_equivalent"],
+      "required": [
+        "zig_version",
+        "minimum_zig_version",
+        "maximum_tested_zig_version",
+        "hosted",
+        "freestanding",
+        "thread_safe",
+        "reentrant",
+        "interrupt_safe",
+        "async_safe",
+        "signal_safe",
+        "platforms",
+        "architectures",
+        "allocator_assumptions",
+        "libc_required",
+        "operating_system_required",
+        "ffi",
+        "no_std_equivalent"
+      ],
       "properties": {
-        "zig_version": { "type": "string" },
-        "hosted": { "type": "string" },
-        "freestanding": { "type": "string" },
-        "thread_safe": { "type": "string" },
-        "reentrant": { "type": "string" },
-        "endianness": { "type": "string" },
-        "platforms": { "type": "array", "items": { "type": "string" } },
-        "architectures": { "type": "array", "items": { "type": "string" } },
-        "allocator_assumptions": { "type": "string" },
-        "ffi": { "type": "string" },
-        "no_std_equivalent": { "type": "string" }
-      }
+        "zig_version": {},
+        "minimum_zig_version": {},
+        "maximum_tested_zig_version": {},
+        "hosted": {},
+        "freestanding": {},
+        "thread_safe": {},
+        "reentrant": {},
+        "interrupt_safe": {},
+        "async_safe": {},
+        "signal_safe": {},
+        "platforms": {},
+        "architectures": {},
+        "allocator_assumptions": {},
+        "libc_required": {},
+        "operating_system_required": {},
+        "ffi": {},
+        "no_std_equivalent": {}
+      },
+      "additionalProperties": false
     },
-    "complexity": {
+    "concurrency": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["operations", "space", "compile_time", "notes"],
+      "required": [
+        "internal_synchronization",
+        "caller_synchronization_required",
+        "atomic_operations",
+        "memory_ordering",
+        "lock_ordering",
+        "thread_ownership",
+        "interrupt_context_rules"
+      ],
       "properties": {
-        "operations": { "type": "array", "items": { "type": "object" } },
-        "space": { "type": "string" },
-        "compile_time": { "type": "string" },
-        "notes": { "type": "array", "items": { "type": "string" } }
-      }
+        "internal_synchronization": {},
+        "caller_synchronization_required": {},
+        "atomic_operations": {},
+        "memory_ordering": {},
+        "lock_ordering": {},
+        "thread_ownership": {},
+        "interrupt_context_rules": {}
+      },
+      "additionalProperties": false
     },
-    "limits": { "type": "array", "items": { "type": "object" } },
+    "performance": {
+      "type": "object",
+      "required": [
+        "time_complexity",
+        "space_complexity",
+        "allocation_behavior",
+        "cache_behavior",
+        "branch_behavior",
+        "compile_time_cost",
+        "known_hot_paths",
+        "benchmark_commands",
+        "benchmark_results"
+      ],
+      "properties": {
+        "time_complexity": {},
+        "space_complexity": {},
+        "allocation_behavior": {},
+        "cache_behavior": {},
+        "branch_behavior": {},
+        "compile_time_cost": {},
+        "known_hot_paths": {},
+        "benchmark_commands": {},
+        "benchmark_results": {}
+      },
+      "additionalProperties": false
+    },
+    "limits": {
+      "type": "object",
+      "required": [
+        "hard_limits",
+        "soft_limits",
+        "resource_quotas",
+        "overflow_boundaries",
+        "recursion_limits",
+        "capacity_behavior"
+      ],
+      "properties": {
+        "hard_limits": {},
+        "soft_limits": {},
+        "resource_quotas": {},
+        "overflow_boundaries": {},
+        "recursion_limits": {},
+        "capacity_behavior": {}
+      },
+      "additionalProperties": false
+    },
+    "security": {
+      "type": "object",
+      "required": [
+        "trust_boundary",
+        "untrusted_inputs",
+        "validation_performed",
+        "resource_exhaustion_controls",
+        "side_channel_considerations",
+        "unsafe_operations",
+        "security_non_goals"
+      ],
+      "properties": {
+        "trust_boundary": {},
+        "untrusted_inputs": {},
+        "validation_performed": {},
+        "resource_exhaustion_controls": {},
+        "side_channel_considerations": {},
+        "unsafe_operations": {},
+        "security_non_goals": {}
+      },
+      "additionalProperties": false
+    },
+    "testing": {
+      "type": "object",
+      "required": [
+        "build_step",
+        "commands",
+        "unit_tests",
+        "integration_tests",
+        "property_tests",
+        "fuzz_tests",
+        "failure_injection_tests",
+        "zero_capacity_tests",
+        "boundary_tests",
+        "regression_tests",
+        "test_dependencies"
+      ],
+      "properties": {
+        "build_step": {},
+        "commands": {},
+        "unit_tests": {},
+        "integration_tests": {},
+        "property_tests": {},
+        "fuzz_tests": {},
+        "failure_injection_tests": {},
+        "zero_capacity_tests": {},
+        "boundary_tests": {},
+        "regression_tests": {},
+        "test_dependencies": {}
+      },
+      "additionalProperties": false
+    },
     "validation": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["build_step", "commands", "compiler_validated", "compiler_version", "last_validated_commit", "unit_tests", "integration_tests", "property_tests", "fuzz_tests", "benchmarks", "known_failures", "notes"],
+      "required": [
+        "compiler_validated",
+        "compiler_version",
+        "last_validated_commit",
+        "last_validation_result",
+        "continuous_integration",
+        "known_compile_failures",
+        "known_test_failures",
+        "unverified_claims",
+        "notes"
+      ],
       "properties": {
-        "build_step": { "type": "string" },
-        "commands": { "type": "array", "items": { "type": "string" } },
-        "compiler_validated": { "type": "boolean" },
-        "compiler_version": { "type": "string" },
-        "last_validated_commit": { "type": "string" },
-        "unit_tests": { "type": "array", "items": { "type": "string" } },
-        "integration_tests": { "type": "array", "items": { "type": "string" } },
-        "property_tests": { "type": "array", "items": { "type": "string" } },
-        "fuzz_tests": { "type": "array", "items": { "type": "string" } },
-        "benchmarks": { "type": "array", "items": { "type": "string" } },
-        "known_failures": { "type": "array", "items": { "type": "string" } },
-        "notes": { "type": "array", "items": { "type": "string" } }
-      }
+        "compiler_validated": {},
+        "compiler_version": {},
+        "last_validated_commit": {},
+        "last_validation_result": {},
+        "continuous_integration": {},
+        "known_compile_failures": {},
+        "known_test_failures": {},
+        "unverified_claims": {},
+        "notes": {}
+      },
+      "additionalProperties": false
     },
     "documentation": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["read_order", "examples_covered", "exercises", "glossary_terms", "related_modules"],
+      "required": [
+        "read_order",
+        "examples_covered",
+        "exercises",
+        "readiness_questions",
+        "glossary_terms",
+        "related_modules",
+        "external_references"
+      ],
       "properties": {
-        "read_order": { "type": "array", "items": { "type": "string" } },
-        "examples_covered": { "type": "array", "items": { "type": "string" } },
-        "exercises": { "type": "array", "items": { "type": "string" } },
-        "glossary_terms": { "type": "array", "items": { "type": "string" } },
-        "related_modules": { "type": "array", "items": { "type": "string" } }
-      }
+        "read_order": {},
+        "examples_covered": {},
+        "exercises": {},
+        "readiness_questions": {},
+        "glossary_terms": {},
+        "related_modules": {},
+        "external_references": {}
+      },
+      "additionalProperties": false
     },
     "maintenance": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["stability", "breaking_change_policy", "known_gaps", "planned_extensions", "review_triggers", "synchronization_requirements"],
+      "required": [
+        "stability",
+        "breaking_change_policy",
+        "deprecation_policy",
+        "known_gaps",
+        "known_bugs",
+        "planned_extensions",
+        "review_triggers",
+        "synchronization_requirements",
+        "owners"
+      ],
       "properties": {
-        "stability": { "type": "string" },
-        "breaking_change_policy": { "type": "string" },
-        "known_gaps": { "type": "array", "items": { "type": "string" } },
-        "planned_extensions": { "type": "array", "items": { "type": "string" } },
-        "review_triggers": { "type": "array", "items": { "type": "string" } },
-        "synchronization_requirements": { "type": "array", "items": { "type": "string" } }
-      }
+        "stability": {},
+        "breaking_change_policy": {},
+        "deprecation_policy": {},
+        "known_gaps": {},
+        "known_bugs": {},
+        "planned_extensions": {},
+        "review_triggers": {},
+        "synchronization_requirements": {},
+        "owners": {}
+      },
+      "additionalProperties": false
     },
-    "search": {
+    "discovery": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["capabilities", "problems", "inputs", "outputs", "environments", "keywords"],
+      "required": [
+        "capabilities",
+        "problems",
+        "inputs",
+        "outputs",
+        "environments",
+        "keywords",
+        "grep_terms",
+        "natural_language_queries",
+        "negative_search_terms"
+      ],
       "properties": {
-        "capabilities": { "type": "array", "items": { "type": "string" } },
-        "problems": { "type": "array", "items": { "type": "string" } },
-        "inputs": { "type": "array", "items": { "type": "string" } },
-        "outputs": { "type": "array", "items": { "type": "string" } },
-        "environments": { "type": "array", "items": { "type": "string" } },
-        "keywords": { "type": "array", "items": { "type": "string" } }
-      }
+        "capabilities": {},
+        "problems": {},
+        "inputs": {},
+        "outputs": {},
+        "environments": {},
+        "keywords": {},
+        "grep_terms": {},
+        "natural_language_queries": {},
+        "negative_search_terms": {}
+      },
+      "additionalProperties": false
+    },
+    "snowball": {
+      "type": "object",
+      "required": [
+        "foundation_layer",
+        "reuses_modules",
+        "guarantees_inherited",
+        "future_modules_enabled",
+        "future_code_removed",
+        "future_reasoning_removed",
+        "composition_value",
+        "snowball_score"
+      ],
+      "properties": {
+        "foundation_layer": {},
+        "reuses_modules": {},
+        "guarantees_inherited": {},
+        "future_modules_enabled": {},
+        "future_code_removed": {},
+        "future_reasoning_removed": {},
+        "composition_value": {},
+        "snowball_score": {}
+      },
+      "additionalProperties": false
+    },
+    "agent_guidance": {
+      "type": "object",
+      "required": [
+        "use_when",
+        "do_not_use_when",
+        "selection_questions",
+        "required_preconditions",
+        "integration_steps",
+        "verification_steps",
+        "common_agent_mistakes",
+        "safe_modification_boundaries",
+        "files_to_read_first",
+        "files_not_required_for_basic_use"
+      ],
+      "properties": {
+        "use_when": {},
+        "do_not_use_when": {},
+        "selection_questions": {},
+        "required_preconditions": {},
+        "integration_steps": {},
+        "verification_steps": {},
+        "common_agent_mistakes": {},
+        "safe_modification_boundaries": {},
+        "files_to_read_first": {},
+        "files_not_required_for_basic_use": {}
+      },
+      "additionalProperties": false
+    },
+    "source_map": {
+      "type": "object",
+      "required": [
+        "symbols_to_files",
+        "tests_to_behaviors",
+        "errors_to_operations",
+        "invariants_to_tests",
+        "dependencies_to_imports"
+      ],
+      "properties": {
+        "symbols_to_files": {},
+        "tests_to_behaviors": {},
+        "errors_to_operations": {},
+        "invariants_to_tests": {},
+        "dependencies_to_imports": {}
+      },
+      "additionalProperties": false
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "original_author",
+        "created_commit",
+        "last_modified_commit",
+        "derived_from",
+        "design_sources",
+        "migration_history"
+      ],
+      "properties": {
+        "original_author": {},
+        "created_commit": {},
+        "last_modified_commit": {},
+        "derived_from": {},
+        "design_sources": {},
+        "migration_history": {}
+      },
+      "additionalProperties": false
     }
   }
 }

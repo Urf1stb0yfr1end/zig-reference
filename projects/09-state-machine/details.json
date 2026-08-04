@@ -1,1 +1,551 @@
-{"schema_version":"1.0.0","module":{"id":"09","name":"state-machine","directory":"projects/09-state-machine","summary":"Generic explicit state machine with compile-time transition policy and failure-atomic application.","status":"experimental-unverified","category":"control-flow","tags":["state-machine","transition","lifecycle","comptime","freestanding"]},"purpose":"Represent legal transitions in one compile-time function and reject invalid events without mutating current state.","c_pain":{"summary":"Scattered flags and switch statements permit contradictory states and inconsistent transition checks.","failure_modes":["invalid transition mutates state","contradictory booleans","unhandled state-event pair","terminal state accidentally reactivated"],"why_c_is_attractive":"Enums and switch statements are direct and efficient.","where_c_degrades":"Transition policy becomes duplicated across callers and data valid only in one state is often left globally accessible."},"zig_response":{"summary":"Supply State, Event, and one transition function at compile time; expose canApply and failure-atomic apply.","language_features":["comptime function parameter","generic type factory","error union","optional next state"],"guarantees_made_visible":["only transition policy changes state","invalid transition preserves state","state handling can be exhaustive"],"remaining_programmer_responsibilities":["design complete state and event sets","keep side effects outside or transactional around apply","synchronize shared machines externally"]},"public_surface":{"root_symbols":["StateMachine"],"types":[{"name":"StateMachine(State, Event, transition)","kind":"generic type factory"}],"functions":[],"methods":[{"name":"init","signature":"init(initial: State) Self"},{"name":"state","signature":"state(self: *const Self) State"},{"name":"canApply","signature":"canApply(self: *const Self, event: Event) bool"},{"name":"apply","signature":"apply(self: *Self, event: Event) error{InvalidTransition}!State"}],"errors":["InvalidTransition"],"constants":[]},"locations":{"implementation":["projects/09-state-machine/src/state_machine.zig"],"test_source":["projects/09-state-machine/src/state_machine.zig"],"readme":"","mastery":"","details_markdown":"","details_json":"projects/09-state-machine/details.json","examples":[],"benchmarks":[],"fixtures":[],"fuzz":[]},"inputs":[{"name":"State","type":"type","ownership":"compile-time","lifetime":"program","constraints":"copyable state value"},{"name":"Event","type":"type","ownership":"compile-time","lifetime":"program","constraints":"copyable event value"},{"name":"transition","type":"fn(State, Event) ?State","ownership":"compile-time function","lifetime":"program","constraints":"null denotes invalid transition"}],"outputs":[{"name":"state","type":"State","ownership":"copied","lifetime":"caller value","invalidation":"none","caller_cleanup":"none"},{"name":"apply result","type":"State","ownership":"copied next state","lifetime":"caller value","invalidation":"none","caller_cleanup":"none"}],"state":[{"name":"current","type":"State","role":"current lifecycle or protocol state"}],"invariants":["current is a valid State","only the transition function determines next states","failed apply leaves current unchanged"],"failure_behavior":{"errors":[{"operation":"apply","error":"InvalidTransition","state_change":"none"}],"optional_empty_results":[],"failure_atomicity":"transition is computed before current is assigned","partial_effects":[],"panic_conditions":[],"undefined_behavior_preconditions":[]},"ownership":{"owns":["current state value"],"borrows":[],"copies":["state and event values"],"transfers":[],"allocator":"none","element_cleanup":"not applicable unless State itself owns resources, which is discouraged"},"cleanup":[],"invalidation":[],"dependencies":{"repository":[],"standard_library":["std.testing"],"external":[],"conceptual":["explicit transition table","failure-atomic mutation"]},"expected_dependents":[{"name":"VM lifecycle","reason":"created-to-destroyed transitions"},{"name":"vCPU lifecycle","reason":"runnable/running/paused/stopped transitions"},{"name":"device lifecycle","reason":"reset and teardown order"},{"name":"protocol handshake","reason":"message-order validation"}],"composition":{"import_name":"state_machine","import_configuration":"Import projects/09-state-machine/src/state_machine.zig.","minimal_example":"const StateMachine = @import(\"state_machine.zig\").StateMachine; var machine = StateMachine(State, Event, transition).init(.created);","integration_patterns":[],"incompatible_combinations":[],"replacement_options":[]},"compatibility":{"zig_version":"0.14.0","hosted":"yes","freestanding":"yes","thread_safe":"no internal synchronization","reentrant":"yes for distinct instances","endianness":"not applicable","platforms":[],"architectures":[],"allocator_assumptions":"none","ffi":"no stable C ABI","no_std_equivalent":"already freestanding-suitable"},"complexity":{"operations":[{"operation":"state","time":"O(1)"},{"operation":"canApply","time":"transition-function dependent"},{"operation":"apply","time":"transition-function dependent"}],"space":"O(sizeof(State))","compile_time":"one concrete type per State/Event/transition tuple","notes":[]},"limits":[],"validation":{"build_step":"test-state-machine","commands":["zig build test-state-machine","zig build test"],"compiler_validated":false,"compiler_version":"","last_validated_commit":"","unit_tests":["valid transition sequence","invalid transition preserves state","terminal state rejection"],"integration_tests":[],"property_tests":[],"fuzz_tests":[],"benchmarks":[],"known_failures":[],"notes":["Human documentation and build registration require verification or creation."]},"documentation":{"read_order":["details.json","src/state_machine.zig"],"examples_covered":[],"exercises":[],"glossary_terms":["state","event","transition","terminal state"],"related_modules":[]},"maintenance":{"stability":"experimental","breaking_change_policy":"Update source, tests, contracts, build, catalog, and dependents together.","known_gaps":["compiler validation pending","human documentation paths blank"],"planned_extensions":[],"review_triggers":["transition signature changes","failure semantics changes"],"synchronization_requirements":["public signatures must match source"]},"search":{"capabilities":["explicit state transitions","lifecycle validation","failure-atomic transition"],"problems":["contradictory flags","invalid transition","scattered lifecycle logic"],"inputs":["state","event","transition policy"],"outputs":["next state"],"environments":["hosted","freestanding","kernel","hypervisor"],"keywords":["state machine","lifecycle","transition table"]}}
+{
+  "schema_version": "2.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "09",
+    "canonical_name": "state-machine",
+    "display_name": "State Machine",
+    "directory": "projects/09-state-machine",
+    "summary": "Generic explicit state machine with compile-time transition policy and failure-atomic application.",
+    "long_description": "Generic explicit state machine with compile-time transition policy and failure-atomic application.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "control-flow",
+    "subcategory": "",
+    "tags": [
+      "state-machine",
+      "transition",
+      "lifecycle",
+      "comptime",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Represent legal transitions in one compile-time function and reject invalid events without mutating current state.",
+    "secondary": [],
+    "non_goals": [],
+    "problems_solved": [],
+    "future_role": ""
+  },
+  "c_pain": {
+    "summary": "Scattered flags and switch statements permit contradictory states and inconsistent transition checks.",
+    "common_failure_modes": [
+      "invalid transition mutates state",
+      "contradictory booleans",
+      "unhandled state-event pair",
+      "terminal state accidentally reactivated"
+    ],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "Enums and switch statements are direct and efficient.",
+    "where_c_degrades": "Transition policy becomes duplicated across callers and data valid only in one state is often left globally accessible."
+  },
+  "zig_response": {
+    "summary": "Supply State, Event, and one transition function at compile time; expose canApply and failure-atomic apply.",
+    "language_features": [
+      "comptime function parameter",
+      "generic type factory",
+      "error union",
+      "optional next state"
+    ],
+    "guarantees_made_visible": [
+      "only transition policy changes state",
+      "invalid transition preserves state",
+      "state handling can be exhaustive"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "design complete state and event sets",
+      "keep side effects outside or transactional around apply",
+      "synchronize shared machines externally"
+    ],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/09-state-machine",
+    "implementation": [
+      "projects/09-state-machine/src/state_machine.zig"
+    ],
+    "public_entrypoint": "projects/09-state-machine/src/state_machine.zig",
+    "tests": [
+      "projects/09-state-machine/src/state_machine.zig"
+    ],
+    "readme": "projects/09-state-machine/README.md",
+    "mastery": "projects/09-state-machine/MASTERY.md",
+    "details_markdown": "projects/09-state-machine/DETAILS.md",
+    "details_json": "projects/09-state-machine/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "StateMachine"
+    ],
+    "types": [
+      {
+        "name": "StateMachine(State, Event, transition)",
+        "kind": "generic type factory"
+      }
+    ],
+    "functions": [],
+    "methods": [
+      {
+        "name": "init",
+        "signature": "init(initial: State) Self"
+      },
+      {
+        "name": "state",
+        "signature": "state(self: *const Self) State"
+      },
+      {
+        "name": "canApply",
+        "signature": "canApply(self: *const Self, event: Event) bool"
+      },
+      {
+        "name": "apply",
+        "signature": "apply(self: *Self, event: Event) error{InvalidTransition}!State"
+      }
+    ],
+    "constants": [],
+    "errors": [
+      "InvalidTransition"
+    ],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": []
+  },
+  "inputs": [
+    {
+      "name": "State",
+      "type": "type",
+      "ownership": "compile-time",
+      "lifetime": "program",
+      "constraints": "copyable state value"
+    },
+    {
+      "name": "Event",
+      "type": "type",
+      "ownership": "compile-time",
+      "lifetime": "program",
+      "constraints": "copyable event value"
+    },
+    {
+      "name": "transition",
+      "type": "fn(State, Event) ?State",
+      "ownership": "compile-time function",
+      "lifetime": "program",
+      "constraints": "null denotes invalid transition"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "state",
+      "type": "State",
+      "ownership": "copied",
+      "lifetime": "caller value",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    },
+    {
+      "name": "apply result",
+      "type": "State",
+      "ownership": "copied next state",
+      "lifetime": "caller value",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    }
+  ],
+  "state": {
+    "fields": [
+      {
+        "name": "current",
+        "type": "State",
+        "role": "current lifecycle or protocol state"
+      }
+    ],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "current is a valid State",
+      "only the transition function determines next states",
+      "failed apply leaves current unchanged"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [
+      "current state value"
+    ],
+    "borrows": [],
+    "copies": [
+      "state and event values"
+    ],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "not applicable unless State itself owns resources, which is discouraged",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [
+      {
+        "operation": "apply",
+        "error": "InvalidTransition",
+        "state_change": "none"
+      }
+    ],
+    "optional_empty_results": [],
+    "failure_atomicity": "transition is computed before current is assigned",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [],
+    "standard_library": [
+      "std.testing"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": [
+      "explicit transition table",
+      "failure-atomic mutation"
+    ]
+  },
+  "dependency_contracts": [],
+  "expected_dependents": [
+    {
+      "name": "VM lifecycle",
+      "reason": "created-to-destroyed transitions"
+    },
+    {
+      "name": "vCPU lifecycle",
+      "reason": "runnable/running/paused/stopped transitions"
+    },
+    {
+      "name": "device lifecycle",
+      "reason": "reset and teardown order"
+    },
+    {
+      "name": "protocol handshake",
+      "reason": "message-order validation"
+    }
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "state_machine",
+    "import_path": "projects/09-state-machine/src/state_machine.zig",
+    "import_configuration": "Import projects/09-state-machine/src/state_machine.zig.",
+    "minimal_example": "const StateMachine = @import(\"state_machine.zig\").StateMachine; var machine = StateMachine(State, Event, transition).init(.created);",
+    "integration_patterns": [],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "no internal synchronization",
+    "reentrant": "yes for distinct instances",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "none",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "no stable C ABI",
+    "no_std_equivalent": "already freestanding-suitable"
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-state-machine",
+    "commands": [
+      "zig build test-state-machine",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "valid transitions advance state",
+      "invalid transitions preserve state",
+      "terminal state rejects every event"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [
+      "invalid transitions preserve state"
+    ],
+    "regression_tests": [],
+    "test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Human documentation and build registration require verification or creation."
+    ]
+  },
+  "documentation": {
+    "read_order": [
+      "details.json",
+      "DETAILS.md",
+      "README.md",
+      "MASTERY.md",
+      "projects/09-state-machine/src/state_machine.zig"
+    ],
+    "examples_covered": [],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [
+      "state",
+      "event",
+      "transition",
+      "terminal state"
+    ],
+    "related_modules": [],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Update source, tests, contracts, build, catalog, and dependents together.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [
+      "compiler validation pending",
+      "human documentation paths blank"
+    ],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [
+      "transition signature changes",
+      "failure semantics changes"
+    ],
+    "synchronization_requirements": [
+      "public signatures must match source"
+    ],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "explicit state transitions",
+      "lifecycle validation",
+      "failure-atomic transition"
+    ],
+    "problems": [
+      "contradictory flags",
+      "invalid transition",
+      "scattered lifecycle logic"
+    ],
+    "inputs": [
+      "state",
+      "event",
+      "transition policy"
+    ],
+    "outputs": [
+      "next state"
+    ],
+    "environments": [
+      "hosted",
+      "freestanding",
+      "kernel",
+      "hypervisor"
+    ],
+    "keywords": [
+      "state machine",
+      "lifecycle",
+      "transition table"
+    ],
+    "grep_terms": [
+      "state-machine",
+      "StateMachine"
+    ],
+    "natural_language_queries": [
+      "How do I generic explicit state machine with compile-time transition policy and failure-atomic application?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "control-flow",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [
+      "VM lifecycle",
+      "vCPU lifecycle",
+      "device lifecycle",
+      "protocol handshake"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Generic explicit state machine with compile-time transition policy and failure-atomic application.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [
+      "contradictory flags",
+      "invalid transition",
+      "scattered lifecycle logic"
+    ],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-state-machine"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ]
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "StateMachine",
+        "file": "projects/09-state-machine/src/state_machine.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "valid transitions advance state",
+        "file": "projects/09-state-machine/src/state_machine.zig"
+      },
+      {
+        "test": "invalid transitions preserve state",
+        "file": "projects/09-state-machine/src/state_machine.zig"
+      },
+      {
+        "test": "terminal state rejects every event",
+        "file": "projects/09-state-machine/src/state_machine.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  }
+}

@@ -1,5 +1,5 @@
 const std = @import("std");
-const dynamic_array = @import("../../02-dynamic-array/src/dynamic_array.zig");
+const dynamic_array = @import("../../01-dynamic-array/src/dynamic_array.zig");
 
 /// A last-in, first-out container built by composition over DynamicArray.
 pub fn Stack(comptime T: type) type {

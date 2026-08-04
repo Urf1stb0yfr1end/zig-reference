@@ -4,76 +4,84 @@
   "generated_at": "2026-08-04",
   "last_reviewed_at": "2026-08-04",
   "module": {
-    "id": "12",
-    "canonical_name": "bounded-integer",
-    "display_name": "Bounded Integer",
-    "directory": "projects/12-bounded-integer",
-    "summary": "Integer wrapper constrained to compile-time inclusive bounds.",
-    "long_description": "Integer wrapper constrained to compile-time inclusive bounds.",
+    "id": "02",
+    "canonical_name": "ring-buffer",
+    "display_name": "Ring Buffer",
+    "directory": "projects/02-ring-buffer",
+    "summary": "Fixed-capacity FIFO with wrapped logical ordering.",
+    "long_description": "Fixed-capacity FIFO with wrapped logical ordering.",
     "status": "experimental-unverified",
     "maturity": "experimental",
-    "category": "validated-value",
+    "category": "queue",
     "subcategory": "",
     "tags": [
-      "integer",
-      "range",
-      "validated-type",
-      "freestanding"
+      "fifo",
+      "circular-buffer",
+      "fixed-capacity",
+      "freestanding",
+      "queue"
     ],
     "aliases": [],
     "deprecated_names": []
   },
   "purpose": {
-    "primary": "Represent a scalar integer that can only contain values within a declared inclusive range.",
+    "primary": "Provide allocation-free FIFO storage while separating logical order from wrapped physical layout.",
     "secondary": [],
     "non_goals": [],
     "problems_solved": [],
     "future_role": ""
   },
   "c_pain": {
-    "summary": "Raw integer fields admit impossible values and spread duplicated range checks throughout a codebase.",
+    "summary": "C circular buffers often encode full and empty ambiguously and scatter modulo arithmetic across callers.",
     "common_failure_modes": [
-      "out-of-range state",
-      "inconsistent boundary checks",
-      "mutation before validation"
+      "head equals tail ambiguity",
+      "off-by-one wrap errors",
+      "overwriting unread values",
+      "reading uninitialized slots",
+      "zero-capacity modulo",
+      "shutdown code assuming linear layout"
     ],
     "maintenance_burdens": [],
     "undefined_or_implementation_defined_behavior": [],
     "ownership_ambiguities": [],
-    "why_c_is_attractive": "A raw integer is simple and efficient.",
-    "where_c_degrades": "The semantic range remains external to the type and every caller must remember it."
+    "why_c_is_attractive": "Two indices and a fixed array produce a very fast queue.",
+    "where_c_degrades": "The state model becomes fragile when full, empty, wrap, and capacity edge cases are represented only by conventions."
   },
   "zig_response": {
-    "summary": "Encode bounds in a comptime-generated type and reject invalid construction or mutation.",
+    "summary": "The type stores head plus len, derives the tail, and exposes full insertion as an error.",
     "language_features": [
-      "generic type factory",
-      "comptime bounds",
-      "error union"
+      "comptime capacity",
+      "arrays",
+      "error unions",
+      "optionals"
     ],
     "guarantees_made_visible": [
-      "minimum <= value <= maximum",
-      "failed mutation preserves prior value"
+      "len <= capacity",
+      "logical FIFO order is independent of physical wrap",
+      "failed push leaves state unchanged",
+      "zero-capacity instance is valid"
     ],
     "invalid_states_removed": [],
     "remaining_programmer_responsibilities": [
-      "choose correct inclusive bounds",
-      "model non-contiguous domains separately"
+      "provide synchronization when shared",
+      "choose capacity",
+      "clean resource-owning elements"
     ],
     "tradeoffs": []
   },
   "locations": {
-    "module_root": "projects/12-bounded-integer",
+    "module_root": "projects/02-ring-buffer",
     "implementation": [
-      "projects/12-bounded-integer/src/bounded_integer.zig"
+      "projects/02-ring-buffer/src/ring_buffer.zig"
     ],
-    "public_entrypoint": "projects/12-bounded-integer/src/bounded_integer.zig",
+    "public_entrypoint": "projects/02-ring-buffer/src/ring_buffer.zig",
     "tests": [
-      "projects/12-bounded-integer/src/bounded_integer.zig"
+      "projects/02-ring-buffer/src/ring_buffer.zig"
     ],
-    "readme": "projects/12-bounded-integer/README.md",
-    "mastery": "projects/12-bounded-integer/MASTERY.md",
-    "details_markdown": "projects/12-bounded-integer/DETAILS.md",
-    "details_json": "projects/12-bounded-integer/details.json",
+    "readme": "projects/02-ring-buffer/README.md",
+    "mastery": "projects/02-ring-buffer/MASTERY.md",
+    "details_markdown": "projects/02-ring-buffer/DETAILS.md",
+    "details_json": "projects/02-ring-buffer/details.json",
     "examples": [],
     "benchmarks": [],
     "fixtures": [],
@@ -82,40 +90,52 @@
   },
   "public_surface": {
     "root_symbols": [
-      "BoundedInteger"
+      "RingBuffer"
     ],
     "types": [
       {
-        "name": "BoundedInteger(T, minimum, maximum)",
+        "name": "RingBuffer(T, capacity)",
         "kind": "generic type factory"
       }
     ],
     "functions": [],
     "methods": [
       {
-        "name": "init",
-        "signature": "init(value: T) error{OutOfRange}!Self"
+        "name": "count",
+        "signature": "count(self: *const Self) usize"
+      },
+      {
+        "name": "isEmpty",
+        "signature": "isEmpty(self: *const Self) bool"
+      },
+      {
+        "name": "isFull",
+        "signature": "isFull(self: *const Self) bool"
+      },
+      {
+        "name": "push",
+        "signature": "push(self: *Self, value: T) Error!void"
+      },
+      {
+        "name": "pop",
+        "signature": "pop(self: *Self) ?T"
+      },
+      {
+        "name": "peek",
+        "signature": "peek(self: *const Self) ?T"
       },
       {
         "name": "get",
-        "signature": "get(self: Self) T"
+        "signature": "get(self: *const Self, logical_index: usize) ?T"
       },
       {
-        "name": "set",
-        "signature": "set(self: *Self, value: T) error{OutOfRange}!void"
-      },
-      {
-        "name": "minValue",
-        "signature": "minValue() T"
-      },
-      {
-        "name": "maxValue",
-        "signature": "maxValue() T"
+        "name": "clear",
+        "signature": "clear(self: *Self) void"
       }
     ],
     "constants": [],
     "errors": [
-      "OutOfRange"
+      "Full"
     ],
     "callbacks": [],
     "interfaces": [],
@@ -127,54 +147,49 @@
       "type": "type",
       "ownership": "compile-time",
       "lifetime": "program",
-      "constraints": "integer type"
+      "constraints": "valid Zig type"
     },
     {
-      "name": "minimum",
-      "type": "T",
+      "name": "capacity",
+      "type": "usize",
       "ownership": "compile-time",
       "lifetime": "program",
-      "constraints": "minimum <= maximum"
-    },
-    {
-      "name": "maximum",
-      "type": "T",
-      "ownership": "compile-time",
-      "lifetime": "program",
-      "constraints": "maximum >= minimum"
+      "constraints": "may be zero"
     },
     {
       "name": "value",
       "type": "T",
       "ownership": "copied",
-      "lifetime": "instance lifetime",
-      "constraints": "inclusive range"
+      "lifetime": "until popped or cleared",
+      "constraints": "element cleanup external"
     }
   ],
   "outputs": [
     {
-      "name": "instance",
-      "type": "BoundedInteger(T, minimum, maximum)",
-      "ownership": "owned scalar wrapper",
+      "name": "pop/peek/get",
+      "type": "?T",
+      "ownership": "copied value",
       "lifetime": "caller value",
-      "invalidation": "none",
-      "caller_cleanup": "none"
-    },
-    {
-      "name": "underlying value",
-      "type": "T",
-      "ownership": "copied",
-      "lifetime": "caller value",
-      "invalidation": "none",
-      "caller_cleanup": "none"
+      "invalidation": "none for copied value",
+      "caller_cleanup": "depends on T"
     }
   ],
   "state": {
     "fields": [
       {
-        "name": "value",
-        "type": "T",
-        "role": "validated bounded scalar"
+        "name": "storage",
+        "type": "[capacity]T",
+        "role": "physical slots"
+      },
+      {
+        "name": "head",
+        "type": "usize",
+        "role": "physical index of logical first item"
+      },
+      {
+        "name": "len",
+        "type": "usize",
+        "role": "logical item count"
       }
     ],
     "states": [],
@@ -184,9 +199,11 @@
   },
   "invariants": {
     "representation": [
-      "minimum <= value",
-      "value <= maximum",
-      "failed set leaves value unchanged"
+      "len <= capacity",
+      "empty iff len == 0",
+      "full iff len == capacity",
+      "when len > 0 and capacity > 0 head < capacity",
+      "logical index i maps to (head + i) % capacity"
     ],
     "ownership": [],
     "ordering": [],
@@ -197,17 +214,17 @@
   },
   "ownership": {
     "owns": [
-      "one scalar integer"
+      "inline storage"
     ],
     "borrows": [],
     "copies": [
-      "input and output scalar"
+      "queued values"
     ],
     "transfers": [],
     "shared": [],
     "allocator": "none",
     "allocator_lifetime": "",
-    "element_cleanup": "none",
+    "element_cleanup": "caller must drain or clean resource-owning values before clear or destruction",
     "resource_release_order": []
   },
   "lifetime": {
@@ -230,18 +247,22 @@
   "failure_behavior": {
     "errors": [
       {
-        "operation": "init",
-        "error": "OutOfRange",
-        "state_change": "no instance produced"
-      },
-      {
-        "operation": "set",
-        "error": "OutOfRange",
+        "operation": "push",
+        "error": "Full",
         "state_change": "none"
       }
     ],
-    "optional_empty_results": [],
-    "failure_atomicity": "validation occurs before assignment",
+    "optional_empty_results": [
+      {
+        "operation": "pop/peek",
+        "meaning": "empty"
+      },
+      {
+        "operation": "get",
+        "meaning": "logical index out of range"
+      }
+    ],
+    "failure_atomicity": "push checks fullness and zero capacity before writing.",
     "state_after_failure": [],
     "partial_effects": [],
     "rollback": [],
@@ -250,7 +271,13 @@
     "undefined_behavior_preconditions": []
   },
   "invalidation": {
-    "rules": [],
+    "rules": [
+      {
+        "reference": "logical positions",
+        "trigger": "push or pop",
+        "effect": "indices may refer to different values"
+      }
+    ],
     "mutation_invalidation": [],
     "growth_invalidation": [],
     "move_invalidation": [],
@@ -266,44 +293,48 @@
     "platform": [],
     "architecture": [],
     "conceptual": [
-      "validated construction",
-      "inclusive range"
+      "fixed-capacity storage",
+      "logical-versus-physical indexing"
     ]
   },
   "dependency_contracts": [],
   "expected_dependents": [
     {
-      "name": "interrupt priority",
-      "reason": "architectural range"
+      "name": "work queue",
+      "reason": "bounded FIFO jobs"
     },
     {
-      "name": "port number",
-      "reason": "protocol range"
+      "name": "serial buffer",
+      "reason": "ordered bytes or events"
     },
     {
-      "name": "CPU index",
-      "reason": "platform limit"
-    },
-    {
-      "name": "register field",
-      "reason": "bitfield range"
-    },
-    {
-      "name": "configuration limit",
-      "reason": "validated input"
+      "name": "network receive queue",
+      "reason": "bounded frames"
     }
   ],
   "known_consumers": [],
   "composition": {
-    "import_name": "bounded_integer",
-    "import_path": "projects/12-bounded-integer/src/bounded_integer.zig",
-    "import_configuration": "Import projects/12-bounded-integer/src/bounded_integer.zig.",
-    "minimal_example": "const BoundedInteger = @import(\"bounded_integer.zig\").BoundedInteger; const Priority = BoundedInteger(u8, 0, 15); const p = try Priority.init(raw);",
-    "integration_patterns": [],
+    "import_name": "ring_buffer",
+    "import_path": "projects/02-ring-buffer/src/ring_buffer.zig",
+    "import_configuration": "Import the source directly or register it as a build module.",
+    "minimal_example": "const RingBuffer = @import(\"ring_buffer\").RingBuffer;\nvar q = RingBuffer(u8, 16){};\ntry q.push(1);",
+    "integration_patterns": [
+      {
+        "with": "mutex/condition variable",
+        "pattern": "wrap operations to create a thread-safe bounded queue"
+      }
+    ],
     "pipeline_position": [],
     "common_combinations": [],
-    "incompatible_combinations": [],
-    "replacement_options": [],
+    "incompatible_combinations": [
+      "unbounded queue requirements without an overflow policy"
+    ],
+    "replacement_options": [
+      {
+        "condition": "runtime capacity or growth required",
+        "module": "02-dynamic-array plus head index"
+      }
+    ],
     "extension_points": []
   },
   "data_contracts": {
@@ -322,7 +353,7 @@
     "hosted": "yes",
     "freestanding": "yes",
     "thread_safe": "no internal synchronization",
-    "reentrant": "yes",
+    "reentrant": "yes for distinct instances",
     "interrupt_safe": "unknown",
     "async_safe": "unknown",
     "signal_safe": "unknown",
@@ -331,8 +362,8 @@
     "allocator_assumptions": "none",
     "libc_required": false,
     "operating_system_required": false,
-    "ffi": "unwrap to T at ABI boundaries",
-    "no_std_equivalent": "already freestanding-suitable"
+    "ffi": "not ABI-stable",
+    "no_std_equivalent": "already allocation-free"
   },
   "concurrency": {
     "internal_synchronization": "none",
@@ -372,22 +403,27 @@
     "security_non_goals": []
   },
   "testing": {
-    "build_step": "test-bounded-integer",
+    "build_step": "test-ring-buffer",
     "commands": [
-      "zig build test-bounded-integer",
+      "zig build test-ring-buffer",
       "zig build test"
     ],
     "unit_tests": [
-      "accepts both inclusive boundaries",
-      "rejects values outside the declared range without mutation"
+      "queue preserves first-in first-out order",
+      "wrapped storage preserves logical order",
+      "full push fails without changing the queue",
+      "zero-capacity queue is valid and always full"
     ],
     "integration_tests": [],
     "property_tests": [],
     "fuzz_tests": [],
     "failure_injection_tests": [],
-    "zero_capacity_tests": [],
+    "zero_capacity_tests": [
+      "zero-capacity queue is valid and always full"
+    ],
     "boundary_tests": [
-      "accepts both inclusive boundaries"
+      "full push fails without changing the queue",
+      "zero-capacity queue is valid and always full"
     ],
     "regression_tests": [],
     "test_dependencies": []
@@ -402,7 +438,7 @@
     "known_test_failures": [],
     "unverified_claims": [],
     "notes": [
-      "Build registration and local compiler validation pending."
+      "Compiler validation pending."
     ]
   },
   "documentation": {
@@ -411,98 +447,109 @@
       "DETAILS.md",
       "README.md",
       "MASTERY.md",
-      "projects/12-bounded-integer/src/bounded_integer.zig"
+      "projects/02-ring-buffer/src/ring_buffer.zig"
     ],
     "examples_covered": [
-      "interrupt priority"
+      "push/pop",
+      "wrap",
+      "full and empty"
     ],
-    "exercises": [],
+    "exercises": [
+      "iterator",
+      "overwrite policy",
+      "thread-safe adapter"
+    ],
     "readiness_questions": [],
     "glossary_terms": [
-      "inclusive bound",
-      "validated value",
-      "failure atomicity"
+      "FIFO",
+      "head",
+      "tail",
+      "wrap",
+      "logical index"
     ],
     "related_modules": [
-      "checked-integer-cast",
-      "nonzero-integer"
+      "00-fixed-capacity-vector",
+      "02-dynamic-array"
     ],
     "external_references": []
   },
   "maintenance": {
     "stability": "experimental",
-    "breaking_change_policy": "Update source, tests, contracts, build, catalog, and dependents together.",
+    "breaking_change_policy": "Update contracts, catalog, build, and dependents together.",
     "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
     "known_gaps": [
-      "compiler validation pending"
+      "compiler validation pending",
+      "numeric prefix collides with bit-set module"
     ],
     "known_bugs": [],
     "planned_extensions": [],
     "review_triggers": [
-      "bound semantics",
-      "mutation semantics"
+      "state representation change",
+      "overflow policy change",
+      "numbering repair"
     ],
     "synchronization_requirements": [
-      "public signatures must match source"
+      "keep MODULES.md paths synchronized"
     ],
     "owners": []
   },
   "discovery": {
     "capabilities": [
-      "bounded integer",
-      "range-validated scalar",
-      "failure-atomic numeric mutation"
+      "FIFO queue",
+      "circular buffer",
+      "bounded event queue"
     ],
     "problems": [
-      "out-of-range integer",
-      "repeated range check"
+      "head-tail ambiguity",
+      "wraparound bugs",
+      "queue overflow"
     ],
     "inputs": [
-      "integer",
-      "minimum",
-      "maximum"
+      "generic values"
     ],
     "outputs": [
-      "bounded integer wrapper"
+      "optional dequeued value"
     ],
     "environments": [
       "hosted",
-      "freestanding"
+      "freestanding",
+      "embedded",
+      "hypervisor"
     ],
     "keywords": [
-      "bounded integer",
-      "range type",
-      "validated integer"
+      "ring buffer",
+      "circular queue",
+      "FIFO",
+      "bounded queue"
     ],
     "grep_terms": [
-      "bounded-integer",
-      "BoundedInteger"
+      "ring-buffer",
+      "RingBuffer"
     ],
     "natural_language_queries": [
-      "How do I integer wrapper constrained to compile-time inclusive bounds?"
+      "How do I fixed-capacity fifo with wrapped logical ordering?"
     ],
     "negative_search_terms": []
   },
   "snowball": {
-    "foundation_layer": "validated-value",
+    "foundation_layer": "queue",
     "reuses_modules": [],
     "guarantees_inherited": [],
     "future_modules_enabled": [
-      "interrupt priority",
-      "port number",
-      "CPU index",
-      "register field",
-      "configuration limit"
+      "work queue",
+      "serial buffer",
+      "network receive queue"
     ],
     "future_code_removed": [],
     "future_reasoning_removed": [],
-    "composition_value": "Integer wrapper constrained to compile-time inclusive bounds.",
+    "composition_value": "Fixed-capacity FIFO with wrapped logical ordering.",
     "snowball_score": "unmeasured"
   },
   "agent_guidance": {
     "use_when": [
-      "out-of-range integer",
-      "repeated range check"
+      "head-tail ambiguity",
+      "wraparound bugs",
+      "queue overflow"
     ],
     "do_not_use_when": [],
     "selection_questions": [],
@@ -513,7 +560,7 @@
       "Run the dedicated test step."
     ],
     "verification_steps": [
-      "zig build test-bounded-integer"
+      "zig build test-ring-buffer"
     ],
     "common_agent_mistakes": [],
     "safe_modification_boundaries": [
@@ -530,18 +577,26 @@
   "source_map": {
     "symbols_to_files": [
       {
-        "symbol": "BoundedInteger",
-        "file": "projects/12-bounded-integer/src/bounded_integer.zig"
+        "symbol": "RingBuffer",
+        "file": "projects/02-ring-buffer/src/ring_buffer.zig"
       }
     ],
     "tests_to_behaviors": [
       {
-        "test": "accepts both inclusive boundaries",
-        "file": "projects/12-bounded-integer/src/bounded_integer.zig"
+        "test": "queue preserves first-in first-out order",
+        "file": "projects/02-ring-buffer/src/ring_buffer.zig"
       },
       {
-        "test": "rejects values outside the declared range without mutation",
-        "file": "projects/12-bounded-integer/src/bounded_integer.zig"
+        "test": "wrapped storage preserves logical order",
+        "file": "projects/02-ring-buffer/src/ring_buffer.zig"
+      },
+      {
+        "test": "full push fails without changing the queue",
+        "file": "projects/02-ring-buffer/src/ring_buffer.zig"
+      },
+      {
+        "test": "zero-capacity queue is valid and always full",
+        "file": "projects/02-ring-buffer/src/ring_buffer.zig"
       }
     ],
     "errors_to_operations": [],

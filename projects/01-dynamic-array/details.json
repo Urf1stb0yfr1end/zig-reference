@@ -4,82 +4,87 @@
   "generated_at": "2026-08-04",
   "last_reviewed_at": "2026-08-04",
   "module": {
-    "id": "00",
-    "canonical_name": "fixed-capacity-vector",
-    "display_name": "Fixed Capacity Vector",
-    "directory": "projects/00-fixed-capacity-vector",
-    "summary": "Inline bounded sequence with explicit initialized length and no allocation.",
-    "long_description": "Inline bounded sequence with explicit initialized length and no allocation.",
+    "id": "01",
+    "canonical_name": "dynamic-array",
+    "display_name": "Dynamic Array",
+    "directory": "projects/01-dynamic-array",
+    "summary": "Allocator-backed growable contiguous sequence.",
+    "long_description": "Allocator-backed growable contiguous sequence.",
     "status": "experimental-unverified",
     "maturity": "experimental",
     "category": "container",
     "subcategory": "",
     "tags": [
-      "fixed-capacity",
+      "allocator",
+      "growth",
+      "contiguous",
       "generic",
-      "slice",
-      "freestanding",
-      "foundation"
+      "ownership"
     ],
     "aliases": [],
     "deprecated_names": []
   },
   "purpose": {
-    "primary": "Store up to a compile-time capacity of values while exposing only initialized elements.",
+    "primary": "Store a runtime-sized sequence while making allocator ownership, checked growth, cleanup, and reallocation invalidation explicit.",
     "secondary": [],
     "non_goals": [],
     "problems_solved": [],
     "future_role": ""
   },
   "c_pain": {
-    "summary": "C fixed arrays often rely on separate informal length conventions and unchecked writes.",
+    "summary": "C growable arrays concentrate overflow, realloc failure, stale-pointer, and cleanup hazards in deceptively small code.",
     "common_failure_modes": [
-      "length exceeds capacity",
-      "uninitialized slots treated as values",
-      "unchecked index access",
-      "caller and container disagree about active length"
+      "capacity arithmetic overflow",
+      "losing the original pointer after failed realloc",
+      "len updated before allocation succeeds",
+      "stale pointers after growth",
+      "allocator mismatch",
+      "partial cleanup leaks"
     ],
     "maintenance_burdens": [],
     "undefined_or_implementation_defined_behavior": [],
     "ownership_ambiguities": [],
-    "why_c_is_attractive": "A C array plus size_t length is compact and direct.",
-    "where_c_degrades": "The invariants remain conventions repeated at every call site rather than properties defended by one type."
+    "why_c_is_attractive": "A pointer, length, capacity, and realloc loop produce a fast compact container.",
+    "where_c_degrades": "Every added requirement multiplies informal ownership, failure ordering, and invalidation rules."
   },
   "zig_response": {
-    "summary": "A comptime-generated type keeps capacity in the type, length in state, and insertion failure explicit.",
+    "summary": "An allocator is stored explicitly; growth uses checked arithmetic and replacement-before-commit semantics.",
     "language_features": [
-      "comptime type parameters",
-      "arrays",
-      "slices",
+      "Allocator",
       "error unions",
-      "optionals"
+      "std.math.add",
+      "std.math.mul",
+      "errdefer",
+      "slices",
+      "comptime generics"
     ],
     "guarantees_made_visible": [
-      "len never exceeds capacity after successful operations",
-      "only initialized elements are exposed as a slice",
-      "full insertion is an explicit error"
+      "len <= capacity",
+      "failed growth preserves existing state",
+      "cleanup uses the same allocator",
+      "initialized values are exposed as slices"
     ],
     "invalid_states_removed": [],
     "remaining_programmer_responsibilities": [
-      "choose an appropriate capacity",
-      "respect reference invalidation after mutation",
-      "perform element-level cleanup when T owns resources"
+      "choose allocator and growth suitability",
+      "avoid retaining slices across growth",
+      "clean element-owned resources before container cleanup"
     ],
     "tradeoffs": []
   },
   "locations": {
-    "module_root": "projects/00-fixed-capacity-vector",
+    "module_root": "projects/01-dynamic-array",
     "implementation": [
-      "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig"
+      "projects/01-dynamic-array/src/dynamic_array.zig"
     ],
-    "public_entrypoint": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig",
+    "public_entrypoint": "projects/01-dynamic-array/src/dynamic_array.zig",
     "tests": [
-      "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig"
+      "projects/01-dynamic-array/src/dynamic_array.zig"
     ],
-    "readme": "projects/00-fixed-capacity-vector/README.md",
-    "mastery": "projects/00-fixed-capacity-vector/MASTERY.md",
-    "details_markdown": "projects/00-fixed-capacity-vector/DETAILS.md",
-    "details_json": "projects/00-fixed-capacity-vector/details.json",
+    "readme": "projects/01-dynamic-array/README.md",
+    "mastery": "projects/01-dynamic-array/MASTERY.md",
+    "details_markdown": "projects/01-dynamic-array/DETAILS.md",
+    "details_json": "projects/01-dynamic-array/details.json",
     "examples": [],
     "benchmarks": [],
     "fixtures": [],
@@ -88,27 +93,27 @@
   },
   "public_surface": {
     "root_symbols": [
-      "FixedVector"
+      "DynamicArray"
     ],
     "types": [
       {
-        "name": "FixedVector(T, capacity)",
+        "name": "DynamicArray(T)",
         "kind": "generic type factory"
       }
     ],
     "functions": [],
     "methods": [
       {
-        "name": "append",
-        "signature": "append(self: *Self, value: T) Error!void"
+        "name": "init",
+        "signature": "init(allocator: std.mem.Allocator) Self"
       },
       {
-        "name": "pop",
-        "signature": "pop(self: *Self) ?T"
+        "name": "deinit",
+        "signature": "deinit(self: *Self) void"
       },
       {
-        "name": "get",
-        "signature": "get(self: *const Self, index: usize) ?T"
+        "name": "capacity",
+        "signature": "capacity(self: *const Self) usize"
       },
       {
         "name": "items",
@@ -119,13 +124,30 @@
         "signature": "constItems(self: *const Self) []const T"
       },
       {
-        "name": "clear",
-        "signature": "clear(self: *Self) void"
+        "name": "append",
+        "signature": "append(self: *Self, value: T) !void"
+      },
+      {
+        "name": "pop",
+        "signature": "pop(self: *Self) ?T"
+      },
+      {
+        "name": "get",
+        "signature": "get(self: *const Self, index: usize) ?T"
+      },
+      {
+        "name": "clearRetainingCapacity",
+        "signature": "clearRetainingCapacity(self: *Self) void"
+      },
+      {
+        "name": "ensureUnusedCapacity",
+        "signature": "ensureUnusedCapacity(self: *Self, additional: usize) !void"
       }
     ],
     "constants": [],
     "errors": [
-      "Full"
+      "OutOfMemory",
+      "Overflow"
     ],
     "callbacks": [],
     "interfaces": [],
@@ -133,41 +155,41 @@
   },
   "inputs": [
     {
-      "name": "T",
-      "type": "type",
-      "ownership": "compile-time",
-      "lifetime": "program",
-      "constraints": "valid Zig type"
-    },
-    {
-      "name": "capacity",
-      "type": "usize",
-      "ownership": "compile-time",
-      "lifetime": "program",
-      "constraints": "may be zero"
+      "name": "allocator",
+      "type": "std.mem.Allocator",
+      "ownership": "copied allocator handle",
+      "lifetime": "must remain valid through deinit",
+      "constraints": "must free allocations it creates"
     },
     {
       "name": "value",
       "type": "T",
       "ownership": "copied into storage",
-      "lifetime": "stored until removed or overwritten",
-      "constraints": "copy semantics of T"
+      "lifetime": "until removed or cleared",
+      "constraints": "element cleanup external"
+    },
+    {
+      "name": "additional",
+      "type": "usize",
+      "ownership": "value",
+      "lifetime": "call",
+      "constraints": "checked with len for overflow"
     }
   ],
   "outputs": [
     {
       "name": "items",
       "type": "[]T or []const T",
-      "ownership": "borrowed view",
-      "lifetime": "until mutation or container destruction",
-      "invalidation": "mutation may alter logical contents",
+      "ownership": "borrowed",
+      "lifetime": "until growth, deinit, or mutation affecting contents",
+      "invalidation": "any reallocation invalidates all prior slices and pointers",
       "caller_cleanup": "none"
     },
     {
       "name": "pop result",
       "type": "?T",
       "ownership": "copied out",
-      "lifetime": "caller-owned value",
+      "lifetime": "caller value",
       "invalidation": "none",
       "caller_cleanup": "depends on T"
     }
@@ -175,9 +197,14 @@
   "state": {
     "fields": [
       {
+        "name": "allocator",
+        "type": "std.mem.Allocator",
+        "role": "allocation and release authority"
+      },
+      {
         "name": "storage",
-        "type": "[capacity]T",
-        "role": "inline physical storage"
+        "type": "[]T",
+        "role": "allocated capacity"
       },
       {
         "name": "len",
@@ -192,9 +219,10 @@
   },
   "invariants": {
     "representation": [
-      "len <= capacity",
-      "initialized elements occupy storage[0..len]",
-      "storage[len..capacity] is not exposed as valid elements"
+      "len <= storage.len",
+      "storage[0..len] contains initialized values",
+      "storage.len is capacity",
+      "the stored allocator releases storage"
     ],
     "ownership": [],
     "ordering": [],
@@ -205,18 +233,18 @@
   },
   "ownership": {
     "owns": [
-      "inline storage"
+      "storage allocation"
     ],
     "borrows": [],
     "copies": [
       "appended values",
-      "returned scalar values"
+      "allocator handle"
     ],
     "transfers": [],
     "shared": [],
-    "allocator": "none",
+    "allocator": "caller supplied and retained",
     "allocator_lifetime": "",
-    "element_cleanup": "caller or dependent layer must clean elements that own resources before clear or destruction",
+    "element_cleanup": "not performed automatically",
     "resource_release_order": []
   },
   "lifetime": {
@@ -228,8 +256,14 @@
     "shutdown_requirements": []
   },
   "cleanup": {
-    "required": false,
-    "operations": [],
+    "required": true,
+    "operations": [
+      {
+        "operation": "deinit",
+        "releases": "storage allocation",
+        "postcondition": "self becomes undefined"
+      }
+    ],
     "automatic_cleanup": [],
     "manual_cleanup": [],
     "partial_construction_cleanup": [],
@@ -239,37 +273,48 @@
   "failure_behavior": {
     "errors": [
       {
-        "operation": "append",
-        "error": "Full",
+        "operation": "append/ensureUnusedCapacity",
+        "error": "OutOfMemory",
+        "state_change": "none"
+      },
+      {
+        "operation": "ensureUnusedCapacity",
+        "error": "Overflow",
         "state_change": "none"
       }
     ],
     "optional_empty_results": [
       {
         "operation": "pop",
-        "meaning": "empty container"
+        "meaning": "empty"
       },
       {
         "operation": "get",
-        "meaning": "index outside initialized range"
+        "meaning": "out of range"
       }
     ],
-    "failure_atomicity": "append checks capacity before writing or incrementing len.",
+    "failure_atomicity": "Replacement storage is allocated and copied before self.storage is committed.",
     "state_after_failure": [],
     "partial_effects": [],
     "rollback": [],
     "panic_conditions": [],
     "assertion_conditions": [],
     "undefined_behavior_preconditions": [
-      "borrowed slices must not outlive the container"
+      "borrowed views must not outlive or cross reallocation",
+      "deinit exactly once"
     ]
   },
   "invalidation": {
     "rules": [
       {
-        "reference": "items slice",
-        "trigger": "append, pop, clear, or container move",
-        "effect": "logical contents or address assumptions may change"
+        "reference": "items slices and element pointers",
+        "trigger": "capacity growth or deinit",
+        "effect": "address invalid"
+      },
+      {
+        "reference": "logical element references",
+        "trigger": "pop or clear",
+        "effect": "element no longer logically present"
       }
     ],
     "mutation_invalidation": [],
@@ -281,50 +326,62 @@
   "dependencies": {
     "repository": [],
     "standard_library": [
+      "std.mem.Allocator",
+      "std.math",
       "std.testing"
     ],
     "external": [],
     "platform": [],
     "architecture": [],
     "conceptual": [
-      "length-capacity invariant",
-      "initialized storage"
+      "fixed-capacity vector",
+      "failure atomicity"
     ]
   },
   "dependency_contracts": [],
   "expected_dependents": [
     {
-      "name": "fixed stack",
-      "reason": "bounded LIFO storage"
+      "name": "05-stack",
+      "reason": "growable LIFO storage"
     },
     {
-      "name": "bootstrap tables",
-      "reason": "allocation-free early initialization"
+      "name": "06-byte-writer",
+      "reason": "owned byte accumulation"
     },
     {
-      "name": "embedded queues",
-      "reason": "known static capacity"
+      "name": "hash table",
+      "reason": "owned bucket storage"
+    },
+    {
+      "name": "token buffer",
+      "reason": "runtime token sequence"
     }
   ],
   "known_consumers": [],
   "composition": {
-    "import_name": "fixed_vector",
-    "import_path": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig",
-    "import_configuration": "Add the implementation as a Zig module or import by repository-relative path.",
-    "minimal_example": "const FixedVector = @import(\"fixed_vector\").FixedVector;\nvar values = FixedVector(u32, 8){};\ntry values.append(1);",
+    "import_name": "dynamic_array",
+    "import_path": "projects/01-dynamic-array/src/dynamic_array.zig",
+    "import_configuration": "Import projects/01-dynamic-array/src/dynamic_array.zig or register it as a build module.",
+    "minimal_example": "const DynamicArray = @import(\"dynamic_array\").DynamicArray;\nvar values = DynamicArray(u32).init(allocator);\ndefer values.deinit();\ntry values.append(1);",
     "integration_patterns": [
       {
-        "with": "bounded algorithms",
-        "pattern": "use constItems() as the initialized input slice"
+        "with": "stack",
+        "pattern": "wrap DynamicArray and expose only LIFO operations"
+      },
+      {
+        "with": "byte writer",
+        "pattern": "specialize DynamicArray(u8) and add encoding operations"
       }
     ],
     "pipeline_position": [],
     "common_combinations": [],
-    "incompatible_combinations": [],
+    "incompatible_combinations": [
+      "freestanding environments without a compatible allocator"
+    ],
     "replacement_options": [
       {
-        "condition": "runtime growth required",
-        "module": "02-dynamic-array"
+        "condition": "known compile-time maximum",
+        "module": "00-fixed-capacity-vector"
       }
     ],
     "extension_points": []
@@ -343,7 +400,7 @@
     "minimum_zig_version": "0.14.0",
     "maximum_tested_zig_version": "",
     "hosted": "yes",
-    "freestanding": "yes; no allocator required",
+    "freestanding": "only with a supplied freestanding allocator",
     "thread_safe": "no internal synchronization",
     "reentrant": "yes for distinct instances",
     "interrupt_safe": "unknown",
@@ -351,11 +408,11 @@
     "signal_safe": "unknown",
     "platforms": [],
     "architectures": [],
-    "allocator_assumptions": "none",
+    "allocator_assumptions": "allocator supports alloc and free for T slices",
     "libc_required": false,
     "operating_system_required": false,
-    "ffi": "layout is not declared extern and should not be treated as a stable C ABI",
-    "no_std_equivalent": "module already avoids hosted allocation"
+    "ffi": "not ABI-stable",
+    "no_std_equivalent": "supply custom allocator or use fixed vector"
   },
   "concurrency": {
     "internal_synchronization": "none",
@@ -395,31 +452,24 @@
     "security_non_goals": []
   },
   "testing": {
-    "build_step": "test-fixed-capacity-vector",
+    "build_step": "test-dynamic-array",
     "commands": [
-      "zig build test-fixed-capacity-vector",
+      "zig build test-dynamic-array",
       "zig build test"
     ],
     "unit_tests": [
-      "starts empty with full remaining capacity",
-      "append exposes only initialized elements",
-      "append refuses to exceed capacity without changing state",
-      "get checks the initialized range rather than raw capacity",
-      "pop returns values in reverse insertion order",
-      "ordered removal preserves order",
-      "zero-capacity vectors are valid and always full"
+      "append grows while preserving values",
+      "pop and clear preserve the invariant",
+      "zero elements require no allocation"
     ],
     "integration_tests": [],
     "property_tests": [],
     "fuzz_tests": [],
     "failure_injection_tests": [],
     "zero_capacity_tests": [
-      "zero-capacity vectors are valid and always full"
+      "zero elements require no allocation"
     ],
-    "boundary_tests": [
-      "starts empty with full remaining capacity",
-      "zero-capacity vectors are valid and always full"
-    ],
+    "boundary_tests": [],
     "regression_tests": [],
     "test_dependencies": []
   },
@@ -433,7 +483,7 @@
     "known_test_failures": [],
     "unverified_claims": [],
     "notes": [
-      "Requires local Zig 0.14.0 validation."
+      "Compiler validation pending."
     ]
   },
   "documentation": {
@@ -442,87 +492,91 @@
       "DETAILS.md",
       "README.md",
       "MASTERY.md",
-      "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig"
+      "projects/01-dynamic-array/src/dynamic_array.zig"
     ],
     "examples_covered": [
-      "bounded append",
+      "append growth",
       "pop",
-      "initialized slice"
+      "clear retaining capacity"
     ],
     "exercises": [
-      "ordered removal",
-      "insert at index",
-      "fixed stack adapter"
+      "insert",
+      "ordered remove",
+      "shrink",
+      "element cleanup policy"
     ],
     "readiness_questions": [],
     "glossary_terms": [
+      "allocator",
       "capacity",
-      "length",
-      "initialized storage",
-      "slice"
+      "reallocation",
+      "failure atomicity",
+      "invalidation"
     ],
     "related_modules": [
-      "02-dynamic-array",
-      "03-ring-buffer"
+      "00-fixed-capacity-vector",
+      "05-stack",
+      "06-byte-writer"
     ],
     "external_references": []
   },
   "maintenance": {
     "stability": "experimental",
-    "breaking_change_policy": "Update source, tests, DETAILS.md, details.json, MODULES.md, and dependents together.",
+    "breaking_change_policy": "Update dependents and all contracts together.",
     "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
     "known_gaps": [
-      "compiler validation pending"
+      "compiler validation pending",
+      "numbering drift exists elsewhere in repository"
     ],
     "known_bugs": [],
     "planned_extensions": [],
     "review_triggers": [
-      "public method changes",
-      "invariant changes",
-      "path or numbering changes"
+      "growth policy change",
+      "allocator semantics change",
+      "public field or method change"
     ],
     "synchronization_requirements": [
-      "keep public symbols synchronized with source"
+      "keep Stack and ByteWriter dependency contracts synchronized"
     ],
     "owners": []
   },
   "discovery": {
     "capabilities": [
-      "bounded sequence",
-      "inline storage",
-      "allocation-free container"
+      "growable array",
+      "owned contiguous storage",
+      "generic vector"
     ],
     "problems": [
-      "unchecked fixed array length",
-      "uninitialized slots",
-      "capacity overflow"
+      "realloc failure",
+      "capacity overflow",
+      "stale pointers",
+      "allocator ownership"
     ],
     "inputs": [
+      "allocator",
       "generic values"
     ],
     "outputs": [
-      "borrowed initialized slice",
+      "borrowed slice",
       "optional value"
     ],
     "environments": [
       "hosted",
-      "freestanding",
-      "embedded",
-      "hypervisor bootstrap"
+      "freestanding with allocator"
     ],
     "keywords": [
+      "dynamic array",
       "vector",
-      "fixed vector",
-      "small buffer",
-      "bounded array",
-      "static capacity"
+      "array list",
+      "growable buffer",
+      "allocator-backed"
     ],
     "grep_terms": [
-      "fixed-capacity-vector",
-      "FixedVector"
+      "dynamic-array",
+      "DynamicArray"
     ],
     "natural_language_queries": [
-      "How do I inline bounded sequence with explicit initialized length and no allocation?"
+      "How do I allocator-backed growable contiguous sequence?"
     ],
     "negative_search_terms": []
   },
@@ -531,20 +585,22 @@
     "reuses_modules": [],
     "guarantees_inherited": [],
     "future_modules_enabled": [
-      "fixed stack",
-      "bootstrap tables",
-      "embedded queues"
+      "05-stack",
+      "06-byte-writer",
+      "hash table",
+      "token buffer"
     ],
     "future_code_removed": [],
     "future_reasoning_removed": [],
-    "composition_value": "Inline bounded sequence with explicit initialized length and no allocation.",
+    "composition_value": "Allocator-backed growable contiguous sequence.",
     "snowball_score": "unmeasured"
   },
   "agent_guidance": {
     "use_when": [
-      "unchecked fixed array length",
-      "uninitialized slots",
-      "capacity overflow"
+      "realloc failure",
+      "capacity overflow",
+      "stale pointers",
+      "allocator ownership"
     ],
     "do_not_use_when": [],
     "selection_questions": [],
@@ -555,7 +611,7 @@
       "Run the dedicated test step."
     ],
     "verification_steps": [
-      "zig build test-fixed-capacity-vector"
+      "zig build test-dynamic-array"
     ],
     "common_agent_mistakes": [],
     "safe_modification_boundaries": [
@@ -572,38 +628,22 @@
   "source_map": {
     "symbols_to_files": [
       {
-        "symbol": "FixedVector",
-        "file": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig"
+        "symbol": "DynamicArray",
+        "file": "projects/01-dynamic-array/src/dynamic_array.zig"
       }
     ],
     "tests_to_behaviors": [
       {
-        "test": "starts empty with full remaining capacity",
-        "file": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig"
+        "test": "append grows while preserving values",
+        "file": "projects/01-dynamic-array/src/dynamic_array.zig"
       },
       {
-        "test": "append exposes only initialized elements",
-        "file": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig"
+        "test": "pop and clear preserve the invariant",
+        "file": "projects/01-dynamic-array/src/dynamic_array.zig"
       },
       {
-        "test": "append refuses to exceed capacity without changing state",
-        "file": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig"
-      },
-      {
-        "test": "get checks the initialized range rather than raw capacity",
-        "file": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig"
-      },
-      {
-        "test": "pop returns values in reverse insertion order",
-        "file": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig"
-      },
-      {
-        "test": "ordered removal preserves order",
-        "file": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig"
-      },
-      {
-        "test": "zero-capacity vectors are valid and always full",
-        "file": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig"
+        "test": "zero elements require no allocation",
+        "file": "projects/01-dynamic-array/src/dynamic_array.zig"
       }
     ],
     "errors_to_operations": [],

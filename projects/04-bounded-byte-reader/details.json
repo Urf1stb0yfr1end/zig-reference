@@ -1,1 +1,627 @@
-{"schema_version":"1.0.0","module":{"id":"04","name":"bounded-byte-reader","directory":"projects/04-bounded-byte-reader","summary":"Borrowed binary input cursor with checked, failure-atomic reads.","status":"experimental-unverified","category":"binary-io","tags":["parser","reader","bounds","endianness","borrowed"]},"purpose":"Read structured values from a borrowed byte slice without advancing beyond its bounds or consuming input on failed reads.","c_pain":{"summary":"C binary parsers commonly mix pointer arithmetic, length checks, cursor mutation, alignment, and endianness at every call site.","failure_modes":["cursor plus count overflow","read past end","failed read advances cursor","unaligned integer load","implicit host endianness","substructure escapes parent bounds"],"why_c_is_attractive":"Pointer increments and casts make initial parsers short and fast.","where_c_degrades":"Every field repeats subtle security-sensitive arithmetic and rollback behavior."},"zig_response":{"summary":"A borrowed slice and cursor are encapsulated behind checked reads with explicit byte order and confined sub-readers.","language_features":["slices","error unions","std.mem.readInt","explicit endian enum","value semantics"],"guarantees_made_visible":["cursor <= input.len","failed reads leave cursor unchanged","integer byte order is explicit","child readers cannot exceed their assigned slice"],"remaining_programmer_responsibilities":["interpret the format correctly","apply semantic limits","decide whether trailing bytes are valid","keep borrowed input alive"]},"public_surface":{"root_symbols":["BoundedReader"],"types":[{"name":"BoundedReader","kind":"struct"}],"functions":[],"methods":[{"name":"init","signature":"init(input: []const u8) BoundedReader"},{"name":"remaining","signature":"remaining(self: *const BoundedReader) usize"},{"name":"readBytes","signature":"readBytes(self: *BoundedReader, count: usize) Error![]const u8"},{"name":"skip","signature":"skip(self: *BoundedReader, count: usize) Error!void"},{"name":"readU8","signature":"readU8(self: *BoundedReader) Error!u8"},{"name":"readU16Le/readU16Be","signature":"explicit-endian u16 reads"},{"name":"readU32Le/readU32Be","signature":"explicit-endian u32 reads"},{"name":"subReader","signature":"subReader(self: *BoundedReader, count: usize) Error!BoundedReader"}],"errors":["UnexpectedEnd"],"constants":[]},"locations":{"implementation":["projects/04-bounded-byte-reader/src/bounded_reader.zig"],"test_source":["projects/04-bounded-byte-reader/src/bounded_reader.zig"],"readme":"projects/04-bounded-byte-reader/README.md","mastery":"projects/04-bounded-byte-reader/MASTERY.md","details_markdown":"projects/04-bounded-byte-reader/DETAILS.md","details_json":"projects/04-bounded-byte-reader/details.json","examples":[],"benchmarks":[],"fixtures":[],"fuzz":[]},"inputs":[{"name":"input","type":"[]const u8","ownership":"borrowed","lifetime":"must outlive reader and all returned slices/sub-readers","constraints":"any byte slice"},{"name":"count","type":"usize","ownership":"value","lifetime":"call","constraints":"must be <= remaining for success"}],"outputs":[{"name":"readBytes","type":"[]const u8","ownership":"borrowed subslice","lifetime":"tied to input","invalidation":"input lifetime end","caller_cleanup":"none"},{"name":"subReader","type":"BoundedReader","ownership":"value containing borrowed slice","lifetime":"tied to parent input","invalidation":"input lifetime end","caller_cleanup":"none"},{"name":"integers","type":"u8/u16/u32","ownership":"value","lifetime":"caller value","invalidation":"none","caller_cleanup":"none"}],"state":[{"name":"input","type":"[]const u8","role":"borrowed immutable source"},{"name":"cursor","type":"usize","role":"next unread offset"}],"invariants":["cursor <= input.len","remaining == input.len - cursor","successful reads advance exactly their byte count","failed reads do not advance"],"failure_behavior":{"errors":[{"operation":"readBytes/skip/integer reads/subReader","error":"UnexpectedEnd","state_change":"none"}],"optional_empty_results":[],"failure_atomicity":"Bounds are checked using count <= input.len - cursor before cursor mutation.","partial_effects":[],"panic_conditions":[],"undefined_behavior_preconditions":["input must remain alive"]},"ownership":{"owns":[],"borrows":["input bytes"],"copies":["decoded integer values"],"transfers":[],"allocator":"none","element_cleanup":"not applicable"},"cleanup":[],"invalidation":[{"reference":"returned slices and child readers","trigger":"source input becomes invalid","effect":"all borrowed data invalid"}],"dependencies":{"repository":[],"standard_library":["std.mem","std.testing"],"external":[],"conceptual":["bounded cursor","failure atomicity","explicit endianness"]},"expected_dependents":[{"name":"binary format parser","reason":"safe structural decoding"},{"name":"ELF loader","reason":"bounded executable fields"},{"name":"network decoder","reason":"framed protocol input"},{"name":"database record reader","reason":"bounded persistent records"}],"composition":{"import_name":"bounded_reader","import_configuration":"Import source or register as build module.","minimal_example":"var reader = BoundedReader.init(bytes);\nconst magic = try reader.readU32Le();","integration_patterns":[{"with":"06-byte-writer","pattern":"decode and encode the same explicit binary format"},{"with":"resource limits","pattern":"validate decoded counts before allocation"}],"incompatible_combinations":[],"replacement_options":[]},"compatibility":{"zig_version":"0.14.0","hosted":"yes","freestanding":"yes","thread_safe":"safe for separate instances; shared mutation requires synchronization","reentrant":"yes for distinct readers","endianness":"explicit per integer operation","platforms":[],"architectures":[],"allocator_assumptions":"none","ffi":"can wrap C-owned byte buffers if lifetime is guaranteed","no_std_equivalent":"already allocation-free"},"complexity":{"operations":[{"operation":"read/skip/subReader","time":"O(1) plus returned byte count only for consumer use"}],"space":"O(1) reader state","compile_time":"minimal","notes":[]},"limits":[{"name":"maximum readable bytes","value":"input.len","source":"borrowed input"}],"validation":{"build_step":"test-bounded-reader","commands":["zig build test-bounded-reader","zig build test"],"compiler_validated":false,"compiler_version":"","last_validated_commit":"","unit_tests":["sequential reads","explicit endian","failed read cursor unchanged","sub-reader confinement","zero-length reads"],"integration_tests":[],"property_tests":[],"fuzz_tests":[],"benchmarks":[],"known_failures":[],"notes":["Compiler validation pending."]},"documentation":{"read_order":["README.md","MASTERY.md","DETAILS.md","details.json","src/bounded_reader.zig"],"examples_covered":["byte slices","integers","sub-reader"],"exercises":["u64 reads","peek","format-specific decoder"],"glossary_terms":["cursor","borrowed slice","endianness","failure atomicity"],"related_modules":["06-byte-writer"]},"maintenance":{"stability":"experimental","breaking_change_policy":"Keep cursor and error semantics stable or update all parser dependents.","known_gaps":["compiler validation pending"],"planned_extensions":["additional integer widths","peek operations"],"review_triggers":["cursor semantics change","new errors","endianness API change"],"synchronization_requirements":["keep method signatures synchronized with source"]},"search":{"capabilities":["bounded byte reading","binary decoding","explicit endian integers","sub-reader"],"problems":["buffer overread","cursor rollback","unaligned loads","implicit endianness"],"inputs":["borrowed byte slice"],"outputs":["borrowed subslice","decoded integers","bounded child reader"],"environments":["hosted","freestanding","parser","network","hypervisor"],"keywords":["byte reader","binary parser","cursor","bounded input","endian reader"]}}
+{
+  "schema_version": "2.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "04",
+    "canonical_name": "bounded-byte-reader",
+    "display_name": "Bounded Byte Reader",
+    "directory": "projects/04-bounded-byte-reader",
+    "summary": "Borrowed binary input cursor with checked, failure-atomic reads.",
+    "long_description": "Borrowed binary input cursor with checked, failure-atomic reads.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "binary-io",
+    "subcategory": "",
+    "tags": [
+      "parser",
+      "reader",
+      "bounds",
+      "endianness",
+      "borrowed"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Read structured values from a borrowed byte slice without advancing beyond its bounds or consuming input on failed reads.",
+    "secondary": [],
+    "non_goals": [],
+    "problems_solved": [],
+    "future_role": ""
+  },
+  "c_pain": {
+    "summary": "C binary parsers commonly mix pointer arithmetic, length checks, cursor mutation, alignment, and endianness at every call site.",
+    "common_failure_modes": [
+      "cursor plus count overflow",
+      "read past end",
+      "failed read advances cursor",
+      "unaligned integer load",
+      "implicit host endianness",
+      "substructure escapes parent bounds"
+    ],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "Pointer increments and casts make initial parsers short and fast.",
+    "where_c_degrades": "Every field repeats subtle security-sensitive arithmetic and rollback behavior."
+  },
+  "zig_response": {
+    "summary": "A borrowed slice and cursor are encapsulated behind checked reads with explicit byte order and confined sub-readers.",
+    "language_features": [
+      "slices",
+      "error unions",
+      "std.mem.readInt",
+      "explicit endian enum",
+      "value semantics"
+    ],
+    "guarantees_made_visible": [
+      "cursor <= input.len",
+      "failed reads leave cursor unchanged",
+      "integer byte order is explicit",
+      "child readers cannot exceed their assigned slice"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "interpret the format correctly",
+      "apply semantic limits",
+      "decide whether trailing bytes are valid",
+      "keep borrowed input alive"
+    ],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/04-bounded-byte-reader",
+    "implementation": [
+      "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig"
+    ],
+    "public_entrypoint": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig",
+    "tests": [
+      "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig"
+    ],
+    "readme": "projects/04-bounded-byte-reader/README.md",
+    "mastery": "projects/04-bounded-byte-reader/MASTERY.md",
+    "details_markdown": "projects/04-bounded-byte-reader/DETAILS.md",
+    "details_json": "projects/04-bounded-byte-reader/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "BoundedReader"
+    ],
+    "types": [
+      {
+        "name": "BoundedReader",
+        "kind": "struct"
+      }
+    ],
+    "functions": [],
+    "methods": [
+      {
+        "name": "init",
+        "signature": "init(input: []const u8) BoundedReader"
+      },
+      {
+        "name": "remaining",
+        "signature": "remaining(self: *const BoundedReader) usize"
+      },
+      {
+        "name": "readBytes",
+        "signature": "readBytes(self: *BoundedReader, count: usize) Error![]const u8"
+      },
+      {
+        "name": "skip",
+        "signature": "skip(self: *BoundedReader, count: usize) Error!void"
+      },
+      {
+        "name": "readU8",
+        "signature": "readU8(self: *BoundedReader) Error!u8"
+      },
+      {
+        "name": "readU16Le/readU16Be",
+        "signature": "explicit-endian u16 reads"
+      },
+      {
+        "name": "readU32Le/readU32Be",
+        "signature": "explicit-endian u32 reads"
+      },
+      {
+        "name": "subReader",
+        "signature": "subReader(self: *BoundedReader, count: usize) Error!BoundedReader"
+      }
+    ],
+    "constants": [],
+    "errors": [
+      "UnexpectedEnd"
+    ],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": []
+  },
+  "inputs": [
+    {
+      "name": "input",
+      "type": "[]const u8",
+      "ownership": "borrowed",
+      "lifetime": "must outlive reader and all returned slices/sub-readers",
+      "constraints": "any byte slice"
+    },
+    {
+      "name": "count",
+      "type": "usize",
+      "ownership": "value",
+      "lifetime": "call",
+      "constraints": "must be <= remaining for success"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "readBytes",
+      "type": "[]const u8",
+      "ownership": "borrowed subslice",
+      "lifetime": "tied to input",
+      "invalidation": "input lifetime end",
+      "caller_cleanup": "none"
+    },
+    {
+      "name": "subReader",
+      "type": "BoundedReader",
+      "ownership": "value containing borrowed slice",
+      "lifetime": "tied to parent input",
+      "invalidation": "input lifetime end",
+      "caller_cleanup": "none"
+    },
+    {
+      "name": "integers",
+      "type": "u8/u16/u32",
+      "ownership": "value",
+      "lifetime": "caller value",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    }
+  ],
+  "state": {
+    "fields": [
+      {
+        "name": "input",
+        "type": "[]const u8",
+        "role": "borrowed immutable source"
+      },
+      {
+        "name": "cursor",
+        "type": "usize",
+        "role": "next unread offset"
+      }
+    ],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "cursor <= input.len",
+      "remaining == input.len - cursor",
+      "successful reads advance exactly their byte count",
+      "failed reads do not advance"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [],
+    "borrows": [
+      "input bytes"
+    ],
+    "copies": [
+      "decoded integer values"
+    ],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "not applicable",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [
+      {
+        "operation": "readBytes/skip/integer reads/subReader",
+        "error": "UnexpectedEnd",
+        "state_change": "none"
+      }
+    ],
+    "optional_empty_results": [],
+    "failure_atomicity": "Bounds are checked using count <= input.len - cursor before cursor mutation.",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": [
+      "input must remain alive"
+    ]
+  },
+  "invalidation": {
+    "rules": [
+      {
+        "reference": "returned slices and child readers",
+        "trigger": "source input becomes invalid",
+        "effect": "all borrowed data invalid"
+      }
+    ],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [],
+    "standard_library": [
+      "std.mem",
+      "std.testing"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": [
+      "bounded cursor",
+      "failure atomicity",
+      "explicit endianness"
+    ]
+  },
+  "dependency_contracts": [],
+  "expected_dependents": [
+    {
+      "name": "binary format parser",
+      "reason": "safe structural decoding"
+    },
+    {
+      "name": "ELF loader",
+      "reason": "bounded executable fields"
+    },
+    {
+      "name": "network decoder",
+      "reason": "framed protocol input"
+    },
+    {
+      "name": "database record reader",
+      "reason": "bounded persistent records"
+    }
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "bounded_reader",
+    "import_path": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig",
+    "import_configuration": "Import source or register as build module.",
+    "minimal_example": "var reader = BoundedReader.init(bytes);\nconst magic = try reader.readU32Le();",
+    "integration_patterns": [
+      {
+        "with": "06-byte-writer",
+        "pattern": "decode and encode the same explicit binary format"
+      },
+      {
+        "with": "resource limits",
+        "pattern": "validate decoded counts before allocation"
+      }
+    ],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "safe for separate instances; shared mutation requires synchronization",
+    "reentrant": "yes for distinct readers",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "none",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "can wrap C-owned byte buffers if lifetime is guaranteed",
+    "no_std_equivalent": "already allocation-free"
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-bounded-byte-reader",
+    "commands": [
+      "zig build test-bounded-byte-reader",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "read bytes and track remaining input",
+      "failed reads do not move the cursor",
+      "read explicit little and big endian integers",
+      "sub-reader cannot escape its declared section",
+      "zero-length reads are valid and do not advance"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [
+      "zero-length reads are valid and do not advance"
+    ],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Compiler validation pending."
+    ]
+  },
+  "documentation": {
+    "read_order": [
+      "details.json",
+      "DETAILS.md",
+      "README.md",
+      "MASTERY.md",
+      "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig"
+    ],
+    "examples_covered": [
+      "byte slices",
+      "integers",
+      "sub-reader"
+    ],
+    "exercises": [
+      "u64 reads",
+      "peek",
+      "format-specific decoder"
+    ],
+    "readiness_questions": [],
+    "glossary_terms": [
+      "cursor",
+      "borrowed slice",
+      "endianness",
+      "failure atomicity"
+    ],
+    "related_modules": [
+      "06-byte-writer"
+    ],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Keep cursor and error semantics stable or update all parser dependents.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [
+      "compiler validation pending"
+    ],
+    "known_bugs": [],
+    "planned_extensions": [
+      "additional integer widths",
+      "peek operations"
+    ],
+    "review_triggers": [
+      "cursor semantics change",
+      "new errors",
+      "endianness API change"
+    ],
+    "synchronization_requirements": [
+      "keep method signatures synchronized with source"
+    ],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "bounded byte reading",
+      "binary decoding",
+      "explicit endian integers",
+      "sub-reader"
+    ],
+    "problems": [
+      "buffer overread",
+      "cursor rollback",
+      "unaligned loads",
+      "implicit endianness"
+    ],
+    "inputs": [
+      "borrowed byte slice"
+    ],
+    "outputs": [
+      "borrowed subslice",
+      "decoded integers",
+      "bounded child reader"
+    ],
+    "environments": [
+      "hosted",
+      "freestanding",
+      "parser",
+      "network",
+      "hypervisor"
+    ],
+    "keywords": [
+      "byte reader",
+      "binary parser",
+      "cursor",
+      "bounded input",
+      "endian reader"
+    ],
+    "grep_terms": [
+      "bounded-byte-reader",
+      "BoundedReader"
+    ],
+    "natural_language_queries": [
+      "How do I borrowed binary input cursor with checked, failure-atomic reads?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "binary-io",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [
+      "binary format parser",
+      "ELF loader",
+      "network decoder",
+      "database record reader"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Borrowed binary input cursor with checked, failure-atomic reads.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [
+      "buffer overread",
+      "cursor rollback",
+      "unaligned loads",
+      "implicit endianness"
+    ],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-bounded-byte-reader"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ]
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "BoundedReader",
+        "file": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "read bytes and track remaining input",
+        "file": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig"
+      },
+      {
+        "test": "failed reads do not move the cursor",
+        "file": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig"
+      },
+      {
+        "test": "read explicit little and big endian integers",
+        "file": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig"
+      },
+      {
+        "test": "sub-reader cannot escape its declared section",
+        "file": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig"
+      },
+      {
+        "test": "zero-length reads are valid and do not advance",
+        "file": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  }
+}

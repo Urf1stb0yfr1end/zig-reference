@@ -35,8 +35,8 @@ A project belongs when:
 ## Early study path
 
 1. [Fixed-capacity vector](projects/00-fixed-capacity-vector/README.md)
-2. [Dynamic array](projects/02-dynamic-array/README.md)
-3. [Ring buffer](projects/03-ring-buffer/README.md)
+2. [Dynamic array](projects/01-dynamic-array/README.md)
+3. [Ring buffer](projects/02-ring-buffer/README.md)
 4. [Fixed bit set](projects/03-bit-set/README.md)
 5. [Bounded byte reader](projects/04-bounded-byte-reader/README.md)
 6. [Stack](projects/05-stack/README.md)

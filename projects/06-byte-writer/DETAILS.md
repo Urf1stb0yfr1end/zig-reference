@@ -44,7 +44,7 @@ Allocation failure leaves the previous logical byte sequence unchanged because c
 
 ## Dependencies
 
-- `projects/02-dynamic-array`
+- `projects/01-dynamic-array`
 
 ## Expected dependents
 

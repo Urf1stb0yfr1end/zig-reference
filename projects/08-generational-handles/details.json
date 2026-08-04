@@ -1,1 +1,618 @@
-{"schema_version":"1.0.0","module":{"id":"08","name":"generational-handles","directory":"projects/08-generational-handles","summary":"Fixed-capacity value table with generation-bearing handles that reject stale references.","status":"experimental-unverified","category":"identity","tags":["handles","generation","stale-reference","slot-table","freestanding"]},"purpose":"Store values behind index-plus-generation handles so removed and reused slots cannot be accessed through stale identifiers.","c_pain":{"summary":"Raw pointers and array indices can outlive removed resources and silently refer to reused storage.","failure_modes":["use after remove","stale index aliases new object","double removal","escaped pointer outlives slot"],"why_c_is_attractive":"Pointers and integer indices are compact and fast.","where_c_degrades":"Lifetime validity is not carried by the identifier and must be reconstructed by convention."},"zig_response":{"summary":"Pair every slot index with a generation and validate both on access.","language_features":["generic type factory","optionals","precise integer generation","inline storage"],"guarantees_made_visible":["stale handles return null","removal increments generation","count equals occupied slots"],"remaining_programmer_responsibilities":["do not retain returned pointers across removal or table moves","clean up T-owned resources before or after removal","provide synchronization externally"]},"public_surface":{"root_symbols":["HandleTable"],"types":[{"name":"HandleTable(T, capacity)","kind":"generic type factory"},{"name":"Handle","kind":"index and generation value"}],"functions":[],"methods":[{"name":"count","signature":"count(self: *const Self) usize"},{"name":"insert","signature":"insert(self: *Self, value: T) error{Full}!Handle"},{"name":"get","signature":"get(self: *Self, handle: Handle) ?*T"},{"name":"getConst","signature":"getConst(self: *const Self, handle: Handle) ?*const T"},{"name":"remove","signature":"remove(self: *Self, handle: Handle) ?T"}],"errors":["Full"],"constants":[]},"locations":{"implementation":["projects/08-generational-handles/src/generational_handles.zig"],"test_source":["projects/08-generational-handles/src/generational_handles.zig"],"readme":"","mastery":"","details_markdown":"","details_json":"projects/08-generational-handles/details.json","examples":[],"benchmarks":[],"fixtures":[],"fuzz":[]},"inputs":[{"name":"T","type":"type","ownership":"compile-time","lifetime":"program","constraints":"valid Zig type"},{"name":"capacity","type":"usize","ownership":"compile-time","lifetime":"program","constraints":"may be zero"},{"name":"value","type":"T","ownership":"copied into slot","lifetime":"until remove","constraints":"copy semantics of T"},{"name":"handle","type":"Handle","ownership":"copied identifier","lifetime":"until corresponding removal","constraints":"must match index and generation for access"}],"outputs":[{"name":"Handle","type":"Handle","ownership":"copied","lifetime":"valid until remove","invalidation":"remove(handle)","caller_cleanup":"none"},{"name":"get pointer","type":"?*T or ?*const T","ownership":"borrowed","lifetime":"until removal, table move, or destruction","invalidation":"remove, table move, table destruction","caller_cleanup":"none"},{"name":"removed value","type":"?T","ownership":"copied out","lifetime":"caller-owned","invalidation":"none","caller_cleanup":"depends on T"}],"state":[{"name":"slots","type":"[capacity]Slot","role":"inline values, occupancy, and generation"},{"name":"len","type":"usize","role":"occupied slot count"}],"invariants":["len equals occupied slot count","valid handles require in-range index, occupied slot, and matching generation","occupied slot generations are never zero","removal invalidates prior handles before reuse"],"failure_behavior":{"errors":[{"operation":"insert","error":"Full","state_change":"none"}],"optional_empty_results":[{"operation":"get/getConst","meaning":"invalid, stale, or removed handle"},{"operation":"remove","meaning":"invalid, stale, or removed handle"}],"failure_atomicity":"failed insertion and invalid handle operations preserve state","partial_effects":[],"panic_conditions":[],"undefined_behavior_preconditions":["borrowed pointers must not outlive their slot or table"]},"ownership":{"owns":["inline slot storage","stored copies of T"],"borrows":[],"copies":["inserted and removed values","handles"],"transfers":[],"allocator":"none","element_cleanup":"caller must manage resource-owning T values"},"cleanup":[],"invalidation":[{"reference":"Handle","trigger":"successful remove","effect":"generation mismatch makes it stale"},{"reference":"pointer returned by get","trigger":"remove, table move, or destruction","effect":"pointer no longer valid"}],"dependencies":{"repository":[],"standard_library":["std.testing"],"external":[],"conceptual":["stable handle","generation counter","slot occupancy"]},"expected_dependents":[{"name":"virtual machine registry","reason":"stable VM identity"},{"name":"vCPU registry","reason":"stale vCPU rejection"},{"name":"device registry","reason":"stable device handles"},{"name":"timer registry","reason":"safe cancellation handles"}],"composition":{"import_name":"generational_handles","import_configuration":"Import projects/08-generational-handles/src/generational_handles.zig.","minimal_example":"const HandleTable = @import(\"generational_handles.zig\").HandleTable; var table = HandleTable(u32, 16){}; const h = try table.insert(42);","integration_patterns":[],"incompatible_combinations":[],"replacement_options":[]},"compatibility":{"zig_version":"0.14.0","hosted":"yes","freestanding":"yes","thread_safe":"no internal synchronization","reentrant":"yes for distinct instances","endianness":"not applicable","platforms":[],"architectures":[],"allocator_assumptions":"none","ffi":"Handle layout is not declared extern","no_std_equivalent":"already freestanding-suitable"},"complexity":{"operations":[{"operation":"insert","time":"O(capacity)"},{"operation":"get/getConst","time":"O(1)"},{"operation":"remove","time":"O(1)"}],"space":"O(capacity * sizeof(Slot)) inline","compile_time":"one concrete type per T and capacity","notes":[]},"limits":[{"name":"maximum live entries","value":"capacity","source":"compile-time parameter"},{"name":"generation width","value":"u32","source":"implementation"}],"validation":{"build_step":"test-generational-handles","commands":["zig build test-generational-handles","zig build test"],"compiler_validated":false,"compiler_version":"","last_validated_commit":"","unit_tests":["insert and retrieve","stale handle rejection","invalid removal","full and zero capacity"],"integration_tests":[],"property_tests":[],"fuzz_tests":[],"benchmarks":[],"known_failures":[],"notes":["README.md, MASTERY.md, DETAILS.md, and build registration require verification or creation."]},"documentation":{"read_order":["details.json","src/generational_handles.zig"],"examples_covered":[],"exercises":[],"glossary_terms":["handle","generation","slot","stale reference"],"related_modules":["bitmap-allocator"]},"maintenance":{"stability":"experimental","breaking_change_policy":"Update source, tests, contracts, build, catalog, and dependents together.","known_gaps":["compiler validation pending","human documentation paths blank"],"planned_extensions":[],"review_triggers":["generation policy changes","pointer lifetime changes","capacity representation changes"],"synchronization_requirements":["public signatures must match source"]},"search":{"capabilities":["stale-handle rejection","stable resource identity","fixed-capacity handle table"],"problems":["stale index","use after removal","slot reuse"],"inputs":["value","handle"],"outputs":["generation handle","borrowed pointer","removed value"],"environments":["hosted","freestanding","kernel","hypervisor"],"keywords":["generational handles","handle table","slot map","stale handle"]}}
+{
+  "schema_version": "2.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "08",
+    "canonical_name": "generational-handles",
+    "display_name": "Generational Handles",
+    "directory": "projects/08-generational-handles",
+    "summary": "Fixed-capacity value table with generation-bearing handles that reject stale references.",
+    "long_description": "Fixed-capacity value table with generation-bearing handles that reject stale references.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "identity",
+    "subcategory": "",
+    "tags": [
+      "handles",
+      "generation",
+      "stale-reference",
+      "slot-table",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Store values behind index-plus-generation handles so removed and reused slots cannot be accessed through stale identifiers.",
+    "secondary": [],
+    "non_goals": [],
+    "problems_solved": [],
+    "future_role": ""
+  },
+  "c_pain": {
+    "summary": "Raw pointers and array indices can outlive removed resources and silently refer to reused storage.",
+    "common_failure_modes": [
+      "use after remove",
+      "stale index aliases new object",
+      "double removal",
+      "escaped pointer outlives slot"
+    ],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "Pointers and integer indices are compact and fast.",
+    "where_c_degrades": "Lifetime validity is not carried by the identifier and must be reconstructed by convention."
+  },
+  "zig_response": {
+    "summary": "Pair every slot index with a generation and validate both on access.",
+    "language_features": [
+      "generic type factory",
+      "optionals",
+      "precise integer generation",
+      "inline storage"
+    ],
+    "guarantees_made_visible": [
+      "stale handles return null",
+      "removal increments generation",
+      "count equals occupied slots"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "do not retain returned pointers across removal or table moves",
+      "clean up T-owned resources before or after removal",
+      "provide synchronization externally"
+    ],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/08-generational-handles",
+    "implementation": [
+      "projects/08-generational-handles/src/generational_handles.zig"
+    ],
+    "public_entrypoint": "projects/08-generational-handles/src/generational_handles.zig",
+    "tests": [
+      "projects/08-generational-handles/src/generational_handles.zig"
+    ],
+    "readme": "projects/08-generational-handles/README.md",
+    "mastery": "projects/08-generational-handles/MASTERY.md",
+    "details_markdown": "projects/08-generational-handles/DETAILS.md",
+    "details_json": "projects/08-generational-handles/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "HandleTable"
+    ],
+    "types": [
+      {
+        "name": "HandleTable(T, capacity)",
+        "kind": "generic type factory"
+      },
+      {
+        "name": "Handle",
+        "kind": "index and generation value"
+      }
+    ],
+    "functions": [],
+    "methods": [
+      {
+        "name": "count",
+        "signature": "count(self: *const Self) usize"
+      },
+      {
+        "name": "insert",
+        "signature": "insert(self: *Self, value: T) error{Full}!Handle"
+      },
+      {
+        "name": "get",
+        "signature": "get(self: *Self, handle: Handle) ?*T"
+      },
+      {
+        "name": "getConst",
+        "signature": "getConst(self: *const Self, handle: Handle) ?*const T"
+      },
+      {
+        "name": "remove",
+        "signature": "remove(self: *Self, handle: Handle) ?T"
+      }
+    ],
+    "constants": [],
+    "errors": [
+      "Full"
+    ],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": []
+  },
+  "inputs": [
+    {
+      "name": "T",
+      "type": "type",
+      "ownership": "compile-time",
+      "lifetime": "program",
+      "constraints": "valid Zig type"
+    },
+    {
+      "name": "capacity",
+      "type": "usize",
+      "ownership": "compile-time",
+      "lifetime": "program",
+      "constraints": "may be zero"
+    },
+    {
+      "name": "value",
+      "type": "T",
+      "ownership": "copied into slot",
+      "lifetime": "until remove",
+      "constraints": "copy semantics of T"
+    },
+    {
+      "name": "handle",
+      "type": "Handle",
+      "ownership": "copied identifier",
+      "lifetime": "until corresponding removal",
+      "constraints": "must match index and generation for access"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Handle",
+      "type": "Handle",
+      "ownership": "copied",
+      "lifetime": "valid until remove",
+      "invalidation": "remove(handle)",
+      "caller_cleanup": "none"
+    },
+    {
+      "name": "get pointer",
+      "type": "?*T or ?*const T",
+      "ownership": "borrowed",
+      "lifetime": "until removal, table move, or destruction",
+      "invalidation": "remove, table move, table destruction",
+      "caller_cleanup": "none"
+    },
+    {
+      "name": "removed value",
+      "type": "?T",
+      "ownership": "copied out",
+      "lifetime": "caller-owned",
+      "invalidation": "none",
+      "caller_cleanup": "depends on T"
+    }
+  ],
+  "state": {
+    "fields": [
+      {
+        "name": "slots",
+        "type": "[capacity]Slot",
+        "role": "inline values, occupancy, and generation"
+      },
+      {
+        "name": "len",
+        "type": "usize",
+        "role": "occupied slot count"
+      }
+    ],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "len equals occupied slot count",
+      "valid handles require in-range index, occupied slot, and matching generation",
+      "occupied slot generations are never zero",
+      "removal invalidates prior handles before reuse"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [
+      "inline slot storage",
+      "stored copies of T"
+    ],
+    "borrows": [],
+    "copies": [
+      "inserted and removed values",
+      "handles"
+    ],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "caller must manage resource-owning T values",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [
+      {
+        "operation": "insert",
+        "error": "Full",
+        "state_change": "none"
+      }
+    ],
+    "optional_empty_results": [
+      {
+        "operation": "get/getConst",
+        "meaning": "invalid, stale, or removed handle"
+      },
+      {
+        "operation": "remove",
+        "meaning": "invalid, stale, or removed handle"
+      }
+    ],
+    "failure_atomicity": "failed insertion and invalid handle operations preserve state",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": [
+      "borrowed pointers must not outlive their slot or table"
+    ]
+  },
+  "invalidation": {
+    "rules": [
+      {
+        "reference": "Handle",
+        "trigger": "successful remove",
+        "effect": "generation mismatch makes it stale"
+      },
+      {
+        "reference": "pointer returned by get",
+        "trigger": "remove, table move, or destruction",
+        "effect": "pointer no longer valid"
+      }
+    ],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [],
+    "standard_library": [
+      "std.testing"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": [
+      "stable handle",
+      "generation counter",
+      "slot occupancy"
+    ]
+  },
+  "dependency_contracts": [],
+  "expected_dependents": [
+    {
+      "name": "virtual machine registry",
+      "reason": "stable VM identity"
+    },
+    {
+      "name": "vCPU registry",
+      "reason": "stale vCPU rejection"
+    },
+    {
+      "name": "device registry",
+      "reason": "stable device handles"
+    },
+    {
+      "name": "timer registry",
+      "reason": "safe cancellation handles"
+    }
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "generational_handles",
+    "import_path": "projects/08-generational-handles/src/generational_handles.zig",
+    "import_configuration": "Import projects/08-generational-handles/src/generational_handles.zig.",
+    "minimal_example": "const HandleTable = @import(\"generational_handles.zig\").HandleTable; var table = HandleTable(u32, 16){}; const h = try table.insert(42);",
+    "integration_patterns": [],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "no internal synchronization",
+    "reentrant": "yes for distinct instances",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "none",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "Handle layout is not declared extern",
+    "no_std_equivalent": "already freestanding-suitable"
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-generational-handles",
+    "commands": [
+      "zig build test-generational-handles",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "insert and retrieve values",
+      "removed handles become stale",
+      "invalid removal does not mutate state",
+      "full and zero-capacity tables fail explicitly"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [
+      "full and zero-capacity tables fail explicitly"
+    ],
+    "boundary_tests": [
+      "invalid removal does not mutate state",
+      "full and zero-capacity tables fail explicitly"
+    ],
+    "regression_tests": [],
+    "test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "README.md, MASTERY.md, DETAILS.md, and build registration require verification or creation."
+    ]
+  },
+  "documentation": {
+    "read_order": [
+      "details.json",
+      "DETAILS.md",
+      "README.md",
+      "MASTERY.md",
+      "projects/08-generational-handles/src/generational_handles.zig"
+    ],
+    "examples_covered": [],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [
+      "handle",
+      "generation",
+      "slot",
+      "stale reference"
+    ],
+    "related_modules": [
+      "bitmap-allocator"
+    ],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Update source, tests, contracts, build, catalog, and dependents together.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [
+      "compiler validation pending",
+      "human documentation paths blank"
+    ],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [
+      "generation policy changes",
+      "pointer lifetime changes",
+      "capacity representation changes"
+    ],
+    "synchronization_requirements": [
+      "public signatures must match source"
+    ],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "stale-handle rejection",
+      "stable resource identity",
+      "fixed-capacity handle table"
+    ],
+    "problems": [
+      "stale index",
+      "use after removal",
+      "slot reuse"
+    ],
+    "inputs": [
+      "value",
+      "handle"
+    ],
+    "outputs": [
+      "generation handle",
+      "borrowed pointer",
+      "removed value"
+    ],
+    "environments": [
+      "hosted",
+      "freestanding",
+      "kernel",
+      "hypervisor"
+    ],
+    "keywords": [
+      "generational handles",
+      "handle table",
+      "slot map",
+      "stale handle"
+    ],
+    "grep_terms": [
+      "generational-handles",
+      "HandleTable"
+    ],
+    "natural_language_queries": [
+      "How do I fixed-capacity value table with generation-bearing handles that reject stale references?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "identity",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [
+      "virtual machine registry",
+      "vCPU registry",
+      "device registry",
+      "timer registry"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Fixed-capacity value table with generation-bearing handles that reject stale references.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [
+      "stale index",
+      "use after removal",
+      "slot reuse"
+    ],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-generational-handles"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ]
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "HandleTable",
+        "file": "projects/08-generational-handles/src/generational_handles.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "insert and retrieve values",
+        "file": "projects/08-generational-handles/src/generational_handles.zig"
+      },
+      {
+        "test": "removed handles become stale",
+        "file": "projects/08-generational-handles/src/generational_handles.zig"
+      },
+      {
+        "test": "invalid removal does not mutate state",
+        "file": "projects/08-generational-handles/src/generational_handles.zig"
+      },
+      {
+        "test": "full and zero-capacity tables fail explicitly",
+        "file": "projects/08-generational-handles/src/generational_handles.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  }
+}

@@ -59,6 +59,6 @@ zig build test-bounded-reader
 ```
 
 ## Source map
-- implementation: `src/bounded_reader.zig`
+- implementation: `src/bounded_byte_reader.zig`
 - introduction: `README.md`
 - study guide: `MASTERY.md`

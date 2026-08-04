@@ -1,1 +1,412 @@
-{"schema_version":"1.0.0","module":{"id":"26","name":"tagged-result","directory":"projects/26-tagged-result","summary":"Exclusive success or failure payload in a tagged union.","status":"experimental-unverified","category":"outcome","tags":["tagged-union","result","api","freestanding"]},"purpose":"Keep outcome and matching payload structurally synchronized.","public_surface":{"root_symbols":["TaggedResult"],"methods":["isSuccess","successValue","failureValue"],"errors":[]},"locations":{"implementation":["projects/26-tagged-result/src/tagged_result.zig"],"readme":"projects/26-tagged-result/README.md","mastery":"projects/26-tagged-result/MASTERY.md","details_markdown":"projects/26-tagged-result/DETAILS.md","details_json":"projects/26-tagged-result/details.json"},"inputs":[{"name":"Success/Failure","type":"types","ownership":"compile-time"}],"outputs":[{"name":"outcome","type":"TaggedResult(Success,Failure)","ownership":"owns contained value","invalidation":"depends on payload"}],"invariants":["exactly one variant is active"],"failure_behavior":{"errors":[],"optional_empty_results":["inactive payload accessor returns null"],"failure_atomicity":"value construction is direct"},"ownership":{"owns":["active payload"],"borrows":[],"allocator":"none unless payload owns one"},"dependencies":{"repository":[],"standard_library":["std.testing"]},"expected_dependents":["authorization","parsers","negotiation","instruction emulation"],"compatibility":{"zig_version":"0.14.0","hosted":"yes","freestanding":"yes","thread_safe":"depends on payload"},"complexity":{"operations":"O(1)","space":"tag plus largest payload"},"validation":{"build_step":"test-tagged-result","compiler_validated":false,"notes":["Local validation pending."]},"search":{"capabilities":["tagged result","structured outcome"],"keywords":["success failure","tagged union","result"]}}
+{
+  "schema_version": "2.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "26",
+    "canonical_name": "tagged-result",
+    "display_name": "Tagged Result",
+    "directory": "projects/26-tagged-result",
+    "summary": "Exclusive success or failure payload in a tagged union.",
+    "long_description": "Exclusive success or failure payload in a tagged union.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "outcome",
+    "subcategory": "",
+    "tags": [
+      "tagged-union",
+      "result",
+      "api",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Keep outcome and matching payload structurally synchronized.",
+    "secondary": [],
+    "non_goals": [],
+    "problems_solved": [],
+    "future_role": ""
+  },
+  "c_pain": {
+    "summary": "",
+    "common_failure_modes": [],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "",
+    "where_c_degrades": ""
+  },
+  "zig_response": {
+    "summary": "",
+    "language_features": [],
+    "guarantees_made_visible": [],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/26-tagged-result",
+    "implementation": [
+      "projects/26-tagged-result/src/tagged_result.zig"
+    ],
+    "public_entrypoint": "projects/26-tagged-result/src/tagged_result.zig",
+    "tests": [
+      "projects/26-tagged-result/src/tagged_result.zig"
+    ],
+    "readme": "projects/26-tagged-result/README.md",
+    "mastery": "projects/26-tagged-result/MASTERY.md",
+    "details_markdown": "projects/26-tagged-result/DETAILS.md",
+    "details_json": "projects/26-tagged-result/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "TaggedResult"
+    ],
+    "types": [],
+    "functions": [],
+    "methods": [
+      "isSuccess",
+      "successValue",
+      "failureValue"
+    ],
+    "constants": [],
+    "errors": [],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": []
+  },
+  "inputs": [
+    {
+      "name": "Success/Failure",
+      "type": "types",
+      "ownership": "compile-time"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "outcome",
+      "type": "TaggedResult(Success,Failure)",
+      "ownership": "owns contained value",
+      "invalidation": "depends on payload"
+    }
+  ],
+  "state": {
+    "fields": [],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "exactly one variant is active"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [
+      "active payload"
+    ],
+    "borrows": [],
+    "copies": [],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none unless payload owns one",
+    "allocator_lifetime": "",
+    "element_cleanup": "",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [],
+    "optional_empty_results": [
+      "inactive payload accessor returns null"
+    ],
+    "failure_atomicity": "value construction is direct",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [],
+    "standard_library": [
+      "std.testing"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": []
+  },
+  "dependency_contracts": [],
+  "expected_dependents": [
+    "authorization",
+    "parsers",
+    "negotiation",
+    "instruction emulation"
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "tagged_result",
+    "import_path": "projects/26-tagged-result/src/tagged_result.zig",
+    "import_configuration": "Import the canonical repository-relative source path.",
+    "minimal_example": "",
+    "integration_patterns": [],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "depends on payload",
+    "reentrant": "unknown",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "",
+    "no_std_equivalent": ""
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-tagged-result",
+    "commands": [
+      "zig build test-tagged-result",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "outcomes are exclusive"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Local validation pending."
+    ]
+  },
+  "documentation": {
+    "read_order": [
+      "details.json",
+      "DETAILS.md",
+      "README.md",
+      "MASTERY.md",
+      "projects/26-tagged-result/src/tagged_result.zig"
+    ],
+    "examples_covered": [],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [],
+    "related_modules": [],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Synchronize source, tests, contracts, catalog, and dependents.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [],
+    "synchronization_requirements": [],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "tagged result",
+      "structured outcome"
+    ],
+    "problems": [],
+    "inputs": [],
+    "outputs": [],
+    "environments": [],
+    "keywords": [
+      "success failure",
+      "tagged union",
+      "result"
+    ],
+    "grep_terms": [
+      "tagged-result",
+      "TaggedResult"
+    ],
+    "natural_language_queries": [
+      "How do I exclusive success or failure payload in a tagged union?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "outcome",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [
+      "authorization",
+      "parsers",
+      "negotiation",
+      "instruction emulation"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Exclusive success or failure payload in a tagged union.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-tagged-result"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ]
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "TaggedResult",
+        "file": "projects/26-tagged-result/src/tagged_result.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "outcomes are exclusive",
+        "file": "projects/26-tagged-result/src/tagged_result.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  }
+}

@@ -4,27 +4,22 @@
   "generated_at": "2026-08-04",
   "last_reviewed_at": "2026-08-04",
   "module": {
-    "id": "27",
-    "canonical_name": "source-span",
-    "display_name": "Source Span",
-    "directory": "projects/27-source-span",
-    "summary": "Checked half-open byte span into source data.",
-    "long_description": "Checked half-open byte span into source data.",
+    "id": "06",
+    "canonical_name": "byte-writer",
+    "display_name": "Byte Writer",
+    "directory": "projects/06-byte-writer",
+    "summary": "Byte Writer reference module.",
+    "long_description": "Byte Writer reference module.",
     "status": "experimental-unverified",
     "maturity": "experimental",
-    "category": "diagnostics",
+    "category": "",
     "subcategory": "",
-    "tags": [
-      "source",
-      "span",
-      "lexer",
-      "parser"
-    ],
+    "tags": [],
     "aliases": [],
     "deprecated_names": []
   },
   "purpose": {
-    "primary": "Centralize source byte offsets and slicing semantics.",
+    "primary": "",
     "secondary": [],
     "non_goals": [],
     "problems_solved": [],
@@ -48,18 +43,18 @@
     "tradeoffs": []
   },
   "locations": {
-    "module_root": "projects/27-source-span",
+    "module_root": "projects/06-byte-writer",
     "implementation": [
-      "projects/27-source-span/src/source_span.zig"
+      "projects/06-byte-writer/src/byte_writer.zig"
     ],
-    "public_entrypoint": "projects/27-source-span/src/source_span.zig",
+    "public_entrypoint": "projects/06-byte-writer/src/byte_writer.zig",
     "tests": [
-      "projects/27-source-span/src/source_span.zig"
+      "projects/06-byte-writer/src/byte_writer.zig"
     ],
-    "readme": "projects/27-source-span/README.md",
-    "mastery": "projects/27-source-span/MASTERY.md",
-    "details_markdown": "projects/27-source-span/DETAILS.md",
-    "details_json": "projects/27-source-span/details.json",
+    "readme": "projects/06-byte-writer/README.md",
+    "mastery": "projects/06-byte-writer/MASTERY.md",
+    "details_markdown": "projects/06-byte-writer/DETAILS.md",
+    "details_json": "projects/06-byte-writer/details.json",
     "examples": [],
     "benchmarks": [],
     "fixtures": [],
@@ -68,46 +63,19 @@
   },
   "public_surface": {
     "root_symbols": [
-      "SourceSpan"
+      "ByteWriter"
     ],
     "types": [],
     "functions": [],
-    "methods": [
-      "init",
-      "len",
-      "isEmpty",
-      "slice"
-    ],
+    "methods": [],
     "constants": [],
-    "errors": [
-      "InvalidOrder",
-      "OutOfBounds"
-    ],
+    "errors": [],
     "callbacks": [],
     "interfaces": [],
     "compile_time_parameters": []
   },
-  "inputs": [
-    {
-      "name": "start/end",
-      "type": "usize",
-      "ownership": "copied"
-    },
-    {
-      "name": "source",
-      "type": "[]const u8",
-      "ownership": "borrowed",
-      "lifetime": "returned slice lifetime"
-    }
-  ],
-  "outputs": [
-    {
-      "name": "source slice",
-      "type": "[]const u8",
-      "ownership": "borrowed",
-      "invalidation": "source mutation or destruction"
-    }
-  ],
+  "inputs": [],
+  "outputs": [],
   "state": {
     "fields": [],
     "states": [],
@@ -116,10 +84,7 @@
     "initial_state": ""
   },
   "invariants": {
-    "representation": [
-      "start <= end",
-      "span is half-open"
-    ],
+    "representation": [],
     "ownership": [],
     "ordering": [],
     "bounds": [],
@@ -128,16 +93,12 @@
     "cross_module": []
   },
   "ownership": {
-    "owns": [
-      "offsets"
-    ],
-    "borrows": [
-      "source during slice"
-    ],
+    "owns": [],
+    "borrows": [],
     "copies": [],
     "transfers": [],
     "shared": [],
-    "allocator": "none",
+    "allocator": "",
     "allocator_lifetime": "",
     "element_cleanup": "",
     "resource_release_order": []
@@ -160,12 +121,9 @@
     "cleanup_order": []
   },
   "failure_behavior": {
-    "errors": [
-      "InvalidOrder",
-      "OutOfBounds"
-    ],
+    "errors": [],
     "optional_empty_results": [],
-    "failure_atomicity": "stateless failures",
+    "failure_atomicity": "",
     "state_after_failure": [],
     "partial_effects": [],
     "rollback": [],
@@ -182,26 +140,35 @@
     "deinit_invalidation": []
   },
   "dependencies": {
-    "repository": [],
-    "standard_library": [
-      "std.testing"
+    "repository": [
+      {
+        "module": "dynamic-array",
+        "path": "projects/01-dynamic-array/src/dynamic_array.zig",
+        "symbol": "DynamicArray",
+        "guarantee": "owned contiguous growth and rollback length storage",
+        "reason": "stores emitted bytes without recreating growth logic"
+      }
     ],
+    "standard_library": [],
     "external": [],
     "platform": [],
     "architecture": [],
     "conceptual": []
   },
-  "dependency_contracts": [],
-  "expected_dependents": [
-    "lexers",
-    "parsers",
-    "diagnostic renderers",
-    "compilers"
+  "dependency_contracts": [
+    {
+      "module": "dynamic-array",
+      "path": "projects/01-dynamic-array/src/dynamic_array.zig",
+      "symbol": "DynamicArray",
+      "guarantee": "owned contiguous growth and rollback length storage",
+      "reason": "stores emitted bytes without recreating growth logic"
+    }
   ],
+  "expected_dependents": [],
   "known_consumers": [],
   "composition": {
-    "import_name": "source_span",
-    "import_path": "projects/27-source-span/src/source_span.zig",
+    "import_name": "byte_writer",
+    "import_path": "projects/06-byte-writer/src/byte_writer.zig",
     "import_configuration": "Import the canonical repository-relative source path.",
     "minimal_example": "",
     "integration_patterns": [],
@@ -224,9 +191,9 @@
     "zig_version": "0.14.0",
     "minimum_zig_version": "0.14.0",
     "maximum_tested_zig_version": "",
-    "hosted": "yes",
-    "freestanding": "yes",
-    "thread_safe": "value type",
+    "hosted": "unknown",
+    "freestanding": "unknown",
+    "thread_safe": "unknown",
     "reentrant": "unknown",
     "interrupt_safe": "unknown",
     "async_safe": "unknown",
@@ -277,22 +244,22 @@
     "security_non_goals": []
   },
   "testing": {
-    "build_step": "test-source-span",
+    "build_step": "test-byte-writer",
     "commands": [
-      "zig build test-source-span",
+      "zig build test-byte-writer",
       "zig build test"
     ],
     "unit_tests": [
-      "source spans preserve half-open boundaries"
+      "writes bytes in order",
+      "writes integers with explicit byte order",
+      "rollback restores a prior logical length"
     ],
     "integration_tests": [],
     "property_tests": [],
     "fuzz_tests": [],
     "failure_injection_tests": [],
     "zero_capacity_tests": [],
-    "boundary_tests": [
-      "source spans preserve half-open boundaries"
-    ],
+    "boundary_tests": [],
     "regression_tests": [],
     "test_dependencies": []
   },
@@ -305,9 +272,7 @@
     "known_compile_failures": [],
     "known_test_failures": [],
     "unverified_claims": [],
-    "notes": [
-      "Local validation pending."
-    ]
+    "notes": []
   },
   "documentation": {
     "read_order": [
@@ -315,7 +280,7 @@
       "DETAILS.md",
       "README.md",
       "MASTERY.md",
-      "projects/27-source-span/src/source_span.zig"
+      "projects/06-byte-writer/src/byte_writer.zig"
     ],
     "examples_covered": [],
     "exercises": [],
@@ -336,41 +301,33 @@
     "owners": []
   },
   "discovery": {
-    "capabilities": [
-      "source span",
-      "byte range diagnostic"
-    ],
+    "capabilities": [],
     "problems": [],
     "inputs": [],
     "outputs": [],
     "environments": [],
-    "keywords": [
-      "offset",
-      "span",
-      "token location"
-    ],
+    "keywords": [],
     "grep_terms": [
-      "source-span",
-      "SourceSpan"
+      "byte-writer",
+      "ByteWriter"
     ],
     "natural_language_queries": [
-      "How do I checked half-open byte span into source data?"
+      "How do I byte writer reference module?"
     ],
     "negative_search_terms": []
   },
   "snowball": {
-    "foundation_layer": "diagnostics",
-    "reuses_modules": [],
-    "guarantees_inherited": [],
-    "future_modules_enabled": [
-      "lexers",
-      "parsers",
-      "diagnostic renderers",
-      "compilers"
+    "foundation_layer": "",
+    "reuses_modules": [
+      "dynamic-array"
     ],
+    "guarantees_inherited": [
+      "owned contiguous growth and rollback length storage"
+    ],
+    "future_modules_enabled": [],
     "future_code_removed": [],
     "future_reasoning_removed": [],
-    "composition_value": "Checked half-open byte span into source data.",
+    "composition_value": "Byte Writer reference module.",
     "snowball_score": "unmeasured"
   },
   "agent_guidance": {
@@ -384,7 +341,7 @@
       "Run the dedicated test step."
     ],
     "verification_steps": [
-      "zig build test-source-span"
+      "zig build test-byte-writer"
     ],
     "common_agent_mistakes": [],
     "safe_modification_boundaries": [
@@ -401,19 +358,35 @@
   "source_map": {
     "symbols_to_files": [
       {
-        "symbol": "SourceSpan",
-        "file": "projects/27-source-span/src/source_span.zig"
+        "symbol": "ByteWriter",
+        "file": "projects/06-byte-writer/src/byte_writer.zig"
       }
     ],
     "tests_to_behaviors": [
       {
-        "test": "source spans preserve half-open boundaries",
-        "file": "projects/27-source-span/src/source_span.zig"
+        "test": "writes bytes in order",
+        "file": "projects/06-byte-writer/src/byte_writer.zig"
+      },
+      {
+        "test": "writes integers with explicit byte order",
+        "file": "projects/06-byte-writer/src/byte_writer.zig"
+      },
+      {
+        "test": "rollback restores a prior logical length",
+        "file": "projects/06-byte-writer/src/byte_writer.zig"
       }
     ],
     "errors_to_operations": [],
     "invariants_to_tests": [],
-    "dependencies_to_imports": []
+    "dependencies_to_imports": [
+      {
+        "module": "dynamic-array",
+        "path": "projects/01-dynamic-array/src/dynamic_array.zig",
+        "symbol": "DynamicArray",
+        "guarantee": "owned contiguous growth and rollback length storage",
+        "reason": "stores emitted bytes without recreating growth logic"
+      }
+    ]
   },
   "provenance": {
     "original_author": "",

@@ -56,6 +56,6 @@ zig build test-fixed-vector
 ```
 
 ## Source map
-- implementation: `src/fixed_vector.zig`
+- implementation: `src/fixed_capacity_vector.zig`
 - introduction: `README.md`
 - study guide: `MASTERY.md`

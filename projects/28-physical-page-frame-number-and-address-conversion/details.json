@@ -1,1 +1,465 @@
-{"schema_version":"1.0.0","module":{"id":"28","name":"physical-page-frame-number-and-address-conversion","directory":"projects/28-physical-page-frame-number-and-address-conversion","summary":"Checked conversion between 4 KiB physical page-frame indices and physical addresses.","status":"experimental-unverified","category":"memory-foundation","tags":["physical-memory","page-frame","address","hypervisor","freestanding"]},"purpose":"Provide one checked conversion contract between page indices and physical addresses.","public_surface":{"root_symbols":["PageSize","PhysicalPageFrameNumber"],"methods":["init","toAddress","fromAddress"],"errors":["Overflow","Unaligned"]},"locations":{"implementation":["projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_conversion.zig"],"readme":"projects/28-physical-page-frame-number-and-address-conversion/README.md","mastery":"projects/28-physical-page-frame-number-and-address-conversion/MASTERY.md","details_markdown":"projects/28-physical-page-frame-number-and-address-conversion/DETAILS.md","details_json":"projects/28-physical-page-frame-number-and-address-conversion/details.json"},"inputs":[{"name":"frame number","type":"usize","ownership":"copied"},{"name":"physical address","type":"PhysicalAddress","ownership":"copied","constraints":"4096-byte aligned"}],"outputs":[{"name":"physical address or frame number","type":"PhysicalAddress or PhysicalPageFrameNumber","ownership":"copied","invalidation":"none"}],"invariants":["PageSize is 4096","produced addresses are aligned"],"failure_behavior":{"errors":["Overflow","Unaligned"],"failure_atomicity":"value conversion is stateless"},"ownership":{"owns":["scalar frame index"],"borrows":[],"allocator":"none"},"dependencies":{"repository":[{"module":"18-distinct-memory-address-types","path":"projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig","symbol":"PhysicalAddress","reason":"preserve physical address domain identity"}],"standard_library":["std.math.mul"]},"expected_dependents":["physical page allocator","page-frame database","page tables","EPT","DMA","guest memory"],"compatibility":{"zig_version":"0.14.0","hosted":"yes","freestanding":"yes","thread_safe":"value type","architectures":["page policy currently architecture-neutral but fixed at 4 KiB"]},"complexity":{"operations":"O(1)","space":"O(usize)"},"validation":{"build_step":"test-physical-page-frame-conversion","compiler_validated":false,"notes":["Local validation pending."]},"search":{"capabilities":["physical frame conversion","page number to address"],"keywords":["PFN","physical page","4096","page frame"]}}
+{
+  "schema_version": "2.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "28",
+    "canonical_name": "physical-page-frame-number-and-address-conversion",
+    "display_name": "Physical Page Frame Number And Address Conversion",
+    "directory": "projects/28-physical-page-frame-number-and-address-conversion",
+    "summary": "Checked conversion between 4 KiB physical page-frame indices and physical addresses.",
+    "long_description": "Checked conversion between 4 KiB physical page-frame indices and physical addresses.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "memory-foundation",
+    "subcategory": "",
+    "tags": [
+      "physical-memory",
+      "page-frame",
+      "address",
+      "hypervisor",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Provide one checked conversion contract between page indices and physical addresses.",
+    "secondary": [],
+    "non_goals": [],
+    "problems_solved": [],
+    "future_role": ""
+  },
+  "c_pain": {
+    "summary": "",
+    "common_failure_modes": [],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "",
+    "where_c_degrades": ""
+  },
+  "zig_response": {
+    "summary": "",
+    "language_features": [],
+    "guarantees_made_visible": [],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/28-physical-page-frame-number-and-address-conversion",
+    "implementation": [
+      "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig"
+    ],
+    "public_entrypoint": "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig",
+    "tests": [
+      "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig"
+    ],
+    "readme": "projects/28-physical-page-frame-number-and-address-conversion/README.md",
+    "mastery": "projects/28-physical-page-frame-number-and-address-conversion/MASTERY.md",
+    "details_markdown": "projects/28-physical-page-frame-number-and-address-conversion/DETAILS.md",
+    "details_json": "projects/28-physical-page-frame-number-and-address-conversion/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "PageSize",
+      "PhysicalPageFrameNumber"
+    ],
+    "types": [],
+    "functions": [],
+    "methods": [
+      "init",
+      "toAddress",
+      "fromAddress"
+    ],
+    "constants": [],
+    "errors": [
+      "Overflow",
+      "Unaligned"
+    ],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": []
+  },
+  "inputs": [
+    {
+      "name": "frame number",
+      "type": "usize",
+      "ownership": "copied"
+    },
+    {
+      "name": "physical address",
+      "type": "PhysicalAddress",
+      "ownership": "copied",
+      "constraints": "4096-byte aligned"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "physical address or frame number",
+      "type": "PhysicalAddress or PhysicalPageFrameNumber",
+      "ownership": "copied",
+      "invalidation": "none"
+    }
+  ],
+  "state": {
+    "fields": [],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "PageSize is 4096",
+      "produced addresses are aligned"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [
+      "scalar frame index"
+    ],
+    "borrows": [],
+    "copies": [],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [
+      "Overflow",
+      "Unaligned"
+    ],
+    "optional_empty_results": [],
+    "failure_atomicity": "value conversion is stateless",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [
+      {
+        "module": "distinct-memory-address-types",
+        "path": "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig",
+        "symbol": "PhysicalAddress",
+        "guarantee": "physical-address domain separation and checked arithmetic",
+        "reason": "returns the repository physical address type"
+      }
+    ],
+    "standard_library": [
+      "std.math.mul"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": []
+  },
+  "dependency_contracts": [
+    {
+      "module": "distinct-memory-address-types",
+      "path": "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig",
+      "symbol": "PhysicalAddress",
+      "guarantee": "physical-address domain separation and checked arithmetic",
+      "reason": "returns the repository physical address type"
+    }
+  ],
+  "expected_dependents": [
+    "physical page allocator",
+    "page-frame database",
+    "page tables",
+    "EPT",
+    "DMA",
+    "guest memory"
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "physical_page_frame_number_and_address_conversion",
+    "import_path": "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig",
+    "import_configuration": "Import the canonical repository-relative source path.",
+    "minimal_example": "",
+    "integration_patterns": [],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "value type",
+    "reentrant": "unknown",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [
+      "page policy currently architecture-neutral but fixed at 4 KiB"
+    ],
+    "allocator_assumptions": "",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "",
+    "no_std_equivalent": ""
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-physical-page-frame-number-and-address-conversion",
+    "commands": [
+      "zig build test-physical-page-frame-number-and-address-conversion",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "page frame numbers and aligned physical addresses round trip"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Local validation pending."
+    ]
+  },
+  "documentation": {
+    "read_order": [
+      "details.json",
+      "DETAILS.md",
+      "README.md",
+      "MASTERY.md",
+      "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig"
+    ],
+    "examples_covered": [],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [],
+    "related_modules": [],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Synchronize source, tests, contracts, catalog, and dependents.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [],
+    "synchronization_requirements": [],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "physical frame conversion",
+      "page number to address"
+    ],
+    "problems": [],
+    "inputs": [],
+    "outputs": [],
+    "environments": [],
+    "keywords": [
+      "PFN",
+      "physical page",
+      "4096",
+      "page frame"
+    ],
+    "grep_terms": [
+      "physical-page-frame-number-and-address-conversion",
+      "PageSize",
+      "PhysicalPageFrameNumber"
+    ],
+    "natural_language_queries": [
+      "How do I checked conversion between 4 kib physical page-frame indices and physical addresses?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "memory-foundation",
+    "reuses_modules": [
+      "distinct-memory-address-types"
+    ],
+    "guarantees_inherited": [
+      "physical-address domain separation and checked arithmetic"
+    ],
+    "future_modules_enabled": [
+      "physical page allocator",
+      "page-frame database",
+      "page tables",
+      "EPT",
+      "DMA",
+      "guest memory"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Checked conversion between 4 KiB physical page-frame indices and physical addresses.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-physical-page-frame-number-and-address-conversion"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ]
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "PageSize",
+        "file": "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig"
+      },
+      {
+        "symbol": "PhysicalPageFrameNumber",
+        "file": "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "page frame numbers and aligned physical addresses round trip",
+        "file": "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": [
+      {
+        "module": "distinct-memory-address-types",
+        "path": "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig",
+        "symbol": "PhysicalAddress",
+        "guarantee": "physical-address domain separation and checked arithmetic",
+        "reason": "returns the repository physical address type"
+      }
+    ]
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  }
+}
