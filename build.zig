@@ -92,6 +92,12 @@ pub fn build(b: *std.Build) void {
     const status_command = b.addSystemCommand(&.{ "python3", "tools/status.py" });
     const status_step = b.step("status", "Print evidence-backed repository health");
     status_step.dependOn(&status_command.step);
+    const evidence_check_command = b.addSystemCommand(&.{ "python3", "tools/record-validation.py", "--check" });
+    const evidence_check_step = b.step("check-validation-evidence", "Reject invalid, stale, or wrong-version module evidence");
+    evidence_check_step.dependOn(&evidence_check_command.step);
+    policy_step.dependOn(evidence_check_step);
+    status_step.dependOn(evidence_check_step);
+    status_step.dependOn(&index_check_command.step);
     const query_command = b.addSystemCommand(&.{ "python3", "tools/query-reference.py", "status" });
     const query_step = b.step("query", "Run the default repository status query; use the Python tool for arguments");
     query_step.dependOn(&query_command.step);
@@ -113,13 +119,16 @@ pub fn build(b: *std.Build) void {
         for (spec.dependencies) |dependency_name| modules[i].addImport(dependency_name, findModule(dependency_name, &modules));
     }
 
-    const smoke_all = b.step("smoke", "Run every external-consumer smoke test");
+    const smoke_all = b.step("smoke", "Run every external-consumer smoke test and verify committed evidence");
+    smoke_all.dependOn(evidence_check_step);
     smoke_all.dependOn(portability_smoke_step);
-    const test_all = b.step("test", "Run contract checks, unit tests, and smoke tests");
+    const test_all = b.step("test", "Run contract checks, unit tests, and smoke tests; verify committed evidence");
+    test_all.dependOn(evidence_check_step);
     test_all.dependOn(check_step);
     test_all.dependOn(port_check_step);
     const recipes_step = b.step("recipes", "Run unit tests for modules used by the initial composition recipes");
-    const conformance_step = b.step("conformance", "Run behavioral tests for the initial conformance module families");
+    const conformance_step = b.step("conformance", "Run configured family tests; no maturity credit without dedicated adapters");
+    conformance_step.dependOn(evidence_check_step);
     for (specs, 0..) |spec, i| {
         const unit_tests = b.addTest(.{ .root_module = modules[i] });
         const run_unit = b.addRunArtifact(unit_tests);

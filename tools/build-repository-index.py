@@ -27,22 +27,27 @@ def build():
     order=topological(dep)
     ports=[]
     for p in port_contracts(): ports.append({"module":p["module"]["canonicalName"],"baseline":p["baseline"],"path":p["module"]["portContract"],"risks":p.get("semanticPortingRisks",[])})
-    evidence=list((GENERATED/"validation").glob("*.json")) if (GENERATED/"validation").exists() else []
+    evidence_path=GENERATED/"validation/modules.json"
+    evidence=[]
+    if evidence_path.exists():
+        import json
+        evidence=json.loads(evidence_path.read_text())["records"]
     # Maturity is evidence-derived: contracts and implementation establish L2; explicit successful evidence raises it.
     status=[]
     for m in mods:
         ev=[]
-        for path in evidence:
-            import json
-            x=json.loads(path.read_text())
+        for x in evidence:
             if x.get("module")==m["name"]: ev.append(x)
         level=2
-        if any(x.get("unit_test_result")=="passed" for x in ev): level=3
-        if any(x.get("smoke_test_result")=="passed" for x in ev): level=max(level,4)
-        status.append({"module":m["name"],"lifecycle":m["lifecycle"],"target_maturity_level":m["target_maturity_level"],"maturity_level":level,"evidence_records":len(ev)})
+        unit=any(x.get("unit_test")=="pass" for x in ev)
+        smoke=unit and any(x.get("smoke_test")=="pass" for x in ev)
+        conformance=any(x.get("conformance")=="pass" for x in ev)
+        if unit: level=3
+        if smoke: level=4
+        status.append({"module":m["name"],"lifecycle":m["lifecycle"],"target_maturity_level":m["target_maturity_level"],"maturity_level":level,"unit_validated":unit,"smoke_validated":smoke,"conformance_validated":conformance,"evidence_records":len(ev)})
     ontology=[]
     for c,implementers in sorted(caps.items()): ontology.append({"canonical_name":c,"description":f"Repository capability represented by: {c}.","aliases":[],"related_terms":[],"broader_capability":None,"narrower_capabilities":[],"negative_matches":[],"implementing_modules":sorted(implementers),"partially_implementing_modules":[],"common_queries":[c],"common_mistaken_matches":[]})
-    health={"definitions":{"implemented_modules":"modules with an implementation source path","contracted_modules":"modules with a validated details.json","compiler_validated_modules":"modules backed by successful textual validation evidence","smoke_tested_modules":"modules backed by successful external smoke evidence","conformance_tested_modules":"modules named by an executable dedicated adapter with successful evidence","reused_modules":"modules having at least one declared reverse dependent","system_proven_modules":"modules backed by a recipe or flagship integration evidence record","port_contract_coverage":"modules with port.js divided by contracted modules"},"implemented_modules":len(mods),"contracted_modules":len(mods),"compiler_validated_modules":sum(s["maturity_level"]>=3 for s in status),"smoke_tested_modules":sum(s["maturity_level"]>=4 for s in status),"conformance_tested_modules":0,"reused_modules":sum(bool(rev[n]) for n in rev),"system_proven_modules":0,"stable_modules":sum(s["maturity_level"]>=9 for s in status),"deprecated_modules":sum(s["lifecycle"]=="deprecated" for s in status),"dependency_cycles":0,"missing_contracts":0,"stale_generated_textual_files":0,"zig_baseline":"0.14.0","port_contract_coverage":{"covered":len(ports),"total":len(mods)},"recipe_coverage":len(list((ROOT/"recipes").glob("*/recipe.json"))) if (ROOT/"recipes").exists() else 0,"hyper_zig_readiness":{"system_proven":False,"note":"foundation contracts exist; complete integration evidence does not"},"unsupported_claims":[]}
+    health={"definitions":{"implemented_modules":"modules with an implementation source path","contracted_modules":"modules with a validated details.json","compiler_validated_modules":"modules whose canonical Zig 0.14.0 unit target passed and whose textual evidence source digest is current","smoke_tested_modules":"compiler-validated modules whose canonical named-import smoke target passed and whose evidence is current","conformance_tested_modules":"modules named by a dedicated shared behavioral adapter with successful current evidence; unit-test reuse receives no credit","reused_modules":"modules having at least one declared reverse dependent","system_proven_modules":"modules backed by a recipe or flagship integration evidence record","port_contract_coverage":"modules with port.js divided by contracted modules"},"implemented_modules":len(mods),"contracted_modules":len(mods),"compiler_validated_modules":sum(s["unit_validated"] for s in status),"smoke_tested_modules":sum(s["smoke_validated"] for s in status),"conformance_tested_modules":sum(s["conformance_validated"] for s in status),"reused_modules":sum(bool(rev[n]) for n in rev),"system_proven_modules":0,"stable_modules":sum(s["maturity_level"]>=9 for s in status),"deprecated_modules":sum(s["lifecycle"]=="deprecated" for s in status),"dependency_cycles":0,"missing_contracts":0,"stale_generated_textual_files":0,"zig_baseline":"0.14.0","port_contract_coverage":{"covered":len(ports),"total":len(mods)},"recipe_coverage":len(list((ROOT/"recipes").glob("*/recipe.json"))) if (ROOT/"recipes").exists() else 0,"hyper_zig_readiness":{"system_proven":False,"note":"foundation contracts exist; complete integration evidence does not"},"unsupported_claims":[]}
     return {
       "modules":generated({"modules":mods}),"ports":generated({"ports":sorted(ports,key=lambda x:x["module"])}),
       "dependencies":generated({"dependencies":dep}),"reverse-dependencies":generated({"reverse_dependencies":rev}),

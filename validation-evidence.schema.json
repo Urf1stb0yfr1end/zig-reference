@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/thanks-cohn/zig-reference/validation-evidence.schema.json",
+  "title": "zig-reference module validation evidence 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "validation_contract_version", "records"],
+  "properties": {
+    "schema": {"const": "validation-evidence.schema.json"},
+    "validation_contract_version": {"const": "1.0.0"},
+    "records": {"type": "array", "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["module", "zig_version", "target_triple", "optimization_mode", "validation_contract_version", "source_revision", "source_digest", "source_files", "unit_test", "unit_target", "smoke_test", "smoke_target", "conformance", "conformance_target"],
+      "properties": {
+        "module": {"type": "string", "minLength": 1}, "zig_version": {"const": "0.14.0"},
+        "target_triple": {"type": "string", "minLength": 1}, "optimization_mode": {"type": "string", "minLength": 1},
+        "validation_contract_version": {"const": "1.0.0"}, "source_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "source_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "source_files": {"type": "array", "minItems": 4, "items": {"type": "string"}},
+        "unit_test": {"enum": ["pass", "not_run"]}, "unit_target": {"type": "string", "pattern": "^zig build test-"},
+        "smoke_test": {"enum": ["pass", "not_run"]}, "smoke_target": {"type": "string", "pattern": "^zig build smoke-"},
+        "conformance": {"enum": ["pass", "not_applicable"]}, "conformance_target": {"type": ["string", "null"]}
+      }
+    }}
+  }
+}
