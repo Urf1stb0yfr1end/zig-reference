@@ -1,1 +1,414 @@
-{"schema_version":"1.0.0","module":{"id":"22","name":"endian-integer-codec","directory":"projects/22-endian-integer-codec","summary":"Fixed-width integer encoding with explicit byte order.","status":"experimental-unverified","category":"binary","tags":["endianness","integer","codec","freestanding"]},"purpose":"Separate external byte order from host representation.","public_surface":{"root_symbols":["EndianIntegerCodec"],"methods":["encode","decode"],"errors":[]},"locations":{"implementation":["projects/22-endian-integer-codec/src/endian_integer_codec.zig"],"readme":"projects/22-endian-integer-codec/README.md","mastery":"projects/22-endian-integer-codec/MASTERY.md","details_markdown":"projects/22-endian-integer-codec/DETAILS.md","details_json":"projects/22-endian-integer-codec/details.json"},"inputs":[{"name":"T","type":"fixed-width integer type","ownership":"compile-time"},{"name":"endian","type":"std.builtin.Endian","ownership":"compile-time"}],"outputs":[{"name":"encoded bytes or decoded integer","type":"fixed value","ownership":"copied","invalidation":"none"}],"invariants":["encoded width equals @sizeOf(T)","host endianness does not affect result"],"failure_behavior":{"errors":[],"failure_atomicity":"operations are total"},"ownership":{"owns":[],"borrows":[],"allocator":"none"},"dependencies":{"repository":[],"standard_library":["std.mem.readInt","std.mem.writeInt"]},"expected_dependents":["binary readers","protocol codecs","firmware parsers","loaders"],"compatibility":{"zig_version":"0.14.0","hosted":"yes","freestanding":"yes","thread_safe":"stateless"},"complexity":{"operations":"O(sizeof(T))","space":"O(sizeof(T))"},"validation":{"build_step":"test-endian-integer-codec","compiler_validated":false,"notes":["Local validation pending."]},"search":{"capabilities":["endian integer encode","endian integer decode"],"keywords":["little endian","big endian","byte order"]}}
+{
+  "schema_version": "2.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "22",
+    "canonical_name": "endian-integer-codec",
+    "display_name": "Endian Integer Codec",
+    "directory": "projects/22-endian-integer-codec",
+    "summary": "Fixed-width integer encoding with explicit byte order.",
+    "long_description": "Fixed-width integer encoding with explicit byte order.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "binary",
+    "subcategory": "",
+    "tags": [
+      "endianness",
+      "integer",
+      "codec",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Separate external byte order from host representation.",
+    "secondary": [],
+    "non_goals": [],
+    "problems_solved": [],
+    "future_role": ""
+  },
+  "c_pain": {
+    "summary": "",
+    "common_failure_modes": [],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "",
+    "where_c_degrades": ""
+  },
+  "zig_response": {
+    "summary": "",
+    "language_features": [],
+    "guarantees_made_visible": [],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/22-endian-integer-codec",
+    "implementation": [
+      "projects/22-endian-integer-codec/src/endian_integer_codec.zig"
+    ],
+    "public_entrypoint": "projects/22-endian-integer-codec/src/endian_integer_codec.zig",
+    "tests": [
+      "projects/22-endian-integer-codec/src/endian_integer_codec.zig"
+    ],
+    "readme": "projects/22-endian-integer-codec/README.md",
+    "mastery": "projects/22-endian-integer-codec/MASTERY.md",
+    "details_markdown": "projects/22-endian-integer-codec/DETAILS.md",
+    "details_json": "projects/22-endian-integer-codec/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "EndianIntegerCodec"
+    ],
+    "types": [],
+    "functions": [],
+    "methods": [
+      "encode",
+      "decode"
+    ],
+    "constants": [],
+    "errors": [],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": []
+  },
+  "inputs": [
+    {
+      "name": "T",
+      "type": "fixed-width integer type",
+      "ownership": "compile-time"
+    },
+    {
+      "name": "endian",
+      "type": "std.builtin.Endian",
+      "ownership": "compile-time"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "encoded bytes or decoded integer",
+      "type": "fixed value",
+      "ownership": "copied",
+      "invalidation": "none"
+    }
+  ],
+  "state": {
+    "fields": [],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "encoded width equals @sizeOf(T)",
+      "host endianness does not affect result"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [],
+    "borrows": [],
+    "copies": [],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [],
+    "optional_empty_results": [],
+    "failure_atomicity": "operations are total",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [],
+    "standard_library": [
+      "std.mem.readInt",
+      "std.mem.writeInt"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": []
+  },
+  "dependency_contracts": [],
+  "expected_dependents": [
+    "binary readers",
+    "protocol codecs",
+    "firmware parsers",
+    "loaders"
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "endian_integer_codec",
+    "import_path": "projects/22-endian-integer-codec/src/endian_integer_codec.zig",
+    "import_configuration": "Import the canonical repository-relative source path.",
+    "minimal_example": "",
+    "integration_patterns": [],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "stateless",
+    "reentrant": "unknown",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "",
+    "no_std_equivalent": ""
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-endian-integer-codec",
+    "commands": [
+      "zig build test-endian-integer-codec",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "endianness is selected by the type"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Local validation pending."
+    ]
+  },
+  "documentation": {
+    "read_order": [
+      "details.json",
+      "DETAILS.md",
+      "README.md",
+      "MASTERY.md",
+      "projects/22-endian-integer-codec/src/endian_integer_codec.zig"
+    ],
+    "examples_covered": [],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [],
+    "related_modules": [],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Synchronize source, tests, contracts, catalog, and dependents.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [],
+    "synchronization_requirements": [],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "endian integer encode",
+      "endian integer decode"
+    ],
+    "problems": [],
+    "inputs": [],
+    "outputs": [],
+    "environments": [],
+    "keywords": [
+      "little endian",
+      "big endian",
+      "byte order"
+    ],
+    "grep_terms": [
+      "endian-integer-codec",
+      "EndianIntegerCodec"
+    ],
+    "natural_language_queries": [
+      "How do I fixed-width integer encoding with explicit byte order?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "binary",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [
+      "binary readers",
+      "protocol codecs",
+      "firmware parsers",
+      "loaders"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Fixed-width integer encoding with explicit byte order.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-endian-integer-codec"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ]
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "EndianIntegerCodec",
+        "file": "projects/22-endian-integer-codec/src/endian_integer_codec.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "endianness is selected by the type",
+        "file": "projects/22-endian-integer-codec/src/endian_integer_codec.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  }
+}

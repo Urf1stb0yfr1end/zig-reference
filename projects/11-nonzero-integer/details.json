@@ -1,1 +1,520 @@
-{"schema_version":"1.0.0","module":{"id":"11","name":"nonzero-integer","directory":"projects/11-nonzero-integer","summary":"Integer wrapper that rejects zero at construction.","status":"experimental-unverified","category":"validated-value","tags":["integer","nonzero","validated-type","freestanding"]},"purpose":"Represent an integer whose stored value is guaranteed not to be zero.","c_pain":{"summary":"Zero-as-sentinel conventions spread repeated checks and ambiguous meanings across APIs.","failure_modes":["zero reaches forbidden operation","zero means several unrelated states","missing validation at one call site"],"why_c_is_attractive":"A raw integer is compact and interoperable.","where_c_degrades":"The nonzero rule is carried only by comments and caller discipline."},"zig_response":{"summary":"Validate once at construction and expose only a nonzero wrapper afterward.","language_features":["generic type factory","error union","compile-time type validation"],"guarantees_made_visible":["every successfully constructed instance contains a nonzero value"],"remaining_programmer_responsibilities":["apply any additional domain constraints","unwrap deliberately at boundaries"]},"public_surface":{"root_symbols":["NonZeroInteger"],"types":[{"name":"NonZeroInteger(T)","kind":"generic type factory"}],"functions":[],"methods":[{"name":"init","signature":"init(value: T) error{ZeroNotAllowed}!Self"},{"name":"get","signature":"get(self: Self) T"}],"errors":["ZeroNotAllowed"],"constants":[]},"locations":{"implementation":["projects/11-nonzero-integer/src/nonzero_integer.zig"],"test_source":["projects/11-nonzero-integer/src/nonzero_integer.zig"],"readme":"projects/11-nonzero-integer/README.md","mastery":"projects/11-nonzero-integer/MASTERY.md","details_markdown":"projects/11-nonzero-integer/DETAILS.md","details_json":"projects/11-nonzero-integer/details.json","examples":[],"benchmarks":[],"fixtures":[],"fuzz":[]},"inputs":[{"name":"T","type":"type","ownership":"compile-time","lifetime":"program","constraints":"integer type"},{"name":"value","type":"T","ownership":"copied","lifetime":"instance lifetime","constraints":"must not equal zero"}],"outputs":[{"name":"instance","type":"NonZeroInteger(T)","ownership":"owned scalar wrapper","lifetime":"caller value","invalidation":"none","caller_cleanup":"none"},{"name":"underlying value","type":"T","ownership":"copied","lifetime":"caller value","invalidation":"none","caller_cleanup":"none"}],"state":[{"name":"value","type":"T","role":"validated nonzero scalar"}],"invariants":["value != 0"],"failure_behavior":{"errors":[{"operation":"init","error":"ZeroNotAllowed","state_change":"no instance produced"}],"optional_empty_results":[],"failure_atomicity":"construction either returns a valid wrapper or an error","partial_effects":[],"panic_conditions":[],"undefined_behavior_preconditions":[]},"ownership":{"owns":["one scalar integer"],"borrows":[],"copies":["input and output scalar"],"transfers":[],"allocator":"none","element_cleanup":"none"},"cleanup":[],"invalidation":[],"dependencies":{"repository":[],"standard_library":["std.testing"],"external":[],"conceptual":["validated construction"]},"expected_dependents":[{"name":"nonzero page count","reason":"forbid empty allocations"},{"name":"divisor type","reason":"prevent division by zero"},{"name":"queue depth","reason":"forbid zero-sized hardware queues"},{"name":"generation value","reason":"reserve zero as invalid"}],"composition":{"import_name":"nonzero_integer","import_configuration":"Import projects/11-nonzero-integer/src/nonzero_integer.zig.","minimal_example":"const NonZeroInteger = @import(\"nonzero_integer.zig\").NonZeroInteger; const Count = NonZeroInteger(usize); const count = try Count.init(raw);","integration_patterns":[],"incompatible_combinations":[],"replacement_options":[]},"compatibility":{"zig_version":"0.14.0","hosted":"yes","freestanding":"yes","thread_safe":"immutable values are shareable; mutable containing state needs external synchronization","reentrant":"yes","endianness":"not applicable","platforms":[],"architectures":[],"allocator_assumptions":"none","ffi":"unwrap to T at ABI boundaries","no_std_equivalent":"already freestanding-suitable"},"complexity":{"operations":[{"operation":"init","time":"O(1)"},{"operation":"get","time":"O(1)"}],"space":"O(sizeof(T))","compile_time":"one concrete type per T","notes":[]},"limits":[],"validation":{"build_step":"test-nonzero-integer","commands":["zig build test-nonzero-integer","zig build test"],"compiler_validated":false,"compiler_version":"","last_validated_commit":"","unit_tests":["positive value","negative value","zero rejection"],"integration_tests":[],"property_tests":[],"fuzz_tests":[],"benchmarks":[],"known_failures":[],"notes":["Build registration and local compiler validation pending."]},"documentation":{"read_order":["README.md","MASTERY.md","DETAILS.md","details.json","src/nonzero_integer.zig"],"examples_covered":["nonzero page count"],"exercises":[],"glossary_terms":["sentinel","validated type","construction invariant"],"related_modules":["checked-integer-cast","bounded-integer"]},"maintenance":{"stability":"experimental","breaking_change_policy":"Update source, tests, contracts, build, catalog, and dependents together.","known_gaps":["compiler validation pending"],"planned_extensions":[],"review_triggers":["underlying type constraints","construction semantics"],"synchronization_requirements":["public signature must match source"]},"search":{"capabilities":["nonzero integer","validated scalar","sentinel elimination"],"problems":["zero sentinel","forbidden zero"],"inputs":["integer"],"outputs":["nonzero integer wrapper"],"environments":["hosted","freestanding"],"keywords":["nonzero","non-zero integer","validated integer"]}}
+{
+  "schema_version": "2.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "11",
+    "canonical_name": "nonzero-integer",
+    "display_name": "Nonzero Integer",
+    "directory": "projects/11-nonzero-integer",
+    "summary": "Integer wrapper that rejects zero at construction.",
+    "long_description": "Integer wrapper that rejects zero at construction.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "validated-value",
+    "subcategory": "",
+    "tags": [
+      "integer",
+      "nonzero",
+      "validated-type",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Represent an integer whose stored value is guaranteed not to be zero.",
+    "secondary": [],
+    "non_goals": [],
+    "problems_solved": [],
+    "future_role": ""
+  },
+  "c_pain": {
+    "summary": "Zero-as-sentinel conventions spread repeated checks and ambiguous meanings across APIs.",
+    "common_failure_modes": [
+      "zero reaches forbidden operation",
+      "zero means several unrelated states",
+      "missing validation at one call site"
+    ],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "A raw integer is compact and interoperable.",
+    "where_c_degrades": "The nonzero rule is carried only by comments and caller discipline."
+  },
+  "zig_response": {
+    "summary": "Validate once at construction and expose only a nonzero wrapper afterward.",
+    "language_features": [
+      "generic type factory",
+      "error union",
+      "compile-time type validation"
+    ],
+    "guarantees_made_visible": [
+      "every successfully constructed instance contains a nonzero value"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "apply any additional domain constraints",
+      "unwrap deliberately at boundaries"
+    ],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/11-nonzero-integer",
+    "implementation": [
+      "projects/11-nonzero-integer/src/nonzero_integer.zig"
+    ],
+    "public_entrypoint": "projects/11-nonzero-integer/src/nonzero_integer.zig",
+    "tests": [
+      "projects/11-nonzero-integer/src/nonzero_integer.zig"
+    ],
+    "readme": "projects/11-nonzero-integer/README.md",
+    "mastery": "projects/11-nonzero-integer/MASTERY.md",
+    "details_markdown": "projects/11-nonzero-integer/DETAILS.md",
+    "details_json": "projects/11-nonzero-integer/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "NonZeroInteger"
+    ],
+    "types": [
+      {
+        "name": "NonZeroInteger(T)",
+        "kind": "generic type factory"
+      }
+    ],
+    "functions": [],
+    "methods": [
+      {
+        "name": "init",
+        "signature": "init(value: T) error{ZeroNotAllowed}!Self"
+      },
+      {
+        "name": "get",
+        "signature": "get(self: Self) T"
+      }
+    ],
+    "constants": [],
+    "errors": [
+      "ZeroNotAllowed"
+    ],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": []
+  },
+  "inputs": [
+    {
+      "name": "T",
+      "type": "type",
+      "ownership": "compile-time",
+      "lifetime": "program",
+      "constraints": "integer type"
+    },
+    {
+      "name": "value",
+      "type": "T",
+      "ownership": "copied",
+      "lifetime": "instance lifetime",
+      "constraints": "must not equal zero"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "instance",
+      "type": "NonZeroInteger(T)",
+      "ownership": "owned scalar wrapper",
+      "lifetime": "caller value",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    },
+    {
+      "name": "underlying value",
+      "type": "T",
+      "ownership": "copied",
+      "lifetime": "caller value",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    }
+  ],
+  "state": {
+    "fields": [
+      {
+        "name": "value",
+        "type": "T",
+        "role": "validated nonzero scalar"
+      }
+    ],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "value != 0"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [
+      "one scalar integer"
+    ],
+    "borrows": [],
+    "copies": [
+      "input and output scalar"
+    ],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "none",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [
+      {
+        "operation": "init",
+        "error": "ZeroNotAllowed",
+        "state_change": "no instance produced"
+      }
+    ],
+    "optional_empty_results": [],
+    "failure_atomicity": "construction either returns a valid wrapper or an error",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [],
+    "standard_library": [
+      "std.testing"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": [
+      "validated construction"
+    ]
+  },
+  "dependency_contracts": [],
+  "expected_dependents": [
+    {
+      "name": "nonzero page count",
+      "reason": "forbid empty allocations"
+    },
+    {
+      "name": "divisor type",
+      "reason": "prevent division by zero"
+    },
+    {
+      "name": "queue depth",
+      "reason": "forbid zero-sized hardware queues"
+    },
+    {
+      "name": "generation value",
+      "reason": "reserve zero as invalid"
+    }
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "nonzero_integer",
+    "import_path": "projects/11-nonzero-integer/src/nonzero_integer.zig",
+    "import_configuration": "Import projects/11-nonzero-integer/src/nonzero_integer.zig.",
+    "minimal_example": "const NonZeroInteger = @import(\"nonzero_integer.zig\").NonZeroInteger; const Count = NonZeroInteger(usize); const count = try Count.init(raw);",
+    "integration_patterns": [],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "immutable values are shareable; mutable containing state needs external synchronization",
+    "reentrant": "yes",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "none",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "unwrap to T at ABI boundaries",
+    "no_std_equivalent": "already freestanding-suitable"
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-nonzero-integer",
+    "commands": [
+      "zig build test-nonzero-integer",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "constructs positive and negative nonzero values",
+      "rejects zero"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [
+      "constructs positive and negative nonzero values",
+      "rejects zero"
+    ],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Build registration and local compiler validation pending."
+    ]
+  },
+  "documentation": {
+    "read_order": [
+      "details.json",
+      "DETAILS.md",
+      "README.md",
+      "MASTERY.md",
+      "projects/11-nonzero-integer/src/nonzero_integer.zig"
+    ],
+    "examples_covered": [
+      "nonzero page count"
+    ],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [
+      "sentinel",
+      "validated type",
+      "construction invariant"
+    ],
+    "related_modules": [
+      "checked-integer-cast",
+      "bounded-integer"
+    ],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Update source, tests, contracts, build, catalog, and dependents together.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [
+      "compiler validation pending"
+    ],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [
+      "underlying type constraints",
+      "construction semantics"
+    ],
+    "synchronization_requirements": [
+      "public signature must match source"
+    ],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "nonzero integer",
+      "validated scalar",
+      "sentinel elimination"
+    ],
+    "problems": [
+      "zero sentinel",
+      "forbidden zero"
+    ],
+    "inputs": [
+      "integer"
+    ],
+    "outputs": [
+      "nonzero integer wrapper"
+    ],
+    "environments": [
+      "hosted",
+      "freestanding"
+    ],
+    "keywords": [
+      "nonzero",
+      "non-zero integer",
+      "validated integer"
+    ],
+    "grep_terms": [
+      "nonzero-integer",
+      "NonZeroInteger"
+    ],
+    "natural_language_queries": [
+      "How do I integer wrapper that rejects zero at construction?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "validated-value",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [
+      "nonzero page count",
+      "divisor type",
+      "queue depth",
+      "generation value"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Integer wrapper that rejects zero at construction.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [
+      "zero sentinel",
+      "forbidden zero"
+    ],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-nonzero-integer"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ]
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "NonZeroInteger",
+        "file": "projects/11-nonzero-integer/src/nonzero_integer.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "constructs positive and negative nonzero values",
+        "file": "projects/11-nonzero-integer/src/nonzero_integer.zig"
+      },
+      {
+        "test": "rejects zero",
+        "file": "projects/11-nonzero-integer/src/nonzero_integer.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  }
+}

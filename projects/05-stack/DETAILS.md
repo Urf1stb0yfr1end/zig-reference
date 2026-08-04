@@ -43,7 +43,7 @@ C stack implementations frequently duplicate growth, ownership, cleanup, and ove
 
 ## Dependencies
 
-- `projects/02-dynamic-array`
+- `projects/01-dynamic-array`
 
 ## Expected dependents
 

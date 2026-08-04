@@ -1,1 +1,493 @@
-{"schema_version":"1.0.0","module":{"id":"10","name":"checked-integer-cast","directory":"projects/10-checked-integer-cast","summary":"Fallible integer conversion that rejects unrepresentable values.","status":"experimental-unverified","category":"numeric-boundary","tags":["integer","cast","range-check","freestanding"]},"purpose":"Convert an integer to another integer type without truncation, wrapping, or sign loss.","c_pain":{"summary":"Implicit narrowing and signedness conversions silently change values.","failure_modes":["truncation","negative-to-unsigned conversion","destination overflow"],"why_c_is_attractive":"C casts are concise and direct.","where_c_degrades":"Representability checks are optional and scattered."},"zig_response":{"summary":"Use one explicit error-returning conversion boundary.","language_features":["error union","comptime type","std.math.cast"],"guarantees_made_visible":["successful result preserves the mathematical value","failure has no side effects"],"remaining_programmer_responsibilities":["perform domain validation after representability"]},"public_surface":{"root_symbols":["checkedIntegerCast"],"types":[],"functions":[{"name":"checkedIntegerCast","signature":"checkedIntegerCast(comptime Destination: type, value: anytype) error{OutOfRange}!Destination"}],"methods":[],"errors":["OutOfRange"],"constants":[]},"locations":{"implementation":["projects/10-checked-integer-cast/src/checked_integer_cast.zig"],"test_source":["projects/10-checked-integer-cast/src/checked_integer_cast.zig"],"readme":"projects/10-checked-integer-cast/README.md","mastery":"projects/10-checked-integer-cast/MASTERY.md","details_markdown":"projects/10-checked-integer-cast/DETAILS.md","details_json":"projects/10-checked-integer-cast/details.json","examples":[],"benchmarks":[],"fixtures":[],"fuzz":[]},"inputs":[{"name":"Destination","type":"type","ownership":"compile-time","lifetime":"program","constraints":"integer type"},{"name":"value","type":"integer or comptime_int","ownership":"copied","lifetime":"call","constraints":"must be representable for success"}],"outputs":[{"name":"converted value","type":"Destination","ownership":"copied","lifetime":"caller-owned scalar","invalidation":"none","caller_cleanup":"none"}],"state":[],"invariants":["every successful result exactly preserves the source mathematical value"],"failure_behavior":{"errors":[{"operation":"checkedIntegerCast","error":"OutOfRange","state_change":"none"}],"optional_empty_results":[],"failure_atomicity":"stateless","partial_effects":[],"panic_conditions":[],"undefined_behavior_preconditions":[]},"ownership":{"owns":[],"borrows":[],"copies":["input and output scalar"],"transfers":[],"allocator":"none","element_cleanup":"none"},"cleanup":[],"invalidation":[],"dependencies":{"repository":[],"standard_library":["std.math.cast","std.testing"],"external":[],"conceptual":["representability"]},"expected_dependents":[{"name":"bounded integer construction","reason":"convert before semantic range validation"},{"name":"binary parser","reason":"convert field widths safely"},{"name":"FFI gate","reason":"validate foreign integer widths"}],"composition":{"import_name":"checked_integer_cast","import_configuration":"Import projects/10-checked-integer-cast/src/checked_integer_cast.zig.","minimal_example":"const cast = @import(\"checked_integer_cast.zig\"); const value = try cast.checkedIntegerCast(u16, raw);","integration_patterns":[],"incompatible_combinations":[],"replacement_options":[]},"compatibility":{"zig_version":"0.14.0","hosted":"yes","freestanding":"yes","thread_safe":"stateless","reentrant":"yes","endianness":"not applicable","platforms":[],"architectures":[],"allocator_assumptions":"none","ffi":"useful at ABI boundaries; no stable ABI","no_std_equivalent":"already freestanding-suitable"},"complexity":{"operations":[{"operation":"checkedIntegerCast","time":"O(1)"}],"space":"O(1)","compile_time":"destination type specialization","notes":[]},"limits":[],"validation":{"build_step":"test-checked-integer-cast","commands":["zig build test-checked-integer-cast","zig build test"],"compiler_validated":false,"compiler_version":"","last_validated_commit":"","unit_tests":["widening","narrowing","signedness","out-of-range","comptime literal"],"integration_tests":[],"property_tests":[],"fuzz_tests":[],"benchmarks":[],"known_failures":[],"notes":["Build registration and local Zig 0.14.0 validation pending."]},"documentation":{"read_order":["README.md","MASTERY.md","DETAILS.md","details.json","src/checked_integer_cast.zig"],"examples_covered":["safe narrowing"],"exercises":[],"glossary_terms":["representability","narrowing","signedness"],"related_modules":["bounded-integer","nonzero-integer"]},"maintenance":{"stability":"experimental","breaking_change_policy":"Update source, tests, all contracts, build, catalog, and dependents together.","known_gaps":["compiler validation pending"],"planned_extensions":[],"review_triggers":["accepted source type changes","error changes"],"synchronization_requirements":["public signature must match source"]},"search":{"capabilities":["checked integer cast","safe narrowing","signedness validation"],"problems":["integer truncation","unsafe cast"],"inputs":["integer"],"outputs":["representable integer"],"environments":["hosted","freestanding"],"keywords":["checked cast","integer conversion","range cast"]}}
+{
+  "schema_version": "2.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "10",
+    "canonical_name": "checked-integer-cast",
+    "display_name": "Checked Integer Cast",
+    "directory": "projects/10-checked-integer-cast",
+    "summary": "Fallible integer conversion that rejects unrepresentable values.",
+    "long_description": "Fallible integer conversion that rejects unrepresentable values.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "numeric-boundary",
+    "subcategory": "",
+    "tags": [
+      "integer",
+      "cast",
+      "range-check",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Convert an integer to another integer type without truncation, wrapping, or sign loss.",
+    "secondary": [],
+    "non_goals": [],
+    "problems_solved": [],
+    "future_role": ""
+  },
+  "c_pain": {
+    "summary": "Implicit narrowing and signedness conversions silently change values.",
+    "common_failure_modes": [
+      "truncation",
+      "negative-to-unsigned conversion",
+      "destination overflow"
+    ],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "C casts are concise and direct.",
+    "where_c_degrades": "Representability checks are optional and scattered."
+  },
+  "zig_response": {
+    "summary": "Use one explicit error-returning conversion boundary.",
+    "language_features": [
+      "error union",
+      "comptime type",
+      "std.math.cast"
+    ],
+    "guarantees_made_visible": [
+      "successful result preserves the mathematical value",
+      "failure has no side effects"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "perform domain validation after representability"
+    ],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/10-checked-integer-cast",
+    "implementation": [
+      "projects/10-checked-integer-cast/src/checked_integer_cast.zig"
+    ],
+    "public_entrypoint": "projects/10-checked-integer-cast/src/checked_integer_cast.zig",
+    "tests": [
+      "projects/10-checked-integer-cast/src/checked_integer_cast.zig"
+    ],
+    "readme": "projects/10-checked-integer-cast/README.md",
+    "mastery": "projects/10-checked-integer-cast/MASTERY.md",
+    "details_markdown": "projects/10-checked-integer-cast/DETAILS.md",
+    "details_json": "projects/10-checked-integer-cast/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "checkedIntegerCast"
+    ],
+    "types": [],
+    "functions": [
+      {
+        "name": "checkedIntegerCast",
+        "signature": "checkedIntegerCast(comptime Destination: type, value: anytype) error{OutOfRange}!Destination"
+      }
+    ],
+    "methods": [],
+    "constants": [],
+    "errors": [
+      "OutOfRange"
+    ],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": []
+  },
+  "inputs": [
+    {
+      "name": "Destination",
+      "type": "type",
+      "ownership": "compile-time",
+      "lifetime": "program",
+      "constraints": "integer type"
+    },
+    {
+      "name": "value",
+      "type": "integer or comptime_int",
+      "ownership": "copied",
+      "lifetime": "call",
+      "constraints": "must be representable for success"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "converted value",
+      "type": "Destination",
+      "ownership": "copied",
+      "lifetime": "caller-owned scalar",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    }
+  ],
+  "state": {
+    "fields": [],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "every successful result exactly preserves the source mathematical value"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [],
+    "borrows": [],
+    "copies": [
+      "input and output scalar"
+    ],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "none",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [
+      {
+        "operation": "checkedIntegerCast",
+        "error": "OutOfRange",
+        "state_change": "none"
+      }
+    ],
+    "optional_empty_results": [],
+    "failure_atomicity": "stateless",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [],
+    "standard_library": [
+      "std.math.cast",
+      "std.testing"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": [
+      "representability"
+    ]
+  },
+  "dependency_contracts": [],
+  "expected_dependents": [
+    {
+      "name": "bounded integer construction",
+      "reason": "convert before semantic range validation"
+    },
+    {
+      "name": "binary parser",
+      "reason": "convert field widths safely"
+    },
+    {
+      "name": "FFI gate",
+      "reason": "validate foreign integer widths"
+    }
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "checked_integer_cast",
+    "import_path": "projects/10-checked-integer-cast/src/checked_integer_cast.zig",
+    "import_configuration": "Import projects/10-checked-integer-cast/src/checked_integer_cast.zig.",
+    "minimal_example": "const cast = @import(\"checked_integer_cast.zig\"); const value = try cast.checkedIntegerCast(u16, raw);",
+    "integration_patterns": [],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "stateless",
+    "reentrant": "yes",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "none",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "useful at ABI boundaries; no stable ABI",
+    "no_std_equivalent": "already freestanding-suitable"
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-checked-integer-cast",
+    "commands": [
+      "zig build test-checked-integer-cast",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "accepts representable widening and narrowing conversions",
+      "rejects values outside the destination range",
+      "supports comptime integer literals"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Build registration and local Zig 0.14.0 validation pending."
+    ]
+  },
+  "documentation": {
+    "read_order": [
+      "details.json",
+      "DETAILS.md",
+      "README.md",
+      "MASTERY.md",
+      "projects/10-checked-integer-cast/src/checked_integer_cast.zig"
+    ],
+    "examples_covered": [
+      "safe narrowing"
+    ],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [
+      "representability",
+      "narrowing",
+      "signedness"
+    ],
+    "related_modules": [
+      "bounded-integer",
+      "nonzero-integer"
+    ],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Update source, tests, all contracts, build, catalog, and dependents together.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [
+      "compiler validation pending"
+    ],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [
+      "accepted source type changes",
+      "error changes"
+    ],
+    "synchronization_requirements": [
+      "public signature must match source"
+    ],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "checked integer cast",
+      "safe narrowing",
+      "signedness validation"
+    ],
+    "problems": [
+      "integer truncation",
+      "unsafe cast"
+    ],
+    "inputs": [
+      "integer"
+    ],
+    "outputs": [
+      "representable integer"
+    ],
+    "environments": [
+      "hosted",
+      "freestanding"
+    ],
+    "keywords": [
+      "checked cast",
+      "integer conversion",
+      "range cast"
+    ],
+    "grep_terms": [
+      "checked-integer-cast",
+      "checkedIntegerCast"
+    ],
+    "natural_language_queries": [
+      "How do I fallible integer conversion that rejects unrepresentable values?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "numeric-boundary",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [
+      "bounded integer construction",
+      "binary parser",
+      "FFI gate"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Fallible integer conversion that rejects unrepresentable values.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [
+      "integer truncation",
+      "unsafe cast"
+    ],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-checked-integer-cast"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ]
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "checkedIntegerCast",
+        "file": "projects/10-checked-integer-cast/src/checked_integer_cast.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "accepts representable widening and narrowing conversions",
+        "file": "projects/10-checked-integer-cast/src/checked_integer_cast.zig"
+      },
+      {
+        "test": "rejects values outside the destination range",
+        "file": "projects/10-checked-integer-cast/src/checked_integer_cast.zig"
+      },
+      {
+        "test": "supports comptime integer literals",
+        "file": "projects/10-checked-integer-cast/src/checked_integer_cast.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  }
+}

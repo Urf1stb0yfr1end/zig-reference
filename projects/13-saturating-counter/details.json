@@ -1,1 +1,562 @@
-{"schema_version":"1.0.0","module":{"id":"13","name":"saturating-counter","directory":"projects/13-saturating-counter","summary":"Unsigned counter that clamps between zero and a compile-time maximum.","status":"experimental-unverified","category":"numeric-policy","tags":["counter","saturating-arithmetic","quota","freestanding"]},"purpose":"Make clamping overflow policy explicit for counters, quotas, retries, telemetry, and resource pressure.","c_pain":{"summary":"Counter overflow behavior is often accidental; wrapping can reset limits or produce misleading telemetry.","failure_modes":["wrap to zero","underflow to maximum","quota bypass","retry counter reset"],"why_c_is_attractive":"Plain integer arithmetic is compact and fast.","where_c_degrades":"The arithmetic policy is inherited accidentally from the type and operator rather than stated by the domain."},"zig_response":{"summary":"Use explicit saturating arithmetic and a compile-time ceiling.","language_features":["saturating operators","generic type factory","comptime maximum"],"guarantees_made_visible":["0 <= value <= maximum","addition never wraps","subtraction never wraps"],"remaining_programmer_responsibilities":["decide whether saturation is preferable to error or wrapping","observe saturation when overload must be reported"]},"public_surface":{"root_symbols":["SaturatingCounter"],"types":[{"name":"SaturatingCounter(T, maximum)","kind":"generic type factory"}],"functions":[],"methods":[{"name":"init","signature":"init(value: T) Self"},{"name":"get","signature":"get(self: Self) T"},{"name":"increment","signature":"increment(self: *Self) void"},{"name":"decrement","signature":"decrement(self: *Self) void"},{"name":"add","signature":"add(self: *Self, amount: T) void"},{"name":"subtract","signature":"subtract(self: *Self, amount: T) void"},{"name":"reset","signature":"reset(self: *Self) void"},{"name":"isSaturated","signature":"isSaturated(self: Self) bool"}],"errors":[],"constants":[]},"locations":{"implementation":["projects/13-saturating-counter/src/saturating_counter.zig"],"test_source":["projects/13-saturating-counter/src/saturating_counter.zig"],"readme":"projects/13-saturating-counter/README.md","mastery":"projects/13-saturating-counter/MASTERY.md","details_markdown":"projects/13-saturating-counter/DETAILS.md","details_json":"projects/13-saturating-counter/details.json","examples":[],"benchmarks":[],"fixtures":[],"fuzz":[]},"inputs":[{"name":"T","type":"type","ownership":"compile-time","lifetime":"program","constraints":"unsigned integer type"},{"name":"maximum","type":"T","ownership":"compile-time","lifetime":"program","constraints":"saturation ceiling"},{"name":"value or amount","type":"T","ownership":"copied","lifetime":"call or instance","constraints":"none; values are clamped"}],"outputs":[{"name":"counter value","type":"T","ownership":"copied","lifetime":"caller value","invalidation":"none","caller_cleanup":"none"},{"name":"saturation flag","type":"bool","ownership":"copied","lifetime":"caller value","invalidation":"none","caller_cleanup":"none"}],"state":[{"name":"value","type":"T","role":"current clamped count"}],"invariants":["value <= maximum","addition never decreases value","subtraction never increases value","arithmetic never wraps"],"failure_behavior":{"errors":[],"optional_empty_results":[],"failure_atomicity":"operations are total and clamp instead of failing","partial_effects":[],"panic_conditions":[],"undefined_behavior_preconditions":[]},"ownership":{"owns":["one scalar counter"],"borrows":[],"copies":["values and amounts"],"transfers":[],"allocator":"none","element_cleanup":"none"},"cleanup":[],"invalidation":[],"dependencies":{"repository":[],"standard_library":["std.testing"],"external":[],"conceptual":["saturating arithmetic","quota ceiling"]},"expected_dependents":[{"name":"retry counter","reason":"prevent wraparound reopening retry loops"},{"name":"quota counter","reason":"clamp at configured limit"},{"name":"telemetry counter","reason":"avoid misleading rollover"},{"name":"resource pressure indicator","reason":"bounded severity"}],"composition":{"import_name":"saturating_counter","import_configuration":"Import projects/13-saturating-counter/src/saturating_counter.zig.","minimal_example":"const SaturatingCounter = @import(\"saturating_counter.zig\").SaturatingCounter; const RetryCount = SaturatingCounter(u8, 8); var retries = RetryCount.init(0); retries.increment();","integration_patterns":[],"incompatible_combinations":[],"replacement_options":[{"condition":"out-of-range input must be rejected","module":"bounded-integer"}]},"compatibility":{"zig_version":"0.14.0","hosted":"yes","freestanding":"yes","thread_safe":"no internal synchronization","reentrant":"yes","endianness":"not applicable","platforms":[],"architectures":[],"allocator_assumptions":"none","ffi":"unwrap to T at ABI boundaries","no_std_equivalent":"already freestanding-suitable"},"complexity":{"operations":[{"operation":"all public operations","time":"O(1)"}],"space":"O(sizeof(T))","compile_time":"one concrete type per T and maximum","notes":[]},"limits":[{"name":"maximum","value":"compile-time parameter","source":"type"}],"validation":{"build_step":"test-saturating-counter","commands":["zig build test-saturating-counter","zig build test"],"compiler_validated":false,"compiler_version":"","last_validated_commit":"","unit_tests":["upper saturation","lower saturation","initial clamping","reset","saturation detection"],"integration_tests":[],"property_tests":[],"fuzz_tests":[],"benchmarks":[],"known_failures":[],"notes":["Build registration and local compiler validation pending."]},"documentation":{"read_order":["README.md","MASTERY.md","DETAILS.md","details.json","src/saturating_counter.zig"],"examples_covered":["retry count"],"exercises":[],"glossary_terms":["saturation","clamping","overflow policy"],"related_modules":["bounded-integer","wrapping-sequence-number"]},"maintenance":{"stability":"experimental","breaking_change_policy":"Update source, tests, contracts, build, catalog, and dependents together.","known_gaps":["compiler validation pending"],"planned_extensions":[],"review_triggers":["arithmetic policy changes","maximum semantics changes"],"synchronization_requirements":["public signatures must match source"]},"search":{"capabilities":["saturating counter","clamped quota","non-wrapping arithmetic"],"problems":["counter wraparound","counter underflow","quota bypass"],"inputs":["unsigned integer amount"],"outputs":["clamped counter value"],"environments":["hosted","freestanding"],"keywords":["saturating counter","clamped counter","quota counter"]}}
+{
+  "schema_version": "2.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "13",
+    "canonical_name": "saturating-counter",
+    "display_name": "Saturating Counter",
+    "directory": "projects/13-saturating-counter",
+    "summary": "Unsigned counter that clamps between zero and a compile-time maximum.",
+    "long_description": "Unsigned counter that clamps between zero and a compile-time maximum.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "numeric-policy",
+    "subcategory": "",
+    "tags": [
+      "counter",
+      "saturating-arithmetic",
+      "quota",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Make clamping overflow policy explicit for counters, quotas, retries, telemetry, and resource pressure.",
+    "secondary": [],
+    "non_goals": [],
+    "problems_solved": [],
+    "future_role": ""
+  },
+  "c_pain": {
+    "summary": "Counter overflow behavior is often accidental; wrapping can reset limits or produce misleading telemetry.",
+    "common_failure_modes": [
+      "wrap to zero",
+      "underflow to maximum",
+      "quota bypass",
+      "retry counter reset"
+    ],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "Plain integer arithmetic is compact and fast.",
+    "where_c_degrades": "The arithmetic policy is inherited accidentally from the type and operator rather than stated by the domain."
+  },
+  "zig_response": {
+    "summary": "Use explicit saturating arithmetic and a compile-time ceiling.",
+    "language_features": [
+      "saturating operators",
+      "generic type factory",
+      "comptime maximum"
+    ],
+    "guarantees_made_visible": [
+      "0 <= value <= maximum",
+      "addition never wraps",
+      "subtraction never wraps"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "decide whether saturation is preferable to error or wrapping",
+      "observe saturation when overload must be reported"
+    ],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/13-saturating-counter",
+    "implementation": [
+      "projects/13-saturating-counter/src/saturating_counter.zig"
+    ],
+    "public_entrypoint": "projects/13-saturating-counter/src/saturating_counter.zig",
+    "tests": [
+      "projects/13-saturating-counter/src/saturating_counter.zig"
+    ],
+    "readme": "projects/13-saturating-counter/README.md",
+    "mastery": "projects/13-saturating-counter/MASTERY.md",
+    "details_markdown": "projects/13-saturating-counter/DETAILS.md",
+    "details_json": "projects/13-saturating-counter/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "SaturatingCounter"
+    ],
+    "types": [
+      {
+        "name": "SaturatingCounter(T, maximum)",
+        "kind": "generic type factory"
+      }
+    ],
+    "functions": [],
+    "methods": [
+      {
+        "name": "init",
+        "signature": "init(value: T) Self"
+      },
+      {
+        "name": "get",
+        "signature": "get(self: Self) T"
+      },
+      {
+        "name": "increment",
+        "signature": "increment(self: *Self) void"
+      },
+      {
+        "name": "decrement",
+        "signature": "decrement(self: *Self) void"
+      },
+      {
+        "name": "add",
+        "signature": "add(self: *Self, amount: T) void"
+      },
+      {
+        "name": "subtract",
+        "signature": "subtract(self: *Self, amount: T) void"
+      },
+      {
+        "name": "reset",
+        "signature": "reset(self: *Self) void"
+      },
+      {
+        "name": "isSaturated",
+        "signature": "isSaturated(self: Self) bool"
+      }
+    ],
+    "constants": [],
+    "errors": [],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": []
+  },
+  "inputs": [
+    {
+      "name": "T",
+      "type": "type",
+      "ownership": "compile-time",
+      "lifetime": "program",
+      "constraints": "unsigned integer type"
+    },
+    {
+      "name": "maximum",
+      "type": "T",
+      "ownership": "compile-time",
+      "lifetime": "program",
+      "constraints": "saturation ceiling"
+    },
+    {
+      "name": "value or amount",
+      "type": "T",
+      "ownership": "copied",
+      "lifetime": "call or instance",
+      "constraints": "none; values are clamped"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "counter value",
+      "type": "T",
+      "ownership": "copied",
+      "lifetime": "caller value",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    },
+    {
+      "name": "saturation flag",
+      "type": "bool",
+      "ownership": "copied",
+      "lifetime": "caller value",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    }
+  ],
+  "state": {
+    "fields": [
+      {
+        "name": "value",
+        "type": "T",
+        "role": "current clamped count"
+      }
+    ],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "value <= maximum",
+      "addition never decreases value",
+      "subtraction never increases value",
+      "arithmetic never wraps"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [
+      "one scalar counter"
+    ],
+    "borrows": [],
+    "copies": [
+      "values and amounts"
+    ],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "none",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [],
+    "optional_empty_results": [],
+    "failure_atomicity": "operations are total and clamp instead of failing",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [],
+    "standard_library": [
+      "std.testing"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": [
+      "saturating arithmetic",
+      "quota ceiling"
+    ]
+  },
+  "dependency_contracts": [],
+  "expected_dependents": [
+    {
+      "name": "retry counter",
+      "reason": "prevent wraparound reopening retry loops"
+    },
+    {
+      "name": "quota counter",
+      "reason": "clamp at configured limit"
+    },
+    {
+      "name": "telemetry counter",
+      "reason": "avoid misleading rollover"
+    },
+    {
+      "name": "resource pressure indicator",
+      "reason": "bounded severity"
+    }
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "saturating_counter",
+    "import_path": "projects/13-saturating-counter/src/saturating_counter.zig",
+    "import_configuration": "Import projects/13-saturating-counter/src/saturating_counter.zig.",
+    "minimal_example": "const SaturatingCounter = @import(\"saturating_counter.zig\").SaturatingCounter; const RetryCount = SaturatingCounter(u8, 8); var retries = RetryCount.init(0); retries.increment();",
+    "integration_patterns": [],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [
+      {
+        "condition": "out-of-range input must be rejected",
+        "module": "bounded-integer"
+      }
+    ],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "no internal synchronization",
+    "reentrant": "yes",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "none",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "unwrap to T at ABI boundaries",
+    "no_std_equivalent": "already freestanding-suitable"
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-saturating-counter",
+    "commands": [
+      "zig build test-saturating-counter",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "addition clamps to the configured maximum",
+      "subtraction clamps to zero",
+      "initial value is clamped and reset returns to zero"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [
+      "subtraction clamps to zero",
+      "initial value is clamped and reset returns to zero"
+    ],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Build registration and local compiler validation pending."
+    ]
+  },
+  "documentation": {
+    "read_order": [
+      "details.json",
+      "DETAILS.md",
+      "README.md",
+      "MASTERY.md",
+      "projects/13-saturating-counter/src/saturating_counter.zig"
+    ],
+    "examples_covered": [
+      "retry count"
+    ],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [
+      "saturation",
+      "clamping",
+      "overflow policy"
+    ],
+    "related_modules": [
+      "bounded-integer",
+      "wrapping-sequence-number"
+    ],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Update source, tests, contracts, build, catalog, and dependents together.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [
+      "compiler validation pending"
+    ],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [
+      "arithmetic policy changes",
+      "maximum semantics changes"
+    ],
+    "synchronization_requirements": [
+      "public signatures must match source"
+    ],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "saturating counter",
+      "clamped quota",
+      "non-wrapping arithmetic"
+    ],
+    "problems": [
+      "counter wraparound",
+      "counter underflow",
+      "quota bypass"
+    ],
+    "inputs": [
+      "unsigned integer amount"
+    ],
+    "outputs": [
+      "clamped counter value"
+    ],
+    "environments": [
+      "hosted",
+      "freestanding"
+    ],
+    "keywords": [
+      "saturating counter",
+      "clamped counter",
+      "quota counter"
+    ],
+    "grep_terms": [
+      "saturating-counter",
+      "SaturatingCounter"
+    ],
+    "natural_language_queries": [
+      "How do I unsigned counter that clamps between zero and a compile-time maximum?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "numeric-policy",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [
+      "retry counter",
+      "quota counter",
+      "telemetry counter",
+      "resource pressure indicator"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Unsigned counter that clamps between zero and a compile-time maximum.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [
+      "counter wraparound",
+      "counter underflow",
+      "quota bypass"
+    ],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-saturating-counter"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ]
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "SaturatingCounter",
+        "file": "projects/13-saturating-counter/src/saturating_counter.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "addition clamps to the configured maximum",
+        "file": "projects/13-saturating-counter/src/saturating_counter.zig"
+      },
+      {
+        "test": "subtraction clamps to zero",
+        "file": "projects/13-saturating-counter/src/saturating_counter.zig"
+      },
+      {
+        "test": "initial value is clamped and reset returns to zero",
+        "file": "projects/13-saturating-counter/src/saturating_counter.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  }
+}

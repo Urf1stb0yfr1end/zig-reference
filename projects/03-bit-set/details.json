@@ -1,1 +1,577 @@
-{"schema_version":"1.0.0","module":{"id":"03","name":"bit-set","directory":"projects/03-bit-set","summary":"Compact fixed-count Boolean state stored in machine words.","status":"experimental-unverified","category":"bit-structure","tags":["bitset","bitmap","flags","freestanding","compact"]},"purpose":"Represent a compile-time number of Boolean states compactly with checked indices and masked padding bits.","c_pain":{"summary":"C bitmap code commonly repeats word and mask arithmetic, permits invalid shifts, and accidentally treats padding bits as real state.","failure_modes":["out-of-range bit index","invalid shift width","padding bits set by set-all","word-count rounding errors","signed mask bugs"],"why_c_is_attractive":"Bitwise operators make compact state extremely cheap.","where_c_degrades":"Every caller must reproduce the same indexing and masking rules correctly."},"zig_response":{"summary":"The module centralizes bit addressing, uses precise integer types, and preserves unused-bit invariants.","language_features":["comptime bit count","u64 storage","u6 shift amount","error unions","precise casts"],"guarantees_made_visible":["only logical bit indices are accepted","padding bits remain clear","zero-bit sets are valid"],"remaining_programmer_responsibilities":["define synchronization for shared use","choose correct logical bit count","interpret bit meanings consistently"]},"public_surface":{"root_symbols":["BitSet"],"types":[{"name":"BitSet(bit_count)","kind":"generic type factory"}],"functions":[],"methods":[{"name":"set","signature":"set(self: *Self, index: usize) Error!void"},{"name":"unset","signature":"unset(self: *Self, index: usize) Error!void"},{"name":"isSet","signature":"isSet(self: *const Self, index: usize) Error!bool"},{"name":"setAll","signature":"setAll(self: *Self) void"},{"name":"clearAll","signature":"clearAll(self: *Self) void"},{"name":"count","signature":"count(self: *const Self) usize"}],"errors":["OutOfBounds"],"constants":[]},"locations":{"implementation":["projects/03-bit-set/src/bit_set.zig"],"test_source":["projects/03-bit-set/src/bit_set.zig"],"readme":"projects/03-bit-set/README.md","mastery":"projects/03-bit-set/MASTERY.md","details_markdown":"projects/03-bit-set/DETAILS.md","details_json":"projects/03-bit-set/details.json","examples":[],"benchmarks":[],"fixtures":[],"fuzz":[]},"inputs":[{"name":"bit_count","type":"usize","ownership":"compile-time","lifetime":"program","constraints":"may be zero"},{"name":"index","type":"usize","ownership":"value","lifetime":"call","constraints":"index < bit_count"}],"outputs":[{"name":"isSet","type":"bool","ownership":"value","lifetime":"call result","invalidation":"none","caller_cleanup":"none"},{"name":"count","type":"usize","ownership":"value","lifetime":"call result","invalidation":"none","caller_cleanup":"none"}],"state":[{"name":"words","type":"array of u64","role":"physical bit storage"}],"invariants":["logical indices are in 0..bit_count","unused high bits in the final word remain zero","word count equals ceil(bit_count / 64)"],"failure_behavior":{"errors":[{"operation":"set/unset/isSet","error":"OutOfBounds","state_change":"none"}],"optional_empty_results":[],"failure_atomicity":"Index validation occurs before mutation.","partial_effects":[],"panic_conditions":[],"undefined_behavior_preconditions":[]},"ownership":{"owns":["inline word storage"],"borrows":[],"copies":[],"transfers":[],"allocator":"none","element_cleanup":"not applicable"},"cleanup":[],"invalidation":[],"dependencies":{"repository":[],"standard_library":["std.testing","std.math or bit operations"],"external":[],"conceptual":["word indexing","bit masks"]},"expected_dependents":[{"name":"bitmap allocator","reason":"track free and used units"},{"name":"page map","reason":"track physical pages"},{"name":"permission set","reason":"compact Boolean capabilities"}],"composition":{"import_name":"bit_set","import_configuration":"Import source or register build module.","minimal_example":"const BitSet = @import(\"bit_set\").BitSet;\nvar bits = BitSet(128){};\ntry bits.set(7);","integration_patterns":[{"with":"allocator","pattern":"scan clear bits and mark allocations"}],"incompatible_combinations":[],"replacement_options":[{"condition":"runtime bit count","module":"future dynamic bit set"}]},"compatibility":{"zig_version":"0.14.0","hosted":"yes","freestanding":"yes","thread_safe":"no internal synchronization","reentrant":"yes for distinct instances","endianness":"logical behavior independent; raw storage serialization requires an explicit format","platforms":[],"architectures":[],"allocator_assumptions":"none","ffi":"raw layout not stable ABI","no_std_equivalent":"already allocation-free"},"complexity":{"operations":[{"operation":"set/unset/isSet","time":"O(1)"},{"operation":"setAll/clearAll/count","time":"O(words)"}],"space":"ceil(bit_count / 64) * 8 bytes","compile_time":"one type per bit_count","notes":[]},"limits":[{"name":"logical bits","value":"bit_count","source":"compile-time"}],"validation":{"build_step":"test-bit-set","commands":["zig build test-bit-set","zig build test"],"compiler_validated":false,"compiler_version":"","last_validated_commit":"","unit_tests":["set and unset","bounds errors","cross-word bits","setAll padding","zero bits"],"integration_tests":[],"property_tests":[],"fuzz_tests":[],"benchmarks":[],"known_failures":[],"notes":["Compiler validation pending."]},"documentation":{"read_order":["README.md","MASTERY.md","DETAILS.md","details.json","src/bit_set.zig"],"examples_covered":["single bits","word boundary","set all"],"exercises":["find first clear","union/intersection","dynamic storage"],"glossary_terms":["word","mask","padding bit","popcount"],"related_modules":["00-fixed-capacity-vector"]},"maintenance":{"stability":"experimental","breaking_change_policy":"Update all contracts and dependents together.","known_gaps":["compiler validation pending","numeric prefix collides with ring-buffer"],"planned_extensions":["bitmap allocator"],"review_triggers":["storage word type changes","raw serialization added","numbering repair"],"synchronization_requirements":["keep padding invariant documented and tested"]},"search":{"capabilities":["bit set","bitmap","compact flags"],"problems":["invalid shifts","padding bits","repeated mask arithmetic"],"inputs":["bit index"],"outputs":["Boolean state","set-bit count"],"environments":["hosted","freestanding","embedded","hypervisor"],"keywords":["bitset","bitmap","flags","page bitmap","permission bits"]}}
+{
+  "schema_version": "2.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "03",
+    "canonical_name": "bit-set",
+    "display_name": "Bit Set",
+    "directory": "projects/03-bit-set",
+    "summary": "Compact fixed-count Boolean state stored in machine words.",
+    "long_description": "Compact fixed-count Boolean state stored in machine words.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "bit-structure",
+    "subcategory": "",
+    "tags": [
+      "bitset",
+      "bitmap",
+      "flags",
+      "freestanding",
+      "compact"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Represent a compile-time number of Boolean states compactly with checked indices and masked padding bits.",
+    "secondary": [],
+    "non_goals": [],
+    "problems_solved": [],
+    "future_role": ""
+  },
+  "c_pain": {
+    "summary": "C bitmap code commonly repeats word and mask arithmetic, permits invalid shifts, and accidentally treats padding bits as real state.",
+    "common_failure_modes": [
+      "out-of-range bit index",
+      "invalid shift width",
+      "padding bits set by set-all",
+      "word-count rounding errors",
+      "signed mask bugs"
+    ],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "Bitwise operators make compact state extremely cheap.",
+    "where_c_degrades": "Every caller must reproduce the same indexing and masking rules correctly."
+  },
+  "zig_response": {
+    "summary": "The module centralizes bit addressing, uses precise integer types, and preserves unused-bit invariants.",
+    "language_features": [
+      "comptime bit count",
+      "u64 storage",
+      "u6 shift amount",
+      "error unions",
+      "precise casts"
+    ],
+    "guarantees_made_visible": [
+      "only logical bit indices are accepted",
+      "padding bits remain clear",
+      "zero-bit sets are valid"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "define synchronization for shared use",
+      "choose correct logical bit count",
+      "interpret bit meanings consistently"
+    ],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/03-bit-set",
+    "implementation": [
+      "projects/03-bit-set/src/bit_set.zig"
+    ],
+    "public_entrypoint": "projects/03-bit-set/src/bit_set.zig",
+    "tests": [
+      "projects/03-bit-set/src/bit_set.zig"
+    ],
+    "readme": "projects/03-bit-set/README.md",
+    "mastery": "projects/03-bit-set/MASTERY.md",
+    "details_markdown": "projects/03-bit-set/DETAILS.md",
+    "details_json": "projects/03-bit-set/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "BitSet"
+    ],
+    "types": [
+      {
+        "name": "BitSet(bit_count)",
+        "kind": "generic type factory"
+      }
+    ],
+    "functions": [],
+    "methods": [
+      {
+        "name": "set",
+        "signature": "set(self: *Self, index: usize) Error!void"
+      },
+      {
+        "name": "unset",
+        "signature": "unset(self: *Self, index: usize) Error!void"
+      },
+      {
+        "name": "isSet",
+        "signature": "isSet(self: *const Self, index: usize) Error!bool"
+      },
+      {
+        "name": "setAll",
+        "signature": "setAll(self: *Self) void"
+      },
+      {
+        "name": "clearAll",
+        "signature": "clearAll(self: *Self) void"
+      },
+      {
+        "name": "count",
+        "signature": "count(self: *const Self) usize"
+      }
+    ],
+    "constants": [],
+    "errors": [
+      "OutOfBounds"
+    ],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": []
+  },
+  "inputs": [
+    {
+      "name": "bit_count",
+      "type": "usize",
+      "ownership": "compile-time",
+      "lifetime": "program",
+      "constraints": "may be zero"
+    },
+    {
+      "name": "index",
+      "type": "usize",
+      "ownership": "value",
+      "lifetime": "call",
+      "constraints": "index < bit_count"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "isSet",
+      "type": "bool",
+      "ownership": "value",
+      "lifetime": "call result",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    },
+    {
+      "name": "count",
+      "type": "usize",
+      "ownership": "value",
+      "lifetime": "call result",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    }
+  ],
+  "state": {
+    "fields": [
+      {
+        "name": "words",
+        "type": "array of u64",
+        "role": "physical bit storage"
+      }
+    ],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "logical indices are in 0..bit_count",
+      "unused high bits in the final word remain zero",
+      "word count equals ceil(bit_count / 64)"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [
+      "inline word storage"
+    ],
+    "borrows": [],
+    "copies": [],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "not applicable",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [
+      {
+        "operation": "set/unset/isSet",
+        "error": "OutOfBounds",
+        "state_change": "none"
+      }
+    ],
+    "optional_empty_results": [],
+    "failure_atomicity": "Index validation occurs before mutation.",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [],
+    "standard_library": [
+      "std.testing",
+      "std.math or bit operations"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": [
+      "word indexing",
+      "bit masks"
+    ]
+  },
+  "dependency_contracts": [],
+  "expected_dependents": [
+    {
+      "name": "bitmap allocator",
+      "reason": "track free and used units"
+    },
+    {
+      "name": "page map",
+      "reason": "track physical pages"
+    },
+    {
+      "name": "permission set",
+      "reason": "compact Boolean capabilities"
+    }
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "bit_set",
+    "import_path": "projects/03-bit-set/src/bit_set.zig",
+    "import_configuration": "Import source or register build module.",
+    "minimal_example": "const BitSet = @import(\"bit_set\").BitSet;\nvar bits = BitSet(128){};\ntry bits.set(7);",
+    "integration_patterns": [
+      {
+        "with": "allocator",
+        "pattern": "scan clear bits and mark allocations"
+      }
+    ],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [
+      {
+        "condition": "runtime bit count",
+        "module": "future dynamic bit set"
+      }
+    ],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "no internal synchronization",
+    "reentrant": "yes for distinct instances",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "none",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "raw layout not stable ABI",
+    "no_std_equivalent": "already allocation-free"
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-bit-set",
+    "commands": [
+      "zig build test-bit-set",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "set, clear, toggle, and inspect bits",
+      "setAll masks storage outside the declared capacity",
+      "out-of-range operations fail without mutation",
+      "zero-capacity bit set is valid"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [
+      "zero-capacity bit set is valid"
+    ],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Compiler validation pending."
+    ]
+  },
+  "documentation": {
+    "read_order": [
+      "details.json",
+      "DETAILS.md",
+      "README.md",
+      "MASTERY.md",
+      "projects/03-bit-set/src/bit_set.zig"
+    ],
+    "examples_covered": [
+      "single bits",
+      "word boundary",
+      "set all"
+    ],
+    "exercises": [
+      "find first clear",
+      "union/intersection",
+      "dynamic storage"
+    ],
+    "readiness_questions": [],
+    "glossary_terms": [
+      "word",
+      "mask",
+      "padding bit",
+      "popcount"
+    ],
+    "related_modules": [
+      "00-fixed-capacity-vector"
+    ],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Update all contracts and dependents together.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [
+      "compiler validation pending",
+      "numeric prefix collides with ring-buffer"
+    ],
+    "known_bugs": [],
+    "planned_extensions": [
+      "bitmap allocator"
+    ],
+    "review_triggers": [
+      "storage word type changes",
+      "raw serialization added",
+      "numbering repair"
+    ],
+    "synchronization_requirements": [
+      "keep padding invariant documented and tested"
+    ],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "bit set",
+      "bitmap",
+      "compact flags"
+    ],
+    "problems": [
+      "invalid shifts",
+      "padding bits",
+      "repeated mask arithmetic"
+    ],
+    "inputs": [
+      "bit index"
+    ],
+    "outputs": [
+      "Boolean state",
+      "set-bit count"
+    ],
+    "environments": [
+      "hosted",
+      "freestanding",
+      "embedded",
+      "hypervisor"
+    ],
+    "keywords": [
+      "bitset",
+      "bitmap",
+      "flags",
+      "page bitmap",
+      "permission bits"
+    ],
+    "grep_terms": [
+      "bit-set",
+      "BitSet"
+    ],
+    "natural_language_queries": [
+      "How do I compact fixed-count boolean state stored in machine words?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "bit-structure",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [
+      "bitmap allocator",
+      "page map",
+      "permission set"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Compact fixed-count Boolean state stored in machine words.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [
+      "invalid shifts",
+      "padding bits",
+      "repeated mask arithmetic"
+    ],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-bit-set"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ]
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "BitSet",
+        "file": "projects/03-bit-set/src/bit_set.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "set, clear, toggle, and inspect bits",
+        "file": "projects/03-bit-set/src/bit_set.zig"
+      },
+      {
+        "test": "setAll masks storage outside the declared capacity",
+        "file": "projects/03-bit-set/src/bit_set.zig"
+      },
+      {
+        "test": "out-of-range operations fail without mutation",
+        "file": "projects/03-bit-set/src/bit_set.zig"
+      },
+      {
+        "test": "zero-capacity bit set is valid",
+        "file": "projects/03-bit-set/src/bit_set.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  }
+}

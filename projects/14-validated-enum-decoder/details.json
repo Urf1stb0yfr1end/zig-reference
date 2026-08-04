@@ -1,1 +1,515 @@
-{"schema_version":"1.0.0","module":{"id":"14","name":"validated-enum-decoder","directory":"projects/14-validated-enum-decoder","summary":"Validates integer tags before converting them into enum values.","status":"experimental-unverified","category":"validated-value","tags":["enum","decoder","ffi","parser","freestanding"]},"purpose":"Prevent undeclared integer tags from entering trusted enum-typed state.","c_pain":{"summary":"Integer-to-enum casts can admit invalid states.","failure_modes":["invalid enum tag","non-exhaustive downstream logic","foreign value trusted without validation"],"why_c_is_attractive":"A cast is concise.","where_c_degrades":"The cast performs conversion without proving membership in the declared set."},"zig_response":{"summary":"Use an error-returning enum conversion at the boundary.","language_features":["enum types","error unions","comptime type parameters","std.meta"],"guarantees_made_visible":["successful result names a declared enum field"],"remaining_programmer_responsibilities":["choose the correct enum backing type","decide policy for unknown future values"]},"public_surface":{"root_symbols":["decodeEnum","isValidEnumValue"],"types":[],"functions":[{"name":"decodeEnum","signature":"decodeEnum(comptime E: type, raw: std.meta.Tag(E)) error{InvalidEnumValue}!E"},{"name":"isValidEnumValue","signature":"isValidEnumValue(comptime E: type, raw: std.meta.Tag(E)) bool"}],"methods":[],"errors":["InvalidEnumValue"],"constants":[]},"locations":{"implementation":["projects/14-validated-enum-decoder/src/validated_enum_decoder.zig"],"test_source":["projects/14-validated-enum-decoder/src/validated_enum_decoder.zig"],"readme":"projects/14-validated-enum-decoder/README.md","mastery":"projects/14-validated-enum-decoder/MASTERY.md","details_markdown":"projects/14-validated-enum-decoder/DETAILS.md","details_json":"projects/14-validated-enum-decoder/details.json","examples":[],"benchmarks":[],"fixtures":[],"fuzz":[]},"inputs":[{"name":"E","type":"type","ownership":"compile-time","lifetime":"program","constraints":"integer-backed enum"},{"name":"raw","type":"std.meta.Tag(E)","ownership":"copied","lifetime":"call","constraints":"any backing value"}],"outputs":[{"name":"decoded enum","type":"E","ownership":"copied","lifetime":"caller value","invalidation":"none","caller_cleanup":"none"},{"name":"validity","type":"bool","ownership":"copied","lifetime":"caller value","invalidation":"none","caller_cleanup":"none"}],"state":[],"invariants":["every successful result is declared by E"],"failure_behavior":{"errors":[{"operation":"decodeEnum","error":"InvalidEnumValue","state_change":"none"}],"optional_empty_results":[],"failure_atomicity":"pure conversion with no effects","partial_effects":[],"panic_conditions":[],"undefined_behavior_preconditions":[]},"ownership":{"owns":[],"borrows":[],"copies":["raw tag","enum result"],"transfers":[],"allocator":"none","element_cleanup":"none"},"cleanup":[],"invalidation":[],"dependencies":{"repository":[],"standard_library":["std.meta","std.testing"],"external":[],"conceptual":["validation boundary","declared enum membership"]},"expected_dependents":[{"name":"binary parsers","reason":"validate encoded tags"},{"name":"device register decoders","reason":"reject reserved values"},{"name":"FFI adapters","reason":"translate foreign integer enums"}],"composition":{"import_name":"validated_enum_decoder","import_configuration":"Import the implementation path or expose it through a build module.","minimal_example":"const decodeEnum = @import(\"validated_enum_decoder.zig\").decodeEnum; const kind = try decodeEnum(Kind, raw);","integration_patterns":[{"with":"bounded-byte-reader","pattern":"read backing integer, then decode enum"}],"incompatible_combinations":[],"replacement_options":[]},"compatibility":{"zig_version":"0.14.0","hosted":"yes","freestanding":"yes","thread_safe":"yes","reentrant":"yes","endianness":"not applicable after integer decoding","platforms":[],"architectures":[],"allocator_assumptions":"none","ffi":"intended for FFI translation boundaries","no_std_equivalent":"allocation-free"},"complexity":{"operations":[{"operation":"decodeEnum","time":"implementation-dependent bounded enum conversion"},{"operation":"isValidEnumValue","time":"same as decodeEnum"}],"space":"O(1)","compile_time":"specialized by enum type","notes":[]},"limits":[],"validation":{"build_step":"test-validated-enum-decoder","commands":["zig build test-validated-enum-decoder","zig build test"],"compiler_validated":false,"compiler_version":"","last_validated_commit":"","unit_tests":["declared tag","undeclared tag","predicate"],"integration_tests":[],"property_tests":[],"fuzz_tests":[],"benchmarks":[],"known_failures":[],"notes":["Local Zig 0.14.0 validation pending."]},"documentation":{"read_order":["README.md","MASTERY.md","DETAILS.md","details.json","src/validated_enum_decoder.zig"],"examples_covered":["protocol tag"],"exercises":[],"glossary_terms":["enum tag","validation boundary"],"related_modules":["bounded-byte-reader","validated-bit-flags"]},"maintenance":{"stability":"experimental","breaking_change_policy":"Synchronize source, tests, contracts, build, catalog, and checklist.","known_gaps":["compiler validation pending"],"planned_extensions":[],"review_triggers":["public signature changes","error-policy changes"],"synchronization_requirements":["public signatures must match source"]},"search":{"capabilities":["validated enum decode","integer tag validation"],"problems":["invalid enum cast","reserved tag"],"inputs":["integer enum tag"],"outputs":["validated enum"],"environments":["hosted","freestanding","ffi","parser"],"keywords":["enum decoder","validated enum","int to enum"]}}
+{
+  "schema_version": "2.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "14",
+    "canonical_name": "validated-enum-decoder",
+    "display_name": "Validated Enum Decoder",
+    "directory": "projects/14-validated-enum-decoder",
+    "summary": "Validates integer tags before converting them into enum values.",
+    "long_description": "Validates integer tags before converting them into enum values.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "validated-value",
+    "subcategory": "",
+    "tags": [
+      "enum",
+      "decoder",
+      "ffi",
+      "parser",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Prevent undeclared integer tags from entering trusted enum-typed state.",
+    "secondary": [],
+    "non_goals": [],
+    "problems_solved": [],
+    "future_role": ""
+  },
+  "c_pain": {
+    "summary": "Integer-to-enum casts can admit invalid states.",
+    "common_failure_modes": [
+      "invalid enum tag",
+      "non-exhaustive downstream logic",
+      "foreign value trusted without validation"
+    ],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "A cast is concise.",
+    "where_c_degrades": "The cast performs conversion without proving membership in the declared set."
+  },
+  "zig_response": {
+    "summary": "Use an error-returning enum conversion at the boundary.",
+    "language_features": [
+      "enum types",
+      "error unions",
+      "comptime type parameters",
+      "std.meta"
+    ],
+    "guarantees_made_visible": [
+      "successful result names a declared enum field"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "choose the correct enum backing type",
+      "decide policy for unknown future values"
+    ],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/14-validated-enum-decoder",
+    "implementation": [
+      "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig"
+    ],
+    "public_entrypoint": "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig",
+    "tests": [
+      "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig"
+    ],
+    "readme": "projects/14-validated-enum-decoder/README.md",
+    "mastery": "projects/14-validated-enum-decoder/MASTERY.md",
+    "details_markdown": "projects/14-validated-enum-decoder/DETAILS.md",
+    "details_json": "projects/14-validated-enum-decoder/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "decodeEnum",
+      "isValidEnumValue"
+    ],
+    "types": [],
+    "functions": [
+      {
+        "name": "decodeEnum",
+        "signature": "decodeEnum(comptime E: type, raw: std.meta.Tag(E)) error{InvalidEnumValue}!E"
+      },
+      {
+        "name": "isValidEnumValue",
+        "signature": "isValidEnumValue(comptime E: type, raw: std.meta.Tag(E)) bool"
+      }
+    ],
+    "methods": [],
+    "constants": [],
+    "errors": [
+      "InvalidEnumValue"
+    ],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": []
+  },
+  "inputs": [
+    {
+      "name": "E",
+      "type": "type",
+      "ownership": "compile-time",
+      "lifetime": "program",
+      "constraints": "integer-backed enum"
+    },
+    {
+      "name": "raw",
+      "type": "std.meta.Tag(E)",
+      "ownership": "copied",
+      "lifetime": "call",
+      "constraints": "any backing value"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "decoded enum",
+      "type": "E",
+      "ownership": "copied",
+      "lifetime": "caller value",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    },
+    {
+      "name": "validity",
+      "type": "bool",
+      "ownership": "copied",
+      "lifetime": "caller value",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    }
+  ],
+  "state": {
+    "fields": [],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "every successful result is declared by E"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [],
+    "borrows": [],
+    "copies": [
+      "raw tag",
+      "enum result"
+    ],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "none",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [
+      {
+        "operation": "decodeEnum",
+        "error": "InvalidEnumValue",
+        "state_change": "none"
+      }
+    ],
+    "optional_empty_results": [],
+    "failure_atomicity": "pure conversion with no effects",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [],
+    "standard_library": [
+      "std.meta",
+      "std.testing"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": [
+      "validation boundary",
+      "declared enum membership"
+    ]
+  },
+  "dependency_contracts": [],
+  "expected_dependents": [
+    {
+      "name": "binary parsers",
+      "reason": "validate encoded tags"
+    },
+    {
+      "name": "device register decoders",
+      "reason": "reject reserved values"
+    },
+    {
+      "name": "FFI adapters",
+      "reason": "translate foreign integer enums"
+    }
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "validated_enum_decoder",
+    "import_path": "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig",
+    "import_configuration": "Import the implementation path or expose it through a build module.",
+    "minimal_example": "const decodeEnum = @import(\"validated_enum_decoder.zig\").decodeEnum; const kind = try decodeEnum(Kind, raw);",
+    "integration_patterns": [
+      {
+        "with": "bounded-byte-reader",
+        "pattern": "read backing integer, then decode enum"
+      }
+    ],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "yes",
+    "reentrant": "yes",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "none",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "intended for FFI translation boundaries",
+    "no_std_equivalent": "allocation-free"
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-validated-enum-decoder",
+    "commands": [
+      "zig build test-validated-enum-decoder",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "declared tags decode",
+      "undeclared tags fail explicitly"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Local Zig 0.14.0 validation pending."
+    ]
+  },
+  "documentation": {
+    "read_order": [
+      "details.json",
+      "DETAILS.md",
+      "README.md",
+      "MASTERY.md",
+      "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig"
+    ],
+    "examples_covered": [
+      "protocol tag"
+    ],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [
+      "enum tag",
+      "validation boundary"
+    ],
+    "related_modules": [
+      "bounded-byte-reader",
+      "validated-bit-flags"
+    ],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Synchronize source, tests, contracts, build, catalog, and checklist.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [
+      "compiler validation pending"
+    ],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [
+      "public signature changes",
+      "error-policy changes"
+    ],
+    "synchronization_requirements": [
+      "public signatures must match source"
+    ],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "validated enum decode",
+      "integer tag validation"
+    ],
+    "problems": [
+      "invalid enum cast",
+      "reserved tag"
+    ],
+    "inputs": [
+      "integer enum tag"
+    ],
+    "outputs": [
+      "validated enum"
+    ],
+    "environments": [
+      "hosted",
+      "freestanding",
+      "ffi",
+      "parser"
+    ],
+    "keywords": [
+      "enum decoder",
+      "validated enum",
+      "int to enum"
+    ],
+    "grep_terms": [
+      "validated-enum-decoder",
+      "decodeEnum",
+      "isValidEnumValue"
+    ],
+    "natural_language_queries": [
+      "How do I validates integer tags before converting them into enum values?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "validated-value",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [
+      "binary parsers",
+      "device register decoders",
+      "FFI adapters"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Validates integer tags before converting them into enum values.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [
+      "invalid enum cast",
+      "reserved tag"
+    ],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-validated-enum-decoder"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ]
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "decodeEnum",
+        "file": "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig"
+      },
+      {
+        "symbol": "isValidEnumValue",
+        "file": "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "declared tags decode",
+        "file": "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig"
+      },
+      {
+        "test": "undeclared tags fail explicitly",
+        "file": "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  }
+}

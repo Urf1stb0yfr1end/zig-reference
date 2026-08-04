@@ -1,1 +1,419 @@
-{"schema_version":"1.0.0","module":{"id":"20","name":"optional-typed-handle","directory":"projects/20-optional-typed-handle","summary":"Tag-distinguished opaque handle with optional absence.","status":"experimental-unverified","category":"identity","tags":["handle","optional","type-safety","freestanding"]},"purpose":"Prevent accidental interchange of unrelated integer handles and eliminate magic absent values.","public_surface":{"root_symbols":["TypedHandle","OptionalTypedHandle"],"methods":["init","value"],"errors":[]},"locations":{"implementation":["projects/20-optional-typed-handle/src/optional_typed_handle.zig"],"readme":"projects/20-optional-typed-handle/README.md","mastery":"projects/20-optional-typed-handle/MASTERY.md","details_markdown":"projects/20-optional-typed-handle/DETAILS.md","details_json":"projects/20-optional-typed-handle/details.json"},"inputs":[{"name":"Tag","type":"type","ownership":"compile-time"},{"name":"Integer","type":"integer type","ownership":"compile-time"}],"outputs":[{"name":"handle","type":"TypedHandle(Tag,Integer)","ownership":"copied","invalidation":"resource lifecycle is external"}],"invariants":["different tags produce different types","null alone means absence"],"failure_behavior":{"errors":[],"failure_atomicity":"operations are total"},"ownership":{"owns":["raw identifier value"],"borrows":[],"allocator":"none"},"dependencies":{"repository":[],"standard_library":["std.testing"]},"expected_dependents":["resource registries","VM and device APIs","configuration models"],"compatibility":{"zig_version":"0.14.0","hosted":"yes","freestanding":"yes","thread_safe":"value type"},"complexity":{"operations":"O(1)","space":"O(sizeof(Integer))"},"validation":{"build_step":"test-optional-typed-handle","compiler_validated":false,"notes":["Local validation pending."]},"search":{"capabilities":["typed handle","optional resource ID"],"keywords":["opaque handle","optional handle","resource ID"]}}
+{
+  "schema_version": "2.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "20",
+    "canonical_name": "optional-typed-handle",
+    "display_name": "Optional Typed Handle",
+    "directory": "projects/20-optional-typed-handle",
+    "summary": "Tag-distinguished opaque handle with optional absence.",
+    "long_description": "Tag-distinguished opaque handle with optional absence.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "identity",
+    "subcategory": "",
+    "tags": [
+      "handle",
+      "optional",
+      "type-safety",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Prevent accidental interchange of unrelated integer handles and eliminate magic absent values.",
+    "secondary": [],
+    "non_goals": [],
+    "problems_solved": [],
+    "future_role": ""
+  },
+  "c_pain": {
+    "summary": "",
+    "common_failure_modes": [],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "",
+    "where_c_degrades": ""
+  },
+  "zig_response": {
+    "summary": "",
+    "language_features": [],
+    "guarantees_made_visible": [],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/20-optional-typed-handle",
+    "implementation": [
+      "projects/20-optional-typed-handle/src/optional_typed_handle.zig"
+    ],
+    "public_entrypoint": "projects/20-optional-typed-handle/src/optional_typed_handle.zig",
+    "tests": [
+      "projects/20-optional-typed-handle/src/optional_typed_handle.zig"
+    ],
+    "readme": "projects/20-optional-typed-handle/README.md",
+    "mastery": "projects/20-optional-typed-handle/MASTERY.md",
+    "details_markdown": "projects/20-optional-typed-handle/DETAILS.md",
+    "details_json": "projects/20-optional-typed-handle/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "TypedHandle",
+      "OptionalTypedHandle"
+    ],
+    "types": [],
+    "functions": [],
+    "methods": [
+      "init",
+      "value"
+    ],
+    "constants": [],
+    "errors": [],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": []
+  },
+  "inputs": [
+    {
+      "name": "Tag",
+      "type": "type",
+      "ownership": "compile-time"
+    },
+    {
+      "name": "Integer",
+      "type": "integer type",
+      "ownership": "compile-time"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "handle",
+      "type": "TypedHandle(Tag,Integer)",
+      "ownership": "copied",
+      "invalidation": "resource lifecycle is external"
+    }
+  ],
+  "state": {
+    "fields": [],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "different tags produce different types",
+      "null alone means absence"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [
+      "raw identifier value"
+    ],
+    "borrows": [],
+    "copies": [],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [],
+    "optional_empty_results": [],
+    "failure_atomicity": "operations are total",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [],
+    "standard_library": [
+      "std.testing"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": []
+  },
+  "dependency_contracts": [],
+  "expected_dependents": [
+    "resource registries",
+    "VM and device APIs",
+    "configuration models"
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "optional_typed_handle",
+    "import_path": "projects/20-optional-typed-handle/src/optional_typed_handle.zig",
+    "import_configuration": "Import the canonical repository-relative source path.",
+    "minimal_example": "",
+    "integration_patterns": [],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "value type",
+    "reentrant": "unknown",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "",
+    "no_std_equivalent": ""
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-optional-typed-handle",
+    "commands": [
+      "zig build test-optional-typed-handle",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "different tag types produce different handle types"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Local validation pending."
+    ]
+  },
+  "documentation": {
+    "read_order": [
+      "details.json",
+      "DETAILS.md",
+      "README.md",
+      "MASTERY.md",
+      "projects/20-optional-typed-handle/src/optional_typed_handle.zig"
+    ],
+    "examples_covered": [],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [],
+    "related_modules": [],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Synchronize source, tests, contracts, catalog, and dependents.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [],
+    "synchronization_requirements": [],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "typed handle",
+      "optional resource ID"
+    ],
+    "problems": [],
+    "inputs": [],
+    "outputs": [],
+    "environments": [],
+    "keywords": [
+      "opaque handle",
+      "optional handle",
+      "resource ID"
+    ],
+    "grep_terms": [
+      "optional-typed-handle",
+      "TypedHandle",
+      "OptionalTypedHandle"
+    ],
+    "natural_language_queries": [
+      "How do I tag-distinguished opaque handle with optional absence?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "identity",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [
+      "resource registries",
+      "VM and device APIs",
+      "configuration models"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Tag-distinguished opaque handle with optional absence.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-optional-typed-handle"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ]
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "TypedHandle",
+        "file": "projects/20-optional-typed-handle/src/optional_typed_handle.zig"
+      },
+      {
+        "symbol": "OptionalTypedHandle",
+        "file": "projects/20-optional-typed-handle/src/optional_typed_handle.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "different tag types produce different handle types",
+        "file": "projects/20-optional-typed-handle/src/optional_typed_handle.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  }
+}

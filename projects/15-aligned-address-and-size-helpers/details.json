@@ -1,1 +1,573 @@
-{"schema_version":"1.0.0","module":{"id":"15","name":"aligned-address-and-size-helpers","directory":"projects/15-aligned-address-and-size-helpers","summary":"Checked power-of-two alignment arithmetic.","status":"experimental-unverified","category":"numeric-foundation","tags":["alignment","address","size","page","freestanding"]},"purpose":"Centralize alignment validation, rounding, and padding calculations.","c_pain":{"summary":"Copied bit-mask formulas accept invalid alignments or overflow during round-up.","failure_modes":["zero alignment","non-power-of-two alignment","round-up overflow","inconsistent formulas"],"why_c_is_attractive":"The formulas are short.","where_c_degrades":"They are repeatedly rewritten under different assumptions."},"zig_response":{"summary":"Use one error-returning alignment boundary with checked arithmetic.","language_features":["error unions","checked std.math arithmetic","usize"],"guarantees_made_visible":["successful results satisfy the requested power-of-two alignment","overflow is reported"],"remaining_programmer_responsibilities":["select the correct domain alignment"]},"public_surface":{"root_symbols":["AlignmentError","isPowerOfTwo","isAligned","alignDown","alignUp","paddingNeeded"],"types":[],"functions":[{"name":"isPowerOfTwo","signature":"isPowerOfTwo(value: usize) bool"},{"name":"isAligned","signature":"isAligned(value: usize, alignment: usize) AlignmentError!bool"},{"name":"alignDown","signature":"alignDown(value: usize, alignment: usize) AlignmentError!usize"},{"name":"alignUp","signature":"alignUp(value: usize, alignment: usize) AlignmentError!usize"},{"name":"paddingNeeded","signature":"paddingNeeded(value: usize, alignment: usize) AlignmentError!usize"}],"methods":[],"errors":["InvalidAlignment","Overflow"],"constants":[]},"locations":{"implementation":["projects/15-aligned-address-and-size-helpers/src/alignment_helpers.zig"],"test_source":["projects/15-aligned-address-and-size-helpers/src/alignment_helpers.zig"],"readme":"projects/15-aligned-address-and-size-helpers/README.md","mastery":"projects/15-aligned-address-and-size-helpers/MASTERY.md","details_markdown":"projects/15-aligned-address-and-size-helpers/DETAILS.md","details_json":"projects/15-aligned-address-and-size-helpers/details.json","examples":[],"benchmarks":[],"fixtures":[],"fuzz":[]},"inputs":[{"name":"value","type":"usize","ownership":"copied","lifetime":"call","constraints":"none"},{"name":"alignment","type":"usize","ownership":"copied","lifetime":"call","constraints":"nonzero power of two"}],"outputs":[{"name":"aligned value or padding","type":"usize","ownership":"copied","lifetime":"caller value","invalidation":"none","caller_cleanup":"none"},{"name":"alignment predicate","type":"bool","ownership":"copied","lifetime":"caller value","invalidation":"none","caller_cleanup":"none"}],"state":[],"invariants":["successful alignment values are powers of two","alignDown result <= input","alignUp result >= input","paddingNeeded + input == alignUp result"],"failure_behavior":{"errors":[{"operation":"checked operations","error":"InvalidAlignment","state_change":"none"},{"operation":"alignUp and paddingNeeded","error":"Overflow","state_change":"none"}],"optional_empty_results":[],"failure_atomicity":"pure functions","partial_effects":[],"panic_conditions":[],"undefined_behavior_preconditions":[]},"ownership":{"owns":[],"borrows":[],"copies":["integer inputs and outputs"],"transfers":[],"allocator":"none","element_cleanup":"none"},"cleanup":[],"invalidation":[],"dependencies":{"repository":[],"standard_library":["std.math","std.testing"],"external":[],"conceptual":["power-of-two alignment","checked addition"]},"expected_dependents":[{"name":"page allocators","reason":"align page bases and sizes"},{"name":"ELF loaders","reason":"validate segment alignment"},{"name":"DMA buffers","reason":"satisfy device alignment"},{"name":"binary parsers","reason":"skip aligned padding"}],"composition":{"import_name":"alignment_helpers","import_configuration":"Import projects/15-aligned-address-and-size-helpers/src/alignment_helpers.zig.","minimal_example":"const aligned = try alignment.alignUp(size, 4096);","integration_patterns":[{"with":"checked-half-open-range","pattern":"align range endpoints before reserving regions"}],"incompatible_combinations":[],"replacement_options":[]},"compatibility":{"zig_version":"0.14.0","hosted":"yes","freestanding":"yes","thread_safe":"yes","reentrant":"yes","endianness":"not applicable","platforms":[],"architectures":[],"allocator_assumptions":"none","ffi":"plain integer boundary","no_std_equivalent":"already allocation-free"},"complexity":{"operations":[{"operation":"all","time":"O(1)"}],"space":"O(1)","compile_time":"none","notes":[]},"limits":[],"validation":{"build_step":"test-alignment-helpers","commands":["zig build test-alignment-helpers","zig build test"],"compiler_validated":false,"compiler_version":"","last_validated_commit":"","unit_tests":["aligned values","round up","round down","padding","invalid alignment","overflow"],"integration_tests":[],"property_tests":[],"fuzz_tests":[],"benchmarks":[],"known_failures":[],"notes":["Local Zig 0.14.0 validation pending."]},"documentation":{"read_order":["README.md","MASTERY.md","DETAILS.md","details.json","src/alignment_helpers.zig"],"examples_covered":["page alignment"],"exercises":[],"glossary_terms":["alignment","padding","power of two"],"related_modules":["checked-half-open-range","distinct-memory-address-types"]},"maintenance":{"stability":"experimental","breaking_change_policy":"Synchronize source, tests, contracts, build, catalog, and checklist.","known_gaps":["compiler validation pending"],"planned_extensions":[],"review_triggers":["alignment-policy changes","integer-width changes"],"synchronization_requirements":["public signatures must match source"]},"search":{"capabilities":["align up","align down","alignment check","padding calculation"],"problems":["alignment overflow","invalid alignment"],"inputs":["address","size","alignment"],"outputs":["aligned integer","padding"],"environments":["hosted","freestanding","kernel","hypervisor"],"keywords":["alignment helpers","align up","align down","padding"]}}
+{
+  "schema_version": "2.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "15",
+    "canonical_name": "aligned-address-and-size-helpers",
+    "display_name": "Aligned Address And Size Helpers",
+    "directory": "projects/15-aligned-address-and-size-helpers",
+    "summary": "Checked power-of-two alignment arithmetic.",
+    "long_description": "Checked power-of-two alignment arithmetic.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "numeric-foundation",
+    "subcategory": "",
+    "tags": [
+      "alignment",
+      "address",
+      "size",
+      "page",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Centralize alignment validation, rounding, and padding calculations.",
+    "secondary": [],
+    "non_goals": [],
+    "problems_solved": [],
+    "future_role": ""
+  },
+  "c_pain": {
+    "summary": "Copied bit-mask formulas accept invalid alignments or overflow during round-up.",
+    "common_failure_modes": [
+      "zero alignment",
+      "non-power-of-two alignment",
+      "round-up overflow",
+      "inconsistent formulas"
+    ],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "The formulas are short.",
+    "where_c_degrades": "They are repeatedly rewritten under different assumptions."
+  },
+  "zig_response": {
+    "summary": "Use one error-returning alignment boundary with checked arithmetic.",
+    "language_features": [
+      "error unions",
+      "checked std.math arithmetic",
+      "usize"
+    ],
+    "guarantees_made_visible": [
+      "successful results satisfy the requested power-of-two alignment",
+      "overflow is reported"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "select the correct domain alignment"
+    ],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/15-aligned-address-and-size-helpers",
+    "implementation": [
+      "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig"
+    ],
+    "public_entrypoint": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig",
+    "tests": [
+      "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig"
+    ],
+    "readme": "projects/15-aligned-address-and-size-helpers/README.md",
+    "mastery": "projects/15-aligned-address-and-size-helpers/MASTERY.md",
+    "details_markdown": "projects/15-aligned-address-and-size-helpers/DETAILS.md",
+    "details_json": "projects/15-aligned-address-and-size-helpers/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "AlignmentError",
+      "isPowerOfTwo",
+      "isAligned",
+      "alignDown",
+      "alignUp",
+      "paddingNeeded"
+    ],
+    "types": [],
+    "functions": [
+      {
+        "name": "isPowerOfTwo",
+        "signature": "isPowerOfTwo(value: usize) bool"
+      },
+      {
+        "name": "isAligned",
+        "signature": "isAligned(value: usize, alignment: usize) AlignmentError!bool"
+      },
+      {
+        "name": "alignDown",
+        "signature": "alignDown(value: usize, alignment: usize) AlignmentError!usize"
+      },
+      {
+        "name": "alignUp",
+        "signature": "alignUp(value: usize, alignment: usize) AlignmentError!usize"
+      },
+      {
+        "name": "paddingNeeded",
+        "signature": "paddingNeeded(value: usize, alignment: usize) AlignmentError!usize"
+      }
+    ],
+    "methods": [],
+    "constants": [],
+    "errors": [
+      "InvalidAlignment",
+      "Overflow"
+    ],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": []
+  },
+  "inputs": [
+    {
+      "name": "value",
+      "type": "usize",
+      "ownership": "copied",
+      "lifetime": "call",
+      "constraints": "none"
+    },
+    {
+      "name": "alignment",
+      "type": "usize",
+      "ownership": "copied",
+      "lifetime": "call",
+      "constraints": "nonzero power of two"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "aligned value or padding",
+      "type": "usize",
+      "ownership": "copied",
+      "lifetime": "caller value",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    },
+    {
+      "name": "alignment predicate",
+      "type": "bool",
+      "ownership": "copied",
+      "lifetime": "caller value",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    }
+  ],
+  "state": {
+    "fields": [],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "successful alignment values are powers of two",
+      "alignDown result <= input",
+      "alignUp result >= input",
+      "paddingNeeded + input == alignUp result"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [],
+    "borrows": [],
+    "copies": [
+      "integer inputs and outputs"
+    ],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "none",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [
+      {
+        "operation": "checked operations",
+        "error": "InvalidAlignment",
+        "state_change": "none"
+      },
+      {
+        "operation": "alignUp and paddingNeeded",
+        "error": "Overflow",
+        "state_change": "none"
+      }
+    ],
+    "optional_empty_results": [],
+    "failure_atomicity": "pure functions",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [],
+    "standard_library": [
+      "std.math",
+      "std.testing"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": [
+      "power-of-two alignment",
+      "checked addition"
+    ]
+  },
+  "dependency_contracts": [],
+  "expected_dependents": [
+    {
+      "name": "page allocators",
+      "reason": "align page bases and sizes"
+    },
+    {
+      "name": "ELF loaders",
+      "reason": "validate segment alignment"
+    },
+    {
+      "name": "DMA buffers",
+      "reason": "satisfy device alignment"
+    },
+    {
+      "name": "binary parsers",
+      "reason": "skip aligned padding"
+    }
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "alignment_helpers",
+    "import_path": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig",
+    "import_configuration": "Import projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig.",
+    "minimal_example": "const aligned = try alignment.alignUp(size, 4096);",
+    "integration_patterns": [
+      {
+        "with": "checked-half-open-range",
+        "pattern": "align range endpoints before reserving regions"
+      }
+    ],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "yes",
+    "reentrant": "yes",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "none",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "plain integer boundary",
+    "no_std_equivalent": "already allocation-free"
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-aligned-address-and-size-helpers",
+    "commands": [
+      "zig build test-aligned-address-and-size-helpers",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "alignment helpers share one power-of-two policy",
+      "invalid alignment and overflow fail"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [
+      "invalid alignment and overflow fail"
+    ],
+    "regression_tests": [],
+    "test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Local Zig 0.14.0 validation pending."
+    ]
+  },
+  "documentation": {
+    "read_order": [
+      "details.json",
+      "DETAILS.md",
+      "README.md",
+      "MASTERY.md",
+      "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig"
+    ],
+    "examples_covered": [
+      "page alignment"
+    ],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [
+      "alignment",
+      "padding",
+      "power of two"
+    ],
+    "related_modules": [
+      "checked-half-open-range",
+      "distinct-memory-address-types"
+    ],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Synchronize source, tests, contracts, build, catalog, and checklist.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [
+      "compiler validation pending"
+    ],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [
+      "alignment-policy changes",
+      "integer-width changes"
+    ],
+    "synchronization_requirements": [
+      "public signatures must match source"
+    ],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "align up",
+      "align down",
+      "alignment check",
+      "padding calculation"
+    ],
+    "problems": [
+      "alignment overflow",
+      "invalid alignment"
+    ],
+    "inputs": [
+      "address",
+      "size",
+      "alignment"
+    ],
+    "outputs": [
+      "aligned integer",
+      "padding"
+    ],
+    "environments": [
+      "hosted",
+      "freestanding",
+      "kernel",
+      "hypervisor"
+    ],
+    "keywords": [
+      "alignment helpers",
+      "align up",
+      "align down",
+      "padding"
+    ],
+    "grep_terms": [
+      "aligned-address-and-size-helpers",
+      "AlignmentError",
+      "isPowerOfTwo",
+      "isAligned",
+      "alignDown",
+      "alignUp",
+      "paddingNeeded"
+    ],
+    "natural_language_queries": [
+      "How do I checked power-of-two alignment arithmetic?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "numeric-foundation",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [
+      "page allocators",
+      "ELF loaders",
+      "DMA buffers",
+      "binary parsers"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Checked power-of-two alignment arithmetic.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [
+      "alignment overflow",
+      "invalid alignment"
+    ],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-aligned-address-and-size-helpers"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ]
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "AlignmentError",
+        "file": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig"
+      },
+      {
+        "symbol": "isPowerOfTwo",
+        "file": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig"
+      },
+      {
+        "symbol": "isAligned",
+        "file": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig"
+      },
+      {
+        "symbol": "alignDown",
+        "file": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig"
+      },
+      {
+        "symbol": "alignUp",
+        "file": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig"
+      },
+      {
+        "symbol": "paddingNeeded",
+        "file": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "alignment helpers share one power-of-two policy",
+        "file": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig"
+      },
+      {
+        "test": "invalid alignment and overflow fail",
+        "file": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  }
+}

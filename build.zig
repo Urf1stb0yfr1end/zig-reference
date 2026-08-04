@@ -6,11 +6,15 @@ pub fn build(b: *std.Build) void {
 
     const all_tests_step = b.step("test", "Run all reference-project tests");
 
-    addTestProject(b, target, optimize, all_tests_step, "test-fixed-vector", "Run the fixed-capacity vector tests", "projects/00-fixed-capacity-vector/src/fixed_vector.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-dynamic-array", "Run the dynamic array tests", "projects/02-dynamic-array/src/dynamic_array.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-ring-buffer", "Run the ring buffer tests", "projects/03-ring-buffer/src/ring_buffer.zig");
+    const check_contracts = b.addSystemCommand(&.{ "python3", "tools/module-contract-consistency-checker.py" });
+    const check_step = b.step("check-module-contracts", "Validate module layouts and machine-readable contracts");
+    check_step.dependOn(&check_contracts.step);
+
+    addTestProject(b, target, optimize, all_tests_step, "test-fixed-capacity-vector", "Run the fixed-capacity vector tests", "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig");
+    addTestProject(b, target, optimize, all_tests_step, "test-dynamic-array", "Run the dynamic array tests", "projects/01-dynamic-array/src/dynamic_array.zig");
+    addTestProject(b, target, optimize, all_tests_step, "test-ring-buffer", "Run the ring buffer tests", "projects/02-ring-buffer/src/ring_buffer.zig");
     addTestProject(b, target, optimize, all_tests_step, "test-bit-set", "Run the fixed bit set tests", "projects/03-bit-set/src/bit_set.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-bounded-reader", "Run the bounded byte reader tests", "projects/04-bounded-byte-reader/src/bounded_reader.zig");
+    addTestProject(b, target, optimize, all_tests_step, "test-bounded-byte-reader", "Run the bounded byte reader tests", "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig");
     addTestProject(b, target, optimize, all_tests_step, "test-stack", "Run the stack tests", "projects/05-stack/src/stack.zig");
     addTestProject(b, target, optimize, all_tests_step, "test-byte-writer", "Run the byte writer tests", "projects/06-byte-writer/src/byte_writer.zig");
     addTestProject(b, target, optimize, all_tests_step, "test-bitmap-allocator", "Run the bitmap allocator tests", "projects/07-bitmap-allocator/src/bitmap_allocator.zig");
@@ -21,7 +25,7 @@ pub fn build(b: *std.Build) void {
     addTestProject(b, target, optimize, all_tests_step, "test-bounded-integer", "Run the bounded integer tests", "projects/12-bounded-integer/src/bounded_integer.zig");
     addTestProject(b, target, optimize, all_tests_step, "test-saturating-counter", "Run the saturating counter tests", "projects/13-saturating-counter/src/saturating_counter.zig");
     addTestProject(b, target, optimize, all_tests_step, "test-validated-enum-decoder", "Run the validated enum decoder tests", "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-alignment-helpers", "Run the alignment helper tests", "projects/15-aligned-address-and-size-helpers/src/alignment_helpers.zig");
+    addTestProject(b, target, optimize, all_tests_step, "test-aligned-address-and-size-helpers", "Run the alignment helper tests", "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig");
     addTestProject(b, target, optimize, all_tests_step, "test-validated-bit-flags", "Run the validated bit flags tests", "projects/16-validated-bit-flags/src/validated_bit_flags.zig");
     addTestProject(b, target, optimize, all_tests_step, "test-checked-half-open-range", "Run the checked half-open range tests", "projects/17-checked-half-open-range/src/checked_half_open_range.zig");
     addTestProject(b, target, optimize, all_tests_step, "test-distinct-memory-address-types", "Run the distinct memory address type tests", "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig");
@@ -34,7 +38,7 @@ pub fn build(b: *std.Build) void {
     addTestProject(b, target, optimize, all_tests_step, "test-semantic-version", "Run the semantic version tests", "projects/25-semantic-version/src/semantic_version.zig");
     addTestProject(b, target, optimize, all_tests_step, "test-tagged-result", "Run the tagged result tests", "projects/26-tagged-result/src/tagged_result.zig");
     addTestProject(b, target, optimize, all_tests_step, "test-source-span", "Run the source span tests", "projects/27-source-span/src/source_span.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-physical-page-frame-conversion", "Run the physical page frame conversion tests", "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_conversion.zig");
+    addTestProject(b, target, optimize, all_tests_step, "test-physical-page-frame-number-and-address-conversion", "Run the physical page frame conversion tests", "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig");
 }
 
 fn addTestProject(

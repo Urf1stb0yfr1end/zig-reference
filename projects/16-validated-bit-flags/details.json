@@ -1,1 +1,559 @@
-{"schema_version":"1.0.0","module":{"id":"16","name":"validated-bit-flags","directory":"projects/16-validated-bit-flags","summary":"Typed bit-set wrapper that rejects undeclared storage bits.","status":"experimental-unverified","category":"validated-value","tags":["flags","permissions","registers","protocols","freestanding"]},"purpose":"Keep raw bit storage inside the set of enum-declared flag masks.","c_pain":{"summary":"Raw masks and macros admit reserved bits and mix unrelated flag domains.","failure_modes":["unknown bits accepted","wrong flag domain combined","reserved register bits written","validation duplicated"],"why_c_is_attractive":"Bit masks are compact and direct.","where_c_degrades":"Meaning and validity remain external conventions."},"zig_response":{"summary":"Derive an allowed mask from an enum and expose named operations.","language_features":["enum metadata","comptime type factory","error unions","precise integer backing types"],"guarantees_made_visible":["constructed raw masks contain no unknown bits","operations preserve the allowed mask"],"remaining_programmer_responsibilities":["assign appropriate enum mask values","validate semantic combinations beyond bit membership"]},"public_surface":{"root_symbols":["ValidatedBitFlags"],"types":[{"name":"ValidatedBitFlags(Flag)","kind":"generic type factory"}],"functions":[],"methods":[{"name":"fromRaw","signature":"fromRaw(raw: Storage) error{UnknownBits}!Self"},{"name":"raw","signature":"raw(self: Self) Storage"},{"name":"contains","signature":"contains(self: Self, flag: Flag) bool"},{"name":"insert","signature":"insert(self: *Self, flag: Flag) void"},{"name":"remove","signature":"remove(self: *Self, flag: Flag) void"},{"name":"clear","signature":"clear(self: *Self) void"}],"errors":["UnknownBits"],"constants":[]},"locations":{"implementation":["projects/16-validated-bit-flags/src/validated_bit_flags.zig"],"test_source":["projects/16-validated-bit-flags/src/validated_bit_flags.zig"],"readme":"projects/16-validated-bit-flags/README.md","mastery":"projects/16-validated-bit-flags/MASTERY.md","details_markdown":"projects/16-validated-bit-flags/DETAILS.md","details_json":"projects/16-validated-bit-flags/details.json","examples":[],"benchmarks":[],"fixtures":[],"fuzz":[]},"inputs":[{"name":"Flag","type":"enum type","ownership":"compile-time","lifetime":"program","constraints":"integer-backed enum whose values represent masks"},{"name":"raw","type":"enum tag integer","ownership":"copied","lifetime":"call","constraints":"may contain unknown bits"},{"name":"flag","type":"Flag","ownership":"copied","lifetime":"call","constraints":"declared enum value"}],"outputs":[{"name":"flag set","type":"Self","ownership":"copied value","lifetime":"caller state","invalidation":"none","caller_cleanup":"none"},{"name":"raw bits","type":"Storage","ownership":"copied","lifetime":"caller value","invalidation":"none","caller_cleanup":"none"}],"state":[{"name":"bits","type":"Storage","role":"validated mask"}],"invariants":["bits contains only enum-declared mask bits"],"failure_behavior":{"errors":[{"operation":"fromRaw","error":"UnknownBits","state_change":"no value constructed"}],"optional_empty_results":[],"failure_atomicity":"validation precedes construction","partial_effects":[],"panic_conditions":[],"undefined_behavior_preconditions":[]},"ownership":{"owns":["one integer mask"],"borrows":[],"copies":["flags and masks"],"transfers":[],"allocator":"none","element_cleanup":"none"},"cleanup":[],"invalidation":[],"dependencies":{"repository":[],"standard_library":["std.meta","std.testing"],"external":[],"conceptual":["enum-defined mask vocabulary","unknown-bit rejection"]},"expected_dependents":[{"name":"page-table entry builders","reason":"typed architectural permissions"},{"name":"VMX control builders","reason":"validated requested controls"},{"name":"device register wrappers","reason":"reject reserved bits"},{"name":"protocol negotiation","reason":"typed capabilities"}],"composition":{"import_name":"validated_bit_flags","import_configuration":"Import projects/16-validated-bit-flags/src/validated_bit_flags.zig.","minimal_example":"const Flags = ValidatedBitFlags(Permission); var flags = try Flags.fromRaw(raw); flags.insert(.write);","integration_patterns":[{"with":"validated-enum-decoder","pattern":"decode mode tags and validate accompanying capability flags"}],"incompatible_combinations":[],"replacement_options":[]},"compatibility":{"zig_version":"0.14.0","hosted":"yes","freestanding":"yes","thread_safe":"no internal synchronization","reentrant":"yes for distinct values","endianness":"not applicable after integer decoding","platforms":[],"architectures":[],"allocator_assumptions":"none","ffi":"unwrap and validate integer masks at the boundary","no_std_equivalent":"already allocation-free"},"complexity":{"operations":[{"operation":"all methods","time":"O(1)"}],"space":"one tag-sized integer","compile_time":"allowed mask derived from enum fields","notes":[]},"limits":[],"validation":{"build_step":"test-validated-bit-flags","commands":["zig build test-validated-bit-flags","zig build test"],"compiler_validated":false,"compiler_version":"","last_validated_commit":"","unit_tests":["valid combined flags","insert and remove","unknown bit rejection"],"integration_tests":[],"property_tests":[],"fuzz_tests":[],"benchmarks":[],"known_failures":[],"notes":["Local Zig 0.14.0 validation pending."]},"documentation":{"read_order":["README.md","MASTERY.md","DETAILS.md","details.json","src/validated_bit_flags.zig"],"examples_covered":["permissions"],"exercises":[],"glossary_terms":["mask","flag","reserved bit"],"related_modules":["validated-enum-decoder","fixed-bit-set"]},"maintenance":{"stability":"experimental","breaking_change_policy":"Synchronize source, tests, contracts, build, catalog, and checklist.","known_gaps":["semantic flag-combination validation is caller-owned","compiler validation pending"],"planned_extensions":[],"review_triggers":["enum mask interpretation changes","storage policy changes"],"synchronization_requirements":["public signatures must match source"]},"search":{"capabilities":["validated flags","typed permissions","register mask validation"],"problems":["unknown flag bits","reserved bits","macro masks"],"inputs":["raw mask","enum flag"],"outputs":["validated flag set"],"environments":["hosted","freestanding","kernel","hypervisor","protocol"],"keywords":["bit flags","validated flags","permissions","mask"]}}
+{
+  "schema_version": "2.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "16",
+    "canonical_name": "validated-bit-flags",
+    "display_name": "Validated Bit Flags",
+    "directory": "projects/16-validated-bit-flags",
+    "summary": "Typed bit-set wrapper that rejects undeclared storage bits.",
+    "long_description": "Typed bit-set wrapper that rejects undeclared storage bits.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "validated-value",
+    "subcategory": "",
+    "tags": [
+      "flags",
+      "permissions",
+      "registers",
+      "protocols",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Keep raw bit storage inside the set of enum-declared flag masks.",
+    "secondary": [],
+    "non_goals": [],
+    "problems_solved": [],
+    "future_role": ""
+  },
+  "c_pain": {
+    "summary": "Raw masks and macros admit reserved bits and mix unrelated flag domains.",
+    "common_failure_modes": [
+      "unknown bits accepted",
+      "wrong flag domain combined",
+      "reserved register bits written",
+      "validation duplicated"
+    ],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "Bit masks are compact and direct.",
+    "where_c_degrades": "Meaning and validity remain external conventions."
+  },
+  "zig_response": {
+    "summary": "Derive an allowed mask from an enum and expose named operations.",
+    "language_features": [
+      "enum metadata",
+      "comptime type factory",
+      "error unions",
+      "precise integer backing types"
+    ],
+    "guarantees_made_visible": [
+      "constructed raw masks contain no unknown bits",
+      "operations preserve the allowed mask"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "assign appropriate enum mask values",
+      "validate semantic combinations beyond bit membership"
+    ],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/16-validated-bit-flags",
+    "implementation": [
+      "projects/16-validated-bit-flags/src/validated_bit_flags.zig"
+    ],
+    "public_entrypoint": "projects/16-validated-bit-flags/src/validated_bit_flags.zig",
+    "tests": [
+      "projects/16-validated-bit-flags/src/validated_bit_flags.zig"
+    ],
+    "readme": "projects/16-validated-bit-flags/README.md",
+    "mastery": "projects/16-validated-bit-flags/MASTERY.md",
+    "details_markdown": "projects/16-validated-bit-flags/DETAILS.md",
+    "details_json": "projects/16-validated-bit-flags/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "ValidatedBitFlags"
+    ],
+    "types": [
+      {
+        "name": "ValidatedBitFlags(Flag)",
+        "kind": "generic type factory"
+      }
+    ],
+    "functions": [],
+    "methods": [
+      {
+        "name": "fromRaw",
+        "signature": "fromRaw(raw: Storage) error{UnknownBits}!Self"
+      },
+      {
+        "name": "raw",
+        "signature": "raw(self: Self) Storage"
+      },
+      {
+        "name": "contains",
+        "signature": "contains(self: Self, flag: Flag) bool"
+      },
+      {
+        "name": "insert",
+        "signature": "insert(self: *Self, flag: Flag) void"
+      },
+      {
+        "name": "remove",
+        "signature": "remove(self: *Self, flag: Flag) void"
+      },
+      {
+        "name": "clear",
+        "signature": "clear(self: *Self) void"
+      }
+    ],
+    "constants": [],
+    "errors": [
+      "UnknownBits"
+    ],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": []
+  },
+  "inputs": [
+    {
+      "name": "Flag",
+      "type": "enum type",
+      "ownership": "compile-time",
+      "lifetime": "program",
+      "constraints": "integer-backed enum whose values represent masks"
+    },
+    {
+      "name": "raw",
+      "type": "enum tag integer",
+      "ownership": "copied",
+      "lifetime": "call",
+      "constraints": "may contain unknown bits"
+    },
+    {
+      "name": "flag",
+      "type": "Flag",
+      "ownership": "copied",
+      "lifetime": "call",
+      "constraints": "declared enum value"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "flag set",
+      "type": "Self",
+      "ownership": "copied value",
+      "lifetime": "caller state",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    },
+    {
+      "name": "raw bits",
+      "type": "Storage",
+      "ownership": "copied",
+      "lifetime": "caller value",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    }
+  ],
+  "state": {
+    "fields": [
+      {
+        "name": "bits",
+        "type": "Storage",
+        "role": "validated mask"
+      }
+    ],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "bits contains only enum-declared mask bits"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [
+      "one integer mask"
+    ],
+    "borrows": [],
+    "copies": [
+      "flags and masks"
+    ],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "none",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [
+      {
+        "operation": "fromRaw",
+        "error": "UnknownBits",
+        "state_change": "no value constructed"
+      }
+    ],
+    "optional_empty_results": [],
+    "failure_atomicity": "validation precedes construction",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [],
+    "standard_library": [
+      "std.meta",
+      "std.testing"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": [
+      "enum-defined mask vocabulary",
+      "unknown-bit rejection"
+    ]
+  },
+  "dependency_contracts": [],
+  "expected_dependents": [
+    {
+      "name": "page-table entry builders",
+      "reason": "typed architectural permissions"
+    },
+    {
+      "name": "VMX control builders",
+      "reason": "validated requested controls"
+    },
+    {
+      "name": "device register wrappers",
+      "reason": "reject reserved bits"
+    },
+    {
+      "name": "protocol negotiation",
+      "reason": "typed capabilities"
+    }
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "validated_bit_flags",
+    "import_path": "projects/16-validated-bit-flags/src/validated_bit_flags.zig",
+    "import_configuration": "Import projects/16-validated-bit-flags/src/validated_bit_flags.zig.",
+    "minimal_example": "const Flags = ValidatedBitFlags(Permission); var flags = try Flags.fromRaw(raw); flags.insert(.write);",
+    "integration_patterns": [
+      {
+        "with": "validated-enum-decoder",
+        "pattern": "decode mode tags and validate accompanying capability flags"
+      }
+    ],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "no internal synchronization",
+    "reentrant": "yes for distinct values",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "none",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "unwrap and validate integer masks at the boundary",
+    "no_std_equivalent": "already allocation-free"
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-validated-bit-flags",
+    "commands": [
+      "zig build test-validated-bit-flags",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "named flags compose without unknown bits",
+      "unknown storage bits are rejected"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Local Zig 0.14.0 validation pending."
+    ]
+  },
+  "documentation": {
+    "read_order": [
+      "details.json",
+      "DETAILS.md",
+      "README.md",
+      "MASTERY.md",
+      "projects/16-validated-bit-flags/src/validated_bit_flags.zig"
+    ],
+    "examples_covered": [
+      "permissions"
+    ],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [
+      "mask",
+      "flag",
+      "reserved bit"
+    ],
+    "related_modules": [
+      "validated-enum-decoder",
+      "fixed-bit-set"
+    ],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Synchronize source, tests, contracts, build, catalog, and checklist.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [
+      "semantic flag-combination validation is caller-owned",
+      "compiler validation pending"
+    ],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [
+      "enum mask interpretation changes",
+      "storage policy changes"
+    ],
+    "synchronization_requirements": [
+      "public signatures must match source"
+    ],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "validated flags",
+      "typed permissions",
+      "register mask validation"
+    ],
+    "problems": [
+      "unknown flag bits",
+      "reserved bits",
+      "macro masks"
+    ],
+    "inputs": [
+      "raw mask",
+      "enum flag"
+    ],
+    "outputs": [
+      "validated flag set"
+    ],
+    "environments": [
+      "hosted",
+      "freestanding",
+      "kernel",
+      "hypervisor",
+      "protocol"
+    ],
+    "keywords": [
+      "bit flags",
+      "validated flags",
+      "permissions",
+      "mask"
+    ],
+    "grep_terms": [
+      "validated-bit-flags",
+      "ValidatedBitFlags"
+    ],
+    "natural_language_queries": [
+      "How do I typed bit-set wrapper that rejects undeclared storage bits?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "validated-value",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [
+      "page-table entry builders",
+      "VMX control builders",
+      "device register wrappers",
+      "protocol negotiation"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Typed bit-set wrapper that rejects undeclared storage bits.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [
+      "unknown flag bits",
+      "reserved bits",
+      "macro masks"
+    ],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-validated-bit-flags"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ]
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "ValidatedBitFlags",
+        "file": "projects/16-validated-bit-flags/src/validated_bit_flags.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "named flags compose without unknown bits",
+        "file": "projects/16-validated-bit-flags/src/validated_bit_flags.zig"
+      },
+      {
+        "test": "unknown storage bits are rejected",
+        "file": "projects/16-validated-bit-flags/src/validated_bit_flags.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  }
+}

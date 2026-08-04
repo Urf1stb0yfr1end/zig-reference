@@ -1,1 +1,610 @@
-{"schema_version":"1.0.0","module":{"id":"17","name":"checked-half-open-range","directory":"projects/17-checked-half-open-range","summary":"Validated half-open usize interval with checked length construction.","status":"experimental-unverified","category":"range-foundation","tags":["range","bounds","memory","files","freestanding"]},"purpose":"Provide one overflow-safe boundary convention for regions and extents.","c_pain":{"summary":"Start/end and start/length pairs overflow, reverse, and disagree about inclusivity.","failure_modes":["start plus length overflow","reversed endpoints","touching ranges misclassified","containment off by one"],"why_c_is_attractive":"Two integers are simple.","where_c_degrades":"Every caller must recreate their relationship and boundary policy."},"zig_response":{"summary":"Construct a validated range and centralize all boundary operations.","language_features":["struct value","error unions","optionals","checked std.math arithmetic"],"guarantees_made_visible":["start <= end","end is exclusive","construction from length cannot wrap"],"remaining_programmer_responsibilities":["choose the correct unit and address domain","decide whether empty ranges are meaningful"]},"public_surface":{"root_symbols":["CheckedRange"],"types":[{"name":"CheckedRange","kind":"struct"}],"functions":[],"methods":[{"name":"init","signature":"init(start: usize, end: usize) Error!CheckedRange"},{"name":"fromStartAndLength","signature":"fromStartAndLength(start: usize, length: usize) Error!CheckedRange"},{"name":"length","signature":"length(self: CheckedRange) usize"},{"name":"isEmpty","signature":"isEmpty(self: CheckedRange) bool"},{"name":"containsValue","signature":"containsValue(self: CheckedRange, value: usize) bool"},{"name":"containsRange","signature":"containsRange(self: CheckedRange, other: CheckedRange) bool"},{"name":"overlaps","signature":"overlaps(self: CheckedRange, other: CheckedRange) bool"},{"name":"intersection","signature":"intersection(self: CheckedRange, other: CheckedRange) ?CheckedRange"}],"errors":["InvalidRange","Overflow"],"constants":[]},"locations":{"implementation":["projects/17-checked-half-open-range/src/checked_half_open_range.zig"],"test_source":["projects/17-checked-half-open-range/src/checked_half_open_range.zig"],"readme":"projects/17-checked-half-open-range/README.md","mastery":"projects/17-checked-half-open-range/MASTERY.md","details_markdown":"projects/17-checked-half-open-range/DETAILS.md","details_json":"projects/17-checked-half-open-range/details.json","examples":[],"benchmarks":[],"fixtures":[],"fuzz":[]},"inputs":[{"name":"start","type":"usize","ownership":"copied","lifetime":"value","constraints":"must not exceed end"},{"name":"end","type":"usize","ownership":"copied","lifetime":"value","constraints":"must be >= start"},{"name":"length","type":"usize","ownership":"copied","lifetime":"call","constraints":"start + length must fit usize"}],"outputs":[{"name":"range","type":"CheckedRange","ownership":"copied value","lifetime":"caller value","invalidation":"none","caller_cleanup":"none"},{"name":"intersection","type":"?CheckedRange","ownership":"copied optional","lifetime":"caller value","invalidation":"none","caller_cleanup":"none"}],"state":[{"name":"start","type":"usize","role":"inclusive lower endpoint"},{"name":"end","type":"usize","role":"exclusive upper endpoint"}],"invariants":["start <= end","length == end - start","end is excluded","touching ranges do not overlap"],"failure_behavior":{"errors":[{"operation":"init","error":"InvalidRange","state_change":"no value constructed"},{"operation":"fromStartAndLength","error":"Overflow","state_change":"no value constructed"}],"optional_empty_results":[{"operation":"intersection","meaning":"no nonempty overlap"}],"failure_atomicity":"pure value construction and queries","partial_effects":[],"panic_conditions":[],"undefined_behavior_preconditions":[]},"ownership":{"owns":["two scalar endpoints"],"borrows":[],"copies":["ranges and integer values"],"transfers":[],"allocator":"none","element_cleanup":"none"},"cleanup":[],"invalidation":[],"dependencies":{"repository":[],"standard_library":["std.math","std.testing"],"external":[],"conceptual":["half-open intervals","checked range construction"]},"expected_dependents":[{"name":"physical-memory-region-set","reason":"canonical memory extents"},{"name":"virtual-address allocator","reason":"non-overlapping reservations"},{"name":"ELF loader","reason":"validate file and memory segments"},{"name":"MMIO registry","reason":"detect overlapping device windows"}],"composition":{"import_name":"checked_half_open_range","import_configuration":"Import projects/17-checked-half-open-range/src/checked_half_open_range.zig.","minimal_example":"const region = try CheckedRange.fromStartAndLength(base, size);","integration_patterns":[{"with":"alignment-helpers","pattern":"align endpoints, then construct a checked region"},{"with":"distinct-memory-address-types","pattern":"adapt domain addresses to raw values at one explicit boundary"}],"incompatible_combinations":[],"replacement_options":[]},"compatibility":{"zig_version":"0.14.0","hosted":"yes","freestanding":"yes","thread_safe":"yes","reentrant":"yes","endianness":"not applicable","platforms":[],"architectures":[],"allocator_assumptions":"none","ffi":"plain integer representation is not declared ABI-stable","no_std_equivalent":"already allocation-free"},"complexity":{"operations":[{"operation":"all","time":"O(1)"}],"space":"two usize values","compile_time":"none","notes":[]},"limits":[{"name":"addressable endpoint","value":"maxInt(usize)","source":"target pointer width"}],"validation":{"build_step":"test-checked-half-open-range","commands":["zig build test-checked-half-open-range","zig build test"],"compiler_validated":false,"compiler_version":"","last_validated_commit":"","unit_tests":["half-open containment","touching ranges","overlap","intersection","invalid order","overflow"],"integration_tests":[],"property_tests":[],"fuzz_tests":[],"benchmarks":[],"known_failures":[],"notes":["Local Zig 0.14.0 validation pending."]},"documentation":{"read_order":["README.md","MASTERY.md","DETAILS.md","details.json","src/checked_half_open_range.zig"],"examples_covered":["memory region"],"exercises":["split","subtraction","typed range adapter"],"glossary_terms":["half-open","intersection","containment"],"related_modules":["aligned-address-and-size-helpers","distinct-memory-address-types"]},"maintenance":{"stability":"experimental","breaking_change_policy":"Synchronize source, tests, contracts, build, catalog, and checklist.","known_gaps":["unit and address-domain typing deferred","compiler validation pending"],"planned_extensions":["range subtraction","typed domain ranges"],"review_triggers":["boundary policy changes","empty-range semantics changes"],"synchronization_requirements":["public signatures must match source"]},"search":{"capabilities":["checked range","half-open interval","overlap detection","intersection"],"problems":["range overflow","off-by-one","reversed range"],"inputs":["start","end","length"],"outputs":["validated range","intersection"],"environments":["hosted","freestanding","kernel","hypervisor","parser"],"keywords":["range","half-open range","checked interval","memory region"]}}
+{
+  "schema_version": "2.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "17",
+    "canonical_name": "checked-half-open-range",
+    "display_name": "Checked Half Open Range",
+    "directory": "projects/17-checked-half-open-range",
+    "summary": "Validated half-open usize interval with checked length construction.",
+    "long_description": "Validated half-open usize interval with checked length construction.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "range-foundation",
+    "subcategory": "",
+    "tags": [
+      "range",
+      "bounds",
+      "memory",
+      "files",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Provide one overflow-safe boundary convention for regions and extents.",
+    "secondary": [],
+    "non_goals": [],
+    "problems_solved": [],
+    "future_role": ""
+  },
+  "c_pain": {
+    "summary": "Start/end and start/length pairs overflow, reverse, and disagree about inclusivity.",
+    "common_failure_modes": [
+      "start plus length overflow",
+      "reversed endpoints",
+      "touching ranges misclassified",
+      "containment off by one"
+    ],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "Two integers are simple.",
+    "where_c_degrades": "Every caller must recreate their relationship and boundary policy."
+  },
+  "zig_response": {
+    "summary": "Construct a validated range and centralize all boundary operations.",
+    "language_features": [
+      "struct value",
+      "error unions",
+      "optionals",
+      "checked std.math arithmetic"
+    ],
+    "guarantees_made_visible": [
+      "start <= end",
+      "end is exclusive",
+      "construction from length cannot wrap"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "choose the correct unit and address domain",
+      "decide whether empty ranges are meaningful"
+    ],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/17-checked-half-open-range",
+    "implementation": [
+      "projects/17-checked-half-open-range/src/checked_half_open_range.zig"
+    ],
+    "public_entrypoint": "projects/17-checked-half-open-range/src/checked_half_open_range.zig",
+    "tests": [
+      "projects/17-checked-half-open-range/src/checked_half_open_range.zig"
+    ],
+    "readme": "projects/17-checked-half-open-range/README.md",
+    "mastery": "projects/17-checked-half-open-range/MASTERY.md",
+    "details_markdown": "projects/17-checked-half-open-range/DETAILS.md",
+    "details_json": "projects/17-checked-half-open-range/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "CheckedRange"
+    ],
+    "types": [
+      {
+        "name": "CheckedRange",
+        "kind": "struct"
+      }
+    ],
+    "functions": [],
+    "methods": [
+      {
+        "name": "init",
+        "signature": "init(start: usize, end: usize) Error!CheckedRange"
+      },
+      {
+        "name": "fromStartAndLength",
+        "signature": "fromStartAndLength(start: usize, length: usize) Error!CheckedRange"
+      },
+      {
+        "name": "length",
+        "signature": "length(self: CheckedRange) usize"
+      },
+      {
+        "name": "isEmpty",
+        "signature": "isEmpty(self: CheckedRange) bool"
+      },
+      {
+        "name": "containsValue",
+        "signature": "containsValue(self: CheckedRange, value: usize) bool"
+      },
+      {
+        "name": "containsRange",
+        "signature": "containsRange(self: CheckedRange, other: CheckedRange) bool"
+      },
+      {
+        "name": "overlaps",
+        "signature": "overlaps(self: CheckedRange, other: CheckedRange) bool"
+      },
+      {
+        "name": "intersection",
+        "signature": "intersection(self: CheckedRange, other: CheckedRange) ?CheckedRange"
+      }
+    ],
+    "constants": [],
+    "errors": [
+      "InvalidRange",
+      "Overflow"
+    ],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": []
+  },
+  "inputs": [
+    {
+      "name": "start",
+      "type": "usize",
+      "ownership": "copied",
+      "lifetime": "value",
+      "constraints": "must not exceed end"
+    },
+    {
+      "name": "end",
+      "type": "usize",
+      "ownership": "copied",
+      "lifetime": "value",
+      "constraints": "must be >= start"
+    },
+    {
+      "name": "length",
+      "type": "usize",
+      "ownership": "copied",
+      "lifetime": "call",
+      "constraints": "start + length must fit usize"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "range",
+      "type": "CheckedRange",
+      "ownership": "copied value",
+      "lifetime": "caller value",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    },
+    {
+      "name": "intersection",
+      "type": "?CheckedRange",
+      "ownership": "copied optional",
+      "lifetime": "caller value",
+      "invalidation": "none",
+      "caller_cleanup": "none"
+    }
+  ],
+  "state": {
+    "fields": [
+      {
+        "name": "start",
+        "type": "usize",
+        "role": "inclusive lower endpoint"
+      },
+      {
+        "name": "end",
+        "type": "usize",
+        "role": "exclusive upper endpoint"
+      }
+    ],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "start <= end",
+      "length == end - start",
+      "end is excluded",
+      "touching ranges do not overlap"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [
+      "two scalar endpoints"
+    ],
+    "borrows": [],
+    "copies": [
+      "ranges and integer values"
+    ],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "none",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [
+      {
+        "operation": "init",
+        "error": "InvalidRange",
+        "state_change": "no value constructed"
+      },
+      {
+        "operation": "fromStartAndLength",
+        "error": "Overflow",
+        "state_change": "no value constructed"
+      }
+    ],
+    "optional_empty_results": [
+      {
+        "operation": "intersection",
+        "meaning": "no nonempty overlap"
+      }
+    ],
+    "failure_atomicity": "pure value construction and queries",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [],
+    "standard_library": [
+      "std.math",
+      "std.testing"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": [
+      "half-open intervals",
+      "checked range construction"
+    ]
+  },
+  "dependency_contracts": [],
+  "expected_dependents": [
+    {
+      "name": "physical-memory-region-set",
+      "reason": "canonical memory extents"
+    },
+    {
+      "name": "virtual-address allocator",
+      "reason": "non-overlapping reservations"
+    },
+    {
+      "name": "ELF loader",
+      "reason": "validate file and memory segments"
+    },
+    {
+      "name": "MMIO registry",
+      "reason": "detect overlapping device windows"
+    }
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "checked_half_open_range",
+    "import_path": "projects/17-checked-half-open-range/src/checked_half_open_range.zig",
+    "import_configuration": "Import projects/17-checked-half-open-range/src/checked_half_open_range.zig.",
+    "minimal_example": "const region = try CheckedRange.fromStartAndLength(base, size);",
+    "integration_patterns": [
+      {
+        "with": "alignment-helpers",
+        "pattern": "align endpoints, then construct a checked region"
+      },
+      {
+        "with": "distinct-memory-address-types",
+        "pattern": "adapt domain addresses to raw values at one explicit boundary"
+      }
+    ],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "yes",
+    "reentrant": "yes",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "none",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "plain integer representation is not declared ABI-stable",
+    "no_std_equivalent": "already allocation-free"
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-checked-half-open-range",
+    "commands": [
+      "zig build test-checked-half-open-range",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "half-open boundaries remain unambiguous",
+      "overlap and intersection share one boundary policy",
+      "invalid and overflowing construction fails"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [
+      "half-open boundaries remain unambiguous",
+      "overlap and intersection share one boundary policy",
+      "invalid and overflowing construction fails"
+    ],
+    "regression_tests": [],
+    "test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Local Zig 0.14.0 validation pending."
+    ]
+  },
+  "documentation": {
+    "read_order": [
+      "details.json",
+      "DETAILS.md",
+      "README.md",
+      "MASTERY.md",
+      "projects/17-checked-half-open-range/src/checked_half_open_range.zig"
+    ],
+    "examples_covered": [
+      "memory region"
+    ],
+    "exercises": [
+      "split",
+      "subtraction",
+      "typed range adapter"
+    ],
+    "readiness_questions": [],
+    "glossary_terms": [
+      "half-open",
+      "intersection",
+      "containment"
+    ],
+    "related_modules": [
+      "aligned-address-and-size-helpers",
+      "distinct-memory-address-types"
+    ],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Synchronize source, tests, contracts, build, catalog, and checklist.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [
+      "unit and address-domain typing deferred",
+      "compiler validation pending"
+    ],
+    "known_bugs": [],
+    "planned_extensions": [
+      "range subtraction",
+      "typed domain ranges"
+    ],
+    "review_triggers": [
+      "boundary policy changes",
+      "empty-range semantics changes"
+    ],
+    "synchronization_requirements": [
+      "public signatures must match source"
+    ],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "checked range",
+      "half-open interval",
+      "overlap detection",
+      "intersection"
+    ],
+    "problems": [
+      "range overflow",
+      "off-by-one",
+      "reversed range"
+    ],
+    "inputs": [
+      "start",
+      "end",
+      "length"
+    ],
+    "outputs": [
+      "validated range",
+      "intersection"
+    ],
+    "environments": [
+      "hosted",
+      "freestanding",
+      "kernel",
+      "hypervisor",
+      "parser"
+    ],
+    "keywords": [
+      "range",
+      "half-open range",
+      "checked interval",
+      "memory region"
+    ],
+    "grep_terms": [
+      "checked-half-open-range",
+      "CheckedRange"
+    ],
+    "natural_language_queries": [
+      "How do I validated half-open usize interval with checked length construction?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "range-foundation",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [
+      "physical-memory-region-set",
+      "virtual-address allocator",
+      "ELF loader",
+      "MMIO registry"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Validated half-open usize interval with checked length construction.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [
+      "range overflow",
+      "off-by-one",
+      "reversed range"
+    ],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-checked-half-open-range"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ]
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "CheckedRange",
+        "file": "projects/17-checked-half-open-range/src/checked_half_open_range.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "half-open boundaries remain unambiguous",
+        "file": "projects/17-checked-half-open-range/src/checked_half_open_range.zig"
+      },
+      {
+        "test": "overlap and intersection share one boundary policy",
+        "file": "projects/17-checked-half-open-range/src/checked_half_open_range.zig"
+      },
+      {
+        "test": "invalid and overflowing construction fails",
+        "file": "projects/17-checked-half-open-range/src/checked_half_open_range.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  }
+}
