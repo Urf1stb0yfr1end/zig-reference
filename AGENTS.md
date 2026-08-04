@@ -159,3 +159,19 @@ A module is complete only when:
 - `docs/catalog/MODULES.md` is updated;
 - compatibility and validation status are honest;
 - no compatible repository module was unnecessarily recreated.
+
+## Foundation workflow
+
+Future agents must follow this order:
+
+1. Query first with `tools/query-reference.py`.
+2. Read generated identity in `generated/modules.json`.
+3. Open the selected module's `details.json`.
+4. Open `port.js` only for Zig-version work.
+5. Follow generated dependency/build order.
+6. Reuse compatible existing modules.
+7. Edit canonical sources only: source/tests, `details.json`, `port.js`, or ADRs according to authority.
+8. Regenerate committed textual views.
+9. Run repository validation under Zig 0.14.0.
+10. Record executed validation evidence honestly; never mark skipped work passed.
+11. Never commit binary generated artifacts, databases, caches, executables, images, archives, or fuzz output.

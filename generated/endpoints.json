@@ -1,0 +1,1536 @@
+{
+  "endpoints": [
+    {
+      "kind": "type_or_constant",
+      "module": "aligned-address-and-size-helpers",
+      "name": "AlignmentError",
+      "signature": "AlignmentError"
+    },
+    {
+      "kind": "type_or_constant",
+      "module": "validated-ascii-byte",
+      "name": "AsciiByte",
+      "signature": "AsciiByte"
+    },
+    {
+      "kind": "function",
+      "module": "bit-set",
+      "name": "BitSet",
+      "signature": "BitSet(comptime bit_count: usize) type"
+    },
+    {
+      "kind": "function",
+      "module": "bitmap-allocator",
+      "name": "BitmapAllocator",
+      "signature": "BitmapAllocator(comptime slot_count: usize) type"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-integer",
+      "name": "BoundedInteger",
+      "signature": "BoundedInteger(comptime T: type, comptime minimum: T, comptime maximum: T) type"
+    },
+    {
+      "kind": "type_or_constant",
+      "module": "bounded-byte-reader",
+      "name": "BoundedReader",
+      "signature": "BoundedReader"
+    },
+    {
+      "kind": "type_or_constant",
+      "module": "byte-writer",
+      "name": "ByteWriter",
+      "signature": "ByteWriter"
+    },
+    {
+      "kind": "type_or_constant",
+      "module": "checked-half-open-range",
+      "name": "CheckedRange",
+      "signature": "CheckedRange"
+    },
+    {
+      "kind": "function",
+      "module": "dynamic-array",
+      "name": "DynamicArray",
+      "signature": "DynamicArray(comptime T: type) type"
+    },
+    {
+      "kind": "function",
+      "module": "endian-integer-codec",
+      "name": "EndianIntegerCodec",
+      "signature": "EndianIntegerCodec(comptime T: type, comptime endian: std.builtin.Endian) type"
+    },
+    {
+      "kind": "function",
+      "module": "fixed-capacity-vector",
+      "name": "FixedVector",
+      "signature": "FixedVector(comptime T: type, comptime capacity: usize) type"
+    },
+    {
+      "kind": "type_or_constant",
+      "module": "fourcc-code",
+      "name": "FourCC",
+      "signature": "FourCC"
+    },
+    {
+      "kind": "type_or_constant",
+      "module": "distinct-memory-address-types",
+      "name": "GuestPhysicalAddress",
+      "signature": "GuestPhysicalAddress"
+    },
+    {
+      "kind": "type_or_constant",
+      "module": "distinct-memory-address-types",
+      "name": "GuestVirtualAddress",
+      "signature": "GuestVirtualAddress"
+    },
+    {
+      "kind": "function",
+      "module": "generational-handles",
+      "name": "HandleTable",
+      "signature": "HandleTable(comptime T: type, comptime capacity: usize) type"
+    },
+    {
+      "kind": "type_or_constant",
+      "module": "distinct-memory-address-types",
+      "name": "HostVirtualAddress",
+      "signature": "HostVirtualAddress"
+    },
+    {
+      "kind": "method",
+      "module": "length-prefixed-binary-field",
+      "name": "LengthPrefixedField",
+      "signature": "LengthPrefixedField(comptime Prefix: type, comptime endian: std.builtin.Endian)"
+    },
+    {
+      "kind": "function",
+      "module": "nonzero-integer",
+      "name": "NonZeroInteger",
+      "signature": "NonZeroInteger(comptime T: type) type"
+    },
+    {
+      "kind": "function",
+      "module": "fixed-capacity-object-pool",
+      "name": "ObjectPool",
+      "signature": "ObjectPool(comptime T: type, comptime capacity_: usize)"
+    },
+    {
+      "kind": "function",
+      "module": "optional-typed-handle",
+      "name": "OptionalTypedHandle",
+      "signature": "OptionalTypedHandle(comptime Tag: type, comptime Integer: type) type"
+    },
+    {
+      "kind": "type_or_constant",
+      "module": "physical-page-frame-number-and-address-conversion",
+      "name": "PageSize",
+      "signature": "PageSize"
+    },
+    {
+      "kind": "type_or_constant",
+      "module": "distinct-memory-address-types",
+      "name": "PhysicalAddress",
+      "signature": "PhysicalAddress"
+    },
+    {
+      "kind": "function",
+      "module": "physical-memory-region-set",
+      "name": "PhysicalMemoryRegionSet",
+      "signature": "PhysicalMemoryRegionSet(comptime capacity_:usize)"
+    },
+    {
+      "kind": "method",
+      "module": "physical-page-frame-allocator",
+      "name": "PhysicalPageFrameAllocator",
+      "signature": "PhysicalPageFrameAllocator(comptime max_frames:usize)"
+    },
+    {
+      "kind": "type_or_constant",
+      "module": "physical-page-frame-number-and-address-conversion",
+      "name": "PhysicalPageFrameNumber",
+      "signature": "PhysicalPageFrameNumber"
+    },
+    {
+      "kind": "function",
+      "module": "unit-safe-quantity",
+      "name": "Quantity",
+      "signature": "Quantity(comptime Unit: type, comptime Scalar: type) type"
+    },
+    {
+      "kind": "function",
+      "module": "ring-buffer",
+      "name": "RingBuffer",
+      "signature": "RingBuffer(comptime T: type, comptime capacity: usize) type"
+    },
+    {
+      "kind": "function",
+      "module": "saturating-counter",
+      "name": "SaturatingCounter",
+      "signature": "SaturatingCounter(comptime T: type, comptime maximum: T) type"
+    },
+    {
+      "kind": "type_or_constant",
+      "module": "semantic-version",
+      "name": "SemanticVersion",
+      "signature": "SemanticVersion"
+    },
+    {
+      "kind": "type_or_constant",
+      "module": "source-span",
+      "name": "SourceSpan",
+      "signature": "SourceSpan"
+    },
+    {
+      "kind": "function",
+      "module": "stack",
+      "name": "Stack",
+      "signature": "Stack(comptime T: type) type"
+    },
+    {
+      "kind": "type_or_constant",
+      "module": "state-machine",
+      "name": "StateMachine",
+      "signature": "StateMachine"
+    },
+    {
+      "kind": "function",
+      "module": "tagged-result",
+      "name": "TaggedResult",
+      "signature": "TaggedResult(comptime Success: type, comptime Failure: type) type"
+    },
+    {
+      "kind": "method",
+      "module": "type-length-value-decoder",
+      "name": "TlvDecoder",
+      "signature": "TlvDecoder(comptime Tag: type, comptime Length: type, comptime endian: std.builtin.Endian)"
+    },
+    {
+      "kind": "function",
+      "module": "optional-typed-handle",
+      "name": "TypedHandle",
+      "signature": "TypedHandle(comptime Tag: type, comptime Integer: type) type"
+    },
+    {
+      "kind": "function",
+      "module": "validated-bit-flags",
+      "name": "ValidatedBitFlags",
+      "signature": "ValidatedBitFlags(comptime Flag: type) type"
+    },
+    {
+      "kind": "function",
+      "module": "wrapping-sequence-number",
+      "name": "WrappingSequenceNumber",
+      "signature": "WrappingSequenceNumber(comptime T: type) type"
+    },
+    {
+      "kind": "method",
+      "module": "distinct-memory-address-types",
+      "name": "add",
+      "signature": "add(self: Self, offset: usize) error"
+    },
+    {
+      "kind": "method",
+      "module": "physical-memory-region-set",
+      "name": "add",
+      "signature": "add(self:*@This()"
+    },
+    {
+      "kind": "method",
+      "module": "saturating-counter",
+      "name": "add",
+      "signature": "add(self: *Self, amount: T) void"
+    },
+    {
+      "kind": "method",
+      "module": "unit-safe-quantity",
+      "name": "add",
+      "signature": "add(self: Self, other: Self) Self"
+    },
+    {
+      "kind": "method",
+      "module": "wrapping-sequence-number",
+      "name": "advance",
+      "signature": "advance(self: Self, amount: T) Self"
+    },
+    {
+      "kind": "function",
+      "module": "aligned-address-and-size-helpers",
+      "name": "alignDown",
+      "signature": "alignDown(value: usize, alignment: usize) AlignmentError!usize"
+    },
+    {
+      "kind": "function",
+      "module": "aligned-address-and-size-helpers",
+      "name": "alignUp",
+      "signature": "alignUp(value: usize, alignment: usize) AlignmentError!usize"
+    },
+    {
+      "kind": "method",
+      "module": "bit-set",
+      "name": "all",
+      "signature": "all(self: Self) bool"
+    },
+    {
+      "kind": "method",
+      "module": "bitmap-allocator",
+      "name": "allocate",
+      "signature": "allocate(self: *Self) Error!usize"
+    },
+    {
+      "kind": "method",
+      "module": "physical-page-frame-allocator",
+      "name": "allocate",
+      "signature": "allocate(self:*@This()"
+    },
+    {
+      "kind": "method",
+      "module": "bitmap-allocator",
+      "name": "allocatedCount",
+      "signature": "allocatedCount(self: *const Self) usize"
+    },
+    {
+      "kind": "method",
+      "module": "physical-page-frame-allocator",
+      "name": "allocatedCount",
+      "signature": "allocatedCount(self:*const @This()"
+    },
+    {
+      "kind": "method",
+      "module": "dynamic-array",
+      "name": "append",
+      "signature": "append(self: *Self, value: T) !void"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-vector",
+      "name": "append",
+      "signature": "append(self: *Self, value: T) Error!void"
+    },
+    {
+      "kind": "method",
+      "module": "owned-byte-buffer",
+      "name": "append",
+      "signature": "append(self: *OwnedByteBuffer, input: []const u8)"
+    },
+    {
+      "kind": "method",
+      "module": "owned-byte-buffer",
+      "name": "appendByte",
+      "signature": "appendByte(self: *OwnedByteBuffer, byte: u8)"
+    },
+    {
+      "kind": "method",
+      "module": "state-machine",
+      "name": "apply",
+      "signature": "apply(self: *Self, event: Event) Error!State"
+    },
+    {
+      "kind": "method",
+      "module": "fourcc-code",
+      "name": "asBytes",
+      "signature": "asBytes(self: FourCC) [4]u8"
+    },
+    {
+      "kind": "method",
+      "module": "byte-writer",
+      "name": "bytes",
+      "signature": "bytes(self: *const ByteWriter) []const u8"
+    },
+    {
+      "kind": "method",
+      "module": "length-prefixed-binary-field",
+      "name": "bytes",
+      "signature": "bytes(self: @This()"
+    },
+    {
+      "kind": "method",
+      "module": "owned-byte-buffer",
+      "name": "bytes",
+      "signature": "bytes(self: *const OwnedByteBuffer)"
+    },
+    {
+      "kind": "method",
+      "module": "state-machine",
+      "name": "canApply",
+      "signature": "canApply(self: *const Self, event: Event) bool"
+    },
+    {
+      "kind": "method",
+      "module": "bit-set",
+      "name": "capacity",
+      "signature": "capacity(_: Self) usize"
+    },
+    {
+      "kind": "method",
+      "module": "bitmap-allocator",
+      "name": "capacity",
+      "signature": "capacity(_: *const Self) usize"
+    },
+    {
+      "kind": "method",
+      "module": "dynamic-array",
+      "name": "capacity",
+      "signature": "capacity(self: *const Self) usize"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-object-pool",
+      "name": "capacity",
+      "signature": "capacity(_: *const @This()"
+    },
+    {
+      "kind": "method",
+      "module": "owned-byte-buffer",
+      "name": "capacity",
+      "signature": "capacity(self: *const OwnedByteBuffer)"
+    },
+    {
+      "kind": "method",
+      "module": "binary-cursor-checkpoint",
+      "name": "capture",
+      "signature": "capture(reader: bounded.BoundedReader)"
+    },
+    {
+      "kind": "method",
+      "module": "binary-cursor-checkpoint",
+      "name": "capture",
+      "signature": "capture(reader: bounded.BoundedReader)"
+    },
+    {
+      "kind": "function",
+      "module": "checked-integer-cast",
+      "name": "checkedIntegerCast",
+      "signature": "checkedIntegerCast(comptime Destination: type, value: anytype) error"
+    },
+    {
+      "kind": "method",
+      "module": "byte-writer",
+      "name": "checkpoint",
+      "signature": "checkpoint(self: *const ByteWriter) usize"
+    },
+    {
+      "kind": "method",
+      "module": "bit-set",
+      "name": "clear",
+      "signature": "clear(self: *Self, index: usize) Error!void"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-vector",
+      "name": "clear",
+      "signature": "clear(self: *Self) void"
+    },
+    {
+      "kind": "method",
+      "module": "ring-buffer",
+      "name": "clear",
+      "signature": "clear(self: *Self) void"
+    },
+    {
+      "kind": "method",
+      "module": "validated-bit-flags",
+      "name": "clear",
+      "signature": "clear(self: *Self) void"
+    },
+    {
+      "kind": "method",
+      "module": "bit-set",
+      "name": "clearAll",
+      "signature": "clearAll(self: *Self) void"
+    },
+    {
+      "kind": "method",
+      "module": "dynamic-array",
+      "name": "clearRetainingCapacity",
+      "signature": "clearRetainingCapacity(self: *Self) void"
+    },
+    {
+      "kind": "method",
+      "module": "owned-byte-buffer",
+      "name": "clearRetainingCapacity",
+      "signature": "clearRetainingCapacity(self: *OwnedByteBuffer)"
+    },
+    {
+      "kind": "method",
+      "module": "stack",
+      "name": "clearRetainingCapacity",
+      "signature": "clearRetainingCapacity(self: *Self) void"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-binary-sub-reader",
+      "name": "commit",
+      "signature": "commit(self: *BoundedBinarySubReader)"
+    },
+    {
+      "kind": "method",
+      "module": "semantic-version",
+      "name": "compare",
+      "signature": "compare(self: SemanticVersion, other: SemanticVersion) std.math.Order"
+    },
+    {
+      "kind": "method",
+      "module": "dynamic-array",
+      "name": "constItems",
+      "signature": "constItems(self: *const Self) []const T"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-vector",
+      "name": "constItems",
+      "signature": "constItems(self: *const Self) []const T"
+    },
+    {
+      "kind": "method",
+      "module": "validated-bit-flags",
+      "name": "contains",
+      "signature": "contains(self: Self, flag: Flag) bool"
+    },
+    {
+      "kind": "method",
+      "module": "checked-half-open-range",
+      "name": "containsRange",
+      "signature": "containsRange(self: CheckedRange, other: CheckedRange) bool"
+    },
+    {
+      "kind": "method",
+      "module": "checked-half-open-range",
+      "name": "containsValue",
+      "signature": "containsValue(self: CheckedRange, value: usize) bool"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-object-pool",
+      "name": "count",
+      "signature": "count(self: *const @This()"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-vector",
+      "name": "count",
+      "signature": "count(self: *const Self) usize"
+    },
+    {
+      "kind": "method",
+      "module": "generational-handles",
+      "name": "count",
+      "signature": "count(self: *const Self) usize"
+    },
+    {
+      "kind": "method",
+      "module": "physical-memory-region-set",
+      "name": "count",
+      "signature": "count(self:*const @This()"
+    },
+    {
+      "kind": "method",
+      "module": "ring-buffer",
+      "name": "count",
+      "signature": "count(self: *const Self) usize"
+    },
+    {
+      "kind": "method",
+      "module": "bit-set",
+      "name": "countSet",
+      "signature": "countSet(self: Self) usize"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-binary-sub-reader",
+      "name": "create",
+      "signature": "create(parent: *bounded.BoundedReader, length: usize, policy: AdvancementPolicy)"
+    },
+    {
+      "kind": "method",
+      "module": "endian-integer-codec",
+      "name": "decode",
+      "signature": "decode(bytes: *const [byte_count]u8) T"
+    },
+    {
+      "kind": "function",
+      "module": "validated-enum-decoder",
+      "name": "decodeEnum",
+      "signature": "decodeEnum(comptime E: type, raw: std.meta.Tag(E)) error"
+    },
+    {
+      "kind": "method",
+      "module": "saturating-counter",
+      "name": "decrement",
+      "signature": "decrement(self: *Self) void"
+    },
+    {
+      "kind": "method",
+      "module": "byte-writer",
+      "name": "deinit",
+      "signature": "deinit(self: *ByteWriter) void"
+    },
+    {
+      "kind": "method",
+      "module": "dynamic-array",
+      "name": "deinit",
+      "signature": "deinit(self: *Self) void"
+    },
+    {
+      "kind": "method",
+      "module": "owned-byte-buffer",
+      "name": "deinit",
+      "signature": "deinit(self: *OwnedByteBuffer)"
+    },
+    {
+      "kind": "method",
+      "module": "stack",
+      "name": "deinit",
+      "signature": "deinit(self: *Self) void"
+    },
+    {
+      "kind": "method",
+      "module": "wrapping-sequence-number",
+      "name": "distanceForward",
+      "signature": "distanceForward(from: Self, to: Self) T"
+    },
+    {
+      "kind": "method",
+      "module": "endian-integer-codec",
+      "name": "encode",
+      "signature": "encode(value: T) [byte_count]u8"
+    },
+    {
+      "kind": "method",
+      "module": "dynamic-array",
+      "name": "ensureUnusedCapacity",
+      "signature": "ensureUnusedCapacity(self: *Self, additional: usize) !void"
+    },
+    {
+      "kind": "method",
+      "module": "fourcc-code",
+      "name": "eql",
+      "signature": "eql(self: FourCC, other: FourCC) bool"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-byte-reader",
+      "name": "extent",
+      "signature": "extent(self: BoundedReader) usize"
+    },
+    {
+      "kind": "method",
+      "module": "tagged-result",
+      "name": "failureValue",
+      "signature": "failureValue(self: Self) ?Failure"
+    },
+    {
+      "kind": "method",
+      "module": "physical-memory-region-set",
+      "name": "findContaining",
+      "signature": "findContaining(self:*const @This()"
+    },
+    {
+      "kind": "method",
+      "module": "bitmap-allocator",
+      "name": "free",
+      "signature": "free(self: *Self, index: usize) Error!void"
+    },
+    {
+      "kind": "method",
+      "module": "physical-page-frame-allocator",
+      "name": "freeCount",
+      "signature": "freeCount(self:*const @This()"
+    },
+    {
+      "kind": "method",
+      "module": "physical-page-frame-number-and-address-conversion",
+      "name": "fromAddress",
+      "signature": "fromAddress(address: addresses.PhysicalAddress) error"
+    },
+    {
+      "kind": "method",
+      "module": "validated-bit-flags",
+      "name": "fromRaw",
+      "signature": "fromRaw(raw: Storage) error"
+    },
+    {
+      "kind": "method",
+      "module": "checked-half-open-range",
+      "name": "fromStartAndLength",
+      "signature": "fromStartAndLength(start: usize, length: usize) Error!CheckedRange"
+    },
+    {
+      "kind": "method",
+      "module": "fourcc-code",
+      "name": "fromString",
+      "signature": "fromString(text: []const u8) error"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-integer",
+      "name": "get",
+      "signature": "get(self: Self) T"
+    },
+    {
+      "kind": "method",
+      "module": "dynamic-array",
+      "name": "get",
+      "signature": "get(self: *const Self, index: usize) ?T"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-object-pool",
+      "name": "get",
+      "signature": "get(self: *@This()"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-vector",
+      "name": "get",
+      "signature": "get(self: *Self, index: usize) Error!*T"
+    },
+    {
+      "kind": "method",
+      "module": "generational-handles",
+      "name": "get",
+      "signature": "get(self: *Self, handle: Handle) ?*T"
+    },
+    {
+      "kind": "method",
+      "module": "nonzero-integer",
+      "name": "get",
+      "signature": "get(self: Self) T"
+    },
+    {
+      "kind": "method",
+      "module": "ring-buffer",
+      "name": "get",
+      "signature": "get(self: *const Self, logical_index: usize) ?T"
+    },
+    {
+      "kind": "method",
+      "module": "saturating-counter",
+      "name": "get",
+      "signature": "get(self: Self) T"
+    },
+    {
+      "kind": "method",
+      "module": "unit-safe-quantity",
+      "name": "get",
+      "signature": "get(self: Self) Scalar"
+    },
+    {
+      "kind": "method",
+      "module": "validated-ascii-byte",
+      "name": "get",
+      "signature": "get(self: AsciiByte) u8"
+    },
+    {
+      "kind": "method",
+      "module": "wrapping-sequence-number",
+      "name": "get",
+      "signature": "get(self: Self) T"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-object-pool",
+      "name": "getConst",
+      "signature": "getConst(self: *const @This()"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-vector",
+      "name": "getConst",
+      "signature": "getConst(self: *const Self, index: usize) Error!*const T"
+    },
+    {
+      "kind": "method",
+      "module": "generational-handles",
+      "name": "getConst",
+      "signature": "getConst(self: *const Self, handle: Handle) ?*const T"
+    },
+    {
+      "kind": "method",
+      "module": "saturating-counter",
+      "name": "increment",
+      "signature": "increment(self: *Self) void"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-byte-reader",
+      "name": "init",
+      "signature": "init(input: []const u8) BoundedReader"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-integer",
+      "name": "init",
+      "signature": "init(value: T) Error!Self"
+    },
+    {
+      "kind": "method",
+      "module": "byte-writer",
+      "name": "init",
+      "signature": "init(allocator: std.mem.Allocator) ByteWriter"
+    },
+    {
+      "kind": "method",
+      "module": "checked-half-open-range",
+      "name": "init",
+      "signature": "init(start: usize, end: usize) Error!CheckedRange"
+    },
+    {
+      "kind": "method",
+      "module": "distinct-memory-address-types",
+      "name": "init",
+      "signature": "init(value: usize) Self"
+    },
+    {
+      "kind": "method",
+      "module": "dynamic-array",
+      "name": "init",
+      "signature": "init(allocator: std.mem.Allocator) Self"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-vector",
+      "name": "init",
+      "signature": "init() Self"
+    },
+    {
+      "kind": "method",
+      "module": "fourcc-code",
+      "name": "init",
+      "signature": "init(bytes: [4]u8) FourCC"
+    },
+    {
+      "kind": "method",
+      "module": "nonzero-integer",
+      "name": "init",
+      "signature": "init(value: T) Error!Self"
+    },
+    {
+      "kind": "method",
+      "module": "optional-typed-handle",
+      "name": "init",
+      "signature": "init(raw: Integer) Self"
+    },
+    {
+      "kind": "method",
+      "module": "owned-byte-buffer",
+      "name": "init",
+      "signature": "init(allocator: std.mem.Allocator)"
+    },
+    {
+      "kind": "method",
+      "module": "physical-memory-region-set",
+      "name": "init",
+      "signature": "init(start:addresses.PhysicalAddress,length:usize,kind:RegionKind)"
+    },
+    {
+      "kind": "method",
+      "module": "physical-page-frame-number-and-address-conversion",
+      "name": "init",
+      "signature": "init(value: usize) PhysicalPageFrameNumber"
+    },
+    {
+      "kind": "method",
+      "module": "saturating-counter",
+      "name": "init",
+      "signature": "init(value: T) Self"
+    },
+    {
+      "kind": "method",
+      "module": "source-span",
+      "name": "init",
+      "signature": "init(start: usize, end: usize) Error!SourceSpan"
+    },
+    {
+      "kind": "method",
+      "module": "stack",
+      "name": "init",
+      "signature": "init(allocator: std.mem.Allocator) Self"
+    },
+    {
+      "kind": "method",
+      "module": "state-machine",
+      "name": "init",
+      "signature": "init(initial: State) Self"
+    },
+    {
+      "kind": "method",
+      "module": "type-length-value-decoder",
+      "name": "init",
+      "signature": "init(bytes: []const u8)"
+    },
+    {
+      "kind": "method",
+      "module": "unit-safe-quantity",
+      "name": "init",
+      "signature": "init(value: Scalar) Self"
+    },
+    {
+      "kind": "method",
+      "module": "validated-ascii-byte",
+      "name": "init",
+      "signature": "init(byte: u8) Error!AsciiByte"
+    },
+    {
+      "kind": "method",
+      "module": "wrapping-sequence-number",
+      "name": "init",
+      "signature": "init(value: T) Self"
+    },
+    {
+      "kind": "method",
+      "module": "owned-byte-buffer",
+      "name": "initCopy",
+      "signature": "initCopy(allocator: std.mem.Allocator, bytes: []const u8)"
+    },
+    {
+      "kind": "method",
+      "module": "physical-page-frame-allocator",
+      "name": "initFromRegions",
+      "signature": "initFromRegions(comptime region_capacity:usize,set:*const region_sets.PhysicalMemoryRegionSet(region_capacity)"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-object-pool",
+      "name": "insert",
+      "signature": "insert(self: *@This()"
+    },
+    {
+      "kind": "method",
+      "module": "generational-handles",
+      "name": "insert",
+      "signature": "insert(self: *Self, value: T) Error!Handle"
+    },
+    {
+      "kind": "method",
+      "module": "physical-memory-region-set",
+      "name": "insert",
+      "signature": "insert(self:*@This()"
+    },
+    {
+      "kind": "method",
+      "module": "validated-bit-flags",
+      "name": "insert",
+      "signature": "insert(self: *Self, flag: Flag) void"
+    },
+    {
+      "kind": "method",
+      "module": "checked-half-open-range",
+      "name": "intersection",
+      "signature": "intersection(self: CheckedRange, other: CheckedRange) ?CheckedRange"
+    },
+    {
+      "kind": "method",
+      "module": "physical-memory-region-set",
+      "name": "intersects",
+      "signature": "intersects(self:*const @This()"
+    },
+    {
+      "kind": "method",
+      "module": "owned-byte-buffer",
+      "name": "intoWriter",
+      "signature": "intoWriter(self: *OwnedByteBuffer)"
+    },
+    {
+      "kind": "function",
+      "module": "aligned-address-and-size-helpers",
+      "name": "isAligned",
+      "signature": "isAligned(value: usize, alignment: usize) AlignmentError!bool"
+    },
+    {
+      "kind": "method",
+      "module": "bitmap-allocator",
+      "name": "isAllocated",
+      "signature": "isAllocated(self: *const Self, index: usize) error"
+    },
+    {
+      "kind": "method",
+      "module": "validated-ascii-byte",
+      "name": "isAlphabetic",
+      "signature": "isAlphabetic(self: AsciiByte) bool"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-byte-reader",
+      "name": "isAtEnd",
+      "signature": "isAtEnd(self: BoundedReader) bool"
+    },
+    {
+      "kind": "method",
+      "module": "semantic-version",
+      "name": "isCompatibleWith",
+      "signature": "isCompatibleWith(self: SemanticVersion, required: SemanticVersion) bool"
+    },
+    {
+      "kind": "method",
+      "module": "validated-ascii-byte",
+      "name": "isDigit",
+      "signature": "isDigit(self: AsciiByte) bool"
+    },
+    {
+      "kind": "method",
+      "module": "checked-half-open-range",
+      "name": "isEmpty",
+      "signature": "isEmpty(self: CheckedRange) bool"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-vector",
+      "name": "isEmpty",
+      "signature": "isEmpty(self: *const Self) bool"
+    },
+    {
+      "kind": "method",
+      "module": "ring-buffer",
+      "name": "isEmpty",
+      "signature": "isEmpty(self: *const Self) bool"
+    },
+    {
+      "kind": "method",
+      "module": "source-span",
+      "name": "isEmpty",
+      "signature": "isEmpty(self: SourceSpan) bool"
+    },
+    {
+      "kind": "method",
+      "module": "stack",
+      "name": "isEmpty",
+      "signature": "isEmpty(self: *const Self) bool"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-vector",
+      "name": "isFull",
+      "signature": "isFull(self: *const Self) bool"
+    },
+    {
+      "kind": "method",
+      "module": "ring-buffer",
+      "name": "isFull",
+      "signature": "isFull(self: *const Self) bool"
+    },
+    {
+      "kind": "function",
+      "module": "aligned-address-and-size-helpers",
+      "name": "isPowerOfTwo",
+      "signature": "isPowerOfTwo(value: usize) bool"
+    },
+    {
+      "kind": "method",
+      "module": "saturating-counter",
+      "name": "isSaturated",
+      "signature": "isSaturated(self: Self) bool"
+    },
+    {
+      "kind": "method",
+      "module": "bit-set",
+      "name": "isSet",
+      "signature": "isSet(self: Self, index: usize) Error!bool"
+    },
+    {
+      "kind": "method",
+      "module": "tagged-result",
+      "name": "isSuccess",
+      "signature": "isSuccess(self: Self) bool"
+    },
+    {
+      "kind": "function",
+      "module": "validated-enum-decoder",
+      "name": "isValidEnumValue",
+      "signature": "isValidEnumValue(comptime E: type, raw: std.meta.Tag(E)) bool"
+    },
+    {
+      "kind": "method",
+      "module": "dynamic-array",
+      "name": "items",
+      "signature": "items(self: *Self) []T"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-vector",
+      "name": "items",
+      "signature": "items(self: *Self) []T"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-object-pool",
+      "name": "iterator",
+      "signature": "iterator(self:*const @This()"
+    },
+    {
+      "kind": "method",
+      "module": "byte-writer",
+      "name": "len",
+      "signature": "len(self: *const ByteWriter) usize"
+    },
+    {
+      "kind": "method",
+      "module": "source-span",
+      "name": "len",
+      "signature": "len(self: SourceSpan) usize"
+    },
+    {
+      "kind": "method",
+      "module": "stack",
+      "name": "len",
+      "signature": "len(self: *const Self) usize"
+    },
+    {
+      "kind": "method",
+      "module": "checked-half-open-range",
+      "name": "length",
+      "signature": "length(self: CheckedRange) usize"
+    },
+    {
+      "kind": "method",
+      "module": "physical-memory-region-set",
+      "name": "length",
+      "signature": "length(self:@This()"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-integer",
+      "name": "maxValue",
+      "signature": "maxValue() T"
+    },
+    {
+      "kind": "method",
+      "module": "physical-memory-region-set",
+      "name": "mergeAdjacent",
+      "signature": "mergeAdjacent(self:*@This()"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-integer",
+      "name": "minValue",
+      "signature": "minValue() T"
+    },
+    {
+      "kind": "method",
+      "module": "owned-byte-buffer",
+      "name": "mutableBytes",
+      "signature": "mutableBytes(self: *OwnedByteBuffer)"
+    },
+    {
+      "kind": "method",
+      "module": "type-length-value-decoder",
+      "name": "next",
+      "signature": "next(self: *@This()"
+    },
+    {
+      "kind": "method",
+      "module": "wrapping-sequence-number",
+      "name": "next",
+      "signature": "next(self: Self) Self"
+    },
+    {
+      "kind": "method",
+      "module": "bit-set",
+      "name": "none",
+      "signature": "none(self: Self) bool"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-vector",
+      "name": "orderedRemove",
+      "signature": "orderedRemove(self: *Self, index: usize) Error!T"
+    },
+    {
+      "kind": "method",
+      "module": "checked-half-open-range",
+      "name": "overlaps",
+      "signature": "overlaps(self: CheckedRange, other: CheckedRange) bool"
+    },
+    {
+      "kind": "function",
+      "module": "aligned-address-and-size-helpers",
+      "name": "paddingNeeded",
+      "signature": "paddingNeeded(value: usize, alignment: usize) AlignmentError!usize"
+    },
+    {
+      "kind": "function",
+      "module": "elf64-file-header-parser",
+      "name": "parse",
+      "signature": "parse(reader:*bounded.BoundedReader)"
+    },
+    {
+      "kind": "function",
+      "module": "elf64-program-header-parser",
+      "name": "parseOne",
+      "signature": "parseOne(reader:*bounded.BoundedReader,endian:elf.ElfEndian)"
+    },
+    {
+      "kind": "function",
+      "module": "elf64-program-header-parser",
+      "name": "parseTable",
+      "signature": "parseTable(comptime capacity_:usize,file_reader:*bounded.BoundedReader,header:elf.Elf64FileHeader)"
+    },
+    {
+      "kind": "method",
+      "module": "ring-buffer",
+      "name": "peek",
+      "signature": "peek(self: *const Self) ?T"
+    },
+    {
+      "kind": "method",
+      "module": "stack",
+      "name": "peek",
+      "signature": "peek(self: *const Self) ?T"
+    },
+    {
+      "kind": "method",
+      "module": "dynamic-array",
+      "name": "pop",
+      "signature": "pop(self: *Self) ?T"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-vector",
+      "name": "pop",
+      "signature": "pop(self: *Self) Error!T"
+    },
+    {
+      "kind": "method",
+      "module": "ring-buffer",
+      "name": "pop",
+      "signature": "pop(self: *Self) ?T"
+    },
+    {
+      "kind": "method",
+      "module": "stack",
+      "name": "pop",
+      "signature": "pop(self: *Self) ?T"
+    },
+    {
+      "kind": "method",
+      "module": "binary-cursor-checkpoint",
+      "name": "position",
+      "signature": "position(self: BinaryCursorCheckpoint)"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-byte-reader",
+      "name": "position",
+      "signature": "position(self: BoundedReader) usize"
+    },
+    {
+      "kind": "method",
+      "module": "type-length-value-decoder",
+      "name": "position",
+      "signature": "position(self: @This()"
+    },
+    {
+      "kind": "method",
+      "module": "elf64-file-header-parser",
+      "name": "programTableRange",
+      "signature": "programTableRange(self:@This()"
+    },
+    {
+      "kind": "method",
+      "module": "ring-buffer",
+      "name": "push",
+      "signature": "push(self: *Self, value: T) Error!void"
+    },
+    {
+      "kind": "method",
+      "module": "stack",
+      "name": "push",
+      "signature": "push(self: *Self, value: T) !void"
+    },
+    {
+      "kind": "method",
+      "module": "distinct-memory-address-types",
+      "name": "raw",
+      "signature": "raw(self: Self) usize"
+    },
+    {
+      "kind": "method",
+      "module": "validated-bit-flags",
+      "name": "raw",
+      "signature": "raw(self: Self) Storage"
+    },
+    {
+      "kind": "method",
+      "module": "length-prefixed-binary-field",
+      "name": "read",
+      "signature": "read(reader: *bounded.BoundedReader)"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-byte-reader",
+      "name": "readByte",
+      "signature": "readByte(self: *BoundedReader) Error!u8"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-byte-reader",
+      "name": "readBytes",
+      "signature": "readBytes(self: *BoundedReader, count: usize) Error![]const u8"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-byte-reader",
+      "name": "readU16Be",
+      "signature": "readU16Be(self: *BoundedReader) Error!u16"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-byte-reader",
+      "name": "readU16Le",
+      "signature": "readU16Le(self: *BoundedReader) Error!u16"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-byte-reader",
+      "name": "readU32Be",
+      "signature": "readU32Be(self: *BoundedReader) Error!u32"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-byte-reader",
+      "name": "readU32Le",
+      "signature": "readU32Le(self: *BoundedReader) Error!u32"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-binary-sub-reader",
+      "name": "reader",
+      "signature": "reader(self: *BoundedBinarySubReader)"
+    },
+    {
+      "kind": "method",
+      "module": "physical-page-frame-allocator",
+      "name": "release",
+      "signature": "release(self:*@This()"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-byte-reader",
+      "name": "remaining",
+      "signature": "remaining(self: BoundedReader) usize"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-vector",
+      "name": "remainingCapacity",
+      "signature": "remainingCapacity(self: *const Self) usize"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-object-pool",
+      "name": "remove",
+      "signature": "remove(self: *@This()"
+    },
+    {
+      "kind": "method",
+      "module": "generational-handles",
+      "name": "remove",
+      "signature": "remove(self: *Self, handle: Handle) ?T"
+    },
+    {
+      "kind": "method",
+      "module": "validated-bit-flags",
+      "name": "remove",
+      "signature": "remove(self: *Self, flag: Flag) void"
+    },
+    {
+      "kind": "method",
+      "module": "owned-byte-buffer",
+      "name": "reserve",
+      "signature": "reserve(self: *OwnedByteBuffer, additional: usize)"
+    },
+    {
+      "kind": "method",
+      "module": "bitmap-allocator",
+      "name": "reset",
+      "signature": "reset(self: *Self) void"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-object-pool",
+      "name": "reset",
+      "signature": "reset(self: *@This()"
+    },
+    {
+      "kind": "method",
+      "module": "owned-byte-buffer",
+      "name": "reset",
+      "signature": "reset(self: *OwnedByteBuffer)"
+    },
+    {
+      "kind": "method",
+      "module": "saturating-counter",
+      "name": "reset",
+      "signature": "reset(self: *Self) void"
+    },
+    {
+      "kind": "method",
+      "module": "binary-cursor-checkpoint",
+      "name": "restore",
+      "signature": "restore(self: BinaryCursorCheckpoint, reader: *bounded.BoundedReader)"
+    },
+    {
+      "kind": "function",
+      "module": "binary-cursor-checkpoint",
+      "name": "restore",
+      "signature": "restore(checkpoint: BinaryCursorCheckpoint, reader: *bounded.BoundedReader)"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-binary-sub-reader",
+      "name": "rollback",
+      "signature": "rollback(self: *BoundedBinarySubReader)"
+    },
+    {
+      "kind": "method",
+      "module": "byte-writer",
+      "name": "rollback",
+      "signature": "rollback(self: *ByteWriter, saved_len: usize) error"
+    },
+    {
+      "kind": "method",
+      "module": "elf64-file-header-parser",
+      "name": "sectionTableRange",
+      "signature": "sectionTableRange(self:@This()"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-byte-reader",
+      "name": "seek",
+      "signature": "seek(self: *BoundedReader, position_: usize) error{InvalidPosition}!void"
+    },
+    {
+      "kind": "method",
+      "module": "bit-set",
+      "name": "set",
+      "signature": "set(self: *Self, index: usize) Error!void"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-integer",
+      "name": "set",
+      "signature": "set(self: *Self, value: T) Error!void"
+    },
+    {
+      "kind": "method",
+      "module": "bit-set",
+      "name": "setAll",
+      "signature": "setAll(self: *Self) void"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-byte-reader",
+      "name": "skip",
+      "signature": "skip(self: *BoundedReader, count: usize) Error!void"
+    },
+    {
+      "kind": "method",
+      "module": "source-span",
+      "name": "slice",
+      "signature": "slice(self: SourceSpan, source: []const u8) error"
+    },
+    {
+      "kind": "method",
+      "module": "state-machine",
+      "name": "state",
+      "signature": "state(self: *const Self) State"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-byte-reader",
+      "name": "subReader",
+      "signature": "subReader(self: *BoundedReader, count: usize) Error!BoundedReader"
+    },
+    {
+      "kind": "method",
+      "module": "length-prefixed-binary-field",
+      "name": "subReader",
+      "signature": "subReader(self: @This()"
+    },
+    {
+      "kind": "method",
+      "module": "distinct-memory-address-types",
+      "name": "subtract",
+      "signature": "subtract(self: Self, offset: usize) error"
+    },
+    {
+      "kind": "method",
+      "module": "saturating-counter",
+      "name": "subtract",
+      "signature": "subtract(self: *Self, amount: T) void"
+    },
+    {
+      "kind": "method",
+      "module": "unit-safe-quantity",
+      "name": "subtract",
+      "signature": "subtract(self: Self, other: Self) Self"
+    },
+    {
+      "kind": "method",
+      "module": "tagged-result",
+      "name": "successValue",
+      "signature": "successValue(self: Self) ?Success"
+    },
+    {
+      "kind": "method",
+      "module": "physical-page-frame-number-and-address-conversion",
+      "name": "toAddress",
+      "signature": "toAddress(self: PhysicalPageFrameNumber) error"
+    },
+    {
+      "kind": "method",
+      "module": "bit-set",
+      "name": "toggle",
+      "signature": "toggle(self: *Self, index: usize) Error!void"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-binary-sub-reader",
+      "name": "unread",
+      "signature": "unread(self: *const BoundedBinarySubReader)"
+    },
+    {
+      "kind": "method",
+      "module": "optional-typed-handle",
+      "name": "value",
+      "signature": "value(self: Self) Integer"
+    },
+    {
+      "kind": "method",
+      "module": "byte-writer",
+      "name": "writeAll",
+      "signature": "writeAll(self: *ByteWriter, input: []const u8) !void"
+    },
+    {
+      "kind": "method",
+      "module": "byte-writer",
+      "name": "writeByte",
+      "signature": "writeByte(self: *ByteWriter, value: u8) !void"
+    },
+    {
+      "kind": "method",
+      "module": "byte-writer",
+      "name": "writeU16Be",
+      "signature": "writeU16Be(self: *ByteWriter, value: u16) !void"
+    },
+    {
+      "kind": "method",
+      "module": "byte-writer",
+      "name": "writeU16Le",
+      "signature": "writeU16Le(self: *ByteWriter, value: u16) !void"
+    },
+    {
+      "kind": "method",
+      "module": "byte-writer",
+      "name": "writeU32Be",
+      "signature": "writeU32Be(self: *ByteWriter, value: u32) !void"
+    },
+    {
+      "kind": "method",
+      "module": "byte-writer",
+      "name": "writeU32Le",
+      "signature": "writeU32Le(self: *ByteWriter, value: u32) !void"
+    }
+  ],
+  "generated": true,
+  "generator": "tools/build-repository-index.py"
+}

@@ -1,0 +1,210 @@
+{
+  "edges": [
+    {
+      "dependency": "bounded-byte-reader",
+      "module": "binary-cursor-checkpoint"
+    },
+    {
+      "dependency": "bit-set",
+      "module": "bitmap-allocator"
+    },
+    {
+      "dependency": "binary-cursor-checkpoint",
+      "module": "bounded-binary-sub-reader"
+    },
+    {
+      "dependency": "bounded-byte-reader",
+      "module": "bounded-binary-sub-reader"
+    },
+    {
+      "dependency": "dynamic-array",
+      "module": "byte-writer"
+    },
+    {
+      "dependency": "binary-cursor-checkpoint",
+      "module": "elf64-file-header-parser"
+    },
+    {
+      "dependency": "bounded-byte-reader",
+      "module": "elf64-file-header-parser"
+    },
+    {
+      "dependency": "checked-half-open-range",
+      "module": "elf64-file-header-parser"
+    },
+    {
+      "dependency": "checked-integer-cast",
+      "module": "elf64-file-header-parser"
+    },
+    {
+      "dependency": "endian-integer-codec",
+      "module": "elf64-file-header-parser"
+    },
+    {
+      "dependency": "validated-enum-decoder",
+      "module": "elf64-file-header-parser"
+    },
+    {
+      "dependency": "aligned-address-and-size-helpers",
+      "module": "elf64-program-header-parser"
+    },
+    {
+      "dependency": "binary-cursor-checkpoint",
+      "module": "elf64-program-header-parser"
+    },
+    {
+      "dependency": "bounded-binary-sub-reader",
+      "module": "elf64-program-header-parser"
+    },
+    {
+      "dependency": "bounded-byte-reader",
+      "module": "elf64-program-header-parser"
+    },
+    {
+      "dependency": "checked-half-open-range",
+      "module": "elf64-program-header-parser"
+    },
+    {
+      "dependency": "checked-integer-cast",
+      "module": "elf64-program-header-parser"
+    },
+    {
+      "dependency": "distinct-memory-address-types",
+      "module": "elf64-program-header-parser"
+    },
+    {
+      "dependency": "elf64-file-header-parser",
+      "module": "elf64-program-header-parser"
+    },
+    {
+      "dependency": "endian-integer-codec",
+      "module": "elf64-program-header-parser"
+    },
+    {
+      "dependency": "fixed-capacity-vector",
+      "module": "elf64-program-header-parser"
+    },
+    {
+      "dependency": "validated-bit-flags",
+      "module": "elf64-program-header-parser"
+    },
+    {
+      "dependency": "validated-enum-decoder",
+      "module": "elf64-program-header-parser"
+    },
+    {
+      "dependency": "bitmap-allocator",
+      "module": "fixed-capacity-object-pool"
+    },
+    {
+      "dependency": "generational-handles",
+      "module": "fixed-capacity-object-pool"
+    },
+    {
+      "dependency": "binary-cursor-checkpoint",
+      "module": "length-prefixed-binary-field"
+    },
+    {
+      "dependency": "bounded-binary-sub-reader",
+      "module": "length-prefixed-binary-field"
+    },
+    {
+      "dependency": "bounded-byte-reader",
+      "module": "length-prefixed-binary-field"
+    },
+    {
+      "dependency": "checked-integer-cast",
+      "module": "length-prefixed-binary-field"
+    },
+    {
+      "dependency": "endian-integer-codec",
+      "module": "length-prefixed-binary-field"
+    },
+    {
+      "dependency": "byte-writer",
+      "module": "owned-byte-buffer"
+    },
+    {
+      "dependency": "dynamic-array",
+      "module": "owned-byte-buffer"
+    },
+    {
+      "dependency": "checked-half-open-range",
+      "module": "physical-memory-region-set"
+    },
+    {
+      "dependency": "distinct-memory-address-types",
+      "module": "physical-memory-region-set"
+    },
+    {
+      "dependency": "fixed-capacity-vector",
+      "module": "physical-memory-region-set"
+    },
+    {
+      "dependency": "physical-page-frame-number-and-address-conversion",
+      "module": "physical-memory-region-set"
+    },
+    {
+      "dependency": "validated-enum-decoder",
+      "module": "physical-memory-region-set"
+    },
+    {
+      "dependency": "bit-set",
+      "module": "physical-page-frame-allocator"
+    },
+    {
+      "dependency": "bitmap-allocator",
+      "module": "physical-page-frame-allocator"
+    },
+    {
+      "dependency": "checked-half-open-range",
+      "module": "physical-page-frame-allocator"
+    },
+    {
+      "dependency": "distinct-memory-address-types",
+      "module": "physical-page-frame-allocator"
+    },
+    {
+      "dependency": "physical-memory-region-set",
+      "module": "physical-page-frame-allocator"
+    },
+    {
+      "dependency": "physical-page-frame-number-and-address-conversion",
+      "module": "physical-page-frame-allocator"
+    },
+    {
+      "dependency": "distinct-memory-address-types",
+      "module": "physical-page-frame-number-and-address-conversion"
+    },
+    {
+      "dependency": "dynamic-array",
+      "module": "stack"
+    },
+    {
+      "dependency": "binary-cursor-checkpoint",
+      "module": "type-length-value-decoder"
+    },
+    {
+      "dependency": "bounded-binary-sub-reader",
+      "module": "type-length-value-decoder"
+    },
+    {
+      "dependency": "bounded-byte-reader",
+      "module": "type-length-value-decoder"
+    },
+    {
+      "dependency": "checked-integer-cast",
+      "module": "type-length-value-decoder"
+    },
+    {
+      "dependency": "endian-integer-codec",
+      "module": "type-length-value-decoder"
+    },
+    {
+      "dependency": "length-prefixed-binary-field",
+      "module": "type-length-value-decoder"
+    }
+  ],
+  "generated": true,
+  "generator": "tools/build-repository-index.py"
+}

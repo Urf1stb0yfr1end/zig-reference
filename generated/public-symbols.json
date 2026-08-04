@@ -1,0 +1,262 @@
+{
+  "generated": true,
+  "generator": "tools/build-repository-index.py",
+  "symbols": [
+    {
+      "module": "bounded-binary-sub-reader",
+      "symbol": "AdvancementPolicy"
+    },
+    {
+      "module": "aligned-address-and-size-helpers",
+      "symbol": "AlignmentError"
+    },
+    {
+      "module": "validated-ascii-byte",
+      "symbol": "AsciiByte"
+    },
+    {
+      "module": "binary-cursor-checkpoint",
+      "symbol": "BinaryCursorCheckpoint"
+    },
+    {
+      "module": "bit-set",
+      "symbol": "BitSet"
+    },
+    {
+      "module": "bitmap-allocator",
+      "symbol": "BitmapAllocator"
+    },
+    {
+      "module": "bounded-binary-sub-reader",
+      "symbol": "BoundedBinarySubReader"
+    },
+    {
+      "module": "bounded-integer",
+      "symbol": "BoundedInteger"
+    },
+    {
+      "module": "bounded-byte-reader",
+      "symbol": "BoundedReader"
+    },
+    {
+      "module": "byte-writer",
+      "symbol": "ByteWriter"
+    },
+    {
+      "module": "checked-half-open-range",
+      "symbol": "CheckedRange"
+    },
+    {
+      "module": "dynamic-array",
+      "symbol": "DynamicArray"
+    },
+    {
+      "module": "elf64-file-header-parser",
+      "symbol": "Elf64FileHeader"
+    },
+    {
+      "module": "elf64-file-header-parser",
+      "symbol": "ElfEndian"
+    },
+    {
+      "module": "elf64-file-header-parser",
+      "symbol": "ElfType"
+    },
+    {
+      "module": "endian-integer-codec",
+      "symbol": "EndianIntegerCodec"
+    },
+    {
+      "module": "fixed-capacity-vector",
+      "symbol": "FixedVector"
+    },
+    {
+      "module": "fourcc-code",
+      "symbol": "FourCC"
+    },
+    {
+      "module": "distinct-memory-address-types",
+      "symbol": "GuestPhysicalAddress"
+    },
+    {
+      "module": "distinct-memory-address-types",
+      "symbol": "GuestVirtualAddress"
+    },
+    {
+      "module": "generational-handles",
+      "symbol": "HandleTable"
+    },
+    {
+      "module": "distinct-memory-address-types",
+      "symbol": "HostVirtualAddress"
+    },
+    {
+      "module": "length-prefixed-binary-field",
+      "symbol": "LengthPrefixedField"
+    },
+    {
+      "module": "nonzero-integer",
+      "symbol": "NonZeroInteger"
+    },
+    {
+      "module": "fixed-capacity-object-pool",
+      "symbol": "ObjectPool"
+    },
+    {
+      "module": "optional-typed-handle",
+      "symbol": "OptionalTypedHandle"
+    },
+    {
+      "module": "owned-byte-buffer",
+      "symbol": "OwnedByteBuffer"
+    },
+    {
+      "module": "physical-page-frame-number-and-address-conversion",
+      "symbol": "PageSize"
+    },
+    {
+      "module": "elf64-file-header-parser",
+      "symbol": "ParseError"
+    },
+    {
+      "module": "elf64-program-header-parser",
+      "symbol": "ParseError"
+    },
+    {
+      "module": "elf64-program-header-parser",
+      "symbol": "Permission"
+    },
+    {
+      "module": "distinct-memory-address-types",
+      "symbol": "PhysicalAddress"
+    },
+    {
+      "module": "physical-memory-region-set",
+      "symbol": "PhysicalMemoryRegion"
+    },
+    {
+      "module": "physical-memory-region-set",
+      "symbol": "PhysicalMemoryRegionSet"
+    },
+    {
+      "module": "physical-page-frame-allocator",
+      "symbol": "PhysicalPageFrameAllocator"
+    },
+    {
+      "module": "physical-page-frame-number-and-address-conversion",
+      "symbol": "PhysicalPageFrameNumber"
+    },
+    {
+      "module": "unit-safe-quantity",
+      "symbol": "Quantity"
+    },
+    {
+      "module": "physical-memory-region-set",
+      "symbol": "RegionKind"
+    },
+    {
+      "module": "ring-buffer",
+      "symbol": "RingBuffer"
+    },
+    {
+      "module": "saturating-counter",
+      "symbol": "SaturatingCounter"
+    },
+    {
+      "module": "elf64-program-header-parser",
+      "symbol": "Segment"
+    },
+    {
+      "module": "elf64-program-header-parser",
+      "symbol": "SegmentType"
+    },
+    {
+      "module": "semantic-version",
+      "symbol": "SemanticVersion"
+    },
+    {
+      "module": "source-span",
+      "symbol": "SourceSpan"
+    },
+    {
+      "module": "stack",
+      "symbol": "Stack"
+    },
+    {
+      "module": "state-machine",
+      "symbol": "StateMachine"
+    },
+    {
+      "module": "tagged-result",
+      "symbol": "TaggedResult"
+    },
+    {
+      "module": "type-length-value-decoder",
+      "symbol": "TlvDecoder"
+    },
+    {
+      "module": "optional-typed-handle",
+      "symbol": "TypedHandle"
+    },
+    {
+      "module": "validated-bit-flags",
+      "symbol": "ValidatedBitFlags"
+    },
+    {
+      "module": "wrapping-sequence-number",
+      "symbol": "WrappingSequenceNumber"
+    },
+    {
+      "module": "aligned-address-and-size-helpers",
+      "symbol": "alignDown"
+    },
+    {
+      "module": "aligned-address-and-size-helpers",
+      "symbol": "alignUp"
+    },
+    {
+      "module": "binary-cursor-checkpoint",
+      "symbol": "capture"
+    },
+    {
+      "module": "checked-integer-cast",
+      "symbol": "checkedIntegerCast"
+    },
+    {
+      "module": "validated-enum-decoder",
+      "symbol": "decodeEnum"
+    },
+    {
+      "module": "aligned-address-and-size-helpers",
+      "symbol": "isAligned"
+    },
+    {
+      "module": "aligned-address-and-size-helpers",
+      "symbol": "isPowerOfTwo"
+    },
+    {
+      "module": "validated-enum-decoder",
+      "symbol": "isValidEnumValue"
+    },
+    {
+      "module": "aligned-address-and-size-helpers",
+      "symbol": "paddingNeeded"
+    },
+    {
+      "module": "elf64-file-header-parser",
+      "symbol": "parse"
+    },
+    {
+      "module": "elf64-program-header-parser",
+      "symbol": "parseOne"
+    },
+    {
+      "module": "elf64-program-header-parser",
+      "symbol": "parseTable"
+    },
+    {
+      "module": "binary-cursor-checkpoint",
+      "symbol": "restore"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "integer-codec",
+  "adapters": [
+    "endian-integer-codec"
+  ],
+  "command": "zig build conformance",
+  "behavioral_evidence": "authoritative module unit tests are executed through build.zig",
+  "dedicated_shared_adapter": false,
+  "maturity_credit": false
+}

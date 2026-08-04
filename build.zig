@@ -62,6 +62,41 @@ pub fn build(b: *std.Build) void {
     const portability_smoke_step = b.step("smoke-portability-infrastructure", "Prove port contracts are discoverable and topologically coherent");
     portability_smoke_step.dependOn(&portability_smoke_command.step);
 
+    const policy_command = b.addSystemCommand(&.{ "python3", "tools/check-repository-policy.py" });
+    const policy_step = b.step("check", "Validate contracts, ports, generated drift, graphs, and artifact policy");
+    policy_step.dependOn(&policy_command.step);
+    policy_step.dependOn(check_step);
+    policy_step.dependOn(port_check_step);
+    const index_command = b.addSystemCommand(&.{ "python3", "tools/build-repository-index.py" });
+    const index_step = b.step("index", "Regenerate deterministic textual repository indexes");
+    index_step.dependOn(&index_command.step);
+    const index_check_command = b.addSystemCommand(&.{ "python3", "tools/build-repository-index.py", "--check" });
+    policy_step.dependOn(&index_check_command.step);
+    const graph_command = b.addSystemCommand(&.{ "python3", "tools/build-dependency-graphs.py" });
+    const graph_step = b.step("graph", "Regenerate and validate textual dependency graphs");
+    graph_step.dependOn(&graph_command.step);
+    const graph_check_command = b.addSystemCommand(&.{ "python3", "tools/build-dependency-graphs.py", "--check" });
+    policy_step.dependOn(&graph_check_command.step);
+    const database_command = b.addSystemCommand(&.{ "python3", "tools/build-repository-database.py" });
+    const database_step = b.step("database", "Generate an ignored local SQLite acceleration index");
+    database_step.dependOn(&database_command.step);
+    const database_check_command = b.addSystemCommand(&.{ "python3", "tools/build-repository-database.py", "--check" });
+    const status_command = b.addSystemCommand(&.{ "python3", "tools/status.py" });
+    const status_step = b.step("status", "Print evidence-backed repository health");
+    status_step.dependOn(&status_command.step);
+    const query_command = b.addSystemCommand(&.{ "python3", "tools/query-reference.py", "status" });
+    const query_step = b.step("query", "Run the default repository status query; use the Python tool for arguments");
+    query_step.dependOn(&query_command.step);
+    const property_command = b.addSystemCommand(&.{ "python3", "tools/test-specialized-levels.py", "property" });
+    const property_step = b.step("property", "Run configured deterministic property infrastructure checks");
+    property_step.dependOn(&property_command.step);
+    const fuzz_command = b.addSystemCommand(&.{ "python3", "tools/test-specialized-levels.py", "fuzz-smoke" });
+    const fuzz_step = b.step("fuzz-smoke", "Run bounded generated-input fuzz infrastructure checks");
+    fuzz_step.dependOn(&fuzz_command.step);
+    const differential_command = b.addSystemCommand(&.{ "python3", "tools/test-specialized-levels.py", "differential" });
+    const differential_step = b.step("differential", "Run configured differential infrastructure checks");
+    differential_step.dependOn(&differential_command.step);
+
     var modules: [specs.len]*std.Build.Module = undefined;
     for (specs, 0..) |spec, i| {
         modules[i] = b.createModule(.{ .root_source_file = b.path(spec.source), .target = target, .optimize = optimize });
@@ -75,12 +110,17 @@ pub fn build(b: *std.Build) void {
     const test_all = b.step("test", "Run contract checks, unit tests, and smoke tests");
     test_all.dependOn(check_step);
     test_all.dependOn(port_check_step);
+    const recipes_step = b.step("recipes", "Run unit tests for modules used by the initial composition recipes");
+    const conformance_step = b.step("conformance", "Run behavioral tests for the initial conformance module families");
     for (specs, 0..) |spec, i| {
         const unit_tests = b.addTest(.{ .root_module = modules[i] });
         const run_unit = b.addRunArtifact(unit_tests);
         const unit_step = b.step(b.fmt("test-{s}", .{spec.name}), b.fmt("Run {s} unit tests", .{spec.name}));
         unit_step.dependOn(&run_unit.step);
         test_all.dependOn(&run_unit.step);
+        // These aggregate steps deliberately execute real behavioral module tests rather than empty harnesses.
+        if (i <= 9 or i == 17 or i == 22 or i == 28) recipes_step.dependOn(&run_unit.step);
+        if (i <= 8 or i == 17 or i == 22) conformance_step.dependOn(&run_unit.step);
 
         const smoke_module = b.createModule(.{ .root_source_file = b.path(b.fmt("projects/{s}/tests/smoke_test.zig", .{directoryFor(spec.name)})), .target = target, .optimize = optimize });
         smoke_module.addImport(spec.name, modules[i]);
@@ -92,6 +132,17 @@ pub fn build(b: *std.Build) void {
         smoke_all.dependOn(&run_smoke.step);
         test_all.dependOn(&run_smoke.step);
     }
+
+    const validate_step = b.step("validate-repository", "Run the complete repository validation pipeline");
+    validate_step.dependOn(policy_step);
+    validate_step.dependOn(&database_check_command.step);
+    validate_step.dependOn(test_all);
+    validate_step.dependOn(smoke_all);
+    validate_step.dependOn(recipes_step);
+    validate_step.dependOn(conformance_step);
+    validate_step.dependOn(property_step);
+    validate_step.dependOn(fuzz_step);
+    validate_step.dependOn(differential_step);
 }
 
 fn findModule(name: []const u8, modules: []const *std.Build.Module) *std.Build.Module {

@@ -1,0 +1,17 @@
+{
+  "name": "write-and-read-explicit-endian-record",
+  "generated": false,
+  "modules": [
+    "byte-writer",
+    "bounded-byte-reader",
+    "endian-integer-codec"
+  ],
+  "status": "foundation",
+  "test_command": "zig build recipes",
+  "inherited_guarantees": [
+    "Public module unit contracts and failure-path tests are executed by the recipes aggregate step."
+  ],
+  "gaps": [
+    "A dedicated cross-module orchestration adapter remains required before this recipe can count as system-proven maturity evidence."
+  ]
+}
