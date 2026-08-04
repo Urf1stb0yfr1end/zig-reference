@@ -22,6 +22,8 @@ A project belongs in this repository when:
 1. [Fixed-capacity vector](projects/00-fixed-capacity-vector/README.md) — length, capacity, initialized storage, slices, explicit errors, and invariants.
 2. [Dynamic array](projects/01-dynamic-array/README.md) — allocator ownership, checked growth, cleanup, failure atomicity, and reference invalidation.
 3. [Ring buffer](projects/02-ring-buffer/README.md) — FIFO order, wrapped indexing, full and empty states, and logical versus physical layout.
+4. [Fixed bit set](projects/03-bit-set/README.md) — compact state, bit-to-word mapping, padding invariants, and precise integer widths.
+5. [Bounded byte reader](projects/04-bounded-byte-reader/README.md) — borrowed input, checked cursor movement, explicit endianness, and confined sub-readers.
 
 Each project also contains a `MASTERY.md`: a compact guide to its mental model, invariants, ownership, failure behavior, invalidation rules, tests, adaptation points, and readiness questions. The repository-wide standard is described in [MASTERY.md](MASTERY.md).
 
@@ -37,7 +39,24 @@ zig build test
 zig build test-fixed-vector
 zig build test-dynamic-array
 zig build test-ring-buffer
+zig build test-bit-set
+zig build test-bounded-reader
 ```
+
+## Where Zig distinguishes itself
+
+These projects emphasize qualities that are easy to miss when Zig is described only as a C alternative:
+
+- low-level representations remain visible;
+- allocation is a dependency rather than a global assumption;
+- error behavior appears in function types;
+- compile-time parameters produce specialized concrete types;
+- slices preserve length alongside addresses;
+- arbitrary-width integers can express machine constraints precisely;
+- tests can exercise failure paths and allocation behavior directly;
+- the same language works in hosted programs and freestanding systems.
+
+The objective is not to make systems programming look effortless. It is to make responsibility local, explicit, and teachable.
 
 ## Repository vocabulary
 
