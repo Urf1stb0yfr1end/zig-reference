@@ -138,11 +138,20 @@
       {
         "name": "subReader",
         "signature": "subReader(self: *BoundedReader, count: usize) Error!BoundedReader"
+      },
+      {
+        "name": "extent",
+        "signature": "extent(self: BoundedReader) usize"
+      },
+      {
+        "name": "seek",
+        "signature": "seek(self: *BoundedReader, position_: usize) error{InvalidPosition}!void"
       }
     ],
     "constants": [],
     "errors": [
-      "UnexpectedEnd"
+      "UnexpectedEnd",
+      "InvalidPosition"
     ],
     "callbacks": [],
     "interfaces": [],
@@ -834,6 +843,106 @@
         "invalidates": [],
         "thread_safety": "caller synchronization required for shared mutable state",
         "examples": []
+      },
+      {
+        "name": "extent",
+        "kind": "method",
+        "signature": "extent(self: BoundedReader) usize",
+        "visibility": "public",
+        "summary": "Returns total input extent.",
+        "receiver": {
+          "name": "self",
+          "type": "BoundedReader",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "usize",
+            "meaning": "Returns total input extent.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The position contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "seek",
+        "kind": "method",
+        "signature": "seek(self: *BoundedReader, position_: usize) error{InvalidPosition}!void",
+        "visibility": "public",
+        "summary": "Moves to a checked input position without mutation on failure.",
+        "receiver": {
+          "name": "self",
+          "type": "BoundedReader",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "void",
+            "meaning": "Moves to a checked input position without mutation on failure.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [
+          {
+            "name": "InvalidPosition",
+            "condition": "position_ exceeds input extent",
+            "state_after_error": "reader cursor unchanged"
+          }
+        ],
+        "preconditions": [],
+        "postconditions": [
+          "The position contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
       }
     ]
   },
@@ -1020,6 +1129,21 @@
         "cleanup_required": false,
         "retry_safe": true,
         "retry_guidance": "retry only after correcting the failing condition",
+        "dependency_origin": ""
+      },
+      {
+        "name": "InvalidPosition",
+        "operations": [
+          "seek"
+        ],
+        "condition": "position exceeds input extent",
+        "origin": "bounded-byte-reader",
+        "state_after_error": "cursor unchanged",
+        "partial_effects": [],
+        "rollback": "not needed",
+        "cleanup_required": false,
+        "retry_safe": true,
+        "retry_guidance": "retry with position no greater than extent",
         "dependency_origin": ""
       }
     ],

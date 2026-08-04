@@ -1,0 +1,948 @@
+{
+  "schema_version": "3.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "37",
+    "canonical_name": "elf64-file-header-parser",
+    "display_name": "Elf64 File Header Parser",
+    "directory": "projects/37-elf64-file-header-parser",
+    "summary": "Parse and validate one allocation-free ELF64 file header.",
+    "long_description": "Parse and validate one allocation-free ELF64 file header.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "memory-foundation",
+    "subcategory": "",
+    "tags": [
+      "physical-memory",
+      "page-frame",
+      "address",
+      "hypervisor",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Parse and validate one allocation-free ELF64 file header.",
+    "secondary": [],
+    "non_goals": [
+      "hidden allocation",
+      "implicit synchronization"
+    ],
+    "problems_solved": [],
+    "future_role": "Reusable boundary infrastructure."
+  },
+  "c_pain": {
+    "summary": "",
+    "common_failure_modes": [],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "",
+    "where_c_degrades": ""
+  },
+  "zig_response": {
+    "summary": "",
+    "language_features": [],
+    "guarantees_made_visible": [],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/37-elf64-file-header-parser",
+    "implementation": [
+      "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig"
+    ],
+    "public_entrypoint": "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig",
+    "readme": "projects/37-elf64-file-header-parser/README.md",
+    "mastery": "projects/37-elf64-file-header-parser/MASTERY.md",
+    "details_markdown": "projects/37-elf64-file-header-parser/DETAILS.md",
+    "details_json": "projects/37-elf64-file-header-parser/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": [],
+    "unit_tests": [
+      "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig"
+    ],
+    "smoke_tests": [
+      "projects/37-elf64-file-header-parser/tests/smoke_test.zig"
+    ],
+    "generated_files": [],
+    "dependency_contracts": [
+      "projects/04-bounded-byte-reader/details.json",
+      "projects/10-checked-integer-cast/details.json",
+      "projects/14-validated-enum-decoder/details.json",
+      "projects/17-checked-half-open-range/details.json",
+      "projects/22-endian-integer-codec/details.json",
+      "projects/29-binary-cursor-checkpoint/details.json"
+    ]
+  },
+  "public_surface": {
+    "root_symbols": [
+      "ElfEndian",
+      "ElfType",
+      "Elf64FileHeader",
+      "ParseError",
+      "parse"
+    ],
+    "types": [
+      {
+        "name": "ElfEndian",
+        "kind": "public declaration"
+      },
+      {
+        "name": "ElfType",
+        "kind": "public declaration"
+      },
+      {
+        "name": "Elf64FileHeader",
+        "kind": "public declaration"
+      },
+      {
+        "name": "ParseError",
+        "kind": "public declaration"
+      },
+      {
+        "name": "parse",
+        "kind": "public declaration"
+      }
+    ],
+    "functions": [],
+    "methods": [],
+    "constants": [],
+    "errors": [],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": [],
+    "endpoints": [
+      {
+        "name": "programTableRange",
+        "kind": "method",
+        "signature": "programTableRange(self:@This()",
+        "visibility": "public",
+        "summary": "Public programTableRange operation; exact return type is authoritative in source.",
+        "receiver": {
+          "name": "self",
+          "type": "source-declared receiver or generated type context",
+          "ownership": "borrowed or value as declared",
+          "mutation": "source signature is authoritative"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of programTableRange.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "sectionTableRange",
+        "kind": "method",
+        "signature": "sectionTableRange(self:@This()",
+        "visibility": "public",
+        "summary": "Public sectionTableRange operation; exact return type is authoritative in source.",
+        "receiver": {
+          "name": "self",
+          "type": "source-declared receiver or generated type context",
+          "ownership": "borrowed or value as declared",
+          "mutation": "source signature is authoritative"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of sectionTableRange.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "parse",
+        "kind": "function",
+        "signature": "parse(reader:*bounded.BoundedReader)",
+        "visibility": "public",
+        "summary": "Public parse operation; exact return type is authoritative in source.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "parameters",
+            "type": "reader:*bounded.BoundedReader",
+            "role": "Structured parameters shown in the exact source signature.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": true,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of parse.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "name": "public endpoint inputs",
+      "type": "see endpoint signatures",
+      "ownership": "copied scalar/value or borrowed according to the Zig type",
+      "lifetime": "for the duration of the call unless the output contract says it is stored",
+      "role": "Copied policies/scalars or explicitly borrowed pointers and slices",
+      "borrowing": "explicit in the Zig type",
+      "mutability": "mutable only when the type permits mutation",
+      "valid_range": "all values satisfying the listed constraints",
+      "alignment": "type-defined",
+      "endianness": "not applicable unless stated by the operation",
+      "format": "Zig value",
+      "required_invariants": [],
+      "validation_performed": [],
+      "accepts_untrusted_input": true,
+      "stored": false,
+      "copied": true,
+      "may_mutate": false,
+      "errors_on_invalid_input": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "public endpoint outputs",
+      "type": "see endpoint signatures",
+      "ownership": "not applicable",
+      "lifetime": "program",
+      "meaning": "Copied values or documented borrowed views",
+      "borrowed_from": "",
+      "cleanup_required": false,
+      "cleanup_responsibility": "none",
+      "invalidation_conditions": [],
+      "aliasing": "not applicable",
+      "borrows_from_module": false,
+      "borrows_from_input": false,
+      "valid_after_mutation": "not applicable",
+      "absence_meaning": "not applicable"
+    }
+  ],
+  "state": {
+    "fields": [],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "PageSize is 4096",
+      "produced addresses are aligned"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [
+      "scalar frame index"
+    ],
+    "borrows": [],
+    "copies": [],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [],
+    "optional_empty_results": [],
+    "failure_atomicity": "Failed parsing and mutation preserve externally observable state unless source explicitly documents a committed transition.",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [
+      {
+        "module": "bounded-byte-reader",
+        "path": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig",
+        "symbol": "BoundedReader",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "checked-integer-cast",
+        "path": "projects/10-checked-integer-cast/src/checked_integer_cast.zig",
+        "symbol": "checkedIntegerCast",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "validated-enum-decoder",
+        "path": "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig",
+        "symbol": "decodeEnum",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "checked-half-open-range",
+        "path": "projects/17-checked-half-open-range/src/checked_half_open_range.zig",
+        "symbol": "CheckedRange",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "endian-integer-codec",
+        "path": "projects/22-endian-integer-codec/src/endian_integer_codec.zig",
+        "symbol": "EndianIntegerCodec",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "binary-cursor-checkpoint",
+        "path": "projects/29-binary-cursor-checkpoint/src/binary_cursor_checkpoint.zig",
+        "symbol": "BinaryCursorCheckpoint",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      }
+    ],
+    "standard_library": [
+      "std.math.mul"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": []
+  },
+  "dependency_contracts": [
+    {
+      "module": "bounded-byte-reader",
+      "directory": "projects/04-bounded-byte-reader",
+      "import_name": "bounded-byte-reader",
+      "import_path": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig",
+      "symbols_used": [
+        "BoundedReader"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/04-bounded-byte-reader/details.json"
+    },
+    {
+      "module": "checked-integer-cast",
+      "directory": "projects/10-checked-integer-cast",
+      "import_name": "checked-integer-cast",
+      "import_path": "projects/10-checked-integer-cast/src/checked_integer_cast.zig",
+      "symbols_used": [
+        "checkedIntegerCast"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/10-checked-integer-cast/details.json"
+    },
+    {
+      "module": "validated-enum-decoder",
+      "directory": "projects/14-validated-enum-decoder",
+      "import_name": "validated-enum-decoder",
+      "import_path": "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig",
+      "symbols_used": [
+        "decodeEnum"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/14-validated-enum-decoder/details.json"
+    },
+    {
+      "module": "checked-half-open-range",
+      "directory": "projects/17-checked-half-open-range",
+      "import_name": "checked-half-open-range",
+      "import_path": "projects/17-checked-half-open-range/src/checked_half_open_range.zig",
+      "symbols_used": [
+        "CheckedRange"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/17-checked-half-open-range/details.json"
+    },
+    {
+      "module": "endian-integer-codec",
+      "directory": "projects/22-endian-integer-codec",
+      "import_name": "endian-integer-codec",
+      "import_path": "projects/22-endian-integer-codec/src/endian_integer_codec.zig",
+      "symbols_used": [
+        "EndianIntegerCodec"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/22-endian-integer-codec/details.json"
+    },
+    {
+      "module": "binary-cursor-checkpoint",
+      "directory": "projects/29-binary-cursor-checkpoint",
+      "import_name": "binary-cursor-checkpoint",
+      "import_path": "projects/29-binary-cursor-checkpoint/src/binary_cursor_checkpoint.zig",
+      "symbols_used": [
+        "BinaryCursorCheckpoint"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/29-binary-cursor-checkpoint/details.json"
+    }
+  ],
+  "expected_dependents": [
+    "future composition modules"
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "elf64-file-header-parser",
+    "import_path": "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig",
+    "import_configuration": "Use @import(\"elf64-file-header-parser\") through build.zig.",
+    "minimal_example": "",
+    "integration_patterns": [],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "value type",
+    "reentrant": "unknown",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [
+      "page policy currently architecture-neutral but fixed at 4 KiB"
+    ],
+    "allocator_assumptions": "",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "",
+    "no_std_equivalent": ""
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-elf64-file-header-parser",
+    "commands": [
+      "zig build test-elf64-file-header-parser",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "normal, empty/boundary, invalid, and failure-atomic behavior"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": [],
+    "smoke_test_commands": [
+      "zig build smoke-elf64-file-header-parser",
+      "zig build smoke"
+    ],
+    "smoke_test_behaviors": [
+      "all public declarations are recursively referenced and compiled as an external consumer",
+      "zero private-path access: only the named public module import is available"
+    ],
+    "smoke_test_dependencies": [
+      "bounded-byte-reader",
+      "checked-integer-cast",
+      "validated-enum-decoder",
+      "checked-half-open-range",
+      "endian-integer-codec",
+      "binary-cursor-checkpoint"
+    ]
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig 0.14.0 is unavailable in the execution environment",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Local validation pending."
+    ],
+    "status_dimensions": {
+      "implementation_present": true,
+      "contract_complete": true,
+      "contract_formatted": true,
+      "unit_tests_present": true,
+      "smoke_test_present": true,
+      "contract_checker_passed": false,
+      "compiler_validated": false,
+      "unit_tests_passed": false,
+      "smoke_tests_passed": false
+    }
+  },
+  "documentation": {
+    "read_order": [
+      "projects/37-elf64-file-header-parser/details.json",
+      "projects/37-elf64-file-header-parser/DETAILS.md",
+      "projects/37-elf64-file-header-parser/README.md",
+      "projects/37-elf64-file-header-parser/MASTERY.md",
+      "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig"
+    ],
+    "examples_covered": [],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [],
+    "related_modules": [],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Synchronize source, tests, contracts, catalog, and dependents.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [],
+    "synchronization_requirements": [],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "physical frame conversion",
+      "page number to address"
+    ],
+    "problems": [],
+    "inputs": [],
+    "outputs": [],
+    "environments": [],
+    "keywords": [
+      "PFN",
+      "physical page",
+      "4096",
+      "page frame"
+    ],
+    "grep_terms": [
+      "physical-page-frame-number-and-address-conversion",
+      "PageSize",
+      "PhysicalPageFrameNumber"
+    ],
+    "natural_language_queries": [
+      "How do I checked conversion between 4 kib physical page-frame indices and physical addresses?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "memory-foundation",
+    "reuses_modules": [
+      "bounded-byte-reader",
+      "checked-integer-cast",
+      "validated-enum-decoder",
+      "checked-half-open-range",
+      "endian-integer-codec",
+      "binary-cursor-checkpoint"
+    ],
+    "guarantees_inherited": [
+      "bounds, arithmetic, ownership, and state guarantees from declared dependencies"
+    ],
+    "future_modules_enabled": [
+      "larger parsers, allocators, loaders, and systems"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Parse and validate one allocation-free ELF64 file header.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-elf64-file-header-parser",
+      "zig build smoke-elf64-file-header-parser"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ],
+    "smoke_test_before_integration": "Run zig build smoke-elf64-file-header-parser."
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "ElfEndian",
+        "file": "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig"
+      },
+      {
+        "symbol": "ElfType",
+        "file": "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig"
+      },
+      {
+        "symbol": "Elf64FileHeader",
+        "file": "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig"
+      },
+      {
+        "symbol": "ParseError",
+        "file": "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig"
+      },
+      {
+        "symbol": "parse",
+        "file": "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "module unit tests",
+        "file": "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": [
+      {
+        "module": "bounded-byte-reader",
+        "path": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig",
+        "symbol": "BoundedReader",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "checked-integer-cast",
+        "path": "projects/10-checked-integer-cast/src/checked_integer_cast.zig",
+        "symbol": "checkedIntegerCast",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "validated-enum-decoder",
+        "path": "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig",
+        "symbol": "decodeEnum",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "checked-half-open-range",
+        "path": "projects/17-checked-half-open-range/src/checked_half_open_range.zig",
+        "symbol": "CheckedRange",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "endian-integer-codec",
+        "path": "projects/22-endian-integer-codec/src/endian_integer_codec.zig",
+        "symbol": "EndianIntegerCodec",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "binary-cursor-checkpoint",
+        "path": "projects/29-binary-cursor-checkpoint/src/binary_cursor_checkpoint.zig",
+        "symbol": "BinaryCursorCheckpoint",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      }
+    ],
+    "smoke_tests_to_public_symbols": [
+      {
+        "file": "projects/37-elf64-file-header-parser/tests/smoke_test.zig",
+        "symbols": [
+          "ElfEndian",
+          "ElfType",
+          "Elf64FileHeader",
+          "ParseError",
+          "parse"
+        ]
+      }
+    ],
+    "smoke_tests_to_dependencies": [
+      {
+        "file": "projects/37-elf64-file-header-parser/tests/smoke_test.zig",
+        "dependencies": [
+          "bounded-byte-reader",
+          "checked-integer-cast",
+          "validated-enum-decoder",
+          "checked-half-open-range",
+          "endian-integer-codec",
+          "binary-cursor-checkpoint"
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  },
+  "smoke_test": {
+    "required": true,
+    "implemented": true,
+    "status": "present-unverified",
+    "source_path": "projects/37-elf64-file-header-parser/tests/smoke_test.zig",
+    "build_step": "smoke-elf64-file-header-parser",
+    "commands": [
+      "zig build smoke-elf64-file-header-parser",
+      "zig build smoke"
+    ],
+    "public_import_used": "elf64-file-header-parser",
+    "public_symbols_exercised": [
+      "ElfEndian",
+      "ElfType",
+      "Elf64FileHeader",
+      "ParseError",
+      "parse"
+    ],
+    "successful_operations": [
+      "all public declarations are recursively referenced and compiled as an external consumer"
+    ],
+    "failure_or_boundary_operations": [
+      "zero private-path access: only the named public module import is available"
+    ],
+    "cleanup_exercised": [
+      "compile-time public declaration traversal requires no cleanup"
+    ],
+    "repository_dependencies_exercised": [
+      "bounded-byte-reader",
+      "checked-integer-cast",
+      "validated-enum-decoder",
+      "checked-half-open-range",
+      "endian-integer-codec",
+      "binary-cursor-checkpoint"
+    ],
+    "hosted_environment_required": "Zig test runner",
+    "freestanding_environment_required": "not required for smoke execution",
+    "fixtures": [],
+    "expected_exit_status": "0",
+    "expected_output": [],
+    "forbidden_private_access": true,
+    "last_run": "",
+    "last_result": "unverified",
+    "last_validated_commit": "",
+    "compiler_version": "",
+    "known_failures": [],
+    "notes": [
+      "Runtime behavior remains covered by the module unit tests; this smoke test proves external named-import usability and public declaration compilation."
+    ]
+  }
+}

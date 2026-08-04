@@ -260,6 +260,96 @@
       "details": "projects/28-physical-page-frame-number-and-address-conversion/details.json",
       "unit_test_step": "test-physical-page-frame-number-and-address-conversion",
       "smoke_test_step": "smoke-physical-page-frame-number-and-address-conversion"
+    },
+    {
+      "id": "29",
+      "canonical_name": "binary-cursor-checkpoint",
+      "directory": "projects/29-binary-cursor-checkpoint",
+      "public_entrypoint": "projects/29-binary-cursor-checkpoint/src/binary_cursor_checkpoint.zig",
+      "details": "projects/29-binary-cursor-checkpoint/details.json",
+      "unit_test_step": "test-binary-cursor-checkpoint",
+      "smoke_test_step": "smoke-binary-cursor-checkpoint"
+    },
+    {
+      "id": "30",
+      "canonical_name": "bounded-binary-sub-reader",
+      "directory": "projects/30-bounded-binary-sub-reader",
+      "public_entrypoint": "projects/30-bounded-binary-sub-reader/src/bounded_binary_sub_reader.zig",
+      "details": "projects/30-bounded-binary-sub-reader/details.json",
+      "unit_test_step": "test-bounded-binary-sub-reader",
+      "smoke_test_step": "smoke-bounded-binary-sub-reader"
+    },
+    {
+      "id": "31",
+      "canonical_name": "length-prefixed-binary-field",
+      "directory": "projects/31-length-prefixed-binary-field",
+      "public_entrypoint": "projects/31-length-prefixed-binary-field/src/length_prefixed_binary_field.zig",
+      "details": "projects/31-length-prefixed-binary-field/details.json",
+      "unit_test_step": "test-length-prefixed-binary-field",
+      "smoke_test_step": "smoke-length-prefixed-binary-field"
+    },
+    {
+      "id": "32",
+      "canonical_name": "type-length-value-decoder",
+      "directory": "projects/32-type-length-value-decoder",
+      "public_entrypoint": "projects/32-type-length-value-decoder/src/type_length_value_decoder.zig",
+      "details": "projects/32-type-length-value-decoder/details.json",
+      "unit_test_step": "test-type-length-value-decoder",
+      "smoke_test_step": "smoke-type-length-value-decoder"
+    },
+    {
+      "id": "33",
+      "canonical_name": "owned-byte-buffer",
+      "directory": "projects/33-owned-byte-buffer",
+      "public_entrypoint": "projects/33-owned-byte-buffer/src/owned_byte_buffer.zig",
+      "details": "projects/33-owned-byte-buffer/details.json",
+      "unit_test_step": "test-owned-byte-buffer",
+      "smoke_test_step": "smoke-owned-byte-buffer"
+    },
+    {
+      "id": "34",
+      "canonical_name": "fixed-capacity-object-pool",
+      "directory": "projects/34-fixed-capacity-object-pool",
+      "public_entrypoint": "projects/34-fixed-capacity-object-pool/src/fixed_capacity_object_pool.zig",
+      "details": "projects/34-fixed-capacity-object-pool/details.json",
+      "unit_test_step": "test-fixed-capacity-object-pool",
+      "smoke_test_step": "smoke-fixed-capacity-object-pool"
+    },
+    {
+      "id": "35",
+      "canonical_name": "physical-memory-region-set",
+      "directory": "projects/35-physical-memory-region-set",
+      "public_entrypoint": "projects/35-physical-memory-region-set/src/physical_memory_region_set.zig",
+      "details": "projects/35-physical-memory-region-set/details.json",
+      "unit_test_step": "test-physical-memory-region-set",
+      "smoke_test_step": "smoke-physical-memory-region-set"
+    },
+    {
+      "id": "36",
+      "canonical_name": "physical-page-frame-allocator",
+      "directory": "projects/36-physical-page-frame-allocator",
+      "public_entrypoint": "projects/36-physical-page-frame-allocator/src/physical_page_frame_allocator.zig",
+      "details": "projects/36-physical-page-frame-allocator/details.json",
+      "unit_test_step": "test-physical-page-frame-allocator",
+      "smoke_test_step": "smoke-physical-page-frame-allocator"
+    },
+    {
+      "id": "37",
+      "canonical_name": "elf64-file-header-parser",
+      "directory": "projects/37-elf64-file-header-parser",
+      "public_entrypoint": "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig",
+      "details": "projects/37-elf64-file-header-parser/details.json",
+      "unit_test_step": "test-elf64-file-header-parser",
+      "smoke_test_step": "smoke-elf64-file-header-parser"
+    },
+    {
+      "id": "38",
+      "canonical_name": "elf64-program-header-parser",
+      "directory": "projects/38-elf64-program-header-parser",
+      "public_entrypoint": "projects/38-elf64-program-header-parser/src/elf64_program_header_parser.zig",
+      "details": "projects/38-elf64-program-header-parser/details.json",
+      "unit_test_step": "test-elf64-program-header-parser",
+      "smoke_test_step": "smoke-elf64-program-header-parser"
     }
   ]
 }

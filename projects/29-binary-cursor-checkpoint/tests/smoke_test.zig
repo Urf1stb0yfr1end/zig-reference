@@ -1,0 +1,2 @@
+const std=@import("std"); const m=@import("binary-cursor-checkpoint"); const rmod=@import("bounded-byte-reader");
+test "external checkpoint consumer" {var r=rmod.BoundedReader.init("ab");const c=m.capture(r);_=try r.readByte();try m.restore(c,&r);try std.testing.expectEqual(@as(usize,0),r.position());var other=rmod.BoundedReader.init("x");try std.testing.expectError(error.IncompatibleInput,m.restore(c,&other));}

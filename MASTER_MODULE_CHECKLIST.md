@@ -61,7 +61,7 @@ A check mark means the repository already has a source implementation for that c
 - [ ] **032. Static graph adjacency** — Algorithms and routing.
 - [ ] **033. Inline byte builder** — Serialization.
 - [ ] **034. Fixed freelist** — Pools and kernels.
-- [ ] **035. Object pool** — Games and embedded systems.
+- [x] **035. Object pool** — Games and embedded systems.
 - [ ] **036. Generational arena** — Compilers and frame allocators.
 - [ ] **037. Fixed histogram** — Metrics and profiling.
 - [ ] **038. Small map** — Configuration and embedded code.
@@ -71,7 +71,7 @@ A check mark means the repository already has a source implementation for that c
 ## 03 — Dynamic memory and ownership
 
 - [x] **041. Dynamic array** — General owned storage.
-- [ ] **042. Owned buffer** — I/O and FFI.
+- [x] **042. Owned buffer** — I/O and FFI.
 - [ ] **043. Resizable string** — CLI and text.
 - [ ] **044. Arena allocator** — Parsing and batch work.
 - [ ] **045. Bump allocator** — Boot code and scratch memory.
@@ -95,7 +95,7 @@ A check mark means the repository already has a source implementation for that c
 
 - [x] **061. Bounded byte reader** — All binary parsers.
 - [ ] **062. Bounded byte writer** — Serialization.
-- [ ] **063. Sub-reader** — Chunked formats.
+- [x] **063. Sub-reader** — Chunked formats.
 - [ ] **064. Bit reader** — Compression and codecs.
 - [ ] **065. Bit writer** — Compression.
 - [ ] **066. Varint decoder** — Protocols and storage.
@@ -105,10 +105,10 @@ A check mark means the repository already has a source implementation for that c
 - [ ] **070. Base64 decoder** — Transport formats.
 - [ ] **071. CRC32 calculator** — Archives and storage.
 - [ ] **072. Checksum stream** — Files and packets.
-- [ ] **073. Length-prefixed field** — Protocols.
-- [ ] **074. TLV decoder** — Device and network protocols.
+- [x] **073. Length-prefixed field** — Protocols.
+- [x] **074. TLV decoder** — Device and network protocols.
 - [ ] **075. TLV encoder** — Protocols.
-- [ ] **076. Binary cursor mark** — Speculative parsers.
+- [x] **076. Binary cursor mark** — Speculative parsers.
 - [ ] **077. Magic-header validator** — File detection.
 - [ ] **078. Padding reader** — Object formats.
 - [ ] **079. Record iterator** — Logs and tables.
@@ -340,7 +340,7 @@ A check mark means the repository already has a source implementation for that c
 - [ ] **275. PNG chunk reader** — Images.
 - [ ] **276. TAR header reader** — Archives.
 - [ ] **277. ZIP directory reader** — Archives.
-- [ ] **278. ELF64 reader** — Loaders.
+- [x] **278. ELF64 reader** — Loaders.
 - [ ] **279. PE header reader** — Loaders.
 - [ ] **280. SQLite-page reader** — Database study.
 

@@ -30,6 +30,17 @@ pub const BoundedReader = struct {
         return self.input.len - self.cursor;
     }
 
+    /// Total extent of the borrowed input. Useful for validating parser checkpoints.
+    pub fn extent(self: BoundedReader) usize {
+        return self.input.len;
+    }
+
+    /// Move to a previously validated position. Invalid positions leave the reader unchanged.
+    pub fn seek(self: *BoundedReader, position_: usize) error{InvalidPosition}!void {
+        if (position_ > self.input.len) return error.InvalidPosition;
+        self.cursor = position_;
+    }
+
     pub fn isAtEnd(self: BoundedReader) bool {
         return self.cursor == self.input.len;
     }
@@ -132,4 +143,13 @@ test "zero-length reads are valid and do not advance" {
 
     try std.testing.expectEqual(@as(usize, 0), (try reader.readBytes(0)).len);
     try std.testing.expectEqual(@as(usize, 0), reader.position());
+}
+
+test "seek validates the input extent and is failure atomic" {
+    var reader = BoundedReader.init("abc");
+    try reader.seek(2);
+    try std.testing.expectEqual(@as(usize, 2), reader.position());
+    try std.testing.expectError(error.InvalidPosition, reader.seek(4));
+    try std.testing.expectEqual(@as(usize, 2), reader.position());
+    try std.testing.expectEqual(@as(usize, 3), reader.extent());
 }

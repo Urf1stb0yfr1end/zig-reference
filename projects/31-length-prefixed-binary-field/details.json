@@ -1,0 +1,896 @@
+{
+  "schema_version": "3.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "31",
+    "canonical_name": "length-prefixed-binary-field",
+    "display_name": "Length Prefixed Binary Field",
+    "directory": "projects/31-length-prefixed-binary-field",
+    "summary": "Decode an explicitly endian length prefix and borrow its bounded payload.",
+    "long_description": "Decode an explicitly endian length prefix and borrow its bounded payload.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "memory-foundation",
+    "subcategory": "",
+    "tags": [
+      "physical-memory",
+      "page-frame",
+      "address",
+      "hypervisor",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Decode an explicitly endian length prefix and borrow its bounded payload.",
+    "secondary": [],
+    "non_goals": [
+      "hidden allocation",
+      "implicit synchronization"
+    ],
+    "problems_solved": [],
+    "future_role": "Reusable boundary infrastructure."
+  },
+  "c_pain": {
+    "summary": "",
+    "common_failure_modes": [],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "",
+    "where_c_degrades": ""
+  },
+  "zig_response": {
+    "summary": "",
+    "language_features": [],
+    "guarantees_made_visible": [],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/31-length-prefixed-binary-field",
+    "implementation": [
+      "projects/31-length-prefixed-binary-field/src/length_prefixed_binary_field.zig"
+    ],
+    "public_entrypoint": "projects/31-length-prefixed-binary-field/src/length_prefixed_binary_field.zig",
+    "readme": "projects/31-length-prefixed-binary-field/README.md",
+    "mastery": "projects/31-length-prefixed-binary-field/MASTERY.md",
+    "details_markdown": "projects/31-length-prefixed-binary-field/DETAILS.md",
+    "details_json": "projects/31-length-prefixed-binary-field/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": [],
+    "unit_tests": [
+      "projects/31-length-prefixed-binary-field/src/length_prefixed_binary_field.zig"
+    ],
+    "smoke_tests": [
+      "projects/31-length-prefixed-binary-field/tests/smoke_test.zig"
+    ],
+    "generated_files": [],
+    "dependency_contracts": [
+      "projects/04-bounded-byte-reader/details.json",
+      "projects/10-checked-integer-cast/details.json",
+      "projects/22-endian-integer-codec/details.json",
+      "projects/29-binary-cursor-checkpoint/details.json",
+      "projects/30-bounded-binary-sub-reader/details.json"
+    ]
+  },
+  "public_surface": {
+    "root_symbols": [
+      "LengthPrefixedField"
+    ],
+    "types": [
+      {
+        "name": "LengthPrefixedField",
+        "kind": "public declaration"
+      }
+    ],
+    "functions": [],
+    "methods": [],
+    "constants": [],
+    "errors": [],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": [],
+    "endpoints": [
+      {
+        "name": "LengthPrefixedField",
+        "kind": "method",
+        "signature": "LengthPrefixedField(comptime Prefix: type, comptime endian: std.builtin.Endian)",
+        "visibility": "public",
+        "summary": "Public LengthPrefixedField operation; exact return type is authoritative in source.",
+        "receiver": {
+          "name": "self",
+          "type": "source-declared receiver or generated type context",
+          "ownership": "borrowed or value as declared",
+          "mutation": "source signature is authoritative"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of LengthPrefixedField.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "read",
+        "kind": "method",
+        "signature": "read(reader: *bounded.BoundedReader)",
+        "visibility": "public",
+        "summary": "Public read operation; exact return type is authoritative in source.",
+        "receiver": {
+          "name": "self",
+          "type": "source-declared receiver or generated type context",
+          "ownership": "borrowed or value as declared",
+          "mutation": "source signature is authoritative"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of read.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "bytes",
+        "kind": "method",
+        "signature": "bytes(self: @This()",
+        "visibility": "public",
+        "summary": "Public bytes operation; exact return type is authoritative in source.",
+        "receiver": {
+          "name": "self",
+          "type": "source-declared receiver or generated type context",
+          "ownership": "borrowed or value as declared",
+          "mutation": "source signature is authoritative"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of bytes.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "subReader",
+        "kind": "method",
+        "signature": "subReader(self: @This()",
+        "visibility": "public",
+        "summary": "Public subReader operation; exact return type is authoritative in source.",
+        "receiver": {
+          "name": "self",
+          "type": "source-declared receiver or generated type context",
+          "ownership": "borrowed or value as declared",
+          "mutation": "source signature is authoritative"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of subReader.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "name": "public endpoint inputs",
+      "type": "see endpoint signatures",
+      "ownership": "copied scalar/value or borrowed according to the Zig type",
+      "lifetime": "for the duration of the call unless the output contract says it is stored",
+      "role": "Copied policies/scalars or explicitly borrowed pointers and slices",
+      "borrowing": "explicit in the Zig type",
+      "mutability": "mutable only when the type permits mutation",
+      "valid_range": "all values satisfying the listed constraints",
+      "alignment": "type-defined",
+      "endianness": "not applicable unless stated by the operation",
+      "format": "Zig value",
+      "required_invariants": [],
+      "validation_performed": [],
+      "accepts_untrusted_input": true,
+      "stored": false,
+      "copied": true,
+      "may_mutate": false,
+      "errors_on_invalid_input": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "public endpoint outputs",
+      "type": "see endpoint signatures",
+      "ownership": "not applicable",
+      "lifetime": "program",
+      "meaning": "Copied values or documented borrowed views",
+      "borrowed_from": "",
+      "cleanup_required": false,
+      "cleanup_responsibility": "none",
+      "invalidation_conditions": [],
+      "aliasing": "not applicable",
+      "borrows_from_module": false,
+      "borrows_from_input": false,
+      "valid_after_mutation": "not applicable",
+      "absence_meaning": "not applicable"
+    }
+  ],
+  "state": {
+    "fields": [],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "PageSize is 4096",
+      "produced addresses are aligned"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [
+      "scalar frame index"
+    ],
+    "borrows": [],
+    "copies": [],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [],
+    "optional_empty_results": [],
+    "failure_atomicity": "Failed parsing and mutation preserve externally observable state unless source explicitly documents a committed transition.",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [
+      {
+        "module": "bounded-byte-reader",
+        "path": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig",
+        "symbol": "BoundedReader",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "checked-integer-cast",
+        "path": "projects/10-checked-integer-cast/src/checked_integer_cast.zig",
+        "symbol": "checkedIntegerCast",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "endian-integer-codec",
+        "path": "projects/22-endian-integer-codec/src/endian_integer_codec.zig",
+        "symbol": "EndianIntegerCodec",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "binary-cursor-checkpoint",
+        "path": "projects/29-binary-cursor-checkpoint/src/binary_cursor_checkpoint.zig",
+        "symbol": "BinaryCursorCheckpoint",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "bounded-binary-sub-reader",
+        "path": "projects/30-bounded-binary-sub-reader/src/bounded_binary_sub_reader.zig",
+        "symbol": "BoundedBinarySubReader",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      }
+    ],
+    "standard_library": [
+      "std.math.mul"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": []
+  },
+  "dependency_contracts": [
+    {
+      "module": "bounded-byte-reader",
+      "directory": "projects/04-bounded-byte-reader",
+      "import_name": "bounded-byte-reader",
+      "import_path": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig",
+      "symbols_used": [
+        "BoundedReader"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/04-bounded-byte-reader/details.json"
+    },
+    {
+      "module": "checked-integer-cast",
+      "directory": "projects/10-checked-integer-cast",
+      "import_name": "checked-integer-cast",
+      "import_path": "projects/10-checked-integer-cast/src/checked_integer_cast.zig",
+      "symbols_used": [
+        "checkedIntegerCast"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/10-checked-integer-cast/details.json"
+    },
+    {
+      "module": "endian-integer-codec",
+      "directory": "projects/22-endian-integer-codec",
+      "import_name": "endian-integer-codec",
+      "import_path": "projects/22-endian-integer-codec/src/endian_integer_codec.zig",
+      "symbols_used": [
+        "EndianIntegerCodec"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/22-endian-integer-codec/details.json"
+    },
+    {
+      "module": "binary-cursor-checkpoint",
+      "directory": "projects/29-binary-cursor-checkpoint",
+      "import_name": "binary-cursor-checkpoint",
+      "import_path": "projects/29-binary-cursor-checkpoint/src/binary_cursor_checkpoint.zig",
+      "symbols_used": [
+        "BinaryCursorCheckpoint"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/29-binary-cursor-checkpoint/details.json"
+    },
+    {
+      "module": "bounded-binary-sub-reader",
+      "directory": "projects/30-bounded-binary-sub-reader",
+      "import_name": "bounded-binary-sub-reader",
+      "import_path": "projects/30-bounded-binary-sub-reader/src/bounded_binary_sub_reader.zig",
+      "symbols_used": [
+        "BoundedBinarySubReader"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/30-bounded-binary-sub-reader/details.json"
+    }
+  ],
+  "expected_dependents": [
+    "future composition modules"
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "length-prefixed-binary-field",
+    "import_path": "projects/31-length-prefixed-binary-field/src/length_prefixed_binary_field.zig",
+    "import_configuration": "Use @import(\"length-prefixed-binary-field\") through build.zig.",
+    "minimal_example": "",
+    "integration_patterns": [],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "value type",
+    "reentrant": "unknown",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [
+      "page policy currently architecture-neutral but fixed at 4 KiB"
+    ],
+    "allocator_assumptions": "",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "",
+    "no_std_equivalent": ""
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-length-prefixed-binary-field",
+    "commands": [
+      "zig build test-length-prefixed-binary-field",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "normal, empty/boundary, invalid, and failure-atomic behavior"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": [],
+    "smoke_test_commands": [
+      "zig build smoke-length-prefixed-binary-field",
+      "zig build smoke"
+    ],
+    "smoke_test_behaviors": [
+      "all public declarations are recursively referenced and compiled as an external consumer",
+      "zero private-path access: only the named public module import is available"
+    ],
+    "smoke_test_dependencies": [
+      "bounded-byte-reader",
+      "checked-integer-cast",
+      "endian-integer-codec",
+      "binary-cursor-checkpoint",
+      "bounded-binary-sub-reader"
+    ]
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig 0.14.0 is unavailable in the execution environment",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Local validation pending."
+    ],
+    "status_dimensions": {
+      "implementation_present": true,
+      "contract_complete": true,
+      "contract_formatted": true,
+      "unit_tests_present": true,
+      "smoke_test_present": true,
+      "contract_checker_passed": false,
+      "compiler_validated": false,
+      "unit_tests_passed": false,
+      "smoke_tests_passed": false
+    }
+  },
+  "documentation": {
+    "read_order": [
+      "projects/31-length-prefixed-binary-field/details.json",
+      "projects/31-length-prefixed-binary-field/DETAILS.md",
+      "projects/31-length-prefixed-binary-field/README.md",
+      "projects/31-length-prefixed-binary-field/MASTERY.md",
+      "projects/31-length-prefixed-binary-field/src/length_prefixed_binary_field.zig"
+    ],
+    "examples_covered": [],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [],
+    "related_modules": [],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Synchronize source, tests, contracts, catalog, and dependents.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [],
+    "synchronization_requirements": [],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "physical frame conversion",
+      "page number to address"
+    ],
+    "problems": [],
+    "inputs": [],
+    "outputs": [],
+    "environments": [],
+    "keywords": [
+      "PFN",
+      "physical page",
+      "4096",
+      "page frame"
+    ],
+    "grep_terms": [
+      "physical-page-frame-number-and-address-conversion",
+      "PageSize",
+      "PhysicalPageFrameNumber"
+    ],
+    "natural_language_queries": [
+      "How do I checked conversion between 4 kib physical page-frame indices and physical addresses?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "memory-foundation",
+    "reuses_modules": [
+      "bounded-byte-reader",
+      "checked-integer-cast",
+      "endian-integer-codec",
+      "binary-cursor-checkpoint",
+      "bounded-binary-sub-reader"
+    ],
+    "guarantees_inherited": [
+      "bounds, arithmetic, ownership, and state guarantees from declared dependencies"
+    ],
+    "future_modules_enabled": [
+      "larger parsers, allocators, loaders, and systems"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Decode an explicitly endian length prefix and borrow its bounded payload.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-length-prefixed-binary-field",
+      "zig build smoke-length-prefixed-binary-field"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ],
+    "smoke_test_before_integration": "Run zig build smoke-length-prefixed-binary-field."
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "LengthPrefixedField",
+        "file": "projects/31-length-prefixed-binary-field/src/length_prefixed_binary_field.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "module unit tests",
+        "file": "projects/31-length-prefixed-binary-field/src/length_prefixed_binary_field.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": [
+      {
+        "module": "bounded-byte-reader",
+        "path": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig",
+        "symbol": "BoundedReader",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "checked-integer-cast",
+        "path": "projects/10-checked-integer-cast/src/checked_integer_cast.zig",
+        "symbol": "checkedIntegerCast",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "endian-integer-codec",
+        "path": "projects/22-endian-integer-codec/src/endian_integer_codec.zig",
+        "symbol": "EndianIntegerCodec",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "binary-cursor-checkpoint",
+        "path": "projects/29-binary-cursor-checkpoint/src/binary_cursor_checkpoint.zig",
+        "symbol": "BinaryCursorCheckpoint",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "bounded-binary-sub-reader",
+        "path": "projects/30-bounded-binary-sub-reader/src/bounded_binary_sub_reader.zig",
+        "symbol": "BoundedBinarySubReader",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      }
+    ],
+    "smoke_tests_to_public_symbols": [
+      {
+        "file": "projects/31-length-prefixed-binary-field/tests/smoke_test.zig",
+        "symbols": [
+          "LengthPrefixedField"
+        ]
+      }
+    ],
+    "smoke_tests_to_dependencies": [
+      {
+        "file": "projects/31-length-prefixed-binary-field/tests/smoke_test.zig",
+        "dependencies": [
+          "bounded-byte-reader",
+          "checked-integer-cast",
+          "endian-integer-codec",
+          "binary-cursor-checkpoint",
+          "bounded-binary-sub-reader"
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  },
+  "smoke_test": {
+    "required": true,
+    "implemented": true,
+    "status": "present-unverified",
+    "source_path": "projects/31-length-prefixed-binary-field/tests/smoke_test.zig",
+    "build_step": "smoke-length-prefixed-binary-field",
+    "commands": [
+      "zig build smoke-length-prefixed-binary-field",
+      "zig build smoke"
+    ],
+    "public_import_used": "length-prefixed-binary-field",
+    "public_symbols_exercised": [
+      "LengthPrefixedField"
+    ],
+    "successful_operations": [
+      "all public declarations are recursively referenced and compiled as an external consumer"
+    ],
+    "failure_or_boundary_operations": [
+      "zero private-path access: only the named public module import is available"
+    ],
+    "cleanup_exercised": [
+      "compile-time public declaration traversal requires no cleanup"
+    ],
+    "repository_dependencies_exercised": [
+      "bounded-byte-reader",
+      "checked-integer-cast",
+      "endian-integer-codec",
+      "binary-cursor-checkpoint",
+      "bounded-binary-sub-reader"
+    ],
+    "hosted_environment_required": "Zig test runner",
+    "freestanding_environment_required": "not required for smoke execution",
+    "fixtures": [],
+    "expected_exit_status": "0",
+    "expected_output": [],
+    "forbidden_private_access": true,
+    "last_run": "",
+    "last_result": "unverified",
+    "last_validated_commit": "",
+    "compiler_version": "",
+    "known_failures": [],
+    "notes": [
+      "Runtime behavior remains covered by the module unit tests; this smoke test proves external named-import usability and public declaration compilation."
+    ]
+  }
+}

@@ -1,0 +1,2 @@
+const std=@import("std");const m=@import("length-prefixed-binary-field");const rmod=@import("bounded-byte-reader");
+test "external field consumer" {var r=rmod.BoundedReader.init(&.{1,7});const f=try m.LengthPrefixedField(u8,.little).read(&r);try std.testing.expectEqualSlices(u8,&.{7},f.bytes());var bad=rmod.BoundedReader.init(&.{2,7});try std.testing.expectError(error.UnexpectedEnd,m.LengthPrefixedField(u8,.little).read(&bad));}

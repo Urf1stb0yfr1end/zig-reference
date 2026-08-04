@@ -1,3 +1,4 @@
+// Allocator/growth failures include OutOfMemory or Overflow.
 const std = @import("std");
 const dynamic_array = @import("dynamic-array");
 
