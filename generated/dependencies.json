@@ -1,0 +1,110 @@
+{
+  "dependencies": {
+    "aligned-address-and-size-helpers": [],
+    "binary-cursor-checkpoint": [
+      "bounded-byte-reader"
+    ],
+    "bit-set": [],
+    "bitmap-allocator": [
+      "bit-set"
+    ],
+    "bounded-binary-sub-reader": [
+      "binary-cursor-checkpoint",
+      "bounded-byte-reader"
+    ],
+    "bounded-byte-reader": [],
+    "bounded-integer": [],
+    "byte-writer": [
+      "dynamic-array"
+    ],
+    "checked-half-open-range": [],
+    "checked-integer-cast": [],
+    "distinct-memory-address-types": [],
+    "dynamic-array": [],
+    "elf64-file-header-parser": [
+      "binary-cursor-checkpoint",
+      "bounded-byte-reader",
+      "checked-half-open-range",
+      "checked-integer-cast",
+      "endian-integer-codec",
+      "validated-enum-decoder"
+    ],
+    "elf64-program-header-parser": [
+      "aligned-address-and-size-helpers",
+      "binary-cursor-checkpoint",
+      "bounded-binary-sub-reader",
+      "bounded-byte-reader",
+      "checked-half-open-range",
+      "checked-integer-cast",
+      "distinct-memory-address-types",
+      "elf64-file-header-parser",
+      "endian-integer-codec",
+      "fixed-capacity-vector",
+      "validated-bit-flags",
+      "validated-enum-decoder"
+    ],
+    "endian-integer-codec": [],
+    "fixed-capacity-object-pool": [
+      "bitmap-allocator",
+      "generational-handles"
+    ],
+    "fixed-capacity-vector": [],
+    "fourcc-code": [],
+    "generational-handles": [],
+    "length-prefixed-binary-field": [
+      "binary-cursor-checkpoint",
+      "bounded-binary-sub-reader",
+      "bounded-byte-reader",
+      "checked-integer-cast",
+      "endian-integer-codec"
+    ],
+    "nonzero-integer": [],
+    "optional-typed-handle": [],
+    "owned-byte-buffer": [
+      "byte-writer",
+      "dynamic-array"
+    ],
+    "physical-memory-region-set": [
+      "checked-half-open-range",
+      "distinct-memory-address-types",
+      "fixed-capacity-vector",
+      "physical-page-frame-number-and-address-conversion",
+      "validated-enum-decoder"
+    ],
+    "physical-page-frame-allocator": [
+      "bit-set",
+      "bitmap-allocator",
+      "checked-half-open-range",
+      "distinct-memory-address-types",
+      "physical-memory-region-set",
+      "physical-page-frame-number-and-address-conversion"
+    ],
+    "physical-page-frame-number-and-address-conversion": [
+      "distinct-memory-address-types"
+    ],
+    "ring-buffer": [],
+    "saturating-counter": [],
+    "semantic-version": [],
+    "source-span": [],
+    "stack": [
+      "dynamic-array"
+    ],
+    "state-machine": [],
+    "tagged-result": [],
+    "type-length-value-decoder": [
+      "binary-cursor-checkpoint",
+      "bounded-binary-sub-reader",
+      "bounded-byte-reader",
+      "checked-integer-cast",
+      "endian-integer-codec",
+      "length-prefixed-binary-field"
+    ],
+    "unit-safe-quantity": [],
+    "validated-ascii-byte": [],
+    "validated-bit-flags": [],
+    "validated-enum-decoder": [],
+    "wrapping-sequence-number": []
+  },
+  "generated": true,
+  "generator": "tools/build-repository-index.py"
+}

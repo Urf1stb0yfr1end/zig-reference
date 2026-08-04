@@ -1,0 +1,3 @@
+# Evidence-derived maturity
+
+Maturity is calculated, never self-awarded: 0 Proposed; 1 Implemented; 2 Contracted; 3 Unit validated; 4 externally smoke tested; 5 applicable property, fuzz, or failure-injection tested; 6 reused by a repository module; 7 system proven by a recipe or flagship; 8 independently reviewed; 9 Stable. A level requires its own evidence and all preceding applicable levels. Missing independent review caps maturity below 8. Generated status presently credits only committed structure and successful textual validation evidence, deliberately understating historical runs that have no evidence record.

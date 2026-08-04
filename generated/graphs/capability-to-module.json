@@ -1,0 +1,1574 @@
+{
+  "capabilities": [
+    {
+      "capability": "4096",
+      "modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ]
+    },
+    {
+      "capability": "address",
+      "modules": [
+        "aligned-address-and-size-helpers",
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "distinct-memory-address-types",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ]
+    },
+    {
+      "capability": "align down",
+      "modules": [
+        "aligned-address-and-size-helpers"
+      ]
+    },
+    {
+      "capability": "align up",
+      "modules": [
+        "aligned-address-and-size-helpers"
+      ]
+    },
+    {
+      "capability": "alignment",
+      "modules": [
+        "aligned-address-and-size-helpers"
+      ]
+    },
+    {
+      "capability": "alignment check",
+      "modules": [
+        "aligned-address-and-size-helpers"
+      ]
+    },
+    {
+      "capability": "alignment helpers",
+      "modules": [
+        "aligned-address-and-size-helpers"
+      ]
+    },
+    {
+      "capability": "allocation-free container",
+      "modules": [
+        "fixed-capacity-vector"
+      ]
+    },
+    {
+      "capability": "allocator",
+      "modules": [
+        "bitmap-allocator",
+        "dynamic-array",
+        "stack"
+      ]
+    },
+    {
+      "capability": "allocator-backed",
+      "modules": [
+        "dynamic-array"
+      ]
+    },
+    {
+      "capability": "api",
+      "modules": [
+        "tagged-result"
+      ]
+    },
+    {
+      "capability": "array list",
+      "modules": [
+        "dynamic-array"
+      ]
+    },
+    {
+      "capability": "ascii",
+      "modules": [
+        "validated-ascii-byte"
+      ]
+    },
+    {
+      "capability": "ascii classifier",
+      "modules": [
+        "validated-ascii-byte"
+      ]
+    },
+    {
+      "capability": "big endian",
+      "modules": [
+        "endian-integer-codec"
+      ]
+    },
+    {
+      "capability": "binary decoding",
+      "modules": [
+        "bounded-byte-reader"
+      ]
+    },
+    {
+      "capability": "binary parser",
+      "modules": [
+        "bounded-byte-reader"
+      ]
+    },
+    {
+      "capability": "bit flags",
+      "modules": [
+        "validated-bit-flags"
+      ]
+    },
+    {
+      "capability": "bit set",
+      "modules": [
+        "bit-set"
+      ]
+    },
+    {
+      "capability": "bitmap",
+      "modules": [
+        "bit-set",
+        "bitmap-allocator"
+      ]
+    },
+    {
+      "capability": "bitmap allocation",
+      "modules": [
+        "bitmap-allocator"
+      ]
+    },
+    {
+      "capability": "bitmap allocator",
+      "modules": [
+        "bitmap-allocator"
+      ]
+    },
+    {
+      "capability": "bitset",
+      "modules": [
+        "bit-set"
+      ]
+    },
+    {
+      "capability": "borrowed",
+      "modules": [
+        "bounded-byte-reader"
+      ]
+    },
+    {
+      "capability": "bounded array",
+      "modules": [
+        "fixed-capacity-vector"
+      ]
+    },
+    {
+      "capability": "bounded byte reading",
+      "modules": [
+        "bounded-byte-reader"
+      ]
+    },
+    {
+      "capability": "bounded event queue",
+      "modules": [
+        "ring-buffer"
+      ]
+    },
+    {
+      "capability": "bounded input",
+      "modules": [
+        "bounded-byte-reader"
+      ]
+    },
+    {
+      "capability": "bounded integer",
+      "modules": [
+        "bounded-integer"
+      ]
+    },
+    {
+      "capability": "bounded queue",
+      "modules": [
+        "ring-buffer"
+      ]
+    },
+    {
+      "capability": "bounded sequence",
+      "modules": [
+        "fixed-capacity-vector"
+      ]
+    },
+    {
+      "capability": "bounds",
+      "modules": [
+        "bounded-byte-reader",
+        "checked-half-open-range"
+      ]
+    },
+    {
+      "capability": "byte order",
+      "modules": [
+        "endian-integer-codec"
+      ]
+    },
+    {
+      "capability": "byte range diagnostic",
+      "modules": [
+        "source-span"
+      ]
+    },
+    {
+      "capability": "byte reader",
+      "modules": [
+        "bounded-byte-reader"
+      ]
+    },
+    {
+      "capability": "bytes",
+      "modules": [
+        "unit-safe-quantity"
+      ]
+    },
+    {
+      "capability": "call stack",
+      "modules": [
+        "stack"
+      ]
+    },
+    {
+      "capability": "cast",
+      "modules": [
+        "checked-integer-cast"
+      ]
+    },
+    {
+      "capability": "character validation",
+      "modules": [
+        "validated-ascii-byte"
+      ]
+    },
+    {
+      "capability": "checked address arithmetic",
+      "modules": [
+        "distinct-memory-address-types"
+      ]
+    },
+    {
+      "capability": "checked cast",
+      "modules": [
+        "checked-integer-cast"
+      ]
+    },
+    {
+      "capability": "checked integer cast",
+      "modules": [
+        "checked-integer-cast"
+      ]
+    },
+    {
+      "capability": "checked interval",
+      "modules": [
+        "checked-half-open-range"
+      ]
+    },
+    {
+      "capability": "checked range",
+      "modules": [
+        "checked-half-open-range"
+      ]
+    },
+    {
+      "capability": "circular buffer",
+      "modules": [
+        "ring-buffer"
+      ]
+    },
+    {
+      "capability": "circular queue",
+      "modules": [
+        "ring-buffer"
+      ]
+    },
+    {
+      "capability": "circular-buffer",
+      "modules": [
+        "ring-buffer"
+      ]
+    },
+    {
+      "capability": "clamped counter",
+      "modules": [
+        "saturating-counter"
+      ]
+    },
+    {
+      "capability": "clamped quota",
+      "modules": [
+        "saturating-counter"
+      ]
+    },
+    {
+      "capability": "codec",
+      "modules": [
+        "endian-integer-codec"
+      ]
+    },
+    {
+      "capability": "compact",
+      "modules": [
+        "bit-set"
+      ]
+    },
+    {
+      "capability": "compact flags",
+      "modules": [
+        "bit-set"
+      ]
+    },
+    {
+      "capability": "compatibility check",
+      "modules": [
+        "semantic-version"
+      ]
+    },
+    {
+      "capability": "composition",
+      "modules": [
+        "stack"
+      ]
+    },
+    {
+      "capability": "comptime",
+      "modules": [
+        "state-machine"
+      ]
+    },
+    {
+      "capability": "contiguous",
+      "modules": [
+        "dynamic-array"
+      ]
+    },
+    {
+      "capability": "counter",
+      "modules": [
+        "saturating-counter"
+      ]
+    },
+    {
+      "capability": "cursor",
+      "modules": [
+        "bounded-byte-reader"
+      ]
+    },
+    {
+      "capability": "decoder",
+      "modules": [
+        "validated-enum-decoder"
+      ]
+    },
+    {
+      "capability": "dfs",
+      "modules": [
+        "stack"
+      ]
+    },
+    {
+      "capability": "dimensioned scalar",
+      "modules": [
+        "unit-safe-quantity"
+      ]
+    },
+    {
+      "capability": "double-free detection",
+      "modules": [
+        "bitmap-allocator"
+      ]
+    },
+    {
+      "capability": "dynamic array",
+      "modules": [
+        "dynamic-array"
+      ]
+    },
+    {
+      "capability": "endian integer decode",
+      "modules": [
+        "endian-integer-codec"
+      ]
+    },
+    {
+      "capability": "endian integer encode",
+      "modules": [
+        "endian-integer-codec"
+      ]
+    },
+    {
+      "capability": "endian reader",
+      "modules": [
+        "bounded-byte-reader"
+      ]
+    },
+    {
+      "capability": "endianness",
+      "modules": [
+        "bounded-byte-reader",
+        "endian-integer-codec"
+      ]
+    },
+    {
+      "capability": "enum",
+      "modules": [
+        "validated-enum-decoder"
+      ]
+    },
+    {
+      "capability": "enum decoder",
+      "modules": [
+        "validated-enum-decoder"
+      ]
+    },
+    {
+      "capability": "explicit endian integers",
+      "modules": [
+        "bounded-byte-reader"
+      ]
+    },
+    {
+      "capability": "explicit state transitions",
+      "modules": [
+        "state-machine"
+      ]
+    },
+    {
+      "capability": "failure-atomic numeric mutation",
+      "modules": [
+        "bounded-integer"
+      ]
+    },
+    {
+      "capability": "failure-atomic transition",
+      "modules": [
+        "state-machine"
+      ]
+    },
+    {
+      "capability": "ffi",
+      "modules": [
+        "validated-enum-decoder"
+      ]
+    },
+    {
+      "capability": "fifo",
+      "modules": [
+        "ring-buffer"
+      ]
+    },
+    {
+      "capability": "fifo queue",
+      "modules": [
+        "ring-buffer"
+      ]
+    },
+    {
+      "capability": "files",
+      "modules": [
+        "checked-half-open-range"
+      ]
+    },
+    {
+      "capability": "fixed vector",
+      "modules": [
+        "fixed-capacity-vector"
+      ]
+    },
+    {
+      "capability": "fixed-capacity",
+      "modules": [
+        "bitmap-allocator",
+        "fixed-capacity-vector",
+        "ring-buffer"
+      ]
+    },
+    {
+      "capability": "fixed-capacity handle table",
+      "modules": [
+        "generational-handles"
+      ]
+    },
+    {
+      "capability": "fixed-capacity slot allocation",
+      "modules": [
+        "bitmap-allocator"
+      ]
+    },
+    {
+      "capability": "flags",
+      "modules": [
+        "bit-set",
+        "validated-bit-flags"
+      ]
+    },
+    {
+      "capability": "format",
+      "modules": [
+        "fourcc-code"
+      ]
+    },
+    {
+      "capability": "foundation",
+      "modules": [
+        "fixed-capacity-vector"
+      ]
+    },
+    {
+      "capability": "four byte signature",
+      "modules": [
+        "fourcc-code"
+      ]
+    },
+    {
+      "capability": "fourcc",
+      "modules": [
+        "fourcc-code"
+      ]
+    },
+    {
+      "capability": "freestanding",
+      "modules": [
+        "aligned-address-and-size-helpers",
+        "binary-cursor-checkpoint",
+        "bit-set",
+        "bitmap-allocator",
+        "bounded-binary-sub-reader",
+        "bounded-integer",
+        "checked-half-open-range",
+        "checked-integer-cast",
+        "distinct-memory-address-types",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "endian-integer-codec",
+        "fixed-capacity-object-pool",
+        "fixed-capacity-vector",
+        "fourcc-code",
+        "generational-handles",
+        "length-prefixed-binary-field",
+        "nonzero-integer",
+        "optional-typed-handle",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "ring-buffer",
+        "saturating-counter",
+        "state-machine",
+        "tagged-result",
+        "type-length-value-decoder",
+        "unit-safe-quantity",
+        "validated-ascii-byte",
+        "validated-bit-flags",
+        "validated-enum-decoder",
+        "wrapping-sequence-number"
+      ]
+    },
+    {
+      "capability": "generation",
+      "modules": [
+        "generational-handles"
+      ]
+    },
+    {
+      "capability": "generational handles",
+      "modules": [
+        "generational-handles"
+      ]
+    },
+    {
+      "capability": "generic",
+      "modules": [
+        "dynamic-array",
+        "fixed-capacity-vector"
+      ]
+    },
+    {
+      "capability": "generic vector",
+      "modules": [
+        "dynamic-array"
+      ]
+    },
+    {
+      "capability": "growable array",
+      "modules": [
+        "dynamic-array"
+      ]
+    },
+    {
+      "capability": "growable buffer",
+      "modules": [
+        "dynamic-array"
+      ]
+    },
+    {
+      "capability": "growable stack",
+      "modules": [
+        "stack"
+      ]
+    },
+    {
+      "capability": "growth",
+      "modules": [
+        "dynamic-array"
+      ]
+    },
+    {
+      "capability": "guest address separation",
+      "modules": [
+        "distinct-memory-address-types"
+      ]
+    },
+    {
+      "capability": "guest physical",
+      "modules": [
+        "distinct-memory-address-types"
+      ]
+    },
+    {
+      "capability": "guest virtual",
+      "modules": [
+        "distinct-memory-address-types"
+      ]
+    },
+    {
+      "capability": "guest-memory",
+      "modules": [
+        "distinct-memory-address-types"
+      ]
+    },
+    {
+      "capability": "half-open interval",
+      "modules": [
+        "checked-half-open-range"
+      ]
+    },
+    {
+      "capability": "half-open range",
+      "modules": [
+        "checked-half-open-range"
+      ]
+    },
+    {
+      "capability": "handle",
+      "modules": [
+        "optional-typed-handle"
+      ]
+    },
+    {
+      "capability": "handle table",
+      "modules": [
+        "generational-handles"
+      ]
+    },
+    {
+      "capability": "handles",
+      "modules": [
+        "generational-handles"
+      ]
+    },
+    {
+      "capability": "hypervisor",
+      "modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "distinct-memory-address-types",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ]
+    },
+    {
+      "capability": "index allocator",
+      "modules": [
+        "bitmap-allocator"
+      ]
+    },
+    {
+      "capability": "inline storage",
+      "modules": [
+        "fixed-capacity-vector"
+      ]
+    },
+    {
+      "capability": "int to enum",
+      "modules": [
+        "validated-enum-decoder"
+      ]
+    },
+    {
+      "capability": "integer",
+      "modules": [
+        "bounded-integer",
+        "checked-integer-cast",
+        "endian-integer-codec",
+        "nonzero-integer"
+      ]
+    },
+    {
+      "capability": "integer conversion",
+      "modules": [
+        "checked-integer-cast"
+      ]
+    },
+    {
+      "capability": "integer tag validation",
+      "modules": [
+        "validated-enum-decoder"
+      ]
+    },
+    {
+      "capability": "intersection",
+      "modules": [
+        "checked-half-open-range"
+      ]
+    },
+    {
+      "capability": "lexer",
+      "modules": [
+        "source-span",
+        "validated-ascii-byte"
+      ]
+    },
+    {
+      "capability": "lifecycle",
+      "modules": [
+        "state-machine"
+      ]
+    },
+    {
+      "capability": "lifecycle validation",
+      "modules": [
+        "state-machine"
+      ]
+    },
+    {
+      "capability": "lifo",
+      "modules": [
+        "stack"
+      ]
+    },
+    {
+      "capability": "lifo stack",
+      "modules": [
+        "stack"
+      ]
+    },
+    {
+      "capability": "little endian",
+      "modules": [
+        "endian-integer-codec"
+      ]
+    },
+    {
+      "capability": "magic code",
+      "modules": [
+        "fourcc-code"
+      ]
+    },
+    {
+      "capability": "major minor patch",
+      "modules": [
+        "semantic-version"
+      ]
+    },
+    {
+      "capability": "mask",
+      "modules": [
+        "validated-bit-flags"
+      ]
+    },
+    {
+      "capability": "memory",
+      "modules": [
+        "checked-half-open-range"
+      ]
+    },
+    {
+      "capability": "memory region",
+      "modules": [
+        "checked-half-open-range"
+      ]
+    },
+    {
+      "capability": "modulo counter",
+      "modules": [
+        "wrapping-sequence-number"
+      ]
+    },
+    {
+      "capability": "non-wrapping arithmetic",
+      "modules": [
+        "saturating-counter"
+      ]
+    },
+    {
+      "capability": "non-zero integer",
+      "modules": [
+        "nonzero-integer"
+      ]
+    },
+    {
+      "capability": "nonzero",
+      "modules": [
+        "nonzero-integer"
+      ]
+    },
+    {
+      "capability": "nonzero integer",
+      "modules": [
+        "nonzero-integer"
+      ]
+    },
+    {
+      "capability": "offset",
+      "modules": [
+        "source-span"
+      ]
+    },
+    {
+      "capability": "opaque handle",
+      "modules": [
+        "optional-typed-handle"
+      ]
+    },
+    {
+      "capability": "operand stack",
+      "modules": [
+        "stack"
+      ]
+    },
+    {
+      "capability": "optional",
+      "modules": [
+        "optional-typed-handle"
+      ]
+    },
+    {
+      "capability": "optional handle",
+      "modules": [
+        "optional-typed-handle"
+      ]
+    },
+    {
+      "capability": "optional resource id",
+      "modules": [
+        "optional-typed-handle"
+      ]
+    },
+    {
+      "capability": "ordering",
+      "modules": [
+        "semantic-version"
+      ]
+    },
+    {
+      "capability": "overlap detection",
+      "modules": [
+        "checked-half-open-range"
+      ]
+    },
+    {
+      "capability": "owned contiguous storage",
+      "modules": [
+        "dynamic-array"
+      ]
+    },
+    {
+      "capability": "ownership",
+      "modules": [
+        "dynamic-array"
+      ]
+    },
+    {
+      "capability": "padding",
+      "modules": [
+        "aligned-address-and-size-helpers"
+      ]
+    },
+    {
+      "capability": "padding calculation",
+      "modules": [
+        "aligned-address-and-size-helpers"
+      ]
+    },
+    {
+      "capability": "page",
+      "modules": [
+        "aligned-address-and-size-helpers"
+      ]
+    },
+    {
+      "capability": "page bitmap",
+      "modules": [
+        "bit-set"
+      ]
+    },
+    {
+      "capability": "page frame",
+      "modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ]
+    },
+    {
+      "capability": "page number to address",
+      "modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ]
+    },
+    {
+      "capability": "page-frame",
+      "modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ]
+    },
+    {
+      "capability": "pages",
+      "modules": [
+        "unit-safe-quantity"
+      ]
+    },
+    {
+      "capability": "parser",
+      "modules": [
+        "bounded-byte-reader",
+        "source-span",
+        "stack",
+        "validated-enum-decoder"
+      ]
+    },
+    {
+      "capability": "parser stack",
+      "modules": [
+        "stack"
+      ]
+    },
+    {
+      "capability": "permission bits",
+      "modules": [
+        "bit-set"
+      ]
+    },
+    {
+      "capability": "permissions",
+      "modules": [
+        "validated-bit-flags"
+      ]
+    },
+    {
+      "capability": "pfn",
+      "modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ]
+    },
+    {
+      "capability": "physical address",
+      "modules": [
+        "distinct-memory-address-types"
+      ]
+    },
+    {
+      "capability": "physical frame conversion",
+      "modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ]
+    },
+    {
+      "capability": "physical page",
+      "modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ]
+    },
+    {
+      "capability": "physical-memory",
+      "modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "distinct-memory-address-types",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ]
+    },
+    {
+      "capability": "protocol",
+      "modules": [
+        "semantic-version",
+        "wrapping-sequence-number"
+      ]
+    },
+    {
+      "capability": "protocols",
+      "modules": [
+        "validated-bit-flags"
+      ]
+    },
+    {
+      "capability": "quantity",
+      "modules": [
+        "unit-safe-quantity"
+      ]
+    },
+    {
+      "capability": "queue",
+      "modules": [
+        "ring-buffer"
+      ]
+    },
+    {
+      "capability": "quota",
+      "modules": [
+        "saturating-counter"
+      ]
+    },
+    {
+      "capability": "quota counter",
+      "modules": [
+        "saturating-counter"
+      ]
+    },
+    {
+      "capability": "range",
+      "modules": [
+        "bounded-integer",
+        "checked-half-open-range"
+      ]
+    },
+    {
+      "capability": "range cast",
+      "modules": [
+        "checked-integer-cast"
+      ]
+    },
+    {
+      "capability": "range type",
+      "modules": [
+        "bounded-integer"
+      ]
+    },
+    {
+      "capability": "range-check",
+      "modules": [
+        "checked-integer-cast"
+      ]
+    },
+    {
+      "capability": "range-validated scalar",
+      "modules": [
+        "bounded-integer"
+      ]
+    },
+    {
+      "capability": "reader",
+      "modules": [
+        "bounded-byte-reader"
+      ]
+    },
+    {
+      "capability": "register mask validation",
+      "modules": [
+        "validated-bit-flags"
+      ]
+    },
+    {
+      "capability": "registers",
+      "modules": [
+        "validated-bit-flags"
+      ]
+    },
+    {
+      "capability": "resource id",
+      "modules": [
+        "optional-typed-handle"
+      ]
+    },
+    {
+      "capability": "result",
+      "modules": [
+        "tagged-result"
+      ]
+    },
+    {
+      "capability": "riff",
+      "modules": [
+        "fourcc-code"
+      ]
+    },
+    {
+      "capability": "ring buffer",
+      "modules": [
+        "ring-buffer"
+      ]
+    },
+    {
+      "capability": "rollover",
+      "modules": [
+        "wrapping-sequence-number"
+      ]
+    },
+    {
+      "capability": "safe narrowing",
+      "modules": [
+        "checked-integer-cast"
+      ]
+    },
+    {
+      "capability": "saturating counter",
+      "modules": [
+        "saturating-counter"
+      ]
+    },
+    {
+      "capability": "saturating-arithmetic",
+      "modules": [
+        "saturating-counter"
+      ]
+    },
+    {
+      "capability": "schema",
+      "modules": [
+        "semantic-version"
+      ]
+    },
+    {
+      "capability": "semantic version",
+      "modules": [
+        "semantic-version"
+      ]
+    },
+    {
+      "capability": "sentinel elimination",
+      "modules": [
+        "nonzero-integer"
+      ]
+    },
+    {
+      "capability": "sequence",
+      "modules": [
+        "wrapping-sequence-number"
+      ]
+    },
+    {
+      "capability": "sequence number",
+      "modules": [
+        "wrapping-sequence-number"
+      ]
+    },
+    {
+      "capability": "signature",
+      "modules": [
+        "fourcc-code"
+      ]
+    },
+    {
+      "capability": "signedness validation",
+      "modules": [
+        "checked-integer-cast"
+      ]
+    },
+    {
+      "capability": "size",
+      "modules": [
+        "aligned-address-and-size-helpers"
+      ]
+    },
+    {
+      "capability": "slice",
+      "modules": [
+        "fixed-capacity-vector"
+      ]
+    },
+    {
+      "capability": "slot allocator",
+      "modules": [
+        "bitmap-allocator"
+      ]
+    },
+    {
+      "capability": "slot map",
+      "modules": [
+        "generational-handles"
+      ]
+    },
+    {
+      "capability": "slot-table",
+      "modules": [
+        "generational-handles"
+      ]
+    },
+    {
+      "capability": "slots",
+      "modules": [
+        "bitmap-allocator"
+      ]
+    },
+    {
+      "capability": "small buffer",
+      "modules": [
+        "fixed-capacity-vector"
+      ]
+    },
+    {
+      "capability": "source",
+      "modules": [
+        "source-span"
+      ]
+    },
+    {
+      "capability": "source span",
+      "modules": [
+        "source-span"
+      ]
+    },
+    {
+      "capability": "span",
+      "modules": [
+        "source-span"
+      ]
+    },
+    {
+      "capability": "stable resource identity",
+      "modules": [
+        "generational-handles"
+      ]
+    },
+    {
+      "capability": "stack",
+      "modules": [
+        "stack"
+      ]
+    },
+    {
+      "capability": "stale handle",
+      "modules": [
+        "generational-handles"
+      ]
+    },
+    {
+      "capability": "stale-handle rejection",
+      "modules": [
+        "generational-handles"
+      ]
+    },
+    {
+      "capability": "stale-reference",
+      "modules": [
+        "generational-handles"
+      ]
+    },
+    {
+      "capability": "state machine",
+      "modules": [
+        "state-machine"
+      ]
+    },
+    {
+      "capability": "state-machine",
+      "modules": [
+        "state-machine"
+      ]
+    },
+    {
+      "capability": "static capacity",
+      "modules": [
+        "fixed-capacity-vector"
+      ]
+    },
+    {
+      "capability": "structured outcome",
+      "modules": [
+        "tagged-result"
+      ]
+    },
+    {
+      "capability": "sub-reader",
+      "modules": [
+        "bounded-byte-reader"
+      ]
+    },
+    {
+      "capability": "success failure",
+      "modules": [
+        "tagged-result"
+      ]
+    },
+    {
+      "capability": "tagged result",
+      "modules": [
+        "tagged-result"
+      ]
+    },
+    {
+      "capability": "tagged union",
+      "modules": [
+        "tagged-result"
+      ]
+    },
+    {
+      "capability": "tagged-union",
+      "modules": [
+        "tagged-result"
+      ]
+    },
+    {
+      "capability": "token location",
+      "modules": [
+        "source-span"
+      ]
+    },
+    {
+      "capability": "transition",
+      "modules": [
+        "state-machine"
+      ]
+    },
+    {
+      "capability": "transition table",
+      "modules": [
+        "state-machine"
+      ]
+    },
+    {
+      "capability": "type-safety",
+      "modules": [
+        "optional-typed-handle",
+        "unit-safe-quantity"
+      ]
+    },
+    {
+      "capability": "typed address",
+      "modules": [
+        "distinct-memory-address-types"
+      ]
+    },
+    {
+      "capability": "typed handle",
+      "modules": [
+        "optional-typed-handle"
+      ]
+    },
+    {
+      "capability": "typed permissions",
+      "modules": [
+        "validated-bit-flags"
+      ]
+    },
+    {
+      "capability": "typed physical address",
+      "modules": [
+        "distinct-memory-address-types"
+      ]
+    },
+    {
+      "capability": "typed virtual address",
+      "modules": [
+        "distinct-memory-address-types"
+      ]
+    },
+    {
+      "capability": "u7",
+      "modules": [
+        "validated-ascii-byte"
+      ]
+    },
+    {
+      "capability": "unit-safe value",
+      "modules": [
+        "unit-safe-quantity"
+      ]
+    },
+    {
+      "capability": "units",
+      "modules": [
+        "unit-safe-quantity"
+      ]
+    },
+    {
+      "capability": "validated ascii byte",
+      "modules": [
+        "validated-ascii-byte"
+      ]
+    },
+    {
+      "capability": "validated enum",
+      "modules": [
+        "validated-enum-decoder"
+      ]
+    },
+    {
+      "capability": "validated enum decode",
+      "modules": [
+        "validated-enum-decoder"
+      ]
+    },
+    {
+      "capability": "validated flags",
+      "modules": [
+        "validated-bit-flags"
+      ]
+    },
+    {
+      "capability": "validated integer",
+      "modules": [
+        "bounded-integer",
+        "nonzero-integer"
+      ]
+    },
+    {
+      "capability": "validated scalar",
+      "modules": [
+        "nonzero-integer"
+      ]
+    },
+    {
+      "capability": "validated-type",
+      "modules": [
+        "bounded-integer",
+        "nonzero-integer"
+      ]
+    },
+    {
+      "capability": "validation",
+      "modules": [
+        "validated-ascii-byte"
+      ]
+    },
+    {
+      "capability": "vector",
+      "modules": [
+        "dynamic-array",
+        "fixed-capacity-vector"
+      ]
+    },
+    {
+      "capability": "version",
+      "modules": [
+        "semantic-version"
+      ]
+    },
+    {
+      "capability": "version comparison",
+      "modules": [
+        "semantic-version"
+      ]
+    },
+    {
+      "capability": "virtual address",
+      "modules": [
+        "distinct-memory-address-types"
+      ]
+    },
+    {
+      "capability": "virtual-memory",
+      "modules": [
+        "distinct-memory-address-types"
+      ]
+    },
+    {
+      "capability": "wrapping",
+      "modules": [
+        "wrapping-sequence-number"
+      ]
+    },
+    {
+      "capability": "wrapping sequence",
+      "modules": [
+        "wrapping-sequence-number"
+      ]
+    }
+  ],
+  "generated": true,
+  "generator": "tools/build-repository-index.py"
+}

@@ -1,0 +1,116 @@
+{
+  "generated": true,
+  "generator": "tools/build-repository-index.py",
+  "reverse_dependencies": {
+    "aligned-address-and-size-helpers": [
+      "elf64-program-header-parser"
+    ],
+    "binary-cursor-checkpoint": [
+      "bounded-binary-sub-reader",
+      "elf64-file-header-parser",
+      "elf64-program-header-parser",
+      "length-prefixed-binary-field",
+      "type-length-value-decoder"
+    ],
+    "bit-set": [
+      "bitmap-allocator",
+      "physical-page-frame-allocator"
+    ],
+    "bitmap-allocator": [
+      "fixed-capacity-object-pool",
+      "physical-page-frame-allocator"
+    ],
+    "bounded-binary-sub-reader": [
+      "elf64-program-header-parser",
+      "length-prefixed-binary-field",
+      "type-length-value-decoder"
+    ],
+    "bounded-byte-reader": [
+      "binary-cursor-checkpoint",
+      "bounded-binary-sub-reader",
+      "elf64-file-header-parser",
+      "elf64-program-header-parser",
+      "length-prefixed-binary-field",
+      "type-length-value-decoder"
+    ],
+    "bounded-integer": [],
+    "byte-writer": [
+      "owned-byte-buffer"
+    ],
+    "checked-half-open-range": [
+      "elf64-file-header-parser",
+      "elf64-program-header-parser",
+      "physical-memory-region-set",
+      "physical-page-frame-allocator"
+    ],
+    "checked-integer-cast": [
+      "elf64-file-header-parser",
+      "elf64-program-header-parser",
+      "length-prefixed-binary-field",
+      "type-length-value-decoder"
+    ],
+    "distinct-memory-address-types": [
+      "elf64-program-header-parser",
+      "physical-memory-region-set",
+      "physical-page-frame-allocator",
+      "physical-page-frame-number-and-address-conversion"
+    ],
+    "dynamic-array": [
+      "byte-writer",
+      "owned-byte-buffer",
+      "stack"
+    ],
+    "elf64-file-header-parser": [
+      "elf64-program-header-parser"
+    ],
+    "elf64-program-header-parser": [],
+    "endian-integer-codec": [
+      "elf64-file-header-parser",
+      "elf64-program-header-parser",
+      "length-prefixed-binary-field",
+      "type-length-value-decoder"
+    ],
+    "fixed-capacity-object-pool": [],
+    "fixed-capacity-vector": [
+      "elf64-program-header-parser",
+      "physical-memory-region-set"
+    ],
+    "fourcc-code": [],
+    "generational-handles": [
+      "fixed-capacity-object-pool"
+    ],
+    "length-prefixed-binary-field": [
+      "type-length-value-decoder"
+    ],
+    "nonzero-integer": [],
+    "optional-typed-handle": [],
+    "owned-byte-buffer": [],
+    "physical-memory-region-set": [
+      "physical-page-frame-allocator"
+    ],
+    "physical-page-frame-allocator": [],
+    "physical-page-frame-number-and-address-conversion": [
+      "physical-memory-region-set",
+      "physical-page-frame-allocator"
+    ],
+    "ring-buffer": [],
+    "saturating-counter": [],
+    "semantic-version": [],
+    "source-span": [],
+    "stack": [],
+    "state-machine": [],
+    "tagged-result": [],
+    "type-length-value-decoder": [],
+    "unit-safe-quantity": [],
+    "validated-ascii-byte": [],
+    "validated-bit-flags": [
+      "elf64-program-header-parser"
+    ],
+    "validated-enum-decoder": [
+      "elf64-file-header-parser",
+      "elf64-program-header-parser",
+      "physical-memory-region-set"
+    ],
+    "wrapping-sequence-number": []
+  }
+}

@@ -1,12 +1,20 @@
-# Solved once, documented completely, reused forever.
+Solved once, documented completely, reused forever.
 
-## zig-reference
+# zig-reference
+
 
 **A cumulative systems-programming foundation for Zig 0.14.0.**
+
+> **Write truth once. Derive every view. Verify continuously.**
 
 `zig-reference` preserves recurring systems problems as small, explicit, reusable modules. Each module aims to keep its implementation, tests, human explanation, machine-readable contract, dependency paths, and validation status together so the next programmer or coding agent begins with accumulated knowledge instead of starting over.
 
 This repository is not an alternative standard library, and it does not claim to define official Zig conventions. It is a growing collection of proposed reference forms: mechanisms that can be studied completely, tested independently, and reused as foundations for larger systems.
+
+
+## Repository commands
+
+Query before reading source: `python3 tools/query-reference.py capability "bounded binary parsing"`. Regenerate reviewable indexes with `zig build index` and graphs with `zig build graph`; build the ignored local SQLite accelerator with `zig build database`; inspect evidence-backed health with `zig build status`; and run the complete pipeline with `zig build validate-repository`. The baseline is exactly Zig 0.14.0. Generated databases and compiler artifacts are never committed.
 
 ## The idea
 

@@ -1,0 +1,39 @@
+{
+  "generated": true,
+  "generator": "tools/build-repository-index.py",
+  "summary": {
+    "compiler_validated_modules": 0,
+    "conformance_tested_modules": 0,
+    "contracted_modules": 39,
+    "definitions": {
+      "compiler_validated_modules": "modules backed by successful textual validation evidence",
+      "conformance_tested_modules": "modules named by an executable dedicated adapter with successful evidence",
+      "contracted_modules": "modules with a validated details.json",
+      "implemented_modules": "modules with an implementation source path",
+      "port_contract_coverage": "modules with port.js divided by contracted modules",
+      "reused_modules": "modules having at least one declared reverse dependent",
+      "smoke_tested_modules": "modules backed by successful external smoke evidence",
+      "system_proven_modules": "modules backed by a recipe or flagship integration evidence record"
+    },
+    "dependency_cycles": 0,
+    "deprecated_modules": 0,
+    "hyper_zig_readiness": {
+      "note": "foundation contracts exist; complete integration evidence does not",
+      "system_proven": false
+    },
+    "implemented_modules": 39,
+    "missing_contracts": 0,
+    "port_contract_coverage": {
+      "covered": 39,
+      "total": 39
+    },
+    "recipe_coverage": 6,
+    "reused_modules": 20,
+    "smoke_tested_modules": 0,
+    "stable_modules": 0,
+    "stale_generated_textual_files": 0,
+    "system_proven_modules": 0,
+    "unsupported_claims": [],
+    "zig_baseline": "0.14.0"
+  }
+}

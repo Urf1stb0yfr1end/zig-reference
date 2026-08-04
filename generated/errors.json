@@ -1,0 +1,171 @@
+{
+  "errors": [
+    {
+      "endpoint": "free",
+      "error": "DoubleFree",
+      "module": "bitmap-allocator"
+    },
+    {
+      "endpoint": "allocate",
+      "error": "Full",
+      "module": "bitmap-allocator"
+    },
+    {
+      "endpoint": "append",
+      "error": "Full",
+      "module": "fixed-capacity-vector"
+    },
+    {
+      "endpoint": "insert",
+      "error": "Full",
+      "module": "generational-handles"
+    },
+    {
+      "endpoint": "push",
+      "error": "Full",
+      "module": "ring-buffer"
+    },
+    {
+      "endpoint": "all",
+      "error": "IndexOutOfBounds",
+      "module": "bit-set"
+    },
+    {
+      "endpoint": "free",
+      "error": "IndexOutOfBounds",
+      "module": "bitmap-allocator"
+    },
+    {
+      "endpoint": "isAligned",
+      "error": "InvalidAlignment",
+      "module": "aligned-address-and-size-helpers"
+    },
+    {
+      "endpoint": "alignDown",
+      "error": "InvalidAlignment",
+      "module": "aligned-address-and-size-helpers"
+    },
+    {
+      "endpoint": "alignUp",
+      "error": "InvalidAlignment",
+      "module": "aligned-address-and-size-helpers"
+    },
+    {
+      "endpoint": "rollback",
+      "error": "InvalidCheckpoint",
+      "module": "byte-writer"
+    },
+    {
+      "endpoint": "fromString",
+      "error": "InvalidLength",
+      "module": "fourcc-code"
+    },
+    {
+      "endpoint": "init",
+      "error": "InvalidOrder",
+      "module": "source-span"
+    },
+    {
+      "endpoint": "seek",
+      "error": "InvalidPosition",
+      "module": "bounded-byte-reader"
+    },
+    {
+      "endpoint": "init",
+      "error": "InvalidRange",
+      "module": "checked-half-open-range"
+    },
+    {
+      "endpoint": "apply",
+      "error": "InvalidTransition",
+      "module": "state-machine"
+    },
+    {
+      "endpoint": "init",
+      "error": "NotAscii",
+      "module": "validated-ascii-byte"
+    },
+    {
+      "endpoint": "get",
+      "error": "OutOfBounds",
+      "module": "fixed-capacity-vector"
+    },
+    {
+      "endpoint": "getConst",
+      "error": "OutOfBounds",
+      "module": "fixed-capacity-vector"
+    },
+    {
+      "endpoint": "pop",
+      "error": "OutOfBounds",
+      "module": "fixed-capacity-vector"
+    },
+    {
+      "endpoint": "orderedRemove",
+      "error": "OutOfBounds",
+      "module": "fixed-capacity-vector"
+    },
+    {
+      "endpoint": "slice",
+      "error": "OutOfBounds",
+      "module": "source-span"
+    },
+    {
+      "endpoint": "init",
+      "error": "OutOfRange",
+      "module": "bounded-integer"
+    },
+    {
+      "endpoint": "set",
+      "error": "OutOfRange",
+      "module": "bounded-integer"
+    },
+    {
+      "endpoint": "alignUp",
+      "error": "Overflow",
+      "module": "aligned-address-and-size-helpers"
+    },
+    {
+      "endpoint": "fromStartAndLength",
+      "error": "Overflow",
+      "module": "checked-half-open-range"
+    },
+    {
+      "endpoint": "add",
+      "error": "Overflow",
+      "module": "distinct-memory-address-types"
+    },
+    {
+      "endpoint": "toAddress",
+      "error": "Overflow",
+      "module": "physical-page-frame-number-and-address-conversion"
+    },
+    {
+      "endpoint": "fromAddress",
+      "error": "Unaligned",
+      "module": "physical-page-frame-number-and-address-conversion"
+    },
+    {
+      "endpoint": "subtract",
+      "error": "Underflow",
+      "module": "distinct-memory-address-types"
+    },
+    {
+      "endpoint": "readBytes",
+      "error": "UnexpectedEnd",
+      "module": "bounded-byte-reader"
+    },
+    {
+      "endpoint": "fromRaw",
+      "error": "UnknownBits",
+      "module": "validated-bit-flags"
+    },
+    {
+      "endpoint": "init",
+      "error": "ZeroNotAllowed",
+      "module": "nonzero-integer"
+    }
+  ],
+  "generated": true,
+  "generator": "tools/build-repository-index.py"
+}

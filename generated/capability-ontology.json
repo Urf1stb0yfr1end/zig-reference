@@ -1,0 +1,4159 @@
+{
+  "capabilities": [
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "4096",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "4096"
+      ],
+      "description": "Repository capability represented by: 4096.",
+      "implementing_modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "address",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "address"
+      ],
+      "description": "Repository capability represented by: address.",
+      "implementing_modules": [
+        "aligned-address-and-size-helpers",
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "distinct-memory-address-types",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "align down",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "align down"
+      ],
+      "description": "Repository capability represented by: align down.",
+      "implementing_modules": [
+        "aligned-address-and-size-helpers"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "align up",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "align up"
+      ],
+      "description": "Repository capability represented by: align up.",
+      "implementing_modules": [
+        "aligned-address-and-size-helpers"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "alignment",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "alignment"
+      ],
+      "description": "Repository capability represented by: alignment.",
+      "implementing_modules": [
+        "aligned-address-and-size-helpers"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "alignment check",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "alignment check"
+      ],
+      "description": "Repository capability represented by: alignment check.",
+      "implementing_modules": [
+        "aligned-address-and-size-helpers"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "alignment helpers",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "alignment helpers"
+      ],
+      "description": "Repository capability represented by: alignment helpers.",
+      "implementing_modules": [
+        "aligned-address-and-size-helpers"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "allocation-free container",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "allocation-free container"
+      ],
+      "description": "Repository capability represented by: allocation-free container.",
+      "implementing_modules": [
+        "fixed-capacity-vector"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "allocator",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "allocator"
+      ],
+      "description": "Repository capability represented by: allocator.",
+      "implementing_modules": [
+        "bitmap-allocator",
+        "dynamic-array",
+        "stack"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "allocator-backed",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "allocator-backed"
+      ],
+      "description": "Repository capability represented by: allocator-backed.",
+      "implementing_modules": [
+        "dynamic-array"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "api",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "api"
+      ],
+      "description": "Repository capability represented by: api.",
+      "implementing_modules": [
+        "tagged-result"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "array list",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "array list"
+      ],
+      "description": "Repository capability represented by: array list.",
+      "implementing_modules": [
+        "dynamic-array"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "ascii",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "ascii"
+      ],
+      "description": "Repository capability represented by: ascii.",
+      "implementing_modules": [
+        "validated-ascii-byte"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "ascii classifier",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "ascii classifier"
+      ],
+      "description": "Repository capability represented by: ascii classifier.",
+      "implementing_modules": [
+        "validated-ascii-byte"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "big endian",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "big endian"
+      ],
+      "description": "Repository capability represented by: big endian.",
+      "implementing_modules": [
+        "endian-integer-codec"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "binary decoding",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "binary decoding"
+      ],
+      "description": "Repository capability represented by: binary decoding.",
+      "implementing_modules": [
+        "bounded-byte-reader"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "binary parser",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "binary parser"
+      ],
+      "description": "Repository capability represented by: binary parser.",
+      "implementing_modules": [
+        "bounded-byte-reader"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bit flags",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bit flags"
+      ],
+      "description": "Repository capability represented by: bit flags.",
+      "implementing_modules": [
+        "validated-bit-flags"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bit set",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bit set"
+      ],
+      "description": "Repository capability represented by: bit set.",
+      "implementing_modules": [
+        "bit-set"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bitmap",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bitmap"
+      ],
+      "description": "Repository capability represented by: bitmap.",
+      "implementing_modules": [
+        "bit-set",
+        "bitmap-allocator"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bitmap allocation",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bitmap allocation"
+      ],
+      "description": "Repository capability represented by: bitmap allocation.",
+      "implementing_modules": [
+        "bitmap-allocator"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bitmap allocator",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bitmap allocator"
+      ],
+      "description": "Repository capability represented by: bitmap allocator.",
+      "implementing_modules": [
+        "bitmap-allocator"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bitset",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bitset"
+      ],
+      "description": "Repository capability represented by: bitset.",
+      "implementing_modules": [
+        "bit-set"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "borrowed",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "borrowed"
+      ],
+      "description": "Repository capability represented by: borrowed.",
+      "implementing_modules": [
+        "bounded-byte-reader"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bounded array",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bounded array"
+      ],
+      "description": "Repository capability represented by: bounded array.",
+      "implementing_modules": [
+        "fixed-capacity-vector"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bounded byte reading",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bounded byte reading"
+      ],
+      "description": "Repository capability represented by: bounded byte reading.",
+      "implementing_modules": [
+        "bounded-byte-reader"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bounded event queue",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bounded event queue"
+      ],
+      "description": "Repository capability represented by: bounded event queue.",
+      "implementing_modules": [
+        "ring-buffer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bounded input",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bounded input"
+      ],
+      "description": "Repository capability represented by: bounded input.",
+      "implementing_modules": [
+        "bounded-byte-reader"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bounded integer",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bounded integer"
+      ],
+      "description": "Repository capability represented by: bounded integer.",
+      "implementing_modules": [
+        "bounded-integer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bounded queue",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bounded queue"
+      ],
+      "description": "Repository capability represented by: bounded queue.",
+      "implementing_modules": [
+        "ring-buffer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bounded sequence",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bounded sequence"
+      ],
+      "description": "Repository capability represented by: bounded sequence.",
+      "implementing_modules": [
+        "fixed-capacity-vector"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bounds",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bounds"
+      ],
+      "description": "Repository capability represented by: bounds.",
+      "implementing_modules": [
+        "bounded-byte-reader",
+        "checked-half-open-range"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "byte order",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "byte order"
+      ],
+      "description": "Repository capability represented by: byte order.",
+      "implementing_modules": [
+        "endian-integer-codec"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "byte range diagnostic",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "byte range diagnostic"
+      ],
+      "description": "Repository capability represented by: byte range diagnostic.",
+      "implementing_modules": [
+        "source-span"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "byte reader",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "byte reader"
+      ],
+      "description": "Repository capability represented by: byte reader.",
+      "implementing_modules": [
+        "bounded-byte-reader"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bytes",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bytes"
+      ],
+      "description": "Repository capability represented by: bytes.",
+      "implementing_modules": [
+        "unit-safe-quantity"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "call stack",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "call stack"
+      ],
+      "description": "Repository capability represented by: call stack.",
+      "implementing_modules": [
+        "stack"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "cast",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "cast"
+      ],
+      "description": "Repository capability represented by: cast.",
+      "implementing_modules": [
+        "checked-integer-cast"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "character validation",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "character validation"
+      ],
+      "description": "Repository capability represented by: character validation.",
+      "implementing_modules": [
+        "validated-ascii-byte"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "checked address arithmetic",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "checked address arithmetic"
+      ],
+      "description": "Repository capability represented by: checked address arithmetic.",
+      "implementing_modules": [
+        "distinct-memory-address-types"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "checked cast",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "checked cast"
+      ],
+      "description": "Repository capability represented by: checked cast.",
+      "implementing_modules": [
+        "checked-integer-cast"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "checked integer cast",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "checked integer cast"
+      ],
+      "description": "Repository capability represented by: checked integer cast.",
+      "implementing_modules": [
+        "checked-integer-cast"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "checked interval",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "checked interval"
+      ],
+      "description": "Repository capability represented by: checked interval.",
+      "implementing_modules": [
+        "checked-half-open-range"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "checked range",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "checked range"
+      ],
+      "description": "Repository capability represented by: checked range.",
+      "implementing_modules": [
+        "checked-half-open-range"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "circular buffer",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "circular buffer"
+      ],
+      "description": "Repository capability represented by: circular buffer.",
+      "implementing_modules": [
+        "ring-buffer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "circular queue",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "circular queue"
+      ],
+      "description": "Repository capability represented by: circular queue.",
+      "implementing_modules": [
+        "ring-buffer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "circular-buffer",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "circular-buffer"
+      ],
+      "description": "Repository capability represented by: circular-buffer.",
+      "implementing_modules": [
+        "ring-buffer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "clamped counter",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "clamped counter"
+      ],
+      "description": "Repository capability represented by: clamped counter.",
+      "implementing_modules": [
+        "saturating-counter"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "clamped quota",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "clamped quota"
+      ],
+      "description": "Repository capability represented by: clamped quota.",
+      "implementing_modules": [
+        "saturating-counter"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "codec",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "codec"
+      ],
+      "description": "Repository capability represented by: codec.",
+      "implementing_modules": [
+        "endian-integer-codec"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "compact",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "compact"
+      ],
+      "description": "Repository capability represented by: compact.",
+      "implementing_modules": [
+        "bit-set"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "compact flags",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "compact flags"
+      ],
+      "description": "Repository capability represented by: compact flags.",
+      "implementing_modules": [
+        "bit-set"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "compatibility check",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "compatibility check"
+      ],
+      "description": "Repository capability represented by: compatibility check.",
+      "implementing_modules": [
+        "semantic-version"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "composition",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "composition"
+      ],
+      "description": "Repository capability represented by: composition.",
+      "implementing_modules": [
+        "stack"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "comptime",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "comptime"
+      ],
+      "description": "Repository capability represented by: comptime.",
+      "implementing_modules": [
+        "state-machine"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "contiguous",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "contiguous"
+      ],
+      "description": "Repository capability represented by: contiguous.",
+      "implementing_modules": [
+        "dynamic-array"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "counter",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "counter"
+      ],
+      "description": "Repository capability represented by: counter.",
+      "implementing_modules": [
+        "saturating-counter"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "cursor",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "cursor"
+      ],
+      "description": "Repository capability represented by: cursor.",
+      "implementing_modules": [
+        "bounded-byte-reader"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "decoder",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "decoder"
+      ],
+      "description": "Repository capability represented by: decoder.",
+      "implementing_modules": [
+        "validated-enum-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "dfs",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "dfs"
+      ],
+      "description": "Repository capability represented by: dfs.",
+      "implementing_modules": [
+        "stack"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "dimensioned scalar",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "dimensioned scalar"
+      ],
+      "description": "Repository capability represented by: dimensioned scalar.",
+      "implementing_modules": [
+        "unit-safe-quantity"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "double-free detection",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "double-free detection"
+      ],
+      "description": "Repository capability represented by: double-free detection.",
+      "implementing_modules": [
+        "bitmap-allocator"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "dynamic array",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "dynamic array"
+      ],
+      "description": "Repository capability represented by: dynamic array.",
+      "implementing_modules": [
+        "dynamic-array"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "endian integer decode",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "endian integer decode"
+      ],
+      "description": "Repository capability represented by: endian integer decode.",
+      "implementing_modules": [
+        "endian-integer-codec"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "endian integer encode",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "endian integer encode"
+      ],
+      "description": "Repository capability represented by: endian integer encode.",
+      "implementing_modules": [
+        "endian-integer-codec"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "endian reader",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "endian reader"
+      ],
+      "description": "Repository capability represented by: endian reader.",
+      "implementing_modules": [
+        "bounded-byte-reader"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "endianness",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "endianness"
+      ],
+      "description": "Repository capability represented by: endianness.",
+      "implementing_modules": [
+        "bounded-byte-reader",
+        "endian-integer-codec"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "enum",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "enum"
+      ],
+      "description": "Repository capability represented by: enum.",
+      "implementing_modules": [
+        "validated-enum-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "enum decoder",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "enum decoder"
+      ],
+      "description": "Repository capability represented by: enum decoder.",
+      "implementing_modules": [
+        "validated-enum-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "explicit endian integers",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "explicit endian integers"
+      ],
+      "description": "Repository capability represented by: explicit endian integers.",
+      "implementing_modules": [
+        "bounded-byte-reader"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "explicit state transitions",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "explicit state transitions"
+      ],
+      "description": "Repository capability represented by: explicit state transitions.",
+      "implementing_modules": [
+        "state-machine"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "failure-atomic numeric mutation",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "failure-atomic numeric mutation"
+      ],
+      "description": "Repository capability represented by: failure-atomic numeric mutation.",
+      "implementing_modules": [
+        "bounded-integer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "failure-atomic transition",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "failure-atomic transition"
+      ],
+      "description": "Repository capability represented by: failure-atomic transition.",
+      "implementing_modules": [
+        "state-machine"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "ffi",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "ffi"
+      ],
+      "description": "Repository capability represented by: ffi.",
+      "implementing_modules": [
+        "validated-enum-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "fifo",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "fifo"
+      ],
+      "description": "Repository capability represented by: fifo.",
+      "implementing_modules": [
+        "ring-buffer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "fifo queue",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "fifo queue"
+      ],
+      "description": "Repository capability represented by: fifo queue.",
+      "implementing_modules": [
+        "ring-buffer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "files",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "files"
+      ],
+      "description": "Repository capability represented by: files.",
+      "implementing_modules": [
+        "checked-half-open-range"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "fixed vector",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "fixed vector"
+      ],
+      "description": "Repository capability represented by: fixed vector.",
+      "implementing_modules": [
+        "fixed-capacity-vector"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "fixed-capacity",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "fixed-capacity"
+      ],
+      "description": "Repository capability represented by: fixed-capacity.",
+      "implementing_modules": [
+        "bitmap-allocator",
+        "fixed-capacity-vector",
+        "ring-buffer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "fixed-capacity handle table",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "fixed-capacity handle table"
+      ],
+      "description": "Repository capability represented by: fixed-capacity handle table.",
+      "implementing_modules": [
+        "generational-handles"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "fixed-capacity slot allocation",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "fixed-capacity slot allocation"
+      ],
+      "description": "Repository capability represented by: fixed-capacity slot allocation.",
+      "implementing_modules": [
+        "bitmap-allocator"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "flags",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "flags"
+      ],
+      "description": "Repository capability represented by: flags.",
+      "implementing_modules": [
+        "bit-set",
+        "validated-bit-flags"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "format",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "format"
+      ],
+      "description": "Repository capability represented by: format.",
+      "implementing_modules": [
+        "fourcc-code"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "foundation",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "foundation"
+      ],
+      "description": "Repository capability represented by: foundation.",
+      "implementing_modules": [
+        "fixed-capacity-vector"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "four byte signature",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "four byte signature"
+      ],
+      "description": "Repository capability represented by: four byte signature.",
+      "implementing_modules": [
+        "fourcc-code"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "fourcc",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "fourcc"
+      ],
+      "description": "Repository capability represented by: fourcc.",
+      "implementing_modules": [
+        "fourcc-code"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "freestanding",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "freestanding"
+      ],
+      "description": "Repository capability represented by: freestanding.",
+      "implementing_modules": [
+        "aligned-address-and-size-helpers",
+        "binary-cursor-checkpoint",
+        "bit-set",
+        "bitmap-allocator",
+        "bounded-binary-sub-reader",
+        "bounded-integer",
+        "checked-half-open-range",
+        "checked-integer-cast",
+        "distinct-memory-address-types",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "endian-integer-codec",
+        "fixed-capacity-object-pool",
+        "fixed-capacity-vector",
+        "fourcc-code",
+        "generational-handles",
+        "length-prefixed-binary-field",
+        "nonzero-integer",
+        "optional-typed-handle",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "ring-buffer",
+        "saturating-counter",
+        "state-machine",
+        "tagged-result",
+        "type-length-value-decoder",
+        "unit-safe-quantity",
+        "validated-ascii-byte",
+        "validated-bit-flags",
+        "validated-enum-decoder",
+        "wrapping-sequence-number"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "generation",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "generation"
+      ],
+      "description": "Repository capability represented by: generation.",
+      "implementing_modules": [
+        "generational-handles"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "generational handles",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "generational handles"
+      ],
+      "description": "Repository capability represented by: generational handles.",
+      "implementing_modules": [
+        "generational-handles"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "generic",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "generic"
+      ],
+      "description": "Repository capability represented by: generic.",
+      "implementing_modules": [
+        "dynamic-array",
+        "fixed-capacity-vector"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "generic vector",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "generic vector"
+      ],
+      "description": "Repository capability represented by: generic vector.",
+      "implementing_modules": [
+        "dynamic-array"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "growable array",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "growable array"
+      ],
+      "description": "Repository capability represented by: growable array.",
+      "implementing_modules": [
+        "dynamic-array"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "growable buffer",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "growable buffer"
+      ],
+      "description": "Repository capability represented by: growable buffer.",
+      "implementing_modules": [
+        "dynamic-array"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "growable stack",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "growable stack"
+      ],
+      "description": "Repository capability represented by: growable stack.",
+      "implementing_modules": [
+        "stack"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "growth",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "growth"
+      ],
+      "description": "Repository capability represented by: growth.",
+      "implementing_modules": [
+        "dynamic-array"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "guest address separation",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "guest address separation"
+      ],
+      "description": "Repository capability represented by: guest address separation.",
+      "implementing_modules": [
+        "distinct-memory-address-types"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "guest physical",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "guest physical"
+      ],
+      "description": "Repository capability represented by: guest physical.",
+      "implementing_modules": [
+        "distinct-memory-address-types"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "guest virtual",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "guest virtual"
+      ],
+      "description": "Repository capability represented by: guest virtual.",
+      "implementing_modules": [
+        "distinct-memory-address-types"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "guest-memory",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "guest-memory"
+      ],
+      "description": "Repository capability represented by: guest-memory.",
+      "implementing_modules": [
+        "distinct-memory-address-types"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "half-open interval",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "half-open interval"
+      ],
+      "description": "Repository capability represented by: half-open interval.",
+      "implementing_modules": [
+        "checked-half-open-range"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "half-open range",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "half-open range"
+      ],
+      "description": "Repository capability represented by: half-open range.",
+      "implementing_modules": [
+        "checked-half-open-range"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "handle",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "handle"
+      ],
+      "description": "Repository capability represented by: handle.",
+      "implementing_modules": [
+        "optional-typed-handle"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "handle table",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "handle table"
+      ],
+      "description": "Repository capability represented by: handle table.",
+      "implementing_modules": [
+        "generational-handles"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "handles",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "handles"
+      ],
+      "description": "Repository capability represented by: handles.",
+      "implementing_modules": [
+        "generational-handles"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "hypervisor",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "hypervisor"
+      ],
+      "description": "Repository capability represented by: hypervisor.",
+      "implementing_modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "distinct-memory-address-types",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "index allocator",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "index allocator"
+      ],
+      "description": "Repository capability represented by: index allocator.",
+      "implementing_modules": [
+        "bitmap-allocator"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "inline storage",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "inline storage"
+      ],
+      "description": "Repository capability represented by: inline storage.",
+      "implementing_modules": [
+        "fixed-capacity-vector"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "int to enum",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "int to enum"
+      ],
+      "description": "Repository capability represented by: int to enum.",
+      "implementing_modules": [
+        "validated-enum-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "integer",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "integer"
+      ],
+      "description": "Repository capability represented by: integer.",
+      "implementing_modules": [
+        "bounded-integer",
+        "checked-integer-cast",
+        "endian-integer-codec",
+        "nonzero-integer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "integer conversion",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "integer conversion"
+      ],
+      "description": "Repository capability represented by: integer conversion.",
+      "implementing_modules": [
+        "checked-integer-cast"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "integer tag validation",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "integer tag validation"
+      ],
+      "description": "Repository capability represented by: integer tag validation.",
+      "implementing_modules": [
+        "validated-enum-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "intersection",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "intersection"
+      ],
+      "description": "Repository capability represented by: intersection.",
+      "implementing_modules": [
+        "checked-half-open-range"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "lexer",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "lexer"
+      ],
+      "description": "Repository capability represented by: lexer.",
+      "implementing_modules": [
+        "source-span",
+        "validated-ascii-byte"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "lifecycle",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "lifecycle"
+      ],
+      "description": "Repository capability represented by: lifecycle.",
+      "implementing_modules": [
+        "state-machine"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "lifecycle validation",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "lifecycle validation"
+      ],
+      "description": "Repository capability represented by: lifecycle validation.",
+      "implementing_modules": [
+        "state-machine"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "lifo",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "lifo"
+      ],
+      "description": "Repository capability represented by: lifo.",
+      "implementing_modules": [
+        "stack"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "lifo stack",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "lifo stack"
+      ],
+      "description": "Repository capability represented by: lifo stack.",
+      "implementing_modules": [
+        "stack"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "little endian",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "little endian"
+      ],
+      "description": "Repository capability represented by: little endian.",
+      "implementing_modules": [
+        "endian-integer-codec"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "magic code",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "magic code"
+      ],
+      "description": "Repository capability represented by: magic code.",
+      "implementing_modules": [
+        "fourcc-code"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "major minor patch",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "major minor patch"
+      ],
+      "description": "Repository capability represented by: major minor patch.",
+      "implementing_modules": [
+        "semantic-version"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "mask",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "mask"
+      ],
+      "description": "Repository capability represented by: mask.",
+      "implementing_modules": [
+        "validated-bit-flags"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "memory",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "memory"
+      ],
+      "description": "Repository capability represented by: memory.",
+      "implementing_modules": [
+        "checked-half-open-range"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "memory region",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "memory region"
+      ],
+      "description": "Repository capability represented by: memory region.",
+      "implementing_modules": [
+        "checked-half-open-range"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "modulo counter",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "modulo counter"
+      ],
+      "description": "Repository capability represented by: modulo counter.",
+      "implementing_modules": [
+        "wrapping-sequence-number"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "non-wrapping arithmetic",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "non-wrapping arithmetic"
+      ],
+      "description": "Repository capability represented by: non-wrapping arithmetic.",
+      "implementing_modules": [
+        "saturating-counter"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "non-zero integer",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "non-zero integer"
+      ],
+      "description": "Repository capability represented by: non-zero integer.",
+      "implementing_modules": [
+        "nonzero-integer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "nonzero",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "nonzero"
+      ],
+      "description": "Repository capability represented by: nonzero.",
+      "implementing_modules": [
+        "nonzero-integer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "nonzero integer",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "nonzero integer"
+      ],
+      "description": "Repository capability represented by: nonzero integer.",
+      "implementing_modules": [
+        "nonzero-integer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "offset",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "offset"
+      ],
+      "description": "Repository capability represented by: offset.",
+      "implementing_modules": [
+        "source-span"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "opaque handle",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "opaque handle"
+      ],
+      "description": "Repository capability represented by: opaque handle.",
+      "implementing_modules": [
+        "optional-typed-handle"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "operand stack",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "operand stack"
+      ],
+      "description": "Repository capability represented by: operand stack.",
+      "implementing_modules": [
+        "stack"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "optional",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "optional"
+      ],
+      "description": "Repository capability represented by: optional.",
+      "implementing_modules": [
+        "optional-typed-handle"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "optional handle",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "optional handle"
+      ],
+      "description": "Repository capability represented by: optional handle.",
+      "implementing_modules": [
+        "optional-typed-handle"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "optional resource id",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "optional resource id"
+      ],
+      "description": "Repository capability represented by: optional resource id.",
+      "implementing_modules": [
+        "optional-typed-handle"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "ordering",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "ordering"
+      ],
+      "description": "Repository capability represented by: ordering.",
+      "implementing_modules": [
+        "semantic-version"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "overlap detection",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "overlap detection"
+      ],
+      "description": "Repository capability represented by: overlap detection.",
+      "implementing_modules": [
+        "checked-half-open-range"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "owned contiguous storage",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "owned contiguous storage"
+      ],
+      "description": "Repository capability represented by: owned contiguous storage.",
+      "implementing_modules": [
+        "dynamic-array"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "ownership",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "ownership"
+      ],
+      "description": "Repository capability represented by: ownership.",
+      "implementing_modules": [
+        "dynamic-array"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "padding",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "padding"
+      ],
+      "description": "Repository capability represented by: padding.",
+      "implementing_modules": [
+        "aligned-address-and-size-helpers"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "padding calculation",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "padding calculation"
+      ],
+      "description": "Repository capability represented by: padding calculation.",
+      "implementing_modules": [
+        "aligned-address-and-size-helpers"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "page",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "page"
+      ],
+      "description": "Repository capability represented by: page.",
+      "implementing_modules": [
+        "aligned-address-and-size-helpers"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "page bitmap",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "page bitmap"
+      ],
+      "description": "Repository capability represented by: page bitmap.",
+      "implementing_modules": [
+        "bit-set"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "page frame",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "page frame"
+      ],
+      "description": "Repository capability represented by: page frame.",
+      "implementing_modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "page number to address",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "page number to address"
+      ],
+      "description": "Repository capability represented by: page number to address.",
+      "implementing_modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "page-frame",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "page-frame"
+      ],
+      "description": "Repository capability represented by: page-frame.",
+      "implementing_modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "pages",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "pages"
+      ],
+      "description": "Repository capability represented by: pages.",
+      "implementing_modules": [
+        "unit-safe-quantity"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "parser",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "parser"
+      ],
+      "description": "Repository capability represented by: parser.",
+      "implementing_modules": [
+        "bounded-byte-reader",
+        "source-span",
+        "stack",
+        "validated-enum-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "parser stack",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "parser stack"
+      ],
+      "description": "Repository capability represented by: parser stack.",
+      "implementing_modules": [
+        "stack"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "permission bits",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "permission bits"
+      ],
+      "description": "Repository capability represented by: permission bits.",
+      "implementing_modules": [
+        "bit-set"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "permissions",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "permissions"
+      ],
+      "description": "Repository capability represented by: permissions.",
+      "implementing_modules": [
+        "validated-bit-flags"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "pfn",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "pfn"
+      ],
+      "description": "Repository capability represented by: pfn.",
+      "implementing_modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "physical address",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "physical address"
+      ],
+      "description": "Repository capability represented by: physical address.",
+      "implementing_modules": [
+        "distinct-memory-address-types"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "physical frame conversion",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "physical frame conversion"
+      ],
+      "description": "Repository capability represented by: physical frame conversion.",
+      "implementing_modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "physical page",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "physical page"
+      ],
+      "description": "Repository capability represented by: physical page.",
+      "implementing_modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "physical-memory",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "physical-memory"
+      ],
+      "description": "Repository capability represented by: physical-memory.",
+      "implementing_modules": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "distinct-memory-address-types",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-object-pool",
+        "length-prefixed-binary-field",
+        "owned-byte-buffer",
+        "physical-memory-region-set",
+        "physical-page-frame-allocator",
+        "physical-page-frame-number-and-address-conversion",
+        "type-length-value-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "protocol",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "protocol"
+      ],
+      "description": "Repository capability represented by: protocol.",
+      "implementing_modules": [
+        "semantic-version",
+        "wrapping-sequence-number"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "protocols",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "protocols"
+      ],
+      "description": "Repository capability represented by: protocols.",
+      "implementing_modules": [
+        "validated-bit-flags"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "quantity",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "quantity"
+      ],
+      "description": "Repository capability represented by: quantity.",
+      "implementing_modules": [
+        "unit-safe-quantity"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "queue",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "queue"
+      ],
+      "description": "Repository capability represented by: queue.",
+      "implementing_modules": [
+        "ring-buffer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "quota",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "quota"
+      ],
+      "description": "Repository capability represented by: quota.",
+      "implementing_modules": [
+        "saturating-counter"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "quota counter",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "quota counter"
+      ],
+      "description": "Repository capability represented by: quota counter.",
+      "implementing_modules": [
+        "saturating-counter"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "range",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "range"
+      ],
+      "description": "Repository capability represented by: range.",
+      "implementing_modules": [
+        "bounded-integer",
+        "checked-half-open-range"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "range cast",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "range cast"
+      ],
+      "description": "Repository capability represented by: range cast.",
+      "implementing_modules": [
+        "checked-integer-cast"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "range type",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "range type"
+      ],
+      "description": "Repository capability represented by: range type.",
+      "implementing_modules": [
+        "bounded-integer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "range-check",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "range-check"
+      ],
+      "description": "Repository capability represented by: range-check.",
+      "implementing_modules": [
+        "checked-integer-cast"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "range-validated scalar",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "range-validated scalar"
+      ],
+      "description": "Repository capability represented by: range-validated scalar.",
+      "implementing_modules": [
+        "bounded-integer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "reader",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "reader"
+      ],
+      "description": "Repository capability represented by: reader.",
+      "implementing_modules": [
+        "bounded-byte-reader"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "register mask validation",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "register mask validation"
+      ],
+      "description": "Repository capability represented by: register mask validation.",
+      "implementing_modules": [
+        "validated-bit-flags"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "registers",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "registers"
+      ],
+      "description": "Repository capability represented by: registers.",
+      "implementing_modules": [
+        "validated-bit-flags"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "resource id",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "resource id"
+      ],
+      "description": "Repository capability represented by: resource id.",
+      "implementing_modules": [
+        "optional-typed-handle"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "result",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "result"
+      ],
+      "description": "Repository capability represented by: result.",
+      "implementing_modules": [
+        "tagged-result"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "riff",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "riff"
+      ],
+      "description": "Repository capability represented by: riff.",
+      "implementing_modules": [
+        "fourcc-code"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "ring buffer",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "ring buffer"
+      ],
+      "description": "Repository capability represented by: ring buffer.",
+      "implementing_modules": [
+        "ring-buffer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "rollover",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "rollover"
+      ],
+      "description": "Repository capability represented by: rollover.",
+      "implementing_modules": [
+        "wrapping-sequence-number"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "safe narrowing",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "safe narrowing"
+      ],
+      "description": "Repository capability represented by: safe narrowing.",
+      "implementing_modules": [
+        "checked-integer-cast"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "saturating counter",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "saturating counter"
+      ],
+      "description": "Repository capability represented by: saturating counter.",
+      "implementing_modules": [
+        "saturating-counter"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "saturating-arithmetic",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "saturating-arithmetic"
+      ],
+      "description": "Repository capability represented by: saturating-arithmetic.",
+      "implementing_modules": [
+        "saturating-counter"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "schema",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "schema"
+      ],
+      "description": "Repository capability represented by: schema.",
+      "implementing_modules": [
+        "semantic-version"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "semantic version",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "semantic version"
+      ],
+      "description": "Repository capability represented by: semantic version.",
+      "implementing_modules": [
+        "semantic-version"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "sentinel elimination",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "sentinel elimination"
+      ],
+      "description": "Repository capability represented by: sentinel elimination.",
+      "implementing_modules": [
+        "nonzero-integer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "sequence",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "sequence"
+      ],
+      "description": "Repository capability represented by: sequence.",
+      "implementing_modules": [
+        "wrapping-sequence-number"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "sequence number",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "sequence number"
+      ],
+      "description": "Repository capability represented by: sequence number.",
+      "implementing_modules": [
+        "wrapping-sequence-number"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "signature",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "signature"
+      ],
+      "description": "Repository capability represented by: signature.",
+      "implementing_modules": [
+        "fourcc-code"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "signedness validation",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "signedness validation"
+      ],
+      "description": "Repository capability represented by: signedness validation.",
+      "implementing_modules": [
+        "checked-integer-cast"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "size",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "size"
+      ],
+      "description": "Repository capability represented by: size.",
+      "implementing_modules": [
+        "aligned-address-and-size-helpers"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "slice",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "slice"
+      ],
+      "description": "Repository capability represented by: slice.",
+      "implementing_modules": [
+        "fixed-capacity-vector"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "slot allocator",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "slot allocator"
+      ],
+      "description": "Repository capability represented by: slot allocator.",
+      "implementing_modules": [
+        "bitmap-allocator"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "slot map",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "slot map"
+      ],
+      "description": "Repository capability represented by: slot map.",
+      "implementing_modules": [
+        "generational-handles"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "slot-table",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "slot-table"
+      ],
+      "description": "Repository capability represented by: slot-table.",
+      "implementing_modules": [
+        "generational-handles"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "slots",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "slots"
+      ],
+      "description": "Repository capability represented by: slots.",
+      "implementing_modules": [
+        "bitmap-allocator"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "small buffer",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "small buffer"
+      ],
+      "description": "Repository capability represented by: small buffer.",
+      "implementing_modules": [
+        "fixed-capacity-vector"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "source",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "source"
+      ],
+      "description": "Repository capability represented by: source.",
+      "implementing_modules": [
+        "source-span"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "source span",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "source span"
+      ],
+      "description": "Repository capability represented by: source span.",
+      "implementing_modules": [
+        "source-span"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "span",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "span"
+      ],
+      "description": "Repository capability represented by: span.",
+      "implementing_modules": [
+        "source-span"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "stable resource identity",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "stable resource identity"
+      ],
+      "description": "Repository capability represented by: stable resource identity.",
+      "implementing_modules": [
+        "generational-handles"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "stack",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "stack"
+      ],
+      "description": "Repository capability represented by: stack.",
+      "implementing_modules": [
+        "stack"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "stale handle",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "stale handle"
+      ],
+      "description": "Repository capability represented by: stale handle.",
+      "implementing_modules": [
+        "generational-handles"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "stale-handle rejection",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "stale-handle rejection"
+      ],
+      "description": "Repository capability represented by: stale-handle rejection.",
+      "implementing_modules": [
+        "generational-handles"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "stale-reference",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "stale-reference"
+      ],
+      "description": "Repository capability represented by: stale-reference.",
+      "implementing_modules": [
+        "generational-handles"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "state machine",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "state machine"
+      ],
+      "description": "Repository capability represented by: state machine.",
+      "implementing_modules": [
+        "state-machine"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "state-machine",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "state-machine"
+      ],
+      "description": "Repository capability represented by: state-machine.",
+      "implementing_modules": [
+        "state-machine"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "static capacity",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "static capacity"
+      ],
+      "description": "Repository capability represented by: static capacity.",
+      "implementing_modules": [
+        "fixed-capacity-vector"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "structured outcome",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "structured outcome"
+      ],
+      "description": "Repository capability represented by: structured outcome.",
+      "implementing_modules": [
+        "tagged-result"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "sub-reader",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "sub-reader"
+      ],
+      "description": "Repository capability represented by: sub-reader.",
+      "implementing_modules": [
+        "bounded-byte-reader"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "success failure",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "success failure"
+      ],
+      "description": "Repository capability represented by: success failure.",
+      "implementing_modules": [
+        "tagged-result"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "tagged result",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "tagged result"
+      ],
+      "description": "Repository capability represented by: tagged result.",
+      "implementing_modules": [
+        "tagged-result"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "tagged union",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "tagged union"
+      ],
+      "description": "Repository capability represented by: tagged union.",
+      "implementing_modules": [
+        "tagged-result"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "tagged-union",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "tagged-union"
+      ],
+      "description": "Repository capability represented by: tagged-union.",
+      "implementing_modules": [
+        "tagged-result"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "token location",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "token location"
+      ],
+      "description": "Repository capability represented by: token location.",
+      "implementing_modules": [
+        "source-span"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "transition",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "transition"
+      ],
+      "description": "Repository capability represented by: transition.",
+      "implementing_modules": [
+        "state-machine"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "transition table",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "transition table"
+      ],
+      "description": "Repository capability represented by: transition table.",
+      "implementing_modules": [
+        "state-machine"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "type-safety",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "type-safety"
+      ],
+      "description": "Repository capability represented by: type-safety.",
+      "implementing_modules": [
+        "optional-typed-handle",
+        "unit-safe-quantity"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "typed address",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "typed address"
+      ],
+      "description": "Repository capability represented by: typed address.",
+      "implementing_modules": [
+        "distinct-memory-address-types"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "typed handle",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "typed handle"
+      ],
+      "description": "Repository capability represented by: typed handle.",
+      "implementing_modules": [
+        "optional-typed-handle"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "typed permissions",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "typed permissions"
+      ],
+      "description": "Repository capability represented by: typed permissions.",
+      "implementing_modules": [
+        "validated-bit-flags"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "typed physical address",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "typed physical address"
+      ],
+      "description": "Repository capability represented by: typed physical address.",
+      "implementing_modules": [
+        "distinct-memory-address-types"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "typed virtual address",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "typed virtual address"
+      ],
+      "description": "Repository capability represented by: typed virtual address.",
+      "implementing_modules": [
+        "distinct-memory-address-types"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "u7",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "u7"
+      ],
+      "description": "Repository capability represented by: u7.",
+      "implementing_modules": [
+        "validated-ascii-byte"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "unit-safe value",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "unit-safe value"
+      ],
+      "description": "Repository capability represented by: unit-safe value.",
+      "implementing_modules": [
+        "unit-safe-quantity"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "units",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "units"
+      ],
+      "description": "Repository capability represented by: units.",
+      "implementing_modules": [
+        "unit-safe-quantity"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "validated ascii byte",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "validated ascii byte"
+      ],
+      "description": "Repository capability represented by: validated ascii byte.",
+      "implementing_modules": [
+        "validated-ascii-byte"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "validated enum",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "validated enum"
+      ],
+      "description": "Repository capability represented by: validated enum.",
+      "implementing_modules": [
+        "validated-enum-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "validated enum decode",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "validated enum decode"
+      ],
+      "description": "Repository capability represented by: validated enum decode.",
+      "implementing_modules": [
+        "validated-enum-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "validated flags",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "validated flags"
+      ],
+      "description": "Repository capability represented by: validated flags.",
+      "implementing_modules": [
+        "validated-bit-flags"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "validated integer",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "validated integer"
+      ],
+      "description": "Repository capability represented by: validated integer.",
+      "implementing_modules": [
+        "bounded-integer",
+        "nonzero-integer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "validated scalar",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "validated scalar"
+      ],
+      "description": "Repository capability represented by: validated scalar.",
+      "implementing_modules": [
+        "nonzero-integer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "validated-type",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "validated-type"
+      ],
+      "description": "Repository capability represented by: validated-type.",
+      "implementing_modules": [
+        "bounded-integer",
+        "nonzero-integer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "validation",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "validation"
+      ],
+      "description": "Repository capability represented by: validation.",
+      "implementing_modules": [
+        "validated-ascii-byte"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "vector",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "vector"
+      ],
+      "description": "Repository capability represented by: vector.",
+      "implementing_modules": [
+        "dynamic-array",
+        "fixed-capacity-vector"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "version",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "version"
+      ],
+      "description": "Repository capability represented by: version.",
+      "implementing_modules": [
+        "semantic-version"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "version comparison",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "version comparison"
+      ],
+      "description": "Repository capability represented by: version comparison.",
+      "implementing_modules": [
+        "semantic-version"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "virtual address",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "virtual address"
+      ],
+      "description": "Repository capability represented by: virtual address.",
+      "implementing_modules": [
+        "distinct-memory-address-types"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "virtual-memory",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "virtual-memory"
+      ],
+      "description": "Repository capability represented by: virtual-memory.",
+      "implementing_modules": [
+        "distinct-memory-address-types"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "wrapping",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "wrapping"
+      ],
+      "description": "Repository capability represented by: wrapping.",
+      "implementing_modules": [
+        "wrapping-sequence-number"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "wrapping sequence",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "wrapping sequence"
+      ],
+      "description": "Repository capability represented by: wrapping sequence.",
+      "implementing_modules": [
+        "wrapping-sequence-number"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    }
+  ],
+  "generated": true,
+  "generator": "tools/build-repository-index.py"
+}
