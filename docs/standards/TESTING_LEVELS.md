@@ -1,3 +1,5 @@
 # Testing levels
 
-Unit tests establish implementation behavior. External smoke tests establish public named-import usability. Conformance adapters apply shared behavioral contracts. Property tests check general laws over generated cases. Fuzz smoke checks bounded generated inputs for crashes and invariant violations. Differential tests compare independent implementations or representations. A command must run configured work or explicitly print that no eligible target exists; an empty success step is not evidence.
+Static contract checking proves metadata coherence, not Zig behavior. Unit tests cover local success, boundary, empty/full, overflow, cleanup, and failure atomicity. External smoke tests prove named-import usability. Recipes prove cross-module orchestration; conformance adapters prove a behavioral family without demanding identical APIs. Property, fuzz, differential, failure-injection, and system tests are assigned according to risk.
+
+Every claim names the command, Zig version, target, result, and evidence record. Skipped work remains skipped. Parser, arithmetic, allocator, ownership, and stale-identity code receive stronger testing than trivial type aliases. Aggregate steps may have no eligible target; that is a valid infrastructure result but grants no module maturity.

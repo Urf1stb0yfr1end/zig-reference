@@ -1,40 +1,108 @@
 #!/usr/bin/env python3
-import argparse,json
-from repository import GENERATED,ROOT
-def load(n): return json.loads((GENERATED/f"{n}.json").read_text())
+"""Query committed deterministic repository indexes without rescanning modules."""
+import argparse
+import json
+from repository import GENERATED, ROOT
+
+
+def load(name):
+    return json.loads((GENERATED / f"{name}.json").read_text())
+
+
 def main():
-    p=argparse.ArgumentParser(); p.add_argument("kind",choices=["module","capability","symbol","endpoint","error","dependencies","dependents","build-order","status","unvalidated","maturity","paths","recipe"]); p.add_argument("term",nargs="?"); p.add_argument("--json",action="store_true"); p.add_argument("--compact",action="store_true"); p.add_argument("--paths-only",action="store_true"); p.add_argument("--symbols-only",action="store_true"); p.add_argument("--recursive",action="store_true"); p.add_argument("--explain-selection",action="store_true"); a=p.parse_args(); term=(a.term or "").lower(); out=[]
-    mods=load("modules")["modules"]
-    if a.kind=="module": out=[x for x in mods if term in x["name"] or term in x["display_name"].lower()]
-    elif a.kind=="capability":
-        words=set(term.split())
-        candidates=load("capabilities")["capabilities"]
-        out=[x for x in candidates if term in x["capability"] or (words and words & set(x["capability"].split()))]
-        out.sort(key=lambda x:(-len(words & set(x["capability"].split())),x["capability"]))
-    elif a.kind in ("symbol","endpoint","error"): out=[x for x in load({"symbol":"public-symbols","endpoint":"endpoints","error":"errors"}[a.kind])[{"symbol":"symbols","endpoint":"endpoints","error":"errors"}[a.kind]] if term in x[a.kind].lower()]
-    elif a.kind in ("dependencies","dependents"):
-        key="dependencies" if a.kind=="dependencies" else "reverse_dependencies"; data=load("dependencies" if a.kind=="dependencies" else "reverse-dependencies")[key]; seen=set()
-        def visit(n):
-            for x in data.get(n,[]):
-                if x not in seen: seen.add(x); visit(x) if a.recursive else None
-        visit(a.term); out=sorted(seen)
-    elif a.kind=="build-order":
-        order=load("build-order")["build_order"]; out=order if not term else order[:order.index(a.term)+1] if a.term in order else []
-    elif a.kind=="status": out=load("repository-health")
-    elif a.kind=="unvalidated": out=[x for x in load("status")["status"] if x["maturity_level"]<3]
-    elif a.kind=="maturity":
-        levels={"proposed":0,"implemented":1,"contracted":2,"unit validated":3,"externally smoke tested":4,"stable":9}; out=[x for x in load("status")["status"] if x["maturity_level"]==levels.get(term,-1)]
-    elif a.kind=="paths": out=[{"module":x["name"],"source":x["source"],"details":x["details"]} for x in mods if term in x["name"]]
+    parser = argparse.ArgumentParser()
+    parser.add_argument("kind", choices=["module", "capability", "symbol", "endpoint", "error", "dependencies", "dependents", "build-order", "port-order", "status", "unvalidated", "maturity", "lifecycle", "deprecated", "replacement", "paths", "recipe"])
+    parser.add_argument("term", nargs="?")
+    parser.add_argument("--target", help="target version for port-order context; does not assert compatibility")
+    parser.add_argument("--json", action="store_true")
+    parser.add_argument("--compact", action="store_true")
+    parser.add_argument("--paths-only", action="store_true")
+    parser.add_argument("--symbols-only", action="store_true")
+    parser.add_argument("--recursive", action="store_true")
+    parser.add_argument("--explain-selection", action="store_true")
+    args = parser.parse_args()
+    term = (args.term or "").lower()
+    modules = load("modules")["modules"]
+    by_name = {item["name"]: item for item in modules}
+    aliases = {alias.lower(): item["name"] for item in modules for alias in item.get("aliases", []) + item.get("deprecated_names", [])}
+    canonical = term if term in by_name else aliases.get(term, term)
+    explanation = None
+
+    if args.kind == "module":
+        exact = [item for item in modules if canonical == item["name"]]
+        out = exact or [item for item in modules if term in item["name"] or term in item["display_name"].lower() or term in [str(x).lower() for x in item.get("aliases", [])]]
+        explanation = "exact canonical identifier or declared alias" if exact else "case-insensitive textual candidate; inspect all matches"
+    elif args.kind == "capability":
+        words = set(term.split())
+        candidates = load("capabilities")["capabilities"]
+        out = [item for item in candidates if term in item["capability"] or (words and words & set(item["capability"].split()))]
+        out.sort(key=lambda item: (-len(words & set(item["capability"].split())), item["capability"]))
+        explanation = "ranked textual capability match; not proof of semantic compatibility"
+    elif args.kind in ("symbol", "endpoint", "error"):
+        file_name, collection = {"symbol": ("public-symbols", "symbols"), "endpoint": ("endpoints", "endpoints"), "error": ("errors", "errors")}[args.kind]
+        out = [item for item in load(file_name)[collection] if term in item[args.kind].lower()]
+        explanation = "case-insensitive generated contract-field match"
+    elif args.kind in ("dependencies", "dependents"):
+        key = "dependencies" if args.kind == "dependencies" else "reverse_dependencies"
+        data = load("dependencies" if args.kind == "dependencies" else "reverse-dependencies")[key]
+        seen = set()
+        def visit(name):
+            for dependency in data.get(name, []):
+                if dependency not in seen:
+                    seen.add(dependency)
+                    if args.recursive:
+                        visit(dependency)
+        visit(canonical)
+        out = sorted(seen)
+        explanation = "canonical declared dependency edges" if canonical in data else "module identifier not found"
+    elif args.kind in ("build-order", "port-order"):
+        key = "build_order" if args.kind == "build-order" else "port_order"
+        order = load("build-order" if args.kind == "build-order" else "port-order")[key]
+        out = order if not term or term == "hyper-zig" else order[:order.index(canonical) + 1] if canonical in order else []
+        explanation = "topological order from canonical dependencies"
+        if args.target:
+            explanation += f"; target {args.target} is query context only and remains unverified"
+    elif args.kind == "status":
+        out = load("repository-health")
+    elif args.kind == "unvalidated":
+        out = [item for item in load("status")["status"] if item["maturity_level"] < 3]
+    elif args.kind == "maturity":
+        levels = {"proposed": 0, "implemented": 1, "contracted": 2, "unit validated": 3, "externally smoke tested": 4, "stable": 9}
+        try:
+            level = int(term)
+        except ValueError:
+            level = levels.get(term, -1)
+        out = [item for item in load("status")["status"] if item["maturity_level"] == level]
+    elif args.kind == "lifecycle":
+        out = [item for item in load("status")["status"] if item["lifecycle"] == term]
+    elif args.kind == "deprecated":
+        out = [item for item in modules if item["lifecycle"] in ("deprecated", "superseded")]
+    elif args.kind == "replacement":
+        item = by_name.get(canonical)
+        out = [] if not item else [{"module": item["name"], "replacement_module": item.get("replacement_module", ""), "lifecycle": item["lifecycle"]}]
+    elif args.kind == "paths":
+        out = [{"module": item["name"], "source": item["source"], "details": item["details"]} for item in modules if term in item["name"]]
     else:
-        for path in sorted((ROOT/"recipes").glob("*/recipe.json")):
-            x=json.loads(path.read_text()); x["path"]=str(path.relative_to(ROOT));
-            if term in x["name"]: out.append(x)
-    if a.paths_only and isinstance(out,list): out=[x.get("source") or x.get("path") or x.get("details") for x in out if isinstance(x,dict)]
-    if a.symbols_only and isinstance(out,list): out=[x["symbol"] for x in out if isinstance(x,dict) and "symbol" in x]
-    result={"query":{"kind":a.kind,"term":a.term,"recursive":a.recursive},"selection_explanation":"case-insensitive match against committed generated textual indexes" if a.explain_selection else None,"results":out}
-    if a.json: print(json.dumps(result,separators=(",",":") if a.compact else None,indent=None if a.compact else 2,sort_keys=True))
+        out = []
+        for path in sorted((ROOT / "recipes").glob("*/recipe.json")):
+            item = json.loads(path.read_text())
+            item["path"] = str(path.relative_to(ROOT))
+            if term in item["name"]:
+                out.append(item)
+
+    if args.paths_only and isinstance(out, list):
+        out = [item.get("source") or item.get("path") or item.get("details") for item in out if isinstance(item, dict)]
+    if args.symbols_only and isinstance(out, list):
+        out = [item["symbol"] for item in out if isinstance(item, dict) and "symbol" in item]
+    result = {"query": {"kind": args.kind, "term": args.term, "recursive": args.recursive, "target": args.target}, "selection_explanation": explanation if args.explain_selection else None, "results": out}
+    if args.json:
+        print(json.dumps(result, separators=(",", ":") if args.compact else None, indent=None if args.compact else 2, sort_keys=True))
+    elif isinstance(out, dict):
+        print(json.dumps(out, indent=2, sort_keys=True))
     else:
-        if isinstance(out,dict): print(json.dumps(out,indent=2,sort_keys=True))
-        else:
-            for x in out: print(x if isinstance(x,str) else json.dumps(x,sort_keys=True))
-if __name__=="__main__": main()
+        for item in out:
+            print(item if isinstance(item, str) else json.dumps(item, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()

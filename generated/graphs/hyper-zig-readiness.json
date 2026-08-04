@@ -1,6 +1,7 @@
 {
+  "_generated": true,
+  "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY",
   "definition": "Contracted dependency closure; not a claim that a hypervisor is complete.",
-  "generated": true,
   "generator": "tools/build-repository-index.py",
   "modules": [
     "aligned-address-and-size-helpers",
@@ -43,5 +44,6 @@
     "physical-page-frame-allocator",
     "type-length-value-decoder"
   ],
-  "ready": false
+  "ready": false,
+  "repository_index_version": "1.0.0"
 }

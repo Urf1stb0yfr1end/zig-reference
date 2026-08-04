@@ -1,16 +1,39 @@
 {
   "name": "construct-bounded-state-machine",
-  "generated": false,
-  "modules": [
+  "problem_solved": "construct bounded state machine",
+  "status": "implemented-unverified",
+  "selected_modules": [
     "state-machine",
     "bounded-integer"
   ],
-  "status": "foundation",
-  "test_command": "zig build recipes",
-  "inherited_guarantees": [
-    "Public module unit contracts and failure-path tests are executed by the recipes aggregate step."
+  "selection_reasons": [
+    "Combines explicit failure-atomic transitions with a bounded policy value."
   ],
-  "gaps": [
-    "A dedicated cross-module orchestration adapter remains required before this recipe can count as system-proven maturity evidence."
-  ]
+  "direct_dependencies": [
+    "state-machine",
+    "bounded-integer"
+  ],
+  "dependency_order": [
+    "state-machine",
+    "bounded-integer"
+  ],
+  "public_endpoints_used": [],
+  "adapters_required": [
+    "recipes/construct-bounded-state-machine/src/recipe.zig"
+  ],
+  "inherited_guarantees": [
+    "Ownership, failure atomicity, bounds, and invalidation remain those of the selected canonical module contracts."
+  ],
+  "gaps_discovered": [
+    "Zig 0.14.0 compiler, recipe, and integration validation remain pending under the zero-binary task rule."
+  ],
+  "future_systems_enabled": [
+    "Larger compositions requiring construct bounded state machine"
+  ],
+  "intended_build_commands": [
+    "zig build test-recipe-construct-bounded-state-machine",
+    "zig build recipes"
+  ],
+  "intended_smoke_commands": [],
+  "validation_evidence_references": []
 }

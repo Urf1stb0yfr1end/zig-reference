@@ -1,16 +1,39 @@
 {
   "name": "validate-physical-page-frame",
-  "generated": false,
-  "modules": [
+  "problem_solved": "validate physical page frame",
+  "status": "implemented-unverified",
+  "selected_modules": [
     "distinct-memory-address-types",
     "physical-page-frame-number-and-address-conversion"
   ],
-  "status": "foundation",
-  "test_command": "zig build recipes",
-  "inherited_guarantees": [
-    "Public module unit contracts and failure-path tests are executed by the recipes aggregate step."
+  "selection_reasons": [
+    "Keeps physical-address type identity while enforcing page alignment."
   ],
-  "gaps": [
-    "A dedicated cross-module orchestration adapter remains required before this recipe can count as system-proven maturity evidence."
-  ]
+  "direct_dependencies": [
+    "distinct-memory-address-types",
+    "physical-page-frame-number-and-address-conversion"
+  ],
+  "dependency_order": [
+    "distinct-memory-address-types",
+    "physical-page-frame-number-and-address-conversion"
+  ],
+  "public_endpoints_used": [],
+  "adapters_required": [
+    "recipes/validate-physical-page-frame/src/recipe.zig"
+  ],
+  "inherited_guarantees": [
+    "Ownership, failure atomicity, bounds, and invalidation remain those of the selected canonical module contracts."
+  ],
+  "gaps_discovered": [
+    "Zig 0.14.0 compiler, recipe, and integration validation remain pending under the zero-binary task rule."
+  ],
+  "future_systems_enabled": [
+    "Larger compositions requiring validate physical page frame"
+  ],
+  "intended_build_commands": [
+    "zig build test-recipe-validate-physical-page-frame",
+    "zig build recipes"
+  ],
+  "intended_smoke_commands": [],
+  "validation_evidence_references": []
 }

@@ -1,4 +1,6 @@
 {
+  "_generated": true,
+  "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY",
   "edges": [
     {
       "dependency": "bounded-byte-reader",
@@ -205,6 +207,6 @@
       "module": "type-length-value-decoder"
     }
   ],
-  "generated": true,
-  "generator": "tools/build-repository-index.py"
+  "generator": "tools/build-repository-index.py",
+  "repository_index_version": "1.0.0"
 }

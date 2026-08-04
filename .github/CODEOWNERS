@@ -1,0 +1,8 @@
+# The repository currently has one owner; GitHub resolves this team/user path.
+* @thanks-cohn
+
+# Contracts and repository-wide policy deserve explicit owner review.
+/details.schema.json @thanks-cohn
+/port.schema.json @thanks-cohn
+/docs/decisions/ @thanks-cohn
+/.github/ @thanks-cohn

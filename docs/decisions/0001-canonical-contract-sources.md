@@ -10,7 +10,11 @@ Repository-wide facts must remain searchable without allowing convenient derived
 
 ## Decision
 
-Source defines exact behavior; tests define executable evidence; details.json defines module identity, API, ownership, failure, composition, lifecycle, discovery, and validation metadata; port.js defines version migration metadata; accepted ADRs define repository-wide reasoning. Generated indexes, reports, graphs, and databases are disposable views.
+Source defines exact behavior; tests define executable specifications and, only when executed, evidence; `details.json` defines module identity, API, ownership, failure, composition, lifecycle, discovery, and validation metadata; `port.js` defines Zig-version migration metadata; accepted ADRs define repository-wide reasoning. README, MASTERY, DETAILS, the catalog, indexes, reports, and graphs are human or machine views, never independent authorities.
+
+Facts are written once in the authority that owns them. Generators derive secondary representations; consistency checkers verify summaries that cannot be generated usefully. A source/contract conflict is resolved in favor of observed source behavior, followed by a documentation correction and regression test. Unsupported claims are removed or marked unverified rather than preserved.
+
+Schema migrations change the schema, canonical contracts, readers, and generators in one review. Future agents update source/tests for behavior, `details.json` for composition metadata, `port.js` for version-sensitive knowledge, or an ADR for repository policy, then regenerate textual views. Generated files must never be hand-synchronized.
 
 ## Consequences
 

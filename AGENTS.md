@@ -175,3 +175,13 @@ Future agents must follow this order:
 9. Run repository validation under Zig 0.14.0.
 10. Record executed validation evidence honestly; never mark skipped work passed.
 11. Never commit binary generated artifacts, databases, caches, executables, images, archives, or fuzz output.
+
+## Command workflow
+
+- Consult root [`COMMANDS.md`](COMMANDS.md) before inventing or guessing a command.
+- Change the defining build step, CLI, or canonical metadata before changing its manual entry.
+- Regenerate or validate the module-command section and run `PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check`.
+- Never document a command as available unless it exists, or call it verified unless it executed successfully in the reported environment.
+- Never hand-edit generated indexes, duplicate modules without querying, add undeclared dependencies, bypass applicable smoke tests, ignore lifecycle replacements, or treat generated views as canonical.
+- Never change the Zig 0.14.0 baseline or claim later-version compatibility without evidence.
+- Never manually synchronize multiple copies of a fact, and never create SQLite or other opaque query state where transparent JSON suffices.

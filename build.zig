@@ -43,6 +43,16 @@ const specs = [_]ModuleSpec{
     .{ .name = "elf64-program-header-parser", .source = "projects/38-elf64-program-header-parser/src/elf64_program_header_parser.zig", .dependencies = &.{ "fixed-capacity-vector", "bounded-byte-reader", "checked-integer-cast", "validated-enum-decoder", "aligned-address-and-size-helpers", "validated-bit-flags", "checked-half-open-range", "distinct-memory-address-types", "endian-integer-codec", "binary-cursor-checkpoint", "bounded-binary-sub-reader", "elf64-file-header-parser" } },
 };
 
+const RecipeSpec = struct { name: []const u8, dependencies: []const []const u8 };
+const recipe_specs = [_]RecipeSpec{
+    .{ .name = "parse-length-prefixed-record", .dependencies = &.{ "bounded-byte-reader", "length-prefixed-binary-field" } },
+    .{ .name = "create-stale-safe-object-registry", .dependencies = &.{"fixed-capacity-object-pool"} },
+    .{ .name = "write-and-read-explicit-endian-record", .dependencies = &.{ "byte-writer", "bounded-byte-reader", "endian-integer-codec" } },
+    .{ .name = "validate-physical-page-frame", .dependencies = &.{ "distinct-memory-address-types", "physical-page-frame-number-and-address-conversion" } },
+    .{ .name = "construct-bounded-state-machine", .dependencies = &.{ "state-machine", "bounded-integer" } },
+    .{ .name = "normalize-checked-memory-range", .dependencies = &.{ "checked-half-open-range", "aligned-address-and-size-helpers" } },
+};
+
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
@@ -67,6 +77,8 @@ pub fn build(b: *std.Build) void {
     policy_step.dependOn(&policy_command.step);
     policy_step.dependOn(check_step);
     policy_step.dependOn(port_check_step);
+    const command_reference_check = b.addSystemCommand(&.{ "python3", "tools/check-command-reference.py", "--check" });
+    policy_step.dependOn(&command_reference_check.step);
     const index_command = b.addSystemCommand(&.{ "python3", "tools/build-repository-index.py" });
     const index_step = b.step("index", "Regenerate deterministic textual repository indexes");
     index_step.dependOn(&index_command.step);
@@ -77,10 +89,6 @@ pub fn build(b: *std.Build) void {
     graph_step.dependOn(&graph_command.step);
     const graph_check_command = b.addSystemCommand(&.{ "python3", "tools/build-dependency-graphs.py", "--check" });
     policy_step.dependOn(&graph_check_command.step);
-    const database_command = b.addSystemCommand(&.{ "python3", "tools/build-repository-database.py" });
-    const database_step = b.step("database", "Generate an ignored local SQLite acceleration index");
-    database_step.dependOn(&database_command.step);
-    const database_check_command = b.addSystemCommand(&.{ "python3", "tools/build-repository-database.py", "--check" });
     const status_command = b.addSystemCommand(&.{ "python3", "tools/status.py" });
     const status_step = b.step("status", "Print evidence-backed repository health");
     status_step.dependOn(&status_command.step);
@@ -132,10 +140,18 @@ pub fn build(b: *std.Build) void {
         smoke_all.dependOn(&run_smoke.step);
         test_all.dependOn(&run_smoke.step);
     }
+    for (recipe_specs) |recipe| {
+        const recipe_module = b.createModule(.{ .root_source_file = b.path(b.fmt("recipes/{s}/src/recipe.zig", .{recipe.name})), .target = target, .optimize = optimize });
+        for (recipe.dependencies) |dependency_name| recipe_module.addImport(dependency_name, findModule(dependency_name, &modules));
+        const recipe_tests = b.addTest(.{ .root_module = recipe_module });
+        const run_recipe = b.addRunArtifact(recipe_tests);
+        const recipe_step = b.step(b.fmt("test-recipe-{s}", .{recipe.name}), b.fmt("Run {s} composition tests", .{recipe.name}));
+        recipe_step.dependOn(&run_recipe.step);
+        recipes_step.dependOn(&run_recipe.step);
+    }
 
     const validate_step = b.step("validate-repository", "Run the complete repository validation pipeline");
     validate_step.dependOn(policy_step);
-    validate_step.dependOn(&database_check_command.step);
     validate_step.dependOn(test_all);
     validate_step.dependOn(smoke_all);
     validate_step.dependOn(recipes_step);
