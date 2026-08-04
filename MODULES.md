@@ -23,6 +23,16 @@ Use this file for fast discovery. Open a module's `DETAILS.md` or `details.json`
 | `16-validated-bit-flags` | Typed masks that reject unknown bits | none | permissions, page entries, VMX, registers | [`DETAILS.md`](projects/16-validated-bit-flags/DETAILS.md) |
 | `17-checked-half-open-range` | Overflow-safe `[start,end)` region value | none | memory maps, loaders, MMIO, storage | [`DETAILS.md`](projects/17-checked-half-open-range/DETAILS.md) |
 | `18-distinct-memory-address-types` | Type-separated host, guest, physical, and virtual addresses | none | page tables, EPT, DMA, guest memory | [`DETAILS.md`](projects/18-distinct-memory-address-types/DETAILS.md) |
+| `19-wrapping-sequence-number` | Explicit modulo sequence arithmetic | none | protocols, ring epochs, hardware counters | [`DETAILS.md`](projects/19-wrapping-sequence-number/DETAILS.md) |
+| `20-optional-typed-handle` | Domain-specific opaque handles with optional absence | none | registries, APIs, configuration models | [`DETAILS.md`](projects/20-optional-typed-handle/DETAILS.md) |
+| `21-unit-safe-quantity` | Scalar values separated by unit tags | none | memory sizes, sectors, durations, dimensions | [`DETAILS.md`](projects/21-unit-safe-quantity/DETAILS.md) |
+| `22-endian-integer-codec` | Fixed-width integer encoding with explicit byte order | none | binary readers, protocols, loaders, firmware | [`DETAILS.md`](projects/22-endian-integer-codec/DETAILS.md) |
+| `23-validated-ascii-byte` | Byte value proven to be ASCII | none | lexers, protocol tokens, identifier validators | [`DETAILS.md`](projects/23-validated-ascii-byte/DETAILS.md) |
+| `24-fourcc-code` | Exact four-byte format or protocol identifier | none | media parsers, signature dispatch, firmware | [`DETAILS.md`](projects/24-fourcc-code/DETAILS.md) |
+| `25-semantic-version` | Structured numeric version comparison | none | compatibility, negotiation, migrations | [`DETAILS.md`](projects/25-semantic-version/DETAILS.md) |
+| `26-tagged-result` | Exclusive structured success/failure outcome | none | authorization, parsing, emulation, validation | [`DETAILS.md`](projects/26-tagged-result/DETAILS.md) |
+| `27-source-span` | Checked half-open byte span into source data | none | lexers, parsers, diagnostics, compilers | [`DETAILS.md`](projects/27-source-span/DETAILS.md) |
+| `28-physical-page-frame-number-and-address-conversion` | Checked 4 KiB page-frame/address conversion | `18-distinct-memory-address-types` | page allocators, page tables, EPT, guest memory | [`DETAILS.md`](projects/28-physical-page-frame-number-and-address-conversion/DETAILS.md) |
 
 ## Selection workflow
 
