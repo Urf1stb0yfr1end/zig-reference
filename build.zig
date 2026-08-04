@@ -23,7 +23,7 @@ pub fn build(b: *std.Build) void {
         all_tests_step,
         "test-dynamic-array",
         "Run the dynamic array tests",
-        "projects/02-dynamic-array/src/dynamic_array.zig",
+        "projects/01-dynamic-array/src/dynamic_array.zig",
     );
 
     addTestProject(
@@ -33,7 +33,27 @@ pub fn build(b: *std.Build) void {
         all_tests_step,
         "test-ring-buffer",
         "Run the ring buffer tests",
-        "projects/03-ring-buffer/src/ring_buffer.zig",
+        "projects/02-ring-buffer/src/ring_buffer.zig",
+    );
+
+    addTestProject(
+        b,
+        target,
+        optimize,
+        all_tests_step,
+        "test-bit-set",
+        "Run the fixed bit set tests",
+        "projects/03-bit-set/src/bit_set.zig",
+    );
+
+    addTestProject(
+        b,
+        target,
+        optimize,
+        all_tests_step,
+        "test-bounded-reader",
+        "Run the bounded byte reader tests",
+        "projects/04-bounded-byte-reader/src/bounded_reader.zig",
     );
 }
 
