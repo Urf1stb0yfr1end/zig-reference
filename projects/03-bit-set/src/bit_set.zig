@@ -86,7 +86,7 @@ pub fn BitSet(comptime bit_count: usize) type {
         }
 
         fn maskUnusedBits(self: *Self) void {
-            if (word_count == 0) return;
+            if (comptime word_count == 0) return;
 
             const used_in_last = bit_count % bits_per_word;
             if (used_in_last == 0) return;

@@ -6,14 +6,14 @@ pub const CheckedRange = struct {
 
     pub const Error = error{ InvalidRange, Overflow };
 
-    pub fn init(start: usize, end: usize) Error!CheckedRange {
-        if (end < start) return error.InvalidRange;
-        return .{ .start = start, .end = end };
+    pub fn init(start_value: usize, end_value: usize) Error!CheckedRange {
+        if (end_value < start_value) return error.InvalidRange;
+        return .{ .start = start_value, .end = end_value };
     }
 
-    pub fn fromStartAndLength(start: usize, length: usize) Error!CheckedRange {
-        const end = std.math.add(usize, start, length) catch return error.Overflow;
-        return init(start, end);
+    pub fn fromStartAndLength(start_value: usize, range_length: usize) Error!CheckedRange {
+        const end_value = std.math.add(usize, start_value, range_length) catch return error.Overflow;
+        return init(start_value, end_value);
     }
 
     pub fn length(self: CheckedRange) usize {
@@ -37,10 +37,10 @@ pub const CheckedRange = struct {
     }
 
     pub fn intersection(self: CheckedRange, other: CheckedRange) ?CheckedRange {
-        const start = @max(self.start, other.start);
-        const end = @min(self.end, other.end);
-        if (end <= start) return null;
-        return .{ .start = start, .end = end };
+        const intersection_start = @max(self.start, other.start);
+        const intersection_end = @min(self.end, other.end);
+        if (intersection_end <= intersection_start) return null;
+        return .{ .start = intersection_start, .end = intersection_end };
     }
 };
 

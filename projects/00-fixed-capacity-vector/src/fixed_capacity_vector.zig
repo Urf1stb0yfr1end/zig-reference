@@ -61,6 +61,7 @@ pub fn FixedVector(comptime T: type, comptime capacity: usize) type {
         }
 
         pub fn append(self: *Self, value: T) Error!void {
+            if (comptime capacity == 0) return error.Full;
             if (self.isFull()) return error.Full;
 
             self.storage[self.len] = value;

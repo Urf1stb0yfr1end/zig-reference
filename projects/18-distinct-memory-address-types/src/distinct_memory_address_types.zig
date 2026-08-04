@@ -1,9 +1,10 @@
 const std = @import("std");
 
 fn Address(comptime domain_name: []const u8) type {
-    _ = domain_name;
     return struct {
         const Self = @This();
+
+        pub const domain = domain_name;
 
         value: usize,
 

@@ -14,9 +14,9 @@ pub fn ValidatedBitFlags(comptime Flag: type) type {
 
         bits: Storage = 0,
 
-        pub fn fromRaw(raw: Storage) error{UnknownBits}!Self {
-            if ((raw & ~allowed_mask) != 0) return error.UnknownBits;
-            return .{ .bits = raw };
+        pub fn fromRaw(raw_bits: Storage) error{UnknownBits}!Self {
+            if ((raw_bits & ~allowed_mask) != 0) return error.UnknownBits;
+            return .{ .bits = raw_bits };
         }
 
         pub fn raw(self: Self) Storage {
