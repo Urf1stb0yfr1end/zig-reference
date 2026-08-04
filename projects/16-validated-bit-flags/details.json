@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.0.0",
+  "schema_version": "3.0.0",
   "contract_version": "1.0.0",
   "generated_at": "2026-08-04",
   "last_reviewed_at": "2026-08-04",
@@ -70,9 +70,6 @@
       "projects/16-validated-bit-flags/src/validated_bit_flags.zig"
     ],
     "public_entrypoint": "projects/16-validated-bit-flags/src/validated_bit_flags.zig",
-    "tests": [
-      "projects/16-validated-bit-flags/src/validated_bit_flags.zig"
-    ],
     "readme": "projects/16-validated-bit-flags/README.md",
     "mastery": "projects/16-validated-bit-flags/MASTERY.md",
     "details_markdown": "projects/16-validated-bit-flags/DETAILS.md",
@@ -81,7 +78,15 @@
     "benchmarks": [],
     "fixtures": [],
     "fuzz_targets": [],
-    "architecture_notes": []
+    "architecture_notes": [],
+    "unit_tests": [
+      "projects/16-validated-bit-flags/src/validated_bit_flags.zig"
+    ],
+    "smoke_tests": [
+      "projects/16-validated-bit-flags/tests/smoke_test.zig"
+    ],
+    "generated_files": [],
+    "dependency_contracts": []
   },
   "public_surface": {
     "root_symbols": [
@@ -126,7 +131,439 @@
     ],
     "callbacks": [],
     "interfaces": [],
-    "compile_time_parameters": []
+    "compile_time_parameters": [],
+    "endpoints": [
+      {
+        "name": "ValidatedBitFlags",
+        "kind": "function",
+        "signature": "ValidatedBitFlags(comptime Flag: type) type",
+        "visibility": "public",
+        "summary": "Provides the public ValidatedBitFlags operation documented by the authoritative Zig signature.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "Flag",
+            "type": "type",
+            "role": "Value supplied as Flag.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "type",
+            "meaning": "Result of ValidatedBitFlags.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The ValidatedBitFlags contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "fromRaw",
+        "kind": "method",
+        "signature": "fromRaw(raw: Storage) error",
+        "visibility": "public",
+        "summary": "Provides the public fromRaw operation documented by the authoritative Zig signature.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "raw",
+            "type": "Storage",
+            "role": "Value supplied as raw.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "error",
+            "meaning": "Result of fromRaw.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [
+          {
+            "name": "UnknownBits",
+            "condition": "fromRaw encounters the UnknownBits failure condition documented by source and module failure behavior.",
+            "state_after_error": "unchanged unless explicitly documented otherwise"
+          }
+        ],
+        "preconditions": [],
+        "postconditions": [
+          "The fromRaw contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "raw",
+        "kind": "method",
+        "signature": "raw(self: Self) Storage",
+        "visibility": "public",
+        "summary": "Provides the public raw operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "Self",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Storage",
+            "meaning": "Result of raw.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The raw contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "contains",
+        "kind": "method",
+        "signature": "contains(self: Self, flag: Flag) bool",
+        "visibility": "public",
+        "summary": "Provides the public contains operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "Self",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [
+          {
+            "name": "flag",
+            "type": "Flag",
+            "role": "Value supplied as flag.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "bool",
+            "meaning": "Result of contains.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The contains contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "insert",
+        "kind": "method",
+        "signature": "insert(self: *Self, flag: Flag) void",
+        "visibility": "public",
+        "summary": "Provides the public insert operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [
+          {
+            "name": "flag",
+            "type": "Flag",
+            "role": "Value supplied as flag.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "void",
+            "meaning": "Result of insert.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The insert contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "remove",
+        "kind": "method",
+        "signature": "remove(self: *Self, flag: Flag) void",
+        "visibility": "public",
+        "summary": "Provides the public remove operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [
+          {
+            "name": "flag",
+            "type": "Flag",
+            "role": "Value supplied as flag.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "void",
+            "meaning": "Result of remove.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The remove contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "clear",
+        "kind": "method",
+        "signature": "clear(self: *Self) void",
+        "visibility": "public",
+        "summary": "Provides the public clear operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "void",
+            "meaning": "Result of clear.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The clear contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      }
+    ]
   },
   "inputs": [
     {
@@ -134,21 +571,69 @@
       "type": "enum type",
       "ownership": "compile-time",
       "lifetime": "program",
-      "constraints": "integer-backed enum whose values represent masks"
+      "constraints": [
+        "integer-backed enum whose values represent masks"
+      ],
+      "role": "Module input Flag",
+      "borrowing": "explicit in type",
+      "mutability": "type-defined",
+      "valid_range": "see constraints",
+      "alignment": "type-defined",
+      "endianness": "not applicable unless stated",
+      "format": "Zig value",
+      "required_invariants": [],
+      "validation_performed": [],
+      "accepts_untrusted_input": true,
+      "stored": false,
+      "copied": false,
+      "may_mutate": false,
+      "errors_on_invalid_input": []
     },
     {
       "name": "raw",
       "type": "enum tag integer",
       "ownership": "copied",
       "lifetime": "call",
-      "constraints": "may contain unknown bits"
+      "constraints": [
+        "may contain unknown bits"
+      ],
+      "role": "Module input raw",
+      "borrowing": "explicit in type",
+      "mutability": "type-defined",
+      "valid_range": "see constraints",
+      "alignment": "type-defined",
+      "endianness": "not applicable unless stated",
+      "format": "Zig value",
+      "required_invariants": [],
+      "validation_performed": [],
+      "accepts_untrusted_input": true,
+      "stored": false,
+      "copied": false,
+      "may_mutate": false,
+      "errors_on_invalid_input": []
     },
     {
       "name": "flag",
       "type": "Flag",
       "ownership": "copied",
       "lifetime": "call",
-      "constraints": "declared enum value"
+      "constraints": [
+        "declared enum value"
+      ],
+      "role": "Module input flag",
+      "borrowing": "explicit in type",
+      "mutability": "type-defined",
+      "valid_range": "see constraints",
+      "alignment": "type-defined",
+      "endianness": "not applicable unless stated",
+      "format": "Zig value",
+      "required_invariants": [],
+      "validation_performed": [],
+      "accepts_untrusted_input": true,
+      "stored": false,
+      "copied": false,
+      "may_mutate": false,
+      "errors_on_invalid_input": []
     }
   ],
   "outputs": [
@@ -157,16 +642,36 @@
       "type": "Self",
       "ownership": "copied value",
       "lifetime": "caller state",
-      "invalidation": "none",
-      "caller_cleanup": "none"
+      "meaning": "Module output flag set",
+      "borrowed_from": "module or input as stated by ownership",
+      "cleanup_required": false,
+      "cleanup_responsibility": "none",
+      "invalidation_conditions": [
+        "none"
+      ],
+      "aliasing": "type-defined",
+      "borrows_from_module": false,
+      "borrows_from_input": false,
+      "valid_after_mutation": "subject to invalidation conditions",
+      "absence_meaning": "optional absence is operation-defined"
     },
     {
       "name": "raw bits",
       "type": "Storage",
       "ownership": "copied",
       "lifetime": "caller value",
-      "invalidation": "none",
-      "caller_cleanup": "none"
+      "meaning": "Module output raw bits",
+      "borrowed_from": "module or input as stated by ownership",
+      "cleanup_required": false,
+      "cleanup_responsibility": "none",
+      "invalidation_conditions": [
+        "none"
+      ],
+      "aliasing": "type-defined",
+      "borrows_from_module": false,
+      "borrows_from_input": false,
+      "valid_after_mutation": "subject to invalidation conditions",
+      "absence_meaning": "optional absence is operation-defined"
     }
   ],
   "state": {
@@ -228,9 +733,19 @@
   "failure_behavior": {
     "errors": [
       {
-        "operation": "fromRaw",
-        "error": "UnknownBits",
-        "state_change": "no value constructed"
+        "name": "UnknownBits",
+        "operations": [
+          "fromRaw"
+        ],
+        "condition": "UnknownBits condition documented by the operation",
+        "origin": "module",
+        "state_after_error": "no value constructed",
+        "partial_effects": [],
+        "rollback": "not required when state is unchanged",
+        "cleanup_required": false,
+        "retry_safe": true,
+        "retry_guidance": "retry only after correcting the failing condition",
+        "dependency_origin": ""
       }
     ],
     "optional_empty_results": [],
@@ -285,9 +800,9 @@
   ],
   "known_consumers": [],
   "composition": {
-    "import_name": "validated_bit_flags",
+    "import_name": "validated-bit-flags",
     "import_path": "projects/16-validated-bit-flags/src/validated_bit_flags.zig",
-    "import_configuration": "Import projects/16-validated-bit-flags/src/validated_bit_flags.zig.",
+    "import_configuration": "Use the build-registered named import @import(\"validated-bit-flags\").",
     "minimal_example": "const Flags = ValidatedBitFlags(Permission); var flags = try Flags.fromRaw(raw); flags.insert(.write);",
     "integration_patterns": [
       {
@@ -383,20 +898,40 @@
     "zero_capacity_tests": [],
     "boundary_tests": [],
     "regression_tests": [],
-    "test_dependencies": []
+    "test_dependencies": [],
+    "smoke_test_commands": [
+      "zig build smoke-validated-bit-flags",
+      "zig build smoke"
+    ],
+    "smoke_test_behaviors": [
+      "all public declarations are recursively referenced and compiled as an external consumer",
+      "zero private-path access: only the named public module import is available"
+    ],
+    "smoke_test_dependencies": []
   },
   "validation": {
     "compiler_validated": false,
     "compiler_version": "",
     "last_validated_commit": "",
-    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "last_validation_result": "unverified: Zig is not installed in the migration environment",
     "continuous_integration": "unknown",
     "known_compile_failures": [],
     "known_test_failures": [],
     "unverified_claims": [],
     "notes": [
       "Local Zig 0.14.0 validation pending."
-    ]
+    ],
+    "status_dimensions": {
+      "implementation_present": true,
+      "contract_complete": true,
+      "contract_formatted": true,
+      "unit_tests_present": true,
+      "smoke_test_present": true,
+      "contract_checker_passed": false,
+      "compiler_validated": false,
+      "unit_tests_passed": false,
+      "smoke_tests_passed": false
+    }
   },
   "documentation": {
     "read_order": [
@@ -523,7 +1058,8 @@
     ],
     "files_not_required_for_basic_use": [
       "MASTERY.md"
-    ]
+    ],
+    "smoke_test_before_integration": "Run zig build smoke-validated-bit-flags before integrating this module."
   },
   "source_map": {
     "symbols_to_files": [
@@ -544,7 +1080,21 @@
     ],
     "errors_to_operations": [],
     "invariants_to_tests": [],
-    "dependencies_to_imports": []
+    "dependencies_to_imports": [],
+    "smoke_tests_to_public_symbols": [
+      {
+        "file": "projects/16-validated-bit-flags/tests/smoke_test.zig",
+        "symbols": [
+          "ValidatedBitFlags"
+        ]
+      }
+    ],
+    "smoke_tests_to_dependencies": [
+      {
+        "file": "projects/16-validated-bit-flags/tests/smoke_test.zig",
+        "dependencies": []
+      }
+    ]
   },
   "provenance": {
     "original_author": "",
@@ -554,6 +1104,45 @@
     "design_sources": [],
     "migration_history": [
       "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  },
+  "smoke_test": {
+    "required": true,
+    "implemented": true,
+    "status": "present-unverified",
+    "source_path": "projects/16-validated-bit-flags/tests/smoke_test.zig",
+    "build_step": "smoke-validated-bit-flags",
+    "commands": [
+      "zig build smoke-validated-bit-flags",
+      "zig build smoke"
+    ],
+    "public_import_used": "validated-bit-flags",
+    "public_symbols_exercised": [
+      "ValidatedBitFlags"
+    ],
+    "successful_operations": [
+      "all public declarations are recursively referenced and compiled as an external consumer"
+    ],
+    "failure_or_boundary_operations": [
+      "zero private-path access: only the named public module import is available"
+    ],
+    "cleanup_exercised": [
+      "compile-time public declaration traversal requires no cleanup"
+    ],
+    "repository_dependencies_exercised": [],
+    "hosted_environment_required": "Zig test runner",
+    "freestanding_environment_required": "not required for smoke execution",
+    "fixtures": [],
+    "expected_exit_status": "0",
+    "expected_output": [],
+    "forbidden_private_access": true,
+    "last_run": "",
+    "last_result": "unverified",
+    "last_validated_commit": "",
+    "compiler_version": "",
+    "known_failures": [],
+    "notes": [
+      "Runtime behavior remains covered by the module unit tests; this smoke test proves external named-import usability and public declaration compilation."
     ]
   }
 }

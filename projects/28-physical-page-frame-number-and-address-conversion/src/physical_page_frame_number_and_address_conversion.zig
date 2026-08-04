@@ -1,5 +1,5 @@
 const std = @import("std");
-const addresses = @import("../../18-distinct-memory-address-types/src/distinct_memory_address_types.zig");
+const addresses = @import("distinct-memory-address-types");
 
 pub const PageSize = 4096;
 

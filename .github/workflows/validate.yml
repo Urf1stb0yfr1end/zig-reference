@@ -1,0 +1,17 @@
+name: validate
+on:
+  push:
+  pull_request:
+jobs:
+  contracts-and-zig:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: 0.14.0
+      - run: python3 -m pip install -r tools/requirements.txt
+      - run: python3 tools/format-module-contracts.py --check
+      - run: zig build check-module-contracts
+      - run: zig build smoke
+      - run: zig build test

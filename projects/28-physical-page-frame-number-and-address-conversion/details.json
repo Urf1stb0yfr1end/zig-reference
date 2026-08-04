@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.0.0",
+  "schema_version": "3.0.0",
   "contract_version": "1.0.0",
   "generated_at": "2026-08-04",
   "last_reviewed_at": "2026-08-04",
@@ -54,9 +54,6 @@
       "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig"
     ],
     "public_entrypoint": "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig",
-    "tests": [
-      "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig"
-    ],
     "readme": "projects/28-physical-page-frame-number-and-address-conversion/README.md",
     "mastery": "projects/28-physical-page-frame-number-and-address-conversion/MASTERY.md",
     "details_markdown": "projects/28-physical-page-frame-number-and-address-conversion/DETAILS.md",
@@ -65,7 +62,17 @@
     "benchmarks": [],
     "fixtures": [],
     "fuzz_targets": [],
-    "architecture_notes": []
+    "architecture_notes": [],
+    "unit_tests": [
+      "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig"
+    ],
+    "smoke_tests": [
+      "projects/28-physical-page-frame-number-and-address-conversion/tests/smoke_test.zig"
+    ],
+    "generated_files": [],
+    "dependency_contracts": [
+      "projects/18-distinct-memory-address-types/details.json"
+    ]
   },
   "public_surface": {
     "root_symbols": [
@@ -86,19 +93,312 @@
     ],
     "callbacks": [],
     "interfaces": [],
-    "compile_time_parameters": []
+    "compile_time_parameters": [],
+    "endpoints": [
+      {
+        "name": "PhysicalPageFrameNumber",
+        "kind": "type_or_constant",
+        "signature": "PhysicalPageFrameNumber",
+        "visibility": "public",
+        "summary": "Canonical public root symbol PhysicalPageFrameNumber.",
+        "receiver": null,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "symbol",
+            "type": "type or constant",
+            "meaning": "Public symbol PhysicalPageFrameNumber.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [],
+        "failure_atomicity": "not applicable",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "PageSize",
+        "kind": "type_or_constant",
+        "signature": "PageSize",
+        "visibility": "public",
+        "summary": "Canonical public root symbol PageSize.",
+        "receiver": null,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "symbol",
+            "type": "type or constant",
+            "meaning": "Public symbol PageSize.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [],
+        "failure_atomicity": "not applicable",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "init",
+        "kind": "method",
+        "signature": "init(value: usize) PhysicalPageFrameNumber",
+        "visibility": "public",
+        "summary": "Provides the public init operation documented by the authoritative Zig signature.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "value",
+            "type": "usize",
+            "role": "Value supplied as value.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "PhysicalPageFrameNumber",
+            "meaning": "Result of init.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The init contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "toAddress",
+        "kind": "method",
+        "signature": "toAddress(self: PhysicalPageFrameNumber) error",
+        "visibility": "public",
+        "summary": "Provides the public toAddress operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "PhysicalPageFrameNumber",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "error",
+            "meaning": "Result of toAddress.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [
+          {
+            "name": "Overflow",
+            "condition": "toAddress encounters the Overflow failure condition documented by source and module failure behavior.",
+            "state_after_error": "unchanged unless explicitly documented otherwise"
+          }
+        ],
+        "preconditions": [],
+        "postconditions": [
+          "The toAddress contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "fromAddress",
+        "kind": "method",
+        "signature": "fromAddress(address: addresses.PhysicalAddress) error",
+        "visibility": "public",
+        "summary": "Provides the public fromAddress operation documented by the authoritative Zig signature.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "address",
+            "type": "addresses.PhysicalAddress",
+            "role": "Value supplied as address.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "error",
+            "meaning": "Result of fromAddress.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [
+          {
+            "name": "Unaligned",
+            "condition": "fromAddress encounters the Unaligned failure condition documented by source and module failure behavior.",
+            "state_after_error": "unchanged unless explicitly documented otherwise"
+          }
+        ],
+        "preconditions": [],
+        "postconditions": [
+          "The fromAddress contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      }
+    ]
   },
   "inputs": [
     {
       "name": "frame number",
       "type": "usize",
-      "ownership": "copied"
+      "ownership": "copied",
+      "role": "Module input frame number",
+      "borrowing": "explicit in type",
+      "mutability": "type-defined",
+      "valid_range": "see constraints",
+      "alignment": "type-defined",
+      "endianness": "not applicable unless stated",
+      "format": "Zig value",
+      "required_invariants": [],
+      "validation_performed": [],
+      "accepts_untrusted_input": true,
+      "stored": false,
+      "copied": false,
+      "may_mutate": false,
+      "errors_on_invalid_input": []
     },
     {
       "name": "physical address",
       "type": "PhysicalAddress",
       "ownership": "copied",
-      "constraints": "4096-byte aligned"
+      "constraints": [
+        "4096-byte aligned"
+      ],
+      "role": "Module input physical address",
+      "borrowing": "explicit in type",
+      "mutability": "type-defined",
+      "valid_range": "see constraints",
+      "alignment": "type-defined",
+      "endianness": "not applicable unless stated",
+      "format": "Zig value",
+      "required_invariants": [],
+      "validation_performed": [],
+      "accepts_untrusted_input": true,
+      "stored": false,
+      "copied": false,
+      "may_mutate": false,
+      "errors_on_invalid_input": []
     }
   ],
   "outputs": [
@@ -106,7 +406,18 @@
       "name": "physical address or frame number",
       "type": "PhysicalAddress or PhysicalPageFrameNumber",
       "ownership": "copied",
-      "invalidation": "none"
+      "meaning": "Module output physical address or frame number",
+      "borrowed_from": "module or input as stated by ownership",
+      "cleanup_required": false,
+      "cleanup_responsibility": "none",
+      "invalidation_conditions": [
+        "none"
+      ],
+      "aliasing": "type-defined",
+      "borrows_from_module": false,
+      "borrows_from_input": false,
+      "valid_after_mutation": "subject to invalidation conditions",
+      "absence_meaning": "optional absence is operation-defined"
     }
   ],
   "state": {
@@ -160,8 +471,32 @@
   },
   "failure_behavior": {
     "errors": [
-      "Overflow",
-      "Unaligned"
+      {
+        "name": "Overflow",
+        "operations": [],
+        "condition": "Overflow condition documented by the operation",
+        "origin": "module",
+        "state_after_error": "documented by operation",
+        "partial_effects": [],
+        "rollback": "not required when state is unchanged",
+        "cleanup_required": false,
+        "retry_safe": true,
+        "retry_guidance": "retry only after correcting the failing condition",
+        "dependency_origin": ""
+      },
+      {
+        "name": "Unaligned",
+        "operations": [],
+        "condition": "Unaligned condition documented by the operation",
+        "origin": "module",
+        "state_after_error": "documented by operation",
+        "partial_effects": [],
+        "rollback": "not required when state is unchanged",
+        "cleanup_required": false,
+        "retry_safe": true,
+        "retry_guidance": "retry only after correcting the failing condition",
+        "dependency_origin": ""
+      }
     ],
     "optional_empty_results": [],
     "failure_atomicity": "value conversion is stateless",
@@ -201,10 +536,21 @@
   "dependency_contracts": [
     {
       "module": "distinct-memory-address-types",
-      "path": "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig",
-      "symbol": "PhysicalAddress",
-      "guarantee": "physical-address domain separation and checked arithmetic",
-      "reason": "returns the repository physical address type"
+      "directory": "projects/18-distinct-memory-address-types",
+      "import_name": "distinct-memory-address-types",
+      "import_path": "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig",
+      "symbols_used": [
+        "PhysicalAddress"
+      ],
+      "reason": "returns the repository physical address type",
+      "guarantees_inherited": [
+        "physical-address domain separation and checked arithmetic"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible with the checked repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/18-distinct-memory-address-types/details.json"
     }
   ],
   "expected_dependents": [
@@ -217,9 +563,9 @@
   ],
   "known_consumers": [],
   "composition": {
-    "import_name": "physical_page_frame_number_and_address_conversion",
+    "import_name": "physical-page-frame-number-and-address-conversion",
     "import_path": "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig",
-    "import_configuration": "Import the canonical repository-relative source path.",
+    "import_configuration": "Use the build-registered named import @import(\"physical-page-frame-number-and-address-conversion\").",
     "minimal_example": "",
     "integration_patterns": [],
     "pipeline_position": [],
@@ -311,20 +657,42 @@
     "zero_capacity_tests": [],
     "boundary_tests": [],
     "regression_tests": [],
-    "test_dependencies": []
+    "test_dependencies": [],
+    "smoke_test_commands": [
+      "zig build smoke-physical-page-frame-number-and-address-conversion",
+      "zig build smoke"
+    ],
+    "smoke_test_behaviors": [
+      "all public declarations are recursively referenced and compiled as an external consumer",
+      "zero private-path access: only the named public module import is available"
+    ],
+    "smoke_test_dependencies": [
+      "distinct-memory-address-types"
+    ]
   },
   "validation": {
     "compiler_validated": false,
     "compiler_version": "",
     "last_validated_commit": "",
-    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "last_validation_result": "unverified: Zig is not installed in the migration environment",
     "continuous_integration": "unknown",
     "known_compile_failures": [],
     "known_test_failures": [],
     "unverified_claims": [],
     "notes": [
       "Local validation pending."
-    ]
+    ],
+    "status_dimensions": {
+      "implementation_present": true,
+      "contract_complete": true,
+      "contract_formatted": true,
+      "unit_tests_present": true,
+      "smoke_test_present": true,
+      "contract_checker_passed": false,
+      "compiler_validated": false,
+      "unit_tests_passed": false,
+      "smoke_tests_passed": false
+    }
   },
   "documentation": {
     "read_order": [
@@ -421,7 +789,8 @@
     ],
     "files_not_required_for_basic_use": [
       "MASTERY.md"
-    ]
+    ],
+    "smoke_test_before_integration": "Run zig build smoke-physical-page-frame-number-and-address-conversion before integrating this module."
   },
   "source_map": {
     "symbols_to_files": [
@@ -450,6 +819,23 @@
         "guarantee": "physical-address domain separation and checked arithmetic",
         "reason": "returns the repository physical address type"
       }
+    ],
+    "smoke_tests_to_public_symbols": [
+      {
+        "file": "projects/28-physical-page-frame-number-and-address-conversion/tests/smoke_test.zig",
+        "symbols": [
+          "PageSize",
+          "PhysicalPageFrameNumber"
+        ]
+      }
+    ],
+    "smoke_tests_to_dependencies": [
+      {
+        "file": "projects/28-physical-page-frame-number-and-address-conversion/tests/smoke_test.zig",
+        "dependencies": [
+          "distinct-memory-address-types"
+        ]
+      }
     ]
   },
   "provenance": {
@@ -460,6 +846,48 @@
     "design_sources": [],
     "migration_history": [
       "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  },
+  "smoke_test": {
+    "required": true,
+    "implemented": true,
+    "status": "present-unverified",
+    "source_path": "projects/28-physical-page-frame-number-and-address-conversion/tests/smoke_test.zig",
+    "build_step": "smoke-physical-page-frame-number-and-address-conversion",
+    "commands": [
+      "zig build smoke-physical-page-frame-number-and-address-conversion",
+      "zig build smoke"
+    ],
+    "public_import_used": "physical-page-frame-number-and-address-conversion",
+    "public_symbols_exercised": [
+      "PageSize",
+      "PhysicalPageFrameNumber"
+    ],
+    "successful_operations": [
+      "all public declarations are recursively referenced and compiled as an external consumer"
+    ],
+    "failure_or_boundary_operations": [
+      "zero private-path access: only the named public module import is available"
+    ],
+    "cleanup_exercised": [
+      "compile-time public declaration traversal requires no cleanup"
+    ],
+    "repository_dependencies_exercised": [
+      "distinct-memory-address-types"
+    ],
+    "hosted_environment_required": "Zig test runner",
+    "freestanding_environment_required": "not required for smoke execution",
+    "fixtures": [],
+    "expected_exit_status": "0",
+    "expected_output": [],
+    "forbidden_private_access": true,
+    "last_run": "",
+    "last_result": "unverified",
+    "last_validated_commit": "",
+    "compiler_version": "",
+    "known_failures": [],
+    "notes": [
+      "Runtime behavior remains covered by the module unit tests; this smoke test proves external named-import usability and public declaration compilation."
     ]
   }
 }

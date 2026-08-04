@@ -1,5 +1,5 @@
 const std = @import("std");
-const dynamic_array = @import("../../01-dynamic-array/src/dynamic_array.zig");
+const dynamic_array = @import("dynamic-array");
 
 /// An allocator-backed writer for constructing binary output explicitly.
 pub const ByteWriter = struct {

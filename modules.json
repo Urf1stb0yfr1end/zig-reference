@@ -1,0 +1,265 @@
+{
+  "modules": [
+    {
+      "id": "00",
+      "canonical_name": "fixed-capacity-vector",
+      "directory": "projects/00-fixed-capacity-vector",
+      "public_entrypoint": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig",
+      "details": "projects/00-fixed-capacity-vector/details.json",
+      "unit_test_step": "test-fixed-capacity-vector",
+      "smoke_test_step": "smoke-fixed-capacity-vector"
+    },
+    {
+      "id": "01",
+      "canonical_name": "dynamic-array",
+      "directory": "projects/01-dynamic-array",
+      "public_entrypoint": "projects/01-dynamic-array/src/dynamic_array.zig",
+      "details": "projects/01-dynamic-array/details.json",
+      "unit_test_step": "test-dynamic-array",
+      "smoke_test_step": "smoke-dynamic-array"
+    },
+    {
+      "id": "02",
+      "canonical_name": "ring-buffer",
+      "directory": "projects/02-ring-buffer",
+      "public_entrypoint": "projects/02-ring-buffer/src/ring_buffer.zig",
+      "details": "projects/02-ring-buffer/details.json",
+      "unit_test_step": "test-ring-buffer",
+      "smoke_test_step": "smoke-ring-buffer"
+    },
+    {
+      "id": "03",
+      "canonical_name": "bit-set",
+      "directory": "projects/03-bit-set",
+      "public_entrypoint": "projects/03-bit-set/src/bit_set.zig",
+      "details": "projects/03-bit-set/details.json",
+      "unit_test_step": "test-bit-set",
+      "smoke_test_step": "smoke-bit-set"
+    },
+    {
+      "id": "04",
+      "canonical_name": "bounded-byte-reader",
+      "directory": "projects/04-bounded-byte-reader",
+      "public_entrypoint": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig",
+      "details": "projects/04-bounded-byte-reader/details.json",
+      "unit_test_step": "test-bounded-byte-reader",
+      "smoke_test_step": "smoke-bounded-byte-reader"
+    },
+    {
+      "id": "05",
+      "canonical_name": "stack",
+      "directory": "projects/05-stack",
+      "public_entrypoint": "projects/05-stack/src/stack.zig",
+      "details": "projects/05-stack/details.json",
+      "unit_test_step": "test-stack",
+      "smoke_test_step": "smoke-stack"
+    },
+    {
+      "id": "06",
+      "canonical_name": "byte-writer",
+      "directory": "projects/06-byte-writer",
+      "public_entrypoint": "projects/06-byte-writer/src/byte_writer.zig",
+      "details": "projects/06-byte-writer/details.json",
+      "unit_test_step": "test-byte-writer",
+      "smoke_test_step": "smoke-byte-writer"
+    },
+    {
+      "id": "07",
+      "canonical_name": "bitmap-allocator",
+      "directory": "projects/07-bitmap-allocator",
+      "public_entrypoint": "projects/07-bitmap-allocator/src/bitmap_allocator.zig",
+      "details": "projects/07-bitmap-allocator/details.json",
+      "unit_test_step": "test-bitmap-allocator",
+      "smoke_test_step": "smoke-bitmap-allocator"
+    },
+    {
+      "id": "08",
+      "canonical_name": "generational-handles",
+      "directory": "projects/08-generational-handles",
+      "public_entrypoint": "projects/08-generational-handles/src/generational_handles.zig",
+      "details": "projects/08-generational-handles/details.json",
+      "unit_test_step": "test-generational-handles",
+      "smoke_test_step": "smoke-generational-handles"
+    },
+    {
+      "id": "09",
+      "canonical_name": "state-machine",
+      "directory": "projects/09-state-machine",
+      "public_entrypoint": "projects/09-state-machine/src/state_machine.zig",
+      "details": "projects/09-state-machine/details.json",
+      "unit_test_step": "test-state-machine",
+      "smoke_test_step": "smoke-state-machine"
+    },
+    {
+      "id": "10",
+      "canonical_name": "checked-integer-cast",
+      "directory": "projects/10-checked-integer-cast",
+      "public_entrypoint": "projects/10-checked-integer-cast/src/checked_integer_cast.zig",
+      "details": "projects/10-checked-integer-cast/details.json",
+      "unit_test_step": "test-checked-integer-cast",
+      "smoke_test_step": "smoke-checked-integer-cast"
+    },
+    {
+      "id": "11",
+      "canonical_name": "nonzero-integer",
+      "directory": "projects/11-nonzero-integer",
+      "public_entrypoint": "projects/11-nonzero-integer/src/nonzero_integer.zig",
+      "details": "projects/11-nonzero-integer/details.json",
+      "unit_test_step": "test-nonzero-integer",
+      "smoke_test_step": "smoke-nonzero-integer"
+    },
+    {
+      "id": "12",
+      "canonical_name": "bounded-integer",
+      "directory": "projects/12-bounded-integer",
+      "public_entrypoint": "projects/12-bounded-integer/src/bounded_integer.zig",
+      "details": "projects/12-bounded-integer/details.json",
+      "unit_test_step": "test-bounded-integer",
+      "smoke_test_step": "smoke-bounded-integer"
+    },
+    {
+      "id": "13",
+      "canonical_name": "saturating-counter",
+      "directory": "projects/13-saturating-counter",
+      "public_entrypoint": "projects/13-saturating-counter/src/saturating_counter.zig",
+      "details": "projects/13-saturating-counter/details.json",
+      "unit_test_step": "test-saturating-counter",
+      "smoke_test_step": "smoke-saturating-counter"
+    },
+    {
+      "id": "14",
+      "canonical_name": "validated-enum-decoder",
+      "directory": "projects/14-validated-enum-decoder",
+      "public_entrypoint": "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig",
+      "details": "projects/14-validated-enum-decoder/details.json",
+      "unit_test_step": "test-validated-enum-decoder",
+      "smoke_test_step": "smoke-validated-enum-decoder"
+    },
+    {
+      "id": "15",
+      "canonical_name": "aligned-address-and-size-helpers",
+      "directory": "projects/15-aligned-address-and-size-helpers",
+      "public_entrypoint": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig",
+      "details": "projects/15-aligned-address-and-size-helpers/details.json",
+      "unit_test_step": "test-aligned-address-and-size-helpers",
+      "smoke_test_step": "smoke-aligned-address-and-size-helpers"
+    },
+    {
+      "id": "16",
+      "canonical_name": "validated-bit-flags",
+      "directory": "projects/16-validated-bit-flags",
+      "public_entrypoint": "projects/16-validated-bit-flags/src/validated_bit_flags.zig",
+      "details": "projects/16-validated-bit-flags/details.json",
+      "unit_test_step": "test-validated-bit-flags",
+      "smoke_test_step": "smoke-validated-bit-flags"
+    },
+    {
+      "id": "17",
+      "canonical_name": "checked-half-open-range",
+      "directory": "projects/17-checked-half-open-range",
+      "public_entrypoint": "projects/17-checked-half-open-range/src/checked_half_open_range.zig",
+      "details": "projects/17-checked-half-open-range/details.json",
+      "unit_test_step": "test-checked-half-open-range",
+      "smoke_test_step": "smoke-checked-half-open-range"
+    },
+    {
+      "id": "18",
+      "canonical_name": "distinct-memory-address-types",
+      "directory": "projects/18-distinct-memory-address-types",
+      "public_entrypoint": "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig",
+      "details": "projects/18-distinct-memory-address-types/details.json",
+      "unit_test_step": "test-distinct-memory-address-types",
+      "smoke_test_step": "smoke-distinct-memory-address-types"
+    },
+    {
+      "id": "19",
+      "canonical_name": "wrapping-sequence-number",
+      "directory": "projects/19-wrapping-sequence-number",
+      "public_entrypoint": "projects/19-wrapping-sequence-number/src/wrapping_sequence_number.zig",
+      "details": "projects/19-wrapping-sequence-number/details.json",
+      "unit_test_step": "test-wrapping-sequence-number",
+      "smoke_test_step": "smoke-wrapping-sequence-number"
+    },
+    {
+      "id": "20",
+      "canonical_name": "optional-typed-handle",
+      "directory": "projects/20-optional-typed-handle",
+      "public_entrypoint": "projects/20-optional-typed-handle/src/optional_typed_handle.zig",
+      "details": "projects/20-optional-typed-handle/details.json",
+      "unit_test_step": "test-optional-typed-handle",
+      "smoke_test_step": "smoke-optional-typed-handle"
+    },
+    {
+      "id": "21",
+      "canonical_name": "unit-safe-quantity",
+      "directory": "projects/21-unit-safe-quantity",
+      "public_entrypoint": "projects/21-unit-safe-quantity/src/unit_safe_quantity.zig",
+      "details": "projects/21-unit-safe-quantity/details.json",
+      "unit_test_step": "test-unit-safe-quantity",
+      "smoke_test_step": "smoke-unit-safe-quantity"
+    },
+    {
+      "id": "22",
+      "canonical_name": "endian-integer-codec",
+      "directory": "projects/22-endian-integer-codec",
+      "public_entrypoint": "projects/22-endian-integer-codec/src/endian_integer_codec.zig",
+      "details": "projects/22-endian-integer-codec/details.json",
+      "unit_test_step": "test-endian-integer-codec",
+      "smoke_test_step": "smoke-endian-integer-codec"
+    },
+    {
+      "id": "23",
+      "canonical_name": "validated-ascii-byte",
+      "directory": "projects/23-validated-ascii-byte",
+      "public_entrypoint": "projects/23-validated-ascii-byte/src/validated_ascii_byte.zig",
+      "details": "projects/23-validated-ascii-byte/details.json",
+      "unit_test_step": "test-validated-ascii-byte",
+      "smoke_test_step": "smoke-validated-ascii-byte"
+    },
+    {
+      "id": "24",
+      "canonical_name": "fourcc-code",
+      "directory": "projects/24-fourcc-code",
+      "public_entrypoint": "projects/24-fourcc-code/src/fourcc_code.zig",
+      "details": "projects/24-fourcc-code/details.json",
+      "unit_test_step": "test-fourcc-code",
+      "smoke_test_step": "smoke-fourcc-code"
+    },
+    {
+      "id": "25",
+      "canonical_name": "semantic-version",
+      "directory": "projects/25-semantic-version",
+      "public_entrypoint": "projects/25-semantic-version/src/semantic_version.zig",
+      "details": "projects/25-semantic-version/details.json",
+      "unit_test_step": "test-semantic-version",
+      "smoke_test_step": "smoke-semantic-version"
+    },
+    {
+      "id": "26",
+      "canonical_name": "tagged-result",
+      "directory": "projects/26-tagged-result",
+      "public_entrypoint": "projects/26-tagged-result/src/tagged_result.zig",
+      "details": "projects/26-tagged-result/details.json",
+      "unit_test_step": "test-tagged-result",
+      "smoke_test_step": "smoke-tagged-result"
+    },
+    {
+      "id": "27",
+      "canonical_name": "source-span",
+      "directory": "projects/27-source-span",
+      "public_entrypoint": "projects/27-source-span/src/source_span.zig",
+      "details": "projects/27-source-span/details.json",
+      "unit_test_step": "test-source-span",
+      "smoke_test_step": "smoke-source-span"
+    },
+    {
+      "id": "28",
+      "canonical_name": "physical-page-frame-number-and-address-conversion",
+      "directory": "projects/28-physical-page-frame-number-and-address-conversion",
+      "public_entrypoint": "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig",
+      "details": "projects/28-physical-page-frame-number-and-address-conversion/details.json",
+      "unit_test_step": "test-physical-page-frame-number-and-address-conversion",
+      "smoke_test_step": "smoke-physical-page-frame-number-and-address-conversion"
+    }
+  ]
+}

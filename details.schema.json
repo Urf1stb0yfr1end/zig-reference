@@ -1,8 +1,524 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/thanks-cohn/zig-reference/details.schema.json",
-  "title": "zig-reference exhaustive module contract 2.0",
-  "description": "Category-complete machine-readable composition contract. Every listed category and nested field is required.",
+  "title": "zig-reference exhaustive module contract 3.0",
+  "description": "Strict typed operational contract. All categories and fields are required; recurring structures use $defs.",
+  "$defs": {
+    "stringArray": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "pathArray": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "complexityContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "time",
+        "space"
+      ],
+      "properties": {
+        "time": {
+          "type": "string"
+        },
+        "space": {
+          "type": "string"
+        }
+      }
+    },
+    "inputContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type",
+        "role",
+        "ownership",
+        "borrowing",
+        "mutability",
+        "lifetime",
+        "valid_range",
+        "alignment",
+        "endianness",
+        "format",
+        "required_invariants",
+        "validation_performed",
+        "accepts_untrusted_input",
+        "stored",
+        "copied",
+        "may_mutate",
+        "invalid_input_behavior"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "ownership": {
+          "type": "string"
+        },
+        "borrowing": {
+          "type": "string"
+        },
+        "mutability": {
+          "type": "string"
+        },
+        "lifetime": {
+          "type": "string"
+        },
+        "valid_range": {
+          "type": "string"
+        },
+        "alignment": {
+          "type": "string"
+        },
+        "endianness": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        },
+        "required_invariants": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "validation_performed": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "accepts_untrusted_input": {
+          "type": "boolean"
+        },
+        "stored": {
+          "type": "boolean"
+        },
+        "copied": {
+          "type": "boolean"
+        },
+        "may_mutate": {
+          "type": "boolean"
+        },
+        "invalid_input_behavior": {
+          "type": "string"
+        }
+      }
+    },
+    "outputContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type",
+        "meaning",
+        "ownership",
+        "borrowed_from",
+        "lifetime",
+        "cleanup_required",
+        "cleanup_responsibility",
+        "invalidation_conditions",
+        "aliasing",
+        "borrows_from_module",
+        "borrows_from_input",
+        "valid_after_mutation",
+        "absence_meaning"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "meaning": {
+          "type": "string"
+        },
+        "ownership": {
+          "type": "string"
+        },
+        "borrowed_from": {
+          "type": "string"
+        },
+        "lifetime": {
+          "type": "string"
+        },
+        "cleanup_required": {
+          "type": "boolean"
+        },
+        "cleanup_responsibility": {
+          "type": "string"
+        },
+        "invalidation_conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "aliasing": {
+          "type": "string"
+        },
+        "borrows_from_module": {
+          "type": "boolean"
+        },
+        "borrows_from_input": {
+          "type": "boolean"
+        },
+        "valid_after_mutation": {
+          "type": "string"
+        },
+        "absence_meaning": {
+          "type": "string"
+        }
+      }
+    },
+    "errorContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "operations",
+        "condition",
+        "origin",
+        "state_after_error",
+        "partial_effects",
+        "rollback",
+        "cleanup_required",
+        "retry_safe",
+        "retry_guidance",
+        "dependency_origin"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "condition": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "state_after_error": {
+          "type": "string"
+        },
+        "partial_effects": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "rollback": {
+          "type": "string"
+        },
+        "cleanup_required": {
+          "type": "boolean"
+        },
+        "retry_safe": {
+          "type": "boolean"
+        },
+        "retry_guidance": {
+          "type": "string"
+        },
+        "dependency_origin": {
+          "type": "string"
+        }
+      }
+    },
+    "dependencyContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "module",
+        "directory",
+        "import_name",
+        "import_path",
+        "symbols_used",
+        "reason",
+        "guarantees_inherited",
+        "guarantees_not_inherited",
+        "contract_version_assumption",
+        "usage_phase",
+        "smoke_test_exercises_dependency",
+        "contract_path"
+      ],
+      "properties": {
+        "module": {
+          "type": "string"
+        },
+        "directory": {
+          "type": "string"
+        },
+        "import_name": {
+          "type": "string"
+        },
+        "import_path": {
+          "type": "string"
+        },
+        "symbols_used": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reason": {
+          "type": "string"
+        },
+        "guarantees_inherited": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "guarantees_not_inherited": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "contract_version_assumption": {
+          "type": "string"
+        },
+        "usage_phase": {
+          "type": "string"
+        },
+        "smoke_test_exercises_dependency": {
+          "type": "boolean"
+        },
+        "contract_path": {
+          "type": "string"
+        }
+      }
+    },
+    "testContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "command",
+        "behaviors"
+      ],
+      "properties": {
+        "command": {
+          "type": "string"
+        },
+        "behaviors": {
+          "$ref": "#/$defs/stringArray"
+        }
+      }
+    },
+    "endpointContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "kind",
+        "signature",
+        "visibility",
+        "summary",
+        "receiver",
+        "inputs",
+        "outputs",
+        "errors",
+        "preconditions",
+        "postconditions",
+        "failure_atomicity",
+        "complexity",
+        "invalidates",
+        "thread_safety",
+        "examples"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "signature": {
+          "type": "string"
+        },
+        "visibility": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "receiver": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "type",
+                "ownership",
+                "mutation"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "ownership": {
+                  "type": "string"
+                },
+                "mutation": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/inputContract"
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/outputContract"
+          }
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "condition",
+              "state_after_error"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "condition": {
+                "type": "string"
+              },
+              "state_after_error": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "preconditions": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "postconditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "failure_atomicity": {
+          "type": "string"
+        },
+        "complexity": {
+          "$ref": "#/$defs/complexityContract"
+        },
+        "invalidates": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "thread_safety": {
+          "type": "string"
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  },
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -44,7 +560,8 @@
     "snowball",
     "agent_guidance",
     "source_map",
-    "provenance"
+    "provenance",
+    "smoke_test"
   ],
   "properties": {
     "schema_version": {
@@ -61,6 +578,7 @@
     },
     "module": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "id",
         "canonical_name",
@@ -77,24 +595,75 @@
         "deprecated_names"
       ],
       "properties": {
-        "id": {},
-        "canonical_name": {},
-        "display_name": {},
-        "directory": {},
-        "summary": {},
-        "long_description": {},
-        "status": {},
-        "maturity": {},
-        "category": {},
-        "subcategory": {},
-        "tags": {},
-        "aliases": {},
-        "deprecated_names": {}
-      },
-      "additionalProperties": false
+        "id": {
+          "type": "string"
+        },
+        "canonical_name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "directory": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "long_description": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "maturity": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "subcategory": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "deprecated_names": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        }
+      }
     },
     "purpose": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "primary",
         "secondary",
@@ -103,16 +672,59 @@
         "future_role"
       ],
       "properties": {
-        "primary": {},
-        "secondary": {},
-        "non_goals": {},
-        "problems_solved": {},
-        "future_role": {}
-      },
-      "additionalProperties": false
+        "primary": {
+          "type": "string"
+        },
+        "secondary": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "non_goals": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "problems_solved": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "future_role": {
+          "type": "string"
+        }
+      }
     },
     "c_pain": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "summary",
         "common_failure_modes",
@@ -123,18 +735,68 @@
         "where_c_degrades"
       ],
       "properties": {
-        "summary": {},
-        "common_failure_modes": {},
-        "maintenance_burdens": {},
-        "undefined_or_implementation_defined_behavior": {},
-        "ownership_ambiguities": {},
-        "why_c_is_attractive": {},
-        "where_c_degrades": {}
-      },
-      "additionalProperties": false
+        "summary": {
+          "type": "string"
+        },
+        "common_failure_modes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "maintenance_burdens": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "undefined_or_implementation_defined_behavior": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "ownership_ambiguities": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "why_c_is_attractive": {
+          "type": "string"
+        },
+        "where_c_degrades": {
+          "type": "string"
+        }
+      }
     },
     "zig_response": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "summary",
         "language_features",
@@ -144,22 +806,64 @@
         "tradeoffs"
       ],
       "properties": {
-        "summary": {},
-        "language_features": {},
-        "guarantees_made_visible": {},
-        "invalid_states_removed": {},
-        "remaining_programmer_responsibilities": {},
-        "tradeoffs": {}
-      },
-      "additionalProperties": false
+        "summary": {
+          "type": "string"
+        },
+        "language_features": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "guarantees_made_visible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "invalid_states_removed": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "remaining_programmer_responsibilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tradeoffs": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        }
+      }
     },
     "locations": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "module_root",
         "implementation",
         "public_entrypoint",
-        "tests",
         "readme",
         "mastery",
         "details_markdown",
@@ -168,27 +872,144 @@
         "benchmarks",
         "fixtures",
         "fuzz_targets",
-        "architecture_notes"
+        "architecture_notes",
+        "unit_tests",
+        "smoke_tests",
+        "generated_files",
+        "dependency_contracts"
       ],
       "properties": {
-        "module_root": {},
-        "implementation": {},
-        "public_entrypoint": {},
-        "tests": {},
-        "readme": {},
-        "mastery": {},
-        "details_markdown": {},
-        "details_json": {},
-        "examples": {},
-        "benchmarks": {},
-        "fixtures": {},
-        "fuzz_targets": {},
-        "architecture_notes": {}
-      },
-      "additionalProperties": false
+        "module_root": {
+          "type": "string"
+        },
+        "implementation": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "public_entrypoint": {
+          "type": "string"
+        },
+        "readme": {
+          "type": "string"
+        },
+        "mastery": {
+          "type": "string"
+        },
+        "details_markdown": {
+          "type": "string"
+        },
+        "details_json": {
+          "type": "string"
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "benchmarks": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "fixtures": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "fuzz_targets": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "architecture_notes": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "unit_tests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "smoke_tests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "generated_files": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "dependency_contracts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     },
     "public_surface": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "root_symbols",
         "types",
@@ -198,29 +1019,343 @@
         "errors",
         "callbacks",
         "interfaces",
-        "compile_time_parameters"
+        "compile_time_parameters",
+        "endpoints"
       ],
       "properties": {
-        "root_symbols": {},
-        "types": {},
-        "functions": {},
-        "methods": {},
-        "constants": {},
-        "errors": {},
-        "callbacks": {},
-        "interfaces": {},
-        "compile_time_parameters": {}
-      },
-      "additionalProperties": false
+        "root_symbols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "kind"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "functions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "signature"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "signature": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "methods": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "signature"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "signature": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "constants": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "callbacks": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "interfaces": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "compile_time_parameters": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/endpointContract"
+          }
+        }
+      }
     },
     "inputs": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "type",
+          "ownership",
+          "role",
+          "borrowing",
+          "mutability",
+          "valid_range",
+          "alignment",
+          "endianness",
+          "format",
+          "required_invariants",
+          "validation_performed",
+          "accepts_untrusted_input",
+          "stored",
+          "copied",
+          "may_mutate",
+          "errors_on_invalid_input"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "ownership": {
+            "type": "string"
+          },
+          "lifetime": {
+            "type": "string"
+          },
+          "constraints": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "role": {
+            "type": "string"
+          },
+          "borrowing": {
+            "type": "string"
+          },
+          "mutability": {
+            "type": "string"
+          },
+          "valid_range": {
+            "type": "string"
+          },
+          "alignment": {
+            "type": "string"
+          },
+          "endianness": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          },
+          "required_invariants": {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "integer",
+                "boolean",
+                "object",
+                "array",
+                "null"
+              ]
+            }
+          },
+          "validation_performed": {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "integer",
+                "boolean",
+                "object",
+                "array",
+                "null"
+              ]
+            }
+          },
+          "accepts_untrusted_input": {
+            "type": "boolean"
+          },
+          "stored": {
+            "type": "boolean"
+          },
+          "copied": {
+            "type": "boolean"
+          },
+          "may_mutate": {
+            "type": "boolean"
+          },
+          "errors_on_invalid_input": {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "integer",
+                "boolean",
+                "object",
+                "array",
+                "null"
+              ]
+            }
+          }
+        }
+      }
     },
     "outputs": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "type",
+          "ownership",
+          "meaning",
+          "borrowed_from",
+          "cleanup_required",
+          "cleanup_responsibility",
+          "invalidation_conditions",
+          "aliasing",
+          "borrows_from_module",
+          "borrows_from_input",
+          "valid_after_mutation",
+          "absence_meaning"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "ownership": {
+            "type": "string"
+          },
+          "lifetime": {
+            "type": "string"
+          },
+          "meaning": {
+            "type": "string"
+          },
+          "borrowed_from": {
+            "type": "string"
+          },
+          "cleanup_required": {
+            "type": "boolean"
+          },
+          "cleanup_responsibility": {
+            "type": "string"
+          },
+          "invalidation_conditions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "aliasing": {
+            "type": "string"
+          },
+          "borrows_from_module": {
+            "type": "boolean"
+          },
+          "borrows_from_input": {
+            "type": "boolean"
+          },
+          "valid_after_mutation": {
+            "type": "string"
+          },
+          "absence_meaning": {
+            "type": "string"
+          }
+        }
+      }
     },
     "state": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "fields",
         "states",
@@ -229,16 +1364,79 @@
         "initial_state"
       ],
       "properties": {
-        "fields": {},
-        "states": {},
-        "state_transitions": {},
-        "terminal_states": {},
-        "initial_state": {}
-      },
-      "additionalProperties": false
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "type",
+              "role"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "states": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "state_transitions": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "terminal_states": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "initial_state": {
+          "type": "string"
+        }
+      }
     },
     "invariants": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "representation",
         "ownership",
@@ -249,18 +1447,101 @@
         "cross_module"
       ],
       "properties": {
-        "representation": {},
-        "ownership": {},
-        "ordering": {},
-        "bounds": {},
-        "lifetime": {},
-        "concurrency": {},
-        "cross_module": {}
-      },
-      "additionalProperties": false
+        "representation": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ownership": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "ordering": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "bounds": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "lifetime": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "concurrency": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "cross_module": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        }
+      }
     },
     "ownership": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "owns",
         "borrows",
@@ -273,20 +1554,72 @@
         "resource_release_order"
       ],
       "properties": {
-        "owns": {},
-        "borrows": {},
-        "copies": {},
-        "transfers": {},
-        "shared": {},
-        "allocator": {},
-        "allocator_lifetime": {},
-        "element_cleanup": {},
-        "resource_release_order": {}
-      },
-      "additionalProperties": false
+        "owns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "borrows": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "copies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "transfers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "shared": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "allocator": {
+          "type": "string"
+        },
+        "allocator_lifetime": {
+          "type": "string"
+        },
+        "element_cleanup": {
+          "type": "string"
+        },
+        "resource_release_order": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        }
+      }
     },
     "lifetime": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "instance",
         "inputs",
@@ -296,17 +1629,84 @@
         "shutdown_requirements"
       ],
       "properties": {
-        "instance": {},
-        "inputs": {},
-        "outputs": {},
-        "borrowed_views": {},
-        "escaped_references": {},
-        "shutdown_requirements": {}
-      },
-      "additionalProperties": false
+        "instance": {
+          "type": "string"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "borrowed_views": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "escaped_references": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "shutdown_requirements": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        }
+      }
     },
     "cleanup": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "required",
         "operations",
@@ -317,18 +1717,108 @@
         "cleanup_order"
       ],
       "properties": {
-        "required": {},
-        "operations": {},
-        "automatic_cleanup": {},
-        "manual_cleanup": {},
-        "partial_construction_cleanup": {},
-        "failure_cleanup": {},
-        "cleanup_order": {}
-      },
-      "additionalProperties": false
+        "required": {
+          "type": "boolean"
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "operation"
+            ],
+            "properties": {
+              "operation": {
+                "type": "string"
+              },
+              "responsibility": {
+                "type": "string"
+              },
+              "releases": {
+                "type": "string"
+              },
+              "postcondition": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "automatic_cleanup": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "manual_cleanup": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "partial_construction_cleanup": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "failure_cleanup": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "cleanup_order": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        }
+      }
     },
     "failure_behavior": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "errors",
         "optional_empty_results",
@@ -341,20 +1831,122 @@
         "undefined_behavior_preconditions"
       ],
       "properties": {
-        "errors": {},
-        "optional_empty_results": {},
-        "failure_atomicity": {},
-        "state_after_failure": {},
-        "partial_effects": {},
-        "rollback": {},
-        "panic_conditions": {},
-        "assertion_conditions": {},
-        "undefined_behavior_preconditions": {}
-      },
-      "additionalProperties": false
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/errorContract"
+          }
+        },
+        "optional_empty_results": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "operation",
+                  "meaning"
+                ],
+                "properties": {
+                  "operation": {
+                    "type": "string"
+                  },
+                  "meaning": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "failure_atomicity": {
+          "type": "string"
+        },
+        "state_after_failure": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "partial_effects": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "rollback": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "panic_conditions": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "assertion_conditions": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "undefined_behavior_preconditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     },
     "invalidation": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "rules",
         "mutation_invalidation",
@@ -364,17 +1956,104 @@
         "deinit_invalidation"
       ],
       "properties": {
-        "rules": {},
-        "mutation_invalidation": {},
-        "growth_invalidation": {},
-        "move_invalidation": {},
-        "reset_invalidation": {},
-        "deinit_invalidation": {}
-      },
-      "additionalProperties": false
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "reference",
+              "trigger",
+              "effect"
+            ],
+            "properties": {
+              "reference": {
+                "type": "string"
+              },
+              "trigger": {
+                "type": "string"
+              },
+              "effect": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "mutation_invalidation": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "growth_invalidation": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "move_invalidation": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "reset_invalidation": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "deinit_invalidation": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        }
+      }
     },
     "dependencies": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "repository",
         "standard_library",
@@ -384,26 +2063,142 @@
         "conceptual"
       ],
       "properties": {
-        "repository": {},
-        "standard_library": {},
-        "external": {},
-        "platform": {},
-        "architecture": {},
-        "conceptual": {}
-      },
-      "additionalProperties": false
+        "repository": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "module",
+              "path",
+              "symbol",
+              "guarantee",
+              "reason"
+            ],
+            "properties": {
+              "module": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              },
+              "symbol": {
+                "type": "string"
+              },
+              "guarantee": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "standard_library": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "external": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "platform": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "architecture": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "conceptual": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     },
     "dependency_contracts": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dependencyContract"
+      }
     },
     "expected_dependents": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "reason"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     "known_consumers": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": [
+          "string",
+          "number",
+          "integer",
+          "boolean",
+          "object",
+          "array",
+          "null"
+        ]
+      }
     },
     "composition": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "import_name",
         "import_path",
@@ -417,21 +2212,109 @@
         "extension_points"
       ],
       "properties": {
-        "import_name": {},
-        "import_path": {},
-        "import_configuration": {},
-        "minimal_example": {},
-        "integration_patterns": {},
-        "pipeline_position": {},
-        "common_combinations": {},
-        "incompatible_combinations": {},
-        "replacement_options": {},
-        "extension_points": {}
-      },
-      "additionalProperties": false
+        "import_name": {
+          "type": "string"
+        },
+        "import_path": {
+          "type": "string"
+        },
+        "import_configuration": {
+          "type": "string"
+        },
+        "minimal_example": {
+          "type": "string"
+        },
+        "integration_patterns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "with",
+              "pattern"
+            ],
+            "properties": {
+              "with": {
+                "type": "string"
+              },
+              "pattern": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "pipeline_position": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "common_combinations": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "incompatible_combinations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "replacement_options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "condition",
+              "module"
+            ],
+            "properties": {
+              "condition": {
+                "type": "string"
+              },
+              "module": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "extension_points": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        }
+      }
     },
     "data_contracts": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "input_formats",
         "output_formats",
@@ -442,18 +2325,76 @@
         "abi_stability"
       ],
       "properties": {
-        "input_formats": {},
-        "output_formats": {},
-        "binary_layouts": {},
-        "endianness": {},
-        "alignment": {},
-        "serialization_stability": {},
-        "abi_stability": {}
-      },
-      "additionalProperties": false
+        "input_formats": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "output_formats": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "binary_layouts": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "endianness": {
+          "type": "string"
+        },
+        "alignment": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "serialization_stability": {
+          "type": "string"
+        },
+        "abi_stability": {
+          "type": "string"
+        }
+      }
     },
     "compatibility": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "zig_version",
         "minimum_zig_version",
@@ -474,28 +2415,76 @@
         "no_std_equivalent"
       ],
       "properties": {
-        "zig_version": {},
-        "minimum_zig_version": {},
-        "maximum_tested_zig_version": {},
-        "hosted": {},
-        "freestanding": {},
-        "thread_safe": {},
-        "reentrant": {},
-        "interrupt_safe": {},
-        "async_safe": {},
-        "signal_safe": {},
-        "platforms": {},
-        "architectures": {},
-        "allocator_assumptions": {},
-        "libc_required": {},
-        "operating_system_required": {},
-        "ffi": {},
-        "no_std_equivalent": {}
-      },
-      "additionalProperties": false
+        "zig_version": {
+          "type": "string"
+        },
+        "minimum_zig_version": {
+          "type": "string"
+        },
+        "maximum_tested_zig_version": {
+          "type": "string"
+        },
+        "hosted": {
+          "type": "string"
+        },
+        "freestanding": {
+          "type": "string"
+        },
+        "thread_safe": {
+          "type": "string"
+        },
+        "reentrant": {
+          "type": "string"
+        },
+        "interrupt_safe": {
+          "type": "string"
+        },
+        "async_safe": {
+          "type": "string"
+        },
+        "signal_safe": {
+          "type": "string"
+        },
+        "platforms": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "architectures": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "allocator_assumptions": {
+          "type": "string"
+        },
+        "libc_required": {
+          "type": "boolean"
+        },
+        "operating_system_required": {
+          "type": "boolean"
+        },
+        "ffi": {
+          "type": "string"
+        },
+        "no_std_equivalent": {
+          "type": "string"
+        }
+      }
     },
     "concurrency": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "internal_synchronization",
         "caller_synchronization_required",
@@ -506,18 +2495,76 @@
         "interrupt_context_rules"
       ],
       "properties": {
-        "internal_synchronization": {},
-        "caller_synchronization_required": {},
-        "atomic_operations": {},
-        "memory_ordering": {},
-        "lock_ordering": {},
-        "thread_ownership": {},
-        "interrupt_context_rules": {}
-      },
-      "additionalProperties": false
+        "internal_synchronization": {
+          "type": "string"
+        },
+        "caller_synchronization_required": {
+          "type": "string"
+        },
+        "atomic_operations": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "memory_ordering": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "lock_ordering": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "thread_ownership": {
+          "type": "string"
+        },
+        "interrupt_context_rules": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        }
+      }
     },
     "performance": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "time_complexity",
         "space_complexity",
@@ -530,20 +2577,93 @@
         "benchmark_results"
       ],
       "properties": {
-        "time_complexity": {},
-        "space_complexity": {},
-        "allocation_behavior": {},
-        "cache_behavior": {},
-        "branch_behavior": {},
-        "compile_time_cost": {},
-        "known_hot_paths": {},
-        "benchmark_commands": {},
-        "benchmark_results": {}
-      },
-      "additionalProperties": false
+        "time_complexity": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "space_complexity": {
+          "type": "string"
+        },
+        "allocation_behavior": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "cache_behavior": {
+          "type": "string"
+        },
+        "branch_behavior": {
+          "type": "string"
+        },
+        "compile_time_cost": {
+          "type": "string"
+        },
+        "known_hot_paths": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "benchmark_commands": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "benchmark_results": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        }
+      }
     },
     "limits": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "hard_limits",
         "soft_limits",
@@ -553,17 +2673,95 @@
         "capacity_behavior"
       ],
       "properties": {
-        "hard_limits": {},
-        "soft_limits": {},
-        "resource_quotas": {},
-        "overflow_boundaries": {},
-        "recursion_limits": {},
-        "capacity_behavior": {}
-      },
-      "additionalProperties": false
+        "hard_limits": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "soft_limits": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "resource_quotas": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "overflow_boundaries": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "recursion_limits": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "capacity_behavior": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        }
+      }
     },
     "security": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "trust_boundary",
         "untrusted_inputs",
@@ -574,18 +2772,98 @@
         "security_non_goals"
       ],
       "properties": {
-        "trust_boundary": {},
-        "untrusted_inputs": {},
-        "validation_performed": {},
-        "resource_exhaustion_controls": {},
-        "side_channel_considerations": {},
-        "unsafe_operations": {},
-        "security_non_goals": {}
-      },
-      "additionalProperties": false
+        "trust_boundary": {
+          "type": "string"
+        },
+        "untrusted_inputs": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "validation_performed": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "resource_exhaustion_controls": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "side_channel_considerations": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "unsafe_operations": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "security_non_goals": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        }
+      }
     },
     "testing": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "build_step",
         "commands",
@@ -597,25 +2875,146 @@
         "zero_capacity_tests",
         "boundary_tests",
         "regression_tests",
-        "test_dependencies"
+        "test_dependencies",
+        "smoke_test_commands",
+        "smoke_test_behaviors",
+        "smoke_test_dependencies"
       ],
       "properties": {
-        "build_step": {},
-        "commands": {},
-        "unit_tests": {},
-        "integration_tests": {},
-        "property_tests": {},
-        "fuzz_tests": {},
-        "failure_injection_tests": {},
-        "zero_capacity_tests": {},
-        "boundary_tests": {},
-        "regression_tests": {},
-        "test_dependencies": {}
-      },
-      "additionalProperties": false
+        "build_step": {
+          "type": "string"
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unit_tests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "integration_tests": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "property_tests": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "fuzz_tests": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "failure_injection_tests": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "zero_capacity_tests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "boundary_tests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "regression_tests": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "test_dependencies": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "smoke_test_commands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "smoke_test_behaviors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "smoke_test_dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     },
     "validation": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "compiler_validated",
         "compiler_version",
@@ -625,23 +3024,122 @@
         "known_compile_failures",
         "known_test_failures",
         "unverified_claims",
-        "notes"
+        "notes",
+        "status_dimensions"
       ],
       "properties": {
-        "compiler_validated": {},
-        "compiler_version": {},
-        "last_validated_commit": {},
-        "last_validation_result": {},
-        "continuous_integration": {},
-        "known_compile_failures": {},
-        "known_test_failures": {},
-        "unverified_claims": {},
-        "notes": {}
-      },
-      "additionalProperties": false
+        "compiler_validated": {
+          "type": "boolean"
+        },
+        "compiler_version": {
+          "type": "string"
+        },
+        "last_validated_commit": {
+          "type": "string"
+        },
+        "last_validation_result": {
+          "type": "string"
+        },
+        "continuous_integration": {
+          "type": "string"
+        },
+        "known_compile_failures": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "known_test_failures": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "unverified_claims": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status_dimensions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "implementation_present",
+            "contract_complete",
+            "contract_formatted",
+            "unit_tests_present",
+            "smoke_test_present",
+            "contract_checker_passed",
+            "compiler_validated",
+            "unit_tests_passed",
+            "smoke_tests_passed"
+          ],
+          "properties": {
+            "implementation_present": {
+              "type": "boolean"
+            },
+            "contract_complete": {
+              "type": "boolean"
+            },
+            "contract_formatted": {
+              "type": "boolean"
+            },
+            "unit_tests_present": {
+              "type": "boolean"
+            },
+            "smoke_test_present": {
+              "type": "boolean"
+            },
+            "contract_checker_passed": {
+              "type": "boolean"
+            },
+            "compiler_validated": {
+              "type": "boolean"
+            },
+            "unit_tests_passed": {
+              "type": "boolean"
+            },
+            "smoke_tests_passed": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
     },
     "documentation": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "read_order",
         "examples_covered",
@@ -652,18 +3150,69 @@
         "external_references"
       ],
       "properties": {
-        "read_order": {},
-        "examples_covered": {},
-        "exercises": {},
-        "readiness_questions": {},
-        "glossary_terms": {},
-        "related_modules": {},
-        "external_references": {}
-      },
-      "additionalProperties": false
+        "read_order": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "examples_covered": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exercises": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "readiness_questions": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "glossary_terms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "related_modules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "external_references": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        }
+      }
     },
     "maintenance": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "stability",
         "breaking_change_policy",
@@ -676,20 +3225,72 @@
         "owners"
       ],
       "properties": {
-        "stability": {},
-        "breaking_change_policy": {},
-        "deprecation_policy": {},
-        "known_gaps": {},
-        "known_bugs": {},
-        "planned_extensions": {},
-        "review_triggers": {},
-        "synchronization_requirements": {},
-        "owners": {}
-      },
-      "additionalProperties": false
+        "stability": {
+          "type": "string"
+        },
+        "breaking_change_policy": {
+          "type": "string"
+        },
+        "deprecation_policy": {
+          "type": "string"
+        },
+        "known_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "known_bugs": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "planned_extensions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_triggers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "synchronization_requirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "owners": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        }
+      }
     },
     "discovery": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "capabilities",
         "problems",
@@ -702,20 +3303,73 @@
         "negative_search_terms"
       ],
       "properties": {
-        "capabilities": {},
-        "problems": {},
-        "inputs": {},
-        "outputs": {},
-        "environments": {},
-        "keywords": {},
-        "grep_terms": {},
-        "natural_language_queries": {},
-        "negative_search_terms": {}
-      },
-      "additionalProperties": false
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "problems": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "environments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "grep_terms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "natural_language_queries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "negative_search_terms": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        }
+      }
     },
     "snowball": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "foundation_layer",
         "reuses_modules",
@@ -727,19 +3381,66 @@
         "snowball_score"
       ],
       "properties": {
-        "foundation_layer": {},
-        "reuses_modules": {},
-        "guarantees_inherited": {},
-        "future_modules_enabled": {},
-        "future_code_removed": {},
-        "future_reasoning_removed": {},
-        "composition_value": {},
-        "snowball_score": {}
-      },
-      "additionalProperties": false
+        "foundation_layer": {
+          "type": "string"
+        },
+        "reuses_modules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "guarantees_inherited": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "future_modules_enabled": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "future_code_removed": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "future_reasoning_removed": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "composition_value": {
+          "type": "string"
+        },
+        "snowball_score": {
+          "type": "string"
+        }
+      }
     },
     "agent_guidance": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "use_when",
         "do_not_use_when",
@@ -750,42 +3451,266 @@
         "common_agent_mistakes",
         "safe_modification_boundaries",
         "files_to_read_first",
-        "files_not_required_for_basic_use"
+        "files_not_required_for_basic_use",
+        "smoke_test_before_integration"
       ],
       "properties": {
-        "use_when": {},
-        "do_not_use_when": {},
-        "selection_questions": {},
-        "required_preconditions": {},
-        "integration_steps": {},
-        "verification_steps": {},
-        "common_agent_mistakes": {},
-        "safe_modification_boundaries": {},
-        "files_to_read_first": {},
-        "files_not_required_for_basic_use": {}
-      },
-      "additionalProperties": false
+        "use_when": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "do_not_use_when": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "selection_questions": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "required_preconditions": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "integration_steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verification_steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "common_agent_mistakes": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "safe_modification_boundaries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "files_to_read_first": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "files_not_required_for_basic_use": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "smoke_test_before_integration": {
+          "type": "string"
+        }
+      }
     },
     "source_map": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "symbols_to_files",
         "tests_to_behaviors",
         "errors_to_operations",
         "invariants_to_tests",
-        "dependencies_to_imports"
+        "dependencies_to_imports",
+        "smoke_tests_to_public_symbols",
+        "smoke_tests_to_dependencies"
       ],
       "properties": {
-        "symbols_to_files": {},
-        "tests_to_behaviors": {},
-        "errors_to_operations": {},
-        "invariants_to_tests": {},
-        "dependencies_to_imports": {}
-      },
-      "additionalProperties": false
+        "symbols_to_files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "symbol",
+              "file"
+            ],
+            "properties": {
+              "symbol": {
+                "type": "string"
+              },
+              "file": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "tests_to_behaviors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "test",
+              "file"
+            ],
+            "properties": {
+              "test": {
+                "type": "string"
+              },
+              "file": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "errors_to_operations": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "invariants_to_tests": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "dependencies_to_imports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "module",
+              "path",
+              "symbol",
+              "guarantee",
+              "reason"
+            ],
+            "properties": {
+              "module": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              },
+              "symbol": {
+                "type": "string"
+              },
+              "guarantee": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "smoke_tests_to_public_symbols": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "file",
+              "symbols"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "symbols": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "smoke_tests_to_dependencies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "file",
+              "dependencies"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "dependencies": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "provenance": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "original_author",
         "created_commit",
@@ -795,14 +3720,208 @@
         "migration_history"
       ],
       "properties": {
-        "original_author": {},
-        "created_commit": {},
-        "last_modified_commit": {},
-        "derived_from": {},
-        "design_sources": {},
-        "migration_history": {}
-      },
-      "additionalProperties": false
+        "original_author": {
+          "type": "string"
+        },
+        "created_commit": {
+          "type": "string"
+        },
+        "last_modified_commit": {
+          "type": "string"
+        },
+        "derived_from": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "design_sources": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "migration_history": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "smoke_test": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "implemented",
+        "status",
+        "source_path",
+        "build_step",
+        "commands",
+        "public_import_used",
+        "public_symbols_exercised",
+        "successful_operations",
+        "failure_or_boundary_operations",
+        "cleanup_exercised",
+        "repository_dependencies_exercised",
+        "hosted_environment_required",
+        "freestanding_environment_required",
+        "fixtures",
+        "expected_exit_status",
+        "expected_output",
+        "forbidden_private_access",
+        "last_run",
+        "last_result",
+        "last_validated_commit",
+        "compiler_version",
+        "known_failures",
+        "notes"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "implemented": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string"
+        },
+        "source_path": {
+          "type": "string"
+        },
+        "build_step": {
+          "type": "string"
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "public_import_used": {
+          "type": "string"
+        },
+        "public_symbols_exercised": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "successful_operations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "failure_or_boundary_operations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cleanup_exercised": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "repository_dependencies_exercised": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hosted_environment_required": {
+          "type": "string"
+        },
+        "freestanding_environment_required": {
+          "type": "string"
+        },
+        "fixtures": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "expected_exit_status": {
+          "type": "string"
+        },
+        "expected_output": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "forbidden_private_access": {
+          "type": "boolean"
+        },
+        "last_run": {
+          "type": "string"
+        },
+        "last_result": {
+          "type": "string"
+        },
+        "last_validated_commit": {
+          "type": "string"
+        },
+        "compiler_version": {
+          "type": "string"
+        },
+        "known_failures": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     }
   }
 }
