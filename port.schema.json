@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "zig-reference static port contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contractVersion",
+    "module",
+    "baseline",
+    "sourceInventory",
+    "publicContract",
+    "dependencies",
+    "zigLanguageFeatures",
+    "compilerBuiltins",
+    "standardLibraryUsage",
+    "buildSystemUsage",
+    "targetAndPlatformUsage",
+    "allocatorUsage",
+    "pointerAndMemoryUsage",
+    "integerAndCastUsage",
+    "reflectionAndComptimeUsage",
+    "errorHandlingUsage",
+    "testingUsage",
+    "knownVersionChanges",
+    "possibleMechanicalTransforms",
+    "manualReviewRequired",
+    "semanticPortingRisks",
+    "migrationOrder",
+    "validationPlan",
+    "testedTargets",
+    "untestedTargets",
+    "agentInstructions",
+    "sourceMap",
+    "history"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "contractVersion": {
+      "type": "string"
+    },
+    "module": {
+      "type": "object"
+    },
+    "baseline": {
+      "type": "object"
+    },
+    "sourceInventory": {
+      "type": "object"
+    },
+    "publicContract": {
+      "type": "object"
+    },
+    "dependencies": {
+      "type": "object"
+    },
+    "zigLanguageFeatures": {
+      "type": "object"
+    },
+    "compilerBuiltins": {
+      "type": "object"
+    },
+    "standardLibraryUsage": {
+      "type": "object"
+    },
+    "buildSystemUsage": {
+      "type": "object"
+    },
+    "targetAndPlatformUsage": {
+      "type": "object"
+    },
+    "allocatorUsage": {
+      "type": "object"
+    },
+    "pointerAndMemoryUsage": {
+      "type": "object"
+    },
+    "integerAndCastUsage": {
+      "type": "object"
+    },
+    "reflectionAndComptimeUsage": {
+      "type": "object"
+    },
+    "errorHandlingUsage": {
+      "type": "object"
+    },
+    "testingUsage": {
+      "type": "object"
+    },
+    "knownVersionChanges": {
+      "type": "array"
+    },
+    "possibleMechanicalTransforms": {
+      "type": "array"
+    },
+    "manualReviewRequired": {
+      "type": "array"
+    },
+    "semanticPortingRisks": {
+      "type": "array"
+    },
+    "migrationOrder": {
+      "type": "object"
+    },
+    "validationPlan": {
+      "type": "object"
+    },
+    "testedTargets": {
+      "type": "array"
+    },
+    "untestedTargets": {
+      "type": "array"
+    },
+    "agentInstructions": {
+      "type": "object"
+    },
+    "sourceMap": {
+      "type": "object"
+    },
+    "history": {
+      "type": "object"
+    }
+  }
+}

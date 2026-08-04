@@ -14,7 +14,7 @@ Every implementation should answer three questions:
 
 The objective is not to mock C. C reveals the machine with extraordinary directness. The objective is to preserve that directness while making ownership, bounds, states, failure, cleanup, and intent visible.
 
-Each completed module should include source, tests, a `README.md`, and a `MASTERY.md`. Implementations should target Zig 0.14.0 until the repository deliberately adopts another baseline.
+Each completed module should include source, tests, a `README.md`, and a `docs/standards/MASTERY.md`. Implementations should target Zig 0.14.0 until the repository deliberately adopts another baseline.
 
 ---
 

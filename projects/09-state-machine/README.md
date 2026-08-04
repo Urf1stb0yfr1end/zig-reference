@@ -12,3 +12,7 @@ _ = try machine.apply(.start);
 ```
 
 Protocol handshakes and VM, vCPU, and device lifecycles can reuse this transition boundary.
+
+## Version Portability
+
+The current baseline is Zig 0.14.0. The module-specific [`port.js`](port.js) migration map inventories version-sensitive APIs, dependency order, semantic risks, and validation commands. Later Zig versions are unverified unless the contract records test evidence. Any port must preserve this module's semantic guarantees, and direct repository dependencies should normally be ported first.

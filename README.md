@@ -74,7 +74,8 @@ projects/<canonical-module-name>/
 ├── README.md
 ├── MASTERY.md
 ├── DETAILS.md
-└── details.json
+├── details.json
+└── port.js
 ```
 
 Where present, external smoke tests, examples, fixtures, fuzz targets, and benchmarks remain inside the same module folder.
@@ -88,6 +89,14 @@ Each file has a distinct job:
 - **`details.json`** — the exhaustive, prettified contract showing what the machine sees.
 
 The `details.json` contract is intended to expose the module’s exact paths, public endpoints, inputs, outputs, ownership, lifetime, errors, invalidation rules, dependencies, inherited guarantees, test commands, compatibility, and validation state. It should eliminate repeated source archaeology while remaining readable by humans.
+
+## Version Portability
+
+`zig-reference` currently targets Zig 0.14.0. Every implemented module carries a human-readable, machine-readable `port.js` migration contract describing version-sensitive syntax, standard-library APIs, build definitions, dependency order, semantic risks, and validation commands. The contracts help humans and agents port modules to later releases, but they do not guarantee automatic compatibility with unknown or untested Zig versions.
+
+Lower dependencies should be ported before higher modules. Verified findings and validation evidence remain in the contracts so each later upgrade starts with accumulated migration knowledge. Humans inspect the same static contract used by machines.
+
+Every module remembers not only how it works, but what a future port must preserve. See the [porting guide](docs/porting/PORTING.md), [strict schema](port.schema.json), [generated index](ports.json), [consistency checker](tools/check-port-contracts.js), and the representative [endian codec contract](projects/22-endian-integer-codec/port.js).
 
 ## Current foundations
 
@@ -105,13 +114,13 @@ The repository currently includes foundational modules for:
 - ASCII bytes, FourCC values, semantic versions, tagged results, and source spans;
 - physical page-frame and physical-address conversion.
 
-Browse the complete capability catalog in [`MODULES.md`](MODULES.md).
+Browse the complete capability catalog in [`docs/catalog/MODULES.md`](docs/catalog/MODULES.md).
 
 ## Start here
 
 ### To find a capability
 
-Open [`MODULES.md`](MODULES.md). It links each implemented module to its human contract and machine contract.
+Open [`docs/catalog/MODULES.md`](docs/catalog/MODULES.md). It links each implemented module to its human contract and machine contract.
 
 ### To understand the vision
 
@@ -122,9 +131,9 @@ Open [`MODULES.md`](MODULES.md). It links each implemented module to its human c
 
 ### To see the roadmap
 
-- [`MASTER_MODULE_CHECKLIST.md`](MASTER_MODULE_CHECKLIST.md) — the complete capability ledger;
-- [`MASTER_MODULE_CHECKLIST_PROGRESS.md`](MASTER_MODULE_CHECKLIST_PROGRESS.md) — implementation progress and validation state;
-- [`HYPER_ZIG_REQUIRED_MODULES.md`](HYPER_ZIG_REQUIRED_MODULES.md) — the specialized path toward a composable Zig hypervisor.
+- [`MASTER_MODULE_CHECKLIST.md`](docs/checklists/MASTER_MODULE_CHECKLIST.md) — the complete capability ledger;
+- [`MASTER_MODULE_CHECKLIST_PROGRESS.md`](docs/checklists/MASTER_MODULE_CHECKLIST_PROGRESS.md) — implementation progress and validation state;
+- [`HYPER_ZIG_REQUIRED_MODULES.md`](docs/roadmaps/HYPER_ZIG_REQUIRED_MODULES.md) — the specialized path toward a composable Zig hypervisor.
 
 ## Early study path
 

@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+"use strict";
+const path = require("path"); const lib = require("./port-lib"); const contracts = lib.implementedModules().map((d) => lib.parseContract(path.join(d, "port.js"))); const byName = new Map(contracts.map((c) => [c.module.canonicalName, c])); const visiting = new Set(); const done = new Set(); const order = [];
+function visit(name) { if (visiting.has(name)) throw new Error(`dependency cycle at ${name}`); if (done.has(name)) return; const c = byName.get(name); if (!c) throw new Error(`unknown dependency ${name}`); visiting.add(name); for (const d of c.dependencies.repository.filter((x) => x.mustPortFirst)) visit(d.canonicalName); visiting.delete(name); done.add(name); order.push(name); if (!c.module.publicEntrypoint || !c.validationPlan.baselineCommands.length || !c.publicContract.invariantsToPreserve.length) throw new Error(`${name} lacks discoverable migration facts`); }
+for (const name of byName.keys()) visit(name); console.log(`portability smoke: ${contracts.length} modules; topological order: ${order.join(", ")}`);

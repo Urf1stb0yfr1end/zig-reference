@@ -16,7 +16,7 @@ def jpath(parts):return '$'+''.join(f'[{p}]' if isinstance(p,int) else f'.{p}' f
 try:schema=json.loads((ROOT/'details.schema.json').read_text());Draft202012Validator.check_schema(schema)
 except (json.JSONDecodeError,SchemaError) as e:
  print(f'SCHEMA ERROR: details.schema.json: {e}',file=sys.stderr);raise SystemExit(2)
-validator=Draft202012Validator(schema);catalog=(ROOT/'MODULES.md').read_text();build=(ROOT/'build.zig').read_text();modules=[];contracts={}
+validator=Draft202012Validator(schema);catalog=(ROOT/'docs/catalog/MODULES.md').read_text();build=(ROOT/'build.zig').read_text();modules=[];contracts={}
 for directory in sorted(p for p in PROJECTS.iterdir() if p.is_dir()):
  srcs=sorted((directory/'src').glob('*.zig')) if (directory/'src').is_dir() else []
  if not srcs:fail(directory,'implemented module has no src/*.zig');continue
@@ -55,8 +55,8 @@ for directory in sorted(p for p in PROJECTS.iterdir() if p.is_dir()):
   if not ep.get('outputs'):fail(path,f'endpoint {ep.get("name")} has no structured output')
  for err in data.get('failure_behavior',{}).get('errors',[]):
   if err.get('name') and err['name'] not in source:fail(path,f'documented error {err["name"]} does not appear in source')
- if f'| `{directory.name}` |' not in catalog or sum(line.startswith(f'| `{directory.name}` |') for line in catalog.splitlines())!=1:fail(ROOT/'MODULES.md',f'{directory.name} must appear exactly once')
- if f'({rel(directory)}/DETAILS.md)' not in catalog or f'({rel(directory)}/details.json)' not in catalog:fail(ROOT/'MODULES.md',f'{directory.name} lacks human or machine contract link')
+ if f'| `{directory.name}` |' not in catalog or sum(line.startswith(f'| `{directory.name}` |') for line in catalog.splitlines())!=1:fail(ROOT/'docs/catalog/MODULES.md',f'{directory.name} must appear exactly once')
+ if f'(../../{rel(directory)}/DETAILS.md)' not in catalog or f'(../../{rel(directory)}/details.json)' not in catalog:fail(ROOT/'docs/catalog/MODULES.md',f'{directory.name} lacks human or machine contract link')
  if expected_src not in build or f'"{expected}"' not in build:fail(ROOT/'build.zig',f'missing named module/source registration for {expected}')
  if expected_unit not in json.dumps(data) or expected_smoke not in json.dumps(data):fail(path,'dedicated test step metadata is incomplete')
  smoke_source=(directory/'tests/smoke_test.zig').read_text() if (directory/'tests/smoke_test.zig').exists() else ''

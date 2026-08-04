@@ -68,6 +68,6 @@ Every project includes:
 - **Failure-path tests**
 - **Reference invalidation rules**
 - **Exercises that extend rather than rewrite the design**
-- **A `MASTERY.md` guide**
+- **A `docs/standards/MASTERY.md` guide**
 
 The objective is cumulative understanding: each new project should feel like the next necessary consequence of the previous one.

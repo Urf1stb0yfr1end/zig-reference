@@ -577,7 +577,7 @@ It becomes compositional infrastructure only when it has:
 - a narrow public responsibility;
 - implementation and failure-path tests;
 - `README.md`;
-- `MASTERY.md`;
+- `docs/standards/MASTERY.md`;
 - `DETAILS.md`;
 - exhaustive `details.json`;
 - a build step;

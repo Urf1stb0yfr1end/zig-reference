@@ -174,3 +174,7 @@ That adds exactly the problems this project avoids:
 - whole-buffer reference invalidation.
 
 The fixed-capacity vector is therefore not a disposable toy. It is the conceptual lower half of the dynamic array.
+
+## Version Portability
+
+The current baseline is Zig 0.14.0. The module-specific [`port.js`](port.js) migration map inventories version-sensitive APIs, dependency order, semantic risks, and validation commands. Later Zig versions are unverified unless the contract records test evidence. Any port must preserve this module's semantic guarantees, and direct repository dependencies should normally be ported first.

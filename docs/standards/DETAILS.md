@@ -91,9 +91,9 @@ List exact repository-relative paths for implementation, tests, README, MASTERY 
 ## Documentation roles
 
 - `README.md`: What the module is and why it exists.
-- `MASTERY.md`: How to reason about it deeply.
+- `docs/standards/MASTERY.md`: How to reason about it deeply.
 - `DETAILS.md`: How to select, call, compose, adapt, and validate it.
-- `MODULES.md`: Fast repository-wide discovery index.
+- `docs/catalog/MODULES.md`: Fast repository-wide discovery index.
 
 The `DETAILS.md` files are the authoritative composition map. Source code remains authoritative for exact behavior when documentation and implementation disagree.
 
@@ -101,7 +101,7 @@ The `DETAILS.md` files are the authoritative composition map. Source code remain
 
 A large request should reduce to:
 
-1. Search `MODULES.md` for candidate names.
+1. Search `docs/catalog/MODULES.md` for candidate names.
 2. Read candidate `DETAILS.md` files.
 3. Follow their dependency paths recursively.
 4. Select compatible inputs, outputs, ownership, and environment assumptions.

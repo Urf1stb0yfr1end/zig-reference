@@ -2,7 +2,7 @@
 
 `zig-reference` is written for students and programmers who want to understand systems software deeply enough to rebuild, adapt, and defend it.
 
-Each project may contain a `MASTERY.md` file. It is not a shortcut, generated summary, or substitute for reading the code. It is a compact statement of the knowledge required to use the implementation responsibly.
+Each project may contain a `docs/standards/MASTERY.md` file. It is not a shortcut, generated summary, or substitute for reading the code. It is a compact statement of the knowledge required to use the implementation responsibly.
 
 A mastery guide should answer:
 
@@ -19,7 +19,7 @@ A mastery guide should answer:
 
 ## Required structure
 
-Every project-level `MASTERY.md` should use these sections:
+Every project-level `docs/standards/MASTERY.md` should use these sections:
 
 - **Mental model** — the smallest correct way to picture the structure.
 - **Invariants** — statements that must remain true after every public operation.
@@ -36,7 +36,7 @@ Every project-level `MASTERY.md` should use these sections:
 
 The guides use consistent headings, precise vocabulary, explicit paths, and direct statements of constraints. This benefits readers first. It also allows documentation tools, search systems, and coding assistants to locate and combine the repository's design knowledge without requiring special-purpose files.
 
-A future project may generate another form of repository guidance from these documents. The `MASTERY.md` files remain the human source of truth.
+A future project may generate another form of repository guidance from these documents. The `docs/standards/MASTERY.md` files remain the human source of truth.
 
 ## Standard
 

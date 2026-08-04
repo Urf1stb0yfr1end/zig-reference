@@ -10,8 +10,8 @@ The long-term goal is that large Zig systems can be assembled by discovering mod
 
 Before creating or modifying a module:
 
-1. Read `MODULES.md`.
-2. Read root `DETAILS.md` and `details.schema.json`.
+1. Read `docs/catalog/MODULES.md`.
+2. Read root `docs/standards/DETAILS.md` and `details.schema.json`.
 3. Search existing module names and purposes before writing new mechanisms.
 4. Read candidate modules' `details.json` first.
 5. Read candidate modules' `DETAILS.md` for human explanation.
@@ -39,7 +39,7 @@ A module is incomplete when any required file is missing.
 - `details.json` is authoritative for machine discovery and composition metadata.
 - `DETAILS.md` is the human-readable integration contract.
 - `MASTERY.md` is the human reasoning guide.
-- `MODULES.md` is the repository discovery index.
+- `docs/catalog/MODULES.md` is the repository discovery index.
 
 When source and documentation disagree, fix the documentation and add a regression test. Never silently preserve drift.
 
@@ -75,7 +75,7 @@ Do not use vague claims such as "safer" or "better" without naming the mechanism
 
 Before implementing a container, parser helper, byte primitive, allocator helper, state tracker, queue, writer, reader, or handle system:
 
-1. grep `MODULES.md` and all `details.json` files;
+1. grep `docs/catalog/MODULES.md` and all `details.json` files;
 2. compare public surfaces, ownership, environment, and failure semantics;
 3. import the existing module when compatible;
 4. wrap or adapt it only when the new environment requires different guarantees;
@@ -126,7 +126,7 @@ Do not claim a module is validated until its command has run successfully with t
 For a request such as a hypervisor, database, server, compiler, or filesystem:
 
 1. Decompose the request into capabilities.
-2. Search `MODULES.md` and `details.json` files by capability, input, output, environment, and expected dependents.
+2. Search `docs/catalog/MODULES.md` and `details.json` files by capability, input, output, environment, and expected dependents.
 3. Select the smallest compatible module set.
 4. Follow dependencies recursively.
 5. Verify hosted versus freestanding assumptions.
@@ -143,7 +143,7 @@ Do not promise that large systems require no reasoning or can always be complete
 
 - Use a stable numeric prefix and descriptive kebab-case directory name.
 - Never reuse a numeric prefix.
-- Keep directory paths, `MODULES.md`, build paths, `DETAILS.md`, and `details.json` synchronized.
+- Keep directory paths, `docs/catalog/MODULES.md`, build paths, `DETAILS.md`, and `details.json` synchronized.
 - Detect and repair numbering drift before adding new modules.
 
 ## Completion checklist
@@ -156,6 +156,6 @@ A module is complete only when:
 - `README.md`, `MASTERY.md`, `DETAILS.md`, and `details.json` exist;
 - paths and symbols match source;
 - dependencies and dependents are recorded;
-- `MODULES.md` is updated;
+- `docs/catalog/MODULES.md` is updated;
 - compatibility and validation status are honest;
 - no compatible repository module was unnecessarily recreated.
