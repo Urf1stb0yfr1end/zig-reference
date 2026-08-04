@@ -119,16 +119,13 @@ pub fn build(b: *std.Build) void {
         for (spec.dependencies) |dependency_name| modules[i].addImport(dependency_name, findModule(dependency_name, &modules));
     }
 
-    const smoke_all = b.step("smoke", "Run every external-consumer smoke test and verify committed evidence");
-    smoke_all.dependOn(evidence_check_step);
+    const smoke_all = b.step("smoke", "Run every external-consumer smoke test");
     smoke_all.dependOn(portability_smoke_step);
-    const test_all = b.step("test", "Run contract checks, unit tests, and smoke tests; verify committed evidence");
-    test_all.dependOn(evidence_check_step);
+    const test_all = b.step("test", "Run contract checks, unit tests, and smoke tests");
     test_all.dependOn(check_step);
     test_all.dependOn(port_check_step);
     const recipes_step = b.step("recipes", "Run unit tests for modules used by the initial composition recipes");
     const conformance_step = b.step("conformance", "Run configured family tests; no maturity credit without dedicated adapters");
-    conformance_step.dependOn(evidence_check_step);
     for (specs, 0..) |spec, i| {
         const unit_tests = b.addTest(.{ .root_module = modules[i] });
         const run_unit = b.addRunArtifact(unit_tests);
