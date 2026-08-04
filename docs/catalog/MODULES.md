@@ -1,0 +1,63 @@
+# Module Catalog
+
+Use this file for fast discovery. Open a module's `DETAILS.md` or `details.json` before integrating it.
+
+| Module | Purpose | Repository dependencies | Typical dependents | Human contract | Machine contract |
+|---|---|---|---|---|---|
+| `00-fixed-capacity-vector` | Inline bounded sequence without allocation | none | bootstrap state, fixed stacks, embedded tables | [`DETAILS.md`](../../projects/00-fixed-capacity-vector/DETAILS.md) | [`details.json`](../../projects/00-fixed-capacity-vector/details.json) |
+| `01-dynamic-array` | Allocator-backed growable contiguous sequence | none | stack, byte writer, hash table, token storage | [`DETAILS.md`](../../projects/01-dynamic-array/DETAILS.md) | [`details.json`](../../projects/01-dynamic-array/details.json) |
+| `02-ring-buffer` | Fixed-capacity FIFO with wrapped logical order | none | work queues, event buffers, serial and network queues | [`DETAILS.md`](../../projects/02-ring-buffer/DETAILS.md) | [`details.json`](../../projects/02-ring-buffer/details.json) |
+| `03-bit-set` | Compact fixed-count Boolean state | none | bitmap allocators, page maps, permission sets | [`DETAILS.md`](../../projects/03-bit-set/DETAILS.md) | [`details.json`](../../projects/03-bit-set/details.json) |
+| `04-bounded-byte-reader` | Failure-atomic bounded binary input | none | parsers, protocol decoders, executable loaders | [`DETAILS.md`](../../projects/04-bounded-byte-reader/DETAILS.md) | [`details.json`](../../projects/04-bounded-byte-reader/details.json) |
+| `05-stack` | Allocator-backed LIFO container | `01-dynamic-array` | evaluators, parsers, traversal, virtual machines | [`DETAILS.md`](../../projects/05-stack/DETAILS.md) | [`details.json`](../../projects/05-stack/details.json) |
+| `06-byte-writer` | Owned binary output with explicit endianness | `01-dynamic-array` | serializers, network frames, database records | [`DETAILS.md`](../../projects/06-byte-writer/DETAILS.md) | [`details.json`](../../projects/06-byte-writer/details.json) |
+| `07-bitmap-allocator` | Fixed-capacity slot allocator | `03-bit-set` | page allocators, vector allocators, object pools | [`DETAILS.md`](../../projects/07-bitmap-allocator/DETAILS.md) | [`details.json`](../../projects/07-bitmap-allocator/details.json) |
+| `08-generational-handles` | Fixed-capacity table rejecting stale handles | none | VM, vCPU, device, timer, entity registries | [`DETAILS.md`](../../projects/08-generational-handles/DETAILS.md) | [`details.json`](../../projects/08-generational-handles/details.json) |
+| `09-state-machine` | Compile-time transition-policy state machine | none | lifecycle controllers, protocols, devices | [`DETAILS.md`](../../projects/09-state-machine/DETAILS.md) | [`details.json`](../../projects/09-state-machine/details.json) |
+| `10-checked-integer-cast` | Rejecting integer conversion | none | parsers, size calculations, ABI boundaries | [`DETAILS.md`](../../projects/10-checked-integer-cast/DETAILS.md) | [`details.json`](../../projects/10-checked-integer-cast/details.json) |
+| `11-nonzero-integer` | Integer wrapper that cannot contain zero | none | IDs, divisors, counts, handles | [`DETAILS.md`](../../projects/11-nonzero-integer/DETAILS.md) | [`details.json`](../../projects/11-nonzero-integer/details.json) |
+| `12-bounded-integer` | Compile-time bounded scalar value | none | ports, priorities, dimensions, limits | [`DETAILS.md`](../../projects/12-bounded-integer/DETAILS.md) | [`details.json`](../../projects/12-bounded-integer/details.json) |
+| `13-saturating-counter` | Counter with explicit clamping arithmetic | none | quotas, retries, telemetry, pressure tracking | [`DETAILS.md`](../../projects/13-saturating-counter/DETAILS.md) | [`details.json`](../../projects/13-saturating-counter/details.json) |
+| `14-validated-enum-decoder` | Reject undeclared integer-backed enum tags | none | parsers, device registers, FFI adapters | [`DETAILS.md`](../../projects/14-validated-enum-decoder/DETAILS.md) | [`details.json`](../../projects/14-validated-enum-decoder/details.json) |
+| `15-aligned-address-and-size-helpers` | Checked power-of-two alignment arithmetic | none | page allocators, loaders, DMA, layouts | [`DETAILS.md`](../../projects/15-aligned-address-and-size-helpers/DETAILS.md) | [`details.json`](../../projects/15-aligned-address-and-size-helpers/details.json) |
+| `16-validated-bit-flags` | Typed masks that reject unknown bits | none | permissions, page entries, VMX, registers | [`DETAILS.md`](../../projects/16-validated-bit-flags/DETAILS.md) | [`details.json`](../../projects/16-validated-bit-flags/details.json) |
+| `17-checked-half-open-range` | Overflow-safe `[start,end)` region value | none | memory maps, loaders, MMIO, storage | [`DETAILS.md`](../../projects/17-checked-half-open-range/DETAILS.md) | [`details.json`](../../projects/17-checked-half-open-range/details.json) |
+| `18-distinct-memory-address-types` | Type-separated host, guest, physical, and virtual addresses | none | page tables, EPT, DMA, guest memory | [`DETAILS.md`](../../projects/18-distinct-memory-address-types/DETAILS.md) | [`details.json`](../../projects/18-distinct-memory-address-types/details.json) |
+| `19-wrapping-sequence-number` | Explicit modulo sequence arithmetic | none | protocols, ring epochs, hardware counters | [`DETAILS.md`](../../projects/19-wrapping-sequence-number/DETAILS.md) | [`details.json`](../../projects/19-wrapping-sequence-number/details.json) |
+| `20-optional-typed-handle` | Domain-specific opaque handles with optional absence | none | registries, APIs, configuration models | [`DETAILS.md`](../../projects/20-optional-typed-handle/DETAILS.md) | [`details.json`](../../projects/20-optional-typed-handle/details.json) |
+| `21-unit-safe-quantity` | Scalar values separated by unit tags | none | memory sizes, sectors, durations, dimensions | [`DETAILS.md`](../../projects/21-unit-safe-quantity/DETAILS.md) | [`details.json`](../../projects/21-unit-safe-quantity/details.json) |
+| `22-endian-integer-codec` | Fixed-width integer encoding with explicit byte order | none | binary readers, protocols, loaders, firmware | [`DETAILS.md`](../../projects/22-endian-integer-codec/DETAILS.md) | [`details.json`](../../projects/22-endian-integer-codec/details.json) |
+| `23-validated-ascii-byte` | Byte value proven to be ASCII | none | lexers, protocol tokens, identifier validators | [`DETAILS.md`](../../projects/23-validated-ascii-byte/DETAILS.md) | [`details.json`](../../projects/23-validated-ascii-byte/details.json) |
+| `24-fourcc-code` | Exact four-byte format or protocol identifier | none | media parsers, signature dispatch, firmware | [`DETAILS.md`](../../projects/24-fourcc-code/DETAILS.md) | [`details.json`](../../projects/24-fourcc-code/details.json) |
+| `25-semantic-version` | Structured numeric version comparison | none | compatibility, negotiation, migrations | [`DETAILS.md`](../../projects/25-semantic-version/DETAILS.md) | [`details.json`](../../projects/25-semantic-version/details.json) |
+| `26-tagged-result` | Exclusive structured success/failure outcome | none | authorization, parsing, emulation, validation | [`DETAILS.md`](../../projects/26-tagged-result/DETAILS.md) | [`details.json`](../../projects/26-tagged-result/details.json) |
+| `27-source-span` | Checked half-open byte span into source data | none | lexers, parsers, diagnostics, compilers | [`DETAILS.md`](../../projects/27-source-span/DETAILS.md) | [`details.json`](../../projects/27-source-span/details.json) |
+| `28-physical-page-frame-number-and-address-conversion` | Checked 4 KiB page-frame/address conversion | `18-distinct-memory-address-types` | page allocators, page tables, EPT, guest memory | [`DETAILS.md`](../../projects/28-physical-page-frame-number-and-address-conversion/DETAILS.md) | [`details.json`](../../projects/28-physical-page-frame-number-and-address-conversion/details.json) |
+
+| `29-binary-cursor-checkpoint` | Failure-atomic bounded-reader checkpoints | `04-bounded-byte-reader` | speculative parsers, union decoders | [`DETAILS.md`](../../projects/29-binary-cursor-checkpoint/DETAILS.md) | [`details.json`](../../projects/29-binary-cursor-checkpoint/details.json) |
+| `30-bounded-binary-sub-reader` | Confined child reader with explicit parent policy | `04-bounded-byte-reader`, `29-binary-cursor-checkpoint` | nested formats, payload parsers | [`DETAILS.md`](../../projects/30-bounded-binary-sub-reader/DETAILS.md) | [`details.json`](../../projects/30-bounded-binary-sub-reader/details.json) |
+| `31-length-prefixed-binary-field` | Checked endian length prefix with borrowed payload | `04`, `10`, `22`, `29`, `30` | protocol strings, records | [`DETAILS.md`](../../projects/31-length-prefixed-binary-field/DETAILS.md) | [`details.json`](../../projects/31-length-prefixed-binary-field/details.json) |
+| `32-type-length-value-decoder` | Allocation-free failure-atomic TLV iteration | `04`, `10`, `22`, `29`, `30`, `31` | options, capabilities, negotiation | [`DETAILS.md`](../../projects/32-type-length-value-decoder/DETAILS.md) | [`details.json`](../../projects/32-type-length-value-decoder/details.json) |
+| `33-owned-byte-buffer` | Explicit allocator-owned byte storage and transfer | `01-dynamic-array`, `06-byte-writer` | packet builders, serializers | [`DETAILS.md`](../../projects/33-owned-byte-buffer/DETAILS.md) | [`details.json`](../../projects/33-owned-byte-buffer/details.json) |
+| `34-fixed-capacity-object-pool` | Iterable resettable stale-resistant object pool | `07-bitmap-allocator`, `08-generational-handles` | VM, device, request registries | [`DETAILS.md`](../../projects/34-fixed-capacity-object-pool/DETAILS.md) | [`details.json`](../../projects/34-fixed-capacity-object-pool/details.json) |
+| `35-physical-memory-region-set` | Typed ordered physical region validation and queries | `00`, `14`, `17`, `18`, `28` | memory maps, boot planning | [`DETAILS.md`](../../projects/35-physical-memory-region-set/DETAILS.md) | [`details.json`](../../projects/35-physical-memory-region-set/details.json) |
+| `36-physical-page-frame-allocator` | Deterministic checked physical frame allocation | `03`, `07`, `17`, `18`, `28`, `35` | page tables, EPT, guest memory | [`DETAILS.md`](../../projects/36-physical-page-frame-allocator/DETAILS.md) | [`details.json`](../../projects/36-physical-page-frame-allocator/details.json) |
+| `37-elf64-file-header-parser` | Allocation-free validated ELF64 file header | `04`, `10`, `14`, `17`, `22`, `29` | ELF tables, kernel loaders | [`DETAILS.md`](../../projects/37-elf64-file-header-parser/DETAILS.md) | [`details.json`](../../projects/37-elf64-file-header-parser/details.json) |
+| `38-elf64-program-header-parser` | Validated ELF64 segment and fixed table parsing | `00`, `04`, `10`, `14`–`18`, `22`, `29`, `30`, `37` | load plans, executable mappers | [`DETAILS.md`](../../projects/38-elf64-program-header-parser/DETAILS.md) | [`details.json`](../../projects/38-elf64-program-header-parser/details.json) |
+
+## Selection workflow
+
+1. Search this table by capability or problem.
+2. Open the linked human contract and adjacent `details.json`.
+3. Verify ownership, environment, failure, and invalidation requirements.
+4. Follow listed dependencies recursively.
+5. Import existing source rather than rewriting the mechanism.
+6. Run every dependency test and the final integration tests.
+
+## Snowball rule
+
+Every completed module should reduce the cost of several later modules. Higher layers should inherit tested guarantees from lower layers, so repository growth accelerates through composition rather than repeated implementation.
+
+## Current status
+
+The repository targets Zig 0.14.0. Code written through this interface has not yet been compiler-validated in the current environment; local `zig build test` remains required before treating a module as verified.

@@ -561,7 +561,8 @@
     "agent_guidance",
     "source_map",
     "provenance",
-    "smoke_test"
+    "smoke_test",
+    "portability"
   ],
   "properties": {
     "schema_version": {
@@ -3914,6 +3915,93 @@
               "null"
             ]
           }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "portability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baseline_zig_version",
+        "port_contract",
+        "port_contract_schema",
+        "tested_zig_versions",
+        "untested_zig_versions",
+        "dependencies_must_port_first",
+        "version_sensitive_symbols",
+        "version_sensitive_files",
+        "semantic_guarantees_to_preserve",
+        "validation_commands",
+        "known_porting_blockers",
+        "automatic_port_guaranteed",
+        "notes"
+      ],
+      "properties": {
+        "baseline_zig_version": {
+          "const": "0.14.0"
+        },
+        "port_contract": {
+          "type": "string"
+        },
+        "port_contract_schema": {
+          "const": "port.schema.json"
+        },
+        "tested_zig_versions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "untested_zig_versions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dependencies_must_port_first": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "version_sensitive_symbols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "version_sensitive_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "semantic_guarantees_to_preserve": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "validation_commands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "known_porting_blockers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "automatic_port_guaranteed": {
+          "const": false
         },
         "notes": {
           "type": "array",

@@ -1,0 +1,500 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedFrom": "projects/*/port.js",
+  "modules": [
+    {
+      "id": "00",
+      "canonicalName": "fixed-capacity-vector",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/00-fixed-capacity-vector/port.js",
+      "implementationPath": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "01",
+      "canonicalName": "dynamic-array",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/01-dynamic-array/port.js",
+      "implementationPath": "projects/01-dynamic-array/src/dynamic_array.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "02",
+      "canonicalName": "ring-buffer",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/02-ring-buffer/port.js",
+      "implementationPath": "projects/02-ring-buffer/src/ring_buffer.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "03",
+      "canonicalName": "bit-set",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/03-bit-set/port.js",
+      "implementationPath": "projects/03-bit-set/src/bit_set.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "04",
+      "canonicalName": "bounded-byte-reader",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/04-bounded-byte-reader/port.js",
+      "implementationPath": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "05",
+      "canonicalName": "stack",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/05-stack/port.js",
+      "implementationPath": "projects/05-stack/src/stack.zig",
+      "dependenciesMustPortFirst": [
+        "dynamic-array"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "06",
+      "canonicalName": "byte-writer",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/06-byte-writer/port.js",
+      "implementationPath": "projects/06-byte-writer/src/byte_writer.zig",
+      "dependenciesMustPortFirst": [
+        "dynamic-array"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "07",
+      "canonicalName": "bitmap-allocator",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/07-bitmap-allocator/port.js",
+      "implementationPath": "projects/07-bitmap-allocator/src/bitmap_allocator.zig",
+      "dependenciesMustPortFirst": [
+        "bit-set"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "08",
+      "canonicalName": "generational-handles",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/08-generational-handles/port.js",
+      "implementationPath": "projects/08-generational-handles/src/generational_handles.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "09",
+      "canonicalName": "state-machine",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/09-state-machine/port.js",
+      "implementationPath": "projects/09-state-machine/src/state_machine.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "10",
+      "canonicalName": "checked-integer-cast",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/10-checked-integer-cast/port.js",
+      "implementationPath": "projects/10-checked-integer-cast/src/checked_integer_cast.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "11",
+      "canonicalName": "nonzero-integer",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/11-nonzero-integer/port.js",
+      "implementationPath": "projects/11-nonzero-integer/src/nonzero_integer.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "12",
+      "canonicalName": "bounded-integer",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/12-bounded-integer/port.js",
+      "implementationPath": "projects/12-bounded-integer/src/bounded_integer.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "13",
+      "canonicalName": "saturating-counter",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/13-saturating-counter/port.js",
+      "implementationPath": "projects/13-saturating-counter/src/saturating_counter.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "14",
+      "canonicalName": "validated-enum-decoder",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/14-validated-enum-decoder/port.js",
+      "implementationPath": "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "15",
+      "canonicalName": "aligned-address-and-size-helpers",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/15-aligned-address-and-size-helpers/port.js",
+      "implementationPath": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "16",
+      "canonicalName": "validated-bit-flags",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/16-validated-bit-flags/port.js",
+      "implementationPath": "projects/16-validated-bit-flags/src/validated_bit_flags.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "17",
+      "canonicalName": "checked-half-open-range",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/17-checked-half-open-range/port.js",
+      "implementationPath": "projects/17-checked-half-open-range/src/checked_half_open_range.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "18",
+      "canonicalName": "distinct-memory-address-types",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/18-distinct-memory-address-types/port.js",
+      "implementationPath": "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "19",
+      "canonicalName": "wrapping-sequence-number",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/19-wrapping-sequence-number/port.js",
+      "implementationPath": "projects/19-wrapping-sequence-number/src/wrapping_sequence_number.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "20",
+      "canonicalName": "optional-typed-handle",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/20-optional-typed-handle/port.js",
+      "implementationPath": "projects/20-optional-typed-handle/src/optional_typed_handle.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "21",
+      "canonicalName": "unit-safe-quantity",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/21-unit-safe-quantity/port.js",
+      "implementationPath": "projects/21-unit-safe-quantity/src/unit_safe_quantity.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "22",
+      "canonicalName": "endian-integer-codec",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/22-endian-integer-codec/port.js",
+      "implementationPath": "projects/22-endian-integer-codec/src/endian_integer_codec.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "23",
+      "canonicalName": "validated-ascii-byte",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/23-validated-ascii-byte/port.js",
+      "implementationPath": "projects/23-validated-ascii-byte/src/validated_ascii_byte.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "24",
+      "canonicalName": "fourcc-code",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/24-fourcc-code/port.js",
+      "implementationPath": "projects/24-fourcc-code/src/fourcc_code.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "25",
+      "canonicalName": "semantic-version",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/25-semantic-version/port.js",
+      "implementationPath": "projects/25-semantic-version/src/semantic_version.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "26",
+      "canonicalName": "tagged-result",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/26-tagged-result/port.js",
+      "implementationPath": "projects/26-tagged-result/src/tagged_result.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "27",
+      "canonicalName": "source-span",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/27-source-span/port.js",
+      "implementationPath": "projects/27-source-span/src/source_span.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "28",
+      "canonicalName": "physical-page-frame-number-and-address-conversion",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/28-physical-page-frame-number-and-address-conversion/port.js",
+      "implementationPath": "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig",
+      "dependenciesMustPortFirst": [
+        "distinct-memory-address-types"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "29",
+      "canonicalName": "binary-cursor-checkpoint",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/29-binary-cursor-checkpoint/port.js",
+      "implementationPath": "projects/29-binary-cursor-checkpoint/src/binary_cursor_checkpoint.zig",
+      "dependenciesMustPortFirst": [
+        "bounded-byte-reader"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "30",
+      "canonicalName": "bounded-binary-sub-reader",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/30-bounded-binary-sub-reader/port.js",
+      "implementationPath": "projects/30-bounded-binary-sub-reader/src/bounded_binary_sub_reader.zig",
+      "dependenciesMustPortFirst": [
+        "bounded-byte-reader",
+        "binary-cursor-checkpoint"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "31",
+      "canonicalName": "length-prefixed-binary-field",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/31-length-prefixed-binary-field/port.js",
+      "implementationPath": "projects/31-length-prefixed-binary-field/src/length_prefixed_binary_field.zig",
+      "dependenciesMustPortFirst": [
+        "bounded-byte-reader",
+        "checked-integer-cast",
+        "endian-integer-codec",
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "32",
+      "canonicalName": "type-length-value-decoder",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/32-type-length-value-decoder/port.js",
+      "implementationPath": "projects/32-type-length-value-decoder/src/type_length_value_decoder.zig",
+      "dependenciesMustPortFirst": [
+        "bounded-byte-reader",
+        "checked-integer-cast",
+        "endian-integer-codec",
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "length-prefixed-binary-field"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "33",
+      "canonicalName": "owned-byte-buffer",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/33-owned-byte-buffer/port.js",
+      "implementationPath": "projects/33-owned-byte-buffer/src/owned_byte_buffer.zig",
+      "dependenciesMustPortFirst": [
+        "dynamic-array",
+        "byte-writer"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "34",
+      "canonicalName": "fixed-capacity-object-pool",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/34-fixed-capacity-object-pool/port.js",
+      "implementationPath": "projects/34-fixed-capacity-object-pool/src/fixed_capacity_object_pool.zig",
+      "dependenciesMustPortFirst": [
+        "bitmap-allocator",
+        "generational-handles"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "35",
+      "canonicalName": "physical-memory-region-set",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/35-physical-memory-region-set/port.js",
+      "implementationPath": "projects/35-physical-memory-region-set/src/physical_memory_region_set.zig",
+      "dependenciesMustPortFirst": [
+        "fixed-capacity-vector",
+        "validated-enum-decoder",
+        "checked-half-open-range",
+        "distinct-memory-address-types",
+        "physical-page-frame-number-and-address-conversion"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "36",
+      "canonicalName": "physical-page-frame-allocator",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/36-physical-page-frame-allocator/port.js",
+      "implementationPath": "projects/36-physical-page-frame-allocator/src/physical_page_frame_allocator.zig",
+      "dependenciesMustPortFirst": [
+        "bit-set",
+        "bitmap-allocator",
+        "checked-half-open-range",
+        "distinct-memory-address-types",
+        "physical-page-frame-number-and-address-conversion",
+        "physical-memory-region-set"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "37",
+      "canonicalName": "elf64-file-header-parser",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/37-elf64-file-header-parser/port.js",
+      "implementationPath": "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig",
+      "dependenciesMustPortFirst": [
+        "bounded-byte-reader",
+        "checked-integer-cast",
+        "validated-enum-decoder",
+        "checked-half-open-range",
+        "endian-integer-codec",
+        "binary-cursor-checkpoint"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "38",
+      "canonicalName": "elf64-program-header-parser",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/38-elf64-program-header-parser/port.js",
+      "implementationPath": "projects/38-elf64-program-header-parser/src/elf64_program_header_parser.zig",
+      "dependenciesMustPortFirst": [
+        "fixed-capacity-vector",
+        "bounded-byte-reader",
+        "checked-integer-cast",
+        "validated-enum-decoder",
+        "aligned-address-and-size-helpers",
+        "validated-bit-flags",
+        "checked-half-open-range",
+        "distinct-memory-address-types",
+        "endian-integer-codec",
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "elf64-file-header-parser"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    }
+  ]
+}

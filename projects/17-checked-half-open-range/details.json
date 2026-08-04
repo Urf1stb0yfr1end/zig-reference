@@ -1357,5 +1357,38 @@
     "notes": [
       "Runtime behavior remains covered by the module unit tests; this smoke test proves external named-import usability and public declaration compilation."
     ]
+  },
+  "portability": {
+    "baseline_zig_version": "0.14.0",
+    "port_contract": "projects/17-checked-half-open-range/port.js",
+    "port_contract_schema": "port.schema.json",
+    "tested_zig_versions": [],
+    "untested_zig_versions": [
+      ">0.14.0"
+    ],
+    "dependencies_must_port_first": [],
+    "version_sensitive_symbols": [
+      "@as",
+      "@max",
+      "@min"
+    ],
+    "version_sensitive_files": [
+      "projects/17-checked-half-open-range/src/checked_half_open_range.zig"
+    ],
+    "semantic_guarantees_to_preserve": [
+      "Preserve the documented checked-half-open-range public behavior, boundaries, and failure semantics."
+    ],
+    "validation_commands": [
+      "zig version",
+      "zig build check-module-contracts",
+      "zig build check-port-contracts",
+      "zig build test-checked-half-open-range",
+      "zig build smoke-checked-half-open-range"
+    ],
+    "known_porting_blockers": [],
+    "automatic_port_guaranteed": false,
+    "notes": [
+      "Later Zig releases remain unverified until their exact compiler and semantic checks run."
+    ]
   }
 }

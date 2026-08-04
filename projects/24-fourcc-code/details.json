@@ -816,5 +816,34 @@
     "notes": [
       "Runtime behavior remains covered by the module unit tests; this smoke test proves external named-import usability and public declaration compilation."
     ]
+  },
+  "portability": {
+    "baseline_zig_version": "0.14.0",
+    "port_contract": "projects/24-fourcc-code/port.js",
+    "port_contract_schema": "port.schema.json",
+    "tested_zig_versions": [],
+    "untested_zig_versions": [
+      ">0.14.0"
+    ],
+    "dependencies_must_port_first": [],
+    "version_sensitive_symbols": [],
+    "version_sensitive_files": [
+      "projects/24-fourcc-code/src/fourcc_code.zig"
+    ],
+    "semantic_guarantees_to_preserve": [
+      "Preserve the documented fourcc-code public behavior, boundaries, and failure semantics."
+    ],
+    "validation_commands": [
+      "zig version",
+      "zig build check-module-contracts",
+      "zig build check-port-contracts",
+      "zig build test-fourcc-code",
+      "zig build smoke-fourcc-code"
+    ],
+    "known_porting_blockers": [],
+    "automatic_port_guaranteed": false,
+    "notes": [
+      "Later Zig releases remain unverified until their exact compiler and semantic checks run."
+    ]
   }
 }

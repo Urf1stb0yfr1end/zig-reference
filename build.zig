@@ -49,6 +49,18 @@ pub fn build(b: *std.Build) void {
     const check_command = b.addSystemCommand(&.{ "python3", "tools/module-contract-consistency-checker.py" });
     const check_step = b.step("check-module-contracts", "Validate schema, formatting, paths, public surfaces, dependencies, catalog, and build registrations");
     check_step.dependOn(&check_command.step);
+    const port_check_command = b.addSystemCommand(&.{ "node", "tools/check-port-contracts.js" });
+    const port_check_step = b.step("check-port-contracts", "Validate static module port contracts and the port index");
+    port_check_step.dependOn(&port_check_command.step);
+    const port_format_command = b.addSystemCommand(&.{ "node", "tools/format-port-contracts.js" });
+    const port_format_step = b.step("format-port-contracts", "Canonically format every module port contract");
+    port_format_step.dependOn(&port_format_command.step);
+    const port_index_command = b.addSystemCommand(&.{ "node", "tools/generate-port-index.js" });
+    const port_index_step = b.step("generate-port-index", "Regenerate ports.json from module port contracts");
+    port_index_step.dependOn(&port_index_command.step);
+    const portability_smoke_command = b.addSystemCommand(&.{ "node", "tools/portability-smoke-test.js" });
+    const portability_smoke_step = b.step("smoke-portability-infrastructure", "Prove port contracts are discoverable and topologically coherent");
+    portability_smoke_step.dependOn(&portability_smoke_command.step);
 
     var modules: [specs.len]*std.Build.Module = undefined;
     for (specs, 0..) |spec, i| {
@@ -59,8 +71,10 @@ pub fn build(b: *std.Build) void {
     }
 
     const smoke_all = b.step("smoke", "Run every external-consumer smoke test");
+    smoke_all.dependOn(portability_smoke_step);
     const test_all = b.step("test", "Run contract checks, unit tests, and smoke tests");
     test_all.dependOn(check_step);
+    test_all.dependOn(port_check_step);
     for (specs, 0..) |spec, i| {
         const unit_tests = b.addTest(.{ .root_module = modules[i] });
         const run_unit = b.addRunArtifact(unit_tests);
