@@ -14,60 +14,42 @@ Every new level must answer three questions:
 
 A project should not hide an important mechanism merely to shorten the code. The implementation must remain small enough to study, but complete enough to teach habits that survive production use.
 
-## Pyramid
+## Current foundation
 
 ```text
-                         10  compiler / virtual machine
-                      09  key-value database
-                   08  HTTP server and protocol state
-                07  thread pool and work queues
-             06  process runner and pipelines
-          05  binary formats and validated parsers
-       04  hash table and indexed storage
-    03  ring buffer and queues
- 02  dynamic array and owned growth
-01  fixed-capacity vector
-00  invariants, slices, errors, tests
+04  bounded byte reader   borrowed input, cursor safety, sub-readers
+03  fixed bit set         compact state, masks, padding invariants
+02  ring buffer           FIFO order and wrapped indexing
+01  dynamic array         allocator ownership and failure-atomic growth
+00  fixed vector          capacity, initialized storage, slices, errors
 ```
 
-## Level 01: fixed-capacity vector
+## Planned ascent
 
-The smallest complete project.
+```text
+                         12  compiler / virtual machine
+                      11  key-value database
+                   10  HTTP server and protocol state
+                09  thread pool and work queues
+             08  process runner and pipelines
+          07  binary formats and validated parsers
+       06  hash table and indexed storage
+    05  stack, tokenizer, and expression evaluator
+00-04  reusable foundation
+```
 
-It introduces:
-
-- a generic container;
-- the relationship between length and capacity;
-- initialized and uninitialized storage;
-- bounds-checked insertion and removal;
-- slices as views over initialized elements;
-- reference invalidation rules;
-- invariants stated in prose and enforced by tests.
-
-It deliberately performs no allocation. This lets the reader understand the container before ownership and allocation failure are added.
-
-## Level 02: dynamic array
-
-The fixed-capacity vector becomes heap-backed and growable.
-
-Only then do we introduce:
-
-- allocator ownership;
-- capacity growth policy;
-- checked size arithmetic;
-- allocation failure;
-- failure-atomic mutation;
-- pointer invalidation after reallocation;
-- explicit destruction.
+The bit set forms an additional branch toward bitmap allocation, page tracking, permissions, and freestanding systems. The bounded reader forms the direct base for archives, images, executable formats, and network protocols.
 
 ## How later projects reuse the base
 
-- The ring buffer reuses capacity, indexing, and initialized-region reasoning.
+- The expression evaluator reuses dynamic storage and explicit errors.
 - The hash table reuses owned storage, growth, failure atomicity, and invalidation rules.
-- Parsers reuse slices, bounded indexing, explicit errors, and validated state.
+- Bitmap allocators reuse the bit set's logical-versus-physical representation.
+- Parsers reuse slices, bounded cursor movement, sub-readers, and explicit errors.
 - Work queues reuse ring-buffer mechanics and add synchronization.
 - Databases reuse dynamic storage, parsing, checksums, and failure-atomic replacement.
 - Servers reuse bounded readers, state machines, queues, and owned resources.
+- Hypervisors can reuse fixed storage, bitmaps, bounded executable parsing, and explicit lifecycle state.
 
 ## Teaching standard
 
@@ -82,5 +64,6 @@ Every project includes:
 - **Failure-path tests**
 - **Reference invalidation rules**
 - **Exercises that extend rather than rewrite the design**
+- **A `MASTERY.md` guide**
 
 The objective is cumulative understanding: each new project should feel like the next necessary consequence of the previous one.
