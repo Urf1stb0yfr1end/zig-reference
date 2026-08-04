@@ -1,36 +1,130 @@
-# zig-reference
+# Solved once, documented completely, reused forever.
 
-**Common systems projects, uncommon clarity.**
+## zig-reference
 
-`zig-reference` is a cumulative collection of small, complete systems-programming projects written for **Zig 0.14.0**. Each project begins with first principles, states its invariants, exposes ownership and invalidation rules, tests failure paths, and shows how low-level software can remain understandable as it becomes serious.
+**A cumulative systems-programming foundation for Zig 0.14.0.**
 
-This is not an alternative standard library and it does not claim official Zig conventions. It is a set of proposed reference forms supported by implementations and explicit validation status.
+`zig-reference` preserves recurring systems problems as small, explicit, reusable modules. Each module aims to keep its implementation, tests, human explanation, machine-readable contract, dependency paths, and validation status together so the next programmer or coding agent begins with accumulated knowledge instead of starting over.
 
-## The larger vision
+This repository is not an alternative standard library, and it does not claim to define official Zig conventions. It is a growing collection of proposed reference forms: mechanisms that can be studied completely, tested independently, and reused as foundations for larger systems.
 
-[**Age of Agents**](AGE_OF_AGENTS.md) sets out the long-term design principle: software should preserve solved problems as discoverable, composable knowledge so future systems begin from accumulated understanding rather than from nothing.
+## The idea
 
-[**The Snowball Principle**](SNOWBALL_PRINCIPLE.md) states the repository's growth law: every completed lower module should reduce the implementation, search, documentation, and testing cost of several higher modules.
+Most software repeatedly pays for the same discoveries:
 
-## Discovery and progress
+- where an implementation lives;
+- what it accepts and returns;
+- what it owns or borrows;
+- how it fails;
+- what it invalidates;
+- which lower layers it depends on;
+- how it should be tested;
+- whether it was actually validated.
 
-- [`MODULES.md`](MODULES.md) — fast capability catalog
-- [`MASTER_MODULE_CHECKLIST.md`](MASTER_MODULE_CHECKLIST.md) — complete planning ledger
-- [`MASTER_MODULE_CHECKLIST_PROGRESS.md`](MASTER_MODULE_CHECKLIST_PROGRESS.md) — current completion overlay
-- [`HYPER_ZIG_REQUIRED_MODULES.md`](HYPER_ZIG_REQUIRED_MODULES.md) — specialized Hyper-Zig dependency view
-- [`DETAILS.md`](DETAILS.md) — human composition-contract standard
-- [`details.schema.json`](details.schema.json) — machine-contract schema
+`zig-reference` records those answers once.
 
-## What makes a project belong here?
+A mature module should let a human or agent follow this path:
 
-A project belongs when:
+```text
+search for a capability
+    ↓
+open its module folder
+    ↓
+read the human and machine contracts
+    ↓
+see every input, output, endpoint, path, error, and dependency
+    ↓
+run its tests
+    ↓
+reuse it in the next layer
+```
 
-- students and working programmers commonly need it;
-- its naive implementation is easy, but its durable implementation is not;
-- it exposes a recurring systems-programming failure mode;
-- Zig can make important guarantees visible without hiding the mechanism;
-- it remains small enough to study completely;
-- its ideas become reusable foundations for later projects.
+The goal is simple:
+
+> Never spend time or tokens rediscovering a fact the repository already knows.
+
+## The snowball principle
+
+The repository is designed to become easier to extend as it grows.
+
+```text
+validated values
+    ↓
+checked ranges, addresses, flags, and codecs
+    ↓
+containers, allocators, readers, writers, and registries
+    ↓
+parsers, loaders, schedulers, protocols, and devices
+    ↓
+compilers, databases, operating systems, and hypervisors
+```
+
+Higher modules should reuse lower modules whenever their contracts fit. They should inherit settled guarantees and add only the behavior unique to their layer.
+
+That is how the repository snowballs: each solved problem becomes part of the starting point for every problem above it.
+
+Read the full principle in [`SNOWBALL_PRINCIPLE.md`](SNOWBALL_PRINCIPLE.md).
+
+## What every module should contain
+
+```text
+projects/<canonical-module-name>/
+├── src/
+│   └── <descriptive_module_name>.zig
+├── README.md
+├── MASTERY.md
+├── DETAILS.md
+└── details.json
+```
+
+Where present, external smoke tests, examples, fixtures, fuzz targets, and benchmarks remain inside the same module folder.
+
+Each file has a distinct job:
+
+- **`src/*.zig`** — the implementation and internal unit tests;
+- **`README.md`** — the accessible introduction and motivation;
+- **`MASTERY.md`** — the complete human study guide;
+- **`DETAILS.md`** — the concise integration contract;
+- **`details.json`** — the exhaustive, prettified contract showing what the machine sees.
+
+The `details.json` contract is intended to expose the module’s exact paths, public endpoints, inputs, outputs, ownership, lifetime, errors, invalidation rules, dependencies, inherited guarantees, test commands, compatibility, and validation state. It should eliminate repeated source archaeology while remaining readable by humans.
+
+## Current foundations
+
+The repository currently includes foundational modules for:
+
+- fixed and dynamic containers;
+- ring buffers, stacks, and bit sets;
+- bounded binary reading and owned binary writing;
+- bitmap allocation and generational handles;
+- explicit state transitions;
+- checked casts, bounded values, nonzero values, and saturating counters;
+- validated enums and bit flags;
+- checked alignment, ranges, and address domains;
+- sequence numbers, typed handles, unit-safe quantities, and endian codecs;
+- ASCII bytes, FourCC values, semantic versions, tagged results, and source spans;
+- physical page-frame and physical-address conversion.
+
+Browse the complete capability catalog in [`MODULES.md`](MODULES.md).
+
+## Start here
+
+### To find a capability
+
+Open [`MODULES.md`](MODULES.md). It links each implemented module to its human contract and machine contract.
+
+### To understand the vision
+
+- [`AGE_OF_AGENTS.md`](AGE_OF_AGENTS.md) — why solved software should become constructive memory;
+- [`SNOWBALL_PRINCIPLE.md`](SNOWBALL_PRINCIPLE.md) — how lower layers accelerate higher ones;
+- [`PYRAMID.md`](PYRAMID.md) — the dependency and learning progression;
+- [`ARCHETYPES.md`](ARCHETYPES.md) — the shared architectural vocabulary.
+
+### To see the roadmap
+
+- [`MASTER_MODULE_CHECKLIST.md`](MASTER_MODULE_CHECKLIST.md) — the complete capability ledger;
+- [`MASTER_MODULE_CHECKLIST_PROGRESS.md`](MASTER_MODULE_CHECKLIST_PROGRESS.md) — implementation progress and validation state;
+- [`HYPER_ZIG_REQUIRED_MODULES.md`](HYPER_ZIG_REQUIRED_MODULES.md) — the specialized path toward a composable Zig hypervisor.
 
 ## Early study path
 
@@ -45,43 +139,64 @@ A project belongs when:
 9. [Generational handles](projects/08-generational-handles/README.md)
 10. [Explicit state machine](projects/09-state-machine/README.md)
 
-Each project carries `README.md`, `MASTERY.md`, `DETAILS.md`, and `details.json` beside its implementation.
+After those foundations, follow the dependency links in each module’s `DETAILS.md` or `details.json` rather than relying only on numeric order.
 
-## Run the projects
+## Validation
+
+The repository targets **Zig 0.14.0**.
 
 ```sh
 zig version
+zig build check-module-contracts
 zig build test
 ```
 
-Individual test steps are listed in each module contract and registered in `build.zig`.
+Additional smoke-test commands may be available as the repository-wide external-consumer test layer is completed. Consult `build.zig` and each module’s contract for the exact current commands.
+
+Validation status must remain honest. Source existence, documentation completeness, compiler validation, unit-test success, and smoke-test success are separate claims.
+
+## What makes a module belong here?
+
+A module belongs when:
+
+- it settles a recurring systems-programming problem;
+- its naive implementation is easy but its durable implementation is not;
+- its invariants, ownership, failure behavior, and invalidation can be made explicit;
+- it remains small enough to understand completely;
+- it can be independently tested;
+- it reduces the cost of several future modules;
+- its contract makes reuse easier than reinvention.
+
+A source file alone does not compound.
+
+A discoverable, documented, testable contract does.
 
 ## Where Zig distinguishes itself
 
-These projects emphasize qualities easy to miss when Zig is described only as a C alternative:
+These modules emphasize qualities that are easy to miss when Zig is described only as a C alternative:
 
 - low-level representations remain visible;
-- allocation is a dependency rather than a global assumption;
+- allocation is an explicit dependency;
 - error behavior appears in function types;
-- compile-time parameters produce specialized concrete types;
+- compile-time parameters create specialized concrete types;
 - slices preserve length alongside addresses;
 - precise integer types express machine constraints;
-- tests can exercise failure paths and allocation behavior directly;
-- the same language works in hosted programs and freestanding systems.
+- hosted and freestanding code can share the same language;
+- tests can exercise failure paths and allocation behavior directly.
 
-The objective is not to make systems programming effortless. It is to make responsibility local, explicit, searchable, and teachable.
+The objective is not to make systems programming effortless. It is to make responsibility local, explicit, searchable, reusable, and teachable.
 
-## Repository vocabulary
+## Long-term direction
 
-The shared architectural vocabulary lives in [`ARCHETYPES.md`](ARCHETYPES.md).
+The long-term aim is a repository mature enough that substantial systems can be created primarily through composition.
 
-## Zig version
+A future agent should be able to select validated modules, follow declared dependency edges, generate the orchestration unique to the requested system, and spend most of its effort on genuinely new work.
 
-The repository targets Zig **0.14.0**. Examples should be built and tested with that release unless a module explicitly states otherwise.
+Hyper-Zig is the flagship expression of that direction: not a hypervisor conjured from one prompt, but a hypervisor assembled from layers the repository has already solved and preserved.
 
-## Central principle
+## Central principles
 
-> Freedom of mechanism. Stability of form.
+> Solved once, documented completely, reused forever.
 
 A reader or coding agent should not have to rediscover ownership, invariants, failure behavior, cleanup, and dependency purpose every time it opens an unfamiliar systems project.
 
