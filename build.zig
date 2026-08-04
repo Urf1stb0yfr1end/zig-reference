@@ -9,30 +9,60 @@ pub fn build(b: *std.Build) void {
     addTestProject(b, target, optimize, all_tests_step,
         "test-fixed-vector", "Run the fixed-capacity vector tests",
         "projects/00-fixed-capacity-vector/src/fixed_vector.zig");
-
     addTestProject(b, target, optimize, all_tests_step,
         "test-dynamic-array", "Run the dynamic array tests",
         "projects/02-dynamic-array/src/dynamic_array.zig");
-
     addTestProject(b, target, optimize, all_tests_step,
         "test-ring-buffer", "Run the ring buffer tests",
         "projects/03-ring-buffer/src/ring_buffer.zig");
-
     addTestProject(b, target, optimize, all_tests_step,
         "test-bit-set", "Run the fixed bit set tests",
         "projects/03-bit-set/src/bit_set.zig");
-
     addTestProject(b, target, optimize, all_tests_step,
         "test-bounded-reader", "Run the bounded byte reader tests",
         "projects/04-bounded-byte-reader/src/bounded_reader.zig");
-
     addTestProject(b, target, optimize, all_tests_step,
         "test-stack", "Run the stack tests",
         "projects/05-stack/src/stack.zig");
-
     addTestProject(b, target, optimize, all_tests_step,
         "test-byte-writer", "Run the byte writer tests",
         "projects/06-byte-writer/src/byte_writer.zig");
+    addTestProject(b, target, optimize, all_tests_step,
+        "test-bitmap-allocator", "Run the bitmap allocator tests",
+        "projects/07-bitmap-allocator/src/bitmap_allocator.zig");
+    addTestProject(b, target, optimize, all_tests_step,
+        "test-generational-handles", "Run the generational handle table tests",
+        "projects/08-generational-handles/src/generational_handles.zig");
+    addTestProject(b, target, optimize, all_tests_step,
+        "test-state-machine", "Run the explicit state machine tests",
+        "projects/09-state-machine/src/state_machine.zig");
+    addTestProject(b, target, optimize, all_tests_step,
+        "test-checked-integer-cast", "Run the checked integer cast tests",
+        "projects/10-checked-integer-cast/src/checked_integer_cast.zig");
+    addTestProject(b, target, optimize, all_tests_step,
+        "test-nonzero-integer", "Run the nonzero integer tests",
+        "projects/11-nonzero-integer/src/nonzero_integer.zig");
+    addTestProject(b, target, optimize, all_tests_step,
+        "test-bounded-integer", "Run the bounded integer tests",
+        "projects/12-bounded-integer/src/bounded_integer.zig");
+    addTestProject(b, target, optimize, all_tests_step,
+        "test-saturating-counter", "Run the saturating counter tests",
+        "projects/13-saturating-counter/src/saturating_counter.zig");
+    addTestProject(b, target, optimize, all_tests_step,
+        "test-validated-enum-decoder", "Run the validated enum decoder tests",
+        "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig");
+    addTestProject(b, target, optimize, all_tests_step,
+        "test-alignment-helpers", "Run the alignment helper tests",
+        "projects/15-aligned-address-and-size-helpers/src/alignment_helpers.zig");
+    addTestProject(b, target, optimize, all_tests_step,
+        "test-validated-bit-flags", "Run the validated bit flags tests",
+        "projects/16-validated-bit-flags/src/validated_bit_flags.zig");
+    addTestProject(b, target, optimize, all_tests_step,
+        "test-checked-half-open-range", "Run the checked half-open range tests",
+        "projects/17-checked-half-open-range/src/checked_half_open_range.zig");
+    addTestProject(b, target, optimize, all_tests_step,
+        "test-distinct-memory-address-types", "Run the distinct memory address type tests",
+        "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig");
 }
 
 fn addTestProject(
