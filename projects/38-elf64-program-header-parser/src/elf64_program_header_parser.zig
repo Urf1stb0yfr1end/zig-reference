@@ -1,0 +1,22 @@
+const std=@import("std");
+const vectors=@import("fixed-capacity-vector");
+const bounded=@import("bounded-byte-reader");
+const cast=@import("checked-integer-cast");
+const enums=@import("validated-enum-decoder");
+const alignment=@import("aligned-address-and-size-helpers");
+const flag_module=@import("validated-bit-flags");
+const ranges=@import("checked-half-open-range");
+const addresses=@import("distinct-memory-address-types");
+const codec=@import("endian-integer-codec");
+const checkpoints=@import("binary-cursor-checkpoint");
+const sub=@import("bounded-binary-sub-reader");
+const elf=@import("elf64-file-header-parser");
+
+pub const Permission=enum(u32){ execute=1,write=2,read=4 }; pub const Permissions=flag_module.ValidatedBitFlags(Permission);
+pub const SegmentType=union(enum){known:Known,unknown:u32,pub const Known=enum(u32){null=0,load=1,dynamic=2,interpreter=3,note=4,shared_library=5,program_header=6,tls=7};};
+pub const Segment=struct{segment_type:SegmentType,permissions:Permissions,file_range:ranges.CheckedRange,virtual_range:ranges.CheckedRange,physical_address:addresses.PhysicalAddress,alignment:u64};
+pub const ParseError=error{UnexpectedEnd,UnknownPermissionBits,OutOfRange,FileSizeExceedsMemorySize,InvalidAlignment,InvalidTableEntrySize,TableOutOfBounds,Full};
+fn read(comptime T:type,r:*bounded.BoundedReader,e:elf.ElfEndian)error{UnexpectedEnd}!T{const b=r.readBytes(@sizeOf(T))catch return error.UnexpectedEnd;var a:[@sizeOf(T)]u8=undefined;@memcpy(&a,b);return switch(e){.little=>codec.EndianIntegerCodec(T,.little).decode(&a),.big=>codec.EndianIntegerCodec(T,.big).decode(&a)};}
+pub fn parseOne(reader:*bounded.BoundedReader,endian:elf.ElfEndian) ParseError!Segment { _=enums; const mark=checkpoints.capture(reader.*);errdefer mark.restore(reader)catch unreachable;const raw_type=try read(u32,reader,endian);const raw_flags=try read(u32,reader,endian);const offset=try read(u64,reader,endian);const virtual=try read(u64,reader,endian);const physical=try read(u64,reader,endian);const file_size=try read(u64,reader,endian);const memory_size=try read(u64,reader,endian);const align=try read(u64,reader,endian);if(file_size>memory_size)return error.FileSizeExceedsMemorySize;if(align!=0 and (align>std.math.maxInt(usize) or !alignment.isPowerOfTwo(@intCast(align))))return error.InvalidAlignment;const o=cast.checkedIntegerCast(usize,offset)catch return error.OutOfRange;const fs=cast.checkedIntegerCast(usize,file_size)catch return error.OutOfRange;const v=cast.checkedIntegerCast(usize,virtual)catch return error.OutOfRange;const ms=cast.checkedIntegerCast(usize,memory_size)catch return error.OutOfRange;const p=cast.checkedIntegerCast(usize,physical)catch return error.OutOfRange;const st:SegmentType=switch(raw_type){0=>.{.known=.null},1=>.{.known=.load},2=>.{.known=.dynamic},3=>.{.known=.interpreter},4=>.{.known=.note},5=>.{.known=.shared_library},6=>.{.known=.program_header},7=>.{.known=.tls},else=>.{.unknown=raw_type}};return .{.segment_type=st,.permissions=Permissions.fromRaw(raw_flags)catch return error.UnknownPermissionBits,.file_range=ranges.CheckedRange.fromStartAndLength(o,fs)catch return error.OutOfRange,.virtual_range=ranges.CheckedRange.fromStartAndLength(v,ms)catch return error.OutOfRange,.physical_address=addresses.PhysicalAddress.init(p),.alignment=align};}
+pub fn parseTable(comptime capacity_:usize,file_reader:*bounded.BoundedReader,header:elf.Elf64FileHeader) ParseError!vectors.FixedVector(Segment,capacity_){if(header.program_entry_size!=56)return error.InvalidTableEntrySize;const table=header.programTableRange(file_reader.extent())catch |e|switch(e){error.OutOfRange=>return error.OutOfRange,error.TableOutOfBounds=>return error.TableOutOfBounds};try file_reader.seek(table.start);var region=sub.BoundedBinarySubReader.create(file_reader,table.length(),.immediate)catch return error.TableOutOfBounds;var result=vectors.FixedVector(Segment,capacity_).init();var i:usize=0;while(i<header.program_count):(i+=1)result.append(try parseOne(region.reader(),header.endian))catch return error.Full;return result;}
+test "validates one segment and rejects filesz greater than memsz" {var bytes=[_]u8{0}**56;bytes[0]=1;bytes[4]=4;bytes[32]=1;bytes[40]=2;var r=bounded.BoundedReader.init(&bytes);try std.testing.expectError(error.FileSizeExceedsMemorySize,parseOne(&r,.little));try std.testing.expectEqual(@as(usize,0),r.position());bytes[40]=1;var ok=bounded.BoundedReader.init(&bytes);const s=try parseOne(&ok,.little);try std.testing.expect(s.permissions.contains(.read));}

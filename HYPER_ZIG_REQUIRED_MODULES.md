@@ -152,13 +152,13 @@ Every name below is intentionally descriptive. The name should tell a student, p
 
 ## Phase 4: Physical and Virtual Memory
 
-40. `physical-memory-region-set`
+40. `physical-memory-region-set` **Implemented: `projects/35-physical-memory-region-set`.**
     - Stores, normalizes, splits, reserves, and queries physical address ranges.
 
 41. `physical-page-frame-number-and-address-conversion`
     - Converts pages and addresses with checked alignment and overflow rules.
 
-42. `physical-page-frame-allocator`
+42. `physical-page-frame-allocator` **Implemented: `projects/36-physical-page-frame-allocator`.**
     - Applies the bitmap allocator to actual page ranges while excluding reserved memory.
 
 43. `contiguous-physical-page-run-allocator`
@@ -201,10 +201,10 @@ Every name below is intentionally descriptive. The name should tell a student, p
 
 ## Phase 5: Executable and Binary Loading
 
-55. `elf64-file-header-parser`
+55. `elf64-file-header-parser` **Implemented: `projects/37-elf64-file-header-parser`.**
     - Parses and validates ELF identity, architecture, type, and table locations.
 
-56. `elf64-program-header-parser`
+56. `elf64-program-header-parser` **Implemented: `projects/38-elf64-program-header-parser`.**
     - Reads loadable segments with checked offsets, sizes, permissions, and alignment.
 
 57. `elf64-section-header-parser`

@@ -5,12 +5,22 @@ This file is the current completion overlay for [`MASTER_MODULE_CHECKLIST.md`](M
 ## Current count
 
 - Unique checklist capabilities: **757**
-- Implemented or functionally represented: **32**
+- Implemented or functionally represented: **42**
 - Compiler-validated in the current environment: **0**
 
 A check mark records an implementation and complete repository contract set. It does not claim successful Zig compilation unless the corresponding `details.json` says so.
 
 ## Newly completed in this batch
+
+- [x] **035. Object pool** — `projects/34-fixed-capacity-object-pool` (thin extension of the existing handle table)
+- [x] **042. Owned buffer** — `projects/33-owned-byte-buffer`
+- [x] **063. Sub-reader** — `projects/30-bounded-binary-sub-reader` (adds explicit commit policy to the reader's immediate sub-reader)
+- [x] **073. Length-prefixed field** — `projects/31-length-prefixed-binary-field`
+- [x] **074. TLV decoder** — `projects/32-type-length-value-decoder`
+- [x] **076. Binary cursor mark** — `projects/29-binary-cursor-checkpoint`
+- [x] **278. ELF64 reader** — `projects/37-elf64-file-header-parser` and `projects/38-elf64-program-header-parser`
+- [x] **Hyper-Zig: physical memory region set** — `projects/35-physical-memory-region-set`
+- [x] **Hyper-Zig: physical page-frame allocator** — `projects/36-physical-page-frame-allocator`
 
 - [x] **003. Wrapping sequence number** — `projects/19-wrapping-sequence-number`
 - [x] **008. Tagged result** — `projects/26-tagged-result`

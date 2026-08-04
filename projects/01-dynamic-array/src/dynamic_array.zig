@@ -1,3 +1,4 @@
+// Allocator/growth failures include OutOfMemory or Overflow.
 const std = @import("std");
 
 /// A small allocator-backed dynamic array for teaching ownership, growth,

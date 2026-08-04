@@ -31,6 +31,16 @@ const specs = [_]ModuleSpec{
     .{ .name = "tagged-result", .source = "projects/26-tagged-result/src/tagged_result.zig", .dependencies = &.{} },
     .{ .name = "source-span", .source = "projects/27-source-span/src/source_span.zig", .dependencies = &.{} },
     .{ .name = "physical-page-frame-number-and-address-conversion", .source = "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig", .dependencies = &.{"distinct-memory-address-types"} },
+    .{ .name = "binary-cursor-checkpoint", .source = "projects/29-binary-cursor-checkpoint/src/binary_cursor_checkpoint.zig", .dependencies = &.{"bounded-byte-reader"} },
+    .{ .name = "bounded-binary-sub-reader", .source = "projects/30-bounded-binary-sub-reader/src/bounded_binary_sub_reader.zig", .dependencies = &.{ "bounded-byte-reader", "binary-cursor-checkpoint" } },
+    .{ .name = "length-prefixed-binary-field", .source = "projects/31-length-prefixed-binary-field/src/length_prefixed_binary_field.zig", .dependencies = &.{ "bounded-byte-reader", "checked-integer-cast", "endian-integer-codec", "binary-cursor-checkpoint", "bounded-binary-sub-reader" } },
+    .{ .name = "type-length-value-decoder", .source = "projects/32-type-length-value-decoder/src/type_length_value_decoder.zig", .dependencies = &.{ "bounded-byte-reader", "checked-integer-cast", "endian-integer-codec", "binary-cursor-checkpoint", "bounded-binary-sub-reader", "length-prefixed-binary-field" } },
+    .{ .name = "owned-byte-buffer", .source = "projects/33-owned-byte-buffer/src/owned_byte_buffer.zig", .dependencies = &.{ "dynamic-array", "byte-writer" } },
+    .{ .name = "fixed-capacity-object-pool", .source = "projects/34-fixed-capacity-object-pool/src/fixed_capacity_object_pool.zig", .dependencies = &.{ "bitmap-allocator", "generational-handles" } },
+    .{ .name = "physical-memory-region-set", .source = "projects/35-physical-memory-region-set/src/physical_memory_region_set.zig", .dependencies = &.{ "fixed-capacity-vector", "validated-enum-decoder", "checked-half-open-range", "distinct-memory-address-types", "physical-page-frame-number-and-address-conversion" } },
+    .{ .name = "physical-page-frame-allocator", .source = "projects/36-physical-page-frame-allocator/src/physical_page_frame_allocator.zig", .dependencies = &.{ "bit-set", "bitmap-allocator", "checked-half-open-range", "distinct-memory-address-types", "physical-page-frame-number-and-address-conversion", "physical-memory-region-set" } },
+    .{ .name = "elf64-file-header-parser", .source = "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig", .dependencies = &.{ "bounded-byte-reader", "checked-integer-cast", "validated-enum-decoder", "checked-half-open-range", "endian-integer-codec", "binary-cursor-checkpoint" } },
+    .{ .name = "elf64-program-header-parser", .source = "projects/38-elf64-program-header-parser/src/elf64_program_header_parser.zig", .dependencies = &.{ "fixed-capacity-vector", "bounded-byte-reader", "checked-integer-cast", "validated-enum-decoder", "aligned-address-and-size-helpers", "validated-bit-flags", "checked-half-open-range", "distinct-memory-address-types", "endian-integer-codec", "binary-cursor-checkpoint", "bounded-binary-sub-reader", "elf64-file-header-parser" } },
 };
 
 pub fn build(b: *std.Build) void {
@@ -60,6 +70,7 @@ pub fn build(b: *std.Build) void {
 
         const smoke_module = b.createModule(.{ .root_source_file = b.path(b.fmt("projects/{s}/tests/smoke_test.zig", .{directoryFor(spec.name)})), .target = target, .optimize = optimize });
         smoke_module.addImport(spec.name, modules[i]);
+        for (spec.dependencies) |dependency_name| smoke_module.addImport(dependency_name, findModule(dependency_name, &modules));
         const smoke_tests = b.addTest(.{ .root_module = smoke_module });
         const run_smoke = b.addRunArtifact(smoke_tests);
         const smoke_step = b.step(b.fmt("smoke-{s}", .{spec.name}), b.fmt("Run {s} external smoke test", .{spec.name}));

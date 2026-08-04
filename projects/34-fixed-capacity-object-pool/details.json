@@ -1,0 +1,1026 @@
+{
+  "schema_version": "3.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-04",
+  "last_reviewed_at": "2026-08-04",
+  "module": {
+    "id": "34",
+    "canonical_name": "fixed-capacity-object-pool",
+    "display_name": "Fixed Capacity Object Pool",
+    "directory": "projects/34-fixed-capacity-object-pool",
+    "summary": "Expose the existing generational table as an iterable, resettable object-pool contract.",
+    "long_description": "Expose the existing generational table as an iterable, resettable object-pool contract.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "category": "memory-foundation",
+    "subcategory": "",
+    "tags": [
+      "physical-memory",
+      "page-frame",
+      "address",
+      "hypervisor",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Expose the existing generational table as an iterable, resettable object-pool contract.",
+    "secondary": [],
+    "non_goals": [
+      "hidden allocation",
+      "implicit synchronization"
+    ],
+    "problems_solved": [],
+    "future_role": "Reusable boundary infrastructure."
+  },
+  "c_pain": {
+    "summary": "",
+    "common_failure_modes": [],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "",
+    "where_c_degrades": ""
+  },
+  "zig_response": {
+    "summary": "",
+    "language_features": [],
+    "guarantees_made_visible": [],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/34-fixed-capacity-object-pool",
+    "implementation": [
+      "projects/34-fixed-capacity-object-pool/src/fixed_capacity_object_pool.zig"
+    ],
+    "public_entrypoint": "projects/34-fixed-capacity-object-pool/src/fixed_capacity_object_pool.zig",
+    "readme": "projects/34-fixed-capacity-object-pool/README.md",
+    "mastery": "projects/34-fixed-capacity-object-pool/MASTERY.md",
+    "details_markdown": "projects/34-fixed-capacity-object-pool/DETAILS.md",
+    "details_json": "projects/34-fixed-capacity-object-pool/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": [],
+    "unit_tests": [
+      "projects/34-fixed-capacity-object-pool/src/fixed_capacity_object_pool.zig"
+    ],
+    "smoke_tests": [
+      "projects/34-fixed-capacity-object-pool/tests/smoke_test.zig"
+    ],
+    "generated_files": [],
+    "dependency_contracts": [
+      "projects/07-bitmap-allocator/details.json",
+      "projects/08-generational-handles/details.json"
+    ]
+  },
+  "public_surface": {
+    "root_symbols": [
+      "ObjectPool"
+    ],
+    "types": [
+      {
+        "name": "ObjectPool",
+        "kind": "public declaration"
+      }
+    ],
+    "functions": [],
+    "methods": [],
+    "constants": [],
+    "errors": [],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": [],
+    "endpoints": [
+      {
+        "name": "ObjectPool",
+        "kind": "function",
+        "signature": "ObjectPool(comptime T: type, comptime capacity_: usize)",
+        "visibility": "public",
+        "summary": "Public ObjectPool operation; exact return type is authoritative in source.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "parameters",
+            "type": "comptime T: type, comptime capacity_: usize",
+            "role": "Structured parameters shown in the exact source signature.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of ObjectPool.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "capacity",
+        "kind": "method",
+        "signature": "capacity(_: *const @This()",
+        "visibility": "public",
+        "summary": "Public capacity operation; exact return type is authoritative in source.",
+        "receiver": {
+          "name": "self",
+          "type": "source-declared receiver or generated type context",
+          "ownership": "borrowed or value as declared",
+          "mutation": "source signature is authoritative"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of capacity.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "count",
+        "kind": "method",
+        "signature": "count(self: *const @This()",
+        "visibility": "public",
+        "summary": "Public count operation; exact return type is authoritative in source.",
+        "receiver": {
+          "name": "self",
+          "type": "source-declared receiver or generated type context",
+          "ownership": "borrowed or value as declared",
+          "mutation": "source signature is authoritative"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of count.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "insert",
+        "kind": "method",
+        "signature": "insert(self: *@This()",
+        "visibility": "public",
+        "summary": "Public insert operation; exact return type is authoritative in source.",
+        "receiver": {
+          "name": "self",
+          "type": "source-declared receiver or generated type context",
+          "ownership": "borrowed or value as declared",
+          "mutation": "source signature is authoritative"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of insert.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "get",
+        "kind": "method",
+        "signature": "get(self: *@This()",
+        "visibility": "public",
+        "summary": "Public get operation; exact return type is authoritative in source.",
+        "receiver": {
+          "name": "self",
+          "type": "source-declared receiver or generated type context",
+          "ownership": "borrowed or value as declared",
+          "mutation": "source signature is authoritative"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of get.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "getConst",
+        "kind": "method",
+        "signature": "getConst(self: *const @This()",
+        "visibility": "public",
+        "summary": "Public getConst operation; exact return type is authoritative in source.",
+        "receiver": {
+          "name": "self",
+          "type": "source-declared receiver or generated type context",
+          "ownership": "borrowed or value as declared",
+          "mutation": "source signature is authoritative"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of getConst.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "remove",
+        "kind": "method",
+        "signature": "remove(self: *@This()",
+        "visibility": "public",
+        "summary": "Public remove operation; exact return type is authoritative in source.",
+        "receiver": {
+          "name": "self",
+          "type": "source-declared receiver or generated type context",
+          "ownership": "borrowed or value as declared",
+          "mutation": "source signature is authoritative"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of remove.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "reset",
+        "kind": "method",
+        "signature": "reset(self: *@This()",
+        "visibility": "public",
+        "summary": "Public reset operation; exact return type is authoritative in source.",
+        "receiver": {
+          "name": "self",
+          "type": "source-declared receiver or generated type context",
+          "ownership": "borrowed or value as declared",
+          "mutation": "source signature is authoritative"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of reset.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "iterator",
+        "kind": "method",
+        "signature": "iterator(self:*const @This()",
+        "visibility": "public",
+        "summary": "Public iterator operation; exact return type is authoritative in source.",
+        "receiver": {
+          "name": "self",
+          "type": "source-declared receiver or generated type context",
+          "ownership": "borrowed or value as declared",
+          "mutation": "source signature is authoritative"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of iterator.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "name": "public endpoint inputs",
+      "type": "see endpoint signatures",
+      "ownership": "copied scalar/value or borrowed according to the Zig type",
+      "lifetime": "for the duration of the call unless the output contract says it is stored",
+      "role": "Copied policies/scalars or explicitly borrowed pointers and slices",
+      "borrowing": "explicit in the Zig type",
+      "mutability": "mutable only when the type permits mutation",
+      "valid_range": "all values satisfying the listed constraints",
+      "alignment": "type-defined",
+      "endianness": "not applicable unless stated by the operation",
+      "format": "Zig value",
+      "required_invariants": [],
+      "validation_performed": [],
+      "accepts_untrusted_input": true,
+      "stored": false,
+      "copied": true,
+      "may_mutate": false,
+      "errors_on_invalid_input": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "public endpoint outputs",
+      "type": "see endpoint signatures",
+      "ownership": "not applicable",
+      "lifetime": "program",
+      "meaning": "Copied values or documented borrowed views",
+      "borrowed_from": "",
+      "cleanup_required": false,
+      "cleanup_responsibility": "none",
+      "invalidation_conditions": [],
+      "aliasing": "not applicable",
+      "borrows_from_module": false,
+      "borrows_from_input": false,
+      "valid_after_mutation": "not applicable",
+      "absence_meaning": "not applicable"
+    }
+  ],
+  "state": {
+    "fields": [],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "PageSize is 4096",
+      "produced addresses are aligned"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [
+      "scalar frame index"
+    ],
+    "borrows": [],
+    "copies": [],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [],
+    "optional_empty_results": [],
+    "failure_atomicity": "Failed parsing and mutation preserve externally observable state unless source explicitly documents a committed transition.",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [
+      {
+        "module": "bitmap-allocator",
+        "path": "projects/07-bitmap-allocator/src/bitmap_allocator.zig",
+        "symbol": "BitmapAllocator",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "generational-handles",
+        "path": "projects/08-generational-handles/src/generational_handles.zig",
+        "symbol": "HandleTable",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      }
+    ],
+    "standard_library": [
+      "std.math.mul"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": []
+  },
+  "dependency_contracts": [
+    {
+      "module": "bitmap-allocator",
+      "directory": "projects/07-bitmap-allocator",
+      "import_name": "bitmap-allocator",
+      "import_path": "projects/07-bitmap-allocator/src/bitmap_allocator.zig",
+      "symbols_used": [
+        "BitmapAllocator"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/07-bitmap-allocator/details.json"
+    },
+    {
+      "module": "generational-handles",
+      "directory": "projects/08-generational-handles",
+      "import_name": "generational-handles",
+      "import_path": "projects/08-generational-handles/src/generational_handles.zig",
+      "symbols_used": [
+        "HandleTable"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/08-generational-handles/details.json"
+    }
+  ],
+  "expected_dependents": [
+    "future composition modules"
+  ],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "fixed-capacity-object-pool",
+    "import_path": "projects/34-fixed-capacity-object-pool/src/fixed_capacity_object_pool.zig",
+    "import_configuration": "Use @import(\"fixed-capacity-object-pool\") through build.zig.",
+    "minimal_example": "",
+    "integration_patterns": [],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "not_applicable",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "value type",
+    "reentrant": "unknown",
+    "interrupt_safe": "unknown",
+    "async_safe": "unknown",
+    "signal_safe": "unknown",
+    "platforms": [],
+    "architectures": [
+      "page policy currently architecture-neutral but fixed at 4 KiB"
+    ],
+    "allocator_assumptions": "",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "",
+    "no_std_equivalent": ""
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "for shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "caller-defined",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "caller inputs",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-fixed-capacity-object-pool",
+    "commands": [
+      "zig build test-fixed-capacity-object-pool",
+      "zig build test"
+    ],
+    "unit_tests": [
+      "normal, empty/boundary, invalid, and failure-atomic behavior"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": [],
+    "smoke_test_commands": [
+      "zig build smoke-fixed-capacity-object-pool",
+      "zig build smoke"
+    ],
+    "smoke_test_behaviors": [
+      "all public declarations are recursively referenced and compiled as an external consumer",
+      "zero private-path access: only the named public module import is available"
+    ],
+    "smoke_test_dependencies": [
+      "bitmap-allocator",
+      "generational-handles"
+    ]
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "unverified: Zig 0.14.0 is unavailable in the execution environment",
+    "continuous_integration": "unknown",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [
+      "Local validation pending."
+    ],
+    "status_dimensions": {
+      "implementation_present": true,
+      "contract_complete": true,
+      "contract_formatted": true,
+      "unit_tests_present": true,
+      "smoke_test_present": true,
+      "contract_checker_passed": false,
+      "compiler_validated": false,
+      "unit_tests_passed": false,
+      "smoke_tests_passed": false
+    }
+  },
+  "documentation": {
+    "read_order": [
+      "projects/34-fixed-capacity-object-pool/details.json",
+      "projects/34-fixed-capacity-object-pool/DETAILS.md",
+      "projects/34-fixed-capacity-object-pool/README.md",
+      "projects/34-fixed-capacity-object-pool/MASTERY.md",
+      "projects/34-fixed-capacity-object-pool/src/fixed_capacity_object_pool.zig"
+    ],
+    "examples_covered": [],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [],
+    "related_modules": [],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Synchronize source, tests, contracts, catalog, and dependents.",
+    "deprecation_policy": "Document migrations; do not retain accidental compatibility copies.",
+    "known_gaps": [],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [],
+    "synchronization_requirements": [],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "physical frame conversion",
+      "page number to address"
+    ],
+    "problems": [],
+    "inputs": [],
+    "outputs": [],
+    "environments": [],
+    "keywords": [
+      "PFN",
+      "physical page",
+      "4096",
+      "page frame"
+    ],
+    "grep_terms": [
+      "physical-page-frame-number-and-address-conversion",
+      "PageSize",
+      "PhysicalPageFrameNumber"
+    ],
+    "natural_language_queries": [
+      "How do I checked conversion between 4 kib physical page-frame indices and physical addresses?"
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "memory-foundation",
+    "reuses_modules": [
+      "bitmap-allocator",
+      "generational-handles"
+    ],
+    "guarantees_inherited": [
+      "bounds, arithmetic, ownership, and state guarantees from declared dependencies"
+    ],
+    "future_modules_enabled": [
+      "larger parsers, allocators, loaders, and systems"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Expose the existing generational table as an iterable, resettable object-pool contract.",
+    "snowball_score": "unmeasured"
+  },
+  "agent_guidance": {
+    "use_when": [],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ],
+    "verification_steps": [
+      "zig build test-fixed-capacity-object-pool",
+      "zig build smoke-fixed-capacity-object-pool"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [
+      "Keep source, tests, DETAILS.md, details.json, build.zig, and MODULES.md synchronized."
+    ],
+    "files_to_read_first": [
+      "details.json",
+      "DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [
+      "MASTERY.md"
+    ],
+    "smoke_test_before_integration": "Run zig build smoke-fixed-capacity-object-pool."
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "ObjectPool",
+        "file": "projects/34-fixed-capacity-object-pool/src/fixed_capacity_object_pool.zig"
+      }
+    ],
+    "tests_to_behaviors": [
+      {
+        "test": "module unit tests",
+        "file": "projects/34-fixed-capacity-object-pool/src/fixed_capacity_object_pool.zig"
+      }
+    ],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": [
+      {
+        "module": "bitmap-allocator",
+        "path": "projects/07-bitmap-allocator/src/bitmap_allocator.zig",
+        "symbol": "BitmapAllocator",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "generational-handles",
+        "path": "projects/08-generational-handles/src/generational_handles.zig",
+        "symbol": "HandleTable",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      }
+    ],
+    "smoke_tests_to_public_symbols": [
+      {
+        "file": "projects/34-fixed-capacity-object-pool/tests/smoke_test.zig",
+        "symbols": [
+          "ObjectPool"
+        ]
+      }
+    ],
+    "smoke_tests_to_dependencies": [
+      {
+        "file": "projects/34-fixed-capacity-object-pool/tests/smoke_test.zig",
+        "dependencies": [
+          "bitmap-allocator",
+          "generational-handles"
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": [
+      "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  },
+  "smoke_test": {
+    "required": true,
+    "implemented": true,
+    "status": "present-unverified",
+    "source_path": "projects/34-fixed-capacity-object-pool/tests/smoke_test.zig",
+    "build_step": "smoke-fixed-capacity-object-pool",
+    "commands": [
+      "zig build smoke-fixed-capacity-object-pool",
+      "zig build smoke"
+    ],
+    "public_import_used": "fixed-capacity-object-pool",
+    "public_symbols_exercised": [
+      "ObjectPool"
+    ],
+    "successful_operations": [
+      "all public declarations are recursively referenced and compiled as an external consumer"
+    ],
+    "failure_or_boundary_operations": [
+      "zero private-path access: only the named public module import is available"
+    ],
+    "cleanup_exercised": [
+      "compile-time public declaration traversal requires no cleanup"
+    ],
+    "repository_dependencies_exercised": [
+      "bitmap-allocator",
+      "generational-handles"
+    ],
+    "hosted_environment_required": "Zig test runner",
+    "freestanding_environment_required": "not required for smoke execution",
+    "fixtures": [],
+    "expected_exit_status": "0",
+    "expected_output": [],
+    "forbidden_private_access": true,
+    "last_run": "",
+    "last_result": "unverified",
+    "last_validated_commit": "",
+    "compiler_version": "",
+    "known_failures": [],
+    "notes": [
+      "Runtime behavior remains covered by the module unit tests; this smoke test proves external named-import usability and public declaration compilation."
+    ]
+  }
+}

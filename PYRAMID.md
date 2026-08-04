@@ -24,6 +24,10 @@ A project should not hide an important mechanism merely to shorten the code. The
 00  fixed vector          capacity, initialized storage, slices, errors
 ```
 
+## New boundary layer
+
+Modules 29–38 add parser transactions and TLV structure, owned bytes and object pools, typed physical memory allocation, and ELF64 header/segment parsing. Each imports the lower guarantee rather than restating it.
+
 ## Planned ascent
 
 ```text
