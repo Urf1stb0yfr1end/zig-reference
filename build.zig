@@ -1,65 +1,86 @@
 const std = @import("std");
 
+const ModuleSpec = struct { name: []const u8, source: []const u8, dependencies: []const []const u8 };
+const specs = [_]ModuleSpec{
+    .{ .name = "fixed-capacity-vector", .source = "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig", .dependencies = &.{} },
+    .{ .name = "dynamic-array", .source = "projects/01-dynamic-array/src/dynamic_array.zig", .dependencies = &.{} },
+    .{ .name = "ring-buffer", .source = "projects/02-ring-buffer/src/ring_buffer.zig", .dependencies = &.{} },
+    .{ .name = "bit-set", .source = "projects/03-bit-set/src/bit_set.zig", .dependencies = &.{} },
+    .{ .name = "bounded-byte-reader", .source = "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig", .dependencies = &.{} },
+    .{ .name = "stack", .source = "projects/05-stack/src/stack.zig", .dependencies = &.{"dynamic-array"} },
+    .{ .name = "byte-writer", .source = "projects/06-byte-writer/src/byte_writer.zig", .dependencies = &.{"dynamic-array"} },
+    .{ .name = "bitmap-allocator", .source = "projects/07-bitmap-allocator/src/bitmap_allocator.zig", .dependencies = &.{"bit-set"} },
+    .{ .name = "generational-handles", .source = "projects/08-generational-handles/src/generational_handles.zig", .dependencies = &.{} },
+    .{ .name = "state-machine", .source = "projects/09-state-machine/src/state_machine.zig", .dependencies = &.{} },
+    .{ .name = "checked-integer-cast", .source = "projects/10-checked-integer-cast/src/checked_integer_cast.zig", .dependencies = &.{} },
+    .{ .name = "nonzero-integer", .source = "projects/11-nonzero-integer/src/nonzero_integer.zig", .dependencies = &.{} },
+    .{ .name = "bounded-integer", .source = "projects/12-bounded-integer/src/bounded_integer.zig", .dependencies = &.{} },
+    .{ .name = "saturating-counter", .source = "projects/13-saturating-counter/src/saturating_counter.zig", .dependencies = &.{} },
+    .{ .name = "validated-enum-decoder", .source = "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig", .dependencies = &.{} },
+    .{ .name = "aligned-address-and-size-helpers", .source = "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig", .dependencies = &.{} },
+    .{ .name = "validated-bit-flags", .source = "projects/16-validated-bit-flags/src/validated_bit_flags.zig", .dependencies = &.{} },
+    .{ .name = "checked-half-open-range", .source = "projects/17-checked-half-open-range/src/checked_half_open_range.zig", .dependencies = &.{} },
+    .{ .name = "distinct-memory-address-types", .source = "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig", .dependencies = &.{} },
+    .{ .name = "wrapping-sequence-number", .source = "projects/19-wrapping-sequence-number/src/wrapping_sequence_number.zig", .dependencies = &.{} },
+    .{ .name = "optional-typed-handle", .source = "projects/20-optional-typed-handle/src/optional_typed_handle.zig", .dependencies = &.{} },
+    .{ .name = "unit-safe-quantity", .source = "projects/21-unit-safe-quantity/src/unit_safe_quantity.zig", .dependencies = &.{} },
+    .{ .name = "endian-integer-codec", .source = "projects/22-endian-integer-codec/src/endian_integer_codec.zig", .dependencies = &.{} },
+    .{ .name = "validated-ascii-byte", .source = "projects/23-validated-ascii-byte/src/validated_ascii_byte.zig", .dependencies = &.{} },
+    .{ .name = "fourcc-code", .source = "projects/24-fourcc-code/src/fourcc_code.zig", .dependencies = &.{} },
+    .{ .name = "semantic-version", .source = "projects/25-semantic-version/src/semantic_version.zig", .dependencies = &.{} },
+    .{ .name = "tagged-result", .source = "projects/26-tagged-result/src/tagged_result.zig", .dependencies = &.{} },
+    .{ .name = "source-span", .source = "projects/27-source-span/src/source_span.zig", .dependencies = &.{} },
+    .{ .name = "physical-page-frame-number-and-address-conversion", .source = "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig", .dependencies = &.{"distinct-memory-address-types"} },
+};
+
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
+    const check_command = b.addSystemCommand(&.{ "python3", "tools/module-contract-consistency-checker.py" });
+    const check_step = b.step("check-module-contracts", "Validate schema, formatting, paths, public surfaces, dependencies, catalog, and build registrations");
+    check_step.dependOn(&check_command.step);
 
-    const all_tests_step = b.step("test", "Run all reference-project tests");
+    var modules: [specs.len]*std.Build.Module = undefined;
+    for (specs, 0..) |spec, i| {
+        modules[i] = b.createModule(.{ .root_source_file = b.path(spec.source), .target = target, .optimize = optimize });
+    }
+    for (specs, 0..) |spec, i| {
+        for (spec.dependencies) |dependency_name| modules[i].addImport(dependency_name, findModule(dependency_name, &modules));
+    }
 
-    const check_contracts = b.addSystemCommand(&.{ "python3", "tools/module-contract-consistency-checker.py" });
-    const check_step = b.step("check-module-contracts", "Validate module layouts and machine-readable contracts");
-    check_step.dependOn(&check_contracts.step);
+    const smoke_all = b.step("smoke", "Run every external-consumer smoke test");
+    const test_all = b.step("test", "Run contract checks, unit tests, and smoke tests");
+    test_all.dependOn(check_step);
+    for (specs, 0..) |spec, i| {
+        const unit_tests = b.addTest(.{ .root_module = modules[i] });
+        const run_unit = b.addRunArtifact(unit_tests);
+        const unit_step = b.step(b.fmt("test-{s}", .{spec.name}), b.fmt("Run {s} unit tests", .{spec.name}));
+        unit_step.dependOn(&run_unit.step);
+        test_all.dependOn(&run_unit.step);
 
-    addTestProject(b, target, optimize, all_tests_step, "test-fixed-capacity-vector", "Run the fixed-capacity vector tests", "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-dynamic-array", "Run the dynamic array tests", "projects/01-dynamic-array/src/dynamic_array.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-ring-buffer", "Run the ring buffer tests", "projects/02-ring-buffer/src/ring_buffer.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-bit-set", "Run the fixed bit set tests", "projects/03-bit-set/src/bit_set.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-bounded-byte-reader", "Run the bounded byte reader tests", "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-stack", "Run the stack tests", "projects/05-stack/src/stack.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-byte-writer", "Run the byte writer tests", "projects/06-byte-writer/src/byte_writer.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-bitmap-allocator", "Run the bitmap allocator tests", "projects/07-bitmap-allocator/src/bitmap_allocator.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-generational-handles", "Run the generational handle table tests", "projects/08-generational-handles/src/generational_handles.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-state-machine", "Run the explicit state machine tests", "projects/09-state-machine/src/state_machine.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-checked-integer-cast", "Run the checked integer cast tests", "projects/10-checked-integer-cast/src/checked_integer_cast.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-nonzero-integer", "Run the nonzero integer tests", "projects/11-nonzero-integer/src/nonzero_integer.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-bounded-integer", "Run the bounded integer tests", "projects/12-bounded-integer/src/bounded_integer.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-saturating-counter", "Run the saturating counter tests", "projects/13-saturating-counter/src/saturating_counter.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-validated-enum-decoder", "Run the validated enum decoder tests", "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-aligned-address-and-size-helpers", "Run the alignment helper tests", "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-validated-bit-flags", "Run the validated bit flags tests", "projects/16-validated-bit-flags/src/validated_bit_flags.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-checked-half-open-range", "Run the checked half-open range tests", "projects/17-checked-half-open-range/src/checked_half_open_range.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-distinct-memory-address-types", "Run the distinct memory address type tests", "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-wrapping-sequence-number", "Run the wrapping sequence number tests", "projects/19-wrapping-sequence-number/src/wrapping_sequence_number.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-optional-typed-handle", "Run the optional typed handle tests", "projects/20-optional-typed-handle/src/optional_typed_handle.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-unit-safe-quantity", "Run the unit-safe quantity tests", "projects/21-unit-safe-quantity/src/unit_safe_quantity.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-endian-integer-codec", "Run the endian integer codec tests", "projects/22-endian-integer-codec/src/endian_integer_codec.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-validated-ascii-byte", "Run the validated ASCII byte tests", "projects/23-validated-ascii-byte/src/validated_ascii_byte.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-fourcc-code", "Run the FourCC tests", "projects/24-fourcc-code/src/fourcc_code.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-semantic-version", "Run the semantic version tests", "projects/25-semantic-version/src/semantic_version.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-tagged-result", "Run the tagged result tests", "projects/26-tagged-result/src/tagged_result.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-source-span", "Run the source span tests", "projects/27-source-span/src/source_span.zig");
-    addTestProject(b, target, optimize, all_tests_step, "test-physical-page-frame-number-and-address-conversion", "Run the physical page frame conversion tests", "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig");
+        const smoke_module = b.createModule(.{ .root_source_file = b.path(b.fmt("projects/{s}/tests/smoke_test.zig", .{directoryFor(spec.name)})), .target = target, .optimize = optimize });
+        smoke_module.addImport(spec.name, modules[i]);
+        const smoke_tests = b.addTest(.{ .root_module = smoke_module });
+        const run_smoke = b.addRunArtifact(smoke_tests);
+        const smoke_step = b.step(b.fmt("smoke-{s}", .{spec.name}), b.fmt("Run {s} external smoke test", .{spec.name}));
+        smoke_step.dependOn(&run_smoke.step);
+        smoke_all.dependOn(&run_smoke.step);
+        test_all.dependOn(&run_smoke.step);
+    }
 }
 
-fn addTestProject(
-    b: *std.Build,
-    target: std.Build.ResolvedTarget,
-    optimize: std.builtin.OptimizeMode,
-    all_tests_step: *std.Build.Step,
-    step_name: []const u8,
-    description: []const u8,
-    source_path: []const u8,
-) void {
-    const module = b.createModule(.{
-        .root_source_file = b.path(source_path),
-        .target = target,
-        .optimize = optimize,
-    });
+fn findModule(name: []const u8, modules: []const *std.Build.Module) *std.Build.Module {
+    for (specs, modules) |spec, module| if (std.mem.eql(u8, spec.name, name)) return module;
+    @panic("unknown repository module dependency");
+}
 
-    const tests = b.addTest(.{ .root_module = module });
-    const run_tests = b.addRunArtifact(tests);
-
-    const project_step = b.step(step_name, description);
-    project_step.dependOn(&run_tests.step);
-    all_tests_step.dependOn(&run_tests.step);
+fn directoryFor(name: []const u8) []const u8 {
+    for (specs) |spec| if (std.mem.eql(u8, spec.name, name)) {
+        const prefix = "projects/";
+        const suffix = "/src/";
+        const start = prefix.len;
+        const end = std.mem.indexOfPos(u8, spec.source, start, suffix) orelse @panic("invalid source path");
+        return spec.source[start..end];
+    };
+    @panic("unknown module");
 }

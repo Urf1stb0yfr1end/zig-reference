@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.0.0",
+  "schema_version": "3.0.0",
   "contract_version": "1.0.0",
   "generated_at": "2026-08-04",
   "last_reviewed_at": "2026-08-04",
@@ -77,9 +77,6 @@
       "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig"
     ],
     "public_entrypoint": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig",
-    "tests": [
-      "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig"
-    ],
     "readme": "projects/04-bounded-byte-reader/README.md",
     "mastery": "projects/04-bounded-byte-reader/MASTERY.md",
     "details_markdown": "projects/04-bounded-byte-reader/DETAILS.md",
@@ -88,7 +85,15 @@
     "benchmarks": [],
     "fixtures": [],
     "fuzz_targets": [],
-    "architecture_notes": []
+    "architecture_notes": [],
+    "unit_tests": [
+      "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig"
+    ],
+    "smoke_tests": [
+      "projects/04-bounded-byte-reader/tests/smoke_test.zig"
+    ],
+    "generated_files": [],
+    "dependency_contracts": []
   },
   "public_surface": {
     "root_symbols": [
@@ -141,7 +146,696 @@
     ],
     "callbacks": [],
     "interfaces": [],
-    "compile_time_parameters": []
+    "compile_time_parameters": [],
+    "endpoints": [
+      {
+        "name": "BoundedReader",
+        "kind": "type_or_constant",
+        "signature": "BoundedReader",
+        "visibility": "public",
+        "summary": "Canonical public root symbol BoundedReader.",
+        "receiver": null,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "symbol",
+            "type": "type or constant",
+            "meaning": "Public symbol BoundedReader.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [],
+        "failure_atomicity": "not applicable",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "init",
+        "kind": "method",
+        "signature": "init(input: []const u8) BoundedReader",
+        "visibility": "public",
+        "summary": "Provides the public init operation documented by the authoritative Zig signature.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "input",
+            "type": "[]const u8",
+            "role": "Value supplied as input.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "BoundedReader",
+            "meaning": "Result of init.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The init contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "position",
+        "kind": "method",
+        "signature": "position(self: BoundedReader) usize",
+        "visibility": "public",
+        "summary": "Provides the public position operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "BoundedReader",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "usize",
+            "meaning": "Result of position.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The position contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "remaining",
+        "kind": "method",
+        "signature": "remaining(self: BoundedReader) usize",
+        "visibility": "public",
+        "summary": "Provides the public remaining operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "BoundedReader",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "usize",
+            "meaning": "Result of remaining.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The remaining contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "isAtEnd",
+        "kind": "method",
+        "signature": "isAtEnd(self: BoundedReader) bool",
+        "visibility": "public",
+        "summary": "Provides the public isAtEnd operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "BoundedReader",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "bool",
+            "meaning": "Result of isAtEnd.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The isAtEnd contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "readByte",
+        "kind": "method",
+        "signature": "readByte(self: *BoundedReader) Error!u8",
+        "visibility": "public",
+        "summary": "Provides the public readByte operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*BoundedReader",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error!u8",
+            "meaning": "Result of readByte.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The readByte contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "readBytes",
+        "kind": "method",
+        "signature": "readBytes(self: *BoundedReader, count: usize) Error![]const u8",
+        "visibility": "public",
+        "summary": "Provides the public readBytes operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*BoundedReader",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [
+          {
+            "name": "count",
+            "type": "usize",
+            "role": "Value supplied as count.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error![]const u8",
+            "meaning": "Result of readBytes.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": true,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [
+          {
+            "name": "UnexpectedEnd",
+            "condition": "readBytes encounters the UnexpectedEnd failure condition documented by source and module failure behavior.",
+            "state_after_error": "unchanged unless explicitly documented otherwise"
+          }
+        ],
+        "preconditions": [],
+        "postconditions": [
+          "The readBytes contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "skip",
+        "kind": "method",
+        "signature": "skip(self: *BoundedReader, count: usize) Error!void",
+        "visibility": "public",
+        "summary": "Provides the public skip operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*BoundedReader",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [
+          {
+            "name": "count",
+            "type": "usize",
+            "role": "Value supplied as count.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error!void",
+            "meaning": "Result of skip.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The skip contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "subReader",
+        "kind": "method",
+        "signature": "subReader(self: *BoundedReader, count: usize) Error!BoundedReader",
+        "visibility": "public",
+        "summary": "Provides the public subReader operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*BoundedReader",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [
+          {
+            "name": "count",
+            "type": "usize",
+            "role": "Value supplied as count.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error!BoundedReader",
+            "meaning": "Result of subReader.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The subReader contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "readU16Le",
+        "kind": "method",
+        "signature": "readU16Le(self: *BoundedReader) Error!u16",
+        "visibility": "public",
+        "summary": "Provides the public readU16Le operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*BoundedReader",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error!u16",
+            "meaning": "Result of readU16Le.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The readU16Le contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "readU16Be",
+        "kind": "method",
+        "signature": "readU16Be(self: *BoundedReader) Error!u16",
+        "visibility": "public",
+        "summary": "Provides the public readU16Be operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*BoundedReader",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error!u16",
+            "meaning": "Result of readU16Be.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The readU16Be contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "readU32Le",
+        "kind": "method",
+        "signature": "readU32Le(self: *BoundedReader) Error!u32",
+        "visibility": "public",
+        "summary": "Provides the public readU32Le operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*BoundedReader",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error!u32",
+            "meaning": "Result of readU32Le.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The readU32Le contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "readU32Be",
+        "kind": "method",
+        "signature": "readU32Be(self: *BoundedReader) Error!u32",
+        "visibility": "public",
+        "summary": "Provides the public readU32Be operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*BoundedReader",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error!u32",
+            "meaning": "Result of readU32Be.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The readU32Be contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      }
+    ]
   },
   "inputs": [
     {
@@ -149,14 +843,46 @@
       "type": "[]const u8",
       "ownership": "borrowed",
       "lifetime": "must outlive reader and all returned slices/sub-readers",
-      "constraints": "any byte slice"
+      "constraints": [
+        "any byte slice"
+      ],
+      "role": "Module input input",
+      "borrowing": "explicit in type",
+      "mutability": "type-defined",
+      "valid_range": "see constraints",
+      "alignment": "type-defined",
+      "endianness": "not applicable unless stated",
+      "format": "Zig value",
+      "required_invariants": [],
+      "validation_performed": [],
+      "accepts_untrusted_input": true,
+      "stored": false,
+      "copied": false,
+      "may_mutate": false,
+      "errors_on_invalid_input": []
     },
     {
       "name": "count",
       "type": "usize",
       "ownership": "value",
       "lifetime": "call",
-      "constraints": "must be <= remaining for success"
+      "constraints": [
+        "must be <= remaining for success"
+      ],
+      "role": "Module input count",
+      "borrowing": "explicit in type",
+      "mutability": "type-defined",
+      "valid_range": "see constraints",
+      "alignment": "type-defined",
+      "endianness": "not applicable unless stated",
+      "format": "Zig value",
+      "required_invariants": [],
+      "validation_performed": [],
+      "accepts_untrusted_input": true,
+      "stored": false,
+      "copied": false,
+      "may_mutate": false,
+      "errors_on_invalid_input": []
     }
   ],
   "outputs": [
@@ -165,24 +891,54 @@
       "type": "[]const u8",
       "ownership": "borrowed subslice",
       "lifetime": "tied to input",
-      "invalidation": "input lifetime end",
-      "caller_cleanup": "none"
+      "meaning": "Module output readBytes",
+      "borrowed_from": "module or input as stated by ownership",
+      "cleanup_required": false,
+      "cleanup_responsibility": "none",
+      "invalidation_conditions": [
+        "input lifetime end"
+      ],
+      "aliasing": "type-defined",
+      "borrows_from_module": true,
+      "borrows_from_input": false,
+      "valid_after_mutation": "subject to invalidation conditions",
+      "absence_meaning": "optional absence is operation-defined"
     },
     {
       "name": "subReader",
       "type": "BoundedReader",
       "ownership": "value containing borrowed slice",
       "lifetime": "tied to parent input",
-      "invalidation": "input lifetime end",
-      "caller_cleanup": "none"
+      "meaning": "Module output subReader",
+      "borrowed_from": "module or input as stated by ownership",
+      "cleanup_required": false,
+      "cleanup_responsibility": "none",
+      "invalidation_conditions": [
+        "input lifetime end"
+      ],
+      "aliasing": "type-defined",
+      "borrows_from_module": true,
+      "borrows_from_input": false,
+      "valid_after_mutation": "subject to invalidation conditions",
+      "absence_meaning": "optional absence is operation-defined"
     },
     {
       "name": "integers",
       "type": "u8/u16/u32",
       "ownership": "value",
       "lifetime": "caller value",
-      "invalidation": "none",
-      "caller_cleanup": "none"
+      "meaning": "Module output integers",
+      "borrowed_from": "module or input as stated by ownership",
+      "cleanup_required": false,
+      "cleanup_responsibility": "none",
+      "invalidation_conditions": [
+        "none"
+      ],
+      "aliasing": "type-defined",
+      "borrows_from_module": false,
+      "borrows_from_input": false,
+      "valid_after_mutation": "subject to invalidation conditions",
+      "absence_meaning": "optional absence is operation-defined"
     }
   ],
   "state": {
@@ -252,9 +1008,19 @@
   "failure_behavior": {
     "errors": [
       {
-        "operation": "readBytes/skip/integer reads/subReader",
-        "error": "UnexpectedEnd",
-        "state_change": "none"
+        "name": "UnexpectedEnd",
+        "operations": [
+          "readBytes/skip/integer reads/subReader"
+        ],
+        "condition": "UnexpectedEnd condition documented by the operation",
+        "origin": "module",
+        "state_after_error": "none",
+        "partial_effects": [],
+        "rollback": "not required when state is unchanged",
+        "cleanup_required": false,
+        "retry_safe": true,
+        "retry_guidance": "retry only after correcting the failing condition",
+        "dependency_origin": ""
       }
     ],
     "optional_empty_results": [],
@@ -318,9 +1084,9 @@
   ],
   "known_consumers": [],
   "composition": {
-    "import_name": "bounded_reader",
+    "import_name": "bounded-byte-reader",
     "import_path": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig",
-    "import_configuration": "Import source or register as build module.",
+    "import_configuration": "Use the build-registered named import @import(\"bounded-byte-reader\").",
     "minimal_example": "var reader = BoundedReader.init(bytes);\nconst magic = try reader.readU32Le();",
     "integration_patterns": [
       {
@@ -425,20 +1191,40 @@
     ],
     "boundary_tests": [],
     "regression_tests": [],
-    "test_dependencies": []
+    "test_dependencies": [],
+    "smoke_test_commands": [
+      "zig build smoke-bounded-byte-reader",
+      "zig build smoke"
+    ],
+    "smoke_test_behaviors": [
+      "all public declarations are recursively referenced and compiled as an external consumer",
+      "zero private-path access: only the named public module import is available"
+    ],
+    "smoke_test_dependencies": []
   },
   "validation": {
     "compiler_validated": false,
     "compiler_version": "",
     "last_validated_commit": "",
-    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "last_validation_result": "unverified: Zig is not installed in the migration environment",
     "continuous_integration": "unknown",
     "known_compile_failures": [],
     "known_test_failures": [],
     "unverified_claims": [],
     "notes": [
       "Compiler validation pending."
-    ]
+    ],
+    "status_dimensions": {
+      "implementation_present": true,
+      "contract_complete": true,
+      "contract_formatted": true,
+      "unit_tests_present": true,
+      "smoke_test_present": true,
+      "contract_checker_passed": false,
+      "compiler_validated": false,
+      "unit_tests_passed": false,
+      "smoke_tests_passed": false
+    }
   },
   "documentation": {
     "read_order": [
@@ -579,7 +1365,8 @@
     ],
     "files_not_required_for_basic_use": [
       "MASTERY.md"
-    ]
+    ],
+    "smoke_test_before_integration": "Run zig build smoke-bounded-byte-reader before integrating this module."
   },
   "source_map": {
     "symbols_to_files": [
@@ -612,7 +1399,21 @@
     ],
     "errors_to_operations": [],
     "invariants_to_tests": [],
-    "dependencies_to_imports": []
+    "dependencies_to_imports": [],
+    "smoke_tests_to_public_symbols": [
+      {
+        "file": "projects/04-bounded-byte-reader/tests/smoke_test.zig",
+        "symbols": [
+          "BoundedReader"
+        ]
+      }
+    ],
+    "smoke_tests_to_dependencies": [
+      {
+        "file": "projects/04-bounded-byte-reader/tests/smoke_test.zig",
+        "dependencies": []
+      }
+    ]
   },
   "provenance": {
     "original_author": "",
@@ -622,6 +1423,45 @@
     "design_sources": [],
     "migration_history": [
       "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  },
+  "smoke_test": {
+    "required": true,
+    "implemented": true,
+    "status": "present-unverified",
+    "source_path": "projects/04-bounded-byte-reader/tests/smoke_test.zig",
+    "build_step": "smoke-bounded-byte-reader",
+    "commands": [
+      "zig build smoke-bounded-byte-reader",
+      "zig build smoke"
+    ],
+    "public_import_used": "bounded-byte-reader",
+    "public_symbols_exercised": [
+      "BoundedReader"
+    ],
+    "successful_operations": [
+      "all public declarations are recursively referenced and compiled as an external consumer"
+    ],
+    "failure_or_boundary_operations": [
+      "zero private-path access: only the named public module import is available"
+    ],
+    "cleanup_exercised": [
+      "compile-time public declaration traversal requires no cleanup"
+    ],
+    "repository_dependencies_exercised": [],
+    "hosted_environment_required": "Zig test runner",
+    "freestanding_environment_required": "not required for smoke execution",
+    "fixtures": [],
+    "expected_exit_status": "0",
+    "expected_output": [],
+    "forbidden_private_access": true,
+    "last_run": "",
+    "last_result": "unverified",
+    "last_validated_commit": "",
+    "compiler_version": "",
+    "known_failures": [],
+    "notes": [
+      "Runtime behavior remains covered by the module unit tests; this smoke test proves external named-import usability and public declaration compilation."
     ]
   }
 }

@@ -1,5 +1,5 @@
 const std = @import("std");
-const bit_set = @import("../../03-bit-set/src/bit_set.zig");
+const bit_set = @import("bit-set");
 
 /// A fixed-capacity allocator for integer slots.
 ///

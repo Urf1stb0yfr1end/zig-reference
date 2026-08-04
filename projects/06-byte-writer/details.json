@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.0.0",
+  "schema_version": "3.0.0",
   "contract_version": "1.0.0",
   "generated_at": "2026-08-04",
   "last_reviewed_at": "2026-08-04",
@@ -48,9 +48,6 @@
       "projects/06-byte-writer/src/byte_writer.zig"
     ],
     "public_entrypoint": "projects/06-byte-writer/src/byte_writer.zig",
-    "tests": [
-      "projects/06-byte-writer/src/byte_writer.zig"
-    ],
     "readme": "projects/06-byte-writer/README.md",
     "mastery": "projects/06-byte-writer/MASTERY.md",
     "details_markdown": "projects/06-byte-writer/DETAILS.md",
@@ -59,7 +56,17 @@
     "benchmarks": [],
     "fixtures": [],
     "fuzz_targets": [],
-    "architecture_notes": []
+    "architecture_notes": [],
+    "unit_tests": [
+      "projects/06-byte-writer/src/byte_writer.zig"
+    ],
+    "smoke_tests": [
+      "projects/06-byte-writer/tests/smoke_test.zig"
+    ],
+    "generated_files": [],
+    "dependency_contracts": [
+      "projects/01-dynamic-array/details.json"
+    ]
   },
   "public_surface": {
     "root_symbols": [
@@ -72,7 +79,780 @@
     "errors": [],
     "callbacks": [],
     "interfaces": [],
-    "compile_time_parameters": []
+    "compile_time_parameters": [],
+    "endpoints": [
+      {
+        "name": "ByteWriter",
+        "kind": "type_or_constant",
+        "signature": "ByteWriter",
+        "visibility": "public",
+        "summary": "Canonical public root symbol ByteWriter.",
+        "receiver": null,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "symbol",
+            "type": "type or constant",
+            "meaning": "Public symbol ByteWriter.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [],
+        "failure_atomicity": "not applicable",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "init",
+        "kind": "method",
+        "signature": "init(allocator: std.mem.Allocator) ByteWriter",
+        "visibility": "public",
+        "summary": "Provides the public init operation documented by the authoritative Zig signature.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "allocator",
+            "type": "std.mem.Allocator",
+            "role": "Value supplied as allocator.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "ByteWriter",
+            "meaning": "Result of init.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The init contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "deinit",
+        "kind": "method",
+        "signature": "deinit(self: *ByteWriter) void",
+        "visibility": "public",
+        "summary": "Provides the public deinit operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*ByteWriter",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "void",
+            "meaning": "Result of deinit.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The deinit contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "bytes",
+        "kind": "method",
+        "signature": "bytes(self: *const ByteWriter) []const u8",
+        "visibility": "public",
+        "summary": "Provides the public bytes operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*const ByteWriter",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "[]const u8",
+            "meaning": "Result of bytes.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": true,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The bytes contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "len",
+        "kind": "method",
+        "signature": "len(self: *const ByteWriter) usize",
+        "visibility": "public",
+        "summary": "Provides the public len operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*const ByteWriter",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "usize",
+            "meaning": "Result of len.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The len contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "checkpoint",
+        "kind": "method",
+        "signature": "checkpoint(self: *const ByteWriter) usize",
+        "visibility": "public",
+        "summary": "Provides the public checkpoint operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*const ByteWriter",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "usize",
+            "meaning": "Result of checkpoint.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The checkpoint contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "rollback",
+        "kind": "method",
+        "signature": "rollback(self: *ByteWriter, saved_len: usize) error",
+        "visibility": "public",
+        "summary": "Provides the public rollback operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*ByteWriter",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [
+          {
+            "name": "saved_len",
+            "type": "usize",
+            "role": "Value supplied as saved_len.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "error",
+            "meaning": "Result of rollback.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [
+          {
+            "name": "InvalidCheckpoint",
+            "condition": "rollback encounters the InvalidCheckpoint failure condition documented by source and module failure behavior.",
+            "state_after_error": "unchanged unless explicitly documented otherwise"
+          }
+        ],
+        "preconditions": [],
+        "postconditions": [
+          "The rollback contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "writeByte",
+        "kind": "method",
+        "signature": "writeByte(self: *ByteWriter, value: u8) !void",
+        "visibility": "public",
+        "summary": "Provides the public writeByte operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*ByteWriter",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [
+          {
+            "name": "value",
+            "type": "u8",
+            "role": "Value supplied as value.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "!void",
+            "meaning": "Result of writeByte.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The writeByte contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "writeAll",
+        "kind": "method",
+        "signature": "writeAll(self: *ByteWriter, input: []const u8) !void",
+        "visibility": "public",
+        "summary": "Provides the public writeAll operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*ByteWriter",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [
+          {
+            "name": "input",
+            "type": "[]const u8",
+            "role": "Value supplied as input.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "!void",
+            "meaning": "Result of writeAll.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The writeAll contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "writeU16Le",
+        "kind": "method",
+        "signature": "writeU16Le(self: *ByteWriter, value: u16) !void",
+        "visibility": "public",
+        "summary": "Provides the public writeU16Le operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*ByteWriter",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [
+          {
+            "name": "value",
+            "type": "u16",
+            "role": "Value supplied as value.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "!void",
+            "meaning": "Result of writeU16Le.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The writeU16Le contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "writeU16Be",
+        "kind": "method",
+        "signature": "writeU16Be(self: *ByteWriter, value: u16) !void",
+        "visibility": "public",
+        "summary": "Provides the public writeU16Be operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*ByteWriter",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [
+          {
+            "name": "value",
+            "type": "u16",
+            "role": "Value supplied as value.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "!void",
+            "meaning": "Result of writeU16Be.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The writeU16Be contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "writeU32Le",
+        "kind": "method",
+        "signature": "writeU32Le(self: *ByteWriter, value: u32) !void",
+        "visibility": "public",
+        "summary": "Provides the public writeU32Le operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*ByteWriter",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [
+          {
+            "name": "value",
+            "type": "u32",
+            "role": "Value supplied as value.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "!void",
+            "meaning": "Result of writeU32Le.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The writeU32Le contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "writeU32Be",
+        "kind": "method",
+        "signature": "writeU32Be(self: *ByteWriter, value: u32) !void",
+        "visibility": "public",
+        "summary": "Provides the public writeU32Be operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*ByteWriter",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [
+          {
+            "name": "value",
+            "type": "u32",
+            "role": "Value supplied as value.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "!void",
+            "meaning": "Result of writeU32Be.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The writeU32Be contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      }
+    ]
   },
   "inputs": [],
   "outputs": [],
@@ -121,7 +901,23 @@
     "cleanup_order": []
   },
   "failure_behavior": {
-    "errors": [],
+    "errors": [
+      {
+        "name": "InvalidCheckpoint",
+        "operations": [
+          "rollback"
+        ],
+        "condition": "Source returns error.InvalidCheckpoint when the operation-specific InvalidCheckpoint condition occurs.",
+        "origin": "module",
+        "state_after_error": "unchanged unless the endpoint explicitly documents partial effects",
+        "partial_effects": [],
+        "rollback": "not required when state is unchanged",
+        "cleanup_required": false,
+        "retry_safe": true,
+        "retry_guidance": "correct the failing input or state before retrying",
+        "dependency_origin": ""
+      }
+    ],
     "optional_empty_results": [],
     "failure_atomicity": "",
     "state_after_failure": [],
@@ -158,18 +954,29 @@
   "dependency_contracts": [
     {
       "module": "dynamic-array",
-      "path": "projects/01-dynamic-array/src/dynamic_array.zig",
-      "symbol": "DynamicArray",
-      "guarantee": "owned contiguous growth and rollback length storage",
-      "reason": "stores emitted bytes without recreating growth logic"
+      "directory": "projects/01-dynamic-array",
+      "import_name": "dynamic-array",
+      "import_path": "projects/01-dynamic-array/src/dynamic_array.zig",
+      "symbols_used": [
+        "DynamicArray"
+      ],
+      "reason": "stores emitted bytes without recreating growth logic",
+      "guarantees_inherited": [
+        "owned contiguous growth and rollback length storage"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible with the checked repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/01-dynamic-array/details.json"
     }
   ],
   "expected_dependents": [],
   "known_consumers": [],
   "composition": {
-    "import_name": "byte_writer",
+    "import_name": "byte-writer",
     "import_path": "projects/06-byte-writer/src/byte_writer.zig",
-    "import_configuration": "Import the canonical repository-relative source path.",
+    "import_configuration": "Use the build-registered named import @import(\"byte-writer\").",
     "minimal_example": "",
     "integration_patterns": [],
     "pipeline_position": [],
@@ -261,18 +1068,40 @@
     "zero_capacity_tests": [],
     "boundary_tests": [],
     "regression_tests": [],
-    "test_dependencies": []
+    "test_dependencies": [],
+    "smoke_test_commands": [
+      "zig build smoke-byte-writer",
+      "zig build smoke"
+    ],
+    "smoke_test_behaviors": [
+      "all public declarations are recursively referenced and compiled as an external consumer",
+      "zero private-path access: only the named public module import is available"
+    ],
+    "smoke_test_dependencies": [
+      "dynamic-array"
+    ]
   },
   "validation": {
     "compiler_validated": false,
     "compiler_version": "",
     "last_validated_commit": "",
-    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "last_validation_result": "unverified: Zig is not installed in the migration environment",
     "continuous_integration": "unknown",
     "known_compile_failures": [],
     "known_test_failures": [],
     "unverified_claims": [],
-    "notes": []
+    "notes": [],
+    "status_dimensions": {
+      "implementation_present": true,
+      "contract_complete": true,
+      "contract_formatted": true,
+      "unit_tests_present": true,
+      "smoke_test_present": true,
+      "contract_checker_passed": false,
+      "compiler_validated": false,
+      "unit_tests_passed": false,
+      "smoke_tests_passed": false
+    }
   },
   "documentation": {
     "read_order": [
@@ -353,7 +1182,8 @@
     ],
     "files_not_required_for_basic_use": [
       "MASTERY.md"
-    ]
+    ],
+    "smoke_test_before_integration": "Run zig build smoke-byte-writer before integrating this module."
   },
   "source_map": {
     "symbols_to_files": [
@@ -386,6 +1216,22 @@
         "guarantee": "owned contiguous growth and rollback length storage",
         "reason": "stores emitted bytes without recreating growth logic"
       }
+    ],
+    "smoke_tests_to_public_symbols": [
+      {
+        "file": "projects/06-byte-writer/tests/smoke_test.zig",
+        "symbols": [
+          "ByteWriter"
+        ]
+      }
+    ],
+    "smoke_tests_to_dependencies": [
+      {
+        "file": "projects/06-byte-writer/tests/smoke_test.zig",
+        "dependencies": [
+          "dynamic-array"
+        ]
+      }
     ]
   },
   "provenance": {
@@ -396,6 +1242,47 @@
     "design_sources": [],
     "migration_history": [
       "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  },
+  "smoke_test": {
+    "required": true,
+    "implemented": true,
+    "status": "present-unverified",
+    "source_path": "projects/06-byte-writer/tests/smoke_test.zig",
+    "build_step": "smoke-byte-writer",
+    "commands": [
+      "zig build smoke-byte-writer",
+      "zig build smoke"
+    ],
+    "public_import_used": "byte-writer",
+    "public_symbols_exercised": [
+      "ByteWriter"
+    ],
+    "successful_operations": [
+      "all public declarations are recursively referenced and compiled as an external consumer"
+    ],
+    "failure_or_boundary_operations": [
+      "zero private-path access: only the named public module import is available"
+    ],
+    "cleanup_exercised": [
+      "compile-time public declaration traversal requires no cleanup"
+    ],
+    "repository_dependencies_exercised": [
+      "dynamic-array"
+    ],
+    "hosted_environment_required": "Zig test runner",
+    "freestanding_environment_required": "not required for smoke execution",
+    "fixtures": [],
+    "expected_exit_status": "0",
+    "expected_output": [],
+    "forbidden_private_access": true,
+    "last_run": "",
+    "last_result": "unverified",
+    "last_validated_commit": "",
+    "compiler_version": "",
+    "known_failures": [],
+    "notes": [
+      "Runtime behavior remains covered by the module unit tests; this smoke test proves external named-import usability and public declaration compilation."
     ]
   }
 }

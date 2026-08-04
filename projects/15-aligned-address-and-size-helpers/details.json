@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.0.0",
+  "schema_version": "3.0.0",
   "contract_version": "1.0.0",
   "generated_at": "2026-08-04",
   "last_reviewed_at": "2026-08-04",
@@ -68,9 +68,6 @@
       "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig"
     ],
     "public_entrypoint": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig",
-    "tests": [
-      "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig"
-    ],
     "readme": "projects/15-aligned-address-and-size-helpers/README.md",
     "mastery": "projects/15-aligned-address-and-size-helpers/MASTERY.md",
     "details_markdown": "projects/15-aligned-address-and-size-helpers/DETAILS.md",
@@ -79,7 +76,15 @@
     "benchmarks": [],
     "fixtures": [],
     "fuzz_targets": [],
-    "architecture_notes": []
+    "architecture_notes": [],
+    "unit_tests": [
+      "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig"
+    ],
+    "smoke_tests": [
+      "projects/15-aligned-address-and-size-helpers/tests/smoke_test.zig"
+    ],
+    "generated_files": [],
+    "dependency_contracts": []
   },
   "public_surface": {
     "root_symbols": [
@@ -121,7 +126,465 @@
     ],
     "callbacks": [],
     "interfaces": [],
-    "compile_time_parameters": []
+    "compile_time_parameters": [],
+    "endpoints": [
+      {
+        "name": "AlignmentError",
+        "kind": "type_or_constant",
+        "signature": "AlignmentError",
+        "visibility": "public",
+        "summary": "Canonical public root symbol AlignmentError.",
+        "receiver": null,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "symbol",
+            "type": "type or constant",
+            "meaning": "Public symbol AlignmentError.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [],
+        "failure_atomicity": "not applicable",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "isPowerOfTwo",
+        "kind": "function",
+        "signature": "isPowerOfTwo(value: usize) bool",
+        "visibility": "public",
+        "summary": "Provides the public isPowerOfTwo operation documented by the authoritative Zig signature.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "value",
+            "type": "usize",
+            "role": "Value supplied as value.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "bool",
+            "meaning": "Result of isPowerOfTwo.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The isPowerOfTwo contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "isAligned",
+        "kind": "function",
+        "signature": "isAligned(value: usize, alignment: usize) AlignmentError!bool",
+        "visibility": "public",
+        "summary": "Provides the public isAligned operation documented by the authoritative Zig signature.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "value",
+            "type": "usize",
+            "role": "Value supplied as value.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          },
+          {
+            "name": "alignment",
+            "type": "usize",
+            "role": "Value supplied as alignment.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "AlignmentError!bool",
+            "meaning": "Result of isAligned.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [
+          {
+            "name": "InvalidAlignment",
+            "condition": "isAligned encounters the InvalidAlignment failure condition documented by source and module failure behavior.",
+            "state_after_error": "unchanged unless explicitly documented otherwise"
+          }
+        ],
+        "preconditions": [],
+        "postconditions": [
+          "The isAligned contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "alignDown",
+        "kind": "function",
+        "signature": "alignDown(value: usize, alignment: usize) AlignmentError!usize",
+        "visibility": "public",
+        "summary": "Provides the public alignDown operation documented by the authoritative Zig signature.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "value",
+            "type": "usize",
+            "role": "Value supplied as value.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          },
+          {
+            "name": "alignment",
+            "type": "usize",
+            "role": "Value supplied as alignment.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "AlignmentError!usize",
+            "meaning": "Result of alignDown.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [
+          {
+            "name": "InvalidAlignment",
+            "condition": "alignDown encounters the InvalidAlignment failure condition documented by source and module failure behavior.",
+            "state_after_error": "unchanged unless explicitly documented otherwise"
+          }
+        ],
+        "preconditions": [],
+        "postconditions": [
+          "The alignDown contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "alignUp",
+        "kind": "function",
+        "signature": "alignUp(value: usize, alignment: usize) AlignmentError!usize",
+        "visibility": "public",
+        "summary": "Provides the public alignUp operation documented by the authoritative Zig signature.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "value",
+            "type": "usize",
+            "role": "Value supplied as value.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          },
+          {
+            "name": "alignment",
+            "type": "usize",
+            "role": "Value supplied as alignment.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "AlignmentError!usize",
+            "meaning": "Result of alignUp.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [
+          {
+            "name": "InvalidAlignment",
+            "condition": "alignUp encounters the InvalidAlignment failure condition documented by source and module failure behavior.",
+            "state_after_error": "unchanged unless explicitly documented otherwise"
+          },
+          {
+            "name": "Overflow",
+            "condition": "alignUp encounters the Overflow failure condition documented by source and module failure behavior.",
+            "state_after_error": "unchanged unless explicitly documented otherwise"
+          }
+        ],
+        "preconditions": [],
+        "postconditions": [
+          "The alignUp contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "paddingNeeded",
+        "kind": "function",
+        "signature": "paddingNeeded(value: usize, alignment: usize) AlignmentError!usize",
+        "visibility": "public",
+        "summary": "Provides the public paddingNeeded operation documented by the authoritative Zig signature.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "value",
+            "type": "usize",
+            "role": "Value supplied as value.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          },
+          {
+            "name": "alignment",
+            "type": "usize",
+            "role": "Value supplied as alignment.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "AlignmentError!usize",
+            "meaning": "Result of paddingNeeded.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The paddingNeeded contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      }
+    ]
   },
   "inputs": [
     {
@@ -129,14 +592,46 @@
       "type": "usize",
       "ownership": "copied",
       "lifetime": "call",
-      "constraints": "none"
+      "constraints": [
+        "none"
+      ],
+      "role": "Module input value",
+      "borrowing": "explicit in type",
+      "mutability": "type-defined",
+      "valid_range": "see constraints",
+      "alignment": "type-defined",
+      "endianness": "not applicable unless stated",
+      "format": "Zig value",
+      "required_invariants": [],
+      "validation_performed": [],
+      "accepts_untrusted_input": true,
+      "stored": false,
+      "copied": false,
+      "may_mutate": false,
+      "errors_on_invalid_input": []
     },
     {
       "name": "alignment",
       "type": "usize",
       "ownership": "copied",
       "lifetime": "call",
-      "constraints": "nonzero power of two"
+      "constraints": [
+        "nonzero power of two"
+      ],
+      "role": "Module input alignment",
+      "borrowing": "explicit in type",
+      "mutability": "type-defined",
+      "valid_range": "see constraints",
+      "alignment": "type-defined",
+      "endianness": "not applicable unless stated",
+      "format": "Zig value",
+      "required_invariants": [],
+      "validation_performed": [],
+      "accepts_untrusted_input": true,
+      "stored": false,
+      "copied": false,
+      "may_mutate": false,
+      "errors_on_invalid_input": []
     }
   ],
   "outputs": [
@@ -145,16 +640,36 @@
       "type": "usize",
       "ownership": "copied",
       "lifetime": "caller value",
-      "invalidation": "none",
-      "caller_cleanup": "none"
+      "meaning": "Module output aligned value or padding",
+      "borrowed_from": "module or input as stated by ownership",
+      "cleanup_required": false,
+      "cleanup_responsibility": "none",
+      "invalidation_conditions": [
+        "none"
+      ],
+      "aliasing": "type-defined",
+      "borrows_from_module": false,
+      "borrows_from_input": false,
+      "valid_after_mutation": "subject to invalidation conditions",
+      "absence_meaning": "optional absence is operation-defined"
     },
     {
       "name": "alignment predicate",
       "type": "bool",
       "ownership": "copied",
       "lifetime": "caller value",
-      "invalidation": "none",
-      "caller_cleanup": "none"
+      "meaning": "Module output alignment predicate",
+      "borrowed_from": "module or input as stated by ownership",
+      "cleanup_required": false,
+      "cleanup_responsibility": "none",
+      "invalidation_conditions": [
+        "none"
+      ],
+      "aliasing": "type-defined",
+      "borrows_from_module": false,
+      "borrows_from_input": false,
+      "valid_after_mutation": "subject to invalidation conditions",
+      "absence_meaning": "optional absence is operation-defined"
     }
   ],
   "state": {
@@ -211,14 +726,34 @@
   "failure_behavior": {
     "errors": [
       {
-        "operation": "checked operations",
-        "error": "InvalidAlignment",
-        "state_change": "none"
+        "name": "InvalidAlignment",
+        "operations": [
+          "checked operations"
+        ],
+        "condition": "InvalidAlignment condition documented by the operation",
+        "origin": "module",
+        "state_after_error": "none",
+        "partial_effects": [],
+        "rollback": "not required when state is unchanged",
+        "cleanup_required": false,
+        "retry_safe": true,
+        "retry_guidance": "retry only after correcting the failing condition",
+        "dependency_origin": ""
       },
       {
-        "operation": "alignUp and paddingNeeded",
-        "error": "Overflow",
-        "state_change": "none"
+        "name": "Overflow",
+        "operations": [
+          "alignUp and paddingNeeded"
+        ],
+        "condition": "Overflow condition documented by the operation",
+        "origin": "module",
+        "state_after_error": "none",
+        "partial_effects": [],
+        "rollback": "not required when state is unchanged",
+        "cleanup_required": false,
+        "retry_safe": true,
+        "retry_guidance": "retry only after correcting the failing condition",
+        "dependency_origin": ""
       }
     ],
     "optional_empty_results": [],
@@ -273,9 +808,9 @@
   ],
   "known_consumers": [],
   "composition": {
-    "import_name": "alignment_helpers",
+    "import_name": "aligned-address-and-size-helpers",
     "import_path": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig",
-    "import_configuration": "Import projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig.",
+    "import_configuration": "Use the build-registered named import @import(\"aligned-address-and-size-helpers\").",
     "minimal_example": "const aligned = try alignment.alignUp(size, 4096);",
     "integration_patterns": [
       {
@@ -373,20 +908,40 @@
       "invalid alignment and overflow fail"
     ],
     "regression_tests": [],
-    "test_dependencies": []
+    "test_dependencies": [],
+    "smoke_test_commands": [
+      "zig build smoke-aligned-address-and-size-helpers",
+      "zig build smoke"
+    ],
+    "smoke_test_behaviors": [
+      "all public declarations are recursively referenced and compiled as an external consumer",
+      "zero private-path access: only the named public module import is available"
+    ],
+    "smoke_test_dependencies": []
   },
   "validation": {
     "compiler_validated": false,
     "compiler_version": "",
     "last_validated_commit": "",
-    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "last_validation_result": "unverified: Zig is not installed in the migration environment",
     "continuous_integration": "unknown",
     "known_compile_failures": [],
     "known_test_failures": [],
     "unverified_claims": [],
     "notes": [
       "Local Zig 0.14.0 validation pending."
-    ]
+    ],
+    "status_dimensions": {
+      "implementation_present": true,
+      "contract_complete": true,
+      "contract_formatted": true,
+      "unit_tests_present": true,
+      "smoke_test_present": true,
+      "contract_checker_passed": false,
+      "compiler_validated": false,
+      "unit_tests_passed": false,
+      "smoke_tests_passed": false
+    }
   },
   "documentation": {
     "read_order": [
@@ -517,7 +1072,8 @@
     ],
     "files_not_required_for_basic_use": [
       "MASTERY.md"
-    ]
+    ],
+    "smoke_test_before_integration": "Run zig build smoke-aligned-address-and-size-helpers before integrating this module."
   },
   "source_map": {
     "symbols_to_files": [
@@ -558,7 +1114,26 @@
     ],
     "errors_to_operations": [],
     "invariants_to_tests": [],
-    "dependencies_to_imports": []
+    "dependencies_to_imports": [],
+    "smoke_tests_to_public_symbols": [
+      {
+        "file": "projects/15-aligned-address-and-size-helpers/tests/smoke_test.zig",
+        "symbols": [
+          "AlignmentError",
+          "isPowerOfTwo",
+          "isAligned",
+          "alignDown",
+          "alignUp",
+          "paddingNeeded"
+        ]
+      }
+    ],
+    "smoke_tests_to_dependencies": [
+      {
+        "file": "projects/15-aligned-address-and-size-helpers/tests/smoke_test.zig",
+        "dependencies": []
+      }
+    ]
   },
   "provenance": {
     "original_author": "",
@@ -568,6 +1143,50 @@
     "design_sources": [],
     "migration_history": [
       "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  },
+  "smoke_test": {
+    "required": true,
+    "implemented": true,
+    "status": "present-unverified",
+    "source_path": "projects/15-aligned-address-and-size-helpers/tests/smoke_test.zig",
+    "build_step": "smoke-aligned-address-and-size-helpers",
+    "commands": [
+      "zig build smoke-aligned-address-and-size-helpers",
+      "zig build smoke"
+    ],
+    "public_import_used": "aligned-address-and-size-helpers",
+    "public_symbols_exercised": [
+      "AlignmentError",
+      "isPowerOfTwo",
+      "isAligned",
+      "alignDown",
+      "alignUp",
+      "paddingNeeded"
+    ],
+    "successful_operations": [
+      "all public declarations are recursively referenced and compiled as an external consumer"
+    ],
+    "failure_or_boundary_operations": [
+      "zero private-path access: only the named public module import is available"
+    ],
+    "cleanup_exercised": [
+      "compile-time public declaration traversal requires no cleanup"
+    ],
+    "repository_dependencies_exercised": [],
+    "hosted_environment_required": "Zig test runner",
+    "freestanding_environment_required": "not required for smoke execution",
+    "fixtures": [],
+    "expected_exit_status": "0",
+    "expected_output": [],
+    "forbidden_private_access": true,
+    "last_run": "",
+    "last_result": "unverified",
+    "last_validated_commit": "",
+    "compiler_version": "",
+    "known_failures": [],
+    "notes": [
+      "Runtime behavior remains covered by the module unit tests; this smoke test proves external named-import usability and public declaration compilation."
     ]
   }
 }

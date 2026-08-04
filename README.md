@@ -198,4 +198,28 @@ Hyper-Zig is the flagship expression of that direction: not a hypervisor conjure
 
 > Solved once, documented completely, reused forever.
 
-> Freedom of mechanism. Stability of form.
+A reader or coding agent should not have to rediscover ownership, invariants, failure behavior, cleanup, and dependency purpose every time it opens an unfamiliar systems project.
+
+## Contract-first maintenance
+
+Each implemented module exposes a strict, readable `details.json` and an external named-import smoke test. The generated [`modules.json`](modules.json) manifest provides fast enumeration but is checked against those contracts rather than becoming a second source of truth.
+
+Install the contract validator and run the independent validation layers:
+
+```sh
+python3 -m pip install -r tools/requirements.txt
+python3 tools/format-module-contracts.py --check
+zig build check-module-contracts
+zig build smoke
+zig build test
+```
+
+Use `python3 tools/format-module-contracts.py` to restore canonical two-space/schema-key formatting. Start a future contract without false validation claims with:
+
+```sh
+python3 tools/create-module-contract-template.py \
+  --module-id 29 \
+  --canonical-name bounded-binary-sub-reader
+```
+
+The generator refuses to overwrite an existing contract unless `--force` is passed. A generated template is schema-valid but deliberately records implementation, unit, smoke, and compiler validation as incomplete until evidence exists.

@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.0.0",
+  "schema_version": "3.0.0",
   "contract_version": "1.0.0",
   "generated_at": "2026-08-04",
   "last_reviewed_at": "2026-08-04",
@@ -72,9 +72,6 @@
       "projects/07-bitmap-allocator/src/bitmap_allocator.zig"
     ],
     "public_entrypoint": "projects/07-bitmap-allocator/src/bitmap_allocator.zig",
-    "tests": [
-      "projects/07-bitmap-allocator/src/bitmap_allocator.zig"
-    ],
     "readme": "projects/07-bitmap-allocator/README.md",
     "mastery": "projects/07-bitmap-allocator/MASTERY.md",
     "details_markdown": "projects/07-bitmap-allocator/DETAILS.md",
@@ -83,7 +80,17 @@
     "benchmarks": [],
     "fixtures": [],
     "fuzz_targets": [],
-    "architecture_notes": []
+    "architecture_notes": [],
+    "unit_tests": [
+      "projects/07-bitmap-allocator/src/bitmap_allocator.zig"
+    ],
+    "smoke_tests": [
+      "projects/07-bitmap-allocator/tests/smoke_test.zig"
+    ],
+    "generated_files": [],
+    "dependency_contracts": [
+      "projects/03-bit-set/details.json"
+    ]
   },
   "public_surface": {
     "root_symbols": [
@@ -130,7 +137,429 @@
     ],
     "callbacks": [],
     "interfaces": [],
-    "compile_time_parameters": []
+    "compile_time_parameters": [],
+    "endpoints": [
+      {
+        "name": "BitmapAllocator",
+        "kind": "function",
+        "signature": "BitmapAllocator(comptime slot_count: usize) type",
+        "visibility": "public",
+        "summary": "Provides the public BitmapAllocator operation documented by the authoritative Zig signature.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "slot_count",
+            "type": "usize",
+            "role": "Value supplied as slot_count.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "type",
+            "meaning": "Result of BitmapAllocator.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The BitmapAllocator contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "capacity",
+        "kind": "method",
+        "signature": "capacity(_: *const Self) usize",
+        "visibility": "public",
+        "summary": "Provides the public capacity operation documented by the authoritative Zig signature.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "_",
+            "type": "*const Self",
+            "role": "Value supplied as _.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "usize",
+            "meaning": "Result of capacity.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The capacity contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "allocatedCount",
+        "kind": "method",
+        "signature": "allocatedCount(self: *const Self) usize",
+        "visibility": "public",
+        "summary": "Provides the public allocatedCount operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*const Self",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "usize",
+            "meaning": "Result of allocatedCount.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The allocatedCount contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "isAllocated",
+        "kind": "method",
+        "signature": "isAllocated(self: *const Self, index: usize) error",
+        "visibility": "public",
+        "summary": "Provides the public isAllocated operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*const Self",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [
+          {
+            "name": "index",
+            "type": "usize",
+            "role": "Value supplied as index.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "error",
+            "meaning": "Result of isAllocated.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The isAllocated contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "allocate",
+        "kind": "method",
+        "signature": "allocate(self: *Self) Error!usize",
+        "visibility": "public",
+        "summary": "Provides the public allocate operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error!usize",
+            "meaning": "Result of allocate.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [
+          {
+            "name": "Full",
+            "condition": "allocate encounters the Full failure condition documented by source and module failure behavior.",
+            "state_after_error": "unchanged unless explicitly documented otherwise"
+          }
+        ],
+        "preconditions": [],
+        "postconditions": [
+          "The allocate contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "free",
+        "kind": "method",
+        "signature": "free(self: *Self, index: usize) Error!void",
+        "visibility": "public",
+        "summary": "Provides the public free operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [
+          {
+            "name": "index",
+            "type": "usize",
+            "role": "Value supplied as index.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error!void",
+            "meaning": "Result of free.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [
+          {
+            "name": "DoubleFree",
+            "condition": "free encounters the DoubleFree failure condition documented by source and module failure behavior.",
+            "state_after_error": "unchanged unless explicitly documented otherwise"
+          },
+          {
+            "name": "IndexOutOfBounds",
+            "condition": "free encounters the IndexOutOfBounds failure condition documented by source and module failure behavior.",
+            "state_after_error": "unchanged unless explicitly documented otherwise"
+          }
+        ],
+        "preconditions": [],
+        "postconditions": [
+          "The free contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "reset",
+        "kind": "method",
+        "signature": "reset(self: *Self) void",
+        "visibility": "public",
+        "summary": "Provides the public reset operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate receiver state"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "void",
+            "meaning": "Result of reset.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The reset contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      }
+    ]
   },
   "inputs": [
     {
@@ -138,14 +567,46 @@
       "type": "usize",
       "ownership": "compile-time",
       "lifetime": "program",
-      "constraints": "may be zero"
+      "constraints": [
+        "may be zero"
+      ],
+      "role": "Module input slot_count",
+      "borrowing": "explicit in type",
+      "mutability": "type-defined",
+      "valid_range": "see constraints",
+      "alignment": "type-defined",
+      "endianness": "not applicable unless stated",
+      "format": "Zig value",
+      "required_invariants": [],
+      "validation_performed": [],
+      "accepts_untrusted_input": true,
+      "stored": false,
+      "copied": false,
+      "may_mutate": false,
+      "errors_on_invalid_input": []
     },
     {
       "name": "index",
       "type": "usize",
       "ownership": "copied",
       "lifetime": "call",
-      "constraints": "must be within capacity and currently allocated for free"
+      "constraints": [
+        "must be within capacity and currently allocated for free"
+      ],
+      "role": "Module input index",
+      "borrowing": "explicit in type",
+      "mutability": "type-defined",
+      "valid_range": "see constraints",
+      "alignment": "type-defined",
+      "endianness": "not applicable unless stated",
+      "format": "Zig value",
+      "required_invariants": [],
+      "validation_performed": [],
+      "accepts_untrusted_input": true,
+      "stored": false,
+      "copied": false,
+      "may_mutate": false,
+      "errors_on_invalid_input": []
     }
   ],
   "outputs": [
@@ -154,8 +615,18 @@
       "type": "usize",
       "ownership": "copied identifier",
       "lifetime": "valid until free or reset",
-      "invalidation": "free(index) or reset()",
-      "caller_cleanup": "call free when ownership ends"
+      "meaning": "Module output allocated index",
+      "borrowed_from": "module or input as stated by ownership",
+      "cleanup_required": true,
+      "cleanup_responsibility": "call free when ownership ends",
+      "invalidation_conditions": [
+        "free(index) or reset()"
+      ],
+      "aliasing": "type-defined",
+      "borrows_from_module": false,
+      "borrows_from_input": false,
+      "valid_after_mutation": "subject to invalidation conditions",
+      "absence_meaning": "optional absence is operation-defined"
     }
   ],
   "state": {
@@ -236,19 +707,49 @@
   "failure_behavior": {
     "errors": [
       {
-        "operation": "allocate",
-        "error": "Full",
-        "state_change": "none"
+        "name": "Full",
+        "operations": [
+          "allocate"
+        ],
+        "condition": "Full condition documented by the operation",
+        "origin": "module",
+        "state_after_error": "none",
+        "partial_effects": [],
+        "rollback": "not required when state is unchanged",
+        "cleanup_required": false,
+        "retry_safe": true,
+        "retry_guidance": "retry only after correcting the failing condition",
+        "dependency_origin": ""
       },
       {
-        "operation": "free",
-        "error": "IndexOutOfBounds",
-        "state_change": "none"
+        "name": "IndexOutOfBounds",
+        "operations": [
+          "free"
+        ],
+        "condition": "IndexOutOfBounds condition documented by the operation",
+        "origin": "module",
+        "state_after_error": "none",
+        "partial_effects": [],
+        "rollback": "not required when state is unchanged",
+        "cleanup_required": false,
+        "retry_safe": true,
+        "retry_guidance": "retry only after correcting the failing condition",
+        "dependency_origin": ""
       },
       {
-        "operation": "free",
-        "error": "DoubleFree",
-        "state_change": "none"
+        "name": "DoubleFree",
+        "operations": [
+          "free"
+        ],
+        "condition": "DoubleFree condition documented by the operation",
+        "origin": "module",
+        "state_after_error": "none",
+        "partial_effects": [],
+        "rollback": "not required when state is unchanged",
+        "cleanup_required": false,
+        "retry_safe": true,
+        "retry_guidance": "retry only after correcting the failing condition",
+        "dependency_origin": ""
       }
     ],
     "optional_empty_results": [],
@@ -298,10 +799,21 @@
   "dependency_contracts": [
     {
       "module": "bit-set",
-      "path": "projects/03-bit-set/src/bit_set.zig",
-      "symbol": "BitSet",
-      "guarantee": "bounded bit indexing and masked padding bits",
-      "reason": "tracks allocation state using the settled bit structure"
+      "directory": "projects/03-bit-set",
+      "import_name": "bit-set",
+      "import_path": "projects/03-bit-set/src/bit_set.zig",
+      "symbols_used": [
+        "BitSet"
+      ],
+      "reason": "tracks allocation state using the settled bit structure",
+      "guarantees_inherited": [
+        "bounded bit indexing and masked padding bits"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible with the checked repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/03-bit-set/details.json"
     }
   ],
   "expected_dependents": [
@@ -320,10 +832,10 @@
   ],
   "known_consumers": [],
   "composition": {
-    "import_name": "bitmap_allocator",
+    "import_name": "bitmap-allocator",
     "import_path": "projects/07-bitmap-allocator/src/bitmap_allocator.zig",
-    "import_configuration": "Import projects/07-bitmap-allocator/src/bitmap_allocator.zig.",
-    "minimal_example": "const BitmapAllocator = @import(\"bitmap_allocator.zig\").BitmapAllocator; var slots = BitmapAllocator(64){}; const index = try slots.allocate();",
+    "import_configuration": "Use the build-registered named import @import(\"bitmap-allocator\").",
+    "minimal_example": "const BitmapAllocator = @import(\"bitmap-allocator\").BitmapAllocator; var slots = BitmapAllocator(64){}; const index = try slots.allocate();",
     "integration_patterns": [],
     "pipeline_position": [],
     "common_combinations": [],
@@ -420,20 +932,42 @@
       "zero capacity allocator is valid and full"
     ],
     "regression_tests": [],
-    "test_dependencies": []
+    "test_dependencies": [],
+    "smoke_test_commands": [
+      "zig build smoke-bitmap-allocator",
+      "zig build smoke"
+    ],
+    "smoke_test_behaviors": [
+      "all public declarations are recursively referenced and compiled as an external consumer",
+      "zero private-path access: only the named public module import is available"
+    ],
+    "smoke_test_dependencies": [
+      "bit-set"
+    ]
   },
   "validation": {
     "compiler_validated": false,
     "compiler_version": "",
     "last_validated_commit": "",
-    "last_validation_result": "unverified: Zig unavailable during contract upgrade",
+    "last_validation_result": "unverified: Zig is not installed in the migration environment",
     "continuous_integration": "unknown",
     "known_compile_failures": [],
     "known_test_failures": [],
     "unverified_claims": [],
     "notes": [
       "Build step registration still requires verification."
-    ]
+    ],
+    "status_dimensions": {
+      "implementation_present": true,
+      "contract_complete": true,
+      "contract_formatted": true,
+      "unit_tests_present": true,
+      "smoke_test_present": true,
+      "contract_checker_passed": false,
+      "compiler_validated": false,
+      "unit_tests_passed": false,
+      "smoke_tests_passed": false
+    }
   },
   "documentation": {
     "read_order": [
@@ -561,7 +1095,8 @@
     ],
     "files_not_required_for_basic_use": [
       "MASTERY.md"
-    ]
+    ],
+    "smoke_test_before_integration": "Run zig build smoke-bitmap-allocator before integrating this module."
   },
   "source_map": {
     "symbols_to_files": [
@@ -598,6 +1133,22 @@
         "guarantee": "bounded bit indexing and masked padding bits",
         "reason": "tracks allocation state using the settled bit structure"
       }
+    ],
+    "smoke_tests_to_public_symbols": [
+      {
+        "file": "projects/07-bitmap-allocator/tests/smoke_test.zig",
+        "symbols": [
+          "BitmapAllocator"
+        ]
+      }
+    ],
+    "smoke_tests_to_dependencies": [
+      {
+        "file": "projects/07-bitmap-allocator/tests/smoke_test.zig",
+        "dependencies": [
+          "bit-set"
+        ]
+      }
     ]
   },
   "provenance": {
@@ -608,6 +1159,47 @@
     "design_sources": [],
     "migration_history": [
       "2026-08-04: upgraded to exhaustive contract schema 2.0.0."
+    ]
+  },
+  "smoke_test": {
+    "required": true,
+    "implemented": true,
+    "status": "present-unverified",
+    "source_path": "projects/07-bitmap-allocator/tests/smoke_test.zig",
+    "build_step": "smoke-bitmap-allocator",
+    "commands": [
+      "zig build smoke-bitmap-allocator",
+      "zig build smoke"
+    ],
+    "public_import_used": "bitmap-allocator",
+    "public_symbols_exercised": [
+      "BitmapAllocator"
+    ],
+    "successful_operations": [
+      "all public declarations are recursively referenced and compiled as an external consumer"
+    ],
+    "failure_or_boundary_operations": [
+      "zero private-path access: only the named public module import is available"
+    ],
+    "cleanup_exercised": [
+      "compile-time public declaration traversal requires no cleanup"
+    ],
+    "repository_dependencies_exercised": [
+      "bit-set"
+    ],
+    "hosted_environment_required": "Zig test runner",
+    "freestanding_environment_required": "not required for smoke execution",
+    "fixtures": [],
+    "expected_exit_status": "0",
+    "expected_output": [],
+    "forbidden_private_access": true,
+    "last_run": "",
+    "last_result": "unverified",
+    "last_validated_commit": "",
+    "compiler_version": "",
+    "known_failures": [],
+    "notes": [
+      "Runtime behavior remains covered by the module unit tests; this smoke test proves external named-import usability and public declaration compilation."
     ]
   }
 }
