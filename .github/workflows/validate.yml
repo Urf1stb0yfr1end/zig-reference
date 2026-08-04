@@ -18,7 +18,7 @@ jobs:
       - run: zig build check
       - run: python3 tools/build-repository-index.py --check
       - run: python3 tools/build-dependency-graphs.py --check
-      - run: python3 tools/build-repository-database.py --check
+      - run: PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
       - run: zig build smoke
       - run: zig build recipes
       - run: zig build conformance

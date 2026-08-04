@@ -14,7 +14,9 @@ This repository is not an alternative standard library, and it does not claim to
 
 ## Repository commands
 
-Query before reading source: `python3 tools/query-reference.py capability "bounded binary parsing"`. Regenerate reviewable indexes with `zig build index` and graphs with `zig build graph`; build the ignored local SQLite accelerator with `zig build database`; inspect evidence-backed health with `zig build status`; and run the complete pipeline with `zig build validate-repository`. The baseline is exactly Zig 0.14.0. Generated databases and compiler artifacts are never committed.
+Query before reading source: `python3 tools/query-reference.py capability "bounded binary parsing"`. Regenerate reviewable JSON indexes with `zig build index` and textual graphs with `zig build graph`; inspect evidence-backed health with `zig build status`; and run the complete pipeline with `zig build validate-repository`. The baseline is exactly Zig 0.14.0. Opaque databases are prohibited; generated JSON is the only query acceleration layer.
+
+For the complete repository command surface, operational workflows, command status definitions, and validation commands, see [`COMMANDS.md`](COMMANDS.md).
 
 ## The idea
 

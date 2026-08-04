@@ -589,6 +589,18 @@
         "long_description",
         "status",
         "maturity",
+        "lifecycle",
+        "target_maturity_level",
+        "implementation_version",
+        "public_contract_version",
+        "introduced_version",
+        "deprecated_version",
+        "superseded_version",
+        "removed_version",
+        "replacement_module",
+        "migration_guide",
+        "support_policy",
+        "deprecation_reason",
         "category",
         "subcategory",
         "tags",
@@ -620,6 +632,24 @@
         "maturity": {
           "type": "string"
         },
+        "lifecycle": {
+          "enum": ["proposed", "experimental", "active", "stable", "deprecated", "superseded", "archived"]
+        },
+        "target_maturity_level": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9
+        },
+        "implementation_version": { "type": "string" },
+        "public_contract_version": { "type": "string" },
+        "introduced_version": { "type": "string" },
+        "deprecated_version": { "type": "string" },
+        "superseded_version": { "type": "string" },
+        "removed_version": { "type": "string" },
+        "replacement_module": { "type": "string" },
+        "migration_guide": { "type": "string" },
+        "support_policy": { "type": "string" },
+        "deprecation_reason": { "type": "string" },
         "category": {
           "type": "string"
         },

@@ -7,10 +7,11 @@ def main():
     deps=load("dependencies")["dependencies"]; reverse=load("reverse-dependencies")["reverse_dependencies"]; order=topological(deps)
     # Cross-check the root build declarations, which are independently maintained executable wiring.
     build=(ROOT/"build.zig").read_text()
-    declared=set(re.findall(r'\.name = "([^"]+)"',build)); names=set(deps)
+    module_declarations=build.split("const RecipeSpec",1)[0]
+    declared=set(re.findall(r'\.name = "([^"]+)"',module_declarations)); names=set(deps)
     if declared!=names: raise SystemExit(f"build/contract modules differ: build-only={sorted(declared-names)}, contract-only={sorted(names-declared)}")
     for name,ds in deps.items():
-        block=re.search(rf'\.name = "{re.escape(name)}".*?\.dependencies = &\.\{{(.*?)\}}',build,re.S)
+        block=re.search(rf'\.name = "{re.escape(name)}".*?\.dependencies = &\.\{{(.*?)\}}',module_declarations,re.S)
         wired=set(re.findall(r'"([^"]+)"',block.group(1))) if block else set()
         if wired!=set(ds): raise SystemExit(f"{name}: build dependencies {sorted(wired)} != contract {ds}")
     graphdir=GENERATED/"graphs"; reportdir=ROOT/"docs/reports/generated"; graphdir.mkdir(parents=True,exist_ok=True); reportdir.mkdir(parents=True,exist_ok=True)

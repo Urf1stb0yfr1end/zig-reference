@@ -1,3 +1,5 @@
 # Security policy
 
-Report vulnerabilities privately through the repository owner's GitHub security-reporting channel when available; otherwise open a minimal issue requesting private contact without exploit detail. Supported code is the current Zig 0.14.0 branch. Maintainers triage without promising a response deadline that current staffing cannot guarantee. Never commit secrets, exploit artifacts, dumps, databases, or disk images. Security claims require contract threat boundaries and executable evidence.
+Report vulnerabilities through GitHub private vulnerability reporting when enabled; otherwise open a minimal issue requesting private contact without exploit details. Do not commit secrets, exploit payloads, dumps, databases, images, or build artifacts. The maintained baseline is Zig 0.14.0; later versions are unsupported until verified.
+
+The owner triages affected modules, trust boundaries, dependents, containment, and disclosure without promising an unavailable response SLA. Fixes require regression coverage and honest evidence. Public contracts must not claim security from type shape or test presence alone. See `docs/standards/THREAT_MODELING.md` for module requirements.

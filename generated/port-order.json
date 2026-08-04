@@ -1,5 +1,6 @@
 {
-  "generated": true,
+  "_generated": true,
+  "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY",
   "generator": "tools/build-repository-index.py",
   "port_order": [
     "aligned-address-and-size-helpers",
@@ -41,5 +42,6 @@
     "length-prefixed-binary-field",
     "physical-page-frame-allocator",
     "type-length-value-decoder"
-  ]
+  ],
+  "repository_index_version": "1.0.0"
 }

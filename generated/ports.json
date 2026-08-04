@@ -1,5 +1,6 @@
 {
-  "generated": true,
+  "_generated": true,
+  "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY",
   "generator": "tools/build-repository-index.py",
   "ports": [
     {
@@ -1197,5 +1198,6 @@
         }
       ]
     }
-  ]
+  ],
+  "repository_index_version": "1.0.0"
 }

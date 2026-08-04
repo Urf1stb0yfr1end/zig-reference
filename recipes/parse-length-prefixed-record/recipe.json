@@ -1,18 +1,45 @@
 {
   "name": "parse-length-prefixed-record",
-  "generated": false,
-  "modules": [
+  "problem_solved": "parse length prefixed record",
+  "status": "implemented-unverified",
+  "selected_modules": [
     "bounded-byte-reader",
     "binary-cursor-checkpoint",
     "bounded-binary-sub-reader",
     "length-prefixed-binary-field"
   ],
-  "status": "foundation",
-  "test_command": "zig build recipes",
-  "inherited_guarantees": [
-    "Public module unit contracts and failure-path tests are executed by the recipes aggregate step."
+  "selection_reasons": [
+    "Uses the canonical failure-atomic length-field decoder over borrowed input."
   ],
-  "gaps": [
-    "A dedicated cross-module orchestration adapter remains required before this recipe can count as system-proven maturity evidence."
-  ]
+  "direct_dependencies": [
+    "bounded-byte-reader",
+    "binary-cursor-checkpoint",
+    "bounded-binary-sub-reader",
+    "length-prefixed-binary-field"
+  ],
+  "dependency_order": [
+    "bounded-byte-reader",
+    "binary-cursor-checkpoint",
+    "bounded-binary-sub-reader",
+    "length-prefixed-binary-field"
+  ],
+  "public_endpoints_used": [],
+  "adapters_required": [
+    "recipes/parse-length-prefixed-record/src/recipe.zig"
+  ],
+  "inherited_guarantees": [
+    "Ownership, failure atomicity, bounds, and invalidation remain those of the selected canonical module contracts."
+  ],
+  "gaps_discovered": [
+    "Zig 0.14.0 compiler, recipe, and integration validation remain pending under the zero-binary task rule."
+  ],
+  "future_systems_enabled": [
+    "Larger compositions requiring parse length prefixed record"
+  ],
+  "intended_build_commands": [
+    "zig build test-recipe-parse-length-prefixed-record",
+    "zig build recipes"
+  ],
+  "intended_smoke_commands": [],
+  "validation_evidence_references": []
 }

@@ -1,6 +1,8 @@
 {
-  "generated": true,
+  "_generated": true,
+  "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY",
   "generator": "tools/build-repository-index.py",
+  "repository_index_version": "1.0.0",
   "summary": {
     "compiler_validated_modules": 0,
     "conformance_tested_modules": 0,

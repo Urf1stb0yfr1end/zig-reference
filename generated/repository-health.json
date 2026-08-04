@@ -1,4 +1,6 @@
 {
+  "_generated": true,
+  "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY",
   "compiler_validated_modules": 0,
   "conformance_tested_modules": 0,
   "contracted_modules": 39,
@@ -14,7 +16,6 @@
   },
   "dependency_cycles": 0,
   "deprecated_modules": 0,
-  "generated": true,
   "generator": "tools/build-repository-index.py",
   "hyper_zig_readiness": {
     "note": "foundation contracts exist; complete integration evidence does not",
@@ -27,6 +28,7 @@
     "total": 39
   },
   "recipe_coverage": 6,
+  "repository_index_version": "1.0.0",
   "reused_modules": 20,
   "smoke_tested_modules": 0,
   "stable_modules": 0,

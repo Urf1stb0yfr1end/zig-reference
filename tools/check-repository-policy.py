@@ -10,5 +10,7 @@ for raw in tracked:
     if path.suffix.lower() in forbidden: errors.append(f"forbidden tracked artifact: {rel}")
     if path.is_file() and b"\0" in path.read_bytes(): errors.append(f"tracked file contains NUL byte: {rel}")
 if (ROOT/"generated/zig-reference.sqlite").exists(): errors.append("legacy generated/zig-reference.sqlite exists")
+if (ROOT/"tools/build-repository-database.py").exists(): errors.append("database generator is forbidden by repository policy")
+if 'b.step("database"' in (ROOT/"build.zig").read_text(): errors.append("zig build database is forbidden by repository policy")
 if errors: print("\n".join(errors),file=sys.stderr); raise SystemExit(1)
 print(f"repository policy passed: {len(tracked)-1} tracked files are text and no prohibited artifact is tracked")

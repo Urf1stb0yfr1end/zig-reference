@@ -1,4 +1,6 @@
 {
+  "_generated": true,
+  "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY",
   "endpoints": [
     {
       "kind": "type_or_constant",
@@ -1531,6 +1533,6 @@
       "signature": "writeU32Le(self: *ByteWriter, value: u32) !void"
     }
   ],
-  "generated": true,
-  "generator": "tools/build-repository-index.py"
+  "generator": "tools/build-repository-index.py",
+  "repository_index_version": "1.0.0"
 }

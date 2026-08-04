@@ -39,7 +39,13 @@ def dependencies(d):
     return sorted(set(out))
 
 def generated(data):
-    return {"generated":True,"generator":"tools/build-repository-index.py",**data}
+    return {
+        "_generated": True,
+        "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY",
+        "generator": "tools/build-repository-index.py",
+        "repository_index_version": "1.0.0",
+        **data,
+    }
 
 def dump(data): return json.dumps(data,indent=2,sort_keys=True,ensure_ascii=False)+"\n"
 

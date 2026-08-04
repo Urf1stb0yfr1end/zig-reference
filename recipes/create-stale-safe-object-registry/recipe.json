@@ -1,16 +1,39 @@
 {
   "name": "create-stale-safe-object-registry",
-  "generated": false,
-  "modules": [
+  "problem_solved": "create stale safe object registry",
+  "status": "implemented-unverified",
+  "selected_modules": [
     "generational-handles",
     "fixed-capacity-object-pool"
   ],
-  "status": "foundation",
-  "test_command": "zig build recipes",
-  "inherited_guarantees": [
-    "Public module unit contracts and failure-path tests are executed by the recipes aggregate step."
+  "selection_reasons": [
+    "Uses the object pool adapter to prove generation changes reject a removed identity."
   ],
-  "gaps": [
-    "A dedicated cross-module orchestration adapter remains required before this recipe can count as system-proven maturity evidence."
-  ]
+  "direct_dependencies": [
+    "generational-handles",
+    "fixed-capacity-object-pool"
+  ],
+  "dependency_order": [
+    "generational-handles",
+    "fixed-capacity-object-pool"
+  ],
+  "public_endpoints_used": [],
+  "adapters_required": [
+    "recipes/create-stale-safe-object-registry/src/recipe.zig"
+  ],
+  "inherited_guarantees": [
+    "Ownership, failure atomicity, bounds, and invalidation remain those of the selected canonical module contracts."
+  ],
+  "gaps_discovered": [
+    "Zig 0.14.0 compiler, recipe, and integration validation remain pending under the zero-binary task rule."
+  ],
+  "future_systems_enabled": [
+    "Larger compositions requiring create stale safe object registry"
+  ],
+  "intended_build_commands": [
+    "zig build test-recipe-create-stale-safe-object-registry",
+    "zig build recipes"
+  ],
+  "intended_smoke_commands": [],
+  "validation_evidence_references": []
 }

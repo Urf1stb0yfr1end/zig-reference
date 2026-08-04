@@ -1,17 +1,42 @@
 {
   "name": "write-and-read-explicit-endian-record",
-  "generated": false,
-  "modules": [
+  "problem_solved": "write and read explicit endian record",
+  "status": "implemented-unverified",
+  "selected_modules": [
     "byte-writer",
     "bounded-byte-reader",
     "endian-integer-codec"
   ],
-  "status": "foundation",
-  "test_command": "zig build recipes",
-  "inherited_guarantees": [
-    "Public module unit contracts and failure-path tests are executed by the recipes aggregate step."
+  "selection_reasons": [
+    "Shares one explicit byte order across encoding, storage, and bounded reading."
   ],
-  "gaps": [
-    "A dedicated cross-module orchestration adapter remains required before this recipe can count as system-proven maturity evidence."
-  ]
+  "direct_dependencies": [
+    "byte-writer",
+    "bounded-byte-reader",
+    "endian-integer-codec"
+  ],
+  "dependency_order": [
+    "byte-writer",
+    "bounded-byte-reader",
+    "endian-integer-codec"
+  ],
+  "public_endpoints_used": [],
+  "adapters_required": [
+    "recipes/write-and-read-explicit-endian-record/src/recipe.zig"
+  ],
+  "inherited_guarantees": [
+    "Ownership, failure atomicity, bounds, and invalidation remain those of the selected canonical module contracts."
+  ],
+  "gaps_discovered": [
+    "Zig 0.14.0 compiler, recipe, and integration validation remain pending under the zero-binary task rule."
+  ],
+  "future_systems_enabled": [
+    "Larger compositions requiring write and read explicit endian record"
+  ],
+  "intended_build_commands": [
+    "zig build test-recipe-write-and-read-explicit-endian-record",
+    "zig build recipes"
+  ],
+  "intended_smoke_commands": [],
+  "validation_evidence_references": []
 }

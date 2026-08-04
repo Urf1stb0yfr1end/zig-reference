@@ -1,3 +1,5 @@
 # Code of conduct
 
-Be respectful, specific, and technically honest. Critique work rather than people; welcome questions; avoid harassment and discrimination. Repository owners may moderate participation. Report sensitive conduct concerns privately where a repository contact channel exists.
+Participate respectfully, critique engineering rather than people, assume good faith while requiring evidence, and make the project accessible to learners. Harassment, discrimination, threats, doxxing, and sustained disruption are unacceptable.
+
+Report conduct concerns privately to the repository owner through GitHub when possible. The current owner reviews incidents, limits disclosure, documents conflicts of interest, and may warn, restrict, or remove participation. This single-maintainer reality is stated plainly; an independent enforcement committee does not currently exist.
