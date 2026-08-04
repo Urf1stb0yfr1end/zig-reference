@@ -39,7 +39,7 @@ This is the canonical human-readable inventory of repository operations. Command
 | Graphs | `python3 tools/build-dependency-graphs.py [--check]` | Text-verified; textual output only | `tools/build-dependency-graphs.py` |
 | Policy | `python3 tools/check-repository-policy.py`; `python3 tools/check-command-reference.py [--check]` | Text-verified | tool source |
 | Query | `python3 tools/query-reference.py KIND [TERM] [FLAGS]` | Text-verified | `tools/query-reference.py` |
-| Evidence | `python3 tools/record-validation.py MODULE --command COMMAND [--target TARGET] [--optimize MODE] [--ci-id ID]` | Available; runs supplied commands | `tools/record-validation.py` |
+| Evidence | `python3 tools/record-validation.py --level {unit,smoke,all}`; `python3 tools/record-validation.py --check`; `zig build check-validation-evidence` | Compiler-executed in this review | `tools/record-validation.py`, `validation-evidence.schema.json` |
 | Specialized | `python3 tools/test-specialized-levels.py {property,fuzz-smoke,differential}` | Planned and defined; eligible targets vary | tool source |
 | Status | `python3 tools/status.py`; `python3 tools/query-reference.py status` | Available | generated health index |
 
@@ -81,10 +81,11 @@ Common flags are `--json`, `--compact` (compact JSON), `--paths-only`, `--symbol
 
 | Command | Status in this review | Purpose / effects | Source |
 |---|---|---|---|
-| `zig build check` | Defined, pending | Runs contract, port, policy, command-manual, index-drift, and graph-drift checks; text tools may update nothing in check mode. | `build.zig` |
+| `zig build check` | Compiler-executed in this review | Runs contract, port, policy, command-manual, evidence, index-drift, and graph-drift checks; check mode updates nothing. | `build.zig` |
 | `zig build index` | Defined, pending | Regenerates committed textual indexes. | `build.zig` |
 | `zig build graph` | Defined, pending | Regenerates textual graph datasets and Mermaid/DOT reports. | `build.zig` |
-| `zig build status` | Defined, pending | Prints generated evidence-backed health. | `build.zig` |
+| `zig build status` | Compiler-executed in this review | Prints generated evidence-backed health. | `build.zig` |
+| `zig build check-validation-evidence` | Compiler-executed in this review | Checks the evidence schema contract, exact module/target identity, Zig 0.14.0 attribution, and current source digests without modifying evidence. | `build.zig` |
 | `zig build query` | Defined, pending | Runs the default status query; use Python for arguments. | `build.zig` |
 | `zig build recipes` | Defined, pending | Compiles and tests recipe adapters and dependencies. May create compiler output. | `build.zig` |
 | `zig build conformance` | Defined, pending | Compiles and runs configured behavioral adapters. May create compiler output. | `build.zig` |
@@ -156,7 +157,11 @@ Suites are `allocator`, `binary-writer`, `bounded-reader`, `fixed-capacity-conta
 
 ## Property, fuzz, differential, and evidence
 
-Testing is risk-based; not every module is eligible. `zig build property`, `zig build fuzz-smoke`, and `zig build differential` are defined aggregate interfaces. A zero-target run is infrastructure status, not module evidence. Successful evidence may only be written by `python3 tools/record-validation.py`, which executes every supplied `--command`, records exit codes/failures/skips honestly, and writes textual JSON below `generated/validation/`. Never hand-author a passing record.
+Testing is risk-based; not every module is eligible. `zig build property`, `zig build fuzz-smoke`, and `zig build differential` are defined aggregate interfaces. A zero-target run is infrastructure status, not module evidence. The eight conformance suite declarations currently reuse module unit tests and explicitly set `dedicated_shared_adapter` and `maturity_credit` false, so `zig build conformance` earns no per-module conformance credit.
+
+Passing evidence may only be produced by `PYTHONDONTWRITEBYTECODE=1 python3 tools/record-validation.py --level unit`, `--level smoke`, or `--level all`. The generator obtains `zig version`, runs every exact canonical `zig build test-<module>` and/or `zig build smoke-<module>` target, stops on the first failure, and writes a single deterministic `generated/validation/modules.json`. It intentionally records no wall-clock timestamp. Each record names the module, target, Zig version, native target and optimization, baseline Git revision, and a SHA-256 digest over root build wiring, its canonical source, contract, and external smoke source. Run `PYTHONDONTWRITEBYTECODE=1 python3 tools/record-validation.py --check` (or `zig build check-validation-evidence`) for non-mutating drift validation, then regenerate indexes with `python3 tools/build-repository-index.py`. Normal `zig build test`, `smoke`, and `conformance` runs execute their configured targets and also reject missing, wrong-version, wrong-target, or source-stale committed evidence; they do not rewrite Git-tracked evidence.
+
+The generated status interprets a current unit pass as maturity level 3 and requires that pass plus a current smoke pass for level 4. Conformance is a separate counter and does not raise maturity under the current level policy. Levels 5–9 still require advanced, reuse, system, review, and stability evidence described in `docs/standards/MATURITY_LEVELS.md`; therefore smoke-tested experimental modules are not called stable or system proven.
 
 ## Contribution and CI equivalence
 

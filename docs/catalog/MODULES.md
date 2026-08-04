@@ -60,4 +60,4 @@ Every completed module should reduce the cost of several later modules. Higher l
 
 ## Current status
 
-The repository targets Zig 0.14.0. Code written through this interface has not yet been compiler-validated in the current environment; local `zig build test` remains required before treating a module as verified.
+The repository targets Zig 0.14.0. Consult `generated/validation/modules.json` and the generated repository health report for source-digest-checked compiler and external-smoke evidence; declarations in this catalog do not award validation or maturity.

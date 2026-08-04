@@ -4,8 +4,8 @@
 
 - Implemented modules: 39
 - Contracted modules: 39
-- Compiler-validated modules: 0
-- Smoke-tested modules: 0
+- Compiler-validated modules: 39
+- Smoke-tested modules: 39
 - Conformance-tested modules: 0
 - Reused modules: 20
 - System-proven modules: 0
@@ -24,9 +24,9 @@
 
 - **implemented modules:** modules with an implementation source path
 - **contracted modules:** modules with a validated details.json
-- **compiler validated modules:** modules backed by successful textual validation evidence
-- **smoke tested modules:** modules backed by successful external smoke evidence
-- **conformance tested modules:** modules named by an executable dedicated adapter with successful evidence
+- **compiler validated modules:** modules whose canonical Zig 0.14.0 unit target passed and whose textual evidence source digest is current
+- **smoke tested modules:** compiler-validated modules whose canonical named-import smoke target passed and whose evidence is current
+- **conformance tested modules:** modules named by a dedicated shared behavioral adapter with successful current evidence; unit-test reuse receives no credit
 - **reused modules:** modules having at least one declared reverse dependent
 - **system proven modules:** modules backed by a recipe or flagship integration evidence record
 - **port contract coverage:** modules with port.js divided by contracted modules

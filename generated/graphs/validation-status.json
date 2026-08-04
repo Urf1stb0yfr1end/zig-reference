@@ -4,277 +4,394 @@
   "generator": "tools/build-repository-index.py",
   "modules": [
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "fixed-capacity-vector",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "dynamic-array",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "ring-buffer",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "bit-set",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "bounded-byte-reader",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "stack",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "byte-writer",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "bitmap-allocator",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "generational-handles",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "state-machine",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "checked-integer-cast",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "nonzero-integer",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "bounded-integer",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "saturating-counter",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "validated-enum-decoder",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "aligned-address-and-size-helpers",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "validated-bit-flags",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "checked-half-open-range",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "distinct-memory-address-types",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "wrapping-sequence-number",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "optional-typed-handle",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "unit-safe-quantity",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "endian-integer-codec",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "validated-ascii-byte",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "fourcc-code",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "semantic-version",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "tagged-result",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "source-span",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "physical-page-frame-number-and-address-conversion",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "binary-cursor-checkpoint",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "bounded-binary-sub-reader",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "length-prefixed-binary-field",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "type-length-value-decoder",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "owned-byte-buffer",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "fixed-capacity-object-pool",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "physical-memory-region-set",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "physical-page-frame-allocator",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "elf64-file-header-parser",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     },
     {
-      "evidence_records": 0,
+      "conformance_validated": false,
+      "evidence_records": 1,
       "lifecycle": "experimental",
-      "maturity_level": 2,
+      "maturity_level": 4,
       "module": "elf64-program-header-parser",
-      "target_maturity_level": 2
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     }
   ],
   "repository_index_version": "1.0.0"
