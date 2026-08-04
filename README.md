@@ -6,6 +6,10 @@
 
 This is not an alternative standard library and it does not claim official Zig conventions. It is a set of proposed reference forms supported by working implementations.
 
+## The larger vision
+
+[**Age of Agents**](AGE_OF_AGENTS.md) sets out the repository's long-term design principle: software should preserve solved problems as discoverable, composable knowledge so future systems can begin from accumulated understanding rather than from nothing.
+
 ## What makes a project belong here?
 
 A project belongs in this repository when:
