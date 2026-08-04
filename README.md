@@ -20,8 +20,12 @@ A project belongs in this repository when:
 ## Study path
 
 1. [Fixed-capacity vector](projects/00-fixed-capacity-vector/README.md) — length, capacity, initialized storage, slices, explicit errors, and invariants.
-2. [Dynamic array](projects/02-dynamic-array/README.md) — allocator ownership, checked growth, cleanup, failure atomicity, and reference invalidation.
-3. [Ring buffer](projects/03-ring-buffer/README.md) — FIFO order, wrapped indexing, full and empty states, and logical versus physical layout.
+2. [Dynamic array](projects/01-dynamic-array/README.md) — allocator ownership, checked growth, cleanup, failure atomicity, and reference invalidation.
+3. [Ring buffer](projects/02-ring-buffer/README.md) — FIFO order, wrapped indexing, full and empty states, and logical versus physical layout.
+
+Each project also contains a `MASTERY.md`: a compact guide to its mental model, invariants, ownership, failure behavior, invalidation rules, tests, adaptation points, and readiness questions. The repository-wide standard is described in [MASTERY.md](MASTERY.md).
+
+These files are written for serious human study. Their consistent structure also makes the repository's reasoning easy for documentation tools and coding assistants to locate and combine, without making machine-specific guidance the public face of the project.
 
 The complete dependency plan lives in [PYRAMID.md](PYRAMID.md).
 
