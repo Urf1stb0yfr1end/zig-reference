@@ -484,6 +484,12 @@
     },
     {
       "kind": "method",
+      "module": "physical-memory-region-set",
+      "name": "contains",
+      "signature": "contains(self: @This(), address: addresses.PhysicalAddress) bool"
+    },
+    {
+      "kind": "method",
       "module": "validated-bit-flags",
       "name": "contains",
       "signature": "contains(self: Self, flag: Flag) bool"
@@ -1054,6 +1060,12 @@
     },
     {
       "kind": "method",
+      "module": "physical-memory-region-set",
+      "name": "items",
+      "signature": "items(self: *const @This()) []const PhysicalMemoryRegion"
+    },
+    {
+      "kind": "method",
       "module": "fixed-capacity-object-pool",
       "name": "iterator",
       "signature": "iterator(self:*const @This()"
@@ -1111,6 +1123,12 @@
       "module": "owned-byte-buffer",
       "name": "mutableBytes",
       "signature": "mutableBytes(self: *OwnedByteBuffer)"
+    },
+    {
+      "kind": "method",
+      "module": "fixed-capacity-object-pool",
+      "name": "next",
+      "signature": "next(it: *Iterator) ?*const T"
     },
     {
       "kind": "method",

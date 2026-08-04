@@ -528,6 +528,54 @@
         "invalidates": [],
         "thread_safety": "not applicable",
         "examples": []
+      },
+      {
+        "name": "next",
+        "kind": "method",
+        "signature": "next(it: *Iterator) ?*const T",
+        "visibility": "public",
+        "summary": "Provides the public next operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "it",
+          "type": "*Iterator",
+          "ownership": "borrowed mutable",
+          "mutation": "advances the iterator index"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "?*const T",
+            "meaning": "Borrowed pointer to the next occupied pool value, or null after iteration completes.",
+            "ownership": "borrowed immutable",
+            "borrowed_from": "the pool referenced by the iterator",
+            "lifetime": "valid while the pool remains alive and the slot remains occupied",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "removing or resetting the referenced slot",
+              "destroying the pool"
+            ],
+            "aliasing": "aliases the occupied pool slot",
+            "borrows_from_module": true,
+            "borrows_from_input": false,
+            "valid_after_mutation": "invalid after removal or reset of its slot",
+            "absence_meaning": "iteration is complete"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The next contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
       }
     ]
   },

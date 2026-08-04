@@ -30,21 +30,25 @@ pub fn BitSet(comptime bit_count: usize) type {
         }
 
         pub fn isSet(self: Self, index: usize) Error!bool {
+            if (comptime word_count == 0) return error.IndexOutOfBounds;
             const location = try locate(index);
             return (self.words[location.word] & location.mask) != 0;
         }
 
         pub fn set(self: *Self, index: usize) Error!void {
+            if (comptime word_count == 0) return error.IndexOutOfBounds;
             const location = try locate(index);
             self.words[location.word] |= location.mask;
         }
 
         pub fn clear(self: *Self, index: usize) Error!void {
+            if (comptime word_count == 0) return error.IndexOutOfBounds;
             const location = try locate(index);
             self.words[location.word] &= ~location.mask;
         }
 
         pub fn toggle(self: *Self, index: usize) Error!void {
+            if (comptime word_count == 0) return error.IndexOutOfBounds;
             const location = try locate(index);
             self.words[location.word] ^= location.mask;
         }

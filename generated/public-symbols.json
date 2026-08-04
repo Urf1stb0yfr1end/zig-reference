@@ -129,6 +129,10 @@
       "symbol": "Permission"
     },
     {
+      "module": "elf64-program-header-parser",
+      "symbol": "Permissions"
+    },
+    {
       "module": "distinct-memory-address-types",
       "symbol": "PhysicalAddress"
     },

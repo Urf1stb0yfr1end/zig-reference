@@ -103,6 +103,7 @@
   "public_surface": {
     "root_symbols": [
       "Permission",
+      "Permissions",
       "SegmentType",
       "Segment",
       "ParseError",
@@ -113,6 +114,10 @@
       {
         "name": "Permission",
         "kind": "public declaration"
+      },
+      {
+        "name": "Permissions",
+        "kind": "validated bit-flags type alias"
       },
       {
         "name": "SegmentType",
@@ -947,6 +952,10 @@
         "file": "projects/38-elf64-program-header-parser/src/elf64_program_header_parser.zig"
       },
       {
+        "symbol": "Permissions",
+        "file": "projects/38-elf64-program-header-parser/src/elf64_program_header_parser.zig"
+      },
+      {
         "symbol": "SegmentType",
         "file": "projects/38-elf64-program-header-parser/src/elf64_program_header_parser.zig"
       },
@@ -1066,6 +1075,7 @@
         "file": "projects/38-elf64-program-header-parser/tests/smoke_test.zig",
         "symbols": [
           "Permission",
+          "Permissions",
           "SegmentType",
           "Segment",
           "ParseError",
@@ -1117,6 +1127,7 @@
     "public_import_used": "elf64-program-header-parser",
     "public_symbols_exercised": [
       "Permission",
+      "Permissions",
       "SegmentType",
       "Segment",
       "ParseError",
