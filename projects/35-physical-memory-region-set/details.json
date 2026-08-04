@@ -541,6 +541,122 @@
         "invalidates": [],
         "thread_safety": "not applicable",
         "examples": []
+      },
+      {
+        "name": "contains",
+        "kind": "method",
+        "signature": "contains(self: @This(), address: addresses.PhysicalAddress) bool",
+        "visibility": "public",
+        "summary": "Provides the public contains operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "Self",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [
+          {
+            "name": "address",
+            "type": "addresses.PhysicalAddress",
+            "role": "Physical address tested against this region.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "bool",
+            "meaning": "Result of contains.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The contains contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "items",
+        "kind": "method",
+        "signature": "items(self: *const @This()) []const PhysicalMemoryRegion",
+        "visibility": "public",
+        "summary": "Provides the public items operation documented by the authoritative Zig signature.",
+        "receiver": {
+          "name": "self",
+          "type": "*const @This()",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "[]const PhysicalMemoryRegion",
+            "meaning": "Ordered borrowed view of the stored regions.",
+            "ownership": "borrowed immutable",
+            "borrowed_from": "receiver region storage",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "any mutation of the region set",
+              "destruction of the region set"
+            ],
+            "aliasing": "aliases inline region storage",
+            "borrows_from_module": true,
+            "borrows_from_input": false,
+            "valid_after_mutation": "invalid after any set mutation",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The items contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
       }
     ]
   },
