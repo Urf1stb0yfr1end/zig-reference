@@ -1905,6 +1905,12 @@
       "signature": "value(self: Self) Integer"
     },
     {
+      "kind": "method",
+      "module": "type-length-value-decoder",
+      "name": "valueReader",
+      "signature": "valueReader(self: @This()) bounded.BoundedReader"
+    },
+    {
       "kind": "function",
       "module": "riscv-sv39-page-table-walker",
       "name": "walk",

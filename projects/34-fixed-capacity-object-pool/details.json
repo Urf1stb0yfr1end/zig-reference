@@ -1178,7 +1178,7 @@
     "thread_safety": "not_synchronized",
     "unsafe_boundaries": [],
     "examples": [
-      "projects/34-fixed-capacity-object-pool/tests/agent/pass/pool_stale_handle_repair.zig"
+      "projects/34-fixed-capacity-object-pool/tests/agent/repair/pool_stale_handle_repair.zig"
     ],
     "recipes": [
       "create-stale-safe-object-registry"
@@ -1193,11 +1193,11 @@
         "id": "ZIGREF-POOL-STALE-HANDLE",
         "title": "Stale pool handle",
         "violated_rule": "A handle must not be used after removal or reset.",
-        "evidence_status": "future_analyzer_expectation",
-        "fixture": "projects/34-fixed-capacity-object-pool/tests/agent/fail/pool_stale_handle.zig",
-        "fixture_classification": "future_analyzer_expectation",
+        "evidence_status": "tested",
+        "fixture": "projects/34-fixed-capacity-object-pool/tests/agent/misuse/pool_stale_handle.zig",
+        "fixture_classification": "runtime_negative_test",
         "zig_rejects": false,
-        "repair_example": "projects/34-fixed-capacity-object-pool/tests/agent/pass/pool_stale_handle_repair.zig",
+        "repair_example": "projects/34-fixed-capacity-object-pool/tests/agent/repair/pool_stale_handle_repair.zig",
         "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
         "related_module": "fixed-capacity-object-pool",
         "related_recipe": "create-stale-safe-object-registry"
@@ -1207,10 +1207,10 @@
         "title": "Repeated pool removal",
         "violated_rule": "A removed handle cannot remove a value again.",
         "evidence_status": "tested",
-        "fixture": "projects/34-fixed-capacity-object-pool/tests/agent/fail/pool_double_release.zig",
+        "fixture": "projects/34-fixed-capacity-object-pool/tests/agent/misuse/pool_double_release.zig",
         "fixture_classification": "runtime_negative_test",
         "zig_rejects": false,
-        "repair_example": "projects/34-fixed-capacity-object-pool/tests/agent/pass/pool_double_release_repair.zig",
+        "repair_example": "projects/34-fixed-capacity-object-pool/tests/agent/repair/pool_double_release_repair.zig",
         "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
         "related_module": "fixed-capacity-object-pool",
         "related_recipe": "create-stale-safe-object-registry"

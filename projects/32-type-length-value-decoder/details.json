@@ -248,6 +248,51 @@
         "examples": []
       },
       {
+        "name": "valueReader",
+        "kind": "method",
+        "signature": "valueReader(self: @This()) bounded.BoundedReader",
+        "visibility": "public",
+        "summary": "Create a bounded reader over this record's borrowed value bytes.",
+        "receiver": {
+          "name": "self",
+          "type": "source-declared receiver or generated type context",
+          "ownership": "borrowed or value as declared",
+          "mutation": "source signature is authoritative"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "bounded.BoundedReader",
+            "meaning": "A bounded reader over the record value.",
+            "ownership": "copied reader borrowing the record value",
+            "borrowed_from": "Record.value",
+            "lifetime": "valid while the decoded input bytes remain valid",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": true,
+            "valid_after_mutation": "The independent reader cursor remains valid; the underlying borrowed bytes must remain alive",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
         "name": "position",
         "kind": "method",
         "signature": "position(self: @This()",

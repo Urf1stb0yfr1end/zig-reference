@@ -8,7 +8,7 @@
       "description": "Do not access a returned slice after reset.",
       "evidence_class": "static_contract",
       "evidence_references": [
-        "projects/41-fixed-bump-allocator/tests/agent/fail/bump_use_after_reset.zig",
+        "projects/41-fixed-bump-allocator/tests/agent/misuse/bump_use_after_reset.zig",
         "projects/41-fixed-bump-allocator/src/fixed_bump_allocator.zig"
       ],
       "status": "supported"

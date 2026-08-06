@@ -55,22 +55,23 @@ const specs = [_]ModuleSpec{
 };
 
 const RecipeSpec = struct { name: []const u8, dependencies: []const []const u8 };
-const AgentFixtureSpec = struct { module: []const u8, path: []const u8 };
+const AgentFixtureClass = enum { runtime_negative_test, repair, future_analyzer_expectation };
+const AgentFixtureSpec = struct { module: []const u8, path: []const u8, class: AgentFixtureClass };
 const agent_fixture_specs = [_]AgentFixtureSpec{
-    .{ .module = "fixed-capacity-object-pool", .path = "projects/34-fixed-capacity-object-pool/tests/agent/fail/pool_stale_handle.zig" },
-    .{ .module = "fixed-capacity-object-pool", .path = "projects/34-fixed-capacity-object-pool/tests/agent/pass/pool_stale_handle_repair.zig" },
-    .{ .module = "fixed-capacity-object-pool", .path = "projects/34-fixed-capacity-object-pool/tests/agent/fail/pool_double_release.zig" },
-    .{ .module = "fixed-capacity-object-pool", .path = "projects/34-fixed-capacity-object-pool/tests/agent/pass/pool_double_release_repair.zig" },
-    .{ .module = "fixed-free-list", .path = "projects/40-fixed-free-list/tests/agent/fail/freelist_double_release.zig" },
-    .{ .module = "fixed-free-list", .path = "projects/40-fixed-free-list/tests/agent/pass/freelist_double_release_repair.zig" },
-    .{ .module = "fixed-bump-allocator", .path = "projects/41-fixed-bump-allocator/tests/agent/fail/bump_use_after_reset.zig" },
-    .{ .module = "fixed-bump-allocator", .path = "projects/41-fixed-bump-allocator/tests/agent/pass/bump_use_after_reset_repair.zig" },
-    .{ .module = "fixed-capacity-priority-queue", .path = "projects/42-fixed-capacity-priority-queue/tests/agent/fail/pqueue_capacity.zig" },
-    .{ .module = "fixed-capacity-priority-queue", .path = "projects/42-fixed-capacity-priority-queue/tests/agent/pass/pqueue_capacity_repair.zig" },
-    .{ .module = "fixed-capacity-topological-sort", .path = "projects/43-fixed-capacity-topological-sort/tests/agent/fail/topo_cycle.zig" },
-    .{ .module = "fixed-capacity-topological-sort", .path = "projects/43-fixed-capacity-topological-sort/tests/agent/pass/topo_cycle_repair.zig" },
-    .{ .module = "fixed-capacity-topological-sort", .path = "projects/43-fixed-capacity-topological-sort/tests/agent/fail/topo_invalid_vertex.zig" },
-    .{ .module = "fixed-capacity-topological-sort", .path = "projects/43-fixed-capacity-topological-sort/tests/agent/pass/topo_invalid_vertex_repair.zig" },
+    .{ .module = "fixed-capacity-object-pool", .path = "projects/34-fixed-capacity-object-pool/tests/agent/misuse/pool_stale_handle.zig", .class = .runtime_negative_test },
+    .{ .module = "fixed-capacity-object-pool", .path = "projects/34-fixed-capacity-object-pool/tests/agent/repair/pool_stale_handle_repair.zig", .class = .repair },
+    .{ .module = "fixed-capacity-object-pool", .path = "projects/34-fixed-capacity-object-pool/tests/agent/misuse/pool_double_release.zig", .class = .runtime_negative_test },
+    .{ .module = "fixed-capacity-object-pool", .path = "projects/34-fixed-capacity-object-pool/tests/agent/repair/pool_double_release_repair.zig", .class = .repair },
+    .{ .module = "fixed-free-list", .path = "projects/40-fixed-free-list/tests/agent/misuse/freelist_double_release.zig", .class = .runtime_negative_test },
+    .{ .module = "fixed-free-list", .path = "projects/40-fixed-free-list/tests/agent/repair/freelist_double_release_repair.zig", .class = .repair },
+    .{ .module = "fixed-bump-allocator", .path = "projects/41-fixed-bump-allocator/tests/agent/misuse/bump_use_after_reset.zig", .class = .future_analyzer_expectation },
+    .{ .module = "fixed-bump-allocator", .path = "projects/41-fixed-bump-allocator/tests/agent/repair/bump_use_after_reset_repair.zig", .class = .repair },
+    .{ .module = "fixed-capacity-priority-queue", .path = "projects/42-fixed-capacity-priority-queue/tests/agent/misuse/pqueue_capacity.zig", .class = .runtime_negative_test },
+    .{ .module = "fixed-capacity-priority-queue", .path = "projects/42-fixed-capacity-priority-queue/tests/agent/repair/pqueue_capacity_repair.zig", .class = .repair },
+    .{ .module = "fixed-capacity-topological-sort", .path = "projects/43-fixed-capacity-topological-sort/tests/agent/misuse/topo_cycle.zig", .class = .runtime_negative_test },
+    .{ .module = "fixed-capacity-topological-sort", .path = "projects/43-fixed-capacity-topological-sort/tests/agent/repair/topo_cycle_repair.zig", .class = .repair },
+    .{ .module = "fixed-capacity-topological-sort", .path = "projects/43-fixed-capacity-topological-sort/tests/agent/misuse/topo_invalid_vertex.zig", .class = .runtime_negative_test },
+    .{ .module = "fixed-capacity-topological-sort", .path = "projects/43-fixed-capacity-topological-sort/tests/agent/repair/topo_invalid_vertex_repair.zig", .class = .repair },
 };
 const recipe_specs = [_]RecipeSpec{
     .{ .name = "parse-length-prefixed-record", .dependencies = &.{ "bounded-byte-reader", "length-prefixed-binary-field" } },
@@ -156,7 +157,12 @@ pub fn build(b: *std.Build) void {
         const fixture_module = b.createModule(.{ .root_source_file = b.path(fixture.path), .target = target, .optimize = optimize });
         fixture_module.addImport(fixture.module, findModule(fixture.module, &modules));
         const fixture_tests = b.addTest(.{ .root_module = fixture_module });
-        agent_check_step.dependOn(&b.addRunArtifact(fixture_tests).step);
+        switch (fixture.class) {
+            .runtime_negative_test, .repair => agent_check_step.dependOn(&b.addRunArtifact(fixture_tests).step),
+            // This fixture documents a contract violation that Zig 0.14.0 accepts. Compiling it
+            // confirms that status, but deliberately awards no runtime-negative evidence.
+            .future_analyzer_expectation => agent_check_step.dependOn(&fixture_tests.step),
+        }
     }
 
     const smoke_all = b.step("smoke", "Run every external-consumer smoke test");

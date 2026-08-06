@@ -8,7 +8,7 @@
       "description": "The graph must be acyclic for sort to return an order.",
       "evidence_class": "runtime_negative_test",
       "evidence_references": [
-        "projects/43-fixed-capacity-topological-sort/tests/agent/fail/topo_cycle.zig",
+        "projects/43-fixed-capacity-topological-sort/tests/agent/misuse/topo_cycle.zig",
         "projects/43-fixed-capacity-topological-sort/src/fixed_capacity_topological_sort.zig"
       ],
       "status": "supported"
@@ -19,7 +19,7 @@
       "description": "Edge endpoints must be less than node_count.",
       "evidence_class": "runtime_negative_test",
       "evidence_references": [
-        "projects/43-fixed-capacity-topological-sort/tests/agent/fail/topo_invalid_vertex.zig",
+        "projects/43-fixed-capacity-topological-sort/tests/agent/misuse/topo_invalid_vertex.zig",
         "projects/43-fixed-capacity-topological-sort/src/fixed_capacity_topological_sort.zig"
       ],
       "status": "supported"

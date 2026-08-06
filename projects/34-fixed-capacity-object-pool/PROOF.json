@@ -6,9 +6,9 @@
       "id": "FIXED-CAPACITY-OBJECT-POOL-CLAIM-01",
       "claim_type": "invalidation_event",
       "description": "A handle must not be used after removal or reset.",
-      "evidence_class": "static_contract",
+      "evidence_class": "runtime_negative_test",
       "evidence_references": [
-        "projects/34-fixed-capacity-object-pool/tests/agent/fail/pool_stale_handle.zig",
+        "projects/34-fixed-capacity-object-pool/tests/agent/misuse/pool_stale_handle.zig",
         "projects/34-fixed-capacity-object-pool/src/fixed_capacity_object_pool.zig"
       ],
       "status": "supported"
@@ -19,7 +19,7 @@
       "description": "A removed handle cannot remove a value again.",
       "evidence_class": "runtime_negative_test",
       "evidence_references": [
-        "projects/34-fixed-capacity-object-pool/tests/agent/fail/pool_double_release.zig",
+        "projects/34-fixed-capacity-object-pool/tests/agent/misuse/pool_double_release.zig",
         "projects/34-fixed-capacity-object-pool/src/fixed_capacity_object_pool.zig"
       ],
       "status": "supported"

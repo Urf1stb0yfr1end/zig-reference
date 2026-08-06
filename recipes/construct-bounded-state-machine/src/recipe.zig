@@ -5,7 +5,11 @@ const bounded = @import("bounded-integer");
 pub const State = enum { idle, running, stopped };
 pub const Event = enum { start, stop };
 fn transition(state: State, event: Event) ?State {
-    return switch (state) { .idle => if (event == .start) .running else null, .running => if (event == .stop) .stopped else null, .stopped => null };
+    return switch (state) {
+        .idle => if (event == .start) .running else null,
+        .running => if (event == .stop) .stopped else null,
+        .stopped => null,
+    };
 }
 pub const Machine = machines.StateMachine(State, Event, transition);
 pub const RetryBudget = bounded.BoundedInteger(u8, 0, 3);

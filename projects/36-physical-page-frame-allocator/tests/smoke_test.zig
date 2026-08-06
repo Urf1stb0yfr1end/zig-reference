@@ -1,2 +1,13 @@
-const std=@import("std");const m=@import("physical-page-frame-allocator");const sets=@import("physical-memory-region-set");const a=@import("distinct-memory-address-types");const f=@import("physical-page-frame-number-and-address-conversion");
-test "external frame allocator consumer" {var s=sets.PhysicalMemoryRegionSet(1){};try s.add(a.PhysicalAddress.init(0),f.PageSize,.usable);var p=try m.PhysicalPageFrameAllocator(1).initFromRegions(1,&s);const frame=try p.allocate();try std.testing.expectError(error.Exhausted,p.allocate());try p.release(frame);}
+const std = @import("std");
+const m = @import("physical-page-frame-allocator");
+const sets = @import("physical-memory-region-set");
+const a = @import("distinct-memory-address-types");
+const f = @import("physical-page-frame-number-and-address-conversion");
+test "external frame allocator consumer" {
+    var s = sets.PhysicalMemoryRegionSet(1){};
+    try s.add(a.PhysicalAddress.init(0), f.PageSize, .usable);
+    var p = try m.PhysicalPageFrameAllocator(1).initFromRegions(1, &s);
+    const frame = try p.allocate();
+    try std.testing.expectError(error.Exhausted, p.allocate());
+    try p.release(frame);
+}

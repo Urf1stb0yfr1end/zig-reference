@@ -220,7 +220,7 @@ For an AI system, consistency can matter as much as raw ecosystem size.
 
 A smaller corpus with predictable structure may be easier to use correctly than a vast ecosystem in which every package must be understood from the beginning.
 
-For the longer argument about competing in the AI-agent era, read [`Agents Hate Rust.md`](Agents%20Hate%20Rust.md).
+For the longer argument about competing in the AI-agent era, read [`Agents Hate Rust.md`](docs/Agents%20Hate%20Rust.md).
 
 ## The machine-readable layer
 
@@ -497,7 +497,7 @@ Open [`docs/catalog/MODULES.md`](docs/catalog/MODULES.md). It links every implem
 - [`SNOWBALL_PRINCIPLE.md`](SNOWBALL_PRINCIPLE.md) — how lower layers accelerate higher ones;
 - [`PYRAMID.md`](PYRAMID.md) — the dependency and learning progression;
 - [`ARCHETYPES.md`](ARCHETYPES.md) — the shared architectural vocabulary;
-- [`Agents Hate Rust.md`](Agents%20Hate%20Rust.md) — what it would take to become the preferred systems substrate for AI agents.
+- [`Agents Hate Rust.md`](docs/Agents%20Hate%20Rust.md) — what it would take to become the preferred systems substrate for AI agents.
 
 ### See the roadmap
 
