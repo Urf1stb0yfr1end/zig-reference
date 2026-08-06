@@ -67,6 +67,28 @@
       ]
     },
     {
+      "capability": "allocate aligned slices monotonically from a caller-owned byte region.",
+      "modules": [
+        "fixed-bump-allocator"
+      ]
+    },
+    {
+      "capability": "allocate and recycle bounded integer slots in deterministic constant time.",
+      "modules": [
+        "fixed-free-list"
+      ]
+    },
+    {
+      "capability": "allocation-explicit",
+      "modules": [
+        "fixed-bump-allocator",
+        "fixed-capacity-priority-queue",
+        "fixed-capacity-topological-sort",
+        "fixed-free-list",
+        "intrusive-doubly-linked-list"
+      ]
+    },
+    {
       "capability": "allocation-free container",
       "modules": [
         "fixed-capacity-vector"
@@ -77,6 +99,7 @@
       "modules": [
         "bitmap-allocator",
         "dynamic-array",
+        "fixed-bump-allocator",
         "stack"
       ]
     },
@@ -172,6 +195,16 @@
       ]
     },
     {
+      "capability": "bounded",
+      "modules": [
+        "fixed-bump-allocator",
+        "fixed-capacity-priority-queue",
+        "fixed-capacity-topological-sort",
+        "fixed-free-list",
+        "intrusive-doubly-linked-list"
+      ]
+    },
+    {
       "capability": "bounded array",
       "modules": [
         "fixed-capacity-vector"
@@ -221,6 +254,12 @@
       ]
     },
     {
+      "capability": "bump",
+      "modules": [
+        "fixed-bump-allocator"
+      ]
+    },
+    {
       "capability": "byte order",
       "modules": [
         "endian-integer-codec"
@@ -248,6 +287,13 @@
       "capability": "call stack",
       "modules": [
         "stack"
+      ]
+    },
+    {
+      "capability": "capacity",
+      "modules": [
+        "fixed-capacity-priority-queue",
+        "fixed-capacity-topological-sort"
       ]
     },
     {
@@ -401,6 +447,12 @@
       ]
     },
     {
+      "capability": "doubly",
+      "modules": [
+        "intrusive-doubly-linked-list"
+      ]
+    },
+    {
       "capability": "dynamic array",
       "modules": [
         "dynamic-array"
@@ -492,6 +544,15 @@
       ]
     },
     {
+      "capability": "fixed",
+      "modules": [
+        "fixed-bump-allocator",
+        "fixed-capacity-priority-queue",
+        "fixed-capacity-topological-sort",
+        "fixed-free-list"
+      ]
+    },
+    {
       "capability": "fixed vector",
       "modules": [
         "fixed-capacity-vector"
@@ -549,6 +610,12 @@
       ]
     },
     {
+      "capability": "free",
+      "modules": [
+        "fixed-free-list"
+      ]
+    },
+    {
       "capability": "freestanding",
       "modules": [
         "aligned-address-and-size-helpers",
@@ -563,10 +630,15 @@
         "elf64-file-header-parser",
         "elf64-program-header-parser",
         "endian-integer-codec",
+        "fixed-bump-allocator",
         "fixed-capacity-object-pool",
+        "fixed-capacity-priority-queue",
+        "fixed-capacity-topological-sort",
         "fixed-capacity-vector",
+        "fixed-free-list",
         "fourcc-code",
         "generational-handles",
+        "intrusive-doubly-linked-list",
         "length-prefixed-binary-field",
         "nonzero-integer",
         "optional-typed-handle",
@@ -752,6 +824,12 @@
       ]
     },
     {
+      "capability": "intrusive",
+      "modules": [
+        "intrusive-doubly-linked-list"
+      ]
+    },
+    {
       "capability": "lexer",
       "modules": [
         "source-span",
@@ -783,6 +861,19 @@
       ]
     },
     {
+      "capability": "linked",
+      "modules": [
+        "intrusive-doubly-linked-list"
+      ]
+    },
+    {
+      "capability": "list",
+      "modules": [
+        "fixed-free-list",
+        "intrusive-doubly-linked-list"
+      ]
+    },
+    {
       "capability": "little endian",
       "modules": [
         "endian-integer-codec"
@@ -792,6 +883,12 @@
       "capability": "magic code",
       "modules": [
         "fourcc-code"
+      ]
+    },
+    {
+      "capability": "maintain caller-owned nodes in an allocation-free doubly linked list.",
+      "modules": [
+        "intrusive-doubly-linked-list"
       ]
     },
     {
@@ -882,6 +979,12 @@
       "capability": "optional resource id",
       "modules": [
         "optional-typed-handle"
+      ]
+    },
+    {
+      "capability": "order bounded values without allocation and preserve insertion order for equal priorities.",
+      "modules": [
+        "fixed-capacity-priority-queue"
       ]
     },
     {
@@ -1085,6 +1188,18 @@
       ]
     },
     {
+      "capability": "priority",
+      "modules": [
+        "fixed-capacity-priority-queue"
+      ]
+    },
+    {
+      "capability": "produce a deterministic dependency order or report a cycle in a bounded graph.",
+      "modules": [
+        "fixed-capacity-topological-sort"
+      ]
+    },
+    {
       "capability": "protocol",
       "modules": [
         "semantic-version",
@@ -1106,6 +1221,7 @@
     {
       "capability": "queue",
       "modules": [
+        "fixed-capacity-priority-queue",
         "ring-buffer"
       ]
     },
@@ -1168,6 +1284,16 @@
       "capability": "registers",
       "modules": [
         "validated-bit-flags"
+      ]
+    },
+    {
+      "capability": "repeated bounded mechanism implementation",
+      "modules": [
+        "fixed-bump-allocator",
+        "fixed-capacity-priority-queue",
+        "fixed-capacity-topological-sort",
+        "fixed-free-list",
+        "intrusive-doubly-linked-list"
       ]
     },
     {
@@ -1303,6 +1429,12 @@
       ]
     },
     {
+      "capability": "sort",
+      "modules": [
+        "fixed-capacity-topological-sort"
+      ]
+    },
+    {
       "capability": "source",
       "modules": [
         "source-span"
@@ -1408,6 +1540,12 @@
       "capability": "token location",
       "modules": [
         "source-span"
+      ]
+    },
+    {
+      "capability": "topological",
+      "modules": [
+        "fixed-capacity-topological-sort"
       ]
     },
     {

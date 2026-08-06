@@ -147,11 +147,16 @@ The following section is derived from `generated/modules.json` and canonical mod
 | `physical-page-frame-allocator` | `zig build test-physical-page-frame-allocator` | `zig build smoke-physical-page-frame-allocator` | `projects/36-physical-page-frame-allocator/details.json` |
 | `elf64-file-header-parser` | `zig build test-elf64-file-header-parser` | `zig build smoke-elf64-file-header-parser` | `projects/37-elf64-file-header-parser/details.json` |
 | `elf64-program-header-parser` | `zig build test-elf64-program-header-parser` | `zig build smoke-elf64-program-header-parser` | `projects/38-elf64-program-header-parser/details.json` |
+| `intrusive-doubly-linked-list` | `zig build test-intrusive-doubly-linked-list` | `zig build smoke-intrusive-doubly-linked-list` | `projects/39-intrusive-doubly-linked-list/details.json` |
+| `fixed-free-list` | `zig build test-fixed-free-list` | `zig build smoke-fixed-free-list` | `projects/40-fixed-free-list/details.json` |
+| `fixed-bump-allocator` | `zig build test-fixed-bump-allocator` | `zig build smoke-fixed-bump-allocator` | `projects/41-fixed-bump-allocator/details.json` |
+| `fixed-capacity-priority-queue` | `zig build test-fixed-capacity-priority-queue` | `zig build smoke-fixed-capacity-priority-queue` | `projects/42-fixed-capacity-priority-queue/details.json` |
+| `fixed-capacity-topological-sort` | `zig build test-fixed-capacity-topological-sort` | `zig build smoke-fixed-capacity-topological-sort` | `projects/43-fixed-capacity-topological-sort/details.json` |
 <!-- END GENERATED MODULE COMMANDS -->
 
 ## Recipes and conformance
 
-List or inspect recipes with `find recipes -mindepth 1 -maxdepth 1 -type d -print | sort` and `python3 tools/query-reference.py recipe NAME`. The six initial recipes are `construct-bounded-state-machine`, `create-stale-safe-object-registry`, `normalize-checked-memory-range`, `parse-length-prefixed-record`, `validate-physical-page-frame`, and `write-and-read-explicit-endian-record`. `zig build recipes` is the aggregate command; each has a `zig build test-recipe-<name>` step defined from `recipe_specs` in `build.zig`. These compiler-driven steps remain pending in this review.
+List or inspect recipes with `find recipes -mindepth 1 -maxdepth 1 -type d -print | sort` and `python3 tools/query-reference.py recipe NAME`. The composition recipes include `plan-bounded-initialization`; the original six are `construct-bounded-state-machine`, `create-stale-safe-object-registry`, `normalize-checked-memory-range`, `parse-length-prefixed-record`, `validate-physical-page-frame`, and `write-and-read-explicit-endian-record`. `zig build recipes` is the aggregate command; each has a `zig build test-recipe-<name>` step defined from `recipe_specs` in `build.zig`. These compiler-driven steps remain pending in this review.
 
 Suites are `allocator`, `binary-writer`, `bounded-reader`, `fixed-capacity-container`, `growable-container`, `handle-registry`, `integer-codec`, and `range-value`. Inspect `conformance/<suite>/suite.json`; run configured adapters with `zig build conformance`. Presence of metadata is not conformance evidence, and no per-suite build steps currently exist. Use `python3 tools/query-reference.py unvalidated` to locate modules without unit evidence.
 

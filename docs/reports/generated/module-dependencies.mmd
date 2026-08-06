@@ -23,8 +23,12 @@ graph TD
   elf64_program_header_parser --> fixed_capacity_vector
   elf64_program_header_parser --> validated_bit_flags
   elf64_program_header_parser --> validated_enum_decoder
+  fixed_bump_allocator --> aligned_address_and_size_helpers
   fixed_capacity_object_pool --> bitmap_allocator
   fixed_capacity_object_pool --> generational_handles
+  fixed_capacity_priority_queue --> fixed_capacity_vector
+  fixed_capacity_topological_sort --> fixed_capacity_priority_queue
+  fixed_capacity_topological_sort --> fixed_capacity_vector
   length_prefixed_binary_field --> binary_cursor_checkpoint
   length_prefixed_binary_field --> bounded_binary_sub_reader
   length_prefixed_binary_field --> bounded_byte_reader

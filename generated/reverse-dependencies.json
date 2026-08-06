@@ -5,7 +5,8 @@
   "repository_index_version": "1.0.0",
   "reverse_dependencies": {
     "aligned-address-and-size-helpers": [
-      "elf64-program-header-parser"
+      "elf64-program-header-parser",
+      "fixed-bump-allocator"
     ],
     "binary-cursor-checkpoint": [
       "bounded-binary-sub-reader",
@@ -72,15 +73,24 @@
       "length-prefixed-binary-field",
       "type-length-value-decoder"
     ],
+    "fixed-bump-allocator": [],
     "fixed-capacity-object-pool": [],
+    "fixed-capacity-priority-queue": [
+      "fixed-capacity-topological-sort"
+    ],
+    "fixed-capacity-topological-sort": [],
     "fixed-capacity-vector": [
       "elf64-program-header-parser",
+      "fixed-capacity-priority-queue",
+      "fixed-capacity-topological-sort",
       "physical-memory-region-set"
     ],
+    "fixed-free-list": [],
     "fourcc-code": [],
     "generational-handles": [
       "fixed-capacity-object-pool"
     ],
+    "intrusive-doubly-linked-list": [],
     "length-prefixed-binary-field": [
       "type-length-value-decoder"
     ],

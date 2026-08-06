@@ -350,6 +350,51 @@
       "details": "projects/38-elf64-program-header-parser/details.json",
       "unit_test_step": "test-elf64-program-header-parser",
       "smoke_test_step": "smoke-elf64-program-header-parser"
+    },
+    {
+      "id": "39",
+      "canonical_name": "intrusive-doubly-linked-list",
+      "directory": "projects/39-intrusive-doubly-linked-list",
+      "public_entrypoint": "projects/39-intrusive-doubly-linked-list/src/intrusive_doubly_linked_list.zig",
+      "details": "projects/39-intrusive-doubly-linked-list/details.json",
+      "unit_test_step": "test-intrusive-doubly-linked-list",
+      "smoke_test_step": "smoke-intrusive-doubly-linked-list"
+    },
+    {
+      "id": "40",
+      "canonical_name": "fixed-free-list",
+      "directory": "projects/40-fixed-free-list",
+      "public_entrypoint": "projects/40-fixed-free-list/src/fixed_free_list.zig",
+      "details": "projects/40-fixed-free-list/details.json",
+      "unit_test_step": "test-fixed-free-list",
+      "smoke_test_step": "smoke-fixed-free-list"
+    },
+    {
+      "id": "41",
+      "canonical_name": "fixed-bump-allocator",
+      "directory": "projects/41-fixed-bump-allocator",
+      "public_entrypoint": "projects/41-fixed-bump-allocator/src/fixed_bump_allocator.zig",
+      "details": "projects/41-fixed-bump-allocator/details.json",
+      "unit_test_step": "test-fixed-bump-allocator",
+      "smoke_test_step": "smoke-fixed-bump-allocator"
+    },
+    {
+      "id": "42",
+      "canonical_name": "fixed-capacity-priority-queue",
+      "directory": "projects/42-fixed-capacity-priority-queue",
+      "public_entrypoint": "projects/42-fixed-capacity-priority-queue/src/fixed_capacity_priority_queue.zig",
+      "details": "projects/42-fixed-capacity-priority-queue/details.json",
+      "unit_test_step": "test-fixed-capacity-priority-queue",
+      "smoke_test_step": "smoke-fixed-capacity-priority-queue"
+    },
+    {
+      "id": "43",
+      "canonical_name": "fixed-capacity-topological-sort",
+      "directory": "projects/43-fixed-capacity-topological-sort",
+      "public_entrypoint": "projects/43-fixed-capacity-topological-sort/src/fixed_capacity_topological_sort.zig",
+      "details": "projects/43-fixed-capacity-topological-sort/details.json",
+      "unit_test_step": "test-fixed-capacity-topological-sort",
+      "smoke_test_step": "smoke-fixed-capacity-topological-sort"
     }
   ]
 }

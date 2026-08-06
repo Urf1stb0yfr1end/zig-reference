@@ -495,6 +495,68 @@
       "baselineValidated": false,
       "testedTargetVersions": [],
       "knownMigrationBlockers": []
+    },
+    {
+      "id": "39",
+      "canonicalName": "intrusive-doubly-linked-list",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/39-intrusive-doubly-linked-list/port.js",
+      "implementationPath": "projects/39-intrusive-doubly-linked-list/src/intrusive_doubly_linked_list.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "40",
+      "canonicalName": "fixed-free-list",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/40-fixed-free-list/port.js",
+      "implementationPath": "projects/40-fixed-free-list/src/fixed_free_list.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "41",
+      "canonicalName": "fixed-bump-allocator",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/41-fixed-bump-allocator/port.js",
+      "implementationPath": "projects/41-fixed-bump-allocator/src/fixed_bump_allocator.zig",
+      "dependenciesMustPortFirst": [
+        "aligned-address-and-size-helpers"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "42",
+      "canonicalName": "fixed-capacity-priority-queue",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/42-fixed-capacity-priority-queue/port.js",
+      "implementationPath": "projects/42-fixed-capacity-priority-queue/src/fixed_capacity_priority_queue.zig",
+      "dependenciesMustPortFirst": [
+        "fixed-capacity-vector"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "43",
+      "canonicalName": "fixed-capacity-topological-sort",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/43-fixed-capacity-topological-sort/port.js",
+      "implementationPath": "projects/43-fixed-capacity-topological-sort/src/fixed_capacity_topological_sort.zig",
+      "dependenciesMustPortFirst": [
+        "fixed-capacity-vector",
+        "fixed-capacity-priority-queue"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
     }
   ]
 }

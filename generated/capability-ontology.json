@@ -146,6 +146,61 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "allocate aligned slices monotonically from a caller-owned byte region.",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "allocate aligned slices monotonically from a caller-owned byte region."
+      ],
+      "description": "Repository capability represented by: allocate aligned slices monotonically from a caller-owned byte region..",
+      "implementing_modules": [
+        "fixed-bump-allocator"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "allocate and recycle bounded integer slots in deterministic constant time.",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "allocate and recycle bounded integer slots in deterministic constant time."
+      ],
+      "description": "Repository capability represented by: allocate and recycle bounded integer slots in deterministic constant time..",
+      "implementing_modules": [
+        "fixed-free-list"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "allocation-explicit",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "allocation-explicit"
+      ],
+      "description": "Repository capability represented by: allocation-explicit.",
+      "implementing_modules": [
+        "fixed-bump-allocator",
+        "fixed-capacity-priority-queue",
+        "fixed-capacity-topological-sort",
+        "fixed-free-list",
+        "intrusive-doubly-linked-list"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "allocation-free container",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -172,6 +227,7 @@
       "implementing_modules": [
         "bitmap-allocator",
         "dynamic-array",
+        "fixed-bump-allocator",
         "stack"
       ],
       "narrower_capabilities": [],
@@ -438,6 +494,27 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "bounded",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bounded"
+      ],
+      "description": "Repository capability represented by: bounded.",
+      "implementing_modules": [
+        "fixed-bump-allocator",
+        "fixed-capacity-priority-queue",
+        "fixed-capacity-topological-sort",
+        "fixed-free-list",
+        "intrusive-doubly-linked-list"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "bounded array",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -575,6 +652,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "bump",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bump"
+      ],
+      "description": "Repository capability represented by: bump.",
+      "implementing_modules": [
+        "fixed-bump-allocator"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "byte order",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -651,6 +745,24 @@
       "description": "Repository capability represented by: call stack.",
       "implementing_modules": [
         "stack"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "capacity",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "capacity"
+      ],
+      "description": "Repository capability represented by: capacity.",
+      "implementing_modules": [
+        "fixed-capacity-priority-queue",
+        "fixed-capacity-topological-sort"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -1085,6 +1197,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "doubly",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "doubly"
+      ],
+      "description": "Repository capability represented by: doubly.",
+      "implementing_modules": [
+        "intrusive-doubly-linked-list"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "dynamic array",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -1341,6 +1470,26 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "fixed",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "fixed"
+      ],
+      "description": "Repository capability represented by: fixed.",
+      "implementing_modules": [
+        "fixed-bump-allocator",
+        "fixed-capacity-priority-queue",
+        "fixed-capacity-topological-sort",
+        "fixed-free-list"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "fixed vector",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -1497,6 +1646,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "free",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "free"
+      ],
+      "description": "Repository capability represented by: free.",
+      "implementing_modules": [
+        "fixed-free-list"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "freestanding",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -1516,10 +1682,15 @@
         "elf64-file-header-parser",
         "elf64-program-header-parser",
         "endian-integer-codec",
+        "fixed-bump-allocator",
         "fixed-capacity-object-pool",
+        "fixed-capacity-priority-queue",
+        "fixed-capacity-topological-sort",
         "fixed-capacity-vector",
+        "fixed-free-list",
         "fourcc-code",
         "generational-handles",
+        "intrusive-doubly-linked-list",
         "length-prefixed-binary-field",
         "nonzero-integer",
         "optional-typed-handle",
@@ -1986,6 +2157,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "intrusive",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "intrusive"
+      ],
+      "description": "Repository capability represented by: intrusive.",
+      "implementing_modules": [
+        "intrusive-doubly-linked-list"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "lexer",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -2072,6 +2260,41 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "linked",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "linked"
+      ],
+      "description": "Repository capability represented by: linked.",
+      "implementing_modules": [
+        "intrusive-doubly-linked-list"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "list",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "list"
+      ],
+      "description": "Repository capability represented by: list.",
+      "implementing_modules": [
+        "fixed-free-list",
+        "intrusive-doubly-linked-list"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "little endian",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -2097,6 +2320,23 @@
       "description": "Repository capability represented by: magic code.",
       "implementing_modules": [
         "fourcc-code"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "maintain caller-owned nodes in an allocation-free doubly linked list.",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "maintain caller-owned nodes in an allocation-free doubly linked list."
+      ],
+      "description": "Repository capability represented by: maintain caller-owned nodes in an allocation-free doubly linked list..",
+      "implementing_modules": [
+        "intrusive-doubly-linked-list"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -2352,6 +2592,23 @@
       "description": "Repository capability represented by: optional resource id.",
       "implementing_modules": [
         "optional-typed-handle"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "order bounded values without allocation and preserve insertion order for equal priorities.",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "order bounded values without allocation and preserve insertion order for equal priorities."
+      ],
+      "description": "Repository capability represented by: order bounded values without allocation and preserve insertion order for equal priorities..",
+      "implementing_modules": [
+        "fixed-capacity-priority-queue"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -2792,6 +3049,40 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "priority",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "priority"
+      ],
+      "description": "Repository capability represented by: priority.",
+      "implementing_modules": [
+        "fixed-capacity-priority-queue"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "produce a deterministic dependency order or report a cycle in a bounded graph.",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "produce a deterministic dependency order or report a cycle in a bounded graph."
+      ],
+      "description": "Repository capability represented by: produce a deterministic dependency order or report a cycle in a bounded graph..",
+      "implementing_modules": [
+        "fixed-capacity-topological-sort"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "protocol",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -2851,6 +3142,7 @@
       ],
       "description": "Repository capability represented by: queue.",
       "implementing_modules": [
+        "fixed-capacity-priority-queue",
         "ring-buffer"
       ],
       "narrower_capabilities": [],
@@ -3023,6 +3315,27 @@
       "description": "Repository capability represented by: registers.",
       "implementing_modules": [
         "validated-bit-flags"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "repeated bounded mechanism implementation",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "repeated bounded mechanism implementation"
+      ],
+      "description": "Repository capability represented by: repeated bounded mechanism implementation.",
+      "implementing_modules": [
+        "fixed-bump-allocator",
+        "fixed-capacity-priority-queue",
+        "fixed-capacity-topological-sort",
+        "fixed-free-list",
+        "intrusive-doubly-linked-list"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -3406,6 +3719,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "sort",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "sort"
+      ],
+      "description": "Repository capability represented by: sort.",
+      "implementing_modules": [
+        "fixed-capacity-topological-sort"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "source",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -3703,6 +4033,23 @@
       "description": "Repository capability represented by: token location.",
       "implementing_modules": [
         "source-span"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "topological",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "topological"
+      ],
+      "description": "Repository capability represented by: topological.",
+      "implementing_modules": [
+        "fixed-capacity-topological-sort"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
