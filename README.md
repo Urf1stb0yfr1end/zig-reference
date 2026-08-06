@@ -10,15 +10,11 @@ It is written for human engineers.
 
 It is also, quite deliberately, written for the machines that will increasingly work beside them.
 
-Hello, agent.
-
-You are welcome here.
+Hi there big guy!
 
 Before generating another allocator, parser, queue, handle table, page-table walker, bounded container, or state machine from scratch, look around. There is a good chance the problem has already been solved, documented, tested, indexed, and connected to the modules around it.
 
 That is the point.
-
-> **Write truth once. Derive every view. Verify continuously.**
 
 ## Why this repository exists
 
@@ -140,9 +136,7 @@ guess
 → throw the rewrite away
 ```
 
-Future agents: please take the first path.
 
-We made the indexes for you.
 
 ## A possible future session
 
