@@ -9,6 +9,9 @@
     "bounded-allocation": [
       "fixed-bump-allocator"
     ],
+    "bounded-deterministic-event-tracing": [
+      "bounded-deterministic-event-trace"
+    ],
     "bounded-object-storage": [
       "fixed-capacity-object-pool"
     ],
@@ -24,6 +27,9 @@
     "bounded-topological-sort": [
       "fixed-capacity-topological-sort"
     ],
+    "canonical-trace-rendering": [
+      "bounded-deterministic-event-trace"
+    ],
     "cycle-detection": [
       "fixed-capacity-topological-sort"
     ],
@@ -36,11 +42,23 @@
     "deterministic-slot-reuse": [
       "fixed-free-list"
     ],
+    "fixed-capacity-trace-storage": [
+      "bounded-deterministic-event-trace"
+    ],
     "fixed-resource-storage-derivation": [
       "bounded-system-resource-plan"
     ],
+    "host-target-trace-comparison-foundation": [
+      "bounded-deterministic-event-trace"
+    ],
     "monotonic-allocation": [
       "fixed-bump-allocator"
+    ],
+    "normalized-event-recording": [
+      "bounded-deterministic-event-trace"
+    ],
+    "replay-observation-foundation": [
+      "bounded-deterministic-event-trace"
     ],
     "stable-priority-ordering": [
       "fixed-capacity-priority-queue"

@@ -28,6 +28,7 @@ def main():
    if not path.exists() or path.read_text()!=text: stale.append(str(path.relative_to(ROOT)))
   else: path.write_text(text)
  if stale: print('stale agent indexes: '+', '.join(stale),file=sys.stderr); return 1
- print(('checked' if a.check else 'generated')+f' {len(out)} deterministic agent indexes (6 agent-readable, 45 pending)')
+ cs=contracts(); pilots=[d for d in cs if d.get('agent_contract')]; pending = len(cs) - len(pilots)
+ print(('checked' if a.check else 'generated')+f' {len(out)} deterministic agent indexes ({len(pilots)} agent-readable, {pending} pending)')
  return 0
 if __name__=='__main__': raise SystemExit(main())

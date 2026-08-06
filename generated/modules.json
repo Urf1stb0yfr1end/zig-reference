@@ -920,6 +920,24 @@
       "status": "experimental-unverified",
       "summary": "Derive an exact bounded resource budget and deterministic initialization order.",
       "target_maturity_level": 2
+    },
+    {
+      "aliases": [],
+      "declared_maturity": "experimental",
+      "deprecated_names": [],
+      "details": "projects/51-bounded-deterministic-event-trace/details.json",
+      "directory": "projects/51-bounded-deterministic-event-trace",
+      "display_name": "Bounded Deterministic Event Trace",
+      "id": "51",
+      "implementation_version": "1.0.0",
+      "lifecycle": "experimental",
+      "name": "bounded-deterministic-event-trace",
+      "public_contract_version": "1.0.0",
+      "replacement_module": "",
+      "source": "projects/51-bounded-deterministic-event-trace/src/bounded_deterministic_event_trace.zig",
+      "status": "experimental-unverified",
+      "summary": "Store and canonically render bounded normalized deterministic events.",
+      "target_maturity_level": 2
     }
   ],
   "repository_index_version": "1.0.0"

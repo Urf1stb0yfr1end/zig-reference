@@ -33,6 +33,10 @@
       "symbol": "BoundedBinarySubReader"
     },
     {
+      "module": "bounded-deterministic-event-trace",
+      "symbol": "BoundedDeterministicEventTrace"
+    },
+    {
       "module": "bounded-integer",
       "symbol": "BoundedInteger"
     },
@@ -109,6 +113,10 @@
       "symbol": "Error"
     },
     {
+      "module": "bounded-deterministic-event-trace",
+      "symbol": "EventInput"
+    },
+    {
       "module": "fixed-bump-allocator",
       "symbol": "FixedBumpAllocator"
     },
@@ -179,6 +187,10 @@
     {
       "module": "nonzero-integer",
       "symbol": "NonZeroInteger"
+    },
+    {
+      "module": "bounded-deterministic-event-trace",
+      "symbol": "NormalizedEvent"
     },
     {
       "module": "fixed-capacity-object-pool",

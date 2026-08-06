@@ -53,6 +53,7 @@ const specs = [_]ModuleSpec{
     .{ .name = "riscv-sfence-vma-invalidation", .source = "projects/48-riscv-sfence-vma-invalidation/src/riscv_sfence_vma_invalidation.zig", .dependencies = &.{} },
     .{ .name = "riscv-sv39-page-table-builder", .source = "projects/49-riscv-sv39-page-table-builder/src/riscv_sv39_page_table_builder.zig", .dependencies = &.{ "riscv-sv39-page-table-entry", "riscv-sv39-virtual-address-indexing", "riscv-page-table-page-owner", "riscv-sv39-page-table-walker", "riscv-sfence-vma-invalidation" } },
     .{ .name = "bounded-system-resource-plan", .source = "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig", .dependencies = &.{ "bounded-integer", "checked-integer-cast", "aligned-address-and-size-helpers", "fixed-bump-allocator", "fixed-capacity-topological-sort" } },
+    .{ .name = "bounded-deterministic-event-trace", .source = "projects/51-bounded-deterministic-event-trace/src/bounded_deterministic_event_trace.zig", .dependencies = &.{} },
 };
 
 const RecipeSpec = struct { name: []const u8, dependencies: []const []const u8 };
@@ -83,6 +84,13 @@ const agent_fixture_specs = [_]AgentFixtureSpec{
     .{ .module = "bounded-system-resource-plan", .path = "projects/50-bounded-system-resource-plan/tests/agent/repair/invalid_alignment_repair.zig", .class = .repair },
     .{ .module = "bounded-system-resource-plan", .path = "projects/50-bounded-system-resource-plan/tests/agent/misuse/invalid_capacity.zig", .class = .runtime_negative_test },
     .{ .module = "bounded-system-resource-plan", .path = "projects/50-bounded-system-resource-plan/tests/agent/repair/invalid_capacity_repair.zig", .class = .repair },
+    .{ .module = "bounded-deterministic-event-trace", .path = "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/full.zig", .class = .runtime_negative_test },
+    .{ .module = "bounded-deterministic-event-trace", .path = "projects/51-bounded-deterministic-event-trace/tests/agent/repair/full_repair.zig", .class = .repair },
+    .{ .module = "bounded-deterministic-event-trace", .path = "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/output_too_small.zig", .class = .runtime_negative_test },
+    .{ .module = "bounded-deterministic-event-trace", .path = "projects/51-bounded-deterministic-event-trace/tests/agent/repair/output_too_small_repair.zig", .class = .repair },
+    .{ .module = "bounded-deterministic-event-trace", .path = "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/sequence_exhausted.zig", .class = .runtime_negative_test },
+    .{ .module = "bounded-deterministic-event-trace", .path = "projects/51-bounded-deterministic-event-trace/tests/agent/repair/sequence_exhausted_repair.zig", .class = .repair },
+    .{ .module = "bounded-deterministic-event-trace", .path = "projects/51-bounded-deterministic-event-trace/tests/agent/repair/invalid_capacity_repair.zig", .class = .repair },
 };
 const recipe_specs = [_]RecipeSpec{
     .{ .name = "parse-length-prefixed-record", .dependencies = &.{ "bounded-byte-reader", "length-prefixed-binary-field" } },
@@ -94,6 +102,7 @@ const recipe_specs = [_]RecipeSpec{
     .{ .name = "plan-bounded-initialization", .dependencies = &.{ "intrusive-doubly-linked-list", "fixed-free-list", "fixed-bump-allocator", "fixed-capacity-priority-queue", "fixed-capacity-topological-sort" } },
     .{ .name = "construct-and-verify-sv39-address-space", .dependencies = &.{ "riscv-sv39-page-table-entry", "riscv-sv39-virtual-address-indexing", "riscv-page-table-page-owner", "riscv-sv39-page-table-walker", "riscv-sfence-vma-invalidation", "riscv-sv39-page-table-builder" } },
     .{ .name = "plan-morphic-runtime", .dependencies = &.{"bounded-system-resource-plan"} },
+    .{ .name = "trace-morphic-example", .dependencies = &.{"bounded-deterministic-event-trace"} },
 };
 
 pub fn build(b: *std.Build) void {
@@ -212,6 +221,22 @@ pub fn build(b: *std.Build) void {
         const recipe_step = b.step(b.fmt("test-recipe-{s}", .{recipe.name}), b.fmt("Run {s} composition tests", .{recipe.name}));
         recipe_step.dependOn(&run_recipe.step);
         recipes_step.dependOn(&run_recipe.step);
+        if (std.mem.eql(u8, recipe.name, "trace-morphic-example")) {
+            const executable = b.addExecutable(.{ .name = "trace-morphic-example", .root_module = recipe_module });
+            const run_trace = b.addRunArtifact(executable);
+            const trace_step = b.step("trace-morphic-example", "Print the canonical deterministic Morphic event trace");
+            trace_step.dependOn(&run_trace.step);
+            const verify_step = b.step("verify-morphic-trace", "Verify the trace module, smoke test, recipe, and agent contracts");
+            verify_step.dependOn(&run_recipe.step);
+            verify_step.dependOn(agent_check_step);
+            const trace_module = findModule("bounded-deterministic-event-trace", &modules);
+            const trace_unit = b.addRunArtifact(b.addTest(.{ .root_module = trace_module }));
+            verify_step.dependOn(&trace_unit.step);
+            const smoke_module = b.createModule(.{ .root_source_file = b.path("projects/51-bounded-deterministic-event-trace/tests/smoke_test.zig"), .target = target, .optimize = optimize });
+            smoke_module.addImport("bounded-deterministic-event-trace", trace_module);
+            const trace_smoke = b.addRunArtifact(b.addTest(.{ .root_module = smoke_module }));
+            verify_step.dependOn(&trace_smoke.step);
+        }
         if (std.mem.eql(u8, recipe.name, "plan-morphic-runtime")) {
             const executable = b.addExecutable(.{ .name = "plan-morphic-runtime", .root_module = recipe_module });
             const run_plan = b.addRunArtifact(executable);

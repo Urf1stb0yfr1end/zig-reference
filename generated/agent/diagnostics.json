@@ -13,6 +13,46 @@
       "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
       "title": "Use after bump reset"
     },
+    "ZIGREF-EVENT-TRACE-FULL": {
+      "classification": "runtime_negative_test",
+      "details": "projects/51-bounded-deterministic-event-trace/details.json",
+      "evidence_status": "tested",
+      "fixture": "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/full.zig",
+      "module": "bounded-deterministic-event-trace",
+      "repair_example": "projects/51-bounded-deterministic-event-trace/tests/agent/repair/full_repair.zig",
+      "repair_strategy": "Choose valid bounds and handle the explicit failure before retrying.",
+      "title": "Trace Full"
+    },
+    "ZIGREF-EVENT-TRACE-INVALID-CAPACITY": {
+      "classification": "zig_compile_fail",
+      "details": "projects/51-bounded-deterministic-event-trace/details.json",
+      "evidence_status": "tested",
+      "fixture": "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/invalid_capacity.zig",
+      "module": "bounded-deterministic-event-trace",
+      "repair_example": "projects/51-bounded-deterministic-event-trace/tests/agent/repair/invalid_capacity_repair.zig",
+      "repair_strategy": "Choose valid bounds and handle the explicit failure before retrying.",
+      "title": "Invalid Capacity"
+    },
+    "ZIGREF-EVENT-TRACE-OUTPUT-TOO-SMALL": {
+      "classification": "runtime_negative_test",
+      "details": "projects/51-bounded-deterministic-event-trace/details.json",
+      "evidence_status": "tested",
+      "fixture": "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/output_too_small.zig",
+      "module": "bounded-deterministic-event-trace",
+      "repair_example": "projects/51-bounded-deterministic-event-trace/tests/agent/repair/output_too_small_repair.zig",
+      "repair_strategy": "Choose valid bounds and handle the explicit failure before retrying.",
+      "title": "Output Too Small"
+    },
+    "ZIGREF-EVENT-TRACE-SEQUENCE-EXHAUSTED": {
+      "classification": "documented_misuse_example",
+      "details": "projects/51-bounded-deterministic-event-trace/details.json",
+      "evidence_status": "unproven",
+      "fixture": "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/sequence_exhausted.zig",
+      "module": "bounded-deterministic-event-trace",
+      "repair_example": "projects/51-bounded-deterministic-event-trace/tests/agent/repair/sequence_exhausted_repair.zig",
+      "repair_strategy": "Choose valid bounds and handle the explicit failure before retrying.",
+      "title": "Sequence Exhausted"
+    },
     "ZIGREF-FREELIST-DOUBLE-RELEASE": {
       "classification": "runtime_negative_test",
       "details": "projects/40-fixed-free-list/details.json",

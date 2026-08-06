@@ -159,6 +159,7 @@ The following section is derived from `generated/modules.json` and canonical mod
 | `riscv-sfence-vma-invalidation` | `zig build test-riscv-sfence-vma-invalidation` | `zig build smoke-riscv-sfence-vma-invalidation` | `projects/48-riscv-sfence-vma-invalidation/details.json` |
 | `riscv-sv39-page-table-builder` | `zig build test-riscv-sv39-page-table-builder` | `zig build smoke-riscv-sv39-page-table-builder` | `projects/49-riscv-sv39-page-table-builder/details.json` |
 | `bounded-system-resource-plan` | `zig build test-bounded-system-resource-plan` | `zig build smoke-bounded-system-resource-plan` | `projects/50-bounded-system-resource-plan/details.json` |
+| `bounded-deterministic-event-trace` | `zig build test-bounded-deterministic-event-trace` | `zig build smoke-bounded-deterministic-event-trace` | `projects/51-bounded-deterministic-event-trace/details.json` |
 <!-- END GENERATED MODULE COMMANDS -->
 
 ## Recipes and conformance
@@ -218,3 +219,6 @@ Each module has `zig build test-<module>` and `zig build smoke-<module>` targets
 
 - `zig build plan-morphic-runtime` prints the canonical plan.
 - `zig build verify-morphic-plan` runs deterministic composition, negative, storage, and agent-contract checks.
+- `zig build trace-morphic-example` prints the canonical normalized Morphic event trace.
+- `zig build test-recipe-trace-morphic-example` tests the 4096-capacity composition.
+- `zig build verify-morphic-trace` runs module unit, external smoke, recipe, and agent checks.

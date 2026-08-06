@@ -56,6 +56,7 @@ Use this file for fast discovery. Open a module's `DETAILS.md` or `details.json`
 | `48-riscv-sfence-vma-invalidation` | SFENCE.VMA planning and privileged boundary | none | mapping mutators | [`DETAILS.md`](../../projects/48-riscv-sfence-vma-invalidation/DETAILS.md) | [`details.json`](../../projects/48-riscv-sfence-vma-invalidation/details.json) |
 | `49-riscv-sv39-page-table-builder` | Deterministic mapping, rollback, and unmapping | `44`–`48` | kernels and Hyper-Zig | [`DETAILS.md`](../../projects/49-riscv-sv39-page-table-builder/DETAILS.md) | [`details.json`](../../projects/49-riscv-sv39-page-table-builder/details.json) |
 | `50-bounded-system-resource-plan` | Exact deterministic fixed-resource budgeting and initialization order | `10`, `12`, `15`, `41`, `43` | Morphic runtime, embedded runtimes, kernels, simulators | [`DETAILS.md`](../../projects/50-bounded-system-resource-plan/DETAILS.md) | [`details.json`](../../projects/50-bounded-system-resource-plan/details.json) |
+| `51-bounded-deterministic-event-trace` | Bounded normalized deterministic event recording and canonical rendering | none | schedulers, runtimes, replay observation, host-target comparison | [`DETAILS.md`](../../projects/51-bounded-deterministic-event-trace/DETAILS.md) | [`details.json`](../../projects/51-bounded-deterministic-event-trace/details.json) |
 
 ## Selection workflow
 

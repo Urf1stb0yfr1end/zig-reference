@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0.0",
+  "module": "bounded-deterministic-event-trace",
+  "claims": [
+    {
+      "id": "EVENT-TRACE-CLAIM-01",
+      "claim_type": "invariant",
+      "description": "Successful appends are bounded, internally sequenced, and failure atomic.",
+      "evidence_class": "unit_test",
+      "evidence_references": [
+        "projects/51-bounded-deterministic-event-trace/src/bounded_deterministic_event_trace.zig"
+      ],
+      "status": "supported"
+    },
+    {
+      "id": "EVENT-TRACE-CLAIM-02",
+      "claim_type": "invariant",
+      "description": "Canonical text explicitly renders normalized fields and is repeatable.",
+      "evidence_class": "unit_test",
+      "evidence_references": [
+        "projects/51-bounded-deterministic-event-trace/src/bounded_deterministic_event_trace.zig",
+        "recipes/trace-morphic-example/src/recipe.zig"
+      ],
+      "status": "supported"
+    }
+  ]
+}

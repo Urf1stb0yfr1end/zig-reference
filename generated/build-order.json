@@ -5,6 +5,7 @@
     "aligned-address-and-size-helpers",
     "bit-set",
     "bounded-byte-reader",
+    "bounded-deterministic-event-trace",
     "bounded-integer",
     "checked-half-open-range",
     "checked-integer-cast",

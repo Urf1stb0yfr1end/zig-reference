@@ -15,6 +15,9 @@
     ],
     "plan-morphic-runtime": [
       "bounded-system-resource-plan"
+    ],
+    "trace-morphic-example": [
+      "bounded-deterministic-event-trace"
     ]
   }
 }

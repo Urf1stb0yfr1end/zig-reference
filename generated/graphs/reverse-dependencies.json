@@ -37,6 +37,7 @@
       "length-prefixed-binary-field",
       "type-length-value-decoder"
     ],
+    "bounded-deterministic-event-trace": [],
     "bounded-integer": [
       "bounded-system-resource-plan"
     ],

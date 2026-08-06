@@ -513,6 +513,16 @@
       "smoke_validated": true,
       "target_maturity_level": 2,
       "unit_validated": true
+    },
+    {
+      "conformance_validated": false,
+      "evidence_records": 1,
+      "lifecycle": "experimental",
+      "maturity_level": 4,
+      "module": "bounded-deterministic-event-trace",
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     }
   ]
 }

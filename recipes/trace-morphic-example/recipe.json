@@ -1,0 +1,17 @@
+{
+  "name": "trace-morphic-example",
+  "problem_solved": "compose normalized bounded tracing into a representative deterministic Morphic lifecycle",
+  "status": "implemented-unverified",
+  "selected_modules": ["bounded-deterministic-event-trace"],
+  "selection_reasons": ["The module owns sequence, storage, capacity failure, comparison, and canonical rendering."],
+  "direct_dependencies": ["bounded-deterministic-event-trace"],
+  "dependency_order": ["bounded-deterministic-event-trace"],
+  "public_endpoints_used": ["BoundedDeterministicEventTrace", "append", "events", "render"],
+  "adapters_required": ["recipes/trace-morphic-example/src/recipe.zig"],
+  "inherited_guarantees": ["Bounded allocation-free storage, deterministic sequence assignment, failure atomicity, semantic equality, canonical text."],
+  "gaps_discovered": ["A future multi-implementation trace-sink conformance suite is not yet justified."],
+  "future_systems_enabled": ["Morphic schedulers", "host-target trace equivalence", "replay observation"],
+  "intended_build_commands": ["zig build trace-morphic-example", "zig build test-recipe-trace-morphic-example", "zig build verify-morphic-trace"],
+  "intended_smoke_commands": [],
+  "validation_evidence_references": []
+}

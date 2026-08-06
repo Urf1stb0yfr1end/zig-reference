@@ -458,6 +458,15 @@
       "details": "projects/50-bounded-system-resource-plan/details.json",
       "unit_test_step": "test-bounded-system-resource-plan",
       "smoke_test_step": "smoke-bounded-system-resource-plan"
+    },
+    {
+      "id": "51",
+      "canonical_name": "bounded-deterministic-event-trace",
+      "directory": "projects/51-bounded-deterministic-event-trace",
+      "public_entrypoint": "projects/51-bounded-deterministic-event-trace/src/bounded_deterministic_event_trace.zig",
+      "details": "projects/51-bounded-deterministic-event-trace/details.json",
+      "unit_test_step": "test-bounded-deterministic-event-trace",
+      "smoke_test_step": "smoke-bounded-deterministic-event-trace"
     }
   ]
 }
