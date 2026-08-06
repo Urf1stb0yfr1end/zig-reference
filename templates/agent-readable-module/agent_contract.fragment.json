@@ -1,0 +1,25 @@
+{
+  "agent_contract": {
+    "schema_version": "1.0.0",
+    "summary": "One sentence describing the selection contract.",
+    "search_aliases": [],
+    "capability_ids": [],
+    "use_when": [],
+    "do_not_use_when": [],
+    "entrypoint": "projects/NN-module/src/module.zig",
+    "public_symbols": [],
+    "dependency_ids": [],
+    "ownership": { "storage": "inline", "values": "copied", "cleanup": "none" },
+    "borrowing": {},
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": ["no_hidden_allocation"],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [],
+    "proof_contract": null,
+    "diagnostics": []
+  }
+}

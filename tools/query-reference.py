@@ -2,6 +2,7 @@
 """Query committed deterministic repository indexes without rescanning modules."""
 import argparse
 import json
+import sys
 from repository import GENERATED, ROOT
 
 
@@ -9,7 +10,32 @@ def load(name):
     return json.loads((GENERATED / f"{name}.json").read_text())
 
 
+def agent_query(argv):
+    """Query the compact pilot projection without rescanning canonical contracts."""
+    if not argv or argv[0] not in ("capability", "module", "diagnostic", "symbol", "pending"):
+        raise SystemExit("usage: query-reference.py agent {capability|module|diagnostic|symbol|pending} [TERM]")
+    kind = argv[0]
+    term = argv[1] if len(argv) > 1 else ""
+    directory = GENERATED / "agent"
+    if kind == "pending":
+        result = [x["module"] for x in json.loads((directory / "modules.json").read_text())["modules"] if x["status"] == "pending-migration"]
+    elif kind == "module":
+        modules = json.loads((directory / "modules.json").read_text())["modules"]
+        lowered = term.lower()
+        result = [x for x in modules if x["module"] == lowered or lowered in [a.lower() for a in x.get("aliases", [])]]
+    else:
+        collection = {"capability": "capabilities", "diagnostic": "diagnostics", "symbol": "symbols"}[kind]
+        values = json.loads((directory / f"{collection}.json").read_text())[collection]
+        matches = [key for key in values if term.lower() in key.lower()]
+        result = [{"key": key, "value": values[key]} for key in sorted(matches)]
+    for item in result:
+        print(item if isinstance(item, str) else json.dumps(item, sort_keys=True, separators=(",", ":")))
+
+
 def main():
+    if len(sys.argv) > 1 and sys.argv[1] == "agent":
+        agent_query(sys.argv[2:])
+        return
     parser = argparse.ArgumentParser()
     parser.add_argument("kind", choices=["module", "capability", "symbol", "endpoint", "error", "dependencies", "dependents", "build-order", "port-order", "status", "unvalidated", "maturity", "lifecycle", "deprecated", "replacement", "paths", "recipe"])
     parser.add_argument("term", nargs="?")

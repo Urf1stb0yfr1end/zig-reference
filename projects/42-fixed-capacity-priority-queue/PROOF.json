@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0.0",
+  "module": "fixed-capacity-priority-queue",
+  "claims": [
+    {
+      "id": "FIXED-CAPACITY-PRIORITY-QUEUE-CLAIM-01",
+      "claim_type": "precondition",
+      "description": "Insert only when count is below compile-time capacity.",
+      "evidence_class": "runtime_negative_test",
+      "evidence_references": [
+        "projects/42-fixed-capacity-priority-queue/tests/agent/fail/pqueue_capacity.zig",
+        "projects/42-fixed-capacity-priority-queue/src/fixed_capacity_priority_queue.zig"
+      ],
+      "status": "supported"
+    }
+  ]
+}

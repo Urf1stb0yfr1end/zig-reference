@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/module-proof.schema.json",
+  "title": "zig-reference optional module evidence-claim contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "module",
+    "claims"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "module": {
+      "type": "string",
+      "minLength": 1
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "claim_type",
+          "description",
+          "evidence_class",
+          "evidence_references",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z0-9-]+$"
+          },
+          "claim_type": {
+            "enum": [
+              "invariant",
+              "precondition",
+              "postcondition",
+              "ownership_rule",
+              "borrow_rule",
+              "invalidation_event",
+              "failure_atomicity",
+              "state_transition",
+              "effect_restriction",
+              "unsafe_boundary",
+              "external_assumption"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_class": {
+            "enum": [
+              "compile_time",
+              "unit_test",
+              "smoke_test",
+              "property_test",
+              "compile_fail_fixture",
+              "runtime_negative_test",
+              "recipe_test",
+              "static_contract",
+              "external_assumption",
+              "unproven"
+            ]
+          },
+          "evidence_references": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "enum": [
+              "supported",
+              "assumed",
+              "unproven"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

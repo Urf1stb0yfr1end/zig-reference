@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0.0",
+  "module": "fixed-capacity-object-pool",
+  "expectations": [
+    {
+      "fixture": "projects/34-fixed-capacity-object-pool/tests/agent/fail/pool_stale_handle.zig",
+      "diagnostic_id": "ZIGREF-POOL-STALE-HANDLE",
+      "classification": "future_analyzer_expectation",
+      "zig_rejects": false,
+      "repair_example": "projects/34-fixed-capacity-object-pool/tests/agent/pass/pool_stale_handle_repair.zig"
+    },
+    {
+      "fixture": "projects/34-fixed-capacity-object-pool/tests/agent/fail/pool_double_release.zig",
+      "diagnostic_id": "ZIGREF-POOL-DOUBLE-RELEASE",
+      "classification": "runtime_negative_test",
+      "zig_rejects": false,
+      "repair_example": "projects/34-fixed-capacity-object-pool/tests/agent/pass/pool_double_release_repair.zig"
+    }
+  ]
+}

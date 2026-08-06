@@ -633,23 +633,51 @@
           "type": "string"
         },
         "lifecycle": {
-          "enum": ["proposed", "experimental", "active", "stable", "deprecated", "superseded", "archived"]
+          "enum": [
+            "proposed",
+            "experimental",
+            "active",
+            "stable",
+            "deprecated",
+            "superseded",
+            "archived"
+          ]
         },
         "target_maturity_level": {
           "type": "integer",
           "minimum": 0,
           "maximum": 9
         },
-        "implementation_version": { "type": "string" },
-        "public_contract_version": { "type": "string" },
-        "introduced_version": { "type": "string" },
-        "deprecated_version": { "type": "string" },
-        "superseded_version": { "type": "string" },
-        "removed_version": { "type": "string" },
-        "replacement_module": { "type": "string" },
-        "migration_guide": { "type": "string" },
-        "support_policy": { "type": "string" },
-        "deprecation_reason": { "type": "string" },
+        "implementation_version": {
+          "type": "string"
+        },
+        "public_contract_version": {
+          "type": "string"
+        },
+        "introduced_version": {
+          "type": "string"
+        },
+        "deprecated_version": {
+          "type": "string"
+        },
+        "superseded_version": {
+          "type": "string"
+        },
+        "removed_version": {
+          "type": "string"
+        },
+        "replacement_module": {
+          "type": "string"
+        },
+        "migration_guide": {
+          "type": "string"
+        },
+        "support_policy": {
+          "type": "string"
+        },
+        "deprecation_reason": {
+          "type": "string"
+        },
         "category": {
           "type": "string"
         },
@@ -4037,6 +4065,270 @@
           "type": "array",
           "items": {
             "type": "string"
+          }
+        }
+      }
+    },
+    "agent_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "summary",
+        "search_aliases",
+        "capability_ids",
+        "use_when",
+        "do_not_use_when",
+        "entrypoint",
+        "public_symbols",
+        "dependency_ids",
+        "ownership",
+        "borrowing",
+        "invalidation",
+        "failure_guarantees",
+        "effects",
+        "thread_safety",
+        "unsafe_boundaries",
+        "examples",
+        "recipes",
+        "validation_commands",
+        "proof_contract",
+        "diagnostics"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "search_aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "capability_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "uniqueItems": true
+        },
+        "use_when": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "do_not_use_when": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "entrypoint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "public_symbols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "dependency_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "ownership": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "storage",
+            "values",
+            "cleanup"
+          ],
+          "properties": {
+            "storage": {
+              "enum": [
+                "inline",
+                "caller_owned",
+                "mixed"
+              ]
+            },
+            "values": {
+              "enum": [
+                "copied",
+                "borrowed",
+                "mixed"
+              ]
+            },
+            "cleanup": {
+              "enum": [
+                "none",
+                "caller"
+              ]
+            }
+          }
+        },
+        "borrowing": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "invalidation": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "failure_guarantees": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "mutates_receiver",
+              "reads_receiver",
+              "borrows_caller_memory",
+              "returns_borrow",
+              "no_hidden_allocation",
+              "deterministic_order"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "thread_safety": {
+          "enum": [
+            "not_synchronized",
+            "immutable_reads_only"
+          ]
+        },
+        "unsafe_boundaries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recipes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "validation_commands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "proof_contract": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "(^|/)PROOF\\.json$"
+            }
+          ]
+        },
+        "diagnostics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title",
+              "violated_rule",
+              "evidence_status",
+              "fixture",
+              "fixture_classification",
+              "zig_rejects",
+              "repair_example",
+              "repair_strategy",
+              "related_module",
+              "related_recipe"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^ZIGREF-[A-Z0-9-]+$"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "violated_rule": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidence_status": {
+                "enum": [
+                  "tested",
+                  "static_contract",
+                  "future_analyzer_expectation",
+                  "unproven"
+                ]
+              },
+              "fixture": {
+                "type": "string",
+                "minLength": 1
+              },
+              "fixture_classification": {
+                "enum": [
+                  "zig_compile_fail",
+                  "runtime_negative_test",
+                  "future_analyzer_expectation",
+                  "documented_misuse_example"
+                ]
+              },
+              "zig_rejects": {
+                "type": "boolean"
+              },
+              "repair_example": {
+                "type": "string",
+                "minLength": 1
+              },
+              "repair_strategy": {
+                "type": "string",
+                "minLength": 1
+              },
+              "related_module": {
+                "type": "string"
+              },
+              "related_recipe": {
+                "type": "string"
+              }
+            }
           }
         }
       }

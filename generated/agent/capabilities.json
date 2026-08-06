@@ -1,0 +1,44 @@
+{
+  "_generated": true,
+  "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY",
+  "agent_index_version": "1.0.0",
+  "capabilities": {
+    "aligned-allocation": [
+      "fixed-bump-allocator"
+    ],
+    "bounded-allocation": [
+      "fixed-bump-allocator"
+    ],
+    "bounded-object-storage": [
+      "fixed-capacity-object-pool"
+    ],
+    "bounded-priority-ordering": [
+      "fixed-capacity-priority-queue"
+    ],
+    "bounded-slot-allocation": [
+      "fixed-free-list"
+    ],
+    "bounded-topological-sort": [
+      "fixed-capacity-topological-sort"
+    ],
+    "cycle-detection": [
+      "fixed-capacity-topological-sort"
+    ],
+    "deterministic-graph-ordering": [
+      "fixed-capacity-topological-sort"
+    ],
+    "deterministic-slot-reuse": [
+      "fixed-free-list"
+    ],
+    "monotonic-allocation": [
+      "fixed-bump-allocator"
+    ],
+    "stable-priority-ordering": [
+      "fixed-capacity-priority-queue"
+    ],
+    "stale-handle-rejection": [
+      "fixed-capacity-object-pool"
+    ]
+  },
+  "generator": "tools/build-agent-index.py"
+}

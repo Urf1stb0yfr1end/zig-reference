@@ -199,3 +199,16 @@ Database generators, SQLite generation, binary indexes, rendered graph generatio
 
 ## RISC-V Sv39 foundation commands
 Each module has `zig build test-<module>` and `zig build smoke-<module>` targets for `riscv-sv39-page-table-entry`, `riscv-sv39-virtual-address-indexing`, `riscv-page-table-page-owner`, `riscv-sv39-page-table-walker`, `riscv-sfence-vma-invalidation`, and `riscv-sv39-page-table-builder`. Run the composition independently with `zig build test-recipe-construct-and-verify-sv39-address-space`.
+
+## Agent-readable pilot commands
+
+| Command | Purpose |
+|---|---|
+| `PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py [--check]` | Generate or check the compact deterministic agent projection. |
+| `PYTHONDONTWRITEBYTECODE=1 python3 tools/validate-agent-contracts.py [--self-test]` | Validate pilot contracts/proof evidence or run negative validator tests. |
+| `zig build validate-agent-contracts` | Run the agent contract validator and generated-index drift check. |
+| `python3 tools/query-reference.py agent capability TERM` | Discover pilot modules by controlled capability ID. |
+| `python3 tools/query-reference.py agent module NAME` | Inspect a compact pilot module projection. |
+| `python3 tools/query-reference.py agent diagnostic ID` | Locate misuse evidence and its repair. |
+| `python3 tools/query-reference.py agent symbol SYMBOL` | Discover a pilot module by public symbol. |
+| `python3 tools/query-reference.py agent pending` | List the 45 modules awaiting migration without calling them invalid. |
