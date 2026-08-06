@@ -48,6 +48,14 @@ digraph modules {
   "physical-page-frame-allocator" -> "physical-memory-region-set";
   "physical-page-frame-allocator" -> "physical-page-frame-number-and-address-conversion";
   "physical-page-frame-number-and-address-conversion" -> "distinct-memory-address-types";
+  "riscv-sv39-page-table-builder" -> "riscv-page-table-page-owner";
+  "riscv-sv39-page-table-builder" -> "riscv-sfence-vma-invalidation";
+  "riscv-sv39-page-table-builder" -> "riscv-sv39-page-table-entry";
+  "riscv-sv39-page-table-builder" -> "riscv-sv39-page-table-walker";
+  "riscv-sv39-page-table-builder" -> "riscv-sv39-virtual-address-indexing";
+  "riscv-sv39-page-table-walker" -> "riscv-page-table-page-owner";
+  "riscv-sv39-page-table-walker" -> "riscv-sv39-page-table-entry";
+  "riscv-sv39-page-table-walker" -> "riscv-sv39-virtual-address-indexing";
   "stack" -> "dynamic-array";
   "type-length-value-decoder" -> "binary-cursor-checkpoint";
   "type-length-value-decoder" -> "bounded-binary-sub-reader";

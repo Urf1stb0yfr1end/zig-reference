@@ -893,3 +893,11 @@ A box may be checked only when the module has:
 - honest compiler-validation status;
 
 The final item ends with verified tests, not merely an existing source file.
+
+## RISC-V Sv39 foundation batch
+- [x] riscv-sv39-page-table-entry
+- [x] riscv-sv39-virtual-address-indexing
+- [x] riscv-page-table-page-owner
+- [x] riscv-sv39-page-table-walker
+- [x] riscv-sfence-vma-invalidation
+- [x] riscv-sv39-page-table-builder

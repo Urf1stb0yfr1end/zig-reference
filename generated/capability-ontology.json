@@ -218,6 +218,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "allocation-free read-only sv39 translation through an injected provider",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "allocation-free read-only sv39 translation through an injected provider"
+      ],
+      "description": "Repository capability represented by: allocation-free read-only sv39 translation through an injected provider.",
+      "implementing_modules": [
+        "riscv-sv39-page-table-walker"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "allocator",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -566,6 +583,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "bounded explicit ownership and injected access to zeroed page-table pages",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bounded explicit ownership and injected access to zeroed page-table pages"
+      ],
+      "description": "Repository capability represented by: bounded explicit ownership and injected access to zeroed page-table pages.",
+      "implementing_modules": [
+        "riscv-page-table-page-owner"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "bounded input",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -814,6 +848,23 @@
       "description": "Repository capability represented by: checked address arithmetic.",
       "implementing_modules": [
         "distinct-memory-address-types"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "checked canonical sv39 virtual-address decomposition, reconstruction, alignment, and ranges",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "checked canonical sv39 virtual-address decomposition, reconstruction, alignment, and ranges"
+      ],
+      "description": "Repository capability represented by: checked canonical sv39 virtual-address decomposition, reconstruction, alignment, and ranges.",
+      "implementing_modules": [
+        "riscv-sv39-virtual-address-indexing"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -1137,6 +1188,23 @@
       "description": "Repository capability represented by: decoder.",
       "implementing_modules": [
         "validated-enum-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "deterministic sv39 mapping, walking, protection, unmapping, and rollback",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "deterministic sv39 mapping, walking, protection, unmapping, and rollback"
+      ],
+      "description": "Repository capability represented by: deterministic sv39 mapping, walking, protection, unmapping, and rollback.",
+      "implementing_modules": [
+        "riscv-sv39-page-table-builder"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -2363,6 +2431,28 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "makes architectural validation, ownership, and failure semantics explicit",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "makes architectural validation, ownership, and failure semantics explicit"
+      ],
+      "description": "Repository capability represented by: makes architectural validation, ownership, and failure semantics explicit.",
+      "implementing_modules": [
+        "riscv-page-table-page-owner",
+        "riscv-sfence-vma-invalidation",
+        "riscv-sv39-page-table-builder",
+        "riscv-sv39-page-table-entry",
+        "riscv-sv39-page-table-walker",
+        "riscv-sv39-virtual-address-indexing"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "mask",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -2799,6 +2889,28 @@
         "physical-page-frame-allocator",
         "physical-page-frame-number-and-address-conversion",
         "type-length-value-decoder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "page table",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "page table"
+      ],
+      "description": "Repository capability represented by: page table.",
+      "implementing_modules": [
+        "riscv-page-table-page-owner",
+        "riscv-sfence-vma-invalidation",
+        "riscv-sv39-page-table-builder",
+        "riscv-sv39-page-table-entry",
+        "riscv-sv39-page-table-walker",
+        "riscv-sv39-virtual-address-indexing"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -3413,6 +3525,130 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "risc-v",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "risc-v"
+      ],
+      "description": "Repository capability represented by: risc-v.",
+      "implementing_modules": [
+        "riscv-page-table-page-owner",
+        "riscv-sfence-vma-invalidation",
+        "riscv-sv39-page-table-builder",
+        "riscv-sv39-page-table-entry",
+        "riscv-sv39-page-table-walker",
+        "riscv-sv39-virtual-address-indexing"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "riscv page table page owner",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "riscv page table page owner"
+      ],
+      "description": "Repository capability represented by: riscv page table page owner.",
+      "implementing_modules": [
+        "riscv-page-table-page-owner"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "riscv sfence vma invalidation",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "riscv sfence vma invalidation"
+      ],
+      "description": "Repository capability represented by: riscv sfence vma invalidation.",
+      "implementing_modules": [
+        "riscv-sfence-vma-invalidation"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "riscv sv39 page table builder",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "riscv sv39 page table builder"
+      ],
+      "description": "Repository capability represented by: riscv sv39 page table builder.",
+      "implementing_modules": [
+        "riscv-sv39-page-table-builder"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "riscv sv39 page table entry",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "riscv sv39 page table entry"
+      ],
+      "description": "Repository capability represented by: riscv sv39 page table entry.",
+      "implementing_modules": [
+        "riscv-sv39-page-table-entry"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "riscv sv39 page table walker",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "riscv sv39 page table walker"
+      ],
+      "description": "Repository capability represented by: riscv sv39 page table walker.",
+      "implementing_modules": [
+        "riscv-sv39-page-table-walker"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "riscv sv39 virtual address indexing",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "riscv sv39 virtual address indexing"
+      ],
+      "description": "Repository capability represented by: riscv sv39 virtual address indexing.",
+      "implementing_modules": [
+        "riscv-sv39-virtual-address-indexing"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "rollover",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -3974,6 +4210,28 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "sv39",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "sv39"
+      ],
+      "description": "Repository capability represented by: sv39.",
+      "implementing_modules": [
+        "riscv-page-table-page-owner",
+        "riscv-sfence-vma-invalidation",
+        "riscv-sv39-page-table-builder",
+        "riscv-sv39-page-table-entry",
+        "riscv-sv39-page-table-walker",
+        "riscv-sv39-virtual-address-indexing"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "tagged result",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -4016,6 +4274,23 @@
       "description": "Repository capability represented by: tagged-union.",
       "implementing_modules": [
         "tagged-result"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "testable sfence.vma command planning with an explicit privileged execution boundary",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "testable sfence.vma command planning with an explicit privileged execution boundary"
+      ],
+      "description": "Repository capability represented by: testable sfence.vma command planning with an explicit privileged execution boundary.",
+      "implementing_modules": [
+        "riscv-sfence-vma-invalidation"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -4170,6 +4445,23 @@
       "description": "Repository capability represented by: typed physical address.",
       "implementing_modules": [
         "distinct-memory-address-types"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "typed validation and encoding of sv39 page-table entries",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "typed validation and encoding of sv39 page-table entries"
+      ],
+      "description": "Repository capability represented by: typed validation and encoding of sv39 page-table entries.",
+      "implementing_modules": [
+        "riscv-sv39-page-table-entry"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],

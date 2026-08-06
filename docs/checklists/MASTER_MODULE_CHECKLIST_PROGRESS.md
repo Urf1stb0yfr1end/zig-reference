@@ -74,3 +74,6 @@ The page-frame conversion module imports `PhysicalAddress` from `18-distinct-mem
 ## Synchronization note
 
 The main checklist remains the complete 757-capability planning ledger. This overlay should be updated with each implementation batch until the planned `module-contract-consistency-checker`, `details-json-schema-validator`, and `repository-dependency-graph-generator` can generate status directly from `details.json`.
+
+## RISC-V Sv39 foundation
+Modules 44–49 implement the host-style Sv39 entry, indexing, ownership/provider, walker, invalidation-plan, and failure-atomic builder layers. Evidence state is generated from executed Zig 0.14.0 commands.

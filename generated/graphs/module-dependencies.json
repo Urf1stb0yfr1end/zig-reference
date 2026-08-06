@@ -195,6 +195,38 @@
       "module": "physical-page-frame-number-and-address-conversion"
     },
     {
+      "dependency": "riscv-page-table-page-owner",
+      "module": "riscv-sv39-page-table-builder"
+    },
+    {
+      "dependency": "riscv-sfence-vma-invalidation",
+      "module": "riscv-sv39-page-table-builder"
+    },
+    {
+      "dependency": "riscv-sv39-page-table-entry",
+      "module": "riscv-sv39-page-table-builder"
+    },
+    {
+      "dependency": "riscv-sv39-page-table-walker",
+      "module": "riscv-sv39-page-table-builder"
+    },
+    {
+      "dependency": "riscv-sv39-virtual-address-indexing",
+      "module": "riscv-sv39-page-table-builder"
+    },
+    {
+      "dependency": "riscv-page-table-page-owner",
+      "module": "riscv-sv39-page-table-walker"
+    },
+    {
+      "dependency": "riscv-sv39-page-table-entry",
+      "module": "riscv-sv39-page-table-walker"
+    },
+    {
+      "dependency": "riscv-sv39-virtual-address-indexing",
+      "module": "riscv-sv39-page-table-walker"
+    },
+    {
       "dependency": "dynamic-array",
       "module": "stack"
     },

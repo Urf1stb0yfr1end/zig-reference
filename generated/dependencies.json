@@ -97,6 +97,22 @@
       "distinct-memory-address-types"
     ],
     "ring-buffer": [],
+    "riscv-page-table-page-owner": [],
+    "riscv-sfence-vma-invalidation": [],
+    "riscv-sv39-page-table-builder": [
+      "riscv-page-table-page-owner",
+      "riscv-sfence-vma-invalidation",
+      "riscv-sv39-page-table-entry",
+      "riscv-sv39-page-table-walker",
+      "riscv-sv39-virtual-address-indexing"
+    ],
+    "riscv-sv39-page-table-entry": [],
+    "riscv-sv39-page-table-walker": [
+      "riscv-page-table-page-owner",
+      "riscv-sv39-page-table-entry",
+      "riscv-sv39-virtual-address-indexing"
+    ],
+    "riscv-sv39-virtual-address-indexing": [],
     "saturating-counter": [],
     "semantic-version": [],
     "source-span": [],

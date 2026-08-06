@@ -46,6 +46,12 @@ const specs = [_]ModuleSpec{
     .{ .name = "fixed-bump-allocator", .source = "projects/41-fixed-bump-allocator/src/fixed_bump_allocator.zig", .dependencies = &.{"aligned-address-and-size-helpers"} },
     .{ .name = "fixed-capacity-priority-queue", .source = "projects/42-fixed-capacity-priority-queue/src/fixed_capacity_priority_queue.zig", .dependencies = &.{"fixed-capacity-vector"} },
     .{ .name = "fixed-capacity-topological-sort", .source = "projects/43-fixed-capacity-topological-sort/src/fixed_capacity_topological_sort.zig", .dependencies = &.{ "fixed-capacity-vector", "fixed-capacity-priority-queue" } },
+    .{ .name = "riscv-sv39-page-table-entry", .source = "projects/44-riscv-sv39-page-table-entry/src/riscv_sv39_page_table_entry.zig", .dependencies = &.{} },
+    .{ .name = "riscv-sv39-virtual-address-indexing", .source = "projects/45-riscv-sv39-virtual-address-indexing/src/riscv_sv39_virtual_address_indexing.zig", .dependencies = &.{} },
+    .{ .name = "riscv-page-table-page-owner", .source = "projects/46-riscv-page-table-page-owner/src/riscv_page_table_page_owner.zig", .dependencies = &.{} },
+    .{ .name = "riscv-sv39-page-table-walker", .source = "projects/47-riscv-sv39-page-table-walker/src/riscv_sv39_page_table_walker.zig", .dependencies = &.{ "riscv-sv39-page-table-entry", "riscv-sv39-virtual-address-indexing", "riscv-page-table-page-owner" } },
+    .{ .name = "riscv-sfence-vma-invalidation", .source = "projects/48-riscv-sfence-vma-invalidation/src/riscv_sfence_vma_invalidation.zig", .dependencies = &.{} },
+    .{ .name = "riscv-sv39-page-table-builder", .source = "projects/49-riscv-sv39-page-table-builder/src/riscv_sv39_page_table_builder.zig", .dependencies = &.{ "riscv-sv39-page-table-entry", "riscv-sv39-virtual-address-indexing", "riscv-page-table-page-owner", "riscv-sv39-page-table-walker", "riscv-sfence-vma-invalidation" } },
 };
 
 const RecipeSpec = struct { name: []const u8, dependencies: []const []const u8 };
@@ -57,6 +63,7 @@ const recipe_specs = [_]RecipeSpec{
     .{ .name = "construct-bounded-state-machine", .dependencies = &.{ "state-machine", "bounded-integer" } },
     .{ .name = "normalize-checked-memory-range", .dependencies = &.{ "checked-half-open-range", "aligned-address-and-size-helpers" } },
     .{ .name = "plan-bounded-initialization", .dependencies = &.{ "intrusive-doubly-linked-list", "fixed-free-list", "fixed-bump-allocator", "fixed-capacity-priority-queue", "fixed-capacity-topological-sort" } },
+    .{ .name = "construct-and-verify-sv39-address-space", .dependencies = &.{ "riscv-sv39-page-table-entry", "riscv-sv39-virtual-address-indexing", "riscv-page-table-page-owner", "riscv-sv39-page-table-walker", "riscv-sfence-vma-invalidation", "riscv-sv39-page-table-builder" } },
 };
 
 pub fn build(b: *std.Build) void {

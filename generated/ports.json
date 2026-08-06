@@ -1000,6 +1000,209 @@
         ],
         "zigVersion": "0.14.0"
       },
+      "module": "riscv-page-table-page-owner",
+      "path": "projects/46-riscv-page-table-page-owner/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "Error",
+            "PageOwner",
+            "entries_per_page"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-riscv-page-table-page-owner",
+            "zig build smoke-riscv-page-table-page-owner"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented riscv-page-table-page-owner public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
+      "module": "riscv-sfence-vma-invalidation",
+      "path": "projects/48-riscv-sfence-vma-invalidation/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "Plan",
+            "executeUnsafe",
+            "forAddress",
+            "forAddressAsid",
+            "forAsid",
+            "global"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-riscv-sfence-vma-invalidation",
+            "zig build smoke-riscv-sfence-vma-invalidation"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented riscv-sfence-vma-invalidation public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
+      "module": "riscv-sv39-page-table-builder",
+      "path": "projects/49-riscv-sv39-page-table-builder/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "Builder",
+            "Error",
+            "Mutation"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-riscv-sv39-page-table-builder",
+            "zig build smoke-riscv-sv39-page-table-builder"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented riscv-sv39-page-table-builder public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
+      "module": "riscv-sv39-page-table-entry",
+      "path": "projects/44-riscv-sv39-page-table-entry/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "DecodeError",
+            "Entry",
+            "Kind",
+            "Level",
+            "Permissions"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-riscv-sv39-page-table-entry",
+            "zig build smoke-riscv-sv39-page-table-entry"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented riscv-sv39-page-table-entry public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
+      "module": "riscv-sv39-page-table-walker",
+      "path": "projects/47-riscv-sv39-page-table-walker/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "Error",
+            "Result",
+            "walk"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-riscv-sv39-page-table-walker",
+            "zig build smoke-riscv-sv39-page-table-walker"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented riscv-sv39-page-table-walker public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
+      "module": "riscv-sv39-virtual-address-indexing",
+      "path": "projects/45-riscv-sv39-virtual-address-indexing/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "Error",
+            "Level",
+            "Parts",
+            "construct",
+            "decompose",
+            "isCanonical",
+            "pageSize",
+            "requireAligned",
+            "validateRange"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-riscv-sv39-virtual-address-indexing",
+            "zig build smoke-riscv-sv39-virtual-address-indexing"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented riscv-sv39-virtual-address-indexing public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
       "module": "saturating-counter",
       "path": "projects/13-saturating-counter/port.js",
       "risks": [

@@ -39,6 +39,12 @@
       "signature": "BoundedReader"
     },
     {
+      "kind": "function",
+      "module": "riscv-sv39-page-table-builder",
+      "name": "Builder",
+      "signature": "Builder()"
+    },
+    {
       "kind": "type_or_constant",
       "module": "byte-writer",
       "name": "ByteWriter",
@@ -145,6 +151,12 @@
       "module": "optional-typed-handle",
       "name": "OptionalTypedHandle",
       "signature": "OptionalTypedHandle(comptime Tag: type, comptime Integer: type) type"
+    },
+    {
+      "kind": "function",
+      "module": "riscv-page-table-page-owner",
+      "name": "PageOwner",
+      "signature": "PageOwner()"
     },
     {
       "kind": "type_or_constant",
@@ -279,6 +291,12 @@
       "signature": "addEdge()"
     },
     {
+      "kind": "function",
+      "module": "riscv-sv39-page-table-entry",
+      "name": "address",
+      "signature": "address()"
+    },
+    {
       "kind": "method",
       "module": "wrapping-sequence-number",
       "name": "advance",
@@ -327,6 +345,12 @@
       "signature": "allocate(self:*@This()"
     },
     {
+      "kind": "function",
+      "module": "riscv-page-table-page-owner",
+      "name": "allocate",
+      "signature": "allocate()"
+    },
+    {
       "kind": "method",
       "module": "bitmap-allocator",
       "name": "allocatedCount",
@@ -373,6 +397,12 @@
       "module": "fourcc-code",
       "name": "asBytes",
       "signature": "asBytes(self: FourCC) [4]u8"
+    },
+    {
+      "kind": "function",
+      "module": "riscv-sv39-page-table-entry",
+      "name": "branch",
+      "signature": "branch()"
     },
     {
       "kind": "method",
@@ -531,6 +561,12 @@
       "signature": "constItems(self: *const Self) []const T"
     },
     {
+      "kind": "function",
+      "module": "riscv-sv39-virtual-address-indexing",
+      "name": "construct",
+      "signature": "construct()"
+    },
+    {
       "kind": "method",
       "module": "physical-memory-region-set",
       "name": "contains",
@@ -603,6 +639,12 @@
       "signature": "count(self: *const Self) usize"
     },
     {
+      "kind": "function",
+      "module": "riscv-page-table-page-owner",
+      "name": "count",
+      "signature": "count()"
+    },
+    {
       "kind": "method",
       "module": "bit-set",
       "name": "countSet",
@@ -622,9 +664,21 @@
     },
     {
       "kind": "function",
+      "module": "riscv-sv39-page-table-entry",
+      "name": "decode",
+      "signature": "decode()"
+    },
+    {
+      "kind": "function",
       "module": "validated-enum-decoder",
       "name": "decodeEnum",
       "signature": "decodeEnum(comptime E: type, raw: std.meta.Tag(E)) error"
+    },
+    {
+      "kind": "function",
+      "module": "riscv-sv39-virtual-address-indexing",
+      "name": "decompose",
+      "signature": "decompose()"
     },
     {
       "kind": "method",
@@ -649,6 +703,12 @@
       "module": "owned-byte-buffer",
       "name": "deinit",
       "signature": "deinit(self: *OwnedByteBuffer)"
+    },
+    {
+      "kind": "function",
+      "module": "riscv-page-table-page-owner",
+      "name": "deinit",
+      "signature": "deinit()"
     },
     {
       "kind": "method",
@@ -681,6 +741,12 @@
       "signature": "eql(self: FourCC, other: FourCC) bool"
     },
     {
+      "kind": "function",
+      "module": "riscv-sfence-vma-invalidation",
+      "name": "executeUnsafe",
+      "signature": "executeUnsafe()"
+    },
+    {
       "kind": "method",
       "module": "bounded-byte-reader",
       "name": "extent",
@@ -697,6 +763,24 @@
       "module": "physical-memory-region-set",
       "name": "findContaining",
       "signature": "findContaining(self:*const @This()"
+    },
+    {
+      "kind": "function",
+      "module": "riscv-sfence-vma-invalidation",
+      "name": "forAddress",
+      "signature": "forAddress()"
+    },
+    {
+      "kind": "function",
+      "module": "riscv-sfence-vma-invalidation",
+      "name": "forAddressAsid",
+      "signature": "forAddressAsid()"
+    },
+    {
+      "kind": "function",
+      "module": "riscv-sfence-vma-invalidation",
+      "name": "forAsid",
+      "signature": "forAsid()"
     },
     {
       "kind": "method",
@@ -819,6 +903,12 @@
       "signature": "getConst(self: *const Self, handle: Handle) ?*const T"
     },
     {
+      "kind": "function",
+      "module": "riscv-sfence-vma-invalidation",
+      "name": "global",
+      "signature": "global()"
+    },
+    {
       "kind": "method",
       "module": "saturating-counter",
       "name": "increment",
@@ -933,6 +1023,12 @@
       "signature": "init(value: usize) PhysicalPageFrameNumber"
     },
     {
+      "kind": "function",
+      "module": "riscv-sv39-page-table-builder",
+      "name": "init",
+      "signature": "init()"
+    },
+    {
       "kind": "method",
       "module": "saturating-counter",
       "name": "init",
@@ -1042,6 +1138,12 @@
     },
     {
       "kind": "function",
+      "module": "riscv-sv39-page-table-entry",
+      "name": "invalid",
+      "signature": "invalid()"
+    },
+    {
+      "kind": "function",
       "module": "aligned-address-and-size-helpers",
       "name": "isAligned",
       "signature": "isAligned(value: usize, alignment: usize) AlignmentError!bool"
@@ -1069,6 +1171,12 @@
       "module": "bounded-byte-reader",
       "name": "isAtEnd",
       "signature": "isAtEnd(self: BoundedReader) bool"
+    },
+    {
+      "kind": "function",
+      "module": "riscv-sv39-virtual-address-indexing",
+      "name": "isCanonical",
+      "signature": "isCanonical()"
     },
     {
       "kind": "method",
@@ -1191,6 +1299,18 @@
       "signature": "iterator(self:*const @This()"
     },
     {
+      "kind": "function",
+      "module": "riscv-sv39-page-table-entry",
+      "name": "kind",
+      "signature": "kind()"
+    },
+    {
+      "kind": "function",
+      "module": "riscv-sv39-page-table-entry",
+      "name": "leaf",
+      "signature": "leaf()"
+    },
+    {
       "kind": "method",
       "module": "byte-writer",
       "name": "len",
@@ -1219,6 +1339,18 @@
       "module": "physical-memory-region-set",
       "name": "length",
       "signature": "length(self:@This()"
+    },
+    {
+      "kind": "function",
+      "module": "riscv-sv39-page-table-builder",
+      "name": "mapPage",
+      "signature": "mapPage()"
+    },
+    {
+      "kind": "function",
+      "module": "riscv-sv39-page-table-builder",
+      "name": "mapRange",
+      "signature": "mapRange()"
     },
     {
       "kind": "method",
@@ -1288,6 +1420,12 @@
     },
     {
       "kind": "function",
+      "module": "riscv-sv39-virtual-address-indexing",
+      "name": "pageSize",
+      "signature": "pageSize()"
+    },
+    {
+      "kind": "function",
       "module": "elf64-file-header-parser",
       "name": "parse",
       "signature": "parse(reader:*bounded.BoundedReader)"
@@ -1321,6 +1459,12 @@
       "module": "stack",
       "name": "peek",
       "signature": "peek(self: *const Self) ?T"
+    },
+    {
+      "kind": "function",
+      "module": "riscv-sv39-page-table-entry",
+      "name": "permissions",
+      "signature": "permissions()"
     },
     {
       "kind": "method",
@@ -1383,6 +1527,12 @@
       "signature": "programTableRange(self:@This()"
     },
     {
+      "kind": "function",
+      "module": "riscv-sv39-page-table-builder",
+      "name": "protect",
+      "signature": "protect()"
+    },
+    {
       "kind": "method",
       "module": "ring-buffer",
       "name": "push",
@@ -1407,6 +1557,12 @@
       "signature": "pushFront()"
     },
     {
+      "kind": "function",
+      "module": "riscv-sv39-page-table-builder",
+      "name": "query",
+      "signature": "query()"
+    },
+    {
       "kind": "method",
       "module": "distinct-memory-address-types",
       "name": "raw",
@@ -1423,6 +1579,12 @@
       "module": "length-prefixed-binary-field",
       "name": "read",
       "signature": "read(reader: *bounded.BoundedReader)"
+    },
+    {
+      "kind": "function",
+      "module": "riscv-page-table-page-owner",
+      "name": "read",
+      "signature": "read()"
     },
     {
       "kind": "method",
@@ -1479,6 +1641,12 @@
       "signature": "release(self:*@This()"
     },
     {
+      "kind": "function",
+      "module": "riscv-page-table-page-owner",
+      "name": "release",
+      "signature": "release()"
+    },
+    {
       "kind": "method",
       "module": "bounded-byte-reader",
       "name": "remaining",
@@ -1525,6 +1693,12 @@
       "module": "validated-bit-flags",
       "name": "remove",
       "signature": "remove(self: *Self, flag: Flag) void"
+    },
+    {
+      "kind": "function",
+      "module": "riscv-sv39-virtual-address-indexing",
+      "name": "requireAligned",
+      "signature": "requireAligned()"
     },
     {
       "kind": "method",
@@ -1695,6 +1869,12 @@
       "signature": "toggle(self: *Self, index: usize) Error!void"
     },
     {
+      "kind": "function",
+      "module": "riscv-sv39-page-table-builder",
+      "name": "unmapPage",
+      "signature": "unmapPage()"
+    },
+    {
       "kind": "method",
       "module": "bounded-binary-sub-reader",
       "name": "unread",
@@ -1707,10 +1887,34 @@
       "signature": "used()"
     },
     {
+      "kind": "function",
+      "module": "riscv-sv39-page-table-entry",
+      "name": "validateAtLevel",
+      "signature": "validateAtLevel()"
+    },
+    {
+      "kind": "function",
+      "module": "riscv-sv39-virtual-address-indexing",
+      "name": "validateRange",
+      "signature": "validateRange()"
+    },
+    {
       "kind": "method",
       "module": "optional-typed-handle",
       "name": "value",
       "signature": "value(self: Self) Integer"
+    },
+    {
+      "kind": "function",
+      "module": "riscv-sv39-page-table-walker",
+      "name": "walk",
+      "signature": "walk()"
+    },
+    {
+      "kind": "function",
+      "module": "riscv-page-table-page-owner",
+      "name": "write",
+      "signature": "write()"
     },
     {
       "kind": "method",

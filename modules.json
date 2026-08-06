@@ -395,6 +395,60 @@
       "details": "projects/43-fixed-capacity-topological-sort/details.json",
       "unit_test_step": "test-fixed-capacity-topological-sort",
       "smoke_test_step": "smoke-fixed-capacity-topological-sort"
+    },
+    {
+      "id": "44",
+      "canonical_name": "riscv-sv39-page-table-entry",
+      "directory": "projects/44-riscv-sv39-page-table-entry",
+      "public_entrypoint": "projects/44-riscv-sv39-page-table-entry/src/riscv_sv39_page_table_entry.zig",
+      "details": "projects/44-riscv-sv39-page-table-entry/details.json",
+      "unit_test_step": "test-riscv-sv39-page-table-entry",
+      "smoke_test_step": "smoke-riscv-sv39-page-table-entry"
+    },
+    {
+      "id": "45",
+      "canonical_name": "riscv-sv39-virtual-address-indexing",
+      "directory": "projects/45-riscv-sv39-virtual-address-indexing",
+      "public_entrypoint": "projects/45-riscv-sv39-virtual-address-indexing/src/riscv_sv39_virtual_address_indexing.zig",
+      "details": "projects/45-riscv-sv39-virtual-address-indexing/details.json",
+      "unit_test_step": "test-riscv-sv39-virtual-address-indexing",
+      "smoke_test_step": "smoke-riscv-sv39-virtual-address-indexing"
+    },
+    {
+      "id": "46",
+      "canonical_name": "riscv-page-table-page-owner",
+      "directory": "projects/46-riscv-page-table-page-owner",
+      "public_entrypoint": "projects/46-riscv-page-table-page-owner/src/riscv_page_table_page_owner.zig",
+      "details": "projects/46-riscv-page-table-page-owner/details.json",
+      "unit_test_step": "test-riscv-page-table-page-owner",
+      "smoke_test_step": "smoke-riscv-page-table-page-owner"
+    },
+    {
+      "id": "47",
+      "canonical_name": "riscv-sv39-page-table-walker",
+      "directory": "projects/47-riscv-sv39-page-table-walker",
+      "public_entrypoint": "projects/47-riscv-sv39-page-table-walker/src/riscv_sv39_page_table_walker.zig",
+      "details": "projects/47-riscv-sv39-page-table-walker/details.json",
+      "unit_test_step": "test-riscv-sv39-page-table-walker",
+      "smoke_test_step": "smoke-riscv-sv39-page-table-walker"
+    },
+    {
+      "id": "48",
+      "canonical_name": "riscv-sfence-vma-invalidation",
+      "directory": "projects/48-riscv-sfence-vma-invalidation",
+      "public_entrypoint": "projects/48-riscv-sfence-vma-invalidation/src/riscv_sfence_vma_invalidation.zig",
+      "details": "projects/48-riscv-sfence-vma-invalidation/details.json",
+      "unit_test_step": "test-riscv-sfence-vma-invalidation",
+      "smoke_test_step": "smoke-riscv-sfence-vma-invalidation"
+    },
+    {
+      "id": "49",
+      "canonical_name": "riscv-sv39-page-table-builder",
+      "directory": "projects/49-riscv-sv39-page-table-builder",
+      "public_entrypoint": "projects/49-riscv-sv39-page-table-builder/src/riscv_sv39_page_table_builder.zig",
+      "details": "projects/49-riscv-sv39-page-table-builder/details.json",
+      "unit_test_step": "test-riscv-sv39-page-table-builder",
+      "smoke_test_step": "smoke-riscv-sv39-page-table-builder"
     }
   ]
 }

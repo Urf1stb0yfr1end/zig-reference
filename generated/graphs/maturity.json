@@ -442,6 +442,66 @@
       "smoke_validated": true,
       "target_maturity_level": 2,
       "unit_validated": true
+    },
+    {
+      "conformance_validated": false,
+      "evidence_records": 1,
+      "lifecycle": "experimental",
+      "maturity_level": 4,
+      "module": "riscv-sv39-page-table-entry",
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
+    },
+    {
+      "conformance_validated": false,
+      "evidence_records": 1,
+      "lifecycle": "experimental",
+      "maturity_level": 4,
+      "module": "riscv-sv39-virtual-address-indexing",
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
+    },
+    {
+      "conformance_validated": false,
+      "evidence_records": 1,
+      "lifecycle": "experimental",
+      "maturity_level": 4,
+      "module": "riscv-page-table-page-owner",
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
+    },
+    {
+      "conformance_validated": false,
+      "evidence_records": 1,
+      "lifecycle": "experimental",
+      "maturity_level": 4,
+      "module": "riscv-sv39-page-table-walker",
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
+    },
+    {
+      "conformance_validated": false,
+      "evidence_records": 1,
+      "lifecycle": "experimental",
+      "maturity_level": 4,
+      "module": "riscv-sfence-vma-invalidation",
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
+    },
+    {
+      "conformance_validated": false,
+      "evidence_records": 1,
+      "lifecycle": "experimental",
+      "maturity_level": 4,
+      "module": "riscv-sv39-page-table-builder",
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     }
   ],
   "repository_index_version": "1.0.0"
