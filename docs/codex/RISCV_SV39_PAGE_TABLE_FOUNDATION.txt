@@ -1,0 +1,648 @@
+CODEX TASK: BUILD THE RISC-V PAGE-TABLE FOUNDATION
+
+Repository:
+thanks-cohn/zig-reference
+
+Required compiler:
+Zig 0.14.0
+
+CURRENT STATE
+
+The repository already completed the first Snowball Foundation Batch and now contains 44 modules, including:
+
+39 intrusive-doubly-linked-list
+40 fixed-free-list
+41 fixed-bump-allocator
+42 fixed-capacity-priority-queue
+43 fixed-capacity-topological-sort
+
+The repository also already contains important lower foundations for memory work, including:
+
+aligned-address-and-size-helpers
+validated-bit-flags
+checked-half-open-range
+distinct-memory-address-types
+physical-page-frame-number-and-address-conversion
+physical-memory-region-set
+physical-page-frame-allocator
+fixed-capacity-vector
+fixed-capacity-object-pool
+fixed-bump-allocator
+
+MISSION
+
+Build the next coherent Snowball Batch: the reusable RISC-V page-table foundation needed for future Hyper-Zig, RISC-V kernels, bootloaders, supervisors, guest-memory systems, and the Alpine riscv64 boot roadmap.
+
+Do not build the whole hypervisor.
+
+Do not attempt to boot Alpine in this task.
+
+Build the smallest correct set of foundational modules that later host and guest translation layers can depend on.
+
+The objective is to make future page-table, guest-memory, loader, trap, and virtual-device work dramatically easier and safer.
+
+CORE PRINCIPLE
+
+Do not create one giant page-table module.
+
+Separate architectural representation, indexing, walking, mutation, allocation ownership, and invalidation into precise reusable layers.
+
+REQUIRED FIRST ACTION
+
+Before implementing anything, inspect:
+
+README.md
+SNOWBALL_PRINCIPLE.md
+COMMANDS.md
+build.zig
+details.schema.json
+port.schema.json
+validation-evidence.schema.json
+docs/catalog/MODULES.md
+docs/checklists/MASTER_MODULE_CHECKLIST.md
+docs/checklists/MASTER_MODULE_CHECKLIST_PROGRESS.md
+docs/checklists/RISCV64_ALPINE_BOOT_CHECKLIST.md
+docs/roadmaps/HYPER_ZIG_REQUIRED_MODULES.md
+docs/standards/MATURITY_LEVELS.md
+docs/standards/TESTING_LEVELS.md
+all existing memory-related module contracts
+all existing generated dependency and reverse-dependency graphs
+all existing recipes touching memory, ranges, allocation, or ELF loading
+
+Use repository query tools to find all existing capabilities related to:
+
+physical addresses
+virtual addresses
+guest addresses
+alignment
+ranges
+page frames
+page allocation
+bit flags
+ownership
+rollback
+ELF loading
+memory regions
+
+Do not duplicate an existing capability under a new name.
+
+TARGET BATCH
+
+Implement a coherent page-table foundation of approximately 5 to 8 modules.
+
+The preferred architecture is:
+
+1. riscv-sv39-page-table-entry
+2. riscv-sv39-virtual-address-indexing
+3. riscv-page-table-page-owner
+4. riscv-sv39-page-table-walker
+5. riscv-sv39-page-table-builder
+6. riscv-sfence-vma-invalidation
+
+A seventh or eighth module may be added only if repository analysis shows it is necessary to keep contracts clean, such as:
+
+riscv-page-size-and-leaf-level
+riscv-page-table-mapping-permissions
+riscv-page-table-mutation-journal
+riscv-sv39-mapping-plan
+
+Do not add extra modules merely to increase the count.
+
+If a proposed module is too small to justify its own contract, incorporate it into the most coherent neighboring module.
+
+PHASE BOUNDARY
+
+This task covers host-style Sv39 page-table foundations only.
+
+Do not yet implement:
+
+Sv39x4 guest-stage translation
+hgatp management
+guest physical translation
+HS-mode trap entry
+SBI
+FDT
+virtual UART
+Virtio
+Linux image loading
+Alpine boot
+multi-vCPU support
+
+However, design the contracts so those later modules can reuse the foundation without rewriting it.
+
+MODULE 1: RISCV SV39 PAGE-TABLE ENTRY
+
+Create a typed, explicit representation of a 64-bit RISC-V Sv39 page-table entry.
+
+It must cover:
+
+valid bit
+read bit
+write bit
+execute bit
+user bit
+global bit
+accessed bit
+dirty bit
+physical page number fields
+reserved-bit validation
+leaf versus branch classification
+legal and illegal permission combinations
+conversion from page-frame address to PTE fields
+conversion from PTE fields back to physical page-frame address
+clear invalid entry construction
+exact raw-value encoding and decoding
+no silent truncation
+no acceptance of reserved or malformed combinations
+
+Important architectural rules must be encoded and tested, including:
+
+write without read is invalid
+branch entries must not contain leaf permissions
+leaf entries must contain at least one of read or execute
+misaligned superpage leaf encodings must be detectable
+reserved bits must be rejected
+physical page numbers must fit the supported architectural width
+invalid entries must not accidentally expose stale address bits as valid mappings
+
+The contract must clearly distinguish:
+
+architecturally invalid encoding
+valid branch entry
+valid 4 KiB leaf
+valid 2 MiB leaf
+valid 1 GiB leaf
+
+MODULE 2: RISCV SV39 VIRTUAL-ADDRESS INDEXING
+
+Create checked decomposition and reconstruction for Sv39 virtual addresses.
+
+It must provide:
+
+VPN2 index
+VPN1 index
+VPN0 index
+page offset
+canonical-address validation
+sign-extension validation
+checked construction from indices and offset
+page-size-aware alignment checks
+leaf-level identification
+range-boundary handling
+no truncation of noncanonical values
+
+Test:
+
+lowest canonical address
+highest positive canonical address
+lowest negative canonical address
+highest canonical address
+noncanonical holes
+all index boundaries
+all supported leaf levels
+misaligned addresses
+round trips
+
+Reuse distinct-memory-address-types and existing checked arithmetic where contracts fit.
+
+MODULE 3: RISC-V PAGE-TABLE PAGE OWNER
+
+Create an explicit owner for one page-table page or a bounded set of page-table pages.
+
+The module must make allocation and cleanup responsibilities obvious.
+
+It must define:
+
+who allocates a page-table page
+who owns it
+how it is initialized to zero
+how its physical frame identity is retained
+how the host obtains a temporary mutable view when needed
+how cleanup occurs
+what happens after failed partial construction
+what remains valid after move or transfer
+whether copying is prohibited by contract
+how pages are released to the physical-page-frame-allocator
+how allocation failure is reported
+
+Do not hide allocation.
+
+Do not silently allocate through a global allocator.
+
+Reuse:
+
+physical-page-frame-allocator
+physical-page-frame-number-and-address-conversion
+fixed-bump-allocator where appropriate
+fixed-free-list or fixed-capacity-object-pool only if their contracts genuinely fit
+
+If the repository lacks a safe abstraction for obtaining a mutable memory view from a physical page frame, define the dependency boundary explicitly instead of inventing unsafe global behavior.
+
+A callback or injected page-access provider may be appropriate.
+
+MODULE 4: RISCV SV39 PAGE-TABLE WALKER
+
+Create a read-only walker that resolves a virtual address through a supplied root table and page-access provider.
+
+It must:
+
+walk level 2, level 1, and level 0
+identify branch versus leaf entries
+return resolved physical address
+return leaf level and effective page size
+return mapping permissions
+detect invalid entries
+detect malformed branch entries
+detect misaligned superpage leaves
+detect provider failures
+avoid allocation
+avoid mutation
+avoid undefined pointer assumptions
+return structured failure causes
+
+The walker must be independently usable by:
+
+debuggers
+mapping verification
+guest-memory diagnostics
+page-fault analysis
+page-table builders
+future Sv39x4 code where compatible
+
+MODULE 5: RISCV SV39 PAGE-TABLE BUILDER
+
+Create a deterministic builder for mapping and unmapping Sv39 ranges.
+
+It must support:
+
+map one page
+map aligned ranges
+unmap one page
+unmap aligned ranges
+query existing mappings
+change permissions where safe
+allocate intermediate table pages through injected ownership and allocation interfaces
+reuse existing branch tables
+reject conflicting mappings
+reject overlap unless an explicit replacement operation exists
+support 4 KiB leaves
+support 2 MiB leaves
+support 1 GiB leaves
+select leaf sizes only when alignment and range permit
+optionally expose an exact-page-size mode
+rollback after partial failure
+avoid leaking intermediate page-table pages
+avoid corrupting existing mappings when a later allocation fails
+deterministic traversal and mutation
+structured errors
+explicit invalidation requirements in results
+
+Do not silently replace existing mappings.
+
+Do not silently split a superpage unless the API explicitly performs and documents that operation.
+
+Do not silently merge mappings.
+
+Do not assume identity mapping.
+
+Do not use global mutable state.
+
+The builder should return a mutation result that tells the caller whether an SFENCE.VMA operation is required and what scope is sufficient.
+
+MODULE 6: RISC-V SFENCE.VMA INVALIDATION
+
+Create a narrow architectural invalidation interface.
+
+It must represent and document:
+
+global invalidation
+address-specific invalidation
+address-space-specific invalidation where ASID support is represented
+address-plus-ASID invalidation
+compiler ordering requirements
+CPU ordering assumptions
+unsafe boundary for actual assembly execution
+testable command planning separate from privileged instruction execution
+
+Tests must verify command selection and operands without requiring privileged execution.
+
+The actual instruction wrapper may require an explicit unsafe or architecture-specific boundary.
+
+Do not pretend hosted unit tests execute privileged invalidation.
+
+COMPOSITION RECIPE
+
+Add at least one real recipe, preferably named:
+
+construct-and-verify-sv39-address-space
+
+The recipe should:
+
+create a bounded physical-memory model
+allocate page-table pages
+construct an Sv39 root
+map at least:
+- one 4 KiB page
+- one 2 MiB page
+- one 1 GiB page where practical in the modeled address space
+walk the mappings back
+verify physical resolution and permissions
+reject a conflicting mapping
+exercise an allocation failure and prove rollback
+unmap at least one range
+produce the required invalidation plan
+
+This must be a meaningful composition test, not a type-instantiation demonstration.
+
+CONFORMANCE
+
+Create dedicated conformance work only where it is genuinely useful.
+
+Possible dedicated families include:
+
+page-table-entry
+virtual-address-indexing
+page-table-walker
+
+Do not award conformance credit merely by routing unit tests through the conformance aggregate.
+
+If no dedicated shared adapter is justified yet, defer conformance honestly and explain why.
+
+ARCHITECTURAL ACCURACY
+
+Use the official RISC-V privileged architecture specification as the source of truth for Sv39 rules.
+
+Do not rely on memory or secondary summaries for bit positions, canonical address rules, superpage alignment, reserved bits, or SFENCE.VMA semantics.
+
+Record the exact specification version or revision consulted in human documentation.
+
+Do not copy long passages from the specification.
+
+State rules in original concise language and encode them in tests.
+
+PUBLIC API QUALITY
+
+Every public API must make clear:
+
+ownership
+borrowing
+allocation
+failure atomicity
+mutation
+invalidation
+thread and hart assumptions
+privilege assumptions
+alignment
+supported page sizes
+canonical address requirements
+error conditions
+complexity
+whether the function is safe in hosted tests
+whether it requires privileged execution
+which lower-level guarantees it inherits
+
+FUTURE SV39X4 COMPATIBILITY
+
+Do not implement Sv39x4 yet, but avoid unnecessary design choices that make it impossible to reuse:
+
+entry validation logic
+page-size concepts
+walker result types
+page-access providers
+page ownership interfaces
+mutation journals
+invalidation planning
+
+Where Sv39x4 rules differ, document the future extension point rather than pretending they are identical.
+
+TESTING REQUIREMENTS
+
+Every module must include:
+
+meaningful internal unit tests
+external named-import smoke test
+README.md
+MASTERY.md
+DETAILS.md
+canonical details.json
+canonical port.js
+build registration
+catalog integration
+query discoverability
+honest evidence state
+
+Test failure cases aggressively.
+
+Required failure coverage should include:
+
+noncanonical virtual address
+misaligned 4 KiB mapping
+misaligned 2 MiB mapping
+misaligned 1 GiB mapping
+write-without-read PTE
+reserved-bit PTE
+malformed branch entry
+misaligned superpage leaf
+duplicate mapping
+overlapping range
+out-of-pages allocation failure
+provider read failure
+provider write failure
+partial-construction rollback
+unmap missing mapping
+permission change on malformed mapping
+address arithmetic overflow
+range crossing canonical boundaries
+invalid page-size request
+
+VALIDATION WORKFLOW
+
+Behavior must be tested before evidence is regenerated.
+
+For every new module, run:
+
+zig build test-<module>
+zig build smoke-<module>
+
+Run the new recipe independently:
+
+zig build test-recipe-construct-and-verify-sv39-address-space
+
+Run directly affected existing memory modules:
+
+zig build test-aligned-address-and-size-helpers
+zig build test-validated-bit-flags
+zig build test-checked-half-open-range
+zig build test-distinct-memory-address-types
+zig build test-physical-page-frame-number-and-address-conversion
+zig build test-physical-memory-region-set
+zig build test-physical-page-frame-allocator
+zig build test-fixed-bump-allocator
+
+Run their smoke tests where dependency relationships changed.
+
+Then run:
+
+zig build test
+zig build smoke
+zig build recipes
+zig build conformance
+
+After behavior passes, regenerate evidence honestly:
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/record-validation.py --level all
+
+Regenerate textual indexes and graphs with the repository's canonical generators.
+
+Then run:
+
+zig build check-validation-evidence
+zig build check
+zig build status
+zig build validate-repository
+
+FINAL SEVEN-COMMAND GATE
+
+Run under exactly Zig 0.14.0:
+
+zig version
+
+Expected:
+
+0.14.0
+
+Then run:
+
+zig build check &&
+zig build status &&
+zig build smoke &&
+zig build test &&
+zig build recipes &&
+zig build conformance &&
+zig build validate-repository &&
+printf '\nRISC-V PAGE-TABLE FOUNDATION PASSED\n'
+
+The final line must be reached.
+
+ARTIFACT POLICY
+
+Only reviewable UTF-8 source and structured text may be committed.
+
+Allowed examples:
+
+.zig
+.py
+.js
+.json
+.jsonl
+.md
+.toml
+.yaml
+.sh
+Mermaid text
+DOT text
+
+Do not commit:
+
+.zig-cache
+zig-cache
+zig-out
+executables
+object files
+archives
+databases
+bytecode
+compiler distributions
+opaque generated artifacts
+media
+
+Use external disposable compiler caches.
+
+Before completion:
+
+rm -rf .zig-cache zig-cache zig-out
+find . -type d -name '__pycache__' -prune -exec rm -rf {} +
+find . -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete
+
+git status --short --branch
+git diff --check
+git diff --stat
+git diff --numstat
+
+Confirm all changed files are reviewable text.
+
+DOCUMENTATION AND ROADMAP UPDATES
+
+Update:
+
+COMMANDS.md
+docs/catalog/MODULES.md
+docs/checklists/MASTER_MODULE_CHECKLIST.md
+docs/checklists/MASTER_MODULE_CHECKLIST_PROGRESS.md
+docs/checklists/RISCV64_ALPINE_BOOT_CHECKLIST.md
+relevant Hyper-Zig roadmap references
+dependency graphs
+reverse-dependency graphs
+capability indexes
+symbol indexes
+maturity views
+validation evidence
+repository health report
+recipe catalog
+
+Do not replace or delete the x86_64 Hyper-Zig roadmap.
+
+The RISC-V path is parallel.
+
+Do not manually edit generated files where a canonical generator exists.
+
+FINAL REPORT
+
+Begin the final report with:
+
+Zig version:                    0.14.0
+zig build check:               PASS
+zig build status:              PASS
+zig build smoke:               PASS
+zig build test:                PASS
+zig build recipes:             PASS
+zig build conformance:         PASS
+zig build validate-repository: PASS
+
+Then report:
+
+selected modules
+rejected or merged candidate modules
+architectural rules encoded
+official specification revision consulted
+dependencies reused
+public APIs
+ownership model
+page-access-provider model
+failure-atomicity design
+rollback behavior
+supported page sizes
+walker behavior
+builder behavior
+invalidation planning
+unit-test results
+smoke-test results
+recipe results
+conformance status
+evidence regenerated
+final repository status
+files changed
+generated textual views updated
+artifact-policy result
+limitations
+exact next recommended batch toward Sv39x4 and Alpine boot
+
+DEFINITION OF SUCCESS
+
+Success is not a giant hypervisor file.
+
+Success is a precise, reusable, tested page-table foundation that future Zig systems can depend on without rediscovering Sv39 rules, ownership, walking, mapping, rollback, and invalidation every time.
+
+Build the foundation once.
+
+Let every later system inherit it.
