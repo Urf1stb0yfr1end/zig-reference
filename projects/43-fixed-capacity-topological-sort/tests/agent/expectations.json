@@ -3,18 +3,18 @@
   "module": "fixed-capacity-topological-sort",
   "expectations": [
     {
-      "fixture": "projects/43-fixed-capacity-topological-sort/tests/agent/fail/topo_cycle.zig",
+      "fixture": "projects/43-fixed-capacity-topological-sort/tests/agent/misuse/topo_cycle.zig",
       "diagnostic_id": "ZIGREF-TOPO-CYCLE",
       "classification": "runtime_negative_test",
       "zig_rejects": false,
-      "repair_example": "projects/43-fixed-capacity-topological-sort/tests/agent/pass/topo_cycle_repair.zig"
+      "repair_example": "projects/43-fixed-capacity-topological-sort/tests/agent/repair/topo_cycle_repair.zig"
     },
     {
-      "fixture": "projects/43-fixed-capacity-topological-sort/tests/agent/fail/topo_invalid_vertex.zig",
+      "fixture": "projects/43-fixed-capacity-topological-sort/tests/agent/misuse/topo_invalid_vertex.zig",
       "diagnostic_id": "ZIGREF-TOPO-INVALID-VERTEX",
       "classification": "runtime_negative_test",
       "zig_rejects": false,
-      "repair_example": "projects/43-fixed-capacity-topological-sort/tests/agent/pass/topo_invalid_vertex_repair.zig"
+      "repair_example": "projects/43-fixed-capacity-topological-sort/tests/agent/repair/topo_invalid_vertex_repair.zig"
     }
   ]
 }

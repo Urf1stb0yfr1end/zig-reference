@@ -8,7 +8,7 @@
       "description": "Release only currently allocated indices.",
       "evidence_class": "runtime_negative_test",
       "evidence_references": [
-        "projects/40-fixed-free-list/tests/agent/fail/freelist_double_release.zig",
+        "projects/40-fixed-free-list/tests/agent/misuse/freelist_double_release.zig",
         "projects/40-fixed-free-list/src/fixed_free_list.zig"
       ],
       "status": "supported"

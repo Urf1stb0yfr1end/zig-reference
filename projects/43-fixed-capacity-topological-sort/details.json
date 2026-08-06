@@ -948,7 +948,7 @@
     "thread_safety": "not_synchronized",
     "unsafe_boundaries": [],
     "examples": [
-      "projects/43-fixed-capacity-topological-sort/tests/agent/pass/topo_cycle_repair.zig"
+      "projects/43-fixed-capacity-topological-sort/tests/agent/repair/topo_cycle_repair.zig"
     ],
     "recipes": [
       "plan-bounded-initialization"
@@ -964,10 +964,10 @@
         "title": "Topological cycle",
         "violated_rule": "The graph must be acyclic for sort to return an order.",
         "evidence_status": "tested",
-        "fixture": "projects/43-fixed-capacity-topological-sort/tests/agent/fail/topo_cycle.zig",
+        "fixture": "projects/43-fixed-capacity-topological-sort/tests/agent/misuse/topo_cycle.zig",
         "fixture_classification": "runtime_negative_test",
         "zig_rejects": false,
-        "repair_example": "projects/43-fixed-capacity-topological-sort/tests/agent/pass/topo_cycle_repair.zig",
+        "repair_example": "projects/43-fixed-capacity-topological-sort/tests/agent/repair/topo_cycle_repair.zig",
         "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
         "related_module": "fixed-capacity-topological-sort",
         "related_recipe": "plan-bounded-initialization"
@@ -977,10 +977,10 @@
         "title": "Invalid graph vertex",
         "violated_rule": "Edge endpoints must be less than node_count.",
         "evidence_status": "tested",
-        "fixture": "projects/43-fixed-capacity-topological-sort/tests/agent/fail/topo_invalid_vertex.zig",
+        "fixture": "projects/43-fixed-capacity-topological-sort/tests/agent/misuse/topo_invalid_vertex.zig",
         "fixture_classification": "runtime_negative_test",
         "zig_rejects": false,
-        "repair_example": "projects/43-fixed-capacity-topological-sort/tests/agent/pass/topo_invalid_vertex_repair.zig",
+        "repair_example": "projects/43-fixed-capacity-topological-sort/tests/agent/repair/topo_invalid_vertex_repair.zig",
         "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
         "related_module": "fixed-capacity-topological-sort",
         "related_recipe": "plan-bounded-initialization"

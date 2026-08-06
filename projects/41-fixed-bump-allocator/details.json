@@ -919,7 +919,7 @@
     "thread_safety": "not_synchronized",
     "unsafe_boundaries": [],
     "examples": [
-      "projects/41-fixed-bump-allocator/tests/agent/pass/bump_use_after_reset_repair.zig"
+      "projects/41-fixed-bump-allocator/tests/agent/repair/bump_use_after_reset_repair.zig"
     ],
     "recipes": [
       "plan-bounded-initialization"
@@ -935,10 +935,10 @@
         "title": "Use after bump reset",
         "violated_rule": "Do not access a returned slice after reset.",
         "evidence_status": "future_analyzer_expectation",
-        "fixture": "projects/41-fixed-bump-allocator/tests/agent/fail/bump_use_after_reset.zig",
+        "fixture": "projects/41-fixed-bump-allocator/tests/agent/misuse/bump_use_after_reset.zig",
         "fixture_classification": "future_analyzer_expectation",
         "zig_rejects": false,
-        "repair_example": "projects/41-fixed-bump-allocator/tests/agent/pass/bump_use_after_reset_repair.zig",
+        "repair_example": "projects/41-fixed-bump-allocator/tests/agent/repair/bump_use_after_reset_repair.zig",
         "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
         "related_module": "fixed-bump-allocator",
         "related_recipe": "plan-bounded-initialization"

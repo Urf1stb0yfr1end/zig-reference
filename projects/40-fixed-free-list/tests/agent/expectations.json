@@ -3,11 +3,11 @@
   "module": "fixed-free-list",
   "expectations": [
     {
-      "fixture": "projects/40-fixed-free-list/tests/agent/fail/freelist_double_release.zig",
+      "fixture": "projects/40-fixed-free-list/tests/agent/misuse/freelist_double_release.zig",
       "diagnostic_id": "ZIGREF-FREELIST-DOUBLE-RELEASE",
       "classification": "runtime_negative_test",
       "zig_rejects": false,
-      "repair_example": "projects/40-fixed-free-list/tests/agent/pass/freelist_double_release_repair.zig"
+      "repair_example": "projects/40-fixed-free-list/tests/agent/repair/freelist_double_release_repair.zig"
     }
   ]
 }
