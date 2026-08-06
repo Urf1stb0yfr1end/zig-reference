@@ -486,6 +486,36 @@
         ],
         "zigVersion": "0.14.0"
       },
+      "module": "fixed-bump-allocator",
+      "path": "projects/41-fixed-bump-allocator/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "FixedBumpAllocator"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-fixed-bump-allocator",
+            "zig build smoke-fixed-bump-allocator"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented fixed-bump-allocator public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
       "module": "fixed-capacity-object-pool",
       "path": "projects/34-fixed-capacity-object-pool/port.js",
       "risks": [
@@ -516,6 +546,66 @@
         ],
         "zigVersion": "0.14.0"
       },
+      "module": "fixed-capacity-priority-queue",
+      "path": "projects/42-fixed-capacity-priority-queue/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "FixedPriorityQueue"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-fixed-capacity-priority-queue",
+            "zig build smoke-fixed-capacity-priority-queue"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented fixed-capacity-priority-queue public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
+      "module": "fixed-capacity-topological-sort",
+      "path": "projects/43-fixed-capacity-topological-sort/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "FixedTopologicalGraph"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-fixed-capacity-topological-sort",
+            "zig build smoke-fixed-capacity-topological-sort"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented fixed-capacity-topological-sort public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
       "module": "fixed-capacity-vector",
       "path": "projects/00-fixed-capacity-vector/port.js",
       "risks": [
@@ -530,6 +620,36 @@
           ],
           "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
           "risk": "Preserve the documented fixed-capacity-vector public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
+      "module": "fixed-free-list",
+      "path": "projects/40-fixed-free-list/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "FixedFreeList"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-fixed-free-list",
+            "zig build smoke-fixed-free-list"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented fixed-free-list public behavior, boundaries, and failure semantics."
         }
       ]
     },
@@ -590,6 +710,36 @@
           ],
           "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
           "risk": "Preserve the documented generational-handles public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
+      "module": "intrusive-doubly-linked-list",
+      "path": "projects/39-intrusive-doubly-linked-list/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "IntrusiveDoublyLinkedList"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-intrusive-doubly-linked-list",
+            "zig build smoke-intrusive-doubly-linked-list"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented intrusive-doubly-linked-list public behavior, boundaries, and failure semantics."
         }
       ]
     },

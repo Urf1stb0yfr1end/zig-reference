@@ -5,12 +5,18 @@ This file is the current completion overlay for [`MASTER_MODULE_CHECKLIST.md`](M
 ## Current count
 
 - Unique checklist capabilities: **757**
-- Implemented or functionally represented: **42**
+- Implemented or functionally represented: **47**
 - Compiler-validated in the current environment: **0**
 
 A check mark records an implementation and complete repository contract set. It does not claim successful Zig compilation unless the corresponding `details.json` says so.
 
 ## Newly completed in this batch
+
+- [x] **026. Fixed priority queue** — `projects/42-fixed-capacity-priority-queue`
+- [x] **034. Fixed freelist** — `projects/40-fixed-free-list`
+- [x] **045. Bump allocator** — `projects/41-fixed-bump-allocator`
+- [x] **115. Topological sort** — `projects/43-fixed-capacity-topological-sort`
+- [x] **331. Intrusive list** — `projects/39-intrusive-doubly-linked-list`
 
 - [x] **035. Object pool** — `projects/34-fixed-capacity-object-pool` (thin extension of the existing handle table)
 - [x] **042. Owned buffer** — `projects/33-owned-byte-buffer`

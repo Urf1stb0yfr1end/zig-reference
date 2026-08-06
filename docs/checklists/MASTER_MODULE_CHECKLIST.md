@@ -52,7 +52,7 @@ A check mark means the repository already has a source implementation for that c
 - [ ] **023. Fixed stack** — Parsers and virtual machines.
 - [x] **024. Inline queue** — Schedulers and devices.
 - [ ] **025. Static deque** — Work queues.
-- [ ] **026. Fixed priority queue** — Schedulers and simulations.
+- [x] **026. Fixed priority queue** — Schedulers and simulations. (`projects/42-fixed-capacity-priority-queue`)
 - [ ] **027. Slot map** — Entity and resource tables.
 - [ ] **028. Sparse set** — ECS and registries.
 - [x] **029. Fixed bit set** — Allocators and masks.
@@ -60,7 +60,7 @@ A check mark means the repository already has a source implementation for that c
 - [ ] **031. Fixed matrix** — Graphics and numerics.
 - [ ] **032. Static graph adjacency** — Algorithms and routing.
 - [ ] **033. Inline byte builder** — Serialization.
-- [ ] **034. Fixed freelist** — Pools and kernels.
+- [x] **034. Fixed freelist** — Pools and kernels. (`projects/40-fixed-free-list`)
 - [x] **035. Object pool** — Games and embedded systems.
 - [ ] **036. Generational arena** — Compilers and frame allocators.
 - [ ] **037. Fixed histogram** — Metrics and profiling.
@@ -74,7 +74,7 @@ A check mark means the repository already has a source implementation for that c
 - [x] **042. Owned buffer** — I/O and FFI.
 - [ ] **043. Resizable string** — CLI and text.
 - [ ] **044. Arena allocator** — Parsing and batch work.
-- [ ] **045. Bump allocator** — Boot code and scratch memory.
+- [x] **045. Bump allocator** — Boot code and scratch memory. (`projects/41-fixed-bump-allocator`)
 - [ ] **046. Free-list allocator** — Runtimes and kernels.
 - [ ] **047. Buddy allocator** — Page and heap allocation.
 - [ ] **048. Slab allocator** — Kernels and servers.
@@ -153,7 +153,7 @@ A check mark means the repository already has a source implementation for that c
 - [ ] **112. Sliding window** — Streaming.
 - [ ] **113. KMP substring search** — Text search.
 - [ ] **114. Aho-Corasick trie** — Scanning.
-- [ ] **115. Topological sort** — Build systems.
+- [x] **115. Topological sort** — Build systems. (`projects/43-fixed-capacity-topological-sort`)
 - [ ] **116. Union-find** — Graphs.
 - [ ] **117. Dijkstra queue** — Routing.
 - [ ] **118. LRU list primitive** — Caches.
@@ -402,7 +402,7 @@ A check mark means the repository already has a source implementation for that c
 - [ ] **328. Boot memory-map normalizer** — Boot code.
 - [ ] **329. ELF kernel loader** — Kernels.
 - [ ] **330. Initcall registry** — Kernels.
-- [ ] **331. Intrusive list** — Kernels.
+- [x] **331. Intrusive list** — Kernels. (`projects/39-intrusive-doubly-linked-list`)
 - [ ] **332. Spinlock** — Kernels.
 - [ ] **333. Ticket lock** — Kernels.
 - [ ] **334. Per-CPU storage accessor** — Kernels.

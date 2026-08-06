@@ -23,8 +23,12 @@ digraph modules {
   "elf64-program-header-parser" -> "fixed-capacity-vector";
   "elf64-program-header-parser" -> "validated-bit-flags";
   "elf64-program-header-parser" -> "validated-enum-decoder";
+  "fixed-bump-allocator" -> "aligned-address-and-size-helpers";
   "fixed-capacity-object-pool" -> "bitmap-allocator";
   "fixed-capacity-object-pool" -> "generational-handles";
+  "fixed-capacity-priority-queue" -> "fixed-capacity-vector";
+  "fixed-capacity-topological-sort" -> "fixed-capacity-priority-queue";
+  "fixed-capacity-topological-sort" -> "fixed-capacity-vector";
   "length-prefixed-binary-field" -> "binary-cursor-checkpoint";
   "length-prefixed-binary-field" -> "bounded-binary-sub-reader";
   "length-prefixed-binary-field" -> "bounded-byte-reader";

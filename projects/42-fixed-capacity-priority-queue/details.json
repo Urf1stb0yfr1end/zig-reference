@@ -1,0 +1,945 @@
+{
+  "schema_version": "3.0.0",
+  "contract_version": "1.0.0",
+  "generated_at": "2026-08-06",
+  "last_reviewed_at": "2026-08-06",
+  "module": {
+    "id": "42",
+    "canonical_name": "fixed-capacity-priority-queue",
+    "display_name": "Fixed Capacity Priority Queue",
+    "directory": "projects/42-fixed-capacity-priority-queue",
+    "summary": "Order bounded values without allocation and preserve insertion order for equal priorities.",
+    "long_description": "Order bounded values without allocation and preserve insertion order for equal priorities.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "lifecycle": "experimental",
+    "target_maturity_level": 2,
+    "implementation_version": "1.0.0",
+    "public_contract_version": "1.0.0",
+    "introduced_version": "1.0.0",
+    "deprecated_version": "",
+    "superseded_version": "",
+    "removed_version": "",
+    "replacement_module": "",
+    "migration_guide": "",
+    "support_policy": "Experimental; semantic contract versioning applies.",
+    "deprecation_reason": "",
+    "category": "foundation",
+    "subcategory": "",
+    "tags": [
+      "bounded",
+      "freestanding",
+      "allocation-explicit"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Order bounded values without allocation and preserve insertion order for equal priorities.",
+    "secondary": [],
+    "non_goals": [
+      "hidden allocation",
+      "implicit synchronization"
+    ],
+    "problems_solved": [
+      "repeated bounded mechanism implementation"
+    ],
+    "future_role": "Reusable bounded foundation."
+  },
+  "c_pain": {
+    "summary": "C makes the representation attractive but leaves ownership, bounds, failure atomicity, and invalidation as conventions.",
+    "common_failure_modes": [
+      "bounds or state drift"
+    ],
+    "maintenance_burdens": [
+      "duplicated informal invariants"
+    ],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [
+      "caller and container lifetime confusion"
+    ],
+    "why_c_is_attractive": "Direct arrays and pointers are compact and allocation-free.",
+    "where_c_degrades": "Failure and invalidation policies remain informal across callers."
+  },
+  "zig_response": {
+    "summary": "Compile-time limits, slices, optionals, and error unions expose the contract.",
+    "language_features": [
+      "comptime",
+      "error unions",
+      "slices"
+    ],
+    "guarantees_made_visible": [
+      "fixed capacity",
+      "explicit failure"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "choose capacity",
+      "synchronize access",
+      "maintain caller-owned lifetimes"
+    ],
+    "tradeoffs": [
+      "fixed capacity rejects growth"
+    ]
+  },
+  "locations": {
+    "module_root": "projects/42-fixed-capacity-priority-queue",
+    "implementation": [
+      "projects/42-fixed-capacity-priority-queue/src/fixed_capacity_priority_queue.zig"
+    ],
+    "public_entrypoint": "projects/42-fixed-capacity-priority-queue/src/fixed_capacity_priority_queue.zig",
+    "readme": "projects/42-fixed-capacity-priority-queue/README.md",
+    "mastery": "projects/42-fixed-capacity-priority-queue/MASTERY.md",
+    "details_markdown": "projects/42-fixed-capacity-priority-queue/DETAILS.md",
+    "details_json": "projects/42-fixed-capacity-priority-queue/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": [],
+    "unit_tests": [
+      "projects/42-fixed-capacity-priority-queue/src/fixed_capacity_priority_queue.zig"
+    ],
+    "smoke_tests": [
+      "projects/42-fixed-capacity-priority-queue/tests/smoke_test.zig"
+    ],
+    "generated_files": [],
+    "dependency_contracts": [
+      "projects/00-fixed-capacity-vector/details.json"
+    ]
+  },
+  "public_surface": {
+    "root_symbols": [
+      "FixedPriorityQueue"
+    ],
+    "types": [
+      {
+        "name": "FixedPriorityQueue",
+        "kind": "public declaration"
+      }
+    ],
+    "functions": [],
+    "methods": [],
+    "constants": [],
+    "errors": [],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": [],
+    "endpoints": [
+      {
+        "name": "FixedPriorityQueue",
+        "kind": "function",
+        "signature": "FixedPriorityQueue()",
+        "visibility": "public",
+        "summary": "Public operation; exact source signature is authoritative.",
+        "receiver": null,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of FixedPriorityQueue.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "init",
+        "kind": "function",
+        "signature": "init()",
+        "visibility": "public",
+        "summary": "Public operation; exact source signature is authoritative.",
+        "receiver": null,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of init.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "count",
+        "kind": "function",
+        "signature": "count()",
+        "visibility": "public",
+        "summary": "Public operation; exact source signature is authoritative.",
+        "receiver": null,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of count.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "peek",
+        "kind": "function",
+        "signature": "peek()",
+        "visibility": "public",
+        "summary": "Public operation; exact source signature is authoritative.",
+        "receiver": null,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of peek.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "insert",
+        "kind": "function",
+        "signature": "insert()",
+        "visibility": "public",
+        "summary": "Public operation; exact source signature is authoritative.",
+        "receiver": null,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of insert.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "remove",
+        "kind": "function",
+        "signature": "remove()",
+        "visibility": "public",
+        "summary": "Public operation; exact source signature is authoritative.",
+        "receiver": null,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of remove.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "clear",
+        "kind": "function",
+        "signature": "clear()",
+        "visibility": "public",
+        "summary": "Public operation; exact source signature is authoritative.",
+        "receiver": null,
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of clear.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "name": "public endpoint inputs",
+      "type": "see endpoint signatures",
+      "ownership": "copied scalar/value or borrowed according to the Zig type",
+      "lifetime": "for the duration of the call unless the output contract says it is stored",
+      "role": "Copied policies/scalars or explicitly borrowed pointers and slices",
+      "borrowing": "explicit in the Zig type",
+      "mutability": "mutable only when the type permits mutation",
+      "valid_range": "all values satisfying the listed constraints",
+      "alignment": "type-defined",
+      "endianness": "not applicable unless stated by the operation",
+      "format": "Zig value",
+      "required_invariants": [],
+      "validation_performed": [],
+      "accepts_untrusted_input": true,
+      "stored": false,
+      "copied": true,
+      "may_mutate": false,
+      "errors_on_invalid_input": []
+    }
+  ],
+  "outputs": [
+    {
+      "name": "public endpoint outputs",
+      "type": "see endpoint signatures",
+      "ownership": "not applicable",
+      "lifetime": "program",
+      "meaning": "Copied values or documented borrowed views",
+      "borrowed_from": "",
+      "cleanup_required": false,
+      "cleanup_responsibility": "none",
+      "invalidation_conditions": [],
+      "aliasing": "not applicable",
+      "borrows_from_module": false,
+      "borrows_from_input": false,
+      "valid_after_mutation": "not applicable",
+      "absence_meaning": "not applicable"
+    }
+  ],
+  "state": {
+    "fields": [],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "internal metadata describes only initialized state"
+    ],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [
+      "logical count never exceeds compile-time capacity"
+    ],
+    "lifetime": [],
+    "concurrency": [
+      "caller serializes mutable access"
+    ],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [
+      "inline metadata"
+    ],
+    "borrows": [
+      "caller-owned inputs where API uses pointers or slices"
+    ],
+    "copies": [
+      "inserted scalar values as applicable"
+    ],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none; no allocation",
+    "allocator_lifetime": "",
+    "element_cleanup": "caller responsibility",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "Caller controls instance lifetime.",
+    "inputs": [
+      "Borrowed storage and nodes outlive use."
+    ],
+    "outputs": [
+      "Copied outputs are independent; borrowed outputs follow backing lifetime."
+    ],
+    "borrowed_views": [
+      "Mutations documented by the API invalidate affected views."
+    ],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [],
+    "optional_empty_results": [
+      "Empty query or pop may return null."
+    ],
+    "failure_atomicity": "Every returned error leaves state unchanged.",
+    "state_after_failure": [
+      "unchanged"
+    ],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [
+      "Do not move address-sensitive intrusive state while linked."
+    ],
+    "reset_invalidation": [
+      "All previous logical allocations or contents."
+    ],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [
+      {
+        "module": "fixed-capacity-vector",
+        "path": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig",
+        "symbol": "public contract",
+        "guarantee": "checked lower-layer contract",
+        "reason": "Reuses its canonical bounded primitive."
+      }
+    ],
+    "standard_library": [],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": []
+  },
+  "dependency_contracts": [
+    {
+      "module": "fixed-capacity-vector",
+      "directory": "projects/00-fixed-capacity-vector",
+      "import_name": "fixed-capacity-vector",
+      "import_path": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig",
+      "symbols_used": [
+        "FixedVector"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/00-fixed-capacity-vector/details.json"
+    }
+  ],
+  "expected_dependents": [
+    "schedulers",
+    "compilers",
+    "kernels",
+    "embedded runtimes",
+    "databases",
+    "game engines"
+  ],
+  "known_consumers": [
+    "recipes/plan-bounded-initialization"
+  ],
+  "composition": {
+    "import_name": "fixed-capacity-priority-queue",
+    "import_path": "projects/42-fixed-capacity-priority-queue/src/fixed_capacity_priority_queue.zig",
+    "import_configuration": "Root build named module.",
+    "minimal_example": "const foundation = @import(\"fixed-capacity-priority-queue\");\n_ = foundation.FixedPriorityQueue;",
+    "integration_patterns": [],
+    "pipeline_position": [
+      "foundation"
+    ],
+    "common_combinations": [
+      "fixed-capacity-vector"
+    ],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "no",
+    "reentrant": "caller-controlled",
+    "interrupt_safe": "",
+    "async_safe": "",
+    "signal_safe": "",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "No allocator.",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "No stable ABI.",
+    "no_std_equivalent": "Source does not require hosted services outside tests."
+  },
+  "concurrency": {
+    "internal_synchronization": "none",
+    "caller_synchronization_required": "all shared mutable access",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "single owner or externally synchronized",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [
+      "See endpoint contracts and source; bounded operations are explicit."
+    ],
+    "space_complexity": "Compile-time fixed inline metadata.",
+    "allocation_behavior": [
+      "none"
+    ],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [
+      "compile-time capacity"
+    ],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": [
+      "reports explicit full/exhaustion error"
+    ]
+  },
+  "security": {
+    "trust_boundary": "",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [
+      "fixed capacity"
+    ],
+    "side_channel_considerations": [],
+    "unsafe_operations": [
+      "none"
+    ],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-fixed-capacity-priority-queue",
+    "commands": [
+      "zig build test-fixed-capacity-priority-queue",
+      "zig build smoke-fixed-capacity-priority-queue"
+    ],
+    "unit_tests": [
+      "success, boundary, empty/full, and failure paths"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [
+      "zero-capacity instantiation where generic"
+    ],
+    "boundary_tests": [
+      "capacity and invalid state"
+    ],
+    "regression_tests": [],
+    "test_dependencies": [],
+    "smoke_test_commands": [
+      "zig build smoke-fixed-capacity-priority-queue"
+    ],
+    "smoke_test_behaviors": [
+      "named import and successful public operation"
+    ],
+    "smoke_test_dependencies": [
+      "fixed-capacity-vector"
+    ]
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "",
+    "continuous_integration": "",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [
+      "Behavior remains unverified until Zig 0.14.0 commands execute."
+    ],
+    "notes": [],
+    "status_dimensions": {
+      "implementation_present": true,
+      "contract_complete": true,
+      "contract_formatted": true,
+      "unit_tests_present": true,
+      "smoke_test_present": true,
+      "contract_checker_passed": false,
+      "compiler_validated": false,
+      "unit_tests_passed": false,
+      "smoke_tests_passed": false
+    }
+  },
+  "documentation": {
+    "read_order": [
+      "projects/42-fixed-capacity-priority-queue/README.md",
+      "projects/42-fixed-capacity-priority-queue/DETAILS.md",
+      "projects/42-fixed-capacity-priority-queue/MASTERY.md"
+    ],
+    "examples_covered": [],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [],
+    "related_modules": [
+      "fixed-capacity-vector"
+    ],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "experimental",
+    "breaking_change_policy": "Version the public contract.",
+    "deprecation_policy": "",
+    "known_gaps": [
+      "No internal synchronization."
+    ],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [],
+    "synchronization_requirements": [],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "order bounded values without allocation and preserve insertion order for equal priorities."
+    ],
+    "problems": [
+      "bounded allocation-free foundation"
+    ],
+    "inputs": [],
+    "outputs": [],
+    "environments": [
+      "hosted",
+      "freestanding"
+    ],
+    "keywords": [
+      "fixed",
+      "capacity",
+      "priority",
+      "queue"
+    ],
+    "grep_terms": [
+      "fixed-capacity-priority-queue",
+      "FixedPriorityQueue"
+    ],
+    "natural_language_queries": [
+      "Order bounded values without allocation and preserve insertion order for equal priorities."
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "bounded storage and ordering",
+    "reuses_modules": [
+      "fixed-capacity-vector"
+    ],
+    "guarantees_inherited": [
+      "exact dependency contracts"
+    ],
+    "future_modules_enabled": [
+      "schedulers",
+      "allocators",
+      "dependency planners"
+    ],
+    "future_code_removed": [
+      "repeated bounded mechanism"
+    ],
+    "future_reasoning_removed": [
+      "bounds and failure policy"
+    ],
+    "composition_value": "high",
+    "snowball_score": "qualitatively high"
+  },
+  "agent_guidance": {
+    "use_when": [
+      "fixed bounds and explicit ownership fit"
+    ],
+    "do_not_use_when": [
+      "unbounded growth is required"
+    ],
+    "selection_questions": [
+      "Is fixed capacity acceptable?"
+    ],
+    "required_preconditions": [
+      "Respect borrowed lifetimes."
+    ],
+    "integration_steps": [
+      "Import named module.",
+      "Run focused tests."
+    ],
+    "verification_steps": [
+      "zig build test-fixed-capacity-priority-queue",
+      "zig build smoke-fixed-capacity-priority-queue"
+    ],
+    "common_agent_mistakes": [
+      "assuming synchronization or growth"
+    ],
+    "safe_modification_boundaries": [],
+    "files_to_read_first": [
+      "projects/42-fixed-capacity-priority-queue/details.json",
+      "projects/42-fixed-capacity-priority-queue/DETAILS.md"
+    ],
+    "files_not_required_for_basic_use": [],
+    "smoke_test_before_integration": "zig build smoke-fixed-capacity-priority-queue"
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "FixedPriorityQueue",
+        "file": "projects/42-fixed-capacity-priority-queue/src/fixed_capacity_priority_queue.zig"
+      }
+    ],
+    "tests_to_behaviors": [],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": [
+      {
+        "module": "fixed-capacity-vector",
+        "path": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig",
+        "symbol": "public contract",
+        "guarantee": "checked lower-layer contract",
+        "reason": "Reuses its canonical bounded primitive."
+      }
+    ],
+    "smoke_tests_to_public_symbols": [
+      {
+        "file": "projects/42-fixed-capacity-priority-queue/tests/smoke_test.zig",
+        "symbols": [
+          "FixedPriorityQueue"
+        ]
+      }
+    ],
+    "smoke_tests_to_dependencies": []
+  },
+  "provenance": {
+    "original_author": "zig-reference contributors",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [
+      "fixed-capacity-vector"
+    ],
+    "design_sources": [
+      "docs/plans/SNOWBALL_FOUNDATION_BATCH_01.md"
+    ],
+    "migration_history": []
+  },
+  "smoke_test": {
+    "required": true,
+    "implemented": true,
+    "status": "implemented-unverified",
+    "source_path": "projects/42-fixed-capacity-priority-queue/tests/smoke_test.zig",
+    "build_step": "smoke-fixed-capacity-priority-queue",
+    "commands": [
+      "zig build smoke-fixed-capacity-priority-queue"
+    ],
+    "public_import_used": "fixed-capacity-priority-queue",
+    "public_symbols_exercised": [
+      "FixedPriorityQueue"
+    ],
+    "successful_operations": [
+      "construct and execute public operation"
+    ],
+    "failure_or_boundary_operations": [],
+    "cleanup_exercised": [],
+    "repository_dependencies_exercised": [
+      "fixed-capacity-vector"
+    ],
+    "hosted_environment_required": "test runner only",
+    "freestanding_environment_required": "module is freestanding suitable",
+    "fixtures": [],
+    "expected_exit_status": "0",
+    "expected_output": [],
+    "forbidden_private_access": true,
+    "last_run": "",
+    "last_result": "unverified",
+    "last_validated_commit": "",
+    "compiler_version": "",
+    "known_failures": [],
+    "notes": []
+  },
+  "portability": {
+    "baseline_zig_version": "0.14.0",
+    "port_contract": "projects/42-fixed-capacity-priority-queue/port.js",
+    "port_contract_schema": "port.schema.json",
+    "tested_zig_versions": [],
+    "untested_zig_versions": [
+      "later versions"
+    ],
+    "dependencies_must_port_first": [
+      "fixed-capacity-vector"
+    ],
+    "version_sensitive_symbols": [],
+    "version_sensitive_files": [],
+    "semantic_guarantees_to_preserve": [
+      "bounds, ownership, failure atomicity, invalidation"
+    ],
+    "validation_commands": [
+      "zig version",
+      "zig build test-fixed-capacity-priority-queue",
+      "zig build smoke-fixed-capacity-priority-queue"
+    ],
+    "known_porting_blockers": [],
+    "automatic_port_guaranteed": false,
+    "notes": []
+  }
+}

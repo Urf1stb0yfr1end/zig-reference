@@ -41,6 +41,11 @@ const specs = [_]ModuleSpec{
     .{ .name = "physical-page-frame-allocator", .source = "projects/36-physical-page-frame-allocator/src/physical_page_frame_allocator.zig", .dependencies = &.{ "bit-set", "bitmap-allocator", "checked-half-open-range", "distinct-memory-address-types", "physical-page-frame-number-and-address-conversion", "physical-memory-region-set" } },
     .{ .name = "elf64-file-header-parser", .source = "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig", .dependencies = &.{ "bounded-byte-reader", "checked-integer-cast", "validated-enum-decoder", "checked-half-open-range", "endian-integer-codec", "binary-cursor-checkpoint" } },
     .{ .name = "elf64-program-header-parser", .source = "projects/38-elf64-program-header-parser/src/elf64_program_header_parser.zig", .dependencies = &.{ "fixed-capacity-vector", "bounded-byte-reader", "checked-integer-cast", "validated-enum-decoder", "aligned-address-and-size-helpers", "validated-bit-flags", "checked-half-open-range", "distinct-memory-address-types", "endian-integer-codec", "binary-cursor-checkpoint", "bounded-binary-sub-reader", "elf64-file-header-parser" } },
+    .{ .name = "intrusive-doubly-linked-list", .source = "projects/39-intrusive-doubly-linked-list/src/intrusive_doubly_linked_list.zig", .dependencies = &.{} },
+    .{ .name = "fixed-free-list", .source = "projects/40-fixed-free-list/src/fixed_free_list.zig", .dependencies = &.{} },
+    .{ .name = "fixed-bump-allocator", .source = "projects/41-fixed-bump-allocator/src/fixed_bump_allocator.zig", .dependencies = &.{"aligned-address-and-size-helpers"} },
+    .{ .name = "fixed-capacity-priority-queue", .source = "projects/42-fixed-capacity-priority-queue/src/fixed_capacity_priority_queue.zig", .dependencies = &.{"fixed-capacity-vector"} },
+    .{ .name = "fixed-capacity-topological-sort", .source = "projects/43-fixed-capacity-topological-sort/src/fixed_capacity_topological_sort.zig", .dependencies = &.{ "fixed-capacity-vector", "fixed-capacity-priority-queue" } },
 };
 
 const RecipeSpec = struct { name: []const u8, dependencies: []const []const u8 };
@@ -51,6 +56,7 @@ const recipe_specs = [_]RecipeSpec{
     .{ .name = "validate-physical-page-frame", .dependencies = &.{ "distinct-memory-address-types", "physical-page-frame-number-and-address-conversion" } },
     .{ .name = "construct-bounded-state-machine", .dependencies = &.{ "state-machine", "bounded-integer" } },
     .{ .name = "normalize-checked-memory-range", .dependencies = &.{ "checked-half-open-range", "aligned-address-and-size-helpers" } },
+    .{ .name = "plan-bounded-initialization", .dependencies = &.{ "intrusive-doubly-linked-list", "fixed-free-list", "fixed-bump-allocator", "fixed-capacity-priority-queue", "fixed-capacity-topological-sort" } },
 };
 
 pub fn build(b: *std.Build) void {

@@ -46,13 +46,25 @@
       "validated-enum-decoder"
     ],
     "endian-integer-codec": [],
+    "fixed-bump-allocator": [
+      "aligned-address-and-size-helpers"
+    ],
     "fixed-capacity-object-pool": [
       "bitmap-allocator",
       "generational-handles"
     ],
+    "fixed-capacity-priority-queue": [
+      "fixed-capacity-vector"
+    ],
+    "fixed-capacity-topological-sort": [
+      "fixed-capacity-priority-queue",
+      "fixed-capacity-vector"
+    ],
     "fixed-capacity-vector": [],
+    "fixed-free-list": [],
     "fourcc-code": [],
     "generational-handles": [],
+    "intrusive-doubly-linked-list": [],
     "length-prefixed-binary-field": [
       "binary-cursor-checkpoint",
       "bounded-binary-sub-reader",

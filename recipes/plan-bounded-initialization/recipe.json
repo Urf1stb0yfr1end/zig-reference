@@ -1,0 +1,17 @@
+{
+  "name": "plan-bounded-initialization",
+  "problem_solved": "plan bounded dependency initialization without hidden allocation",
+  "status": "implemented-unverified",
+  "selected_modules": ["intrusive-doubly-linked-list", "fixed-free-list", "fixed-bump-allocator", "fixed-capacity-priority-queue", "fixed-capacity-topological-sort"],
+  "selection_reasons": ["Exercises caller-owned storage, slot reuse, deterministic priority, and dependency ordering as one orchestration."],
+  "direct_dependencies": ["intrusive-doubly-linked-list", "fixed-free-list", "fixed-bump-allocator", "fixed-capacity-priority-queue", "fixed-capacity-topological-sort"],
+  "dependency_order": ["intrusive-doubly-linked-list", "fixed-free-list", "fixed-bump-allocator", "fixed-capacity-priority-queue", "fixed-capacity-topological-sort"],
+  "public_endpoints_used": ["IntrusiveDoublyLinkedList", "FixedFreeList", "FixedBumpAllocator", "FixedPriorityQueue", "FixedTopologicalGraph"],
+  "adapters_required": ["recipes/plan-bounded-initialization/src/recipe.zig"],
+  "inherited_guarantees": ["No hidden allocation; fixed limits; explicit exhaustion; deterministic dependency and priority order."],
+  "gaps_discovered": [],
+  "future_systems_enabled": ["boot initialization", "compiler passes", "bounded job planning"],
+  "intended_build_commands": ["zig build test-recipe-plan-bounded-initialization", "zig build recipes"],
+  "intended_smoke_commands": [],
+  "validation_evidence_references": []
+}

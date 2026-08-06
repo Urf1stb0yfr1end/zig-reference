@@ -392,6 +392,56 @@
       "smoke_validated": true,
       "target_maturity_level": 2,
       "unit_validated": true
+    },
+    {
+      "conformance_validated": false,
+      "evidence_records": 1,
+      "lifecycle": "experimental",
+      "maturity_level": 4,
+      "module": "intrusive-doubly-linked-list",
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
+    },
+    {
+      "conformance_validated": false,
+      "evidence_records": 1,
+      "lifecycle": "experimental",
+      "maturity_level": 4,
+      "module": "fixed-free-list",
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
+    },
+    {
+      "conformance_validated": false,
+      "evidence_records": 1,
+      "lifecycle": "experimental",
+      "maturity_level": 4,
+      "module": "fixed-bump-allocator",
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
+    },
+    {
+      "conformance_validated": false,
+      "evidence_records": 1,
+      "lifecycle": "experimental",
+      "maturity_level": 4,
+      "module": "fixed-capacity-priority-queue",
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
+    },
+    {
+      "conformance_validated": false,
+      "evidence_records": 1,
+      "lifecycle": "experimental",
+      "maturity_level": 4,
+      "module": "fixed-capacity-topological-sort",
+      "smoke_validated": true,
+      "target_maturity_level": 2,
+      "unit_validated": true
     }
   ],
   "repository_index_version": "1.0.0"

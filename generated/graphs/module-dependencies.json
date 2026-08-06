@@ -95,12 +95,28 @@
       "module": "elf64-program-header-parser"
     },
     {
+      "dependency": "aligned-address-and-size-helpers",
+      "module": "fixed-bump-allocator"
+    },
+    {
       "dependency": "bitmap-allocator",
       "module": "fixed-capacity-object-pool"
     },
     {
       "dependency": "generational-handles",
       "module": "fixed-capacity-object-pool"
+    },
+    {
+      "dependency": "fixed-capacity-vector",
+      "module": "fixed-capacity-priority-queue"
+    },
+    {
+      "dependency": "fixed-capacity-priority-queue",
+      "module": "fixed-capacity-topological-sort"
+    },
+    {
+      "dependency": "fixed-capacity-vector",
+      "module": "fixed-capacity-topological-sort"
     },
     {
       "dependency": "binary-cursor-checkpoint",
