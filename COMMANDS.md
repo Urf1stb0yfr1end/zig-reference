@@ -152,6 +152,12 @@ The following section is derived from `generated/modules.json` and canonical mod
 | `fixed-bump-allocator` | `zig build test-fixed-bump-allocator` | `zig build smoke-fixed-bump-allocator` | `projects/41-fixed-bump-allocator/details.json` |
 | `fixed-capacity-priority-queue` | `zig build test-fixed-capacity-priority-queue` | `zig build smoke-fixed-capacity-priority-queue` | `projects/42-fixed-capacity-priority-queue/details.json` |
 | `fixed-capacity-topological-sort` | `zig build test-fixed-capacity-topological-sort` | `zig build smoke-fixed-capacity-topological-sort` | `projects/43-fixed-capacity-topological-sort/details.json` |
+| `riscv-sv39-page-table-entry` | `zig build test-riscv-sv39-page-table-entry` | `zig build smoke-riscv-sv39-page-table-entry` | `projects/44-riscv-sv39-page-table-entry/details.json` |
+| `riscv-sv39-virtual-address-indexing` | `zig build test-riscv-sv39-virtual-address-indexing` | `zig build smoke-riscv-sv39-virtual-address-indexing` | `projects/45-riscv-sv39-virtual-address-indexing/details.json` |
+| `riscv-page-table-page-owner` | `zig build test-riscv-page-table-page-owner` | `zig build smoke-riscv-page-table-page-owner` | `projects/46-riscv-page-table-page-owner/details.json` |
+| `riscv-sv39-page-table-walker` | `zig build test-riscv-sv39-page-table-walker` | `zig build smoke-riscv-sv39-page-table-walker` | `projects/47-riscv-sv39-page-table-walker/details.json` |
+| `riscv-sfence-vma-invalidation` | `zig build test-riscv-sfence-vma-invalidation` | `zig build smoke-riscv-sfence-vma-invalidation` | `projects/48-riscv-sfence-vma-invalidation/details.json` |
+| `riscv-sv39-page-table-builder` | `zig build test-riscv-sv39-page-table-builder` | `zig build smoke-riscv-sv39-page-table-builder` | `projects/49-riscv-sv39-page-table-builder/details.json` |
 <!-- END GENERATED MODULE COMMANDS -->
 
 ## Recipes and conformance
@@ -190,3 +196,6 @@ No release, signing, SBOM, attestation, or artifact-publication command is curre
 ## Prohibited and removed commands
 
 Database generators, SQLite generation, binary indexes, rendered graph generation, and a database build step are removed and unsupported. Deterministic JSON indexes are the complete acceleration layer. Repository generation supports reviewable text only.
+
+## RISC-V Sv39 foundation commands
+Each module has `zig build test-<module>` and `zig build smoke-<module>` targets for `riscv-sv39-page-table-entry`, `riscv-sv39-virtual-address-indexing`, `riscv-page-table-page-owner`, `riscv-sv39-page-table-walker`, `riscv-sfence-vma-invalidation`, and `riscv-sv39-page-table-builder`. Run the composition independently with `zig build test-recipe-construct-and-verify-sv39-address-space`.

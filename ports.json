@@ -557,6 +557,82 @@
       "baselineValidated": false,
       "testedTargetVersions": [],
       "knownMigrationBlockers": []
+    },
+    {
+      "id": "44",
+      "canonicalName": "riscv-sv39-page-table-entry",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/44-riscv-sv39-page-table-entry/port.js",
+      "implementationPath": "projects/44-riscv-sv39-page-table-entry/src/riscv_sv39_page_table_entry.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "45",
+      "canonicalName": "riscv-sv39-virtual-address-indexing",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/45-riscv-sv39-virtual-address-indexing/port.js",
+      "implementationPath": "projects/45-riscv-sv39-virtual-address-indexing/src/riscv_sv39_virtual_address_indexing.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "46",
+      "canonicalName": "riscv-page-table-page-owner",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/46-riscv-page-table-page-owner/port.js",
+      "implementationPath": "projects/46-riscv-page-table-page-owner/src/riscv_page_table_page_owner.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "47",
+      "canonicalName": "riscv-sv39-page-table-walker",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/47-riscv-sv39-page-table-walker/port.js",
+      "implementationPath": "projects/47-riscv-sv39-page-table-walker/src/riscv_sv39_page_table_walker.zig",
+      "dependenciesMustPortFirst": [
+        "riscv-sv39-page-table-entry",
+        "riscv-sv39-virtual-address-indexing",
+        "riscv-page-table-page-owner"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "48",
+      "canonicalName": "riscv-sfence-vma-invalidation",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/48-riscv-sfence-vma-invalidation/port.js",
+      "implementationPath": "projects/48-riscv-sfence-vma-invalidation/src/riscv_sfence_vma_invalidation.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "49",
+      "canonicalName": "riscv-sv39-page-table-builder",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/49-riscv-sv39-page-table-builder/port.js",
+      "implementationPath": "projects/49-riscv-sv39-page-table-builder/src/riscv_sv39_page_table_builder.zig",
+      "dependenciesMustPortFirst": [
+        "riscv-sv39-page-table-entry",
+        "riscv-sv39-virtual-address-indexing",
+        "riscv-page-table-page-owner",
+        "riscv-sv39-page-table-walker",
+        "riscv-sfence-vma-invalidation"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
     }
   ]
 }

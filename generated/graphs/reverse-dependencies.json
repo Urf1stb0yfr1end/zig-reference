@@ -106,6 +106,25 @@
       "physical-page-frame-allocator"
     ],
     "ring-buffer": [],
+    "riscv-page-table-page-owner": [
+      "riscv-sv39-page-table-builder",
+      "riscv-sv39-page-table-walker"
+    ],
+    "riscv-sfence-vma-invalidation": [
+      "riscv-sv39-page-table-builder"
+    ],
+    "riscv-sv39-page-table-builder": [],
+    "riscv-sv39-page-table-entry": [
+      "riscv-sv39-page-table-builder",
+      "riscv-sv39-page-table-walker"
+    ],
+    "riscv-sv39-page-table-walker": [
+      "riscv-sv39-page-table-builder"
+    ],
+    "riscv-sv39-virtual-address-indexing": [
+      "riscv-sv39-page-table-builder",
+      "riscv-sv39-page-table-walker"
+    ],
     "saturating-counter": [],
     "semantic-version": [],
     "source-span": [],

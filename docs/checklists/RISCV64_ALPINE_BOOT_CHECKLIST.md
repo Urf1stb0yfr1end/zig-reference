@@ -411,3 +411,9 @@ The RISC-V path is complete when a clean checkout can, using Zig 0.14.0 and docu
 6. run a deterministic guest command;
 7. shut down cleanly;
 8. reproduce the result from documented textual commands and evidence.
+
+## Completed page-table foundation
+- [x] Host-style Sv39 entry validation and address indexing
+- [x] Explicit page-table page ownership and access-provider boundary
+- [x] Sv39 walker, deterministic builder rollback, and SFENCE.VMA planning
+- [ ] Sv39x4 guest-stage translation (intentionally deferred)

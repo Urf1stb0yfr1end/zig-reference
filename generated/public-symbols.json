@@ -41,12 +41,20 @@
       "symbol": "BoundedReader"
     },
     {
+      "module": "riscv-sv39-page-table-builder",
+      "symbol": "Builder"
+    },
+    {
       "module": "byte-writer",
       "symbol": "ByteWriter"
     },
     {
       "module": "checked-half-open-range",
       "symbol": "CheckedRange"
+    },
+    {
+      "module": "riscv-sv39-page-table-entry",
+      "symbol": "DecodeError"
     },
     {
       "module": "dynamic-array",
@@ -67,6 +75,26 @@
     {
       "module": "endian-integer-codec",
       "symbol": "EndianIntegerCodec"
+    },
+    {
+      "module": "riscv-sv39-page-table-entry",
+      "symbol": "Entry"
+    },
+    {
+      "module": "riscv-page-table-page-owner",
+      "symbol": "Error"
+    },
+    {
+      "module": "riscv-sv39-page-table-builder",
+      "symbol": "Error"
+    },
+    {
+      "module": "riscv-sv39-page-table-walker",
+      "symbol": "Error"
+    },
+    {
+      "module": "riscv-sv39-virtual-address-indexing",
+      "symbol": "Error"
     },
     {
       "module": "fixed-bump-allocator",
@@ -113,8 +141,24 @@
       "symbol": "IntrusiveDoublyLinkedList"
     },
     {
+      "module": "riscv-sv39-page-table-entry",
+      "symbol": "Kind"
+    },
+    {
       "module": "length-prefixed-binary-field",
       "symbol": "LengthPrefixedField"
+    },
+    {
+      "module": "riscv-sv39-page-table-entry",
+      "symbol": "Level"
+    },
+    {
+      "module": "riscv-sv39-virtual-address-indexing",
+      "symbol": "Level"
+    },
+    {
+      "module": "riscv-sv39-page-table-builder",
+      "symbol": "Mutation"
     },
     {
       "module": "nonzero-integer",
@@ -133,6 +177,10 @@
       "symbol": "OwnedByteBuffer"
     },
     {
+      "module": "riscv-page-table-page-owner",
+      "symbol": "PageOwner"
+    },
+    {
       "module": "physical-page-frame-number-and-address-conversion",
       "symbol": "PageSize"
     },
@@ -145,11 +193,19 @@
       "symbol": "ParseError"
     },
     {
+      "module": "riscv-sv39-virtual-address-indexing",
+      "symbol": "Parts"
+    },
+    {
       "module": "elf64-program-header-parser",
       "symbol": "Permission"
     },
     {
       "module": "elf64-program-header-parser",
+      "symbol": "Permissions"
+    },
+    {
+      "module": "riscv-sv39-page-table-entry",
       "symbol": "Permissions"
     },
     {
@@ -173,12 +229,20 @@
       "symbol": "PhysicalPageFrameNumber"
     },
     {
+      "module": "riscv-sfence-vma-invalidation",
+      "symbol": "Plan"
+    },
+    {
       "module": "unit-safe-quantity",
       "symbol": "Quantity"
     },
     {
       "module": "physical-memory-region-set",
       "symbol": "RegionKind"
+    },
+    {
+      "module": "riscv-sv39-page-table-walker",
+      "symbol": "Result"
     },
     {
       "module": "ring-buffer",
@@ -249,12 +313,48 @@
       "symbol": "checkedIntegerCast"
     },
     {
+      "module": "riscv-sv39-virtual-address-indexing",
+      "symbol": "construct"
+    },
+    {
       "module": "validated-enum-decoder",
       "symbol": "decodeEnum"
     },
     {
+      "module": "riscv-sv39-virtual-address-indexing",
+      "symbol": "decompose"
+    },
+    {
+      "module": "riscv-page-table-page-owner",
+      "symbol": "entries_per_page"
+    },
+    {
+      "module": "riscv-sfence-vma-invalidation",
+      "symbol": "executeUnsafe"
+    },
+    {
+      "module": "riscv-sfence-vma-invalidation",
+      "symbol": "forAddress"
+    },
+    {
+      "module": "riscv-sfence-vma-invalidation",
+      "symbol": "forAddressAsid"
+    },
+    {
+      "module": "riscv-sfence-vma-invalidation",
+      "symbol": "forAsid"
+    },
+    {
+      "module": "riscv-sfence-vma-invalidation",
+      "symbol": "global"
+    },
+    {
       "module": "aligned-address-and-size-helpers",
       "symbol": "isAligned"
+    },
+    {
+      "module": "riscv-sv39-virtual-address-indexing",
+      "symbol": "isCanonical"
     },
     {
       "module": "aligned-address-and-size-helpers",
@@ -269,6 +369,10 @@
       "symbol": "paddingNeeded"
     },
     {
+      "module": "riscv-sv39-virtual-address-indexing",
+      "symbol": "pageSize"
+    },
+    {
       "module": "elf64-file-header-parser",
       "symbol": "parse"
     },
@@ -281,8 +385,20 @@
       "symbol": "parseTable"
     },
     {
+      "module": "riscv-sv39-virtual-address-indexing",
+      "symbol": "requireAligned"
+    },
+    {
       "module": "binary-cursor-checkpoint",
       "symbol": "restore"
+    },
+    {
+      "module": "riscv-sv39-virtual-address-indexing",
+      "symbol": "validateRange"
+    },
+    {
+      "module": "riscv-sv39-page-table-walker",
+      "symbol": "walk"
     }
   ]
 }

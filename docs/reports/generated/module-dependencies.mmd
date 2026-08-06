@@ -48,6 +48,14 @@ graph TD
   physical_page_frame_allocator --> physical_memory_region_set
   physical_page_frame_allocator --> physical_page_frame_number_and_address_conversion
   physical_page_frame_number_and_address_conversion --> distinct_memory_address_types
+  riscv_sv39_page_table_builder --> riscv_page_table_page_owner
+  riscv_sv39_page_table_builder --> riscv_sfence_vma_invalidation
+  riscv_sv39_page_table_builder --> riscv_sv39_page_table_entry
+  riscv_sv39_page_table_builder --> riscv_sv39_page_table_walker
+  riscv_sv39_page_table_builder --> riscv_sv39_virtual_address_indexing
+  riscv_sv39_page_table_walker --> riscv_page_table_page_owner
+  riscv_sv39_page_table_walker --> riscv_sv39_page_table_entry
+  riscv_sv39_page_table_walker --> riscv_sv39_virtual_address_indexing
   stack --> dynamic_array
   type_length_value_decoder --> binary_cursor_checkpoint
   type_length_value_decoder --> bounded_binary_sub_reader

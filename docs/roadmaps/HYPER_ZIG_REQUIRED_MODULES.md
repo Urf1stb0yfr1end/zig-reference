@@ -587,3 +587,6 @@ It becomes compositional infrastructure only when it has:
 - documented hosted or freestanding assumptions.
 
 The future `Hyper-Zig` command should select these modules by capability, follow their declared edges, and write only the architecture that remains unique to the final hypervisor.
+
+## Parallel RISC-V Sv39 foundation (implemented)
+Modules 44–49 provide host-stage Sv39 representation, indexing, page ownership, walking, deterministic mutation with rollback, and SFENCE.VMA planning. They do not replace the x86_64 roadmap and deliberately defer Sv39x4, hgatp, traps, SBI, FDT, devices, and Alpine boot.

@@ -95,6 +95,12 @@
       ]
     },
     {
+      "capability": "allocation-free read-only sv39 translation through an injected provider",
+      "modules": [
+        "riscv-sv39-page-table-walker"
+      ]
+    },
+    {
       "capability": "allocator",
       "modules": [
         "bitmap-allocator",
@@ -223,6 +229,12 @@
       ]
     },
     {
+      "capability": "bounded explicit ownership and injected access to zeroed page-table pages",
+      "modules": [
+        "riscv-page-table-page-owner"
+      ]
+    },
+    {
       "capability": "bounded input",
       "modules": [
         "bounded-byte-reader"
@@ -312,6 +324,12 @@
       "capability": "checked address arithmetic",
       "modules": [
         "distinct-memory-address-types"
+      ]
+    },
+    {
+      "capability": "checked canonical sv39 virtual-address decomposition, reconstruction, alignment, and ranges",
+      "modules": [
+        "riscv-sv39-virtual-address-indexing"
       ]
     },
     {
@@ -426,6 +444,12 @@
       "capability": "decoder",
       "modules": [
         "validated-enum-decoder"
+      ]
+    },
+    {
+      "capability": "deterministic sv39 mapping, walking, protection, unmapping, and rollback",
+      "modules": [
+        "riscv-sv39-page-table-builder"
       ]
     },
     {
@@ -898,6 +922,17 @@
       ]
     },
     {
+      "capability": "makes architectural validation, ownership, and failure semantics explicit",
+      "modules": [
+        "riscv-page-table-page-owner",
+        "riscv-sfence-vma-invalidation",
+        "riscv-sv39-page-table-builder",
+        "riscv-sv39-page-table-entry",
+        "riscv-sv39-page-table-walker",
+        "riscv-sv39-virtual-address-indexing"
+      ]
+    },
+    {
       "capability": "mask",
       "modules": [
         "validated-bit-flags"
@@ -1065,6 +1100,17 @@
         "physical-page-frame-allocator",
         "physical-page-frame-number-and-address-conversion",
         "type-length-value-decoder"
+      ]
+    },
+    {
+      "capability": "page table",
+      "modules": [
+        "riscv-page-table-page-owner",
+        "riscv-sfence-vma-invalidation",
+        "riscv-sv39-page-table-builder",
+        "riscv-sv39-page-table-entry",
+        "riscv-sv39-page-table-walker",
+        "riscv-sv39-virtual-address-indexing"
       ]
     },
     {
@@ -1321,6 +1367,53 @@
       ]
     },
     {
+      "capability": "risc-v",
+      "modules": [
+        "riscv-page-table-page-owner",
+        "riscv-sfence-vma-invalidation",
+        "riscv-sv39-page-table-builder",
+        "riscv-sv39-page-table-entry",
+        "riscv-sv39-page-table-walker",
+        "riscv-sv39-virtual-address-indexing"
+      ]
+    },
+    {
+      "capability": "riscv page table page owner",
+      "modules": [
+        "riscv-page-table-page-owner"
+      ]
+    },
+    {
+      "capability": "riscv sfence vma invalidation",
+      "modules": [
+        "riscv-sfence-vma-invalidation"
+      ]
+    },
+    {
+      "capability": "riscv sv39 page table builder",
+      "modules": [
+        "riscv-sv39-page-table-builder"
+      ]
+    },
+    {
+      "capability": "riscv sv39 page table entry",
+      "modules": [
+        "riscv-sv39-page-table-entry"
+      ]
+    },
+    {
+      "capability": "riscv sv39 page table walker",
+      "modules": [
+        "riscv-sv39-page-table-walker"
+      ]
+    },
+    {
+      "capability": "riscv sv39 virtual address indexing",
+      "modules": [
+        "riscv-sv39-virtual-address-indexing"
+      ]
+    },
+    {
       "capability": "rollover",
       "modules": [
         "wrapping-sequence-number"
@@ -1519,6 +1612,17 @@
       ]
     },
     {
+      "capability": "sv39",
+      "modules": [
+        "riscv-page-table-page-owner",
+        "riscv-sfence-vma-invalidation",
+        "riscv-sv39-page-table-builder",
+        "riscv-sv39-page-table-entry",
+        "riscv-sv39-page-table-walker",
+        "riscv-sv39-virtual-address-indexing"
+      ]
+    },
+    {
       "capability": "tagged result",
       "modules": [
         "tagged-result"
@@ -1534,6 +1638,12 @@
       "capability": "tagged-union",
       "modules": [
         "tagged-result"
+      ]
+    },
+    {
+      "capability": "testable sfence.vma command planning with an explicit privileged execution boundary",
+      "modules": [
+        "riscv-sfence-vma-invalidation"
       ]
     },
     {
@@ -1589,6 +1699,12 @@
       "capability": "typed physical address",
       "modules": [
         "distinct-memory-address-types"
+      ]
+    },
+    {
+      "capability": "typed validation and encoding of sv39 page-table entries",
+      "modules": [
+        "riscv-sv39-page-table-entry"
       ]
     },
     {
