@@ -190,6 +190,12 @@
     },
     {
       "kind": "function",
+      "module": "bounded-system-resource-plan",
+      "name": "Planner",
+      "signature": "Planner()"
+    },
+    {
+      "kind": "function",
       "module": "unit-safe-quantity",
       "name": "Quantity",
       "signature": "Quantity(comptime Unit: type, comptime Scalar: type) type"
@@ -547,6 +553,12 @@
       "module": "semantic-version",
       "name": "compare",
       "signature": "compare(self: SemanticVersion, other: SemanticVersion) std.math.Order"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-system-resource-plan",
+      "name": "concreteStorageBytes",
+      "signature": "concreteStorageBytes()"
     },
     {
       "kind": "method",
@@ -1306,6 +1318,12 @@
     },
     {
       "kind": "function",
+      "module": "bounded-system-resource-plan",
+      "name": "layOutConcreteStorage",
+      "signature": "layOutConcreteStorage()"
+    },
+    {
+      "kind": "function",
       "module": "riscv-sv39-page-table-entry",
       "name": "leaf",
       "signature": "leaf()"
@@ -1465,6 +1483,12 @@
       "module": "riscv-sv39-page-table-entry",
       "name": "permissions",
       "signature": "permissions()"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-system-resource-plan",
+      "name": "plan",
+      "signature": "plan()"
     },
     {
       "kind": "method",
@@ -1693,6 +1717,12 @@
       "module": "validated-bit-flags",
       "name": "remove",
       "signature": "remove(self: *Self, flag: Flag) void"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-system-resource-plan",
+      "name": "render",
+      "signature": "render()"
     },
     {
       "kind": "function",

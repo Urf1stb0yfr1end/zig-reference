@@ -4,6 +4,15 @@
   "agent_index_version": "1.0.0",
   "generator": "tools/build-agent-index.py",
   "symbols": {
+    "CapacityConfiguration": [
+      "bounded-system-resource-plan"
+    ],
+    "DependencyEdge": [
+      "bounded-system-resource-plan"
+    ],
+    "Description": [
+      "bounded-system-resource-plan"
+    ],
     "FixedBumpAllocator": [
       "fixed-bump-allocator"
     ],
@@ -18,6 +27,12 @@
     ],
     "ObjectPool": [
       "fixed-capacity-object-pool"
+    ],
+    "Planner": [
+      "bounded-system-resource-plan"
+    ],
+    "PostSealAllocation": [
+      "bounded-system-resource-plan"
     ]
   }
 }

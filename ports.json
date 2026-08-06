@@ -633,6 +633,23 @@
       "baselineValidated": false,
       "testedTargetVersions": [],
       "knownMigrationBlockers": []
+    },
+    {
+      "id": "50",
+      "canonicalName": "bounded-system-resource-plan",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/50-bounded-system-resource-plan/port.js",
+      "implementationPath": "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig",
+      "dependenciesMustPortFirst": [
+        "bounded-integer",
+        "checked-integer-cast",
+        "aligned-address-and-size-helpers",
+        "fixed-bump-allocator",
+        "fixed-capacity-topological-sort"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
     }
   ]
 }

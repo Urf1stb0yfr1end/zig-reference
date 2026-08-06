@@ -1,0 +1,17 @@
+{
+  "name": "plan-morphic-runtime",
+  "problem_solved": "derive and validate the canonical bounded Morphic runtime resource budget",
+  "status": "implemented-unverified",
+  "selected_modules": ["bounded-system-resource-plan"],
+  "selection_reasons": ["The general planner owns arithmetic, alignment, storage derivation, and initialization ordering."],
+  "direct_dependencies": ["bounded-system-resource-plan"],
+  "dependency_order": ["bounded-system-resource-plan"],
+  "public_endpoints_used": ["Planner", "Description", "DependencyEdge"],
+  "adapters_required": ["recipes/plan-morphic-runtime/src/recipe.zig"],
+  "inherited_guarantees": ["Checked arithmetic, deterministic ordering, fixed storage, explicit exhaustion, and no hidden allocation."],
+  "gaps_discovered": [],
+  "future_systems_enabled": ["Morphic hosted runtime", "embedded runtime", "kernel resource planning"],
+  "intended_build_commands": ["zig build plan-morphic-runtime", "zig build verify-morphic-plan", "zig build test-recipe-plan-morphic-runtime"],
+  "intended_smoke_commands": [],
+  "validation_evidence_references": []
+}

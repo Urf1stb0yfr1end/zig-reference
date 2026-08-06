@@ -53,6 +53,56 @@
       "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
       "title": "Priority queue capacity exceeded"
     },
+    "ZIGREF-RESOURCE-PLAN-ARITHMETIC-OVERFLOW": {
+      "classification": "runtime_negative_test",
+      "details": "projects/50-bounded-system-resource-plan/details.json",
+      "evidence_status": "tested",
+      "fixture": "projects/50-bounded-system-resource-plan/tests/agent/misuse/arithmetic_overflow.zig",
+      "module": "bounded-system-resource-plan",
+      "repair_example": "projects/50-bounded-system-resource-plan/tests/agent/repair/arithmetic_overflow_repair.zig",
+      "repair_strategy": "Correct the declared bounded configuration, then reconstruct and handle the explicit error result.",
+      "title": "Arithmetic Overflow"
+    },
+    "ZIGREF-RESOURCE-PLAN-INITIALIZATION-CYCLE": {
+      "classification": "runtime_negative_test",
+      "details": "projects/50-bounded-system-resource-plan/details.json",
+      "evidence_status": "tested",
+      "fixture": "projects/50-bounded-system-resource-plan/tests/agent/misuse/initialization_cycle.zig",
+      "module": "bounded-system-resource-plan",
+      "repair_example": "projects/50-bounded-system-resource-plan/tests/agent/repair/initialization_cycle_repair.zig",
+      "repair_strategy": "Correct the declared bounded configuration, then reconstruct and handle the explicit error result.",
+      "title": "Initialization Cycle"
+    },
+    "ZIGREF-RESOURCE-PLAN-INVALID-ALIGNMENT": {
+      "classification": "runtime_negative_test",
+      "details": "projects/50-bounded-system-resource-plan/details.json",
+      "evidence_status": "tested",
+      "fixture": "projects/50-bounded-system-resource-plan/tests/agent/misuse/invalid_alignment.zig",
+      "module": "bounded-system-resource-plan",
+      "repair_example": "projects/50-bounded-system-resource-plan/tests/agent/repair/invalid_alignment_repair.zig",
+      "repair_strategy": "Correct the declared bounded configuration, then reconstruct and handle the explicit error result.",
+      "title": "Invalid Alignment"
+    },
+    "ZIGREF-RESOURCE-PLAN-INVALID-CAPACITY": {
+      "classification": "runtime_negative_test",
+      "details": "projects/50-bounded-system-resource-plan/details.json",
+      "evidence_status": "tested",
+      "fixture": "projects/50-bounded-system-resource-plan/tests/agent/misuse/invalid_capacity.zig",
+      "module": "bounded-system-resource-plan",
+      "repair_example": "projects/50-bounded-system-resource-plan/tests/agent/repair/invalid_capacity_repair.zig",
+      "repair_strategy": "Correct the declared bounded configuration, then reconstruct and handle the explicit error result.",
+      "title": "Invalid Capacity"
+    },
+    "ZIGREF-RESOURCE-PLAN-MEMORY-EXCEEDED": {
+      "classification": "runtime_negative_test",
+      "details": "projects/50-bounded-system-resource-plan/details.json",
+      "evidence_status": "tested",
+      "fixture": "projects/50-bounded-system-resource-plan/tests/agent/misuse/memory_exceeded.zig",
+      "module": "bounded-system-resource-plan",
+      "repair_example": "projects/50-bounded-system-resource-plan/tests/agent/repair/memory_exceeded_repair.zig",
+      "repair_strategy": "Correct the declared bounded configuration, then reconstruct and handle the explicit error result.",
+      "title": "Memory Exceeded"
+    },
     "ZIGREF-TOPO-CYCLE": {
       "classification": "runtime_negative_test",
       "details": "projects/43-fixed-capacity-topological-sort/details.json",

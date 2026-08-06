@@ -449,6 +449,15 @@
       "details": "projects/49-riscv-sv39-page-table-builder/details.json",
       "unit_test_step": "test-riscv-sv39-page-table-builder",
       "smoke_test_step": "smoke-riscv-sv39-page-table-builder"
+    },
+    {
+      "id": "50",
+      "canonical_name": "bounded-system-resource-plan",
+      "directory": "projects/50-bounded-system-resource-plan",
+      "public_entrypoint": "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig",
+      "details": "projects/50-bounded-system-resource-plan/details.json",
+      "unit_test_step": "test-bounded-system-resource-plan",
+      "smoke_test_step": "smoke-bounded-system-resource-plan"
     }
   ]
 }

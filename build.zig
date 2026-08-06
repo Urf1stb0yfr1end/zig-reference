@@ -52,6 +52,7 @@ const specs = [_]ModuleSpec{
     .{ .name = "riscv-sv39-page-table-walker", .source = "projects/47-riscv-sv39-page-table-walker/src/riscv_sv39_page_table_walker.zig", .dependencies = &.{ "riscv-sv39-page-table-entry", "riscv-sv39-virtual-address-indexing", "riscv-page-table-page-owner" } },
     .{ .name = "riscv-sfence-vma-invalidation", .source = "projects/48-riscv-sfence-vma-invalidation/src/riscv_sfence_vma_invalidation.zig", .dependencies = &.{} },
     .{ .name = "riscv-sv39-page-table-builder", .source = "projects/49-riscv-sv39-page-table-builder/src/riscv_sv39_page_table_builder.zig", .dependencies = &.{ "riscv-sv39-page-table-entry", "riscv-sv39-virtual-address-indexing", "riscv-page-table-page-owner", "riscv-sv39-page-table-walker", "riscv-sfence-vma-invalidation" } },
+    .{ .name = "bounded-system-resource-plan", .source = "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig", .dependencies = &.{ "bounded-integer", "checked-integer-cast", "aligned-address-and-size-helpers", "fixed-bump-allocator", "fixed-capacity-topological-sort" } },
 };
 
 const RecipeSpec = struct { name: []const u8, dependencies: []const []const u8 };
@@ -72,6 +73,16 @@ const agent_fixture_specs = [_]AgentFixtureSpec{
     .{ .module = "fixed-capacity-topological-sort", .path = "projects/43-fixed-capacity-topological-sort/tests/agent/repair/topo_cycle_repair.zig", .class = .repair },
     .{ .module = "fixed-capacity-topological-sort", .path = "projects/43-fixed-capacity-topological-sort/tests/agent/misuse/topo_invalid_vertex.zig", .class = .runtime_negative_test },
     .{ .module = "fixed-capacity-topological-sort", .path = "projects/43-fixed-capacity-topological-sort/tests/agent/repair/topo_invalid_vertex_repair.zig", .class = .repair },
+    .{ .module = "bounded-system-resource-plan", .path = "projects/50-bounded-system-resource-plan/tests/agent/misuse/memory_exceeded.zig", .class = .runtime_negative_test },
+    .{ .module = "bounded-system-resource-plan", .path = "projects/50-bounded-system-resource-plan/tests/agent/repair/memory_exceeded_repair.zig", .class = .repair },
+    .{ .module = "bounded-system-resource-plan", .path = "projects/50-bounded-system-resource-plan/tests/agent/misuse/arithmetic_overflow.zig", .class = .runtime_negative_test },
+    .{ .module = "bounded-system-resource-plan", .path = "projects/50-bounded-system-resource-plan/tests/agent/repair/arithmetic_overflow_repair.zig", .class = .repair },
+    .{ .module = "bounded-system-resource-plan", .path = "projects/50-bounded-system-resource-plan/tests/agent/misuse/initialization_cycle.zig", .class = .runtime_negative_test },
+    .{ .module = "bounded-system-resource-plan", .path = "projects/50-bounded-system-resource-plan/tests/agent/repair/initialization_cycle_repair.zig", .class = .repair },
+    .{ .module = "bounded-system-resource-plan", .path = "projects/50-bounded-system-resource-plan/tests/agent/misuse/invalid_alignment.zig", .class = .runtime_negative_test },
+    .{ .module = "bounded-system-resource-plan", .path = "projects/50-bounded-system-resource-plan/tests/agent/repair/invalid_alignment_repair.zig", .class = .repair },
+    .{ .module = "bounded-system-resource-plan", .path = "projects/50-bounded-system-resource-plan/tests/agent/misuse/invalid_capacity.zig", .class = .runtime_negative_test },
+    .{ .module = "bounded-system-resource-plan", .path = "projects/50-bounded-system-resource-plan/tests/agent/repair/invalid_capacity_repair.zig", .class = .repair },
 };
 const recipe_specs = [_]RecipeSpec{
     .{ .name = "parse-length-prefixed-record", .dependencies = &.{ "bounded-byte-reader", "length-prefixed-binary-field" } },
@@ -82,6 +93,7 @@ const recipe_specs = [_]RecipeSpec{
     .{ .name = "normalize-checked-memory-range", .dependencies = &.{ "checked-half-open-range", "aligned-address-and-size-helpers" } },
     .{ .name = "plan-bounded-initialization", .dependencies = &.{ "intrusive-doubly-linked-list", "fixed-free-list", "fixed-bump-allocator", "fixed-capacity-priority-queue", "fixed-capacity-topological-sort" } },
     .{ .name = "construct-and-verify-sv39-address-space", .dependencies = &.{ "riscv-sv39-page-table-entry", "riscv-sv39-virtual-address-indexing", "riscv-page-table-page-owner", "riscv-sv39-page-table-walker", "riscv-sfence-vma-invalidation", "riscv-sv39-page-table-builder" } },
+    .{ .name = "plan-morphic-runtime", .dependencies = &.{"bounded-system-resource-plan"} },
 };
 
 pub fn build(b: *std.Build) void {
@@ -91,7 +103,7 @@ pub fn build(b: *std.Build) void {
     const check_step = b.step("check-module-contracts", "Validate schema, formatting, paths, public surfaces, dependencies, catalog, and build registrations");
     check_step.dependOn(&check_command.step);
     const agent_check_command = b.addSystemCommand(&.{ "python3", "tools/validate-agent-contracts.py" });
-    const agent_check_step = b.step("validate-agent-contracts", "Validate the five-module agent-readable pilot and deterministic projections");
+    const agent_check_step = b.step("validate-agent-contracts", "Validate agent-readable modules and deterministic projections");
     agent_check_step.dependOn(&agent_check_command.step);
     const port_check_command = b.addSystemCommand(&.{ "node", "tools/check-port-contracts.js" });
     const port_check_step = b.step("check-port-contracts", "Validate static module port contracts and the port index");
@@ -200,6 +212,15 @@ pub fn build(b: *std.Build) void {
         const recipe_step = b.step(b.fmt("test-recipe-{s}", .{recipe.name}), b.fmt("Run {s} composition tests", .{recipe.name}));
         recipe_step.dependOn(&run_recipe.step);
         recipes_step.dependOn(&run_recipe.step);
+        if (std.mem.eql(u8, recipe.name, "plan-morphic-runtime")) {
+            const executable = b.addExecutable(.{ .name = "plan-morphic-runtime", .root_module = recipe_module });
+            const run_plan = b.addRunArtifact(executable);
+            const plan_step = b.step("plan-morphic-runtime", "Print the canonical deterministic Morphic resource plan");
+            plan_step.dependOn(&run_plan.step);
+            const verify_step = b.step("verify-morphic-plan", "Verify Morphic plan determinism, failures, typed storage, and agent contracts");
+            verify_step.dependOn(&run_recipe.step);
+            verify_step.dependOn(agent_check_step);
+        }
     }
 
     const validate_step = b.step("validate-repository", "Run the complete repository validation pipeline");

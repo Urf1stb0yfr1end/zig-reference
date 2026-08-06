@@ -18,6 +18,9 @@
     "bounded-slot-allocation": [
       "fixed-free-list"
     ],
+    "bounded-system-resource-planning": [
+      "bounded-system-resource-plan"
+    ],
     "bounded-topological-sort": [
       "fixed-capacity-topological-sort"
     ],
@@ -27,8 +30,14 @@
     "deterministic-graph-ordering": [
       "fixed-capacity-topological-sort"
     ],
+    "deterministic-initialization-planning": [
+      "bounded-system-resource-plan"
+    ],
     "deterministic-slot-reuse": [
       "fixed-free-list"
+    ],
+    "fixed-resource-storage-derivation": [
+      "bounded-system-resource-plan"
     ],
     "monotonic-allocation": [
       "fixed-bump-allocator"

@@ -38,6 +38,16 @@
       "dependencies": [],
       "status": "pending-migration"
     },
+    "bounded-system-resource-plan": {
+      "dependencies": [
+        "aligned-address-and-size-helpers",
+        "bounded-integer",
+        "checked-integer-cast",
+        "fixed-bump-allocator",
+        "fixed-capacity-topological-sort"
+      ],
+      "status": "agent-readable"
+    },
     "byte-writer": {
       "dependencies": [
         "dynamic-array"

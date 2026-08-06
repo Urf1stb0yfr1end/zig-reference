@@ -187,6 +187,7 @@
       ],
       "description": "Repository capability represented by: allocation-explicit.",
       "implementing_modules": [
+        "bounded-system-resource-plan",
         "fixed-bump-allocator",
         "fixed-capacity-priority-queue",
         "fixed-capacity-topological-sort",
@@ -518,6 +519,7 @@
       ],
       "description": "Repository capability represented by: bounded.",
       "implementing_modules": [
+        "bounded-system-resource-plan",
         "fixed-bump-allocator",
         "fixed-capacity-priority-queue",
         "fixed-capacity-topological-sort",
@@ -795,6 +797,7 @@
       ],
       "description": "Repository capability represented by: capacity.",
       "implementing_modules": [
+        "bounded-system-resource-plan",
         "fixed-capacity-priority-queue",
         "fixed-capacity-topological-sort"
       ],
@@ -1545,6 +1548,7 @@
       ],
       "description": "Repository capability represented by: fixed.",
       "implementing_modules": [
+        "bounded-system-resource-plan",
         "fixed-bump-allocator",
         "fixed-capacity-priority-queue",
         "fixed-capacity-topological-sort",
@@ -1744,6 +1748,7 @@
         "bitmap-allocator",
         "bounded-binary-sub-reader",
         "bounded-integer",
+        "bounded-system-resource-plan",
         "checked-half-open-range",
         "checked-integer-cast",
         "distinct-memory-address-types",
@@ -3195,6 +3200,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "produce an exact deterministic bounded system resource plan.",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "produce an exact deterministic bounded system resource plan."
+      ],
+      "description": "Repository capability represented by: produce an exact deterministic bounded system resource plan..",
+      "implementing_modules": [
+        "bounded-system-resource-plan"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "protocol",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -3443,6 +3465,7 @@
       ],
       "description": "Repository capability represented by: repeated bounded mechanism implementation.",
       "implementing_modules": [
+        "bounded-system-resource-plan",
         "fixed-bump-allocator",
         "fixed-capacity-priority-queue",
         "fixed-capacity-topological-sort",
@@ -3962,6 +3985,7 @@
       ],
       "description": "Repository capability represented by: sort.",
       "implementing_modules": [
+        "bounded-system-resource-plan",
         "fixed-capacity-topological-sort"
       ],
       "narrower_capabilities": [],
@@ -4324,6 +4348,7 @@
       ],
       "description": "Repository capability represented by: topological.",
       "implementing_modules": [
+        "bounded-system-resource-plan",
         "fixed-capacity-topological-sort"
       ],
       "narrower_capabilities": [],

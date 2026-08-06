@@ -49,12 +49,24 @@
       "symbol": "ByteWriter"
     },
     {
+      "module": "bounded-system-resource-plan",
+      "symbol": "CapacityConfiguration"
+    },
+    {
       "module": "checked-half-open-range",
       "symbol": "CheckedRange"
     },
     {
       "module": "riscv-sv39-page-table-entry",
       "symbol": "DecodeError"
+    },
+    {
+      "module": "bounded-system-resource-plan",
+      "symbol": "DependencyEdge"
+    },
+    {
+      "module": "bounded-system-resource-plan",
+      "symbol": "Description"
     },
     {
       "module": "dynamic-array",
@@ -127,6 +139,10 @@
     {
       "module": "distinct-memory-address-types",
       "symbol": "GuestVirtualAddress"
+    },
+    {
+      "module": "bounded-system-resource-plan",
+      "symbol": "HandleStorage"
     },
     {
       "module": "generational-handles",
@@ -233,6 +249,14 @@
       "symbol": "Plan"
     },
     {
+      "module": "bounded-system-resource-plan",
+      "symbol": "Planner"
+    },
+    {
+      "module": "bounded-system-resource-plan",
+      "symbol": "PostSealAllocation"
+    },
+    {
       "module": "unit-safe-quantity",
       "symbol": "Quantity"
     },
@@ -281,8 +305,16 @@
       "symbol": "TaggedResult"
     },
     {
+      "module": "bounded-system-resource-plan",
+      "symbol": "TaskStorage"
+    },
+    {
       "module": "type-length-value-decoder",
       "symbol": "TlvDecoder"
+    },
+    {
+      "module": "bounded-system-resource-plan",
+      "symbol": "TraceEventStorage"
     },
     {
       "module": "optional-typed-handle",

@@ -16,6 +16,7 @@ PILOTS = {
     "fixed-bump-allocator",
     "fixed-capacity-priority-queue",
     "fixed-capacity-topological-sort",
+    "bounded-system-resource-plan",
 }
 CLASSES = {
     "runtime_negative_test",
@@ -227,7 +228,7 @@ def main():
         if errors:
             print("\n".join("AGENT CONTRACT ERROR: " + error for error in errors), file=sys.stderr)
             return 1
-        print("PASS: 5 agent-readable contracts validated; 45 modules are pending migration (not invalid).")
+        print(f"PASS: {len(PILOTS)} agent-readable contracts validated; 45 modules are pending migration (not invalid).")
         return 0
     except Exception as exc:
         print(f"AGENT CONTRACT ERROR: {exc}", file=sys.stderr)

@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0.0",
+  "module": "bounded-system-resource-plan",
+  "expectations": [
+    {
+      "fixture": "projects/50-bounded-system-resource-plan/tests/agent/misuse/memory_exceeded.zig",
+      "diagnostic_id": "ZIGREF-RESOURCE-PLAN-MEMORY-EXCEEDED",
+      "classification": "runtime_negative_test",
+      "zig_rejects": false,
+      "repair_example": "projects/50-bounded-system-resource-plan/tests/agent/repair/memory_exceeded_repair.zig"
+    },
+    {
+      "fixture": "projects/50-bounded-system-resource-plan/tests/agent/misuse/arithmetic_overflow.zig",
+      "diagnostic_id": "ZIGREF-RESOURCE-PLAN-ARITHMETIC-OVERFLOW",
+      "classification": "runtime_negative_test",
+      "zig_rejects": false,
+      "repair_example": "projects/50-bounded-system-resource-plan/tests/agent/repair/arithmetic_overflow_repair.zig"
+    },
+    {
+      "fixture": "projects/50-bounded-system-resource-plan/tests/agent/misuse/initialization_cycle.zig",
+      "diagnostic_id": "ZIGREF-RESOURCE-PLAN-INITIALIZATION-CYCLE",
+      "classification": "runtime_negative_test",
+      "zig_rejects": false,
+      "repair_example": "projects/50-bounded-system-resource-plan/tests/agent/repair/initialization_cycle_repair.zig"
+    },
+    {
+      "fixture": "projects/50-bounded-system-resource-plan/tests/agent/misuse/invalid_alignment.zig",
+      "diagnostic_id": "ZIGREF-RESOURCE-PLAN-INVALID-ALIGNMENT",
+      "classification": "runtime_negative_test",
+      "zig_rejects": false,
+      "repair_example": "projects/50-bounded-system-resource-plan/tests/agent/repair/invalid_alignment_repair.zig"
+    },
+    {
+      "fixture": "projects/50-bounded-system-resource-plan/tests/agent/misuse/invalid_capacity.zig",
+      "diagnostic_id": "ZIGREF-RESOURCE-PLAN-INVALID-CAPACITY",
+      "classification": "runtime_negative_test",
+      "zig_rejects": false,
+      "repair_example": "projects/50-bounded-system-resource-plan/tests/agent/repair/invalid_capacity_repair.zig"
+    }
+  ]
+}

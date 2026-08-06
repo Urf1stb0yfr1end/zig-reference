@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0.0",
+  "module": "bounded-system-resource-plan",
+  "claims": [
+    {
+      "id": "BOUNDED-SYSTEM-RESOURCE-PLAN-MEMORY-EXCEEDED",
+      "claim_type": "precondition",
+      "description": "Memory Exceeded is reported explicitly.",
+      "evidence_class": "runtime_negative_test",
+      "evidence_references": [
+        "projects/50-bounded-system-resource-plan/tests/agent/misuse/memory_exceeded.zig",
+        "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig"
+      ],
+      "status": "supported"
+    },
+    {
+      "id": "BOUNDED-SYSTEM-RESOURCE-PLAN-ARITHMETIC-OVERFLOW",
+      "claim_type": "precondition",
+      "description": "Arithmetic Overflow is reported explicitly.",
+      "evidence_class": "runtime_negative_test",
+      "evidence_references": [
+        "projects/50-bounded-system-resource-plan/tests/agent/misuse/arithmetic_overflow.zig",
+        "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig"
+      ],
+      "status": "supported"
+    },
+    {
+      "id": "BOUNDED-SYSTEM-RESOURCE-PLAN-INITIALIZATION-CYCLE",
+      "claim_type": "precondition",
+      "description": "Initialization Cycle is reported explicitly.",
+      "evidence_class": "runtime_negative_test",
+      "evidence_references": [
+        "projects/50-bounded-system-resource-plan/tests/agent/misuse/initialization_cycle.zig",
+        "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig"
+      ],
+      "status": "supported"
+    },
+    {
+      "id": "BOUNDED-SYSTEM-RESOURCE-PLAN-INVALID-ALIGNMENT",
+      "claim_type": "precondition",
+      "description": "Invalid Alignment is reported explicitly.",
+      "evidence_class": "runtime_negative_test",
+      "evidence_references": [
+        "projects/50-bounded-system-resource-plan/tests/agent/misuse/invalid_alignment.zig",
+        "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig"
+      ],
+      "status": "supported"
+    },
+    {
+      "id": "BOUNDED-SYSTEM-RESOURCE-PLAN-INVALID-CAPACITY",
+      "claim_type": "precondition",
+      "description": "Invalid Capacity is reported explicitly.",
+      "evidence_class": "runtime_negative_test",
+      "evidence_references": [
+        "projects/50-bounded-system-resource-plan/tests/agent/misuse/invalid_capacity.zig",
+        "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig"
+      ],
+      "status": "supported"
+    }
+  ]
+}

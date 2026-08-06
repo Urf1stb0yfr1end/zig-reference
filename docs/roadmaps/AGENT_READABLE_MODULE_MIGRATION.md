@@ -1,6 +1,6 @@
 # Agent-readable module migration roadmap
 
-The five pilot modules are intentionally excluded. Pending modules remain valid contracted modules; this roadmap does not migrate them. Batches are ordered by numeric module identity and should be refined by dependency review before work begins.
+The five original pilot modules and the agent-readable-from-creation `bounded-system-resource-plan` are intentionally excluded. There are now six agent-readable modules and 45 pending migrations. Pending modules remain valid contracted modules; this roadmap does not migrate them. Batches are ordered by numeric module identity and should be refined by dependency review before work begins.
 
 ## Batch 1 (7 modules)
 
