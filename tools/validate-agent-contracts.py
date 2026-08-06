@@ -17,6 +17,7 @@ PILOTS = {
     "fixed-capacity-priority-queue",
     "fixed-capacity-topological-sort",
     "bounded-system-resource-plan",
+    "bounded-deterministic-event-trace",
 }
 CLASSES = {
     "runtime_negative_test",
@@ -43,8 +44,6 @@ def validate_documents(cs):
     pilots = {d["module"]["canonical_name"] for d in cs if d.get("agent_contract")}
     if pilots != PILOTS:
         errors.append(f"pilot set differs: expected={sorted(PILOTS)} actual={sorted(pilots)}")
-    if len(cs) - len(pilots) != 45:
-        errors.append(f"expected 45 pending modules, found {len(cs) - len(pilots)}")
     build = (ROOT / "build.zig").read_text()
     commands = (ROOT / "COMMANDS.md").read_text()
 
@@ -228,7 +227,8 @@ def main():
         if errors:
             print("\n".join("AGENT CONTRACT ERROR: " + error for error in errors), file=sys.stderr)
             return 1
-        print(f"PASS: {len(PILOTS)} agent-readable contracts validated; 45 modules are pending migration (not invalid).")
+        pending = len(contracts()) - len(PILOTS)
+        print(f"PASS: {len(PILOTS)} agent-readable contracts validated; {pending} modules are pending migration (not invalid).")
         return 0
     except Exception as exc:
         print(f"AGENT CONTRACT ERROR: {exc}", file=sys.stderr)

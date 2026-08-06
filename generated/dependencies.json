@@ -15,6 +15,7 @@
       "bounded-byte-reader"
     ],
     "bounded-byte-reader": [],
+    "bounded-deterministic-event-trace": [],
     "bounded-integer": [],
     "bounded-system-resource-plan": [
       "aligned-address-and-size-helpers",

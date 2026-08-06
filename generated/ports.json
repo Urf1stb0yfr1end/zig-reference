@@ -204,6 +204,38 @@
         ],
         "zigVersion": "0.14.0"
       },
+      "module": "bounded-deterministic-event-trace",
+      "path": "projects/51-bounded-deterministic-event-trace/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "NormalizedEvent",
+            "EventInput",
+            "BoundedDeterministicEventTrace"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-bounded-deterministic-event-trace",
+            "zig build smoke-bounded-deterministic-event-trace"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented bounded-deterministic-event-trace public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
       "module": "bounded-integer",
       "path": "projects/12-bounded-integer/port.js",
       "risks": [

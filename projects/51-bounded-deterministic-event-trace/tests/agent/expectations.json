@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0.0",
+  "module": "bounded-deterministic-event-trace",
+  "expectations": [
+    {
+      "fixture": "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/full.zig",
+      "diagnostic_id": "ZIGREF-EVENT-TRACE-FULL",
+      "classification": "runtime_negative_test",
+      "zig_rejects": false,
+      "repair_example": "projects/51-bounded-deterministic-event-trace/tests/agent/repair/full_repair.zig"
+    },
+    {
+      "fixture": "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/sequence_exhausted.zig",
+      "diagnostic_id": "ZIGREF-EVENT-TRACE-SEQUENCE-EXHAUSTED",
+      "classification": "documented_misuse_example",
+      "zig_rejects": false,
+      "repair_example": "projects/51-bounded-deterministic-event-trace/tests/agent/repair/sequence_exhausted_repair.zig"
+    },
+    {
+      "fixture": "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/output_too_small.zig",
+      "diagnostic_id": "ZIGREF-EVENT-TRACE-OUTPUT-TOO-SMALL",
+      "classification": "runtime_negative_test",
+      "zig_rejects": false,
+      "repair_example": "projects/51-bounded-deterministic-event-trace/tests/agent/repair/output_too_small_repair.zig"
+    },
+    {
+      "fixture": "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/invalid_capacity.zig",
+      "diagnostic_id": "ZIGREF-EVENT-TRACE-INVALID-CAPACITY",
+      "classification": "zig_compile_fail",
+      "zig_rejects": true,
+      "repair_example": "projects/51-bounded-deterministic-event-trace/tests/agent/repair/invalid_capacity_repair.zig"
+    }
+  ]
+}

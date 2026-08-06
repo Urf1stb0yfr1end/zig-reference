@@ -34,6 +34,10 @@
       "dependencies": [],
       "status": "pending-migration"
     },
+    "bounded-deterministic-event-trace": {
+      "dependencies": [],
+      "status": "agent-readable"
+    },
     "bounded-integer": {
       "dependencies": [],
       "status": "pending-migration"

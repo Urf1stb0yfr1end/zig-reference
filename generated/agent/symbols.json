@@ -4,6 +4,9 @@
   "agent_index_version": "1.0.0",
   "generator": "tools/build-agent-index.py",
   "symbols": {
+    "BoundedDeterministicEventTrace": [
+      "bounded-deterministic-event-trace"
+    ],
     "CapacityConfiguration": [
       "bounded-system-resource-plan"
     ],
@@ -12,6 +15,9 @@
     ],
     "Description": [
       "bounded-system-resource-plan"
+    ],
+    "EventInput": [
+      "bounded-deterministic-event-trace"
     ],
     "FixedBumpAllocator": [
       "fixed-bump-allocator"
@@ -24,6 +30,9 @@
     ],
     "FixedTopologicalGraph": [
       "fixed-capacity-topological-sort"
+    ],
+    "NormalizedEvent": [
+      "bounded-deterministic-event-trace"
     ],
     "ObjectPool": [
       "fixed-capacity-object-pool"

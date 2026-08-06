@@ -28,6 +28,12 @@
     },
     {
       "kind": "function",
+      "module": "bounded-deterministic-event-trace",
+      "name": "BoundedDeterministicEventTrace",
+      "signature": "BoundedDeterministicEventTrace()"
+    },
+    {
+      "kind": "function",
       "module": "bounded-integer",
       "name": "BoundedInteger",
       "signature": "BoundedInteger(comptime T: type, comptime minimum: T, comptime maximum: T) type"
@@ -369,6 +375,12 @@
       "signature": "allocatedCount(self:*const @This()"
     },
     {
+      "kind": "function",
+      "module": "bounded-deterministic-event-trace",
+      "name": "append",
+      "signature": "append()"
+    },
+    {
       "kind": "method",
       "module": "dynamic-array",
       "name": "append",
@@ -603,6 +615,12 @@
       "signature": "containsValue(self: CheckedRange, value: usize) bool"
     },
     {
+      "kind": "function",
+      "module": "bounded-deterministic-event-trace",
+      "name": "count",
+      "signature": "count()"
+    },
+    {
       "kind": "method",
       "module": "fixed-capacity-object-pool",
       "name": "count",
@@ -747,10 +765,22 @@
       "signature": "ensureUnusedCapacity(self: *Self, additional: usize) !void"
     },
     {
+      "kind": "function",
+      "module": "bounded-deterministic-event-trace",
+      "name": "eql",
+      "signature": "eql()"
+    },
+    {
       "kind": "method",
       "module": "fourcc-code",
       "name": "eql",
       "signature": "eql(self: FourCC, other: FourCC) bool"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-deterministic-event-trace",
+      "name": "events",
+      "signature": "events()"
     },
     {
       "kind": "function",
@@ -931,6 +961,12 @@
       "module": "bounded-byte-reader",
       "name": "init",
       "signature": "init(input: []const u8) BoundedReader"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-deterministic-event-trace",
+      "name": "init",
+      "signature": "init()"
     },
     {
       "kind": "method",
@@ -1203,6 +1239,12 @@
       "signature": "isDigit(self: AsciiByte) bool"
     },
     {
+      "kind": "function",
+      "module": "bounded-deterministic-event-trace",
+      "name": "isEmpty",
+      "signature": "isEmpty()"
+    },
+    {
       "kind": "method",
       "module": "checked-half-open-range",
       "name": "isEmpty",
@@ -1237,6 +1279,12 @@
       "module": "stack",
       "name": "isEmpty",
       "signature": "isEmpty(self: *const Self) bool"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-deterministic-event-trace",
+      "name": "isFull",
+      "signature": "isFull()"
     },
     {
       "kind": "method",
@@ -1683,6 +1731,12 @@
       "signature": "remaining()"
     },
     {
+      "kind": "function",
+      "module": "bounded-deterministic-event-trace",
+      "name": "remainingCapacity",
+      "signature": "remainingCapacity()"
+    },
+    {
       "kind": "method",
       "module": "fixed-capacity-vector",
       "name": "remainingCapacity",
@@ -1720,6 +1774,12 @@
     },
     {
       "kind": "function",
+      "module": "bounded-deterministic-event-trace",
+      "name": "render",
+      "signature": "render()"
+    },
+    {
+      "kind": "function",
       "module": "bounded-system-resource-plan",
       "name": "render",
       "signature": "render()"
@@ -1741,6 +1801,12 @@
       "module": "bitmap-allocator",
       "name": "reset",
       "signature": "reset(self: *Self) void"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-deterministic-event-trace",
+      "name": "reset",
+      "signature": "reset()"
     },
     {
       "kind": "function",
