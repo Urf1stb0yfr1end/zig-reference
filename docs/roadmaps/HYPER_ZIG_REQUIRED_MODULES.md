@@ -590,3 +590,7 @@ The future `Hyper-Zig` command should select these modules by capability, follow
 
 ## Parallel RISC-V Sv39 foundation (implemented)
 Modules 44–49 provide host-stage Sv39 representation, indexing, page ownership, walking, deterministic mutation with rollback, and SFENCE.VMA planning. They do not replace the x86_64 roadmap and deliberately defer Sv39x4, hgatp, traps, SBI, FDT, devices, and Alpine boot.
+
+## Cross-project composition foundation
+
+`projects/50-bounded-system-resource-plan` is now available to future Hyper-Zig work for deterministic hosted resource budgeting and initialization ordering. It is a planner only; it does not implement an allocator, scheduler, boot path, device, or hypervisor.

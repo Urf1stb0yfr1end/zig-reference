@@ -158,6 +158,7 @@ The following section is derived from `generated/modules.json` and canonical mod
 | `riscv-sv39-page-table-walker` | `zig build test-riscv-sv39-page-table-walker` | `zig build smoke-riscv-sv39-page-table-walker` | `projects/47-riscv-sv39-page-table-walker/details.json` |
 | `riscv-sfence-vma-invalidation` | `zig build test-riscv-sfence-vma-invalidation` | `zig build smoke-riscv-sfence-vma-invalidation` | `projects/48-riscv-sfence-vma-invalidation/details.json` |
 | `riscv-sv39-page-table-builder` | `zig build test-riscv-sv39-page-table-builder` | `zig build smoke-riscv-sv39-page-table-builder` | `projects/49-riscv-sv39-page-table-builder/details.json` |
+| `bounded-system-resource-plan` | `zig build test-bounded-system-resource-plan` | `zig build smoke-bounded-system-resource-plan` | `projects/50-bounded-system-resource-plan/details.json` |
 <!-- END GENERATED MODULE COMMANDS -->
 
 ## Recipes and conformance
@@ -211,4 +212,9 @@ Each module has `zig build test-<module>` and `zig build smoke-<module>` targets
 | `python3 tools/query-reference.py agent module NAME` | Inspect a compact pilot module projection. |
 | `python3 tools/query-reference.py agent diagnostic ID` | Locate misuse evidence and its repair. |
 | `python3 tools/query-reference.py agent symbol SYMBOL` | Discover a pilot module by public symbol. |
-| `python3 tools/query-reference.py agent pending` | List the 45 modules awaiting migration without calling them invalid. |
+| `python3 tools/query-reference.py agent pending` | List modules awaiting migration without calling them invalid. |
+
+## Bounded system resource plan commands
+
+- `zig build plan-morphic-runtime` prints the canonical plan.
+- `zig build verify-morphic-plan` runs deterministic composition, negative, storage, and agent-contract checks.

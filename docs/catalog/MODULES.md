@@ -55,6 +55,7 @@ Use this file for fast discovery. Open a module's `DETAILS.md` or `details.json`
 | `47-riscv-sv39-page-table-walker` | Allocation-free Sv39 translation | `44`, `45`, `46` | diagnostics and builders | [`DETAILS.md`](../../projects/47-riscv-sv39-page-table-walker/DETAILS.md) | [`details.json`](../../projects/47-riscv-sv39-page-table-walker/details.json) |
 | `48-riscv-sfence-vma-invalidation` | SFENCE.VMA planning and privileged boundary | none | mapping mutators | [`DETAILS.md`](../../projects/48-riscv-sfence-vma-invalidation/DETAILS.md) | [`details.json`](../../projects/48-riscv-sfence-vma-invalidation/details.json) |
 | `49-riscv-sv39-page-table-builder` | Deterministic mapping, rollback, and unmapping | `44`–`48` | kernels and Hyper-Zig | [`DETAILS.md`](../../projects/49-riscv-sv39-page-table-builder/DETAILS.md) | [`details.json`](../../projects/49-riscv-sv39-page-table-builder/details.json) |
+| `50-bounded-system-resource-plan` | Exact deterministic fixed-resource budgeting and initialization order | `10`, `12`, `15`, `41`, `43` | Morphic runtime, embedded runtimes, kernels, simulators | [`DETAILS.md`](../../projects/50-bounded-system-resource-plan/DETAILS.md) | [`details.json`](../../projects/50-bounded-system-resource-plan/details.json) |
 
 ## Selection workflow
 

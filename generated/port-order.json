@@ -49,6 +49,7 @@
     "owned-byte-buffer",
     "physical-memory-region-set",
     "riscv-sv39-page-table-builder",
+    "bounded-system-resource-plan",
     "elf64-program-header-parser",
     "length-prefixed-binary-field",
     "physical-page-frame-allocator",

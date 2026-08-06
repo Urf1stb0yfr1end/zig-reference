@@ -234,6 +234,36 @@
         ],
         "zigVersion": "0.14.0"
       },
+      "module": "bounded-system-resource-plan",
+      "path": "projects/50-bounded-system-resource-plan/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "Planner"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-bounded-system-resource-plan",
+            "zig build smoke-bounded-system-resource-plan"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented bounded-system-resource-plan public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
       "module": "byte-writer",
       "path": "projects/06-byte-writer/port.js",
       "risks": [

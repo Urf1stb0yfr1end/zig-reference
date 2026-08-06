@@ -9,7 +9,7 @@
 - This checklist adds 250 new unique composition modules.
 - Six already-built repository modules whose names do not map cleanly to an original roadmap title are listed separately.
 - **Total unique checklist entries: 756**
-- **Currently implemented or functionally represented: 17**
+- **Currently implemented or functionally represented: 18**
 
 A check mark means the repository already has a source implementation for that capability. It does **not** imply compiler validation unless the module contract says so.
 
@@ -21,6 +21,7 @@ A check mark means the repository already has a source implementation for that c
 - [x] `bitmap-allocator` — Allocation tracker composed over the fixed bit set.
 - [x] `generational-handle-table` — Stable slot handles that reject stale generations.
 - [x] `generic-explicit-state-machine` — Compile-time transition-policy state machine.
+- [x] `bounded-system-resource-plan` — Exact fixed-resource budget and deterministic initialization plan composed from existing bounded foundations.
 
 ## 01 — Values, types, and representation
 

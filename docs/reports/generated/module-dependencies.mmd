@@ -4,6 +4,11 @@ graph TD
   bitmap_allocator --> bit_set
   bounded_binary_sub_reader --> binary_cursor_checkpoint
   bounded_binary_sub_reader --> bounded_byte_reader
+  bounded_system_resource_plan --> aligned_address_and_size_helpers
+  bounded_system_resource_plan --> bounded_integer
+  bounded_system_resource_plan --> checked_integer_cast
+  bounded_system_resource_plan --> fixed_bump_allocator
+  bounded_system_resource_plan --> fixed_capacity_topological_sort
   byte_writer --> dynamic_array
   elf64_file_header_parser --> binary_cursor_checkpoint
   elf64_file_header_parser --> bounded_byte_reader

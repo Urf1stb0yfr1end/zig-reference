@@ -902,6 +902,24 @@
       "status": "experimental-unverified",
       "summary": "Deterministic Sv39 mapping, walking, protection, unmapping, and rollback.",
       "target_maturity_level": 2
+    },
+    {
+      "aliases": [],
+      "declared_maturity": "experimental",
+      "deprecated_names": [],
+      "details": "projects/50-bounded-system-resource-plan/details.json",
+      "directory": "projects/50-bounded-system-resource-plan",
+      "display_name": "Bounded System Resource Plan",
+      "id": "50",
+      "implementation_version": "1.0.0",
+      "lifecycle": "experimental",
+      "name": "bounded-system-resource-plan",
+      "public_contract_version": "1.0.0",
+      "replacement_module": "",
+      "source": "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig",
+      "status": "experimental-unverified",
+      "summary": "Derive an exact bounded resource budget and deterministic initialization order.",
+      "target_maturity_level": 2
     }
   ],
   "repository_index_version": "1.0.0"

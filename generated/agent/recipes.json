@@ -12,6 +12,9 @@
       "fixed-capacity-priority-queue",
       "fixed-capacity-topological-sort",
       "fixed-free-list"
+    ],
+    "plan-morphic-runtime": [
+      "bounded-system-resource-plan"
     ]
   }
 }

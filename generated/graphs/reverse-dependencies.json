@@ -5,6 +5,7 @@
   "repository_index_version": "1.0.0",
   "reverse_dependencies": {
     "aligned-address-and-size-helpers": [
+      "bounded-system-resource-plan",
       "elf64-program-header-parser",
       "fixed-bump-allocator"
     ],
@@ -36,7 +37,10 @@
       "length-prefixed-binary-field",
       "type-length-value-decoder"
     ],
-    "bounded-integer": [],
+    "bounded-integer": [
+      "bounded-system-resource-plan"
+    ],
+    "bounded-system-resource-plan": [],
     "byte-writer": [
       "owned-byte-buffer"
     ],
@@ -47,6 +51,7 @@
       "physical-page-frame-allocator"
     ],
     "checked-integer-cast": [
+      "bounded-system-resource-plan",
       "elf64-file-header-parser",
       "elf64-program-header-parser",
       "length-prefixed-binary-field",
@@ -73,12 +78,16 @@
       "length-prefixed-binary-field",
       "type-length-value-decoder"
     ],
-    "fixed-bump-allocator": [],
+    "fixed-bump-allocator": [
+      "bounded-system-resource-plan"
+    ],
     "fixed-capacity-object-pool": [],
     "fixed-capacity-priority-queue": [
       "fixed-capacity-topological-sort"
     ],
-    "fixed-capacity-topological-sort": [],
+    "fixed-capacity-topological-sort": [
+      "bounded-system-resource-plan"
+    ],
     "fixed-capacity-vector": [
       "elf64-program-header-parser",
       "fixed-capacity-priority-queue",

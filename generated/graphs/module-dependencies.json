@@ -19,6 +19,26 @@
       "module": "bounded-binary-sub-reader"
     },
     {
+      "dependency": "aligned-address-and-size-helpers",
+      "module": "bounded-system-resource-plan"
+    },
+    {
+      "dependency": "bounded-integer",
+      "module": "bounded-system-resource-plan"
+    },
+    {
+      "dependency": "checked-integer-cast",
+      "module": "bounded-system-resource-plan"
+    },
+    {
+      "dependency": "fixed-bump-allocator",
+      "module": "bounded-system-resource-plan"
+    },
+    {
+      "dependency": "fixed-capacity-topological-sort",
+      "module": "bounded-system-resource-plan"
+    },
+    {
       "dependency": "dynamic-array",
       "module": "byte-writer"
     },

@@ -1243,3 +1243,7 @@ That is a worthwhile, difficult, testable ambition.
 - [The Embedded Rust Book: `no_std`](https://doc.rust-lang.org/stable/embedded-book/intro/no-std.html)
 - [The Embedded Rust Book: C interoperability](https://doc.rust-lang.org/stable/embedded-book/interoperability/c-with-rust.html)
 - [ISO/IEC JTC1/SC22/WG14, the C language working group](https://open-std.org/jtc1/sc22/wg14/)
+
+## Implemented planning foundation
+
+`projects/50-bounded-system-resource-plan` and `recipes/plan-morphic-runtime` now provide the hosted-only deterministic resource-planning slice described by this proposal. They reuse bounded values, checked casts, alignment helpers, fixed bump layout, and bounded deterministic topological ordering. They do **not** implement the Morphic Microvisor, a scheduler, tracing, RISC-V startup, traps, devices, or post-seal enforcement. The remaining hosted runtime must supply those mechanisms and apply the returned policy.
