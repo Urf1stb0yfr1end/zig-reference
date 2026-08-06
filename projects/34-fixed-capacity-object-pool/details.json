@@ -1117,5 +1117,104 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "1.0.0",
+    "summary": "Expose the existing generational table as an iterable, resettable object-pool contract.",
+    "search_aliases": [
+      "object pool",
+      "stale handle pool",
+      "bounded registry"
+    ],
+    "capability_ids": [
+      "bounded-object-storage",
+      "stale-handle-rejection"
+    ],
+    "use_when": [
+      "Need bounded iterable object storage with generational stale-handle rejection."
+    ],
+    "do_not_use_when": [
+      "Need dynamically growing storage."
+    ],
+    "entrypoint": "projects/34-fixed-capacity-object-pool/src/fixed_capacity_object_pool.zig",
+    "public_symbols": [
+      "ObjectPool"
+    ],
+    "dependency_ids": [
+      "bitmap-allocator",
+      "generational-handles"
+    ],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "caller"
+    },
+    "borrowing": {
+      "get": [
+        "Returned pointer borrows pool storage until removal or reset."
+      ],
+      "getConst": [
+        "Returned pointer borrows pool storage until removal or reset."
+      ]
+    },
+    "invalidation": {
+      "remove": [
+        "Pointers to the removed value and its handle become invalid."
+      ],
+      "reset": [
+        "All handles, iterators, and returned pointers become invalid."
+      ]
+    },
+    "failure_guarantees": [
+      "Reported errors leave receiver state unchanged unless the canonical source explicitly documents otherwise."
+    ],
+    "effects": [
+      "mutates_receiver",
+      "reads_receiver",
+      "returns_borrow",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [
+      "projects/34-fixed-capacity-object-pool/tests/agent/pass/pool_stale_handle_repair.zig"
+    ],
+    "recipes": [
+      "create-stale-safe-object-registry"
+    ],
+    "validation_commands": [
+      "test-fixed-capacity-object-pool",
+      "smoke-fixed-capacity-object-pool"
+    ],
+    "proof_contract": "projects/34-fixed-capacity-object-pool/PROOF.json",
+    "diagnostics": [
+      {
+        "id": "ZIGREF-POOL-STALE-HANDLE",
+        "title": "Stale pool handle",
+        "violated_rule": "A handle must not be used after removal or reset.",
+        "evidence_status": "future_analyzer_expectation",
+        "fixture": "projects/34-fixed-capacity-object-pool/tests/agent/fail/pool_stale_handle.zig",
+        "fixture_classification": "future_analyzer_expectation",
+        "zig_rejects": false,
+        "repair_example": "projects/34-fixed-capacity-object-pool/tests/agent/pass/pool_stale_handle_repair.zig",
+        "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
+        "related_module": "fixed-capacity-object-pool",
+        "related_recipe": "create-stale-safe-object-registry"
+      },
+      {
+        "id": "ZIGREF-POOL-DOUBLE-RELEASE",
+        "title": "Repeated pool removal",
+        "violated_rule": "A removed handle cannot remove a value again.",
+        "evidence_status": "tested",
+        "fixture": "projects/34-fixed-capacity-object-pool/tests/agent/fail/pool_double_release.zig",
+        "fixture_classification": "runtime_negative_test",
+        "zig_rejects": false,
+        "repair_example": "projects/34-fixed-capacity-object-pool/tests/agent/pass/pool_double_release_repair.zig",
+        "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
+        "related_module": "fixed-capacity-object-pool",
+        "related_recipe": "create-stale-safe-object-registry"
+      }
+    ]
   }
 }

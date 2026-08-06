@@ -1,0 +1,17 @@
+{
+  "_generated": true,
+  "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY",
+  "agent_index_version": "1.0.0",
+  "generator": "tools/build-agent-index.py",
+  "recipes": {
+    "create-stale-safe-object-registry": [
+      "fixed-capacity-object-pool"
+    ],
+    "plan-bounded-initialization": [
+      "fixed-bump-allocator",
+      "fixed-capacity-priority-queue",
+      "fixed-capacity-topological-sort",
+      "fixed-free-list"
+    ]
+  }
+}

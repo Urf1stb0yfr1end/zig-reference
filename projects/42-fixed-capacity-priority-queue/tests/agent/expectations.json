@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0.0",
+  "module": "fixed-capacity-priority-queue",
+  "expectations": [
+    {
+      "fixture": "projects/42-fixed-capacity-priority-queue/tests/agent/fail/pqueue_capacity.zig",
+      "diagnostic_id": "ZIGREF-PQUEUE-CAPACITY",
+      "classification": "runtime_negative_test",
+      "zig_rejects": false,
+      "repair_example": "projects/42-fixed-capacity-priority-queue/tests/agent/pass/pqueue_capacity_repair.zig"
+    }
+  ]
+}

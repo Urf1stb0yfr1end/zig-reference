@@ -55,6 +55,23 @@ const specs = [_]ModuleSpec{
 };
 
 const RecipeSpec = struct { name: []const u8, dependencies: []const []const u8 };
+const AgentFixtureSpec = struct { module: []const u8, path: []const u8 };
+const agent_fixture_specs = [_]AgentFixtureSpec{
+    .{ .module = "fixed-capacity-object-pool", .path = "projects/34-fixed-capacity-object-pool/tests/agent/fail/pool_stale_handle.zig" },
+    .{ .module = "fixed-capacity-object-pool", .path = "projects/34-fixed-capacity-object-pool/tests/agent/pass/pool_stale_handle_repair.zig" },
+    .{ .module = "fixed-capacity-object-pool", .path = "projects/34-fixed-capacity-object-pool/tests/agent/fail/pool_double_release.zig" },
+    .{ .module = "fixed-capacity-object-pool", .path = "projects/34-fixed-capacity-object-pool/tests/agent/pass/pool_double_release_repair.zig" },
+    .{ .module = "fixed-free-list", .path = "projects/40-fixed-free-list/tests/agent/fail/freelist_double_release.zig" },
+    .{ .module = "fixed-free-list", .path = "projects/40-fixed-free-list/tests/agent/pass/freelist_double_release_repair.zig" },
+    .{ .module = "fixed-bump-allocator", .path = "projects/41-fixed-bump-allocator/tests/agent/fail/bump_use_after_reset.zig" },
+    .{ .module = "fixed-bump-allocator", .path = "projects/41-fixed-bump-allocator/tests/agent/pass/bump_use_after_reset_repair.zig" },
+    .{ .module = "fixed-capacity-priority-queue", .path = "projects/42-fixed-capacity-priority-queue/tests/agent/fail/pqueue_capacity.zig" },
+    .{ .module = "fixed-capacity-priority-queue", .path = "projects/42-fixed-capacity-priority-queue/tests/agent/pass/pqueue_capacity_repair.zig" },
+    .{ .module = "fixed-capacity-topological-sort", .path = "projects/43-fixed-capacity-topological-sort/tests/agent/fail/topo_cycle.zig" },
+    .{ .module = "fixed-capacity-topological-sort", .path = "projects/43-fixed-capacity-topological-sort/tests/agent/pass/topo_cycle_repair.zig" },
+    .{ .module = "fixed-capacity-topological-sort", .path = "projects/43-fixed-capacity-topological-sort/tests/agent/fail/topo_invalid_vertex.zig" },
+    .{ .module = "fixed-capacity-topological-sort", .path = "projects/43-fixed-capacity-topological-sort/tests/agent/pass/topo_invalid_vertex_repair.zig" },
+};
 const recipe_specs = [_]RecipeSpec{
     .{ .name = "parse-length-prefixed-record", .dependencies = &.{ "bounded-byte-reader", "length-prefixed-binary-field" } },
     .{ .name = "create-stale-safe-object-registry", .dependencies = &.{"fixed-capacity-object-pool"} },
@@ -72,6 +89,9 @@ pub fn build(b: *std.Build) void {
     const check_command = b.addSystemCommand(&.{ "python3", "tools/module-contract-consistency-checker.py" });
     const check_step = b.step("check-module-contracts", "Validate schema, formatting, paths, public surfaces, dependencies, catalog, and build registrations");
     check_step.dependOn(&check_command.step);
+    const agent_check_command = b.addSystemCommand(&.{ "python3", "tools/validate-agent-contracts.py" });
+    const agent_check_step = b.step("validate-agent-contracts", "Validate the five-module agent-readable pilot and deterministic projections");
+    agent_check_step.dependOn(&agent_check_command.step);
     const port_check_command = b.addSystemCommand(&.{ "node", "tools/check-port-contracts.js" });
     const port_check_step = b.step("check-port-contracts", "Validate static module port contracts and the port index");
     port_check_step.dependOn(&port_check_command.step);
@@ -89,6 +109,7 @@ pub fn build(b: *std.Build) void {
     const policy_step = b.step("check", "Validate contracts, ports, generated drift, graphs, and artifact policy");
     policy_step.dependOn(&policy_command.step);
     policy_step.dependOn(check_step);
+    policy_step.dependOn(agent_check_step);
     policy_step.dependOn(port_check_step);
     const command_reference_check = b.addSystemCommand(&.{ "python3", "tools/check-command-reference.py", "--check" });
     policy_step.dependOn(&command_reference_check.step);
@@ -131,6 +152,12 @@ pub fn build(b: *std.Build) void {
     for (specs, 0..) |spec, i| {
         for (spec.dependencies) |dependency_name| modules[i].addImport(dependency_name, findModule(dependency_name, &modules));
     }
+    for (agent_fixture_specs) |fixture| {
+        const fixture_module = b.createModule(.{ .root_source_file = b.path(fixture.path), .target = target, .optimize = optimize });
+        fixture_module.addImport(fixture.module, findModule(fixture.module, &modules));
+        const fixture_tests = b.addTest(.{ .root_module = fixture_module });
+        agent_check_step.dependOn(&b.addRunArtifact(fixture_tests).step);
+    }
 
     const smoke_all = b.step("smoke", "Run every external-consumer smoke test");
     smoke_all.dependOn(portability_smoke_step);
@@ -171,6 +198,7 @@ pub fn build(b: *std.Build) void {
 
     const validate_step = b.step("validate-repository", "Run the complete repository validation pipeline");
     validate_step.dependOn(policy_step);
+    validate_step.dependOn(agent_check_step);
     validate_step.dependOn(test_all);
     validate_step.dependOn(smoke_all);
     validate_step.dependOn(recipes_step);

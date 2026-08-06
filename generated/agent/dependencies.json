@@ -1,0 +1,290 @@
+{
+  "_generated": true,
+  "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY",
+  "agent_index_version": "1.0.0",
+  "dependencies": {
+    "aligned-address-and-size-helpers": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "binary-cursor-checkpoint": {
+      "dependencies": [
+        "bounded-byte-reader"
+      ],
+      "status": "pending-migration"
+    },
+    "bit-set": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "bitmap-allocator": {
+      "dependencies": [
+        "bit-set"
+      ],
+      "status": "pending-migration"
+    },
+    "bounded-binary-sub-reader": {
+      "dependencies": [
+        "binary-cursor-checkpoint",
+        "bounded-byte-reader"
+      ],
+      "status": "pending-migration"
+    },
+    "bounded-byte-reader": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "bounded-integer": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "byte-writer": {
+      "dependencies": [
+        "dynamic-array"
+      ],
+      "status": "pending-migration"
+    },
+    "checked-half-open-range": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "checked-integer-cast": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "distinct-memory-address-types": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "dynamic-array": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "elf64-file-header-parser": {
+      "dependencies": [
+        "binary-cursor-checkpoint",
+        "bounded-byte-reader",
+        "checked-half-open-range",
+        "checked-integer-cast",
+        "endian-integer-codec",
+        "validated-enum-decoder"
+      ],
+      "status": "pending-migration"
+    },
+    "elf64-program-header-parser": {
+      "dependencies": [
+        "aligned-address-and-size-helpers",
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "bounded-byte-reader",
+        "checked-half-open-range",
+        "checked-integer-cast",
+        "distinct-memory-address-types",
+        "elf64-file-header-parser",
+        "endian-integer-codec",
+        "fixed-capacity-vector",
+        "validated-bit-flags",
+        "validated-enum-decoder"
+      ],
+      "status": "pending-migration"
+    },
+    "endian-integer-codec": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "fixed-bump-allocator": {
+      "dependencies": [
+        "aligned-address-and-size-helpers"
+      ],
+      "status": "agent-readable"
+    },
+    "fixed-capacity-object-pool": {
+      "dependencies": [
+        "bitmap-allocator",
+        "generational-handles"
+      ],
+      "status": "agent-readable"
+    },
+    "fixed-capacity-priority-queue": {
+      "dependencies": [
+        "fixed-capacity-vector"
+      ],
+      "status": "agent-readable"
+    },
+    "fixed-capacity-topological-sort": {
+      "dependencies": [
+        "fixed-capacity-priority-queue",
+        "fixed-capacity-vector"
+      ],
+      "status": "agent-readable"
+    },
+    "fixed-capacity-vector": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "fixed-free-list": {
+      "dependencies": [],
+      "status": "agent-readable"
+    },
+    "fourcc-code": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "generational-handles": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "intrusive-doubly-linked-list": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "length-prefixed-binary-field": {
+      "dependencies": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "bounded-byte-reader",
+        "checked-integer-cast",
+        "endian-integer-codec"
+      ],
+      "status": "pending-migration"
+    },
+    "nonzero-integer": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "optional-typed-handle": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "owned-byte-buffer": {
+      "dependencies": [
+        "byte-writer",
+        "dynamic-array"
+      ],
+      "status": "pending-migration"
+    },
+    "physical-memory-region-set": {
+      "dependencies": [
+        "checked-half-open-range",
+        "distinct-memory-address-types",
+        "fixed-capacity-vector",
+        "physical-page-frame-number-and-address-conversion",
+        "validated-enum-decoder"
+      ],
+      "status": "pending-migration"
+    },
+    "physical-page-frame-allocator": {
+      "dependencies": [
+        "bit-set",
+        "bitmap-allocator",
+        "checked-half-open-range",
+        "distinct-memory-address-types",
+        "physical-memory-region-set",
+        "physical-page-frame-number-and-address-conversion"
+      ],
+      "status": "pending-migration"
+    },
+    "physical-page-frame-number-and-address-conversion": {
+      "dependencies": [
+        "distinct-memory-address-types"
+      ],
+      "status": "pending-migration"
+    },
+    "ring-buffer": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "riscv-page-table-page-owner": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "riscv-sfence-vma-invalidation": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "riscv-sv39-page-table-builder": {
+      "dependencies": [
+        "riscv-page-table-page-owner",
+        "riscv-sfence-vma-invalidation",
+        "riscv-sv39-page-table-entry",
+        "riscv-sv39-page-table-walker",
+        "riscv-sv39-virtual-address-indexing"
+      ],
+      "status": "pending-migration"
+    },
+    "riscv-sv39-page-table-entry": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "riscv-sv39-page-table-walker": {
+      "dependencies": [
+        "riscv-page-table-page-owner",
+        "riscv-sv39-page-table-entry",
+        "riscv-sv39-virtual-address-indexing"
+      ],
+      "status": "pending-migration"
+    },
+    "riscv-sv39-virtual-address-indexing": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "saturating-counter": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "semantic-version": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "source-span": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "stack": {
+      "dependencies": [
+        "dynamic-array"
+      ],
+      "status": "pending-migration"
+    },
+    "state-machine": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "tagged-result": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "type-length-value-decoder": {
+      "dependencies": [
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "bounded-byte-reader",
+        "checked-integer-cast",
+        "endian-integer-codec",
+        "length-prefixed-binary-field"
+      ],
+      "status": "pending-migration"
+    },
+    "unit-safe-quantity": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "validated-ascii-byte": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "validated-bit-flags": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "validated-enum-decoder": {
+      "dependencies": [],
+      "status": "pending-migration"
+    },
+    "wrapping-sequence-number": {
+      "dependencies": [],
+      "status": "pending-migration"
+    }
+  },
+  "generator": "tools/build-agent-index.py"
+}

@@ -1,0 +1,23 @@
+{
+  "_generated": true,
+  "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY",
+  "agent_index_version": "1.0.0",
+  "generator": "tools/build-agent-index.py",
+  "symbols": {
+    "FixedBumpAllocator": [
+      "fixed-bump-allocator"
+    ],
+    "FixedFreeList": [
+      "fixed-free-list"
+    ],
+    "FixedPriorityQueue": [
+      "fixed-capacity-priority-queue"
+    ],
+    "FixedTopologicalGraph": [
+      "fixed-capacity-topological-sort"
+    ],
+    "ObjectPool": [
+      "fixed-capacity-object-pool"
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0.0",
+  "module": "fixed-bump-allocator",
+  "expectations": [
+    {
+      "fixture": "projects/41-fixed-bump-allocator/tests/agent/fail/bump_use_after_reset.zig",
+      "diagnostic_id": "ZIGREF-BUMP-USE-AFTER-RESET",
+      "classification": "future_analyzer_expectation",
+      "zig_rejects": false,
+      "repair_example": "projects/41-fixed-bump-allocator/tests/agent/pass/bump_use_after_reset_repair.zig"
+    }
+  ]
+}

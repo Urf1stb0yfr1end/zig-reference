@@ -901,5 +901,90 @@
     "known_porting_blockers": [],
     "automatic_port_guaranteed": false,
     "notes": []
+  },
+  "agent_contract": {
+    "schema_version": "1.0.0",
+    "summary": "Produce a deterministic dependency order or report a cycle in a bounded graph.",
+    "search_aliases": [
+      "topological sort",
+      "bounded dag ordering",
+      "kahn sort"
+    ],
+    "capability_ids": [
+      "bounded-topological-sort",
+      "cycle-detection",
+      "deterministic-graph-ordering"
+    ],
+    "use_when": [
+      "Need deterministic topological ordering for a bounded graph."
+    ],
+    "do_not_use_when": [
+      "Need graph growth beyond compile-time node or edge limits."
+    ],
+    "entrypoint": "projects/43-fixed-capacity-topological-sort/src/fixed_capacity_topological_sort.zig",
+    "public_symbols": [
+      "FixedTopologicalGraph"
+    ],
+    "dependency_ids": [
+      "fixed-capacity-vector",
+      "fixed-capacity-priority-queue"
+    ],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {},
+    "invalidation": {},
+    "failure_guarantees": [
+      "Reported errors leave receiver state unchanged unless the canonical source explicitly documents otherwise."
+    ],
+    "effects": [
+      "mutates_receiver",
+      "reads_receiver",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [
+      "projects/43-fixed-capacity-topological-sort/tests/agent/pass/topo_cycle_repair.zig"
+    ],
+    "recipes": [
+      "plan-bounded-initialization"
+    ],
+    "validation_commands": [
+      "test-fixed-capacity-topological-sort",
+      "smoke-fixed-capacity-topological-sort"
+    ],
+    "proof_contract": "projects/43-fixed-capacity-topological-sort/PROOF.json",
+    "diagnostics": [
+      {
+        "id": "ZIGREF-TOPO-CYCLE",
+        "title": "Topological cycle",
+        "violated_rule": "The graph must be acyclic for sort to return an order.",
+        "evidence_status": "tested",
+        "fixture": "projects/43-fixed-capacity-topological-sort/tests/agent/fail/topo_cycle.zig",
+        "fixture_classification": "runtime_negative_test",
+        "zig_rejects": false,
+        "repair_example": "projects/43-fixed-capacity-topological-sort/tests/agent/pass/topo_cycle_repair.zig",
+        "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
+        "related_module": "fixed-capacity-topological-sort",
+        "related_recipe": "plan-bounded-initialization"
+      },
+      {
+        "id": "ZIGREF-TOPO-INVALID-VERTEX",
+        "title": "Invalid graph vertex",
+        "violated_rule": "Edge endpoints must be less than node_count.",
+        "evidence_status": "tested",
+        "fixture": "projects/43-fixed-capacity-topological-sort/tests/agent/fail/topo_invalid_vertex.zig",
+        "fixture_classification": "runtime_negative_test",
+        "zig_rejects": false,
+        "repair_example": "projects/43-fixed-capacity-topological-sort/tests/agent/pass/topo_invalid_vertex_repair.zig",
+        "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
+        "related_module": "fixed-capacity-topological-sort",
+        "related_recipe": "plan-bounded-initialization"
+      }
+    ]
   }
 }
