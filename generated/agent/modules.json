@@ -168,6 +168,18 @@
       ]
     },
     {
+      "aliases": [
+        "growable sequence",
+        "allocator-backed vector"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "growable-sequence",
+        "allocator-backed-container"
+      ],
       "change_impact": {
         "dependents": [
           "byte-writer",
@@ -176,15 +188,57 @@
         ],
         "recipes": []
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "var values = DynamicArray(u32).init(allocator);",
+        "named_import": "dynamic-array",
+        "primary_symbol": "DynamicArray"
+      },
       "dependency_build_order": [
         "dynamic-array"
       ],
       "details": "projects/01-dynamic-array/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
         "byte-writer",
         "owned-byte-buffer",
         "stack"
+      ],
+      "do_not_use_when": [
+        "Need allocation-free or compile-time bounded storage."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "OutOfMemory",
+          "handling": "Correct the input or state before retrying.",
+          "meaning": "The documented OutOfMemory condition occurred.",
+          "operation": "DynamicArray, init, deinit, capacity, items, constItems, append, pop, get, clearRetainingCapacity, ensureUnusedCapacity"
+        },
+        {
+          "error": "Overflow",
+          "handling": "Correct the input or state before retrying.",
+          "meaning": "The documented Overflow condition occurred.",
+          "operation": "DynamicArray, init, deinit, capacity, items, constItems, append, pop, get, clearRetainingCapacity, ensureUnusedCapacity"
+        }
       ],
       "evidence_summary": {
         "conformance_validated": false,
@@ -196,20 +250,75 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-dynamic-array",
         "zig build smoke-dynamic-array"
       ],
       "id": "01",
+      "integration_notes": [
+        "Import the canonical named module.",
+        "Honor ownership, lifetime, and failure rules.",
+        "Run the focused validation commands."
+      ],
+      "invalidation": {
+        "capacity growth or deinit": [
+          "items slices and element pointers: address invalid"
+        ],
+        "pop or clear": [
+          "logical element references: element no longer logically present"
+        ]
+      },
+      "known_gaps": [
+        "Need allocation-free or compile-time bounded storage."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const DynamicArray = @import(\"dynamic-array\").DynamicArray;",
+        "var values = DynamicArray(u32).init(allocator);",
+        "defer values.deinit();",
+        "try values.append(1);"
+      ],
       "module": "dynamic-array",
+      "operation_map": {
+        "DynamicArray": "DynamicArray",
+        "append": "append",
+        "capacity": "capacity",
+        "clearRetainingCapacity": "clearRetainingCapacity",
+        "constItems": "constItems",
+        "deinit": "deinit",
+        "ensureUnusedCapacity": "ensureUnusedCapacity",
+        "get": "get",
+        "init": "init",
+        "items": "items",
+        "pop": "pop"
+      },
+      "ownership": {
+        "cleanup": "caller",
+        "storage": "caller_owned",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": false,
+        "caller_provided_memory": true,
+        "capacity_model": "unbounded",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "caller_owned"
+      },
+      "selection_priority": "canonical",
       "source": "projects/01-dynamic-array/src/dynamic_array.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Allocator-backed growable contiguous sequence.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
       "transitive_dependents": [
         "byte-writer",
         "owned-byte-buffer",
         "stack"
+      ],
+      "use_when": [
+        "Need runtime-sized contiguous storage with explicit allocator ownership."
       ]
     },
     {
@@ -246,6 +355,18 @@
       "transitive_dependents": []
     },
     {
+      "aliases": [
+        "bitmap",
+        "fixed bitset"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "fixed-bit-set",
+        "compact-boolean-state"
+      ],
       "change_impact": {
         "dependents": [
           "bitmap-allocator",
@@ -254,14 +375,50 @@
         ],
         "recipes": []
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "var bits = BitSet(128){};",
+        "named_import": "bit-set",
+        "primary_symbol": "BitSet"
+      },
       "dependency_build_order": [
         "bit-set"
       ],
       "details": "projects/03-bit-set/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
         "bitmap-allocator",
         "physical-page-frame-allocator"
+      ],
+      "do_not_use_when": [
+        "Need a runtime-sized bit count or atomic concurrent updates."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "OutOfBounds",
+          "handling": "Correct the input or state before retrying.",
+          "meaning": "The documented OutOfBounds condition occurred.",
+          "operation": "BitSet, capacity, isSet, set, clear, toggle, clearAll, setAll, countSet, none, all"
+        }
       ],
       "evidence_summary": {
         "conformance_validated": false,
@@ -273,20 +430,67 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-bit-set",
         "zig build smoke-bit-set"
       ],
       "id": "03",
+      "integration_notes": [
+        "Import the canonical named module.",
+        "Honor ownership, lifetime, and failure rules.",
+        "Run the focused validation commands."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Need a runtime-sized bit count or atomic concurrent updates."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const BitSet = @import(\"bit-set\").BitSet;",
+        "var bits = BitSet(128){};",
+        "try bits.set(7);"
+      ],
       "module": "bit-set",
+      "operation_map": {
+        "BitSet": "BitSet",
+        "all": "all",
+        "capacity": "capacity",
+        "clear": "clear",
+        "clearAll": "clearAll",
+        "countSet": "countSet",
+        "isSet": "isSet",
+        "none": "none",
+        "set": "set",
+        "setAll": "setAll",
+        "toggle": "toggle"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/03-bit-set/src/bit_set.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Compact fixed-count Boolean state stored in machine words.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
       "transitive_dependents": [
         "bitmap-allocator",
         "fixed-capacity-object-pool",
         "physical-page-frame-allocator"
+      ],
+      "use_when": [
+        "Track a compile-time count of Boolean states in compact inline storage."
       ]
     },
     {
@@ -1155,6 +1359,18 @@
       "transitive_dependents": []
     },
     {
+      "aliases": [
+        "range integer",
+        "constrained integer"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "bounded-integer",
+        "validated-scalar"
+      ],
       "change_impact": {
         "dependents": [
           "bounded-system-resource-plan"
@@ -1163,13 +1379,49 @@
           "construct-bounded-state-machine"
         ]
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "Construct BoundedInteger as documented by its public API.",
+        "named_import": "bounded-integer",
+        "primary_symbol": "BoundedInteger"
+      },
       "dependency_build_order": [
         "bounded-integer"
       ],
       "details": "projects/12-bounded-integer/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
         "bounded-system-resource-plan"
+      ],
+      "do_not_use_when": [
+        "Need unchecked wrapping or values outside fixed bounds."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "OutOfRange",
+          "handling": "Correct the input or state before retrying.",
+          "meaning": "The documented OutOfRange condition occurred.",
+          "operation": "BoundedInteger, init, get, set, minValue, maxValue"
+        }
       ],
       "evidence_summary": {
         "conformance_validated": false,
@@ -1181,20 +1433,60 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-bounded-integer",
         "zig build smoke-bounded-integer"
       ],
       "id": "12",
+      "integration_notes": [
+        "Import the canonical named module.",
+        "Honor ownership, lifetime, and failure rules.",
+        "Run the focused validation commands."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Need unchecked wrapping or values outside fixed bounds."
+      ],
       "matching_recipes": [
         "construct-bounded-state-machine"
       ],
+      "minimal_usage": [
+        "const BoundedInteger = @import(\"bounded-integer\").BoundedInteger; const Priority = BoundedInteger(u8, 0, 15); const p = try Priority.init(raw);"
+      ],
       "module": "bounded-integer",
+      "operation_map": {
+        "BoundedInteger": "BoundedInteger",
+        "get": "get",
+        "init": "init",
+        "maxValue": "maxValue",
+        "minValue": "minValue",
+        "set": "set"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/12-bounded-integer/src/bounded_integer.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Integer wrapper constrained to compile-time inclusive bounds.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
       "transitive_dependents": [
         "bounded-system-resource-plan"
+      ],
+      "use_when": [
+        "Represent an integer constrained to compile-time inclusive bounds."
       ]
     },
     {
@@ -1231,6 +1523,18 @@
       "transitive_dependents": []
     },
     {
+      "aliases": [
+        "enum validation",
+        "integer tag decoder"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "validated-enum-decoding",
+        "integer-tag-validation"
+      ],
       "change_impact": {
         "dependents": [
           "elf64-file-header-parser",
@@ -1240,15 +1544,51 @@
         ],
         "recipes": []
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "Use the public functions directly.",
+        "named_import": "validated-enum-decoder",
+        "primary_symbol": "decodeEnum"
+      },
       "dependency_build_order": [
         "validated-enum-decoder"
       ],
       "details": "projects/14-validated-enum-decoder/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
         "elf64-file-header-parser",
         "elf64-program-header-parser",
         "physical-memory-region-set"
+      ],
+      "do_not_use_when": [
+        "Unknown tags must be retained rather than rejected."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "InvalidEnumValue",
+          "handling": "Correct the input or state before retrying.",
+          "meaning": "The documented InvalidEnumValue condition occurred.",
+          "operation": "decodeEnum, isValidEnumValue"
+        }
       ],
       "evidence_summary": {
         "conformance_validated": false,
@@ -1260,21 +1600,57 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-validated-enum-decoder",
         "zig build smoke-validated-enum-decoder"
       ],
       "id": "14",
+      "integration_notes": [
+        "Import the canonical named module.",
+        "Honor ownership, lifetime, and failure rules.",
+        "Run the focused validation commands."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Unknown tags must be retained rather than rejected."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const decodeEnum = @import(\"validated-enum-decoder\").decodeEnum; const kind = try decodeEnum(Kind, raw);"
+      ],
       "module": "validated-enum-decoder",
+      "operation_map": {
+        "decodeEnum": "decodeEnum",
+        "isValidEnumValue": "isValidEnumValue"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "runtime_bounded",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Validates integer tags before converting them into enum values.",
+      "thread_safety": "immutable_reads_only",
       "transitive_dependencies": [],
       "transitive_dependents": [
         "elf64-file-header-parser",
         "elf64-program-header-parser",
         "physical-memory-region-set",
         "physical-page-frame-allocator"
+      ],
+      "use_when": [
+        "Validate an integer tag before constructing an enum value."
       ]
     },
     {
@@ -2166,6 +2542,18 @@
       "transitive_dependents": []
     },
     {
+      "aliases": [
+        "page frame number",
+        "physical page conversion"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "physical-page-conversion",
+        "page-frame-number"
+      ],
       "change_impact": {
         "dependents": [
           "physical-memory-region-set",
@@ -2175,17 +2563,61 @@
           "validate-physical-page-frame"
         ]
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "Construct PageSize as documented by its public API.",
+        "named_import": "physical-page-frame-number-and-address-conversion",
+        "primary_symbol": "PageSize"
+      },
       "dependency_build_order": [
         "distinct-memory-address-types",
         "physical-page-frame-number-and-address-conversion"
       ],
       "details": "projects/28-physical-page-frame-number-and-address-conversion/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [
         "distinct-memory-address-types"
       ],
       "direct_dependents": [
         "physical-memory-region-set",
         "physical-page-frame-allocator"
+      ],
+      "do_not_use_when": [
+        "The page size is not 4 KiB or unaligned addresses must be accepted."
+      ],
+      "environment_constraints": {
+        "architectures": [
+          "page policy currently architecture-neutral but fixed at 4 KiB"
+        ],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "Overflow",
+          "handling": "Correct the input or state before retrying.",
+          "meaning": "The documented Overflow condition occurred.",
+          "operation": "PhysicalPageFrameNumber, PageSize, init, toAddress, fromAddress"
+        },
+        {
+          "error": "Unaligned",
+          "handling": "Correct the input or state before retrying.",
+          "meaning": "The documented Unaligned condition occurred.",
+          "operation": "PhysicalPageFrameNumber, PageSize, init, toAddress, fromAddress"
+        }
       ],
       "evidence_summary": {
         "conformance_validated": false,
@@ -2197,26 +2629,77 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-physical-page-frame-number-and-address-conversion",
         "zig build smoke-physical-page-frame-number-and-address-conversion"
       ],
       "id": "28",
+      "integration_notes": [
+        "Import the canonical named module.",
+        "Honor ownership, lifetime, and failure rules.",
+        "Run the focused validation commands."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "The page size is not 4 KiB or unaligned addresses must be accepted."
+      ],
       "matching_recipes": [
         "validate-physical-page-frame"
       ],
+      "minimal_usage": [
+        "const api = @import(\"physical-page-frame-number-and-address-conversion\");"
+      ],
       "module": "physical-page-frame-number-and-address-conversion",
+      "operation_map": {
+        "PageSize": "PageSize",
+        "PhysicalPageFrameNumber": "PhysicalPageFrameNumber",
+        "fromAddress": "fromAddress",
+        "init": "init",
+        "toAddress": "toAddress"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "runtime_bounded",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/28-physical-page-frame-number-and-address-conversion/src/physical_page_frame_number_and_address_conversion.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Checked conversion between 4 KiB physical page-frame indices and physical addresses.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [
         "distinct-memory-address-types"
       ],
       "transitive_dependents": [
         "physical-memory-region-set",
         "physical-page-frame-allocator"
+      ],
+      "use_when": [
+        "Convert checked 4 KiB page-frame indices and physical addresses."
       ]
     },
     {
+      "aliases": [
+        "parser checkpoint",
+        "reader rollback"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "binary-cursor-checkpoint",
+        "speculative-parsing"
+      ],
       "change_impact": {
         "dependents": [
           "bounded-binary-sub-reader",
@@ -2229,11 +2712,27 @@
           "parse-length-prefixed-record"
         ]
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "Construct BinaryCursorCheckpoint as documented by its public API.",
+        "named_import": "binary-cursor-checkpoint",
+        "primary_symbol": "BinaryCursorCheckpoint"
+      },
       "dependency_build_order": [
         "bounded-byte-reader",
         "binary-cursor-checkpoint"
       ],
       "details": "projects/29-binary-cursor-checkpoint/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [
         "bounded-byte-reader"
       ],
@@ -2244,6 +2743,21 @@
         "length-prefixed-binary-field",
         "type-length-value-decoder"
       ],
+      "do_not_use_when": [
+        "The reader is not a bounded-byte-reader or rollback is not required."
+      ],
+      "environment_constraints": {
+        "architectures": [
+          "page policy currently architecture-neutral but fixed at 4 KiB"
+        ],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -2254,17 +2768,51 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-binary-cursor-checkpoint",
         "zig build smoke-binary-cursor-checkpoint"
       ],
       "id": "29",
+      "integration_notes": [
+        "Import the canonical named module.",
+        "Honor ownership, lifetime, and failure rules.",
+        "Run the focused validation commands."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "The reader is not a bounded-byte-reader or rollback is not required."
+      ],
       "matching_recipes": [
         "parse-length-prefixed-record"
       ],
+      "minimal_usage": [
+        "const api = @import(\"binary-cursor-checkpoint\");"
+      ],
       "module": "binary-cursor-checkpoint",
+      "operation_map": {
+        "capture": "capture",
+        "position": "position",
+        "restore": "restore"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "runtime_bounded",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/29-binary-cursor-checkpoint/src/binary_cursor_checkpoint.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Capture and restore bounded-reader positions for speculative parsing.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [
         "bounded-byte-reader"
       ],
@@ -2274,9 +2822,24 @@
         "elf64-program-header-parser",
         "length-prefixed-binary-field",
         "type-length-value-decoder"
+      ],
+      "use_when": [
+        "Capture and restore bounded-reader positions for speculative parsing."
       ]
     },
     {
+      "aliases": [
+        "bounded subreader",
+        "binary child reader"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "bounded-sub-reader",
+        "binary-region-parsing"
+      ],
       "change_impact": {
         "dependents": [
           "elf64-program-header-parser",
@@ -2287,12 +2850,28 @@
           "parse-length-prefixed-record"
         ]
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "Construct AdvancementPolicy as documented by its public API.",
+        "named_import": "bounded-binary-sub-reader",
+        "primary_symbol": "AdvancementPolicy"
+      },
       "dependency_build_order": [
         "bounded-byte-reader",
         "binary-cursor-checkpoint",
         "bounded-binary-sub-reader"
       ],
       "details": "projects/30-bounded-binary-sub-reader/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [
         "binary-cursor-checkpoint",
         "bounded-byte-reader"
@@ -2302,6 +2881,21 @@
         "length-prefixed-binary-field",
         "type-length-value-decoder"
       ],
+      "do_not_use_when": [
+        "The child may read beyond its declared byte region."
+      ],
+      "environment_constraints": {
+        "architectures": [
+          "page policy currently architecture-neutral but fixed at 4 KiB"
+        ],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -2312,17 +2906,53 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-bounded-binary-sub-reader",
         "zig build smoke-bounded-binary-sub-reader"
       ],
       "id": "30",
+      "integration_notes": [
+        "Import the canonical named module.",
+        "Honor ownership, lifetime, and failure rules.",
+        "Run the focused validation commands."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "The child may read beyond its declared byte region."
+      ],
       "matching_recipes": [
         "parse-length-prefixed-record"
       ],
+      "minimal_usage": [
+        "const api = @import(\"bounded-binary-sub-reader\");"
+      ],
       "module": "bounded-binary-sub-reader",
+      "operation_map": {
+        "commit": "commit",
+        "create": "create",
+        "reader": "reader",
+        "rollback": "rollback",
+        "unread": "unread"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "runtime_bounded",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/30-bounded-binary-sub-reader/src/bounded_binary_sub_reader.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Confine a child reader and make parent advancement policy explicit.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [
         "binary-cursor-checkpoint",
         "bounded-byte-reader"
@@ -2331,6 +2961,9 @@
         "elf64-program-header-parser",
         "length-prefixed-binary-field",
         "type-length-value-decoder"
+      ],
+      "use_when": [
+        "Confine parsing to a child byte region with explicit parent advancement."
       ]
     },
     {
@@ -3571,6 +4204,18 @@
       ]
     },
     {
+      "aliases": [
+        "sv39 pte",
+        "riscv page entry"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "sv39-page-table-entry",
+        "page-table-entry-validation"
+      ],
       "change_impact": {
         "dependents": [
           "riscv-sv39-page-table-builder",
@@ -3580,15 +4225,46 @@
           "construct-and-verify-sv39-address-space"
         ]
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "Construct DecodeError as documented by its public API.",
+        "named_import": "riscv-sv39-page-table-entry",
+        "primary_symbol": "DecodeError"
+      },
       "dependency_build_order": [
         "riscv-sv39-page-table-entry"
       ],
       "details": "projects/44-riscv-sv39-page-table-entry/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
         "riscv-sv39-page-table-builder",
         "riscv-sv39-page-table-walker"
       ],
+      "do_not_use_when": [
+        "Target paging format is not RISC-V Sv39."
+      ],
+      "environment_constraints": {
+        "architectures": [
+          "riscv64 Sv39; hosted modeling on any target"
+        ],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -3599,24 +4275,78 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-riscv-sv39-page-table-entry",
         "zig build smoke-riscv-sv39-page-table-entry"
       ],
       "id": "44",
+      "integration_notes": [
+        "Import the canonical named module.",
+        "Honor ownership, lifetime, and failure rules.",
+        "Run the focused validation commands."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Target paging format is not RISC-V Sv39."
+      ],
       "matching_recipes": [
         "construct-and-verify-sv39-address-space"
       ],
+      "minimal_usage": [
+        "const api = @import(\"riscv-sv39-page-table-entry\");"
+      ],
       "module": "riscv-sv39-page-table-entry",
+      "operation_map": {
+        "address": "address",
+        "branch": "branch",
+        "decode": "decode",
+        "invalid": "invalid",
+        "kind": "kind",
+        "leaf": "leaf",
+        "permissions": "permissions",
+        "validateAtLevel": "validateAtLevel"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "runtime_bounded",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/44-riscv-sv39-page-table-entry/src/riscv_sv39_page_table_entry.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Typed validation and encoding of Sv39 page-table entries.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
       "transitive_dependents": [
         "riscv-sv39-page-table-builder",
         "riscv-sv39-page-table-walker"
+      ],
+      "use_when": [
+        "Validate and encode RISC-V Sv39 page-table entries."
       ]
     },
     {
+      "aliases": [
+        "sv39 virtual address",
+        "vpn indexing"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "sv39-virtual-address",
+        "virtual-address-indexing"
+      ],
       "change_impact": {
         "dependents": [
           "riscv-sv39-page-table-builder",
@@ -3626,15 +4356,46 @@
           "construct-and-verify-sv39-address-space"
         ]
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "Construct Error as documented by its public API.",
+        "named_import": "riscv-sv39-virtual-address-indexing",
+        "primary_symbol": "Error"
+      },
       "dependency_build_order": [
         "riscv-sv39-virtual-address-indexing"
       ],
       "details": "projects/45-riscv-sv39-virtual-address-indexing/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
         "riscv-sv39-page-table-builder",
         "riscv-sv39-page-table-walker"
       ],
+      "do_not_use_when": [
+        "Target address format is not RISC-V Sv39."
+      ],
+      "environment_constraints": {
+        "architectures": [
+          "riscv64 Sv39; hosted modeling on any target"
+        ],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -3645,24 +4406,76 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-riscv-sv39-virtual-address-indexing",
         "zig build smoke-riscv-sv39-virtual-address-indexing"
       ],
       "id": "45",
+      "integration_notes": [
+        "Import the canonical named module.",
+        "Honor ownership, lifetime, and failure rules.",
+        "Run the focused validation commands."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Target address format is not RISC-V Sv39."
+      ],
       "matching_recipes": [
         "construct-and-verify-sv39-address-space"
       ],
+      "minimal_usage": [
+        "const api = @import(\"riscv-sv39-virtual-address-indexing\");"
+      ],
       "module": "riscv-sv39-virtual-address-indexing",
+      "operation_map": {
+        "construct": "construct",
+        "decompose": "decompose",
+        "isCanonical": "isCanonical",
+        "pageSize": "pageSize",
+        "requireAligned": "requireAligned",
+        "validateRange": "validateRange"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "runtime_bounded",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/45-riscv-sv39-virtual-address-indexing/src/riscv_sv39_virtual_address_indexing.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Checked canonical Sv39 virtual-address decomposition, reconstruction, alignment, and ranges.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
       "transitive_dependents": [
         "riscv-sv39-page-table-builder",
         "riscv-sv39-page-table-walker"
+      ],
+      "use_when": [
+        "Validate and decompose canonical RISC-V Sv39 virtual addresses."
       ]
     },
     {
+      "aliases": [
+        "page table owner",
+        "sv39 table pages"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "page-table-page-ownership",
+        "bounded-page-table-storage"
+      ],
       "change_impact": {
         "dependents": [
           "riscv-sv39-page-table-builder",
@@ -3672,15 +4485,46 @@
           "construct-and-verify-sv39-address-space"
         ]
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "Construct Error as documented by its public API.",
+        "named_import": "riscv-page-table-page-owner",
+        "primary_symbol": "Error"
+      },
       "dependency_build_order": [
         "riscv-page-table-page-owner"
       ],
       "details": "projects/46-riscv-page-table-page-owner/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
         "riscv-sv39-page-table-builder",
         "riscv-sv39-page-table-walker"
       ],
+      "do_not_use_when": [
+        "Unbounded allocation or a non-Sv39 page-table layout is required."
+      ],
+      "environment_constraints": {
+        "architectures": [
+          "riscv64 Sv39; hosted modeling on any target"
+        ],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -3691,21 +4535,62 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-riscv-page-table-page-owner",
         "zig build smoke-riscv-page-table-page-owner"
       ],
       "id": "46",
+      "integration_notes": [
+        "Import the canonical named module.",
+        "Honor ownership, lifetime, and failure rules.",
+        "Run the focused validation commands."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Unbounded allocation or a non-Sv39 page-table layout is required."
+      ],
       "matching_recipes": [
         "construct-and-verify-sv39-address-space"
       ],
+      "minimal_usage": [
+        "const api = @import(\"riscv-page-table-page-owner\");"
+      ],
       "module": "riscv-page-table-page-owner",
+      "operation_map": {
+        "PageOwner": "PageOwner",
+        "allocate": "allocate",
+        "count": "count",
+        "deinit": "deinit",
+        "read": "read",
+        "release": "release",
+        "write": "write"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": true,
+        "capacity_model": "runtime_bounded",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/46-riscv-page-table-page-owner/src/riscv_page_table_page_owner.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Bounded explicit ownership and injected access to zeroed page-table pages.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
       "transitive_dependents": [
         "riscv-sv39-page-table-builder",
         "riscv-sv39-page-table-walker"
+      ],
+      "use_when": [
+        "Manage bounded explicit ownership and access to zeroed page-table pages."
       ]
     },
     {

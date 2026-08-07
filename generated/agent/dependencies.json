@@ -11,11 +11,11 @@
       "dependencies": [
         "bounded-byte-reader"
       ],
-      "status": "partial"
+      "status": "full"
     },
     "bit-set": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "bitmap-allocator": {
       "dependencies": [
@@ -28,7 +28,7 @@
         "binary-cursor-checkpoint",
         "bounded-byte-reader"
       ],
-      "status": "partial"
+      "status": "full"
     },
     "bounded-byte-reader": {
       "dependencies": [],
@@ -40,7 +40,7 @@
     },
     "bounded-integer": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "bounded-system-resource-plan": {
       "dependencies": [
@@ -72,7 +72,7 @@
     },
     "dynamic-array": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "elf64-file-header-parser": {
       "dependencies": [
@@ -202,7 +202,7 @@
       "dependencies": [
         "distinct-memory-address-types"
       ],
-      "status": "partial"
+      "status": "full"
     },
     "ring-buffer": {
       "dependencies": [],
@@ -210,7 +210,7 @@
     },
     "riscv-page-table-page-owner": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "riscv-sfence-vma-invalidation": {
       "dependencies": [],
@@ -228,7 +228,7 @@
     },
     "riscv-sv39-page-table-entry": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "riscv-sv39-page-table-walker": {
       "dependencies": [
@@ -240,7 +240,7 @@
     },
     "riscv-sv39-virtual-address-indexing": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "saturating-counter": {
       "dependencies": [],
@@ -293,7 +293,7 @@
     },
     "validated-enum-decoder": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "wrapping-sequence-number": {
       "dependencies": [],

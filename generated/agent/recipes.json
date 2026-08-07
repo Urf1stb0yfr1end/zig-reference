@@ -4,6 +4,14 @@
   "agent_index_version": "2.0.0",
   "generator": "tools/build-agent-index.py",
   "recipes": {
+    "construct-and-verify-sv39-address-space": [
+      "riscv-page-table-page-owner",
+      "riscv-sv39-page-table-entry",
+      "riscv-sv39-virtual-address-indexing"
+    ],
+    "construct-bounded-state-machine": [
+      "bounded-integer"
+    ],
     "create-stale-safe-object-registry": [
       "fixed-capacity-object-pool",
       "generational-handles"
@@ -13,6 +21,8 @@
       "checked-half-open-range"
     ],
     "parse-length-prefixed-record": [
+      "binary-cursor-checkpoint",
+      "bounded-binary-sub-reader",
       "bounded-byte-reader"
     ],
     "plan-bounded-initialization": [
@@ -28,7 +38,8 @@
       "bounded-deterministic-event-trace"
     ],
     "validate-physical-page-frame": [
-      "distinct-memory-address-types"
+      "distinct-memory-address-types",
+      "physical-page-frame-number-and-address-conversion"
     ],
     "write-and-read-explicit-endian-record": [
       "bounded-byte-reader",
