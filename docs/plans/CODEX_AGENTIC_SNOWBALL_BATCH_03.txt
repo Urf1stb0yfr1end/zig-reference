@@ -1,0 +1,392 @@
+CODEX AGENTIC SNOWBALL BATCH 03
+
+MISSION
+
+Continue the Agentic Snowball without weakening the standard.
+
+The repository currently has 52 contracted modules, 27 full Agent Fast Path v2 modules, and 25 partial modules. Batch 03 must do two things in this order:
+
+1. Repair the semantic defects exposed by the independent Batch 02 audit and prevent those exact regressions from returning.
+2. Migrate exactly ten additional highest-leverage partial modules to the existing Agent Contract v2 standard using repository-native impact/dependency information.
+
+If exactly ten unique partial modules are migrated and no concurrent repository change alters the total, the expected final state is 37 full and 15 partial modules.
+
+The purpose is not to create more metadata. The purpose is to make correct reuse cheaper, safer, and more deterministic for future coding agents.
+
+Keep the central rule:
+
+Agents should consume the cheapest sufficient representation first.
+
+Do not make the agent smarter by forcing it to reread the repository. Make the repository cheaper to reason about.
+
+
+START HERE
+
+Work in the repository root.
+
+Read AGENTS.md first.
+
+Before broad source inspection, run:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+
+Record the baseline counts and current commit.
+
+Use the existing Agent Fast Path for discovery before opening canonical source files.
+
+Do not redesign Agent Fast Path v2.
+Do not invent a new metadata system.
+Do not add a new schema version.
+Do not replace the query interface.
+Do not add a database, binary index, daemon, server, LSP, chatbot, network dependency, or generated binary artifact.
+Do not change Zig from 0.14.0.
+Do not commit or push.
+
+
+PART A — SEMANTIC REPAIR BEFORE FURTHER SNOWBALLING
+
+The independent merged-main Batch 02 audit found at least two mechanically valid but semantically misleading Agent Fast Path projections.
+
+Repair them from canonical truth. Do not alter implementation behavior merely to make metadata convenient.
+
+A1. dynamic-array borrowing/invalidation coherence
+
+The current dynamic-array integrate card reports an empty borrowing set while also reporting that items slices and element pointers are invalidated by capacity growth or deinit.
+
+Inspect the canonical dynamic-array details contract, public signatures, implementation, and tests only as needed.
+
+The resulting full Agent Contract must accurately express the borrowing behavior of items() and constItems(). In particular, if those methods return slices into container-owned storage, state that directly, distinguish mutable/immutable borrowed views where useful, and make the lifetime/invalidation relationship consistent with growth, deinit, pop, clear, or any other supported mutation semantics.
+
+Do not overclaim. Preserve uncertainty where canonical material is genuinely uncertain.
+
+The final generated integrate card must not simultaneously claim no borrowing and then invalidate borrowed slices.
+
+A2. riscv-sv39-page-table-entry construction identity
+
+The current integrate card uses DecodeError as the primary construction symbol and says to construct DecodeError. That is not a useful integration entry point for a page-table-entry module unless canonical source proves that the module itself is actually centered on constructing that error type.
+
+Inspect the canonical public surface and implementation.
+
+Choose the real public integration symbol and construction/minimal-usage path supported by the module. The resulting card must guide an agent toward the page-table-entry functionality rather than an incidental error type.
+
+Do not guess a symbol. Derive it from the public API.
+
+A3. bounded semantic audit of the ten Batch 02 migrations
+
+Audit only the ten modules migrated in Batch 02 for the same class of compression defects:
+
+- borrowing contradicts invalidation or returned slice/pointer lifetimes;
+- construction primary symbol is incidental, error-only, or otherwise not the real integration entry point;
+- minimal_usage is an import-only placeholder when canonical public usage can be stated safely;
+- generic text such as “Construct X as documented by its public API” hides a concrete construction path that is already known;
+- error_map assigns every error to every operation when the public surface supports a narrower mapping;
+- resource_profile contradicts allocator/storage behavior;
+- environment or determinism claims are stronger than canonical evidence;
+- copy residue from unrelated modules leaks into the agent projection.
+
+The Batch 02 migration set is:
+
+binary-cursor-checkpoint
+validated-enum-decoder
+bounded-binary-sub-reader
+dynamic-array
+bit-set
+physical-page-frame-number-and-address-conversion
+riscv-sv39-page-table-entry
+riscv-sv39-virtual-address-indexing
+riscv-page-table-page-owner
+bounded-integer
+
+This is a bounded semantic audit, not a rewrite campaign. Repair only facts that can be grounded in canonical contracts, public signatures, source behavior, or tests.
+
+Do not invent diagnostics or proof evidence merely to make a card look richer.
+
+A4. regression protection using existing infrastructure
+
+Add narrow regression assertions to the existing appropriate fast-path/contract test infrastructure so the two independently observed defects cannot silently return.
+
+Prefer extending tools/test-agent-fast-path.py or another already-existing test surface. Do not create a new framework.
+
+At minimum, regression coverage must establish:
+
+- dynamic-array’s generated integrate representation exposes the real borrowed-view semantics consistently with invalidation;
+- riscv-sv39-page-table-entry’s generated construction information points at the actual functional integration surface rather than DecodeError or another incidental error-only symbol.
+
+If the correct public symbol must first be discovered from canonical source, make the regression assert that discovered canonical fact.
+
+Do not attempt to encode subjective “good metadata” heuristics as a giant validator. Keep this narrow and evidence-backed.
+
+
+PART B — SELECT THE NEXT TEN PARTIAL MODULES MECHANICALLY
+
+After Part A is clean, recompute the current partial frontier from the actual tree.
+
+Do not blindly copy the previous report’s ranking. Use current repository data.
+
+For every remaining partial module, use existing commands such as:
+
+python3 tools/query-reference.py agent pending
+python3 tools/query-reference.py agent impact MODULE
+python3 tools/query-reference.py dependencies MODULE --recursive
+python3 tools/query-reference.py dependents MODULE --recursive
+
+Rank candidates using the same mechanical priorities established by the snowball:
+
+1. transitive dependents unlocked or improved;
+2. direct dependents improved;
+3. removal of partial foundations from already-full module closures;
+4. recipe participation and recipe-closure completion;
+5. low-level primitive reuse;
+6. coherent cluster completion where multiple selected modules reduce future choice/inspection cost together.
+
+Do not invent a synthetic precision score unless the repository already defines one.
+
+The Batch 02 report identified the following likely frontier, but it is advisory only and must be recomputed:
+
+- remaining Sv39 walker/invalidation/builder chain;
+- length-prefixed-binary-field;
+- physical-memory-region-set;
+- elf64-file-header-parser;
+- validated-bit-flags;
+- then other high-leverage recipe participants or graph foundations.
+
+Select exactly ten unique modules that are partial at the start of Part B.
+
+Explain why each was selected using graph/recipe/closure evidence.
+
+Do not count Part A repairs to already-full modules as migrations.
+
+
+PART C — MIGRATE THE TEN SELECTED MODULES TO AGENT CONTRACT V2
+
+Use the existing standard exactly.
+
+For each selected module, author only facts supported by canonical truth.
+
+A full Agent Contract v2 projection must be useful for ordinary selection and integration without requiring source inspection when the canonical repository already contains the necessary information.
+
+Populate the existing v2 fields as appropriate, including:
+
+- selection_priority
+- alternatives
+- use_when
+- do_not_use_when
+- capabilities
+- environment_constraints
+- resource_profile
+- construction
+- operation_map
+- error_map
+- ownership
+- borrowing
+- invalidation
+- failure guarantees/effects where supported
+- composition
+- determinism
+- known_gaps
+- minimal_usage
+- integration_notes
+- focused validation commands
+
+Respect derived-vs-authored boundaries already established by the repository.
+
+Never make a compact projection more confident or less restrictive than canonical truth.
+
+Preserve unknowns explicitly.
+
+Do not fabricate proof contracts.
+Do not fabricate diagnostics.
+Do not fabricate misuse fixtures.
+Do not mark future-analyzer behavior as compiler-tested.
+Do not call unit/smoke evidence formal proof.
+
+Source remains authoritative when debugging or modifying implementation. The goal is to eliminate unnecessary source reads for ordinary discovery, selection, composition, and correct integration.
+
+
+PART D — KEEP THE ROOT VISION INTACT
+
+The following two flagship documents intentionally belong at repository root:
+
+MAYBE_THE_NEW_WORLD_FITS_IN_5_GB.md
+Prospectively.md
+
+They must remain there.
+
+The strict root-document policy must remain strict. Do not broaden it to permit arbitrary root Markdown.
+
+Verify that an unapproved temporary Markdown file at root is rejected, then remove the temporary file before completion.
+
+Do not move the two flagship documents back under docs/.
+
+
+PART E — COMMANDS.md IS MANDATORY ON EVERY CODEX RUN
+
+Every Codex run that changes this repository must review and update COMMANDS.md before completion.
+
+This requirement is permanent for this workstream.
+
+For this batch:
+
+- update the Agent Fast Path full/partial counts to the final actual state;
+- document any newly introduced runnable command, changed argument, changed validation behavior, or changed workflow;
+- if no command surface changed, still update COMMANDS.md with the materially established current agent-readability/validation state from this run;
+- never document a command that does not exist;
+- do not claim a validation status that was not actually executed.
+
+Finish by running:
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+
+COMMANDS.md must be current when the run ends.
+
+
+PART F — MEASURE THE SNOWBALL HONESTLY
+
+Create:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_03.md
+
+The report must include:
+
+1. baseline commit and starting counts;
+2. the Part A semantic defects repaired and the canonical evidence used;
+3. whether the other eight Batch 02 modules contained additional demonstrable semantic projection defects;
+4. the ten newly selected partial modules and their mechanical leverage rationale;
+5. before/after full and partial counts;
+6. unique direct/transitive dependents improved;
+7. recipes whose closure gained additional full modules;
+8. exact select/integrate stdout byte counts before and after for the ten newly migrated modules when practical;
+9. source files required for ordinary selection/integration before vs after using the same methodology as prior batches;
+10. representative fast-path selection, composition, impact, and repair/missing-capability behavior;
+11. deterministic index regeneration result;
+12. all validation commands actually executed and their outcomes;
+13. the next recomputed partial frontier.
+
+Do not present card byte growth as a performance regression by itself. The relevant question is whether the smallest sufficient representation avoids deeper, more expensive reads and wrong choices.
+
+Do not invent token counts when only byte counts were measured.
+
+Do not claim OSIR, CCU, DCR, or other agentic metrics were benchmarked unless a controlled protocol actually measured them.
+
+If you discuss them conceptually, label them conceptual rather than empirical.
+
+
+PART G — FAST-PATH ACCEPTANCE
+
+After migration, exercise the existing agent interface against the newly full modules.
+
+At minimum verify:
+
+- bootstrap returns the final actual full/partial count;
+- doctor is status ok;
+- agent decide can select at least one newly migrated module from a natural-language need and explain/reject alternatives correctly;
+- select and integrate cards for representative new modules expose useful constraints and construction without source access;
+- agent compose crosses foundations from Batch 01, Batch 02, and Batch 03 when a real capability composition supports it;
+- a nonexistent capability remains missing rather than being guessed;
+- impact for a selected high-leverage module returns the expected dependent/validation surface;
+- nonexistent diagnostics remain absent rather than fabricated;
+- the two Part A regression cases return corrected cards;
+- generation is deterministic.
+
+Do not manufacture a diagnostic merely so diagnostic lookup has something to return.
+
+
+PART H — VALIDATION
+
+Run focused validation while editing rather than waiting until the end.
+
+Before final completion, run every applicable gate below and repair failures caused by this work:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/format-module-contracts.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/validate-agent-contracts.py --self-test
+PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py
+
+node tools/check-port-contracts.js
+
+zig fmt --check .
+zig build validate-agent-contracts --summary all
+zig build check --summary all
+zig build smoke --summary all
+zig build test --summary all
+zig build recipes --summary all
+zig build conformance --summary all
+zig build validate-repository --summary all
+
+git diff --check
+
+Also run every focused unit/smoke command for modules whose canonical contracts were changed when those commands are not already clearly covered by a stronger executed aggregate gate.
+
+Regenerate generated agent indexes from canonical contracts, then run the generator a second time and verify the second pass produces no diff.
+
+Verify no temporary root-policy test file remains.
+
+Verify both flagship root documents still exist at root.
+
+Verify the repository remains text-only according to its policy.
+
+
+PART I — FINAL QUALITY BAR
+
+Do not stop merely because JSON validates.
+
+A module is not “full” for this project merely because required fields are populated. Its compact card must tell a future agent the right thing.
+
+Before marking the batch complete, ask for every newly full or repaired module:
+
+- Would an agent choose this module for the right reasons?
+- Would it reject the module for the right reasons?
+- Does construction point at the actual integration entry point?
+- Are ownership and borrowing internally consistent?
+- Do invalidation rules match returned views/pointers?
+- Are error mappings operation-specific where canonical truth supports that precision?
+- Are resource and environment claims conservative?
+- Is minimal_usage actually useful?
+- Can ordinary integration proceed from the card plus dependency closure without opening source?
+- Does the card avoid claims that the canonical source cannot support?
+
+Prefer an honest partial fact over a polished false one.
+
+
+PART J — SCOPE CONTROL
+
+Do not add unrelated modules or features.
+Do not redesign the standard.
+Do not refactor working implementation code just for aesthetics.
+Do not rewrite every old contract.
+Do not turn this batch into a general metadata-linter project.
+Do not weaken strict repository policy.
+Do not change the flagship vision documents except where a demonstrable broken link/path caused by prior movement must be corrected.
+Do not commit or push.
+
+The batch succeeds by increasing trustworthy foothold density while keeping reasoning cost bounded.
+
+
+EXPECTED END STATE
+
+If the repository begins Part B at 27 full / 25 partial and no concurrent changes alter the module count:
+
+52 contracted modules
+37 full Agent Fast Path v2 modules
+15 partial modules
+
+If current counts differ because main advanced, report the actual baseline and require exactly ten partial-to-full migrations from that baseline instead of forcing stale numbers.
+
+The two semantic defects from the independent Batch 02 audit are repaired and regression-tested.
+The ten Batch 02 modules have received a bounded semantic coherence audit.
+The next ten partial modules are migrated using current repository-native leverage.
+COMMANDS.md is current.
+The two flagship root documents remain at root.
+All generated indexes are deterministic.
+The full repository validation gate passes.
+
+Do not commit or push.
+
+Finish only when the requested work is complete and the final line of your response is exactly:
+
+AGENTIC SNOWBALL BATCH 03 PASSED
