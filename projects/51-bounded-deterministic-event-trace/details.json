@@ -1144,7 +1144,7 @@
     "notes": []
   },
   "agent_contract": {
-    "schema_version": "1.0.0",
+    "schema_version": "2.0.0",
     "summary": "Store and canonically render bounded normalized deterministic events.",
     "search_aliases": [
       "event trace",
@@ -1255,6 +1255,78 @@
         "related_module": "bounded-deterministic-event-trace",
         "related_recipe": "trace-morphic-example"
       }
-    ]
+    ],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": [
+        "capacity_value"
+      ]
+    },
+    "construction": {
+      "named_import": "bounded-deterministic-event-trace",
+      "primary_symbol": "BoundedDeterministicEventTrace",
+      "initialization": "BoundedDeterministicEventTrace(64).init()"
+    },
+    "operation_map": {
+      "append": "append",
+      "reset": "reset",
+      "render": "render",
+      "inspect": "events"
+    },
+    "error_map": [
+      {
+        "error": "TraceFull",
+        "operation": "append",
+        "meaning": "TraceFull is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      },
+      {
+        "error": "SequenceExhausted",
+        "operation": "append",
+        "meaning": "SequenceExhausted is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      },
+      {
+        "error": "OutputTooSmall",
+        "operation": "append",
+        "meaning": "OutputTooSmall is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      }
+    ],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": [
+        "trace-morphic-example"
+      ]
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Defined by inputs, insertion order, and documented capacity rules.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Timestamps, persistence, replay, overwrite, and synchronization are not provided."
+    ],
+    "minimal_usage": [
+      "const module = @import(\"bounded-deterministic-event-trace\");",
+      "var value = BoundedDeterministicEventTrace(64).init();"
+    ],
+    "integration_notes": []
   }
 }

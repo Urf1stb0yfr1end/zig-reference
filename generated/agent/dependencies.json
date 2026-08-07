@@ -1,46 +1,46 @@
 {
   "_generated": true,
   "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY",
-  "agent_index_version": "1.0.0",
+  "agent_index_version": "2.0.0",
   "dependencies": {
     "aligned-address-and-size-helpers": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "binary-cursor-checkpoint": {
       "dependencies": [
         "bounded-byte-reader"
       ],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "bit-set": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "bitmap-allocator": {
       "dependencies": [
         "bit-set"
       ],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "bounded-binary-sub-reader": {
       "dependencies": [
         "binary-cursor-checkpoint",
         "bounded-byte-reader"
       ],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "bounded-byte-reader": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "bounded-deterministic-event-trace": {
       "dependencies": [],
-      "status": "agent-readable"
+      "status": "full"
     },
     "bounded-integer": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "bounded-system-resource-plan": {
       "dependencies": [
@@ -50,29 +50,29 @@
         "fixed-bump-allocator",
         "fixed-capacity-topological-sort"
       ],
-      "status": "agent-readable"
+      "status": "full"
     },
     "byte-writer": {
       "dependencies": [
         "dynamic-array"
       ],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "checked-half-open-range": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "checked-integer-cast": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "distinct-memory-address-types": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "dynamic-array": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "elf64-file-header-parser": {
       "dependencies": [
@@ -83,7 +83,7 @@
         "endian-integer-codec",
         "validated-enum-decoder"
       ],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "elf64-program-header-parser": {
       "dependencies": [
@@ -100,57 +100,57 @@
         "validated-bit-flags",
         "validated-enum-decoder"
       ],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "endian-integer-codec": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "fixed-bump-allocator": {
       "dependencies": [
         "aligned-address-and-size-helpers"
       ],
-      "status": "agent-readable"
+      "status": "full"
     },
     "fixed-capacity-object-pool": {
       "dependencies": [
         "bitmap-allocator",
         "generational-handles"
       ],
-      "status": "agent-readable"
+      "status": "full"
     },
     "fixed-capacity-priority-queue": {
       "dependencies": [
         "fixed-capacity-vector"
       ],
-      "status": "agent-readable"
+      "status": "full"
     },
     "fixed-capacity-topological-sort": {
       "dependencies": [
         "fixed-capacity-priority-queue",
         "fixed-capacity-vector"
       ],
-      "status": "agent-readable"
+      "status": "full"
     },
     "fixed-capacity-vector": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "fixed-free-list": {
       "dependencies": [],
-      "status": "agent-readable"
+      "status": "full"
     },
     "fourcc-code": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "generational-handles": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "intrusive-doubly-linked-list": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "length-prefixed-binary-field": {
       "dependencies": [
@@ -160,22 +160,22 @@
         "checked-integer-cast",
         "endian-integer-codec"
       ],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "nonzero-integer": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "optional-typed-handle": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "owned-byte-buffer": {
       "dependencies": [
         "byte-writer",
         "dynamic-array"
       ],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "physical-memory-region-set": {
       "dependencies": [
@@ -185,7 +185,7 @@
         "physical-page-frame-number-and-address-conversion",
         "validated-enum-decoder"
       ],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "physical-page-frame-allocator": {
       "dependencies": [
@@ -196,25 +196,25 @@
         "physical-memory-region-set",
         "physical-page-frame-number-and-address-conversion"
       ],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "physical-page-frame-number-and-address-conversion": {
       "dependencies": [
         "distinct-memory-address-types"
       ],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "ring-buffer": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "riscv-page-table-page-owner": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "riscv-sfence-vma-invalidation": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "riscv-sv39-page-table-builder": {
       "dependencies": [
@@ -224,11 +224,11 @@
         "riscv-sv39-page-table-walker",
         "riscv-sv39-virtual-address-indexing"
       ],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "riscv-sv39-page-table-entry": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "riscv-sv39-page-table-walker": {
       "dependencies": [
@@ -236,37 +236,37 @@
         "riscv-sv39-page-table-entry",
         "riscv-sv39-virtual-address-indexing"
       ],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "riscv-sv39-virtual-address-indexing": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "saturating-counter": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "semantic-version": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "source-span": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "stack": {
       "dependencies": [
         "dynamic-array"
       ],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "state-machine": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "tagged-result": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "type-length-value-decoder": {
       "dependencies": [
@@ -277,27 +277,27 @@
         "endian-integer-codec",
         "length-prefixed-binary-field"
       ],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "unit-safe-quantity": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "validated-ascii-byte": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "validated-bit-flags": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "validated-enum-decoder": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     },
     "wrapping-sequence-number": {
       "dependencies": [],
-      "status": "pending-migration"
+      "status": "partial"
     }
   },
   "generator": "tools/build-agent-index.py"

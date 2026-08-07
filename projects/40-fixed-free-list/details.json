@@ -891,7 +891,7 @@
     "notes": []
   },
   "agent_contract": {
-    "schema_version": "1.0.0",
+    "schema_version": "2.0.0",
     "summary": "Allocate and recycle bounded integer slots in deterministic constant time.",
     "search_aliases": [
       "free list",
@@ -963,6 +963,78 @@
         "related_module": "fixed-free-list",
         "related_recipe": "plan-bounded-initialization"
       }
-    ]
+    ],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": [
+        "capacity"
+      ]
+    },
+    "construction": {
+      "named_import": "fixed-free-list",
+      "primary_symbol": "FixedFreeList",
+      "initialization": "FixedFreeList(16).init()"
+    },
+    "operation_map": {
+      "allocate": "allocate",
+      "release": "release",
+      "query": "isAllocated",
+      "reset": "reset"
+    },
+    "error_map": [
+      {
+        "error": "Full",
+        "operation": "allocate",
+        "meaning": "Full is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      },
+      {
+        "error": "OutOfRange",
+        "operation": "allocate",
+        "meaning": "OutOfRange is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      },
+      {
+        "error": "DoubleFree",
+        "operation": "allocate",
+        "meaning": "DoubleFree is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      }
+    ],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": [
+        "plan-bounded-initialization"
+      ]
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Defined by inputs, insertion order, and documented capacity rules.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Value storage and stale-handle generations are not provided."
+    ],
+    "minimal_usage": [
+      "const module = @import(\"fixed-free-list\");",
+      "var value = FixedFreeList(16).init();"
+    ],
+    "integration_notes": []
   }
 }

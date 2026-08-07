@@ -214,6 +214,13 @@ Each module has `zig build test-<module>` and `zig build smoke-<module>` targets
 | `python3 tools/query-reference.py agent diagnostic ID` | Locate misuse evidence and its repair. |
 | `python3 tools/query-reference.py agent symbol SYMBOL` | Discover a pilot module by public symbol. |
 | `python3 tools/query-reference.py agent pending` | List modules awaiting migration without calling them invalid. |
+| `python3 tools/query-reference.py agent bootstrap` | Return the compact zero-context repository entry card. |
+| `python3 tools/query-reference.py agent doctor` | Check fast-path prerequisites, drift, contracts, and Zig 0.14.0. |
+| `python3 tools/query-reference.py agent card MODULE --view {select,integrate,repair,all}` | Return a purpose-sized module card. |
+| `python3 tools/query-reference.py agent decide "TASK"` | Rank or reject up to three modules by deterministic contract matching. |
+| `python3 tools/query-reference.py agent compose CAPABILITY [...]` | Resolve provided, ambiguous, and missing capabilities plus closure and recipes. |
+| `python3 tools/query-reference.py agent impact MODULE` | Derive downstream modules, recipes, and validation commands. |
+| `PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py` | Run the deterministic zero-context acceptance test. |
 
 ## Bounded system resource plan commands
 

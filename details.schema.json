@@ -4093,11 +4093,23 @@
         "recipes",
         "validation_commands",
         "proof_contract",
-        "diagnostics"
+        "diagnostics",
+        "selection_priority",
+        "alternatives",
+        "environment_constraints",
+        "resource_profile",
+        "construction",
+        "operation_map",
+        "error_map",
+        "composition",
+        "determinism",
+        "known_gaps",
+        "minimal_usage",
+        "integration_notes"
       ],
       "properties": {
         "schema_version": {
-          "const": "1.0.0"
+          "const": "2.0.0"
         },
         "summary": {
           "type": "string",
@@ -4329,6 +4341,274 @@
                 "type": "string"
               }
             }
+          }
+        },
+        "selection_priority": {
+          "enum": [
+            "canonical",
+            "specialized",
+            "adapter",
+            "alternative"
+          ]
+        },
+        "alternatives": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "module",
+              "choose_when",
+              "reject_when"
+            ],
+            "properties": {
+              "module": {
+                "type": "string"
+              },
+              "choose_when": {
+                "type": "string"
+              },
+              "reject_when": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "environment_constraints": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "hosted",
+            "freestanding",
+            "architectures",
+            "os_dependency",
+            "libc_required",
+            "endianness",
+            "privilege"
+          ],
+          "properties": {
+            "hosted": {
+              "enum": [
+                "supported",
+                "unsupported",
+                "unknown"
+              ]
+            },
+            "freestanding": {
+              "enum": [
+                "supported",
+                "unsupported",
+                "unknown"
+              ]
+            },
+            "architectures": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "os_dependency": {
+              "type": "boolean"
+            },
+            "libc_required": {
+              "type": "boolean"
+            },
+            "endianness": {
+              "enum": [
+                "independent",
+                "native",
+                "little",
+                "big",
+                "unknown"
+              ]
+            },
+            "privilege": {
+              "enum": [
+                "none",
+                "user",
+                "supervisor",
+                "unknown"
+              ]
+            }
+          }
+        },
+        "resource_profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "hidden_allocation",
+            "storage_model",
+            "capacity_model",
+            "bounded",
+            "caller_provided_memory",
+            "compile_time_parameters"
+          ],
+          "properties": {
+            "hidden_allocation": {
+              "type": "boolean"
+            },
+            "storage_model": {
+              "enum": [
+                "inline",
+                "caller_owned",
+                "mixed"
+              ]
+            },
+            "capacity_model": {
+              "enum": [
+                "compile_time",
+                "runtime_bounded",
+                "caller_buffer",
+                "unbounded"
+              ]
+            },
+            "bounded": {
+              "type": "boolean"
+            },
+            "caller_provided_memory": {
+              "type": "boolean"
+            },
+            "compile_time_parameters": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "construction": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "named_import",
+            "primary_symbol",
+            "initialization"
+          ],
+          "properties": {
+            "named_import": {
+              "type": "string",
+              "minLength": 1
+            },
+            "primary_symbol": {
+              "type": "string",
+              "minLength": 1
+            },
+            "initialization": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "operation_map": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "error_map": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "error",
+              "operation",
+              "meaning",
+              "handling"
+            ],
+            "properties": {
+              "error": {
+                "type": "string",
+                "minLength": 1
+              },
+              "operation": {
+                "type": "string",
+                "minLength": 1
+              },
+              "meaning": {
+                "type": "string",
+                "minLength": 1
+              },
+              "handling": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "composition": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "commonly_with",
+            "conflicts_with",
+            "preferred_recipes"
+          ],
+          "properties": {
+            "commonly_with": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            },
+            "conflicts_with": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            },
+            "preferred_recipes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            }
+          }
+        },
+        "determinism": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "deterministic",
+            "ordering",
+            "external_nondeterminism"
+          ],
+          "properties": {
+            "deterministic": {
+              "type": "boolean"
+            },
+            "ordering": {
+              "type": "string"
+            },
+            "external_nondeterminism": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "known_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "minimal_usage": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "integration_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
           }
         }
       }

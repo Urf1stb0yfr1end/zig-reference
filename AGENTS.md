@@ -10,6 +10,17 @@ The long-term goal is that large Zig systems can be assembled by discovering mod
 
 Assume every coding agent may arrive with no prior knowledge of this repository.
 
+Run this compact deterministic bootstrap before reading catalogs or source:
+
+```text
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+```
+
+Then use `agent decide "TASK"`, `agent card MODULE --view select`, `agent compose
+CAPABILITY ...`, and `agent card MODULE --view integrate`. Use `agent impact MODULE`
+before changing a foundation and `agent diagnostic ZIGREF-*` before inventing a repair.
+
 The repository must explain itself through predictable, conventional, machine-readable paths instead of requiring broad source archaeology. A new agent should be able to determine what exists, what to choose, what to reject, how to integrate it, what can fail, what depends on it, and how to validate the result before reading large amounts of source.
 
 The preferred mental model is:
@@ -276,6 +287,13 @@ Future agents must follow this order:
 9. Run focused validation, then repository validation under Zig 0.14.0.
 10. Record executed validation evidence honestly; never mark skipped work passed.
 11. Never commit binary generated artifacts, databases, caches, executables, images, archives, or fuzz output.
+
+An outside project must not copy a module and discard its contract. Query first,
+select the exact canonical module, record its zig-reference module identity and Zig
+baseline, preserve its declared environment/resource/lifetime constraints, retain a
+link or copy of its `details.json`, run its focused validation commands, and look up
+known `ZIGREF-*` diagnostics before creating a repair. Never silently discard an
+error that the selected contract exposes.
 
 ## Command workflow
 

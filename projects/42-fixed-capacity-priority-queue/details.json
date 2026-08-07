@@ -943,7 +943,7 @@
     "notes": []
   },
   "agent_contract": {
-    "schema_version": "1.0.0",
+    "schema_version": "2.0.0",
     "summary": "Order bounded values without allocation and preserve insertion order for equal priorities.",
     "search_aliases": [
       "priority queue",
@@ -1022,6 +1022,83 @@
         "related_module": "fixed-capacity-priority-queue",
         "related_recipe": "plan-bounded-initialization"
       }
-    ]
+    ],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": [
+        "T",
+        "capacity",
+        "lessThan"
+      ]
+    },
+    "construction": {
+      "named_import": "fixed-capacity-priority-queue",
+      "primary_symbol": "FixedPriorityQueue",
+      "initialization": "FixedPriorityQueue(u32, 16, lessThan).init()"
+    },
+    "operation_map": {
+      "insert": "insert",
+      "remove": "remove",
+      "query": "peek",
+      "reset": "clear"
+    },
+    "error_map": [
+      {
+        "error": "Full",
+        "operation": "insert",
+        "meaning": "Full is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      },
+      {
+        "error": "Empty",
+        "operation": "insert",
+        "meaning": "Empty is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      },
+      {
+        "error": "SequenceOverflow",
+        "operation": "insert",
+        "meaning": "SequenceOverflow is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      }
+    ],
+    "composition": {
+      "commonly_with": [
+        "fixed-capacity-vector"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": [
+        "plan-bounded-initialization"
+      ]
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Defined by inputs, insertion order, and documented capacity rules.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Capacity cannot grow.",
+      "Concurrent mutation is not synchronized."
+    ],
+    "minimal_usage": [
+      "const module = @import(\"fixed-capacity-priority-queue\");",
+      "var value = FixedPriorityQueue(u32, 16, lessThan).init();"
+    ],
+    "integration_notes": []
   }
 }

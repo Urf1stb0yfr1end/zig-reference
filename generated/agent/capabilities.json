@@ -1,7 +1,7 @@
 {
   "_generated": true,
   "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY",
-  "agent_index_version": "1.0.0",
+  "agent_index_version": "2.0.0",
   "capabilities": {
     "aligned-allocation": [
       "fixed-bump-allocator"
@@ -24,6 +24,9 @@
     "bounded-system-resource-planning": [
       "bounded-system-resource-plan"
     ],
+    "bounded-task-storage": [
+      "bounded-system-resource-plan"
+    ],
     "bounded-topological-sort": [
       "fixed-capacity-topological-sort"
     ],
@@ -44,6 +47,9 @@
     ],
     "fixed-capacity-trace-storage": [
       "bounded-deterministic-event-trace"
+    ],
+    "fixed-memory-operation": [
+      "fixed-bump-allocator"
     ],
     "fixed-resource-storage-derivation": [
       "bounded-system-resource-plan"

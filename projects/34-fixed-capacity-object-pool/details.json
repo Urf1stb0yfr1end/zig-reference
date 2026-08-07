@@ -1119,7 +1119,7 @@
     ]
   },
   "agent_contract": {
-    "schema_version": "1.0.0",
+    "schema_version": "2.0.0",
     "summary": "Expose the existing generational table as an iterable, resettable object-pool contract.",
     "search_aliases": [
       "object pool",
@@ -1215,6 +1215,70 @@
         "related_module": "fixed-capacity-object-pool",
         "related_recipe": "create-stale-safe-object-registry"
       }
-    ]
+    ],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": [
+        "capacity"
+      ]
+    },
+    "construction": {
+      "named_import": "fixed-capacity-object-pool",
+      "primary_symbol": "ObjectPool",
+      "initialization": "ObjectPool(u32, 16){}"
+    },
+    "operation_map": {
+      "insert": "insert",
+      "query": "get",
+      "remove": "remove",
+      "reset": "reset"
+    },
+    "error_map": [
+      {
+        "error": "Full",
+        "operation": "insert",
+        "meaning": "Full is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      }
+    ],
+    "composition": {
+      "commonly_with": [
+        "bitmap-allocator",
+        "generational-handles"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": [
+        "create-stale-safe-object-registry"
+      ]
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Defined by inputs, insertion order, and documented capacity rules.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Dynamic growth is not provided.",
+      "Handles and borrows do not survive reset."
+    ],
+    "minimal_usage": [
+      "const module = @import(\"fixed-capacity-object-pool\");",
+      "var value = ObjectPool(u32, 16){};"
+    ],
+    "integration_notes": []
   }
 }
