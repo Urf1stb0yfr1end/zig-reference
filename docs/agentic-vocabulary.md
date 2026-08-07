@@ -532,3 +532,237 @@ The practical standard by which this project should judge whether it has become 
 That behavior matters more than package count, slogans, or claims of language superiority.
 
 The long-term ambition is that using the repository becomes rational simply because the Cost of Correct Use is lower.
+
+---
+
+# Reconstruction Vocabulary
+
+The following terms describe the project's farther-horizon reconstruction thesis: the idea that a comparatively compact Foundation might eventually preserve enough canonical engineering knowledge for an agent to reconstruct large classes of software without depending on broad rediscovery.
+
+These are prospective metrics and design terms. They are not claims that the present repository has already achieved these properties.
+
+## Reconstructive Leverage
+
+The amount and diversity of validated software that can be reconstructed from a given amount of canonical engineering knowledge.
+
+Conceptually:
+
+```text
+Reconstructive Leverage = reconstructible validated capability / canonical foundation size
+```
+
+The numerator may eventually be measured using capability count, validated application classes, reproducible system outputs, or another explicitly defined benchmark unit.
+
+The term captures the difference between preserving finished artifacts and preserving the reusable engineering knowledge needed to create many artifacts.
+
+A small corpus with high Reconstructive Leverage can enable systems vastly larger and more diverse than the corpus itself.
+
+## Foundation Density
+
+The amount of validated reusable capability carried per unit of canonical Foundation corpus.
+
+Conceptually:
+
+```text
+Foundation Density = validated reusable capability / canonical corpus bytes
+```
+
+Foundation Density rewards compression through reuse rather than compression through omission.
+
+Removing contracts, tests, or safety constraints merely to make the repository smaller does not improve meaningful Foundation Density.
+
+The desired direction is:
+
+```text
+less duplication
++ more canonical reuse
++ preserved evidence
+= greater engineering consequence per byte
+```
+
+## Residual Novelty
+
+The portion of a requested system that still requires genuinely new engineering after the Foundation has resolved everything it already knows how to implement, adapt, or compose.
+
+Conceptually:
+
+```text
+Residual Novelty = unresolved genuinely novel requirements / total required capability
+```
+
+Residual Novelty is not a defect. Every genuinely new product needs some.
+
+The goal is to stop settled infrastructure from masquerading as novelty merely because an agent had to rediscover it.
+
+A mature Foundation should drive Residual Novelty toward the actual application-specific problem rather than toward zero at any cost.
+
+## Reconstruction Coverage
+
+The percentage of capabilities required by a target system that the Foundation can already supply through canonical implementation, reconstructible adapter, or validated composition.
+
+Conceptually:
+
+```text
+Reconstruction Coverage = foundation-resolved required capabilities / total required capabilities
+```
+
+Example:
+
+```text
+required capability classes: 126
+foundation-resolved:          115
+Reconstruction Coverage:     91.3%
+```
+
+Coverage must be tied to an explicit target and capability model. It should never be presented as a universal percentage without defining the benchmark set.
+
+## Reconstruction Depth
+
+The number and significance of software layers the Foundation can traverse upward from its minimum bootstrap assumptions while remaining on documented, reconstructible paths.
+
+Example progression:
+
+```text
+machine primitives
+→ runtime foundations
+→ toolchain
+→ operating environment
+→ storage + networking
+→ services
+→ application core
+→ browser-facing application
+→ distributed composed system
+```
+
+A corpus may have broad application coverage while having shallow Reconstruction Depth if it depends on large unexplained foundations below it.
+
+Deep Reconstruction Depth means more of the stack is part of the known world.
+
+## Bootstrap Independence
+
+The degree to which the Foundation can reproduce its useful execution environment without relying on undocumented outside software, package registries, codebases, or engineering knowledge.
+
+Bootstrap Independence does not imply creation from literal nothing.
+
+Every reconstruction experiment must state its irreducible assumptions, such as:
+
+- physical hardware;
+- firmware or machine startup state;
+- processor specification;
+- an initial agent runtime;
+- a minimal compiler or executable bootstrap mechanism.
+
+The metric becomes meaningful only when those assumptions are explicit.
+
+The goal is to minimize everything above them that must be imported from an unknown external world.
+
+## Reconstructive Closure
+
+The condition in which a subsystem has enough preserved implementation, contract, specification, dependency, adapter, recipe, repair, and validation knowledge to be reproduced without an unrecorded outside engineering dependency.
+
+Reconstructive Closure is stronger than "the code exists."
+
+A subsystem is not reconstructively closed if rebuilding it still requires hidden tribal knowledge, an undocumented binary artifact, or an unexplained external package.
+
+Conceptually:
+
+```text
+implementation
++ contracts
++ dependency closure
++ necessary specifications
++ build path
++ validation closure
+= candidate reconstructive closure
+```
+
+Claims of Reconstructive Closure should eventually be tested from clean, deliberately restricted environments.
+
+## Reconstruction Escape Rate
+
+The percentage of reconstruction tasks that force the agent outside the Foundation because a required implementation, specification, adapter, or engineering fact is missing.
+
+Conceptually:
+
+```text
+Reconstruction Escape Rate = tasks requiring outside engineering knowledge / reconstruction tasks attempted
+```
+
+For mature, intentionally covered domains, the project wants this rate to fall.
+
+A high escape rate identifies where the Foundation still has holes even if it contains many modules.
+
+## Seed Sufficiency
+
+Whether a declared Foundation snapshot, together with an explicit minimum bootstrap environment, contains enough engineering knowledge to reach a specified reconstruction milestone.
+
+Seed Sufficiency is always milestone-relative.
+
+Examples:
+
+```text
+Seed sufficient for bounded native CLI environment: yes/no
+Seed sufficient for RISC-V guest boot: yes/no
+Seed sufficient for offline HTTP service stack: yes/no
+Seed sufficient for browser-facing CAD reconstruction: yes/no
+```
+
+This prevents vague claims that the corpus is simply "enough."
+
+Enough for what must always be stated.
+
+## Civilization Compression Ratio
+
+A deliberately broad, partly poetic metric describing the relationship between the size or complexity of a reproducibly reconstructible software world and the size of the canonical Foundation needed to reconstruct it.
+
+Conceptually:
+
+```text
+Civilization Compression Ratio = reconstructible software-world scale / Foundation scale
+```
+
+This metric is difficult to define rigorously because "software-world scale" is not naturally one-dimensional.
+
+It should therefore be treated as a research framing until a defensible benchmark methodology exists.
+
+Its purpose is to ask an important design question:
+
+> **How small can the seed become while the world it can reproducibly grow becomes larger?**
+
+## Reconstructive Snowball
+
+The civilization-scale extension of the Agentic Snowball.
+
+A reconstruction does not merely consume the Foundation. It can return newly proven capabilities, adapters, recipes, diagnostics, repairs, specifications, and composition evidence to it.
+
+The desired cycle is:
+
+```text
+Foundation
+→ reconstruct system
+→ discover genuinely new reusable knowledge
+→ canonicalize it
+→ validate it
+→ return it to Foundation
+→ next reconstruction begins from a stronger seed
+```
+
+The Reconstructive Snowball is the mechanism by which a Foundation can become more capable without asking each future agent to repeat the history that produced it.
+
+## The New World Test
+
+A long-horizon practical test for the reconstruction thesis:
+
+> Given only a declared Foundation snapshot, explicit bootstrap assumptions, and a capable agent, how much useful software infrastructure can be reproducibly rebuilt without outside engineering knowledge?
+
+The goal is not to answer this with rhetoric.
+
+The goal is to make progressively larger portions of the answer executable, benchmarked, and falsifiable.
+
+The project's farthest horizon can therefore be summarized as:
+
+> **Own it. Wrap it. Compose it.**
+>
+> **Build almost anything. Rediscover almost nothing.**
+>
+> **One Agent. One Foundation. A New World.**
