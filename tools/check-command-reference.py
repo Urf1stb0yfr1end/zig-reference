@@ -12,6 +12,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 MANUAL = ROOT / "COMMANDS.md"
 BEGIN = "<!-- BEGIN GENERATED MODULE COMMANDS -->"
 END = "<!-- END GENERATED MODULE COMMANDS -->"
+CURRENT_AGENT_CORPUS = "<!-- CURRENT AGENT CORPUS -->"
 
 
 def module_rows() -> str:
@@ -79,6 +80,18 @@ def main() -> int:
             errors.append(f"documented tool path does not exist: {value}")
     if "zig build database" in text or "build-repository-database.py" in text:
         errors.append("forbidden database command appears in COMMANDS.md")
+
+    agent_modules = json.loads((ROOT / "generated/agent/modules.json").read_text())["modules"]
+    full_count = sum(module["status"] == "full" for module in agent_modules)
+    current_claim = (
+        f"Agent Fast Path v2 currently projects {len(agent_modules)} contracted modules "
+        f"as {full_count} full cards with {len(agent_modules) - full_count} partial cards."
+    )
+    marked_claims = re.findall(re.escape(CURRENT_AGENT_CORPUS) + r"\s*([^\n]+)", text)
+    if marked_claims != [current_claim]:
+        errors.append(
+            "current Agent Fast Path corpus claim is missing or stale; expected: " + current_claim
+        )
 
     if errors:
         print("\n".join(errors), file=sys.stderr)

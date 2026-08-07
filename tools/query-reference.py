@@ -17,11 +17,17 @@ def emit(value):
 
 def words(value): return set(re.findall(r"[a-z0-9]+", value.lower()))
 
+AGENT_OPERATIONS=("bootstrap","doctor","card","preflight","decide","compose","impact","capability","module","diagnostic","diagnose","symbol","pending")
+ZERO_CONTEXT_WORKFLOW=("decide","card select","compose","preflight","card integrate","validate","diagnose","diagnostic repair")
+
+def workflow_operations():
+    """Return canonical agent operation names visible in the beginner workflow."""
+    return tuple(step.split()[0] for step in ZERO_CONTEXT_WORKFLOW if step != "validate")
+
 def agent_query(argv):
     """Query the compact v2 projection without rescanning canonical contracts."""
-    operations=("bootstrap","doctor","card","preflight","decide","compose","impact","capability","module","diagnostic","diagnose","symbol","pending")
-    if not argv or argv[0] not in operations:
-        raise SystemExit("usage: query-reference.py agent {"+"|".join(operations)+"} ...")
+    if not argv or argv[0] not in AGENT_OPERATIONS:
+        raise SystemExit("usage: query-reference.py agent {"+"|".join(AGENT_OPERATIONS)+"} ...")
     kind = argv[0]
     term = argv[1] if len(argv) > 1 else ""
     directory = GENERATED / "agent"
@@ -31,7 +37,8 @@ def agent_query(argv):
     by_name={x["module"]:x for x in modules}
     if kind == "bootstrap":
         full=sum(x["status"]=="full" for x in modules)
-        emit({"status":"ok","query":{"operation":"bootstrap"},"results":{"repository":"zig-reference","zig_baseline":"0.14.0","contracted_modules":len(modules),"full_fast_path_modules":full,"partial_modules":len(modules)-full,"operations":["bootstrap","doctor","decide","card","compose","impact","diagnostic","diagnose"],"workflow":["decide","card select","compose","card integrate","validate","diagnose","diagnostic repair"],"canonical_paths":["generated/agent/modules.json","generated/agent/diagnostics.json","docs/catalog/MODULES.md"],"doctor_command":"python3 tools/query-reference.py agent doctor"},"diagnostics":[]}); return 0
+        visible_operations=("bootstrap","doctor",*dict.fromkeys(workflow_operations()),"impact")
+        emit({"status":"ok","query":{"operation":"bootstrap"},"results":{"repository":"zig-reference","zig_baseline":"0.14.0","contracted_modules":len(modules),"full_fast_path_modules":full,"partial_modules":len(modules)-full,"operations":visible_operations,"workflow":ZERO_CONTEXT_WORKFLOW,"canonical_paths":["generated/agent/modules.json","generated/agent/diagnostics.json","docs/catalog/MODULES.md"],"doctor_command":"python3 tools/query-reference.py agent doctor"},"diagnostics":[]}); return 0
     if kind == "doctor":
         checks=[]; bad=False
         for component,path in [("agent modules",directory/"modules.json"),("agent diagnostics",directory/"diagnostics.json")]:
