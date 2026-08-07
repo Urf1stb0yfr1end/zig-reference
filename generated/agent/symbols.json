@@ -28,6 +28,9 @@
     "BoundedDeterministicEventTrace": [
       "bounded-deterministic-event-trace"
     ],
+    "BoundedDeterministicScheduler": [
+      "bounded-deterministic-scheduler"
+    ],
     "BoundedInteger": [
       "bounded-integer"
     ],
@@ -222,6 +225,9 @@
     ],
     "TaggedResult": [
       "tagged-result"
+    ],
+    "Task": [
+      "bounded-deterministic-scheduler"
     ],
     "TlvDecoder": [
       "type-length-value-decoder"

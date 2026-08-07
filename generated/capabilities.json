@@ -81,6 +81,7 @@
     {
       "capability": "allocation-explicit",
       "modules": [
+        "bounded-deterministic-scheduler",
         "bounded-system-resource-plan",
         "fixed-bump-allocator",
         "fixed-capacity-priority-queue",
@@ -211,6 +212,7 @@
       "capability": "bounded",
       "modules": [
         "bounded-deterministic-event-trace",
+        "bounded-deterministic-scheduler",
         "bounded-system-resource-plan",
         "fixed-bump-allocator",
         "fixed-capacity-priority-queue",
@@ -326,6 +328,7 @@
       "capability": "capacity",
       "modules": [
         "bounded-deterministic-event-trace",
+        "bounded-deterministic-scheduler",
         "bounded-system-resource-plan",
         "fixed-capacity-priority-queue",
         "fixed-capacity-topological-sort"
@@ -606,6 +609,7 @@
       "capability": "fixed",
       "modules": [
         "bounded-deterministic-event-trace",
+        "bounded-deterministic-scheduler",
         "bounded-system-resource-plan",
         "fixed-bump-allocator",
         "fixed-capacity-priority-queue",
@@ -691,6 +695,7 @@
         "bitmap-allocator",
         "bounded-binary-sub-reader",
         "bounded-deterministic-event-trace",
+        "bounded-deterministic-scheduler",
         "bounded-integer",
         "bounded-system-resource-plan",
         "checked-half-open-range",
@@ -1076,6 +1081,7 @@
     {
       "capability": "order bounded values without allocation and preserve insertion order for equal priorities.",
       "modules": [
+        "bounded-deterministic-scheduler",
         "fixed-capacity-priority-queue"
       ]
     },
@@ -1293,6 +1299,7 @@
     {
       "capability": "priority",
       "modules": [
+        "bounded-deterministic-scheduler",
         "fixed-capacity-priority-queue"
       ]
     },
@@ -1330,6 +1337,7 @@
     {
       "capability": "queue",
       "modules": [
+        "bounded-deterministic-scheduler",
         "fixed-capacity-priority-queue",
         "ring-buffer"
       ]
@@ -1398,6 +1406,7 @@
     {
       "capability": "repeated bounded mechanism implementation",
       "modules": [
+        "bounded-deterministic-scheduler",
         "bounded-system-resource-plan",
         "fixed-bump-allocator",
         "fixed-capacity-priority-queue",

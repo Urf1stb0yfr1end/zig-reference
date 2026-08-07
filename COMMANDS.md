@@ -160,6 +160,7 @@ The following section is derived from `generated/modules.json` and canonical mod
 | `riscv-sv39-page-table-builder` | `zig build test-riscv-sv39-page-table-builder` | `zig build smoke-riscv-sv39-page-table-builder` | `projects/49-riscv-sv39-page-table-builder/details.json` |
 | `bounded-system-resource-plan` | `zig build test-bounded-system-resource-plan` | `zig build smoke-bounded-system-resource-plan` | `projects/50-bounded-system-resource-plan/details.json` |
 | `bounded-deterministic-event-trace` | `zig build test-bounded-deterministic-event-trace` | `zig build smoke-bounded-deterministic-event-trace` | `projects/51-bounded-deterministic-event-trace/details.json` |
+| `bounded-deterministic-scheduler` | `zig build test-bounded-deterministic-scheduler` | `zig build smoke-bounded-deterministic-scheduler` | `projects/52-bounded-deterministic-scheduler/details.json` |
 <!-- END GENERATED MODULE COMMANDS -->
 
 ## Recipes and conformance
@@ -252,6 +253,16 @@ Raw `zig build` commands remain implementation surfaces and preserve normal Zig 
 | `python3 tools/developer-command.py verify-morphic-trace` | Run `zig build verify-morphic-trace --summary all` and append the final trace-verification handoff. |
 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py` | Test deterministic formatting, ordering, existing locations, doctor output, controlled success/failure, singular handoffs, and exit preservation. |
 
-The implementation prerequisite steps ending in `-checks` and the raw public build steps never emit subordinate Minimus blocks. Agent Fast Path v2 remains 52 contracted modules, 47 full cards, and the five documented partial cards. Batch 04 repair replaced test-only integration snippets with functional public API usage and corrected the promoted cards' semantic projections.
+The implementation prerequisite steps ending in `-checks` and the raw public build steps never emit subordinate Minimus blocks. Agent Fast Path v2 now projects 53 contracted modules as 53 full cards with no partial cards. Batch 04 repair replaced test-only integration snippets with functional public API usage and corrected the promoted cards' semantic projections.
 
 Raw prerequisite commands are `zig build smoke-checks`, `zig build validate-repository-checks`, `zig build verify-morphic-plan-checks`, and `zig build verify-morphic-trace-checks`. They exist for build-graph composition and deliberately emit no handoff. `python3 tools/developer-minimus.py --command COMMAND --summary TEXT [--status {PASS,FAIL,PARTIAL}] [--failure TEXT] [--next COMMAND] [--modules] [--location LABEL=RELATIVE_PATH ...]` is the internal deterministic formatter used by the doctor and outer driver; developers normally use the canonical surfaces above.
+
+## Hosted Morphic runtime composition commands
+
+Batch 06 established these Zig 0.14.0 command surfaces and validated them in this run:
+
+- `zig build test-bounded-deterministic-scheduler` runs the scheduler unit tests.
+- `zig build smoke-bounded-deterministic-scheduler` runs its external-consumer smoke test.
+- `zig build test-recipe-run-hosted-morphic-runtime` checks bounded execution, explicit output exhaustion, and byte repeatability.
+- `zig build run-hosted-morphic-runtime` prints the canonical capturable output followed by its normalized event trace.
+- `zig build verify-hosted-morphic-runtime` validates the hosted recipe and Agent Fast Path contracts.

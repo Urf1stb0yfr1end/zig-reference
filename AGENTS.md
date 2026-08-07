@@ -320,3 +320,7 @@ A Minimus is deterministic, cheap, and at most 200 lines (normally far shorter).
 
 
 For build-backed checks, `python3 tools/developer-command.py OPERATION` is the canonical outer handoff surface. Raw `zig build ...` steps are implementation commands: they preserve Zig's ordinary output but do not emit Minimus. The outer driver waits for Zig (including its Build Summary), emits exactly one handoff for the operation the developer invoked, and returns Zig's exit status. Aggregate prerequisites must use raw steps and must never emit subordinate handoffs. Direct `python3 tools/query-reference.py agent doctor` remains its own canonical surface.
+
+## Snowball Yield composition rule
+
+For major composition work, freeze the requirement/capability map before implementation and classify existing coverage, genuinely missing reusable capability, orchestration, and deferral according to `docs/standards/SNOWBALL_YIELD.md`. Reuse compatible foundations and add only generally reusable gaps as canonical modules or recipes. Record factual reuse, new reusable work, diagnostic lookups, reliably knowable source reads, and executed validation; mark unavailable quantities `unmeasured`, and never turn run bookkeeping into a universal benchmark claim.

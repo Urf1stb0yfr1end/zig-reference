@@ -16,6 +16,9 @@
     ],
     "bounded-byte-reader": [],
     "bounded-deterministic-event-trace": [],
+    "bounded-deterministic-scheduler": [
+      "fixed-capacity-priority-queue"
+    ],
     "bounded-integer": [],
     "bounded-system-resource-plan": [
       "aligned-address-and-size-helpers",

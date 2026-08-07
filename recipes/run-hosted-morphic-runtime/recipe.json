@@ -1,0 +1,17 @@
+{
+  "name": "run-hosted-morphic-runtime",
+  "problem_solved": "execute a bounded deterministic hosted Morphic runtime with caller-controlled time, capturable output, resource planning, and normalized tracing",
+  "status": "implemented-unverified",
+  "selected_modules": ["bounded-system-resource-plan", "bounded-deterministic-scheduler", "bounded-deterministic-event-trace"],
+  "selection_reasons": ["The resource planner derives fixed storage and initialization order.", "The scheduler owns target-neutral time and runnable ordering policy.", "The event trace records normalized bounded behavior."],
+  "direct_dependencies": ["bounded-system-resource-plan", "bounded-deterministic-scheduler", "bounded-deterministic-event-trace"],
+  "dependency_order": ["fixed-capacity-vector", "fixed-capacity-priority-queue", "fixed-capacity-topological-sort", "fixed-bump-allocator", "bounded-system-resource-plan", "bounded-deterministic-scheduler", "bounded-deterministic-event-trace"],
+  "public_endpoints_used": ["Planner.plan", "BoundedDeterministicScheduler", "schedule", "advanceTo", "nextReady", "BoundedDeterministicEventTrace", "append", "render"],
+  "adapters_required": ["recipes/run-hosted-morphic-runtime/src/recipe.zig"],
+  "inherited_guarantees": ["Fixed resource derivation, stable runnable ordering, caller-controlled time, bounded trace storage, and explicit capacity failures."],
+  "gaps_discovered": ["Freestanding machine operations, privileged RISC-V execution, boot orchestration, and hardware output remain out of scope."],
+  "future_systems_enabled": ["hosted runtime experiments", "later freestanding Morphic backend"],
+  "intended_build_commands": ["zig build run-hosted-morphic-runtime", "zig build test-recipe-run-hosted-morphic-runtime", "zig build verify-hosted-morphic-runtime"],
+  "intended_smoke_commands": [],
+  "validation_evidence_references": []
+}

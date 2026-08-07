@@ -25,6 +25,7 @@
       ],
       "change_impact": {
         "dependents": [
+          "bounded-deterministic-scheduler",
           "bounded-system-resource-plan",
           "elf64-program-header-parser",
           "fixed-capacity-priority-queue",
@@ -156,6 +157,7 @@
       "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
       "transitive_dependents": [
+        "bounded-deterministic-scheduler",
         "bounded-system-resource-plan",
         "elf64-program-header-parser",
         "fixed-capacity-priority-queue",
@@ -5905,6 +5907,7 @@
       ],
       "change_impact": {
         "dependents": [
+          "bounded-deterministic-scheduler",
           "bounded-system-resource-plan",
           "fixed-capacity-topological-sort"
         ],
@@ -5943,6 +5946,7 @@
         "fixed-capacity-vector"
       ],
       "direct_dependents": [
+        "bounded-deterministic-scheduler",
         "fixed-capacity-topological-sort"
       ],
       "do_not_use_when": [
@@ -6048,6 +6052,7 @@
         "fixed-capacity-vector"
       ],
       "transitive_dependents": [
+        "bounded-deterministic-scheduler",
         "bounded-system-resource-plan",
         "fixed-capacity-topological-sort"
       ],
@@ -7038,7 +7043,8 @@
       "change_impact": {
         "dependents": [],
         "recipes": [
-          "plan-morphic-runtime"
+          "plan-morphic-runtime",
+          "run-hosted-morphic-runtime"
         ]
       },
       "composition": {
@@ -7159,7 +7165,8 @@
         "Persistence and dynamic growth are not provided."
       ],
       "matching_recipes": [
-        "plan-morphic-runtime"
+        "plan-morphic-runtime",
+        "run-hosted-morphic-runtime"
       ],
       "minimal_usage": [
         "const module = @import(\"bounded-system-resource-plan\");",
@@ -7224,6 +7231,7 @@
       "change_impact": {
         "dependents": [],
         "recipes": [
+          "run-hosted-morphic-runtime",
           "trace-morphic-example"
         ]
       },
@@ -7312,6 +7320,7 @@
         "Timestamps, persistence, replay, overwrite, and synchronization are not provided."
       ],
       "matching_recipes": [
+        "run-hosted-morphic-runtime",
         "trace-morphic-example"
       ],
       "minimal_usage": [
@@ -7349,6 +7358,160 @@
       "transitive_dependents": [],
       "use_when": [
         "Need bounded architecture-neutral deterministic event observation."
+      ]
+    },
+    {
+      "aliases": [
+        "deterministic scheduler",
+        "bounded scheduler",
+        "caller controlled time"
+      ],
+      "alternatives": [],
+      "borrowing": {},
+      "capabilities": [
+        "bounded-deterministic-scheduling",
+        "caller-controlled-time",
+        "stable-runnable-order"
+      ],
+      "change_impact": {
+        "dependents": [],
+        "recipes": [
+          "run-hosted-morphic-runtime"
+        ]
+      },
+      "composition": {
+        "commonly_with": [
+          "bounded-system-resource-plan",
+          "bounded-deterministic-event-trace"
+        ],
+        "conflicts_with": [],
+        "preferred_recipes": [
+          "run-hosted-morphic-runtime"
+        ]
+      },
+      "construction": {
+        "initialization": "BoundedDeterministicScheduler(16).init(0)",
+        "named_import": "bounded-deterministic-scheduler",
+        "primary_symbol": "BoundedDeterministicScheduler"
+      },
+      "dependency_build_order": [
+        "fixed-capacity-vector",
+        "fixed-capacity-priority-queue",
+        "bounded-deterministic-scheduler"
+      ],
+      "details": "projects/52-bounded-deterministic-scheduler/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Defined by inputs, insertion order, and documented capacity rules."
+      },
+      "diagnostic_ids": [],
+      "direct_dependencies": [
+        "fixed-capacity-priority-queue"
+      ],
+      "direct_dependents": [],
+      "do_not_use_when": [
+        "Need concurrent mutation or ambient wall-clock integration."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "Full",
+          "handling": "Increase the compile-time bound or drain work.",
+          "meaning": "Capacity is exhausted.",
+          "operation": "schedule"
+        },
+        {
+          "error": "SequenceOverflow",
+          "handling": "Reset at a safe lifecycle boundary.",
+          "meaning": "Stable insertion sequence is exhausted.",
+          "operation": "schedule"
+        },
+        {
+          "error": "TimeReversed",
+          "handling": "Provide monotonic caller-controlled time.",
+          "meaning": "New caller time precedes current time.",
+          "operation": "advanceTo"
+        }
+      ],
+      "evidence_summary": {
+        "conformance_validated": false,
+        "evidence_records": 1,
+        "lifecycle": "experimental",
+        "maturity_level": 4,
+        "module": "bounded-deterministic-scheduler",
+        "smoke_validated": true,
+        "target_maturity_level": 2,
+        "unit_validated": true
+      },
+      "failure_guarantees": [
+        "Reported errors leave receiver state unchanged unless the canonical source explicitly documents otherwise."
+      ],
+      "focused_validation_commands": [
+        "zig build test-bounded-deterministic-scheduler",
+        "zig build smoke-bounded-deterministic-scheduler"
+      ],
+      "id": "52",
+      "integration_notes": [],
+      "invalidation": {
+        "reset": [
+          "All queued tasks are discarded."
+        ]
+      },
+      "known_gaps": [
+        "Capacity cannot grow.",
+        "Concurrent mutation is not synchronized."
+      ],
+      "matching_recipes": [
+        "run-hosted-morphic-runtime"
+      ],
+      "minimal_usage": [
+        "const module = @import(\"bounded-deterministic-scheduler\");",
+        "var scheduler = module.BoundedDeterministicScheduler(16).init(0);"
+      ],
+      "module": "bounded-deterministic-scheduler",
+      "operation_map": {
+        "insert": "schedule",
+        "query": "nextWakeTime",
+        "remove": "nextReady",
+        "reset": "reset",
+        "time": "advanceTo"
+      },
+      "ownership": {
+        "cleanup": "caller",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [
+          "capacity"
+        ],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
+      "source": "projects/52-bounded-deterministic-scheduler/src/bounded_deterministic_scheduler.zig",
+      "status": "full",
+      "summary": "Schedule a bounded set of copied tasks with caller-controlled time and stable deterministic ordering.",
+      "thread_safety": "not_synchronized",
+      "transitive_dependencies": [
+        "fixed-capacity-priority-queue",
+        "fixed-capacity-vector"
+      ],
+      "transitive_dependents": [],
+      "use_when": [
+        "Need allocation-free scheduling whose time is supplied explicitly."
       ]
     }
   ]

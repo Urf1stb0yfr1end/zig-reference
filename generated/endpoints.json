@@ -34,6 +34,12 @@
     },
     {
       "kind": "function",
+      "module": "bounded-deterministic-scheduler",
+      "name": "BoundedDeterministicScheduler",
+      "signature": "BoundedDeterministicScheduler()"
+    },
+    {
+      "kind": "function",
       "module": "bounded-integer",
       "name": "BoundedInteger",
       "signature": "BoundedInteger(comptime T: type, comptime minimum: T, comptime maximum: T) type"
@@ -313,6 +319,12 @@
       "module": "wrapping-sequence-number",
       "name": "advance",
       "signature": "advance(self: Self, amount: T) Self"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-deterministic-scheduler",
+      "name": "advanceTo",
+      "signature": "advanceTo()"
     },
     {
       "kind": "function",
@@ -617,6 +629,12 @@
     {
       "kind": "function",
       "module": "bounded-deterministic-event-trace",
+      "name": "count",
+      "signature": "count()"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-deterministic-scheduler",
       "name": "count",
       "signature": "count()"
     },
@@ -965,6 +983,12 @@
     {
       "kind": "function",
       "module": "bounded-deterministic-event-trace",
+      "name": "init",
+      "signature": "init()"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-deterministic-scheduler",
       "name": "init",
       "signature": "init()"
     },
@@ -1461,10 +1485,28 @@
       "signature": "next(self: Self) Self"
     },
     {
+      "kind": "function",
+      "module": "bounded-deterministic-scheduler",
+      "name": "nextReady",
+      "signature": "nextReady()"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-deterministic-scheduler",
+      "name": "nextWakeTime",
+      "signature": "nextWakeTime()"
+    },
+    {
       "kind": "method",
       "module": "bit-set",
       "name": "none",
       "signature": "none(self: Self) bool"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-deterministic-scheduler",
+      "name": "now",
+      "signature": "now()"
     },
     {
       "kind": "method",
@@ -1810,6 +1852,12 @@
     },
     {
       "kind": "function",
+      "module": "bounded-deterministic-scheduler",
+      "name": "reset",
+      "signature": "reset()"
+    },
+    {
+      "kind": "function",
       "module": "fixed-bump-allocator",
       "name": "reset",
       "signature": "reset()"
@@ -1861,6 +1909,12 @@
       "module": "byte-writer",
       "name": "rollback",
       "signature": "rollback(self: *ByteWriter, saved_len: usize) error"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-deterministic-scheduler",
+      "name": "schedule",
+      "signature": "schedule()"
     },
     {
       "kind": "method",

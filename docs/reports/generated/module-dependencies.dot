@@ -4,6 +4,7 @@ digraph modules {
   "bitmap-allocator" -> "bit-set";
   "bounded-binary-sub-reader" -> "binary-cursor-checkpoint";
   "bounded-binary-sub-reader" -> "bounded-byte-reader";
+  "bounded-deterministic-scheduler" -> "fixed-capacity-priority-queue";
   "bounded-system-resource-plan" -> "aligned-address-and-size-helpers";
   "bounded-system-resource-plan" -> "bounded-integer";
   "bounded-system-resource-plan" -> "checked-integer-cast";

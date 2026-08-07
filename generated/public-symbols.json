@@ -37,6 +37,10 @@
       "symbol": "BoundedDeterministicEventTrace"
     },
     {
+      "module": "bounded-deterministic-scheduler",
+      "symbol": "BoundedDeterministicScheduler"
+    },
+    {
       "module": "bounded-integer",
       "symbol": "BoundedInteger"
     },
@@ -315,6 +319,10 @@
     {
       "module": "tagged-result",
       "symbol": "TaggedResult"
+    },
+    {
+      "module": "bounded-deterministic-scheduler",
+      "symbol": "Task"
     },
     {
       "module": "bounded-system-resource-plan",

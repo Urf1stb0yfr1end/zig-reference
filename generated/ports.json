@@ -236,6 +236,36 @@
         ],
         "zigVersion": "0.14.0"
       },
+      "module": "bounded-deterministic-scheduler",
+      "path": "projects/52-bounded-deterministic-scheduler/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "FixedPriorityQueue"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-bounded-deterministic-scheduler",
+            "zig build smoke-bounded-deterministic-scheduler"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented bounded-deterministic-scheduler public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
       "module": "bounded-integer",
       "path": "projects/12-bounded-integer/port.js",
       "risks": [
