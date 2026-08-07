@@ -142,7 +142,7 @@
     },
     "fourcc-code": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "generational-handles": {
       "dependencies": [],
@@ -164,11 +164,11 @@
     },
     "nonzero-integer": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "optional-typed-handle": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "owned-byte-buffer": {
       "dependencies": [
@@ -206,7 +206,7 @@
     },
     "ring-buffer": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "riscv-page-table-page-owner": {
       "dependencies": [],
@@ -244,7 +244,7 @@
     },
     "saturating-counter": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "semantic-version": {
       "dependencies": [],
@@ -258,11 +258,11 @@
       "dependencies": [
         "dynamic-array"
       ],
-      "status": "partial"
+      "status": "full"
     },
     "state-machine": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "tagged-result": {
       "dependencies": [],
@@ -281,11 +281,11 @@
     },
     "unit-safe-quantity": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "validated-ascii-byte": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "validated-bit-flags": {
       "dependencies": [],
@@ -297,7 +297,7 @@
     },
     "wrapping-sequence-number": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     }
   },
   "generator": "tools/build-agent-index.py"

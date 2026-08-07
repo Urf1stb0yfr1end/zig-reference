@@ -13,7 +13,8 @@
       "riscv-sv39-virtual-address-indexing"
     ],
     "construct-bounded-state-machine": [
-      "bounded-integer"
+      "bounded-integer",
+      "state-machine"
     ],
     "create-stale-safe-object-registry": [
       "fixed-capacity-object-pool",

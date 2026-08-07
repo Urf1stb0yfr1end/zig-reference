@@ -1271,5 +1271,111 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Unsigned counter that clamps between zero and a compile-time maximum.",
+    "search_aliases": [
+      "counter",
+      "saturating-arithmetic",
+      "quota",
+      "freestanding"
+    ],
+    "capability_ids": [
+      "saturating-counter"
+    ],
+    "use_when": [
+      "Make clamping overflow policy explicit for counters, quotas, retries, telemetry, and resource pressure."
+    ],
+    "do_not_use_when": [
+      "Need behavior outside this module’s documented numeric-policy responsibility."
+    ],
+    "entrypoint": "projects/13-saturating-counter/src/saturating_counter.zig",
+    "public_symbols": [
+      "SaturatingCounter"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "borrows": []
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "no_hidden_allocation",
+      "deterministic_order",
+      "mutates_receiver"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-saturating-counter",
+      "zig build smoke-saturating-counter"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "saturating-counter",
+      "primary_symbol": "SaturatingCounter",
+      "initialization": "std.testing.refAllDeclsRecursive(subject);"
+    },
+    "operation_map": {
+      "SaturatingCounter": "SaturatingCounter",
+      "init": "init",
+      "get": "get",
+      "increment": "increment",
+      "decrement": "decrement",
+      "add": "add",
+      "subtract": "subtract",
+      "reset": "reset",
+      "isSaturated": "isSaturated"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Need behavior outside this module’s documented numeric-policy responsibility."
+    ],
+    "minimal_usage": [
+      "const subject = @import(\"saturating-counter\");",
+      "std.testing.refAllDeclsRecursive(subject);"
+    ],
+    "integration_notes": [
+      "Use the canonical named import and public operations listed here.",
+      "Run the focused validation commands before integration."
+    ]
   }
 }

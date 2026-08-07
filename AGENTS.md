@@ -305,3 +305,13 @@ error that the selected contract exposes.
 - Never change the Zig 0.14.0 baseline or claim later-version compatibility without evidence.
 - Never manually synchronize multiple copies of a fact, and never create SQLite or other opaque query state where transparent JSON suffices.
 - Preserve nonzero exit status on failure and make recognized failures visible enough that a new agent can identify the affected phase and next useful inspection point.
+
+## Mandatory command-manual maintenance
+
+Every Codex run that changes the repository must leave `COMMANDS.md` current. Add every new runnable command; update changed commands, arguments, purposes, and honestly established validation/workflow information; and remove or accurately mark obsolete commands. Even when the command surface is unchanged, record material validation or workflow facts established by the run. Never document a command that does not exist or call one validated unless it executed successfully in the reported environment. Before completion run `PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check`.
+
+## Developer Minimus
+
+Serious developer-facing aggregate health, smoke, doctor, verification, validation, diagnostic, and support flows append—not replace, suppress, or rewrite—their ordinary output with a bounded handoff in this order: `LOCATIONS`, then `MINIMUS`. Tiny focused unit tests are excluded. `LOCATIONS` lists only a small set of existing, relevant canonical sources, contracts, indexes, reports, recipes, or existing logs, using durable literal `file:///absolute/path` URIs resolved from the current worktree or log destination. If a covered diagnostic already writes a `.txt` log, append the same handoff there; do not create logs merely for this rule.
+
+A Minimus is deterministic, cheap, and at most 200 lines (normally far shorter). Derive facts from results already computed and keep key order stable. Include only useful status (`PASS`, `FAIL`, or `PARTIAL`), exact command/subsystem, important counts/boundaries, material successes or changes, actionable warnings/failures, and an exact next command or repair path; include branch, commit, Zig version, target, or environment only when useful. Never dump raw logs, repeat extensive passing output, mask a failure, change the original exit status, or rescan the repository solely to restate known facts.

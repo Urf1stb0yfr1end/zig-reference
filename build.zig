@@ -186,8 +186,8 @@ pub fn build(b: *std.Build) void {
         }
     }
 
-    const smoke_all = b.step("smoke", "Run every external-consumer smoke test");
-    smoke_all.dependOn(portability_smoke_step);
+    const smoke_core = b.step("smoke-checks", "Run every external-consumer smoke test before the developer handoff");
+    smoke_core.dependOn(portability_smoke_step);
     const test_all = b.step("test", "Run contract checks, unit tests, and smoke tests");
     test_all.dependOn(check_step);
     test_all.dependOn(port_check_step);
@@ -210,9 +210,14 @@ pub fn build(b: *std.Build) void {
         const run_smoke = b.addRunArtifact(smoke_tests);
         const smoke_step = b.step(b.fmt("smoke-{s}", .{spec.name}), b.fmt("Run {s} external smoke test", .{spec.name}));
         smoke_step.dependOn(&run_smoke.step);
-        smoke_all.dependOn(&run_smoke.step);
+        smoke_core.dependOn(&run_smoke.step);
         test_all.dependOn(&run_smoke.step);
     }
+    const smoke_handoff = b.addSystemCommand(&.{ "python3", "tools/developer-minimus.py", "--command", "zig build smoke", "--summary", "aggregate external-consumer smoke checks completed successfully", "--modules", "--location", "contracts=details.schema.json" });
+    smoke_handoff.step.dependOn(smoke_core);
+    const smoke_all = b.step("smoke", "Run every external-consumer smoke test and append the developer handoff");
+    smoke_all.dependOn(&smoke_handoff.step);
+
     for (recipe_specs) |recipe| {
         const recipe_module = b.createModule(.{ .root_source_file = b.path(b.fmt("recipes/{s}/src/recipe.zig", .{recipe.name})), .target = target, .optimize = optimize });
         for (recipe.dependencies) |dependency_name| recipe_module.addImport(dependency_name, findModule(dependency_name, &modules));
@@ -226,7 +231,7 @@ pub fn build(b: *std.Build) void {
             const run_trace = b.addRunArtifact(executable);
             const trace_step = b.step("trace-morphic-example", "Print the canonical deterministic Morphic event trace");
             trace_step.dependOn(&run_trace.step);
-            const verify_step = b.step("verify-morphic-trace", "Verify the trace module, smoke test, recipe, and agent contracts");
+            const verify_step = b.step("verify-morphic-trace-checks", "Verify the trace module, smoke test, recipe, and agent contracts before handoff");
             verify_step.dependOn(&run_recipe.step);
             verify_step.dependOn(agent_check_step);
             const trace_module = findModule("bounded-deterministic-event-trace", &modules);
@@ -236,19 +241,25 @@ pub fn build(b: *std.Build) void {
             smoke_module.addImport("bounded-deterministic-event-trace", trace_module);
             const trace_smoke = b.addRunArtifact(b.addTest(.{ .root_module = smoke_module }));
             verify_step.dependOn(&trace_smoke.step);
+            const handoff = b.addSystemCommand(&.{ "python3", "tools/developer-minimus.py", "--command", "zig build verify-morphic-trace", "--summary", "Morphic trace module, smoke, recipe, and agent checks completed successfully", "--location", "recipe=recipes/trace-morphic-example/recipe.json" });
+            handoff.step.dependOn(verify_step);
+            b.step("verify-morphic-trace", "Verify Morphic trace and append the developer handoff").dependOn(&handoff.step);
         }
         if (std.mem.eql(u8, recipe.name, "plan-morphic-runtime")) {
             const executable = b.addExecutable(.{ .name = "plan-morphic-runtime", .root_module = recipe_module });
             const run_plan = b.addRunArtifact(executable);
             const plan_step = b.step("plan-morphic-runtime", "Print the canonical deterministic Morphic resource plan");
             plan_step.dependOn(&run_plan.step);
-            const verify_step = b.step("verify-morphic-plan", "Verify Morphic plan determinism, failures, typed storage, and agent contracts");
+            const verify_step = b.step("verify-morphic-plan-checks", "Verify Morphic plan before handoff");
             verify_step.dependOn(&run_recipe.step);
             verify_step.dependOn(agent_check_step);
+            const handoff = b.addSystemCommand(&.{ "python3", "tools/developer-minimus.py", "--command", "zig build verify-morphic-plan", "--summary", "Morphic plan determinism, failures, typed storage, and agent checks completed successfully", "--location", "recipe=recipes/plan-morphic-runtime/recipe.json" });
+            handoff.step.dependOn(verify_step);
+            b.step("verify-morphic-plan", "Verify Morphic plan and append the developer handoff").dependOn(&handoff.step);
         }
     }
 
-    const validate_step = b.step("validate-repository", "Run the complete repository validation pipeline");
+    const validate_step = b.step("validate-repository-checks", "Run the complete repository validation pipeline before handoff");
     validate_step.dependOn(policy_step);
     validate_step.dependOn(agent_check_step);
     validate_step.dependOn(test_all);
@@ -258,6 +269,9 @@ pub fn build(b: *std.Build) void {
     validate_step.dependOn(property_step);
     validate_step.dependOn(fuzz_step);
     validate_step.dependOn(differential_step);
+    const validate_handoff = b.addSystemCommand(&.{ "python3", "tools/developer-minimus.py", "--command", "zig build validate-repository", "--summary", "complete repository validation pipeline completed successfully", "--modules", "--location", "contracts=details.schema.json", "--location", "commands=COMMANDS.md" });
+    validate_handoff.step.dependOn(validate_step);
+    b.step("validate-repository", "Run complete repository validation and append the developer handoff").dependOn(&validate_handoff.step);
 }
 
 fn findModule(name: []const u8, modules: []const *std.Build.Module) *std.Build.Module {

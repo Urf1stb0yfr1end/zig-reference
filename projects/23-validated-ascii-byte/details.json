@@ -823,5 +823,114 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Byte value proven to be ASCII.",
+    "search_aliases": [
+      "ascii",
+      "validation",
+      "lexer",
+      "freestanding"
+    ],
+    "capability_ids": [
+      "validated-ascii-byte"
+    ],
+    "use_when": [
+      "Validate ASCII once and carry the range invariant forward."
+    ],
+    "do_not_use_when": [
+      "Need behavior outside this module’s documented text-boundary responsibility."
+    ],
+    "entrypoint": "projects/23-validated-ascii-byte/src/validated_ascii_byte.zig",
+    "public_symbols": [
+      "AsciiByte"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "borrows": []
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "no_hidden_allocation",
+      "deterministic_order",
+      "mutates_receiver"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-validated-ascii-byte",
+      "zig build smoke-validated-ascii-byte"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "validated-ascii-byte",
+      "primary_symbol": "AsciiByte",
+      "initialization": "std.testing.refAllDeclsRecursive(subject);"
+    },
+    "operation_map": {
+      "AsciiByte": "AsciiByte",
+      "init": "init",
+      "get": "get",
+      "isDigit": "isDigit",
+      "isAlphabetic": "isAlphabetic"
+    },
+    "error_map": [
+      {
+        "error": "NotAscii",
+        "operation": "init, get, isDigit, isAlphabetic",
+        "meaning": "The requested operation violates the documented validated-ascii-byte constraints.",
+        "handling": "Handle the error and retain or reject the input according to the canonical operation contract."
+      }
+    ],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Need behavior outside this module’s documented text-boundary responsibility."
+    ],
+    "minimal_usage": [
+      "const subject = @import(\"validated-ascii-byte\");",
+      "std.testing.refAllDeclsRecursive(subject);"
+    ],
+    "integration_notes": [
+      "Use the canonical named import and public operations listed here.",
+      "Run the focused validation commands before integration."
+    ]
   }
 }

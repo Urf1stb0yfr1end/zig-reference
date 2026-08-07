@@ -1001,12 +1001,7 @@
   "agent_contract": {
     "schema_version": "2.0.0",
     "summary": "Parse and validate one allocation-free ELF64 file header.",
-    "search_aliases": [
-      "physical-memory",
-      "page-frame",
-      "address",
-      "hypervisor"
-    ],
+    "search_aliases": [],
     "capability_ids": [
       "elf64-file-header-parser"
     ],
@@ -1014,8 +1009,7 @@
       "Parse and validate one allocation-free ELF64 file header."
     ],
     "do_not_use_when": [
-      "hidden allocation",
-      "implicit synchronization"
+      "Not a replacement for a complete elf64 file header parser application policy."
     ],
     "entrypoint": "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig",
     "public_symbols": [
@@ -1062,9 +1056,7 @@
     "environment_constraints": {
       "hosted": "supported",
       "freestanding": "supported",
-      "architectures": [
-        "page policy currently architecture-neutral but fixed at 4 KiB"
-      ],
+      "architectures": [],
       "os_dependency": false,
       "libc_required": false,
       "endianness": "little",
@@ -1111,8 +1103,7 @@
       "external_nondeterminism": []
     },
     "known_gaps": [
-      "hidden allocation",
-      "implicit synchronization"
+      "Not a replacement for a complete elf64 file header parser application policy."
     ],
     "minimal_usage": [
       "const api = @import(\"elf64-file-header-parser\");",

@@ -204,7 +204,7 @@ Each module has `zig build test-<module>` and `zig build smoke-<module>` targets
 
 ## Agent-readable pilot commands
 
-Agent Fast Path v2 currently projects 37 full contracts and 15 partial contracts. The
+Agent Fast Path v2 currently projects 47 full contracts and 5 partial contracts. The
 root-document policy is checked by `node tools/check-port-contracts.js`; it accepts
 only the explicit flagship/root allowlist and rejects any other root Markdown file.
 
@@ -226,7 +226,7 @@ only the explicit flagship/root allowlist and rejects any other root Markdown fi
 | `python3 tools/query-reference.py agent impact MODULE` | Derive downstream modules, recipes, and validation commands. |
 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py` | Run the deterministic zero-context acceptance test. |
 
-Batch 03 revalidated the 37/15 projection, including explicit DynamicArray borrowed-view semantics and the `Entry.decode` Sv39 page-table-entry construction path. The acceptance test guards both semantic projections.
+Batch 03 established the prior 37/15 projection, including explicit DynamicArray borrowed-view semantics and the `Entry.decode` Sv39 page-table-entry construction path. The acceptance test guards both semantic projections.
 
 ## Bounded system resource plan commands
 
@@ -235,3 +235,13 @@ Batch 03 revalidated the 37/15 projection, including explicit DynamicArray borro
 - `zig build trace-morphic-example` prints the canonical normalized Morphic event trace.
 - `zig build test-recipe-trace-morphic-example` tests the 4096-capacity composition.
 - `zig build verify-morphic-trace` runs module unit, external smoke, recipe, and agent checks.
+
+## Developer handoff output (Batch 04)
+
+Every repository-changing Codex run maintains this manual, even when only materially established workflow or validation facts change. Serious aggregate developer checks preserve their complete ordinary output and then append `LOCATIONS` followed by a deterministic `MINIMUS` of at most 200 lines. Literal `file://` locations resolve from the active worktree. The following implemented surfaces append this handoff: `python3 tools/query-reference.py agent doctor`, `zig build smoke`, `zig build validate-repository`, `zig build verify-morphic-plan`, and `zig build verify-morphic-trace`. No covered surface creates a diagnostic `.txt` log, so this batch adds no log files.
+
+`python3 tools/developer-minimus.py --command COMMAND --summary TEXT [--modules] [--location LABEL=RELATIVE_PATH ...]` is the reusable formatter; a missing location fails nonzero. `PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py` verifies deterministic ordering, existing literal locations, the 200-line bound, preserved doctor output, and exit status.
+
+Agent Fast Path v2 now projects 47 full contracts and 5 partial contracts. Batch 04 migrated ring-buffer, stack, state-machine, nonzero-integer, saturating-counter, wrapping-sequence-number, optional-typed-handle, unit-safe-quantity, validated-ascii-byte, and fourcc-code. The parser/ELF Batch 03 cards were also repaired to remove unrelated physical-page projection residue.
+
+The build graph also exposes implementation prerequisite steps `zig build smoke-checks`, `zig build validate-repository-checks`, `zig build verify-morphic-plan-checks`, and `zig build verify-morphic-trace-checks`. They preserve the pre-handoff checks for dependency ordering; developers should use the corresponding public commands without `-checks` to receive the required appended handoff.

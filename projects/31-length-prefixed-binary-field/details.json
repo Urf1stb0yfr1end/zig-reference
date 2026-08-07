@@ -948,12 +948,7 @@
   "agent_contract": {
     "schema_version": "2.0.0",
     "summary": "Decode an explicitly endian length prefix and borrow its bounded payload.",
-    "search_aliases": [
-      "physical-memory",
-      "page-frame",
-      "address",
-      "hypervisor"
-    ],
+    "search_aliases": [],
     "capability_ids": [
       "length-prefixed-binary-field"
     ],
@@ -961,8 +956,7 @@
       "Decode an explicitly endian length prefix and borrow its bounded payload."
     ],
     "do_not_use_when": [
-      "hidden allocation",
-      "implicit synchronization"
+      "Not a replacement for a complete length prefixed binary field application policy."
     ],
     "entrypoint": "projects/31-length-prefixed-binary-field/src/length_prefixed_binary_field.zig",
     "public_symbols": [
@@ -1008,9 +1002,7 @@
     "environment_constraints": {
       "hosted": "supported",
       "freestanding": "supported",
-      "architectures": [
-        "page policy currently architecture-neutral but fixed at 4 KiB"
-      ],
+      "architectures": [],
       "os_dependency": false,
       "libc_required": false,
       "endianness": "unknown",
@@ -1055,8 +1047,7 @@
       "external_nondeterminism": []
     },
     "known_gaps": [
-      "hidden allocation",
-      "implicit synchronization"
+      "Not a replacement for a complete length prefixed binary field application policy."
     ],
     "minimal_usage": [
       "const api = @import(\"length-prefixed-binary-field\");",

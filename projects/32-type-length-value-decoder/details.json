@@ -1031,12 +1031,7 @@
   "agent_contract": {
     "schema_version": "2.0.0",
     "summary": "Iterate allocation-free TLV records while preserving unknown tags.",
-    "search_aliases": [
-      "physical-memory",
-      "page-frame",
-      "address",
-      "hypervisor"
-    ],
+    "search_aliases": [],
     "capability_ids": [
       "type-length-value-decoder"
     ],
@@ -1044,8 +1039,7 @@
       "Iterate allocation-free TLV records while preserving unknown tags."
     ],
     "do_not_use_when": [
-      "hidden allocation",
-      "implicit synchronization"
+      "Not a replacement for a complete type length value decoder application policy."
     ],
     "entrypoint": "projects/32-type-length-value-decoder/src/type_length_value_decoder.zig",
     "public_symbols": [
@@ -1090,9 +1084,7 @@
     "environment_constraints": {
       "hosted": "supported",
       "freestanding": "supported",
-      "architectures": [
-        "page policy currently architecture-neutral but fixed at 4 KiB"
-      ],
+      "architectures": [],
       "os_dependency": false,
       "libc_required": false,
       "endianness": "independent",
@@ -1137,8 +1129,7 @@
       "external_nondeterminism": []
     },
     "known_gaps": [
-      "hidden allocation",
-      "implicit synchronization"
+      "Not a replacement for a complete type length value decoder application policy."
     ],
     "minimal_usage": [
       "const api = @import(\"type-length-value-decoder\");",
