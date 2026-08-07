@@ -1514,7 +1514,10 @@
       "cleanup": "caller"
     },
     "borrowing": {
-      "borrows": []
+      "borrows": [
+        "mutable []T returned by items() borrowed from DynamicArray-owned allocation; valid until capacity growth, deinit, or removal of the referenced element",
+        "immutable []const T returned by constItems() borrowed from DynamicArray-owned allocation; valid until capacity growth, deinit, or removal of the referenced element"
+      ]
     },
     "invalidation": {
       "capacity growth or deinit": [
@@ -1580,15 +1583,15 @@
     "error_map": [
       {
         "error": "OutOfMemory",
-        "operation": "DynamicArray, init, deinit, capacity, items, constItems, append, pop, get, clearRetainingCapacity, ensureUnusedCapacity",
-        "meaning": "The documented OutOfMemory condition occurred.",
-        "handling": "Correct the input or state before retrying."
+        "operation": "append, ensureUnusedCapacity",
+        "meaning": "Allocator could not provide requested backing storage.",
+        "handling": "Handle allocation failure; the array remains valid."
       },
       {
         "error": "Overflow",
-        "operation": "DynamicArray, init, deinit, capacity, items, constItems, append, pop, get, clearRetainingCapacity, ensureUnusedCapacity",
-        "meaning": "The documented Overflow condition occurred.",
-        "handling": "Correct the input or state before retrying."
+        "operation": "append, ensureUnusedCapacity",
+        "meaning": "Requested capacity arithmetic cannot be represented.",
+        "handling": "Reject the requested growth."
       }
     ],
     "composition": {

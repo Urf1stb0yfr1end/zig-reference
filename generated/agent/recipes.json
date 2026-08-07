@@ -6,7 +6,10 @@
   "recipes": {
     "construct-and-verify-sv39-address-space": [
       "riscv-page-table-page-owner",
+      "riscv-sfence-vma-invalidation",
+      "riscv-sv39-page-table-builder",
       "riscv-sv39-page-table-entry",
+      "riscv-sv39-page-table-walker",
       "riscv-sv39-virtual-address-indexing"
     ],
     "construct-bounded-state-machine": [
@@ -23,7 +26,8 @@
     "parse-length-prefixed-record": [
       "binary-cursor-checkpoint",
       "bounded-binary-sub-reader",
-      "bounded-byte-reader"
+      "bounded-byte-reader",
+      "length-prefixed-binary-field"
     ],
     "plan-bounded-initialization": [
       "fixed-bump-allocator",

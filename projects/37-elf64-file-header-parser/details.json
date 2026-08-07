@@ -997,5 +997,130 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Parse and validate one allocation-free ELF64 file header.",
+    "search_aliases": [
+      "physical-memory",
+      "page-frame",
+      "address",
+      "hypervisor"
+    ],
+    "capability_ids": [
+      "elf64-file-header-parser"
+    ],
+    "use_when": [
+      "Parse and validate one allocation-free ELF64 file header."
+    ],
+    "do_not_use_when": [
+      "hidden allocation",
+      "implicit synchronization"
+    ],
+    "entrypoint": "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig",
+    "public_symbols": [
+      "ElfEndian",
+      "ElfType",
+      "Elf64FileHeader",
+      "ParseError",
+      "parse"
+    ],
+    "dependency_ids": [
+      "bounded-byte-reader",
+      "checked-integer-cast",
+      "validated-enum-decoder",
+      "checked-half-open-range",
+      "endian-integer-codec",
+      "binary-cursor-checkpoint"
+    ],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "borrows": []
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-elf64-file-header-parser",
+      "zig build smoke-elf64-file-header-parser"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [
+        "page policy currently architecture-neutral but fixed at 4 KiB"
+      ],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "little",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "elf64-file-header-parser",
+      "primary_symbol": "parse",
+      "initialization": "const header = try parse(&reader);"
+    },
+    "operation_map": {
+      "programTableRange": "programTableRange",
+      "sectionTableRange": "sectionTableRange",
+      "parse": "parse",
+      "ElfEndian": "ElfEndian",
+      "ElfType": "ElfType",
+      "Elf64FileHeader": "Elf64FileHeader",
+      "ParseError": "ParseError"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [
+        "bounded-byte-reader",
+        "checked-integer-cast",
+        "validated-enum-decoder",
+        "checked-half-open-range",
+        "endian-integer-codec",
+        "binary-cursor-checkpoint"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "hidden allocation",
+      "implicit synchronization"
+    ],
+    "minimal_usage": [
+      "const api = @import(\"elf64-file-header-parser\");",
+      "const header = try parse(&reader);"
+    ],
+    "integration_notes": [
+      "Preserve the Zig 0.14.0 baseline and canonical dependency closure.",
+      "Run the focused validation commands."
+    ]
   }
 }

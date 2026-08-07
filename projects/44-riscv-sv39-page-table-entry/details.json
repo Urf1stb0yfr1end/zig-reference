@@ -865,8 +865,8 @@
     },
     "construction": {
       "named_import": "riscv-sv39-page-table-entry",
-      "primary_symbol": "DecodeError",
-      "initialization": "Construct DecodeError as documented by its public API."
+      "primary_symbol": "Entry",
+      "initialization": "const entry = try Entry.decode(raw);"
     },
     "operation_map": {
       "address": "address",
@@ -893,7 +893,9 @@
       "Target paging format is not RISC-V Sv39."
     ],
     "minimal_usage": [
-      "const api = @import(\"riscv-sv39-page-table-entry\");"
+      "const Entry = @import(\"riscv-sv39-page-table-entry\").Entry;",
+      "const entry = try Entry.decode(raw);",
+      "try entry.validateAtLevel(.level_0);"
     ],
     "integration_notes": [
       "Import the canonical named module.",

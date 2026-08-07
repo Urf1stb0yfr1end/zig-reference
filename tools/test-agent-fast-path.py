@@ -16,6 +16,16 @@ def main():
   a=run(*args)[0].stdout; b=run(*args)[0].stdout; assert a==b,args
  assert_candidate("aligned allocation from caller-owned fixed memory with no hidden heap","fixed-bump-allocator")
  _,d=run("decide","arbitrary independent deallocation"); assert any(x["module"]=="fixed-bump-allocator" for x in d["results"]["rejected"])
+ # Batch 03 semantic regressions: borrowed DynamicArray views and the functional Sv39 PTE entry point.
+ _,d=run("card","dynamic-array","--view","integrate")
+ borrows=d["results"]["borrowing"]["borrows"]
+ assert any("items()" in x and "mutable" in x for x in borrows),d
+ assert any("constItems()" in x and "immutable" in x for x in borrows),d
+ assert "capacity growth or deinit" in d["results"]["invalidation"],d
+ _,d=run("card","riscv-sv39-page-table-entry","--view","integrate")
+ assert d["results"]["construction"]["primary_symbol"]=="Entry",d
+ assert "Entry.decode" in d["results"]["construction"]["initialization"],d
+ assert d["results"]["construction"]["primary_symbol"]!="DecodeError",d
  assert_candidate("stale handle safe bounded object storage","fixed-capacity-object-pool")
  assert_candidate("deterministic bounded graph ordering with cycle detection","fixed-capacity-topological-sort")
  assert_candidate("exact bounded resource budget with deterministic initialization ordering","bounded-system-resource-plan")

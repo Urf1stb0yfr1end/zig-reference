@@ -1,0 +1,4 @@
+{
+  "module": "riscv-sfence-vma-invalidation",
+  "expectations": []
+}

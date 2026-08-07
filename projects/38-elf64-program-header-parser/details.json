@@ -1218,5 +1218,144 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Parse validated ELF64 segments and bounded fixed-capacity tables.",
+    "search_aliases": [
+      "physical-memory",
+      "page-frame",
+      "address",
+      "hypervisor"
+    ],
+    "capability_ids": [
+      "elf64-program-header-parser"
+    ],
+    "use_when": [
+      "Parse validated ELF64 segments and bounded fixed-capacity tables."
+    ],
+    "do_not_use_when": [
+      "hidden allocation",
+      "implicit synchronization"
+    ],
+    "entrypoint": "projects/38-elf64-program-header-parser/src/elf64_program_header_parser.zig",
+    "public_symbols": [
+      "Permission",
+      "Permissions",
+      "SegmentType",
+      "Segment",
+      "ParseError",
+      "parseOne",
+      "parseTable"
+    ],
+    "dependency_ids": [
+      "fixed-capacity-vector",
+      "bounded-byte-reader",
+      "checked-integer-cast",
+      "validated-enum-decoder",
+      "aligned-address-and-size-helpers",
+      "validated-bit-flags",
+      "checked-half-open-range",
+      "distinct-memory-address-types",
+      "endian-integer-codec",
+      "binary-cursor-checkpoint",
+      "bounded-binary-sub-reader",
+      "elf64-file-header-parser"
+    ],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "borrows": []
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-elf64-program-header-parser",
+      "zig build smoke-elf64-program-header-parser"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [
+        "page policy currently architecture-neutral but fixed at 4 KiB"
+      ],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "little",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "elf64-program-header-parser",
+      "primary_symbol": "parseTable",
+      "initialization": "const table = try parseTable(capacity, &reader, header);"
+    },
+    "operation_map": {
+      "parseOne": "parseOne",
+      "parseTable": "parseTable",
+      "Permission": "Permission",
+      "Permissions": "Permissions",
+      "SegmentType": "SegmentType",
+      "Segment": "Segment",
+      "ParseError": "ParseError"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [
+        "fixed-capacity-vector",
+        "bounded-byte-reader",
+        "checked-integer-cast",
+        "validated-enum-decoder",
+        "aligned-address-and-size-helpers",
+        "validated-bit-flags",
+        "checked-half-open-range",
+        "distinct-memory-address-types",
+        "endian-integer-codec",
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "elf64-file-header-parser"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "hidden allocation",
+      "implicit synchronization"
+    ],
+    "minimal_usage": [
+      "const api = @import(\"elf64-program-header-parser\");",
+      "const table = try parseTable(capacity, &reader, header);"
+    ],
+    "integration_notes": [
+      "Preserve the Zig 0.14.0 baseline and canonical dependency closure.",
+      "Run the focused validation commands."
+    ]
   }
 }

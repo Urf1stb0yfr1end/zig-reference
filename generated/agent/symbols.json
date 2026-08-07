@@ -31,6 +31,9 @@
     "BoundedReader": [
       "bounded-byte-reader"
     ],
+    "Builder": [
+      "riscv-sv39-page-table-builder"
+    ],
     "ByteWriter": [
       "byte-writer"
     ],
@@ -52,6 +55,15 @@
     "DynamicArray": [
       "dynamic-array"
     ],
+    "Elf64FileHeader": [
+      "elf64-file-header-parser"
+    ],
+    "ElfEndian": [
+      "elf64-file-header-parser"
+    ],
+    "ElfType": [
+      "elf64-file-header-parser"
+    ],
     "EndianIntegerCodec": [
       "endian-integer-codec"
     ],
@@ -60,6 +72,8 @@
     ],
     "Error": [
       "riscv-page-table-page-owner",
+      "riscv-sv39-page-table-builder",
+      "riscv-sv39-page-table-walker",
       "riscv-sv39-virtual-address-indexing"
     ],
     "EventInput": [
@@ -95,9 +109,15 @@
     "Kind": [
       "riscv-sv39-page-table-entry"
     ],
+    "LengthPrefixedField": [
+      "length-prefixed-binary-field"
+    ],
     "Level": [
       "riscv-sv39-page-table-entry",
       "riscv-sv39-virtual-address-indexing"
+    ],
+    "Mutation": [
+      "riscv-sv39-page-table-builder"
     ],
     "NormalizedEvent": [
       "bounded-deterministic-event-trace"
@@ -111,23 +131,61 @@
     "PageSize": [
       "physical-page-frame-number-and-address-conversion"
     ],
+    "ParseError": [
+      "elf64-file-header-parser",
+      "elf64-program-header-parser"
+    ],
     "Parts": [
       "riscv-sv39-virtual-address-indexing"
     ],
+    "Permission": [
+      "elf64-program-header-parser"
+    ],
     "Permissions": [
+      "elf64-program-header-parser",
       "riscv-sv39-page-table-entry"
     ],
     "PhysicalAddress": [
       "distinct-memory-address-types"
     ],
+    "PhysicalMemoryRegion": [
+      "physical-memory-region-set"
+    ],
+    "PhysicalMemoryRegionSet": [
+      "physical-memory-region-set"
+    ],
+    "PhysicalPageFrameAllocator": [
+      "physical-page-frame-allocator"
+    ],
     "PhysicalPageFrameNumber": [
       "physical-page-frame-number-and-address-conversion"
+    ],
+    "Plan": [
+      "riscv-sfence-vma-invalidation"
     ],
     "Planner": [
       "bounded-system-resource-plan"
     ],
     "PostSealAllocation": [
       "bounded-system-resource-plan"
+    ],
+    "RegionKind": [
+      "physical-memory-region-set"
+    ],
+    "Result": [
+      "riscv-sv39-page-table-walker"
+    ],
+    "Segment": [
+      "elf64-program-header-parser"
+    ],
+    "SegmentType": [
+      "elf64-program-header-parser"
+    ],
+    "TlvDecoder": [
+      "type-length-value-decoder"
+    ],
+    "ValidatedBitFlags": [
+      "validated-bit-flags"
     ],
     "alignDown": [
       "aligned-address-and-size-helpers"
@@ -153,6 +211,21 @@
     "entries_per_page": [
       "riscv-page-table-page-owner"
     ],
+    "executeUnsafe": [
+      "riscv-sfence-vma-invalidation"
+    ],
+    "forAddress": [
+      "riscv-sfence-vma-invalidation"
+    ],
+    "forAddressAsid": [
+      "riscv-sfence-vma-invalidation"
+    ],
+    "forAsid": [
+      "riscv-sfence-vma-invalidation"
+    ],
+    "global": [
+      "riscv-sfence-vma-invalidation"
+    ],
     "isAligned": [
       "aligned-address-and-size-helpers"
     ],
@@ -171,6 +244,15 @@
     "pageSize": [
       "riscv-sv39-virtual-address-indexing"
     ],
+    "parse": [
+      "elf64-file-header-parser"
+    ],
+    "parseOne": [
+      "elf64-program-header-parser"
+    ],
+    "parseTable": [
+      "elf64-program-header-parser"
+    ],
     "requireAligned": [
       "riscv-sv39-virtual-address-indexing"
     ],
@@ -179,6 +261,9 @@
     ],
     "validateRange": [
       "riscv-sv39-virtual-address-indexing"
+    ],
+    "walk": [
+      "riscv-sv39-page-table-walker"
     ]
   }
 }
