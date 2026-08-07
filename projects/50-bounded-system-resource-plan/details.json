@@ -1049,7 +1049,7 @@
     "notes": []
   },
   "agent_contract": {
-    "schema_version": "1.0.0",
+    "schema_version": "2.0.0",
     "summary": "Derive an exact bounded resource budget and deterministic initialization order.",
     "search_aliases": [
       "topological sort",
@@ -1058,6 +1058,7 @@
     ],
     "capability_ids": [
       "bounded-system-resource-planning",
+      "bounded-task-storage",
       "deterministic-initialization-planning",
       "fixed-resource-storage-derivation"
     ],
@@ -1178,6 +1179,96 @@
         "related_module": "bounded-system-resource-plan",
         "related_recipe": "plan-morphic-runtime"
       }
-    ]
+    ],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": [
+        "capacities"
+      ]
+    },
+    "construction": {
+      "named_import": "bounded-system-resource-plan",
+      "primary_symbol": "Planner",
+      "initialization": "const P = Planner(capacities); const result = try P.plan(description)"
+    },
+    "operation_map": {
+      "plan": "plan",
+      "render": "Plan.render",
+      "inspect": "concreteStorageBytes"
+    },
+    "error_map": [
+      {
+        "error": "MemoryExceeded",
+        "operation": "plan",
+        "meaning": "MemoryExceeded is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      },
+      {
+        "error": "ArithmeticOverflow",
+        "operation": "plan",
+        "meaning": "ArithmeticOverflow is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      },
+      {
+        "error": "InitializationCycle",
+        "operation": "plan",
+        "meaning": "InitializationCycle is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      },
+      {
+        "error": "InvalidAlignment",
+        "operation": "plan",
+        "meaning": "InvalidAlignment is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      },
+      {
+        "error": "InvalidCapacity",
+        "operation": "plan",
+        "meaning": "InvalidCapacity is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      }
+    ],
+    "composition": {
+      "commonly_with": [
+        "aligned-address-and-size-helpers",
+        "bounded-integer",
+        "checked-integer-cast",
+        "fixed-bump-allocator",
+        "fixed-capacity-topological-sort"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": [
+        "plan-morphic-runtime"
+      ]
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Defined by inputs, insertion order, and documented capacity rules.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "The plan does not perform initialization.",
+      "Persistence and dynamic growth are not provided."
+    ],
+    "minimal_usage": [
+      "const module = @import(\"bounded-system-resource-plan\");",
+      "var value = const P = Planner(capacities); const result = try P.plan(description);"
+    ],
+    "integration_notes": []
   }
 }

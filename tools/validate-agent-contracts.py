@@ -4,21 +4,13 @@ import argparse
 import copy
 import json
 import pathlib
+import re
 import subprocess
 import sys
 import tempfile
 
 from repository import ROOT, contracts, dependencies
 
-PILOTS = {
-    "fixed-capacity-object-pool",
-    "fixed-free-list",
-    "fixed-bump-allocator",
-    "fixed-capacity-priority-queue",
-    "fixed-capacity-topological-sort",
-    "bounded-system-resource-plan",
-    "bounded-deterministic-event-trace",
-}
 CLASSES = {
     "runtime_negative_test",
     "zig_compile_fail",
@@ -42,8 +34,6 @@ def validate_documents(cs):
     seen = set()
     errors = []
     pilots = {d["module"]["canonical_name"] for d in cs if d.get("agent_contract")}
-    if pilots != PILOTS:
-        errors.append(f"pilot set differs: expected={sorted(PILOTS)} actual={sorted(pilots)}")
     build = (ROOT / "build.zig").read_text()
     commands = (ROOT / "COMMANDS.md").read_text()
 
@@ -66,9 +56,24 @@ def validate_documents(cs):
         for recipe in agent["recipes"]:
             if recipe not in recipe_names:
                 errors.append(f"{name}: missing recipe {recipe}")
+        for alternative in agent.get("alternatives", []):
+            if alternative["module"] not in names:
+                errors.append(f"{name}: missing alternative module {alternative['module']}")
+        composition = agent.get("composition", {})
+        for related in composition.get("commonly_with", []) + composition.get("conflicts_with", []):
+            if related not in names:
+                errors.append(f"{name}: missing composition module {related}")
+        for recipe in composition.get("preferred_recipes", []):
+            if recipe not in recipe_names:
+                errors.append(f"{name}: missing composition recipe {recipe}")
         for symbol in agent["public_symbols"]:
             if (name, symbol) not in generated_symbols:
                 errors.append(f"{name}: symbol not in generated extraction: {symbol}")
+        source_text=(ROOT / agent["entrypoint"]).read_text()
+        for label, symbol in [("construction",agent.get("construction",{}).get("primary_symbol", ""))] + list(agent.get("operation_map", {}).items()):
+            leaf=symbol.split(".")[-1]
+            if leaf and not re.search(r"\b(?:fn|const)\s+"+re.escape(leaf)+r"\b", source_text):
+                errors.append(f"{name}: invalid {label} symbol {symbol}")
         for command in agent["validation_commands"]:
             step = command.removeprefix("zig build ")
             if f'b.step("{step}"' not in build and command not in commands:
@@ -179,6 +184,15 @@ def self_test():
     pilot(broken)["agent_contract"]["diagnostics"][0]["fixture_classification"] = "ceremonial_test"
     cases.append(("unsupported evidence class", broken, "unsupported evidence class"))
 
+    broken = copy.deepcopy(baseline); pilot(broken)["agent_contract"]["schema_version"] = "99.0.0"
+    cases.append(("unsupported contract version", broken, "agent schema"))
+    broken = copy.deepcopy(baseline); pilot(broken)["agent_contract"]["composition"]["preferred_recipes"] = ["missing-recipe"]
+    cases.append(("missing recipe", broken, "missing composition recipe"))
+    broken = copy.deepcopy(baseline); pilot(broken)["agent_contract"]["operation_map"]["insert"] = "notASymbol"
+    cases.append(("invalid operation symbol", broken, "invalid insert symbol"))
+    broken = copy.deepcopy(baseline); pilot(broken)["agent_contract"]["construction"]["primary_symbol"] = "notASymbol"
+    cases.append(("invalid construction symbol", broken, "invalid construction symbol"))
+
     broken = copy.deepcopy(baseline)
     bump = pilot(broken, "fixed-bump-allocator")
     bump["agent_contract"]["diagnostics"][0]["zig_rejects"] = True
@@ -195,13 +209,15 @@ def self_test():
         temporary = pathlib.Path(temporary)
         no_assertion = temporary / "no_assertion.zig"
         no_assertion.write_text('test "ceremonial" { _ = 1; }\n')
-        pilot(cases[6][1])["agent_contract"]["diagnostics"][0]["fixture"] = str(no_assertion)
+        no_assert_case=next(x for x in cases if x[0]=="runtime negative without assertion")
+        pilot(no_assert_case[1])["agent_contract"]["diagnostics"][0]["fixture"] = str(no_assertion)
 
-        proof = json.loads((ROOT / pilot(cases[7][1])["agent_contract"]["proof_contract"]).read_text())
+        proof_case=next(x for x in cases if x[0]=="proof claim without evidence")
+        proof = json.loads((ROOT / pilot(proof_case[1])["agent_contract"]["proof_contract"]).read_text())
         proof["claims"][0]["evidence_references"] = []
         malformed_proof = temporary / "PROOF.json"
         malformed_proof.write_text(json.dumps(proof))
-        pilot(cases[7][1])["agent_contract"]["proof_contract"] = str(malformed_proof)
+        pilot(proof_case[1])["agent_contract"]["proof_contract"] = str(malformed_proof)
 
         for label, malformed, expected in cases:
             input_path = temporary / (label.replace(" ", "-") + ".json")
@@ -215,20 +231,22 @@ def self_test():
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--quick", action="store_true", help="validate contracts without the generated-index drift subprocess")
     args = parser.parse_args()
     try:
         if args.self_test:
             self_test()
             return 0
         errors = validate_documents(contracts())
-        result = subprocess.run([sys.executable, "tools/build-agent-index.py", "--check"], cwd=ROOT)
-        if result.returncode:
-            errors.append("generated agent indexes are stale")
+        if not args.quick:
+            result = subprocess.run([sys.executable, "tools/build-agent-index.py", "--check"], cwd=ROOT, timeout=60)
+            if result.returncode: errors.append("generated agent indexes are stale")
         if errors:
             print("\n".join("AGENT CONTRACT ERROR: " + error for error in errors), file=sys.stderr)
             return 1
-        pending = len(contracts()) - len(PILOTS)
-        print(f"PASS: {len(PILOTS)} agent-readable contracts validated; {pending} modules are pending migration (not invalid).")
+        full=sum(d.get("agent_contract",{}).get("schema_version")=="2.0.0" for d in contracts())
+        pending = len(contracts()) - full
+        print(f"PASS: {full} full agent-readable contracts validated; {pending} modules are partial (not invalid).")
         return 0
     except Exception as exc:
         print(f"AGENT CONTRACT ERROR: {exc}", file=sys.stderr)

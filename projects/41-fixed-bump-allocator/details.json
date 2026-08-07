@@ -862,7 +862,7 @@
     "notes": []
   },
   "agent_contract": {
-    "schema_version": "1.0.0",
+    "schema_version": "2.0.0",
     "summary": "Allocate aligned slices monotonically from a caller-owned byte region.",
     "search_aliases": [
       "bump allocator",
@@ -870,8 +870,9 @@
       "caller-owned arena"
     ],
     "capability_ids": [
-      "bounded-allocation",
       "aligned-allocation",
+      "bounded-allocation",
+      "fixed-memory-operation",
       "monotonic-allocation"
     ],
     "use_when": [
@@ -943,6 +944,78 @@
         "related_module": "fixed-bump-allocator",
         "related_recipe": "plan-bounded-initialization"
       }
-    ]
+    ],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "caller_owned",
+      "capacity_model": "caller_buffer",
+      "bounded": true,
+      "caller_provided_memory": true,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "fixed-bump-allocator",
+      "primary_symbol": "FixedBumpAllocator",
+      "initialization": "FixedBumpAllocator.init(buffer[0..])"
+    },
+    "operation_map": {
+      "allocate": "allocate",
+      "reset": "reset",
+      "inspect": "remaining"
+    },
+    "error_map": [
+      {
+        "error": "InvalidAlignment",
+        "operation": "allocate",
+        "meaning": "InvalidAlignment is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      },
+      {
+        "error": "Overflow",
+        "operation": "allocate",
+        "meaning": "Overflow is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      },
+      {
+        "error": "OutOfMemory",
+        "operation": "allocate",
+        "meaning": "OutOfMemory is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      }
+    ],
+    "composition": {
+      "commonly_with": [
+        "aligned-address-and-size-helpers"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": [
+        "plan-bounded-initialization"
+      ]
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Defined by inputs, insertion order, and documented capacity rules.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Individual allocations cannot be freed.",
+      "Allocations do not survive reset."
+    ],
+    "minimal_usage": [
+      "const module = @import(\"fixed-bump-allocator\");",
+      "var value = FixedBumpAllocator.init(buffer[0..]);"
+    ],
+    "integration_notes": []
   }
 }

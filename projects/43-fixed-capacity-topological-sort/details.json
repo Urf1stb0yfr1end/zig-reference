@@ -903,7 +903,7 @@
     "notes": []
   },
   "agent_contract": {
-    "schema_version": "1.0.0",
+    "schema_version": "2.0.0",
     "summary": "Produce a deterministic dependency order or report a cycle in a bounded graph.",
     "search_aliases": [
       "topological sort",
@@ -985,6 +985,93 @@
         "related_module": "fixed-capacity-topological-sort",
         "related_recipe": "plan-bounded-initialization"
       }
-    ]
+    ],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": [
+        "max_nodes",
+        "max_edges"
+      ]
+    },
+    "construction": {
+      "named_import": "fixed-capacity-topological-sort",
+      "primary_symbol": "FixedTopologicalGraph",
+      "initialization": "try FixedTopologicalGraph(16, 32).init(node_count)"
+    },
+    "operation_map": {
+      "insert": "addEdge",
+      "sort": "sort"
+    },
+    "error_map": [
+      {
+        "error": "TooManyNodes",
+        "operation": "insert",
+        "meaning": "TooManyNodes is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      },
+      {
+        "error": "InvalidNode",
+        "operation": "insert",
+        "meaning": "InvalidNode is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      },
+      {
+        "error": "DuplicateEdge",
+        "operation": "insert",
+        "meaning": "DuplicateEdge is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      },
+      {
+        "error": "Full",
+        "operation": "insert",
+        "meaning": "Full is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      },
+      {
+        "error": "Cycle",
+        "operation": "insert",
+        "meaning": "Cycle is an explicit public operation failure.",
+        "handling": "Handle the error explicitly; preserve or correct the declared bound before retrying."
+      }
+    ],
+    "composition": {
+      "commonly_with": [
+        "fixed-capacity-priority-queue",
+        "fixed-capacity-vector"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": [
+        "plan-bounded-initialization"
+      ]
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Defined by inputs, insertion order, and documented capacity rules.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Graph capacity cannot grow.",
+      "Cycles are reported rather than repaired."
+    ],
+    "minimal_usage": [
+      "const module = @import(\"fixed-capacity-topological-sort\");",
+      "var value = try FixedTopologicalGraph(16, 32).init(node_count);"
+    ],
+    "integration_notes": []
   }
 }
