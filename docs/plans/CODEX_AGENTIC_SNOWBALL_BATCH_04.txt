@@ -1,0 +1,572 @@
+CODEX AGENTIC SNOWBALL BATCH 04
+
+MISSION
+
+Continue the Agentic Snowball from the independently validated Batch 03 state while making developer handoff output a permanent repository convention.
+
+The latest independently tested merged-main state is:
+
+- 52 contracted modules
+- 37 full Agent Fast Path v2 modules
+- 15 partial modules
+- Zig 0.14.0
+- full repository validation green
+- the Sv39 chain substantially machine-legible
+- Batch 03 semantic regressions repaired and guarded
+
+Batch 04 has three equally important goals:
+
+1. Make two repository-wide operating rules permanent in AGENTS.md:
+   - every Codex/repository-changing run updates COMMANDS.md;
+   - serious developer-facing health/doctor/smoke/verify/validation/diagnostic flows append a developer summary called the Minimus.
+2. Audit and repair demonstrable semantic projection residue from Batch 03 without redesigning Agent Fast Path v2.
+3. Migrate exactly ten additional highest-leverage partial modules to full Agent Contract v2 status using the current repository graph.
+
+If the module baseline is still 37 full / 15 partial when Part C begins, the expected final state is 47 full / 5 partial. If main has advanced, use the actual baseline and still migrate exactly ten modules that were partial at the start of Part C.
+
+Do not commit or push.
+
+
+PART A — MAKE THE TWO PERMANENT OPERATING RULES EXPLICIT IN AGENTS.md
+
+Read AGENTS.md first and preserve its existing philosophy and discovery order.
+
+Add concise permanent guidance for BOTH rules below. Do not create a competing policy document that agents may miss. AGENTS.md is the persistent entry point.
+
+A1. MANDATORY COMMAND MANUAL RULE
+
+Every Codex run that changes the repository must update COMMANDS.md before completion.
+
+This is standard repository behavior, not a Batch 04-only instruction.
+
+The AGENTS.md rule must state the equivalent of:
+
+- Add every new runnable command introduced by the run.
+- Update changed commands, arguments, purposes, or validation status.
+- Remove or accurately mark obsolete commands.
+- If the command surface itself did not change, still update COMMANDS.md with validation/workflow information materially established by the run.
+- Never document a command that does not actually exist.
+- Never call a command validated unless it actually executed successfully in the reported environment.
+- Before completion run:
+
+  PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+
+- COMMANDS.md must be current when the run finishes.
+
+Do not merely mention this in the Batch report. Persist it in AGENTS.md.
+
+A2. DEVELOPER MINIMUS STANDARD
+
+Persist the Minimus as a repository-wide developer convention in AGENTS.md.
+
+The Minimus is for any serious developer, not merely coding agents.
+
+IMPORTANT: existing command output MUST remain available as it is today. The Minimus is APPENDED after the normal output has finished. It is not a replacement, simplification, suppression, or rewrite of existing test/build/doctor output.
+
+For serious developer-facing health, smoke, doctor, verification, validation, or diagnostic entry points, the successful terminal tail should follow this conceptual order:
+
+NORMAL EXISTING OUTPUT
+... unchanged existing command output ...
+
+LOCATIONS
+<small bounded set of useful clickable locations>
+
+MINIMUS
+<compact developer handoff summary>
+
+The Minimus plus Locations block must be appended at the end.
+
+Define “serious developer-facing” narrowly enough not to pollute every tiny unit test. It includes aggregate or diagnostic commands whose purpose is to answer whether a meaningful repository/subsystem state is healthy or to give a developer a substantial debugging handoff. Examples include repository doctor, aggregate smoke/validation, Morphic verification, and dedicated diagnostic/support flows. A tiny focused module unit test does not need Minimus merely because it is runnable.
+
+The Minimus must be 200 lines or fewer. It should normally be far shorter.
+
+A useful Minimus contains only the essence required for a developer to continue:
+
+- PASS / FAIL / PARTIAL status;
+- exact command/subsystem checked;
+- important counts or boundaries;
+- what materially succeeded or changed;
+- warnings/failures that matter;
+- exact next focused command or repair path when action is needed;
+- branch, commit, Zig version, target, or environment only when materially useful.
+
+Do not dump raw logs into Minimus.
+Do not repeat hundreds of passing test lines.
+Do not hide existing output.
+Do not turn Minimus into a second verbose report.
+
+A3. LOCATIONS MUST BE NAVIGABLE
+
+Immediately above MINIMUS, serious developer summaries must print a LOCATIONS block.
+
+LOCATIONS is a bounded navigation aid, not a repository listing.
+
+Each location should point to an existing path directly relevant to understanding or repairing the run, such as:
+
+- canonical source;
+- canonical details.json or contract;
+- generated index/report;
+- diagnostic report;
+- recipe/integration file;
+- command-created log file when one exists.
+
+Locations shown in the console must be clickable where ordinary developer terminals support it.
+
+Use a durable literal file URI as the baseline representation:
+
+file:///absolute/path/to/relevant/file
+
+The implementation may additionally emit OSC 8 clickable labels when stdout is an interactive terminal, but the literal file:// URI must remain available as a fallback. Do not make correctness depend on OSC 8 support.
+
+Do not hard-code one developer's home directory. Resolve paths from the current repository/worktree and current log destination.
+
+If a serious diagnostic command already writes a .txt diagnostic/log file, append the same LOCATIONS + MINIMUS handoff to the text log as well as the console so the saved artifact carries its own navigation and summary.
+
+Do NOT start creating log files for every command merely to satisfy this rule. Preserve existing logging behavior. The requirement is: when such a diagnostic .txt exists, its tail should carry the same developer handoff.
+
+A4. MINIMUS MUST BE DETERMINISTIC AND CHEAP
+
+Prefer deriving Minimus facts from information the command already computed.
+
+Do not rescan the entire repository solely to create the summary when the result is already known.
+
+Keep key ordering stable so diffs and saved logs are easy to compare.
+
+Avoid timestamps unless the parent command already has a legitimate reason to record one.
+
+A Minimus must never turn a failing command into success or mask a nonzero exit code.
+
+If a wrapper controls a recognized failure path and can safely append a failure Minimus before returning the original nonzero status, do so. Do not redesign the entire Zig build graph solely to guarantee a Minimus after catastrophic tool/process termination.
+
+
+PART B — IMPLEMENT THE FIRST MINIMUS SURFACE WITHOUT REDESIGNING COMMANDS
+
+Use the smallest reusable implementation that fits the current repository.
+
+First inspect existing major command wiring before deciding where the helper belongs.
+
+Do not invent a daemon, database, service, binary artifact, or opaque state.
+
+A small text-oriented helper under tools/ is acceptable if it avoids duplicated formatting logic. If you add a new runnable helper/command, COMMANDS.md must document it.
+
+At minimum, integrate and validate appended LOCATIONS + MINIMUS output for these meaningful existing surfaces where technically appropriate without replacing their normal output:
+
+- python3 tools/query-reference.py agent doctor
+- the repository's major aggregate smoke flow (`zig build smoke`)
+- the full repository validation flow (`zig build validate-repository`)
+- Morphic verification flows that are currently exposed as serious developer checks (`zig build verify-morphic-plan` and `zig build verify-morphic-trace`)
+
+Also inspect other obvious existing serious doctor/diagnostic/support commands and include them when the same small mechanism applies cleanly. Do not broaden scope into rewriting every build target.
+
+The appended output should look conceptually like:
+
+============================================================
+LOCATIONS
+============================================================
+repository: file:///.../zig-reference
+contract:   file:///.../relevant/details.json
+report:     file:///.../relevant/report-or-index
+log:        file:///.../existing/log.txt        # only when one actually exists
+
+============================================================
+MINIMUS
+============================================================
+status: PASS
+command: zig build validate-repository
+modules: 52 contracted; 47 full; 5 partial
+zig: 0.14.0
+summary: repository validation completed successfully
+next: python3 tools/query-reference.py agent doctor
+============================================================
+
+That is an example shape, not hard-coded data. Emit actual current facts.
+
+Do not require exactly these fields on every command. Keep each Minimus useful to the command.
+
+Add narrow automated regression coverage for:
+
+- LOCATIONS appears before MINIMUS;
+- the Minimus is appended after ordinary output rather than replacing it;
+- Minimus is <= 200 lines;
+- literal file:// locations are emitted and point at existing relevant files for tested cases;
+- normal exit status semantics are preserved;
+- deterministic inputs produce deterministic Minimus text apart from facts already intentionally variable in the parent command;
+- a diagnostic .txt writer, if one is covered by this batch, receives the same summary tail.
+
+Do not implement a giant logging framework.
+
+
+PART C — BOUNDED SEMANTIC AUDIT OF BATCH 03 PROJECTIONS
+
+Before snowballing another ten modules, inspect the ten modules migrated in Batch 03 for the same category of semantic compression errors that Batch 03 was created to prevent.
+
+The Batch 03 migration set was:
+
+- riscv-sv39-page-table-walker
+- riscv-sfence-vma-invalidation
+- riscv-sv39-page-table-builder
+- length-prefixed-binary-field
+- type-length-value-decoder
+- physical-memory-region-set
+- physical-page-frame-allocator
+- validated-bit-flags
+- elf64-file-header-parser
+- elf64-program-header-parser
+
+Use generated cards first, then canonical contracts/source only where needed.
+
+Look specifically for:
+
+- unrelated copy/template residue;
+- architecture/page-policy claims in modules where they do not belong;
+- borrowing claims inconsistent with returned slices/readers/pointers;
+- invalidation missing for borrowed views when canonical truth supports it;
+- generic `do_not_use_when` / `known_gaps` filler that carries no module-specific information;
+- construction paths using incidental symbols instead of real integration entry points;
+- import-only minimal usage when a supported concrete call is known;
+- resource-profile contradictions;
+- overconfident environment/determinism claims;
+- error maps broader than the operations that actually expose those errors.
+
+There is already evidence in the Batch 03 independent output that some parser-facing generated cards may contain suspicious physical-memory/page-policy wording. Verify against canonical truth. Remove it only if it is demonstrably unrelated residue.
+
+Do not assume every suspicious phrase is wrong. Ground every repair.
+
+Add narrow regression protection for each concrete contradiction repaired. Do not build a subjective universal prose linter.
+
+
+PART D — SELECT EXACTLY TEN CURRENT PARTIAL MODULES MECHANICALLY
+
+After Parts A-C are clean, recompute the current partial frontier from the actual tree.
+
+Start with:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+python3 tools/query-reference.py agent pending
+
+For every remaining partial candidate, use current repository-native graph/recipe information such as:
+
+python3 tools/query-reference.py agent impact MODULE
+python3 tools/query-reference.py dependencies MODULE --recursive
+python3 tools/query-reference.py dependents MODULE --recursive
+
+Rank by the established snowball priorities:
+
+1. transitive dependents improved;
+2. direct dependents improved;
+3. removal of partial foundations from otherwise-full closures;
+4. recipe participation/closure completion;
+5. low-level reuse across future systems;
+6. coherent cluster completion;
+7. likely value to Morphic/system composition when graph evidence supports it.
+
+Do not invent an arbitrary precision score.
+
+The independently tested post-Batch-03 pending set was:
+
+- ring-buffer
+- stack
+- state-machine
+- nonzero-integer
+- saturating-counter
+- wrapping-sequence-number
+- optional-typed-handle
+- unit-safe-quantity
+- validated-ascii-byte
+- fourcc-code
+- semantic-version
+- tagged-result
+- source-span
+- owned-byte-buffer
+- intrusive-doubly-linked-list
+
+That list is advisory only. Recompute from current main.
+
+Select exactly ten unique modules that are partial at the start of this part.
+
+Do not count semantic repairs to already-full modules as migrations.
+
+
+PART E — MIGRATE THE TEN SELECTED MODULES USING EXISTING AGENT CONTRACT V2
+
+Do not redesign Agent Fast Path v2.
+Do not create a new contract version.
+Do not invent another per-module metadata file.
+
+For each selected module, author only facts supported by canonical truth.
+
+Populate the existing full fast-path fields as appropriate, including:
+
+- selection_priority
+- alternatives
+- use_when
+- do_not_use_when
+- capabilities
+- environment_constraints
+- resource_profile
+- construction
+- operation_map
+- error_map
+- ownership
+- borrowing
+- invalidation
+- failure guarantees/effects when supported
+- composition
+- determinism
+- known_gaps
+- minimal_usage
+- integration_notes
+- focused validation commands
+
+A full card must guide ordinary selection and integration correctly without unnecessary source inspection.
+
+The compact projection must never be more confident or less restrictive than canonical truth.
+
+Prefer an honest unknown over polished fiction.
+
+Do not fabricate diagnostics.
+Do not fabricate proof contracts.
+Do not fabricate misuse evidence.
+Do not mark future-analyzer expectations as compiler-tested.
+Do not claim formal proof from ordinary tests.
+
+
+PART F — MORPHIC DIRECTION WITHOUT PREMATURE FEATURE EXPANSION
+
+Batch 04 remains primarily an agentic snowball + Minimus batch.
+
+Do not add a large new Morphic subsystem merely to make the batch feel dramatic.
+
+However, when mechanical leverage between remaining partial modules is close, prefer modules that improve reusable system-composition foundations likely to matter to Morphic, hosted/freestanding twins, deterministic execution, boot/runtime work, binary loading, or bounded system services.
+
+Do not add new modules solely for Morphic in this batch unless a required validation/Minimus implementation genuinely needs a reusable module and the addition is clearly within scope. The ten migrations are existing partial modules.
+
+
+PART G — KEEP ROOT VISION AND REPOSITORY POLICY INTACT
+
+These two flagship files intentionally remain at repository root:
+
+MAYBE_THE_NEW_WORLD_FITS_IN_5_GB.md
+Prospectively.md
+
+Keep them there.
+
+Keep the strict root-document allowlist strict.
+
+Verify a temporary unapproved root Markdown file is rejected and remove it afterward.
+
+Do not weaken text-only policy.
+Do not introduce binary generated artifacts, databases, caches, screenshots, archives, or opaque indexes.
+
+
+PART H — COMMANDS.md MUST BE UPDATED IN THIS RUN
+
+This is mandatory even if no command names change.
+
+Because Batch 04 changes developer command behavior, COMMANDS.md must document:
+
+- any new Minimus helper command that is actually runnable;
+- which serious commands append LOCATIONS + MINIMUS;
+- that ordinary pre-existing output remains and the handoff is appended;
+- any diagnostic text-log behavior actually implemented;
+- the final actual Agent Fast Path full/partial counts;
+- any changed command arguments or validation semantics;
+- validation actually executed.
+
+Never document a nonexistent command.
+
+Run:
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+
+COMMANDS.md must be current at completion.
+
+
+PART I — BATCH 04 REPORT
+
+Create:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_04.md
+
+Include:
+
+1. baseline commit and module counts;
+2. exact AGENTS.md permanent rules added;
+3. Minimus implementation design and why it is small;
+4. serious command surfaces receiving appended LOCATIONS + MINIMUS;
+5. proof that normal output remains present before the appended handoff;
+6. proof that tested Minimus output is <= 200 lines;
+7. navigation behavior and file:// fallback;
+8. any diagnostic .txt integration actually implemented;
+9. Batch 03 semantic residue found and grounded repairs made;
+10. the ten selected partial modules and mechanical leverage rationale;
+11. before/after full/partial counts;
+12. unique direct/transitive dependents improved;
+13. recipes/closures improved;
+14. representative select/integrate byte sizes for newly full modules when practical;
+15. source files needed before/after ordinary integration using prior methodology;
+16. deterministic index regeneration result;
+17. full validation results;
+18. recomputed remaining partial frontier;
+19. concrete recommendation for whether Batch 05 should finish the final partials or begin a Morphic/agent benchmark phase.
+
+Do not invent empirical agent metrics that were not measured.
+
+
+PART J — FAST-PATH ACCEPTANCE
+
+After migration verify:
+
+- bootstrap reports the actual final counts;
+- doctor status remains ok AND now appends LOCATIONS + MINIMUS without losing its existing JSON/status output;
+- representative newly migrated modules can be selected from natural-language needs;
+- select cards reject incompatible uses correctly;
+- integrate cards expose concrete construction, ownership/borrowing, errors, dependencies, and focused validation;
+- composition can cross Batch 01, 02, 03, and 04 foundations where real capabilities support it;
+- missing capabilities remain missing;
+- nonexistent diagnostics remain absent;
+- Batch 03 semantic regression repairs remain correct;
+- generated indexes are deterministic.
+
+
+PART K — MINIMUS ACCEPTANCE
+
+Capture representative output to temporary text files during testing and assert the following.
+
+For each tested serious command:
+
+1. legacy/normal output is still present;
+2. LOCATIONS occurs after normal output;
+3. MINIMUS occurs after LOCATIONS;
+4. the final handoff is <= 200 lines;
+5. literal file:// URIs are present;
+6. every asserted location resolves to an existing relevant path at generation time;
+7. status/counts match actual command results;
+8. rerunning on unchanged state produces the same handoff except for parent-command facts that are already intentionally variable;
+9. command success/failure exit semantics are preserved.
+
+At minimum cover:
+
+python3 tools/query-reference.py agent doctor
+zig build smoke
+zig build validate-repository
+zig build verify-morphic-plan
+zig build verify-morphic-trace
+
+If technical wiring makes one of these impossible without invasive redesign, do not fake it. Implement the closest non-invasive canonical surface, explain the limitation in the report, and keep the rule in AGENTS.md for future command work.
+
+Do not leave temporary capture files tracked or in repository root.
+
+
+PART L — VALIDATION
+
+Run focused checks during editing.
+
+Before completion run every applicable existing gate:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/format-module-contracts.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/validate-agent-contracts.py --self-test
+PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py
+
+node tools/check-port-contracts.js
+
+zig fmt --check .
+zig build validate-agent-contracts --summary all
+zig build check --summary all
+zig build smoke --summary all
+zig build test --summary all
+zig build recipes --summary all
+zig build conformance --summary all
+zig build verify-morphic-plan
+zig build verify-morphic-trace
+zig build validate-repository --summary all
+
+git diff --check
+
+Also run Minimus-specific regression coverage added by this batch.
+
+Run focused tests for every canonical contract/module changed by semantic repair when not already clearly covered by a stronger executed aggregate.
+
+Regenerate agent indexes, run generation a second time, and require no second-pass diff.
+
+Verify no temporary root-policy or output-capture files remain.
+
+Verify the worktree contains no generated binary/opaque artifacts.
+
+
+PART M — FINAL QUALITY BAR
+
+Do not stop because schemas validate.
+
+For every newly full/repaired card ask:
+
+- Would a fresh agent choose it for the right reason?
+- Would it reject it for the right reason?
+- Does construction use the real functional API?
+- Are borrowing and invalidation coherent?
+- Are resource/environment claims conservative?
+- Are errors mapped only where supported?
+- Is minimal_usage actually useful?
+- Is there unrelated template/copy residue?
+- Can ordinary integration proceed without opening source when the contract already contains the needed truth?
+
+For every Minimus-enabled command ask:
+
+- Did we preserve all normal output?
+- Is the summary truly appended?
+- Could a developer understand the essential result quickly?
+- Are Locations few, relevant, existing, and navigable?
+- Is the Minimus <= 200 lines?
+- Does it tell the developer what to do next when action is required?
+- Does it preserve the original exit truth?
+
+
+PART N — SCOPE CONTROL
+
+Do not redesign Agent Fast Path v2.
+Do not change Zig 0.14.0.
+Do not create a general logging framework.
+Do not suppress or replace existing command output.
+Do not add Minimus to every tiny module test.
+Do not invent a database, daemon, service, LSP, chatbot, binary index, or network dependency.
+Do not weaken root policy.
+Do not move the flagship vision documents.
+Do not fabricate evidence.
+Do not commit or push.
+
+
+EXPECTED END STATE
+
+If the baseline remains 52 contracted / 37 full / 15 partial:
+
+- 52 contracted modules
+- 47 full Agent Fast Path v2 modules
+- 5 partial modules
+
+Additionally:
+
+- AGENTS.md permanently requires COMMANDS.md maintenance on every repository-changing Codex run;
+- AGENTS.md permanently defines the Developer Minimus convention;
+- normal command output remains unchanged in spirit and available in full;
+- selected serious commands append LOCATIONS followed by MINIMUS;
+- LOCATIONS uses durable clickable file:// URIs with optional terminal hyperlink enhancement;
+- Minimus is 200 lines or fewer;
+- diagnostic .txt logs that are actually produced by covered serious commands carry the same handoff tail;
+- Batch 03 semantic copy/projection residue is repaired where demonstrably present;
+- exactly ten additional partial modules become full;
+- COMMANDS.md is current;
+- root vision/policy remains intact;
+- generated indexes remain deterministic;
+- full validation passes.
+
+Do not commit or push.
+
+Finish only when all requested work is complete and the final line of your response is exactly:
+
+AGENTIC SNOWBALL BATCH 04 PASSED
