@@ -726,8 +726,4 @@ not the world,
 
 but **the seed of one**.
 
-> **Build almost anything. Rediscover almost nothing.**
->
-> **Own it. Wrap it. Compose it.**
->
 > **One Agent. One Foundation. A New World.**
