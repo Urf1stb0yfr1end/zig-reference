@@ -973,12 +973,15 @@
       "capacity_model": "compile_time",
       "bounded": true,
       "caller_provided_memory": false,
-      "compile_time_parameters": []
+      "compile_time_parameters": [
+        "Unit",
+        "Scalar"
+      ]
     },
     "construction": {
       "named_import": "unit-safe-quantity",
       "primary_symbol": "Quantity",
-      "initialization": "std.testing.refAllDeclsRecursive(subject);"
+      "initialization": "const quantities = @import(\"unit-safe-quantity\");\nconst Bytes = quantities.Quantity(BytesTag, usize);\nconst total = Bytes.init(4).add(Bytes.init(8));\nconst raw = total.get();"
     },
     "operation_map": {
       "Quantity": "Quantity",
@@ -1002,8 +1005,10 @@
       "Need behavior outside this module’s documented value-type responsibility."
     ],
     "minimal_usage": [
-      "const subject = @import(\"unit-safe-quantity\");",
-      "std.testing.refAllDeclsRecursive(subject);"
+      "const quantities = @import(\"unit-safe-quantity\");",
+      "const Bytes = quantities.Quantity(BytesTag, usize);",
+      "const total = Bytes.init(4).add(Bytes.init(8));",
+      "const raw = total.get();"
     ],
     "integration_notes": [
       "Use the canonical named import and public operations listed here.",

@@ -10,6 +10,9 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--command", required=True)
     parser.add_argument("--summary", required=True)
+    parser.add_argument("--status", choices=("PASS", "FAIL", "PARTIAL"), default="PASS")
+    parser.add_argument("--failure")
+    parser.add_argument("--next", default="python3 tools/query-reference.py agent doctor")
     parser.add_argument("--location", action="append", default=[])
     parser.add_argument("--modules", action="store_true")
     args = parser.parse_args()
@@ -28,7 +31,7 @@ def main() -> None:
     print("=" * 60)
     print("MINIMUS")
     print("=" * 60)
-    print("status: PASS")
+    print(f"status: {args.status}")
     print(f"command: {args.command}")
     if args.modules:
         import json
@@ -37,7 +40,9 @@ def main() -> None:
         print(f"modules: {len(data)} contracted; {full} full; {len(data) - full} partial")
     print("zig: 0.14.0")
     print(f"summary: {args.summary}")
-    print("next: python3 tools/query-reference.py agent doctor")
+    if args.failure:
+        print(f"failure: {args.failure}")
+    print(f"next: {args.next}")
     print("=" * 60)
 
 

@@ -928,7 +928,7 @@
     "construction": {
       "named_import": "fourcc-code",
       "primary_symbol": "FourCC",
-      "initialization": "std.testing.refAllDeclsRecursive(subject);"
+      "initialization": "const fourcc = @import(\"fourcc-code\");\nconst riff = try fourcc.FourCC.fromString(\"RIFF\");\nconst bytes = riff.asBytes();"
     },
     "operation_map": {
       "FourCC": "FourCC",
@@ -940,7 +940,7 @@
     "error_map": [
       {
         "error": "InvalidLength",
-        "operation": "init, fromString, asBytes, eql",
+        "operation": "fromString",
         "meaning": "The requested operation violates the documented fourcc-code constraints.",
         "handling": "Handle the error and retain or reject the input according to the canonical operation contract."
       }
@@ -959,8 +959,9 @@
       "Need behavior outside this module’s documented binary-value responsibility."
     ],
     "minimal_usage": [
-      "const subject = @import(\"fourcc-code\");",
-      "std.testing.refAllDeclsRecursive(subject);"
+      "const fourcc = @import(\"fourcc-code\");",
+      "const riff = try fourcc.FourCC.fromString(\"RIFF\");",
+      "const bytes = riff.asBytes();"
     ],
     "integration_notes": [
       "Use the canonical named import and public operations listed here.",

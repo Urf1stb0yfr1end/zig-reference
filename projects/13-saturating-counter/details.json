@@ -1337,12 +1337,15 @@
       "capacity_model": "compile_time",
       "bounded": true,
       "caller_provided_memory": false,
-      "compile_time_parameters": []
+      "compile_time_parameters": [
+        "T",
+        "maximum"
+      ]
     },
     "construction": {
       "named_import": "saturating-counter",
       "primary_symbol": "SaturatingCounter",
-      "initialization": "std.testing.refAllDeclsRecursive(subject);"
+      "initialization": "const counter_module = @import(\"saturating-counter\");\nvar counter = counter_module.SaturatingCounter(u8, 10).init(8);\ncounter.increment();\nconst value = counter.get();"
     },
     "operation_map": {
       "SaturatingCounter": "SaturatingCounter",
@@ -1370,8 +1373,10 @@
       "Need behavior outside this module’s documented numeric-policy responsibility."
     ],
     "minimal_usage": [
-      "const subject = @import(\"saturating-counter\");",
-      "std.testing.refAllDeclsRecursive(subject);"
+      "const counter_module = @import(\"saturating-counter\");",
+      "var counter = counter_module.SaturatingCounter(u8, 10).init(8);",
+      "counter.increment();",
+      "const value = counter.get();"
     ],
     "integration_notes": [
       "Use the canonical named import and public operations listed here.",

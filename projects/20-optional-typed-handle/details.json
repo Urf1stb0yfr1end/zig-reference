@@ -924,12 +924,15 @@
       "capacity_model": "compile_time",
       "bounded": true,
       "caller_provided_memory": false,
-      "compile_time_parameters": []
+      "compile_time_parameters": [
+        "Tag",
+        "Integer"
+      ]
     },
     "construction": {
       "named_import": "optional-typed-handle",
       "primary_symbol": "TypedHandle",
-      "initialization": "std.testing.refAllDeclsRecursive(subject);"
+      "initialization": "const handles = @import(\"optional-typed-handle\");\nconst Handle = handles.TypedHandle(ResourceTag, u32);\nconst present: handles.OptionalTypedHandle(ResourceTag, u32) = Handle.init(7);\nconst raw = present.?.value();"
     },
     "operation_map": {
       "TypedHandle": "TypedHandle",
@@ -952,8 +955,10 @@
       "Need behavior outside this module’s documented identity responsibility."
     ],
     "minimal_usage": [
-      "const subject = @import(\"optional-typed-handle\");",
-      "std.testing.refAllDeclsRecursive(subject);"
+      "const handles = @import(\"optional-typed-handle\");",
+      "const Handle = handles.TypedHandle(ResourceTag, u32);",
+      "const present: handles.OptionalTypedHandle(ResourceTag, u32) = Handle.init(7);",
+      "const raw = present.?.value();"
     ],
     "integration_notes": [
       "Use the canonical named import and public operations listed here.",
