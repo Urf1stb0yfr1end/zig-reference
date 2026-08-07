@@ -1,0 +1,405 @@
+CODEX AGENTIC SNOWBALL BATCH 04 REPAIR
+
+MISSION
+
+Repair Batch 04 before beginning Batch 05.
+
+The independent merged-main review found that the repository is mechanically healthy in many important ways, but Batch 04 is not yet semantically complete enough to treat 47/5 as fully trustworthy agent guidance.
+
+Observed merged-main review state:
+
+- commit under review: 48143cba102ac95b33341de43012f5d8d3804189
+- branch: main
+- Zig: 0.14.0
+- 52 contracted modules
+- 47 full Agent Fast Path v2 cards
+- 5 partial cards
+- command reference passes
+- Developer Minimus regression test passes
+- Agent Fast Path acceptance passes
+- aggregate smoke behavior passes 52/52 tests
+- full validation attempt was blocked by the local Python environment lacking jsonschema
+
+The independent review found two repository defects that MUST be repaired before Batch 05:
+
+1. all ten modules promoted in Batch 04 use test-only `std.testing.refAllDeclsRecursive(subject)` as their construction/minimal integration guidance, which is not a functional public integration path;
+2. the current build-step Minimus architecture can print a subordinate PASS handoff before Zig prints its final Build Summary, and can expose a nested `status: PASS` inside an outer command that ultimately fails.
+
+This is a repair run only. Do NOT migrate the remaining five partial modules. Do NOT start the Morphic benchmark phase. Preserve the 52 / 47 / 5 projection unless a module must honestly be demoted because canonical truth cannot support a full card.
+
+Do not commit or push.
+
+
+PART A — ENVIRONMENT PREFLIGHT WITHOUT CONFUSING ENVIRONMENT FAILURE WITH REPOSITORY FAILURE
+
+Work from the repository root and read AGENTS.md first.
+
+Use the existing Python environment before judging Python-backed validation:
+
+  source .venv/bin/activate
+  python3 -c 'import jsonschema; print("jsonschema OK")'
+
+If the existing virtual environment is present but repo-declared Python requirements are not installed, install the existing declared requirements into that environment using the repository's existing dependency workflow (prefer `uv pip install -r tools/requirements.txt` when available). Do not change dependency declarations merely to fix a local environment omission.
+
+Record the environment fact accurately in the repair report. A missing local dependency is not a passing repository gate and is not by itself a code defect.
+
+Preserve Zig 0.14.0.
+
+
+PART B — REPAIR THE TEN BATCH 04 FULL CARDS FROM CANONICAL TRUTH
+
+Audit exactly these ten Batch 04-promoted modules against canonical source, tests, DETAILS.md, and details.json:
+
+- ring-buffer
+- stack
+- state-machine
+- nonzero-integer
+- saturating-counter
+- wrapping-sequence-number
+- optional-typed-handle
+- unit-safe-quantity
+- validated-ascii-byte
+- fourcc-code
+
+The independent review proved that ALL TEN currently expose `std.testing.refAllDeclsRecursive(subject)` in construction and minimal_usage. Remove that test-only declaration traversal from agent integration guidance.
+
+For every one of the ten, derive a real functional integration path from the actual public API. Do not guess symbol names or constructors. A good integration card should let a fresh agent perform a small real use of the module without opening source when the canonical contract contains enough truth.
+
+Examples of the required quality, conceptually:
+
+- import the actual public type/function;
+- instantiate or construct it through its real public API;
+- perform one representative real operation when safe and concise;
+- use only symbols that actually compile for Zig 0.14.0;
+- do not use `std.testing.*` as production integration guidance.
+
+Do NOT hardcode the examples above into modules whose API differs. Derive exact code from canonical truth.
+
+The audit MUST go beyond construction because the independent diff also shows signs of template residue. For all ten modules inspect and repair, only when grounded:
+
+- construction.primary_symbol
+- construction.initialization
+- minimal_usage
+- operation_map
+- error_map, especially which operations can actually emit each error
+- ownership and required cleanup
+- borrowing and invalidation
+- resource_profile, including bounded/unbounded, allocator use, storage model, and real compile-time parameters
+- environment constraints
+- determinism
+- thread-safety
+- known gaps / do_not_use_when
+- aliases and summaries when demonstrably unrelated or generic
+
+Specific high-priority semantic checks:
+
+1. `stack` is described as allocator-backed and composed over DynamicArray. Its full card must therefore be coherent with the actual allocator/growth/deinit/storage semantics; do not leave compile-time-bounded inline-storage metadata if canonical source says otherwise.
+2. `ring-buffer` must not map `Full` or any other error to operations that cannot emit it. Derive exact failing operations from source.
+3. `state-machine` must not map `InvalidTransition` indiscriminately to non-failing query/initialization operations. Derive the real error-producing operation(s).
+4. compile-time parameter lists must reflect real generic parameters where the schema expects them; do not leave them empty merely because a migration template did.
+5. no full card may claim cleanup `none`, inline storage, boundedness, or caller-owned memory in contradiction with its actual implementation.
+
+Quality matters more than preserving a stale card shape. However, do not redesign Agent Contract v2 or its schema in this repair.
+
+If canonical truth genuinely cannot support a useful full integration card for one of these ten, do not invent facts. Explain the gap and demote only if required by the existing contract rules. The preferred outcome is truthful repair while retaining 47/5.
+
+
+PART C — ADD NARROW SEMANTIC REGRESSION COVERAGE
+
+Use existing test infrastructure. Prefer extending `tools/test-agent-fast-path.py` or another existing focused test rather than creating a subjective new framework.
+
+Add deterministic regression assertions for the independently observed class of defects.
+
+At minimum prove:
+
+- none of the ten Batch 04 cards uses `std.testing.refAllDeclsRecursive` in construction or minimal_usage;
+- each of the ten has a non-empty real primary integration symbol;
+- each of the ten has non-empty minimal_usage grounded in public API;
+- the repaired `stack` resource/ownership/cleanup projection is coherent with its canonical implementation;
+- the repaired ring-buffer and state-machine error maps do not attribute their key errors to unrelated operations.
+
+Do not build a giant semantic linter. These are narrow regressions for concrete defects we actually observed.
+
+The existing fast-path acceptance test must still pass.
+
+
+PART D — REPAIR THE DEVELOPER MINIMUS EXECUTION MODEL
+
+Preserve the permanent Minimus philosophy already added to AGENTS.md:
+
+- ordinary output is preserved;
+- LOCATIONS is appended after ordinary output;
+- MINIMUS follows LOCATIONS;
+- Minimus is at most 200 lines and normally much shorter;
+- literal durable `file:///absolute/path` locations must point to existing useful paths;
+- Minimus never masks a failure or changes the underlying truth.
+
+But refine the implementation so the developer sees exactly ONE authoritative top-level handoff for the serious command they intentionally invoked.
+
+The independent review proved the current flaw:
+
+- `zig build smoke --summary all` prints LOCATIONS/MINIMUS from a child build step, then Zig prints its Build Summary afterward, so Minimus is not literally the final developer handoff;
+- `zig build validate-repository --summary all` can execute the smoke child and display `MINIMUS status: PASS command: zig build smoke`, then later fail because another prerequisite failed. That subordinate PASS is visually misleading inside the failed outer command.
+
+Required semantics:
+
+PUBLIC SERIOUS COMMAND
+  normal existing output
+  final normal summary / failure output
+  LOCATIONS
+  MINIMUS for THIS outer command
+  process exits with the original command's exit status
+
+There must not be nested public Minimus blocks from prerequisites when a serious aggregate calls another covered check internally.
+
+Do not try to fake "after Zig's own Build Summary" from a child build step if Zig itself prints the Build Summary only after that child exits. Choose an architecture that can actually satisfy the requirement.
+
+A preferred direction is one compact canonical developer wrapper/driver that:
+
+1. invokes the existing underlying Zig/Python command;
+2. lets/copies its ordinary output through unchanged;
+3. waits for the underlying process to finish;
+4. records the real exit code;
+5. appends LOCATIONS and exactly one MINIMUS for the requested outer operation;
+6. exits with the original underlying status.
+
+Use one small reusable interface, not five unrelated wrappers. Choose the exact command spelling based on existing repository conventions and keep it simple.
+
+If a wrapper becomes the canonical developer-facing handoff surface, preserve the raw `zig build ...` commands as valid underlying implementation commands. Do not lie that raw Zig can print after its parent process's own final summary if it cannot.
+
+Update AGENTS.md so the permanent Minimus rule accurately distinguishes:
+
+- raw implementation/build commands;
+- canonical serious developer handoff commands;
+- nested prerequisite/check steps that MUST NOT emit misleading subordinate Minimus blocks.
+
+Update COMMANDS.md with the exact canonical developer commands and their purpose.
+
+The following serious operations must have a canonical Minimus-producing developer surface after this repair:
+
+- Agent Fast Path doctor
+- aggregate smoke
+- complete repository validation
+- Morphic plan verification
+- Morphic trace verification
+
+For direct `agent doctor`, retaining its existing JSON followed by LOCATIONS then MINIMUS is acceptable if it remains truly at the end of that Python command and is not duplicated by another wrapper.
+
+For build-backed operations, prove the top-level Minimus occurs after the complete underlying command output, including any Zig Build Summary when `--summary all` is part of the canonical invocation.
+
+
+PART E — MINIMUS FAILURE TRUTH AND LOCATIONS
+
+A Minimus must summarize the actual outer command result.
+
+Regression-test BOTH success and failure.
+
+Success example semantics:
+
+  ... normal successful output ...
+  Build Summary: ... succeeded ...
+  LOCATIONS
+  ... existing file:// locations ...
+  MINIMUS
+  status: PASS
+  command: <outer command>
+  ...
+
+Failure example semantics:
+
+  ... normal failure output ...
+  Build Summary: ... failed ...
+  LOCATIONS
+  ... useful existing file:// locations ...
+  MINIMUS
+  status: FAIL
+  command: <outer command>
+  failure: <concise actual reason or failing phase already known>
+  next: <exact useful next command/path>
+
+Then the wrapper/process must return the original nonzero exit code.
+
+Do not rescan the repository merely to generate Minimus. Reuse facts already computed or cheaply available.
+
+Do not dump raw logs into Minimus.
+
+LOCATIONS must remain a small useful set, not a filesystem inventory. Every literal file:// URI emitted must resolve to an existing path at emission time.
+
+If an existing covered diagnostic writes a text log, append the same final LOCATIONS + MINIMUS handoff to that log as well. Do not create logs solely to satisfy this rule.
+
+
+PART F — BOUNDED MINIMUS REGRESSION TESTS
+
+Extend the existing Minimus tests rather than creating another framework.
+
+Prove at least:
+
+1. deterministic formatter output where inputs are deterministic;
+2. LOCATIONS precedes MINIMUS;
+3. Minimus <= 200 lines;
+4. every emitted file:// path exists;
+5. direct doctor ordinary JSON remains before its handoff;
+6. a canonical successful aggregate developer command has its Minimus AFTER the underlying command's final Build Summary;
+7. a canonical failing aggregate developer command emits exactly one final Minimus with status FAIL and preserves the same nonzero exit status;
+8. nested prerequisite execution does not emit a subordinate PASS Minimus inside a failing outer validation;
+9. no Minimus is produced by tiny focused unit tests solely because they are runnable.
+
+Use a cheap controlled failure fixture/path for the failure regression. Do not intentionally break the real repository or require expensive full validation merely to test failure formatting.
+
+
+PART G — PRESERVE THE 47 / 5 FRONTIER
+
+Do not migrate these five remaining partial modules in this repair:
+
+- semantic-version
+- tagged-result
+- source-span
+- owned-byte-buffer
+- intrusive-doubly-linked-list
+
+They belong to the next snowball completion batch after Batch 04 is trustworthy.
+
+At the end, `agent pending` should still report exactly those five if the baseline has not changed for unrelated reasons.
+
+If counts differ because main advanced before this run, report actual baseline and explain. Do not silently force stale counts.
+
+
+PART H — COMMANDS.md IS MANDATORY
+
+This repository rule is permanent and already belongs in AGENTS.md.
+
+Every repository-changing Codex run must leave COMMANDS.md current.
+
+For this repair:
+
+- document the actual Minimus-producing canonical developer command(s);
+- update changed raw/internal command roles accurately;
+- document any new check/test command introduced;
+- remove or correct obsolete Batch 04 claims that raw commands append a truly final handoff if that is no longer accurate;
+- record the repaired 47/5 validation/workflow state only after it is established;
+- never document a command that does not exist;
+- never claim a command passed unless it actually executed successfully.
+
+Run:
+
+  PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+
+COMMANDS.md must be current when the run finishes.
+
+
+PART I — REPAIR REPORT
+
+Create:
+
+  docs/reports/AGENTIC_SNOWBALL_BATCH_04_REPAIR.md
+
+Include:
+
+- exact baseline commit and Zig version;
+- environment preflight result, including jsonschema availability;
+- the independent-review defects being repaired;
+- for each of the ten Batch 04 modules, the real construction/minimal-use path established;
+- notable corrections to error maps, ownership, cleanup, resource profile, borrowing/invalidation, or generic parameters;
+- Minimus architecture before vs after;
+- canonical developer-facing commands after repair;
+- proof that top-level Minimus is after normal output and that nested PASS handoffs are gone;
+- success/failure exit-code preservation evidence;
+- final full/partial counts and exact pending frontier;
+- deterministic-generation result;
+- validation outcomes actually executed;
+- any remaining limitations.
+
+Do not invent token savings, OSIR, CCU, DCR, or benchmark results.
+
+
+PART J — VALIDATION
+
+Run environment preflight first:
+
+  source .venv/bin/activate
+  python3 -c 'import jsonschema; print("jsonschema OK")'
+
+Then run the fast-path and focused repair checks:
+
+  python3 tools/query-reference.py agent bootstrap
+  python3 tools/query-reference.py agent doctor
+  python3 tools/query-reference.py agent pending
+
+  PYTHONDONTWRITEBYTECODE=1 python3 tools/format-module-contracts.py --check
+  PYTHONDONTWRITEBYTECODE=1 python3 tools/validate-agent-contracts.py --self-test
+  PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py --check
+  PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+  PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py
+  PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py
+
+Run focused unit/smoke validation for every canonical module contract changed in Part B.
+
+Run the canonical serious developer handoff commands for:
+
+- smoke
+- Morphic plan verification
+- Morphic trace verification
+- complete repository validation
+
+For the complete repository validation, the final authoritative output must end with its own LOCATIONS then MINIMUS and status PASS when all checks pass.
+
+Also run the underlying repository gates as applicable:
+
+  node tools/check-port-contracts.js
+  zig fmt --check .
+  zig build validate-agent-contracts --summary all
+  zig build check --summary all
+  zig build smoke --summary all
+  zig build test --summary all
+  zig build recipes --summary all
+  zig build conformance --summary all
+  zig build validate-repository --summary all
+  git diff --check
+
+If raw Zig build commands are intentionally no longer the Minimus surface, they only need to preserve their normal build behavior; the canonical developer wrapper must provide the final handoff semantics.
+
+Generate agent indexes twice and verify the second generation produces no diff.
+
+Verify both flagship vision documents remain in repository root:
+
+- MAYBE_THE_NEW_WORLD_FITS_IN_5_GB.md
+- Prospectively.md
+
+Verify strict root Markdown policy still rejects a temporary unapproved root Markdown file, and remove that temporary file before completion.
+
+Verify repository remains text-only according to existing policy.
+
+Verify final worktree changes are only intended repair changes.
+
+
+PART K — ACCEPTANCE BAR
+
+This repair is complete only if ALL of the following are true:
+
+- Zig remains 0.14.0;
+- Python validation dependencies are available in the test environment;
+- 52 contracted modules remain represented;
+- expected projection remains 47 full / 5 partial unless honestly explained otherwise;
+- exact pending frontier remains the five known modules when baseline is unchanged;
+- all ten Batch 04-promoted full cards have real functional integration guidance;
+- none uses `std.testing.refAllDeclsRecursive` as construction/minimal usage;
+- stack ownership/resource/cleanup metadata matches its actual implementation;
+- ring-buffer/state-machine error mappings match actual failing operations;
+- Agent Fast Path acceptance passes;
+- Minimus regression tests pass;
+- direct doctor ends in LOCATIONS then MINIMUS;
+- canonical build-backed developer surfaces emit exactly one top-level handoff after the complete underlying command output;
+- a controlled failure produces final `status: FAIL` and preserves nonzero exit status;
+- no misleading nested PASS Minimus appears inside a failing outer command;
+- COMMANDS.md is current;
+- AGENTS.md accurately describes permanent command-manual and Minimus behavior;
+- full repository validation succeeds in the prepared environment;
+- root policy and flagship docs remain correct;
+- no binary/opaque artifacts are introduced;
+- no commit or push is performed.
+
+Do not declare success merely because schemas validate. The generated integration cards must teach the right mental model and the Minimus must tell the truth about the command the developer actually ran.
+
+Finish the final response with exactly:
+
+AGENTIC SNOWBALL BATCH 04 REPAIR PASSED
