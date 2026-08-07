@@ -103,6 +103,12 @@
     "double-free-detection": [
       "bitmap-allocator"
     ],
+    "elf64-file-header-parser": [
+      "elf64-file-header-parser"
+    ],
+    "elf64-program-header-parser": [
+      "elf64-program-header-parser"
+    ],
     "endian-integer-decoding": [
       "endian-integer-codec"
     ],
@@ -151,6 +157,9 @@
     "integer-tag-validation": [
       "validated-enum-decoder"
     ],
+    "length-prefixed-binary-field": [
+      "length-prefixed-binary-field"
+    ],
     "monotonic-allocation": [
       "fixed-bump-allocator"
     ],
@@ -172,8 +181,14 @@
     "page-table-page-ownership": [
       "riscv-page-table-page-owner"
     ],
+    "physical-memory-region-set": [
+      "physical-memory-region-set"
+    ],
     "physical-page-conversion": [
       "physical-page-frame-number-and-address-conversion"
+    ],
+    "physical-page-frame-allocator": [
+      "physical-page-frame-allocator"
     ],
     "range-intersection": [
       "checked-half-open-range"
@@ -183,6 +198,15 @@
     ],
     "replay-observation-foundation": [
       "bounded-deterministic-event-trace"
+    ],
+    "riscv-sfence-vma-invalidation": [
+      "riscv-sfence-vma-invalidation"
+    ],
+    "riscv-sv39-page-table-builder": [
+      "riscv-sv39-page-table-builder"
+    ],
+    "riscv-sv39-page-table-walker": [
+      "riscv-sv39-page-table-walker"
     ],
     "safe-integer-narrowing": [
       "checked-integer-cast"
@@ -209,11 +233,17 @@
     "sv39-virtual-address": [
       "riscv-sv39-virtual-address-indexing"
     ],
+    "type-length-value-decoder": [
+      "type-length-value-decoder"
+    ],
     "typed-physical-address": [
       "distinct-memory-address-types"
     ],
     "typed-virtual-address": [
       "distinct-memory-address-types"
+    ],
+    "validated-bit-flags": [
+      "validated-bit-flags"
     ],
     "validated-enum-decoding": [
       "validated-enum-decoder"

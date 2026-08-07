@@ -580,5 +580,115 @@
     "known_porting_blockers": [],
     "automatic_port_guaranteed": false,
     "notes": []
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Allocation-free read-only Sv39 translation through an injected provider.",
+    "search_aliases": [],
+    "capability_ids": [
+      "riscv-sv39-page-table-walker"
+    ],
+    "use_when": [
+      "Allocation-free read-only Sv39 translation through an injected provider."
+    ],
+    "do_not_use_when": [
+      "Sv39x4, hgatp, full hypervisor, guest-stage translation"
+    ],
+    "entrypoint": "projects/47-riscv-sv39-page-table-walker/src/riscv_sv39_page_table_walker.zig",
+    "public_symbols": [
+      "Error",
+      "Result",
+      "walk"
+    ],
+    "dependency_ids": [
+      "riscv-sv39-page-table-entry",
+      "riscv-sv39-virtual-address-indexing",
+      "riscv-page-table-page-owner"
+    ],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "borrows": []
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [
+      "construct-and-verify-sv39-address-space"
+    ],
+    "validation_commands": [
+      "zig build test-riscv-sv39-page-table-walker",
+      "zig build smoke-riscv-sv39-page-table-walker"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [
+        "riscv64 Sv39; hosted modeling on any target"
+      ],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "riscv-sv39-page-table-walker",
+      "primary_symbol": "walk",
+      "initialization": "const result = try walk(provider, root_ppn, virtual_address);"
+    },
+    "operation_map": {
+      "walk": "walk",
+      "Error": "Error",
+      "Result": "Result"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [
+        "riscv-sv39-page-table-entry",
+        "riscv-sv39-virtual-address-indexing",
+        "riscv-page-table-page-owner"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": [
+        "construct-and-verify-sv39-address-space"
+      ]
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Sv39x4, hgatp, full hypervisor, guest-stage translation"
+    ],
+    "minimal_usage": [
+      "const api = @import(\"riscv-sv39-page-table-walker\");",
+      "const result = try walk(provider, root_ppn, virtual_address);"
+    ],
+    "integration_notes": [
+      "Preserve the Zig 0.14.0 baseline and canonical dependency closure.",
+      "Run the focused validation commands."
+    ]
   }
 }

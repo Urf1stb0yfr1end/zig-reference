@@ -944,5 +944,127 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Decode an explicitly endian length prefix and borrow its bounded payload.",
+    "search_aliases": [
+      "physical-memory",
+      "page-frame",
+      "address",
+      "hypervisor"
+    ],
+    "capability_ids": [
+      "length-prefixed-binary-field"
+    ],
+    "use_when": [
+      "Decode an explicitly endian length prefix and borrow its bounded payload."
+    ],
+    "do_not_use_when": [
+      "hidden allocation",
+      "implicit synchronization"
+    ],
+    "entrypoint": "projects/31-length-prefixed-binary-field/src/length_prefixed_binary_field.zig",
+    "public_symbols": [
+      "LengthPrefixedField"
+    ],
+    "dependency_ids": [
+      "bounded-byte-reader",
+      "checked-integer-cast",
+      "endian-integer-codec",
+      "binary-cursor-checkpoint",
+      "bounded-binary-sub-reader"
+    ],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "borrows": [
+        "payload/value slices and bounded readers borrowed from input bytes; valid no longer than the input byte buffer"
+      ]
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [
+      "parse-length-prefixed-record"
+    ],
+    "validation_commands": [
+      "zig build test-length-prefixed-binary-field",
+      "zig build smoke-length-prefixed-binary-field"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [
+        "page policy currently architecture-neutral but fixed at 4 KiB"
+      ],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "unknown",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "length-prefixed-binary-field",
+      "primary_symbol": "LengthPrefixedField",
+      "initialization": "const Field = LengthPrefixedField(u16, .little); const field = try Field.read(&reader);"
+    },
+    "operation_map": {
+      "LengthPrefixedField": "LengthPrefixedField",
+      "read": "read",
+      "bytes": "bytes",
+      "subReader": "subReader"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [
+        "bounded-byte-reader",
+        "checked-integer-cast",
+        "endian-integer-codec",
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": [
+        "parse-length-prefixed-record"
+      ]
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "hidden allocation",
+      "implicit synchronization"
+    ],
+    "minimal_usage": [
+      "const api = @import(\"length-prefixed-binary-field\");",
+      "const Field = LengthPrefixedField(u16, .little); const field = try Field.read(&reader);"
+    ],
+    "integration_notes": [
+      "Preserve the Zig 0.14.0 baseline and canonical dependency closure.",
+      "Run the focused validation commands."
+    ]
   }
 }

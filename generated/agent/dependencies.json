@@ -83,7 +83,7 @@
         "endian-integer-codec",
         "validated-enum-decoder"
       ],
-      "status": "partial"
+      "status": "full"
     },
     "elf64-program-header-parser": {
       "dependencies": [
@@ -100,7 +100,7 @@
         "validated-bit-flags",
         "validated-enum-decoder"
       ],
-      "status": "partial"
+      "status": "full"
     },
     "endian-integer-codec": {
       "dependencies": [],
@@ -160,7 +160,7 @@
         "checked-integer-cast",
         "endian-integer-codec"
       ],
-      "status": "partial"
+      "status": "full"
     },
     "nonzero-integer": {
       "dependencies": [],
@@ -185,7 +185,7 @@
         "physical-page-frame-number-and-address-conversion",
         "validated-enum-decoder"
       ],
-      "status": "partial"
+      "status": "full"
     },
     "physical-page-frame-allocator": {
       "dependencies": [
@@ -196,7 +196,7 @@
         "physical-memory-region-set",
         "physical-page-frame-number-and-address-conversion"
       ],
-      "status": "partial"
+      "status": "full"
     },
     "physical-page-frame-number-and-address-conversion": {
       "dependencies": [
@@ -214,7 +214,7 @@
     },
     "riscv-sfence-vma-invalidation": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "riscv-sv39-page-table-builder": {
       "dependencies": [
@@ -224,7 +224,7 @@
         "riscv-sv39-page-table-walker",
         "riscv-sv39-virtual-address-indexing"
       ],
-      "status": "partial"
+      "status": "full"
     },
     "riscv-sv39-page-table-entry": {
       "dependencies": [],
@@ -236,7 +236,7 @@
         "riscv-sv39-page-table-entry",
         "riscv-sv39-virtual-address-indexing"
       ],
-      "status": "partial"
+      "status": "full"
     },
     "riscv-sv39-virtual-address-indexing": {
       "dependencies": [],
@@ -277,7 +277,7 @@
         "endian-integer-codec",
         "length-prefixed-binary-field"
       ],
-      "status": "partial"
+      "status": "full"
     },
     "unit-safe-quantity": {
       "dependencies": [],
@@ -289,7 +289,7 @@
     },
     "validated-bit-flags": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "validated-enum-decoder": {
       "dependencies": [],

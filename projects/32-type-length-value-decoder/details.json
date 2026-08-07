@@ -1027,5 +1027,126 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Iterate allocation-free TLV records while preserving unknown tags.",
+    "search_aliases": [
+      "physical-memory",
+      "page-frame",
+      "address",
+      "hypervisor"
+    ],
+    "capability_ids": [
+      "type-length-value-decoder"
+    ],
+    "use_when": [
+      "Iterate allocation-free TLV records while preserving unknown tags."
+    ],
+    "do_not_use_when": [
+      "hidden allocation",
+      "implicit synchronization"
+    ],
+    "entrypoint": "projects/32-type-length-value-decoder/src/type_length_value_decoder.zig",
+    "public_symbols": [
+      "TlvDecoder"
+    ],
+    "dependency_ids": [
+      "bounded-byte-reader",
+      "checked-integer-cast",
+      "endian-integer-codec",
+      "binary-cursor-checkpoint",
+      "bounded-binary-sub-reader",
+      "length-prefixed-binary-field"
+    ],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "borrows": [
+        "payload/value slices and bounded readers borrowed from input bytes; valid no longer than the input byte buffer"
+      ]
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-type-length-value-decoder",
+      "zig build smoke-type-length-value-decoder"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [
+        "page policy currently architecture-neutral but fixed at 4 KiB"
+      ],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "type-length-value-decoder",
+      "primary_symbol": "TlvDecoder",
+      "initialization": "const Decoder = TlvDecoder(u8, u16, .little); var decoder = Decoder.init(bytes);"
+    },
+    "operation_map": {
+      "TlvDecoder": "TlvDecoder",
+      "init": "init",
+      "next": "next",
+      "valueReader": "valueReader",
+      "position": "position"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [
+        "bounded-byte-reader",
+        "checked-integer-cast",
+        "endian-integer-codec",
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "length-prefixed-binary-field"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "hidden allocation",
+      "implicit synchronization"
+    ],
+    "minimal_usage": [
+      "const api = @import(\"type-length-value-decoder\");",
+      "const Decoder = TlvDecoder(u8, u16, .little); var decoder = Decoder.init(bytes);"
+    ],
+    "integration_notes": [
+      "Preserve the Zig 0.14.0 baseline and canonical dependency closure.",
+      "Run the focused validation commands."
+    ]
   }
 }

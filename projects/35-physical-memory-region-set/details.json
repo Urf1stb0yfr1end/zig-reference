@@ -1321,5 +1321,132 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Validate, order, merge, and query fixed-capacity physical regions.",
+    "search_aliases": [
+      "physical-memory",
+      "page-frame",
+      "address",
+      "hypervisor"
+    ],
+    "capability_ids": [
+      "physical-memory-region-set"
+    ],
+    "use_when": [
+      "Validate, order, merge, and query fixed-capacity physical regions."
+    ],
+    "do_not_use_when": [
+      "hidden allocation",
+      "implicit synchronization"
+    ],
+    "entrypoint": "projects/35-physical-memory-region-set/src/physical_memory_region_set.zig",
+    "public_symbols": [
+      "RegionKind",
+      "PhysicalMemoryRegion",
+      "PhysicalMemoryRegionSet"
+    ],
+    "dependency_ids": [
+      "fixed-capacity-vector",
+      "validated-enum-decoder",
+      "checked-half-open-range",
+      "distinct-memory-address-types",
+      "physical-page-frame-number-and-address-conversion"
+    ],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "borrows": []
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-physical-memory-region-set",
+      "zig build smoke-physical-memory-region-set"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [
+        "page policy currently architecture-neutral but fixed at 4 KiB"
+      ],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "physical-memory-region-set",
+      "primary_symbol": "PhysicalMemoryRegionSet",
+      "initialization": "var regions = PhysicalMemoryRegionSet(capacity).init();"
+    },
+    "operation_map": {
+      "init": "init",
+      "length": "length",
+      "PhysicalMemoryRegionSet": "PhysicalMemoryRegionSet",
+      "count": "count",
+      "insert": "insert",
+      "add": "add",
+      "findContaining": "findContaining",
+      "intersects": "intersects",
+      "mergeAdjacent": "mergeAdjacent",
+      "contains": "contains",
+      "items": "items",
+      "RegionKind": "RegionKind",
+      "PhysicalMemoryRegion": "PhysicalMemoryRegion"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [
+        "fixed-capacity-vector",
+        "validated-enum-decoder",
+        "checked-half-open-range",
+        "distinct-memory-address-types",
+        "physical-page-frame-number-and-address-conversion"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "hidden allocation",
+      "implicit synchronization"
+    ],
+    "minimal_usage": [
+      "const api = @import(\"physical-memory-region-set\");",
+      "var regions = PhysicalMemoryRegionSet(capacity).init();"
+    ],
+    "integration_notes": [
+      "Preserve the Zig 0.14.0 baseline and canonical dependency closure.",
+      "Run the focused validation commands."
+    ]
   }
 }

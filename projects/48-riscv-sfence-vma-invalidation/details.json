@@ -678,5 +678,115 @@
     "known_porting_blockers": [],
     "automatic_port_guaranteed": false,
     "notes": []
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Testable SFENCE.VMA command planning with an explicit privileged execution boundary.",
+    "search_aliases": [],
+    "capability_ids": [
+      "riscv-sfence-vma-invalidation"
+    ],
+    "use_when": [
+      "Testable SFENCE.VMA command planning with an explicit privileged execution boundary."
+    ],
+    "do_not_use_when": [
+      "Sv39x4, hgatp, full hypervisor, guest-stage translation"
+    ],
+    "entrypoint": "projects/48-riscv-sfence-vma-invalidation/src/riscv_sfence_vma_invalidation.zig",
+    "public_symbols": [
+      "Plan",
+      "executeUnsafe",
+      "forAddress",
+      "forAddressAsid",
+      "forAsid",
+      "global"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "borrows": []
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [
+      "privileged instruction execution in executeUnsafe"
+    ],
+    "examples": [],
+    "recipes": [
+      "construct-and-verify-sv39-address-space"
+    ],
+    "validation_commands": [
+      "zig build test-riscv-sfence-vma-invalidation",
+      "zig build smoke-riscv-sfence-vma-invalidation"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [
+        "riscv64 Sv39; hosted modeling on any target"
+      ],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "supervisor"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "riscv-sfence-vma-invalidation",
+      "primary_symbol": "Plan",
+      "initialization": "const plan = global();"
+    },
+    "operation_map": {
+      "executeUnsafe": "executeUnsafe",
+      "forAddress": "forAddress",
+      "forAddressAsid": "forAddressAsid",
+      "forAsid": "forAsid",
+      "global": "global",
+      "Plan": "Plan"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": [
+        "construct-and-verify-sv39-address-space"
+      ]
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Sv39x4, hgatp, full hypervisor, guest-stage translation"
+    ],
+    "minimal_usage": [
+      "const api = @import(\"riscv-sfence-vma-invalidation\");",
+      "const plan = global();"
+    ],
+    "integration_notes": [
+      "Preserve the Zig 0.14.0 baseline and canonical dependency closure.",
+      "Run the focused validation commands."
+    ]
   }
 }

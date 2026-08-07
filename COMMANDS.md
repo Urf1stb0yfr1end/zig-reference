@@ -204,7 +204,7 @@ Each module has `zig build test-<module>` and `zig build smoke-<module>` targets
 
 ## Agent-readable pilot commands
 
-Agent Fast Path v2 currently projects 27 full contracts and 25 partial contracts. The
+Agent Fast Path v2 currently projects 37 full contracts and 15 partial contracts. The
 root-document policy is checked by `node tools/check-port-contracts.js`; it accepts
 only the explicit flagship/root allowlist and rejects any other root Markdown file.
 
@@ -225,6 +225,8 @@ only the explicit flagship/root allowlist and rejects any other root Markdown fi
 | `python3 tools/query-reference.py agent compose CAPABILITY [...]` | Resolve provided, ambiguous, and missing capabilities plus closure and recipes. |
 | `python3 tools/query-reference.py agent impact MODULE` | Derive downstream modules, recipes, and validation commands. |
 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py` | Run the deterministic zero-context acceptance test. |
+
+Batch 03 revalidated the 37/15 projection, including explicit DynamicArray borrowed-view semantics and the `Entry.decode` Sv39 page-table-entry construction path. The acceptance test guards both semantic projections.
 
 ## Bounded system resource plan commands
 

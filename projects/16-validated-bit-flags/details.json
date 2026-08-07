@@ -1190,5 +1190,106 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Typed bit-set wrapper that rejects undeclared storage bits.",
+    "search_aliases": [
+      "flags",
+      "permissions",
+      "registers",
+      "protocols"
+    ],
+    "capability_ids": [
+      "validated-bit-flags"
+    ],
+    "use_when": [
+      "Keep raw bit storage inside the set of enum-declared flag masks."
+    ],
+    "do_not_use_when": [
+      "Need behavior outside the documented module scope."
+    ],
+    "entrypoint": "projects/16-validated-bit-flags/src/validated_bit_flags.zig",
+    "public_symbols": [
+      "ValidatedBitFlags"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "borrows": []
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-validated-bit-flags",
+      "zig build smoke-validated-bit-flags"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "validated-bit-flags",
+      "primary_symbol": "ValidatedBitFlags",
+      "initialization": "const Flags = ValidatedBitFlags(Permission); var flags = try Flags.fromRaw(raw);"
+    },
+    "operation_map": {
+      "ValidatedBitFlags": "ValidatedBitFlags",
+      "fromRaw": "fromRaw",
+      "raw": "raw",
+      "contains": "contains",
+      "insert": "insert",
+      "remove": "remove",
+      "clear": "clear"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [],
+    "minimal_usage": [
+      "const api = @import(\"validated-bit-flags\");",
+      "const Flags = ValidatedBitFlags(Permission); var flags = try Flags.fromRaw(raw);"
+    ],
+    "integration_notes": [
+      "Preserve the Zig 0.14.0 baseline and canonical dependency closure.",
+      "Run the focused validation commands."
+    ]
   }
 }
