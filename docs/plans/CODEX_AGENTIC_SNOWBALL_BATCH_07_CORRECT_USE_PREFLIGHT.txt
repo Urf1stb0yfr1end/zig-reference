@@ -12,6 +12,16 @@ Do not answer with rhetoric.
 
 Make the repository cheaper to use correctly.
 
+LONG-TERM COMPETITIVE AIM
+
+The long-term research ambition is stronger than merely making Zig pleasant to use.
+
+Within domains that zig-reference genuinely covers, drive total agent Cost of Correct Use, diagnosis, repair, validation, and required new implementation low enough that a capable coding agent may rationally prefer the zig-reference path even when a strong Rust/rustc-centered workflow is available.
+
+This is not a present claim that zig-reference equals or exceeds the Rust compiler, borrow checker, Rust memory-safety model, or Rust ecosystem. It is a falsifiable engineering target that must eventually be tested on comparable tasks.
+
+Do not game that future comparison by hiding failures, weakening correctness, or moving work outside the measured path. The intended win is practical: preserve more solved engineering knowledge, expose more decisive state, require less rediscovery and reimplementation, and reach a correct validated result with less total agent work in the covered problem domain.
+
 Rust has a powerful compiler that rejects many ownership, borrowing, lifetime, and type mistakes in newly written code. zig-reference must not pretend to replace rustc, clone a borrow checker, or reproduce every compiler diagnostic.
 
 Instead, zig-reference should make the comparison structurally different:
@@ -404,6 +414,12 @@ native symptom/error
 → minimum useful locations
 → focused validation
 
+Use Invariant-Guided Diagnosis as the preferred conceptual direction when a small set of canonical invariants can explain many superficially different failures. Do not grow an error encyclopedia when the same information can be represented more compactly as component laws plus observed state.
+
+Where a serious failure path can cheaply preserve the decisive diagnostic state, consider a compact Failure State Capsule containing only the component, operation, native symptom/error, relevant observed values, expected invariant or boundary, mutation/rollback status when known, diagnostic identity when known, minimum useful locations, and next focused validation or inspection command.
+
+Do not force Failure State Capsule infrastructure into unrelated modules merely to demonstrate the term. Add only the smallest reusable support justified by real Batch 07 pressure-test failures. Unknown state remains unknown.
+
 Do not create diagnostics for the Phase 0 metadata/Minimus defects merely to increase diagnostic count. Those may be better expressed as repository validation failures if that is the natural layer.
 
 Do not duplicate native compiler diagnostics just to increase diagnostic count.
@@ -411,7 +427,7 @@ Do not create one ZIGREF ID for every compiler message.
 Do not hide native errors.
 Do not invent a cause for an unknown symptom.
 
-Optimize for Diagnostic Reach and Repair Locality, not raw diagnostic volume.
+Optimize for Diagnostic Reach, Repair Locality, and Context Efficiency, not raw diagnostic volume.
 
 OBJECTIVE 8 — VALIDATION CLOSURE MUST BE CHEAP AND TRUTHFUL
 
@@ -553,6 +569,8 @@ Prefer existing vocabulary such as:
 - Validation Distance;
 - Diagnostic Reach;
 - Repair Locality;
+- Invariant-Guided Diagnosis;
+- Failure State Capsule;
 - Snowball Yield;
 - Rediscovery Tax;
 - Reimplementation Tax;
