@@ -5,7 +5,7 @@
   "dependencies": {
     "aligned-address-and-size-helpers": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "binary-cursor-checkpoint": {
       "dependencies": [
@@ -21,7 +21,7 @@
       "dependencies": [
         "bit-set"
       ],
-      "status": "partial"
+      "status": "full"
     },
     "bounded-binary-sub-reader": {
       "dependencies": [
@@ -32,7 +32,7 @@
     },
     "bounded-byte-reader": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "bounded-deterministic-event-trace": {
       "dependencies": [],
@@ -56,19 +56,19 @@
       "dependencies": [
         "dynamic-array"
       ],
-      "status": "partial"
+      "status": "full"
     },
     "checked-half-open-range": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "checked-integer-cast": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "distinct-memory-address-types": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "dynamic-array": {
       "dependencies": [],
@@ -104,7 +104,7 @@
     },
     "endian-integer-codec": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "fixed-bump-allocator": {
       "dependencies": [
@@ -134,7 +134,7 @@
     },
     "fixed-capacity-vector": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "fixed-free-list": {
       "dependencies": [],
@@ -146,7 +146,7 @@
     },
     "generational-handles": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "intrusive-doubly-linked-list": {
       "dependencies": [],

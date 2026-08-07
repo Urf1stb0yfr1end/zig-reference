@@ -1643,5 +1643,139 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Inline bounded sequence with explicit initialized length and no allocation.",
+    "search_aliases": [
+      "vector",
+      "fixed vector",
+      "small buffer",
+      "bounded array",
+      "static capacity"
+    ],
+    "capability_ids": [
+      "bounded-sequence",
+      "inline-storage",
+      "allocation-free-container"
+    ],
+    "use_when": [
+      "Store up to a compile-time capacity of values while exposing only initialized elements."
+    ],
+    "do_not_use_when": [
+      "Need runtime growth beyond a compile-time capacity."
+    ],
+    "entrypoint": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig",
+    "public_symbols": [
+      "FixedVector"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "caller"
+    },
+    "borrowing": {
+      "items": [
+        "Returned slices borrow inline container storage until mutation or container destruction."
+      ]
+    },
+    "invalidation": {
+      "append, pop, clear, or container move": [
+        "items slice: logical contents or address assumptions may change"
+      ]
+    },
+    "failure_guarantees": [
+      "append checks capacity before writing or incrementing len."
+    ],
+    "effects": [
+      "mutates_receiver",
+      "reads_receiver",
+      "returns_borrow",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-fixed-capacity-vector",
+      "zig build smoke-fixed-capacity-vector"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": [
+        "capacity"
+      ]
+    },
+    "construction": {
+      "named_import": "fixed-capacity-vector",
+      "primary_symbol": "FixedVector",
+      "initialization": "var values = FixedVector(u32, 8){};"
+    },
+    "operation_map": {
+      "append": "append",
+      "remove last": "pop",
+      "lookup": "get",
+      "mutable view": "items",
+      "immutable view": "constItems",
+      "reset": "clear"
+    },
+    "error_map": [
+      {
+        "error": "Full",
+        "operation": "append",
+        "meaning": "Full condition documented by the operation",
+        "handling": "retry only after correcting the failing condition"
+      },
+      {
+        "error": "OutOfBounds",
+        "operation": "get, getConst, pop, orderedRemove",
+        "meaning": "Source returns error.OutOfBounds when the operation-specific OutOfBounds condition occurs.",
+        "handling": "correct the failing input or state before retrying"
+      }
+    ],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Capacity is fixed at compile time.",
+      "Element resource cleanup remains the caller’s responsibility."
+    ],
+    "minimal_usage": [
+      "const FixedVector = @import(\"fixed-capacity-vector\").FixedVector;",
+      "var values = FixedVector(u32, 8){};",
+      "try values.append(1);"
+    ],
+    "integration_notes": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ]
   }
 }

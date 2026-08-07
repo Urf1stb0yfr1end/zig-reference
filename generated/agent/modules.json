@@ -5,6 +5,24 @@
   "generator": "tools/build-agent-index.py",
   "modules": [
     {
+      "aliases": [
+        "vector",
+        "fixed vector",
+        "small buffer",
+        "bounded array",
+        "static capacity"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "items": [
+          "Returned slices borrow inline container storage until mutation or container destruction."
+        ]
+      },
+      "capabilities": [
+        "bounded-sequence",
+        "inline-storage",
+        "allocation-free-container"
+      ],
       "change_impact": {
         "dependents": [
           "bounded-system-resource-plan",
@@ -16,16 +34,58 @@
         ],
         "recipes": []
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "var values = FixedVector(u32, 8){};",
+        "named_import": "fixed-capacity-vector",
+        "primary_symbol": "FixedVector"
+      },
       "dependency_build_order": [
         "fixed-capacity-vector"
       ],
       "details": "projects/00-fixed-capacity-vector/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
         "elf64-program-header-parser",
         "fixed-capacity-priority-queue",
         "fixed-capacity-topological-sort",
         "physical-memory-region-set"
+      ],
+      "do_not_use_when": [
+        "Need runtime growth beyond a compile-time capacity."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "Full",
+          "handling": "retry only after correcting the failing condition",
+          "meaning": "Full condition documented by the operation",
+          "operation": "append"
+        },
+        {
+          "error": "OutOfBounds",
+          "handling": "correct the failing input or state before retrying",
+          "meaning": "Source returns error.OutOfBounds when the operation-specific OutOfBounds condition occurs.",
+          "operation": "get, getConst, pop, orderedRemove"
+        }
       ],
       "evidence_summary": {
         "conformance_validated": false,
@@ -37,15 +97,63 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [
+        "append checks capacity before writing or incrementing len."
+      ],
       "focused_validation_commands": [
         "zig build test-fixed-capacity-vector",
         "zig build smoke-fixed-capacity-vector"
       ],
       "id": "00",
+      "integration_notes": [
+        "Read dependency contracts.",
+        "Import the canonical source path.",
+        "Run the dedicated test step."
+      ],
+      "invalidation": {
+        "append, pop, clear, or container move": [
+          "items slice: logical contents or address assumptions may change"
+        ]
+      },
+      "known_gaps": [
+        "Capacity is fixed at compile time.",
+        "Element resource cleanup remains the caller’s responsibility."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const FixedVector = @import(\"fixed-capacity-vector\").FixedVector;",
+        "var values = FixedVector(u32, 8){};",
+        "try values.append(1);"
+      ],
       "module": "fixed-capacity-vector",
+      "operation_map": {
+        "append": "append",
+        "immutable view": "constItems",
+        "lookup": "get",
+        "mutable view": "items",
+        "remove last": "pop",
+        "reset": "clear"
+      },
+      "ownership": {
+        "cleanup": "caller",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [
+          "capacity"
+        ],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Inline bounded sequence with explicit initialized length and no allocation.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
       "transitive_dependents": [
         "bounded-system-resource-plan",
@@ -54,6 +162,9 @@
         "fixed-capacity-topological-sort",
         "physical-memory-region-set",
         "physical-page-frame-allocator"
+      ],
+      "use_when": [
+        "Store up to a compile-time capacity of values while exposing only initialized elements."
       ]
     },
     {
@@ -179,6 +290,25 @@
       ]
     },
     {
+      "aliases": [
+        "byte reader",
+        "binary parser",
+        "cursor",
+        "bounded input",
+        "endian reader"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "input": [
+          "The reader and returned slices borrow the input byte slice for their entire use."
+        ]
+      },
+      "capabilities": [
+        "bounded-byte-reading",
+        "binary-decoding",
+        "explicit-endian-reading",
+        "bounded-sub-reader"
+      ],
       "change_impact": {
         "dependents": [
           "binary-cursor-checkpoint",
@@ -193,10 +323,29 @@
           "write-and-read-explicit-endian-record"
         ]
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": [
+          "parse-length-prefixed-record",
+          "write-and-read-explicit-endian-record"
+        ]
+      },
+      "construction": {
+        "initialization": "var reader = BoundedReader.init(bytes);",
+        "named_import": "bounded-byte-reader",
+        "primary_symbol": "BoundedReader"
+      },
       "dependency_build_order": [
         "bounded-byte-reader"
       ],
       "details": "projects/04-bounded-byte-reader/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
         "binary-cursor-checkpoint",
@@ -205,6 +354,32 @@
         "elf64-program-header-parser",
         "length-prefixed-binary-field",
         "type-length-value-decoder"
+      ],
+      "do_not_use_when": [
+        "Need ownership of the input bytes or streaming input."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "UnexpectedEnd",
+          "handling": "retry only after correcting the failing condition",
+          "meaning": "UnexpectedEnd condition documented by the operation",
+          "operation": "readBytes/skip/integer reads/subReader"
+        },
+        {
+          "error": "InvalidPosition",
+          "handling": "retry with position no greater than extent",
+          "meaning": "position exceeds input extent",
+          "operation": "seek"
+        }
       ],
       "evidence_summary": {
         "conformance_validated": false,
@@ -216,18 +391,63 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [
+        "Bounds are checked using count <= input.len - cursor before cursor mutation."
+      ],
       "focused_validation_commands": [
         "zig build test-bounded-byte-reader",
         "zig build smoke-bounded-byte-reader"
       ],
       "id": "04",
+      "integration_notes": [
+        "Read dependency contracts.",
+        "Import the canonical source path.",
+        "Run the dedicated test step."
+      ],
+      "invalidation": {
+        "source input becomes invalid": [
+          "returned slices and child readers: all borrowed data invalid"
+        ]
+      },
+      "known_gaps": [
+        "The reader borrows rather than owns input bytes.",
+        "Streaming input is not provided."
+      ],
       "matching_recipes": [
         "parse-length-prefixed-record",
         "write-and-read-explicit-endian-record"
       ],
+      "minimal_usage": [
+        "var reader = BoundedReader.init(bytes);",
+        "const magic = try reader.readU32Le();"
+      ],
       "module": "bounded-byte-reader",
+      "operation_map": {
+        "create bounded child": "subReader",
+        "read bytes": "readBytes",
+        "read integer": "readU32Le",
+        "remaining bytes": "remaining",
+        "seek": "seek",
+        "skip bytes": "skip"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "caller_owned",
+        "values": "borrowed"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": true,
+        "capacity_model": "caller_buffer",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "caller_owned"
+      },
+      "selection_priority": "canonical",
       "source": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Borrowed binary input cursor with checked, failure-atomic reads.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
       "transitive_dependents": [
         "binary-cursor-checkpoint",
@@ -236,6 +456,9 @@
         "elf64-program-header-parser",
         "length-prefixed-binary-field",
         "type-length-value-decoder"
+      ],
+      "use_when": [
+        "Read structured values from a borrowed byte slice without advancing beyond its bounds or consuming input on failed reads."
       ]
     },
     {
@@ -277,6 +500,18 @@
       "transitive_dependents": []
     },
     {
+      "aliases": [],
+      "alternatives": [],
+      "borrowing": {
+        "bytes": [
+          "The returned slice borrows writer-owned storage until mutation or deinit."
+        ]
+      },
+      "capabilities": [
+        "owned-byte-writing",
+        "explicit-endian-writing",
+        "writer-checkpoint-rollback"
+      ],
       "change_impact": {
         "dependents": [
           "owned-byte-buffer"
@@ -285,16 +520,56 @@
           "write-and-read-explicit-endian-record"
         ]
       },
+      "composition": {
+        "commonly_with": [
+          "dynamic-array"
+        ],
+        "conflicts_with": [],
+        "preferred_recipes": [
+          "write-and-read-explicit-endian-record"
+        ]
+      },
+      "construction": {
+        "initialization": "var writer = ByteWriter.init(allocator); defer writer.deinit();",
+        "named_import": "byte-writer",
+        "primary_symbol": "ByteWriter"
+      },
       "dependency_build_order": [
         "dynamic-array",
         "byte-writer"
       ],
       "details": "projects/06-byte-writer/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [
         "dynamic-array"
       ],
       "direct_dependents": [
         "owned-byte-buffer"
+      ],
+      "do_not_use_when": [
+        "Need fixed-capacity or allocation-free output."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "unknown",
+        "hosted": "unknown",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "InvalidCheckpoint",
+          "handling": "correct the failing input or state before retrying",
+          "meaning": "Source returns error.InvalidCheckpoint when the operation-specific InvalidCheckpoint condition occurs.",
+          "operation": "rollback"
+        }
       ],
       "evidence_summary": {
         "conformance_validated": false,
@@ -306,25 +581,81 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [
+        "No failure guarantee beyond the public source contract is claimed."
+      ],
       "focused_validation_commands": [
         "zig build test-byte-writer",
         "zig build smoke-byte-writer"
       ],
       "id": "06",
+      "integration_notes": [
+        "Read dependency contracts.",
+        "Import the canonical source path.",
+        "Run the dedicated test step."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Writes may allocate through the caller-supplied allocator.",
+        "Fixed-capacity output is not provided."
+      ],
       "matching_recipes": [
         "write-and-read-explicit-endian-record"
       ],
+      "minimal_usage": [
+        "const module = @import(\"byte-writer\");",
+        "var writer = ByteWriter.init(allocator); defer writer.deinit();"
+      ],
       "module": "byte-writer",
+      "operation_map": {
+        "checkpoint": "checkpoint",
+        "inspect bytes": "bytes",
+        "rollback": "rollback",
+        "write byte": "writeByte",
+        "write bytes": "writeAll",
+        "write integer": "writeU32Le"
+      },
+      "ownership": {
+        "cleanup": "caller",
+        "storage": "mixed",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": false,
+        "caller_provided_memory": true,
+        "capacity_model": "unbounded",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "mixed"
+      },
+      "selection_priority": "canonical",
       "source": "projects/06-byte-writer/src/byte_writer.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Byte Writer reference module.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [
         "dynamic-array"
       ],
       "transitive_dependents": [
         "owned-byte-buffer"
+      ],
+      "use_when": [
+        "Byte Writer reference module."
       ]
     },
     {
+      "aliases": [
+        "bitmap allocator",
+        "slot allocator",
+        "index allocator"
+      ],
+      "alternatives": [],
+      "borrowing": {},
+      "capabilities": [
+        "fixed-capacity-slot-allocation",
+        "bitmap-allocation",
+        "double-free-detection"
+      ],
       "change_impact": {
         "dependents": [
           "fixed-capacity-object-pool",
@@ -332,17 +663,67 @@
         ],
         "recipes": []
       },
+      "composition": {
+        "commonly_with": [
+          "bit-set"
+        ],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "var slots = BitmapAllocator(64){};",
+        "named_import": "bitmap-allocator",
+        "primary_symbol": "BitmapAllocator"
+      },
       "dependency_build_order": [
         "bit-set",
         "bitmap-allocator"
       ],
       "details": "projects/07-bitmap-allocator/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [
         "bit-set"
       ],
       "direct_dependents": [
         "fixed-capacity-object-pool",
         "physical-page-frame-allocator"
+      ],
+      "do_not_use_when": [
+        "Need byte allocation, variable-sized blocks, or runtime growth."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "Full",
+          "handling": "retry only after correcting the failing condition",
+          "meaning": "Full condition documented by the operation",
+          "operation": "allocate"
+        },
+        {
+          "error": "IndexOutOfBounds",
+          "handling": "retry only after correcting the failing condition",
+          "meaning": "IndexOutOfBounds condition documented by the operation",
+          "operation": "free"
+        },
+        {
+          "error": "DoubleFree",
+          "handling": "retry only after correcting the failing condition",
+          "meaning": "DoubleFree condition documented by the operation",
+          "operation": "free"
+        }
       ],
       "evidence_summary": {
         "conformance_validated": false,
@@ -354,24 +735,88 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [
+        "all validation precedes occupancy mutation"
+      ],
       "focused_validation_commands": [
         "zig build test-bitmap-allocator",
         "zig build smoke-bitmap-allocator"
       ],
       "id": "07",
+      "integration_notes": [
+        "Read dependency contracts.",
+        "Import the canonical source path.",
+        "Run the dedicated test step."
+      ],
+      "invalidation": {
+        "free or reset": [
+          "allocated index: index no longer denotes an allocated slot"
+        ]
+      },
+      "known_gaps": [
+        "The module allocates integer slot identities, not memory blocks.",
+        "Capacity is fixed at compile time."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const BitmapAllocator = @import(\"bitmap-allocator\").BitmapAllocator; var slots = BitmapAllocator(64){}; const index = try slots.allocate();"
+      ],
       "module": "bitmap-allocator",
+      "operation_map": {
+        "allocate slot": "allocate",
+        "query slot": "isAllocated",
+        "release slot": "free",
+        "reset": "reset"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [
+          "capacity"
+        ],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/07-bitmap-allocator/src/bitmap_allocator.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Fixed-capacity integer-slot allocator backed by the repository fixed bit set.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [
         "bit-set"
       ],
       "transitive_dependents": [
         "fixed-capacity-object-pool",
         "physical-page-frame-allocator"
+      ],
+      "use_when": [
+        "Allocate and free integer slot indices while detecting exhaustion, out-of-range release, and double free."
       ]
     },
     {
+      "aliases": [
+        "generational handles",
+        "handle table",
+        "slot map",
+        "stale handle"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "get": [
+          "Returned pointers borrow table storage until removal, table move, or destruction."
+        ]
+      },
+      "capabilities": [
+        "stale-handle-rejection",
+        "stable-resource-identity",
+        "fixed-capacity-handle-table"
+      ],
       "change_impact": {
         "dependents": [
           "fixed-capacity-object-pool"
@@ -380,13 +825,51 @@
           "create-stale-safe-object-registry"
         ]
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": [
+          "create-stale-safe-object-registry"
+        ]
+      },
+      "construction": {
+        "initialization": "var table = HandleTable(u32, 16){};",
+        "named_import": "generational-handles",
+        "primary_symbol": "HandleTable"
+      },
       "dependency_build_order": [
         "generational-handles"
       ],
       "details": "projects/08-generational-handles/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
         "fixed-capacity-object-pool"
+      ],
+      "do_not_use_when": [
+        "Need dynamically growing storage or handles that survive removal."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "Full",
+          "handling": "retry only after correcting the failing condition",
+          "meaning": "Full condition documented by the operation",
+          "operation": "insert"
+        }
       ],
       "evidence_summary": {
         "conformance_validated": false,
@@ -398,20 +881,71 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [
+        "failed insertion and invalid handle operations preserve state"
+      ],
       "focused_validation_commands": [
         "zig build test-generational-handles",
         "zig build smoke-generational-handles"
       ],
       "id": "08",
+      "integration_notes": [
+        "Read dependency contracts.",
+        "Import the canonical source path.",
+        "Run the dedicated test step."
+      ],
+      "invalidation": {
+        "remove, table move, or destruction": [
+          "pointer returned by get: pointer no longer valid"
+        ],
+        "successful remove": [
+          "Handle: generation mismatch makes it stale"
+        ]
+      },
+      "known_gaps": [
+        "Capacity is fixed at compile time.",
+        "Generation wrap behavior remains bounded by the generation field."
+      ],
       "matching_recipes": [
         "create-stale-safe-object-registry"
       ],
+      "minimal_usage": [
+        "const HandleTable = @import(\"generational-handles\").HandleTable; var table = HandleTable(u32, 16){}; const h = try table.insert(42);"
+      ],
       "module": "generational-handles",
+      "operation_map": {
+        "count": "count",
+        "immutable lookup": "getConst",
+        "insert": "insert",
+        "mutable lookup": "get",
+        "remove": "remove"
+      },
+      "ownership": {
+        "cleanup": "caller",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [
+          "capacity"
+        ],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/08-generational-handles/src/generational_handles.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Fixed-capacity value table with generation-bearing handles that reject stale references.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
       "transitive_dependents": [
         "fixed-capacity-object-pool"
+      ],
+      "use_when": [
+        "Store values behind index-plus-generation handles so removed and reused slots cannot be accessed through stale identifiers."
       ]
     },
     {
@@ -452,6 +986,18 @@
       "transitive_dependents": []
     },
     {
+      "aliases": [
+        "checked cast",
+        "integer conversion",
+        "range cast"
+      ],
+      "alternatives": [],
+      "borrowing": {},
+      "capabilities": [
+        "checked-integer-cast",
+        "safe-integer-narrowing",
+        "signedness-validation"
+      ],
       "change_impact": {
         "dependents": [
           "bounded-system-resource-plan",
@@ -462,10 +1008,26 @@
         ],
         "recipes": []
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "const value = try checkedIntegerCast(u16, raw);",
+        "named_import": "checked-integer-cast",
+        "primary_symbol": "checkedIntegerCast"
+      },
       "dependency_build_order": [
         "checked-integer-cast"
       ],
       "details": "projects/10-checked-integer-cast/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
         "bounded-system-resource-plan",
@@ -473,6 +1035,26 @@
         "elf64-program-header-parser",
         "length-prefixed-binary-field",
         "type-length-value-decoder"
+      ],
+      "do_not_use_when": [
+        "Need saturating, wrapping, or truncating conversion semantics."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "OutOfRange",
+          "handling": "retry only after correcting the failing condition",
+          "meaning": "OutOfRange condition documented by the operation",
+          "operation": "checkedIntegerCast"
+        }
       ],
       "evidence_summary": {
         "conformance_validated": false,
@@ -484,15 +1066,49 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [
+        "stateless"
+      ],
       "focused_validation_commands": [
         "zig build test-checked-integer-cast",
         "zig build smoke-checked-integer-cast"
       ],
       "id": "10",
+      "integration_notes": [
+        "Read dependency contracts.",
+        "Import the canonical source path.",
+        "Run the dedicated test step."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Only integer-to-integer representability is handled."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const cast = @import(\"checked-integer-cast\"); const value = try cast.checkedIntegerCast(u16, raw);"
+      ],
       "module": "checked-integer-cast",
+      "operation_map": {
+        "convert integer": "checkedIntegerCast"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "runtime_bounded",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/10-checked-integer-cast/src/checked_integer_cast.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Fallible integer conversion that rejects unrepresentable values.",
+      "thread_safety": "immutable_reads_only",
       "transitive_dependencies": [],
       "transitive_dependents": [
         "bounded-system-resource-plan",
@@ -500,6 +1116,9 @@
         "elf64-program-header-parser",
         "length-prefixed-binary-field",
         "type-length-value-decoder"
+      ],
+      "use_when": [
+        "Convert an integer to another integer type without truncation, wrapping, or sign loss."
       ]
     },
     {
@@ -659,6 +1278,20 @@
       ]
     },
     {
+      "aliases": [
+        "alignment helpers",
+        "align up",
+        "align down",
+        "padding"
+      ],
+      "alternatives": [],
+      "borrowing": {},
+      "capabilities": [
+        "alignment-validation",
+        "checked-align-up",
+        "align-down",
+        "padding-calculation"
+      ],
       "change_impact": {
         "dependents": [
           "bounded-system-resource-plan",
@@ -669,15 +1302,59 @@
           "normalize-checked-memory-range"
         ]
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": [
+          "normalize-checked-memory-range"
+        ]
+      },
+      "construction": {
+        "initialization": "const aligned = try alignUp(size, 4096);",
+        "named_import": "aligned-address-and-size-helpers",
+        "primary_symbol": "AlignmentError"
+      },
       "dependency_build_order": [
         "aligned-address-and-size-helpers"
       ],
       "details": "projects/15-aligned-address-and-size-helpers/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
         "bounded-system-resource-plan",
         "elf64-program-header-parser",
         "fixed-bump-allocator"
+      ],
+      "do_not_use_when": [
+        "Need address-domain typing or allocation."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "InvalidAlignment",
+          "handling": "retry only after correcting the failing condition",
+          "meaning": "InvalidAlignment condition documented by the operation",
+          "operation": "checked operations"
+        },
+        {
+          "error": "Overflow",
+          "handling": "retry only after correcting the failing condition",
+          "meaning": "Overflow condition documented by the operation",
+          "operation": "alignUp and paddingNeeded"
+        }
       ],
       "evidence_summary": {
         "conformance_validated": false,
@@ -689,22 +1366,63 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [
+        "pure functions"
+      ],
       "focused_validation_commands": [
         "zig build test-aligned-address-and-size-helpers",
         "zig build smoke-aligned-address-and-size-helpers"
       ],
       "id": "15",
+      "integration_notes": [
+        "Read dependency contracts.",
+        "Import the canonical source path.",
+        "Run the dedicated test step."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "The helpers do not attach an address domain or ownership to integers."
+      ],
       "matching_recipes": [
         "normalize-checked-memory-range"
       ],
+      "minimal_usage": [
+        "const aligned = try alignment.alignUp(size, 4096);"
+      ],
       "module": "aligned-address-and-size-helpers",
+      "operation_map": {
+        "align down": "alignDown",
+        "align up": "alignUp",
+        "calculate padding": "paddingNeeded",
+        "check aligned": "isAligned",
+        "validate alignment": "isPowerOfTwo"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "runtime_bounded",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Checked power-of-two alignment arithmetic.",
+      "thread_safety": "immutable_reads_only",
       "transitive_dependencies": [],
       "transitive_dependents": [
         "bounded-system-resource-plan",
         "elf64-program-header-parser",
         "fixed-bump-allocator"
+      ],
+      "use_when": [
+        "Centralize alignment validation, rounding, and padding calculations."
       ]
     },
     {
@@ -747,6 +1465,19 @@
       ]
     },
     {
+      "aliases": [
+        "range",
+        "half-open range",
+        "checked interval",
+        "memory region"
+      ],
+      "alternatives": [],
+      "borrowing": {},
+      "capabilities": [
+        "checked-half-open-range",
+        "range-overlap-detection",
+        "range-intersection"
+      ],
       "change_impact": {
         "dependents": [
           "elf64-file-header-parser",
@@ -758,16 +1489,60 @@
           "normalize-checked-memory-range"
         ]
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": [
+          "normalize-checked-memory-range"
+        ]
+      },
+      "construction": {
+        "initialization": "const region = try CheckedRange.fromStartAndLength(base, size);",
+        "named_import": "checked-half-open-range",
+        "primary_symbol": "CheckedRange"
+      },
       "dependency_build_order": [
         "checked-half-open-range"
       ],
       "details": "projects/17-checked-half-open-range/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
         "elf64-file-header-parser",
         "elf64-program-header-parser",
         "physical-memory-region-set",
         "physical-page-frame-allocator"
+      ],
+      "do_not_use_when": [
+        "Need unit-typed endpoints, address-domain typing, or inclusive-end ranges."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "InvalidRange",
+          "handling": "retry only after correcting the failing condition",
+          "meaning": "InvalidRange condition documented by the operation",
+          "operation": "init"
+        },
+        {
+          "error": "Overflow",
+          "handling": "retry only after correcting the failing condition",
+          "meaning": "Overflow condition documented by the operation",
+          "operation": "fromStartAndLength"
+        }
       ],
       "evidence_summary": {
         "conformance_validated": false,
@@ -779,26 +1554,83 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [
+        "pure value construction and queries"
+      ],
       "focused_validation_commands": [
         "zig build test-checked-half-open-range",
         "zig build smoke-checked-half-open-range"
       ],
       "id": "17",
+      "integration_notes": [
+        "Read dependency contracts.",
+        "Import the canonical source path.",
+        "Run the dedicated test step."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Unit and address-domain typing are intentionally not provided."
+      ],
       "matching_recipes": [
         "normalize-checked-memory-range"
       ],
+      "minimal_usage": [
+        "const region = try CheckedRange.fromStartAndLength(base, size);"
+      ],
       "module": "checked-half-open-range",
+      "operation_map": {
+        "construct endpoints": "init",
+        "construct length": "fromStartAndLength",
+        "containment": "containsRange",
+        "intersection": "intersection",
+        "length": "length",
+        "overlap": "overlaps"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "runtime_bounded",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/17-checked-half-open-range/src/checked_half_open_range.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Validated half-open usize interval with checked length construction.",
+      "thread_safety": "immutable_reads_only",
       "transitive_dependencies": [],
       "transitive_dependents": [
         "elf64-file-header-parser",
         "elf64-program-header-parser",
         "physical-memory-region-set",
         "physical-page-frame-allocator"
+      ],
+      "use_when": [
+        "Provide one overflow-safe boundary convention for regions and extents."
       ]
     },
     {
+      "aliases": [
+        "physical address",
+        "virtual address",
+        "guest physical",
+        "guest virtual",
+        "typed address"
+      ],
+      "alternatives": [],
+      "borrowing": {},
+      "capabilities": [
+        "typed-physical-address",
+        "typed-virtual-address",
+        "guest-address-separation",
+        "checked-address-arithmetic"
+      ],
       "change_impact": {
         "dependents": [
           "elf64-program-header-parser",
@@ -810,16 +1642,60 @@
           "validate-physical-page-frame"
         ]
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": [
+          "validate-physical-page-frame"
+        ]
+      },
+      "construction": {
+        "initialization": "const guest = GuestPhysicalAddress.init(raw);",
+        "named_import": "distinct-memory-address-types",
+        "primary_symbol": "PhysicalAddress"
+      },
       "dependency_build_order": [
         "distinct-memory-address-types"
       ],
       "details": "projects/18-distinct-memory-address-types/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
         "elf64-program-header-parser",
         "physical-memory-region-set",
         "physical-page-frame-allocator",
         "physical-page-frame-number-and-address-conversion"
+      ],
+      "do_not_use_when": [
+        "Need mapping, canonical-address validation, alignment validation, or memory ownership."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "Overflow",
+          "handling": "retry only after correcting the failing condition",
+          "meaning": "Overflow condition documented by the operation",
+          "operation": "add"
+        },
+        {
+          "error": "Underflow",
+          "handling": "retry only after correcting the failing condition",
+          "meaning": "Underflow condition documented by the operation",
+          "operation": "subtract"
+        }
       ],
       "evidence_summary": {
         "conformance_validated": false,
@@ -831,23 +1707,63 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [
+        "immutable value operations"
+      ],
       "focused_validation_commands": [
         "zig build test-distinct-memory-address-types",
         "zig build smoke-distinct-memory-address-types"
       ],
       "id": "18",
+      "integration_notes": [
+        "Read dependency contracts.",
+        "Import the canonical source path.",
+        "Run the dedicated test step."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Canonicality, alignment, translation, mapping, and ownership are not provided."
+      ],
       "matching_recipes": [
         "validate-physical-page-frame"
       ],
+      "minimal_usage": [
+        "const guest = GuestPhysicalAddress.init(raw); const next = try guest.add(page_size);"
+      ],
       "module": "distinct-memory-address-types",
+      "operation_map": {
+        "add offset": "add",
+        "construct": "init",
+        "subtract offset": "subtract",
+        "unwrap": "raw"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "runtime_bounded",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Type-distinct physical and virtual address domains with checked arithmetic.",
+      "thread_safety": "immutable_reads_only",
       "transitive_dependencies": [],
       "transitive_dependents": [
         "elf64-program-header-parser",
         "physical-memory-region-set",
         "physical-page-frame-allocator",
         "physical-page-frame-number-and-address-conversion"
+      ],
+      "use_when": [
+        "Prevent accidental interchange of address values belonging to different translation domains."
       ]
     },
     {
@@ -950,6 +1866,18 @@
       "transitive_dependents": []
     },
     {
+      "aliases": [
+        "little endian",
+        "big endian",
+        "byte order"
+      ],
+      "alternatives": [],
+      "borrowing": {},
+      "capabilities": [
+        "endian-integer-encoding",
+        "endian-integer-decoding",
+        "explicit-byte-order"
+      ],
       "change_impact": {
         "dependents": [
           "elf64-file-header-parser",
@@ -961,10 +1889,28 @@
           "write-and-read-explicit-endian-record"
         ]
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": [
+          "write-and-read-explicit-endian-record"
+        ]
+      },
+      "construction": {
+        "initialization": "const Codec = EndianIntegerCodec(u32, .little);",
+        "named_import": "endian-integer-codec",
+        "primary_symbol": "EndianIntegerCodec"
+      },
       "dependency_build_order": [
         "endian-integer-codec"
       ],
       "details": "projects/22-endian-integer-codec/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
         "elf64-file-header-parser",
@@ -972,6 +1918,19 @@
         "length-prefixed-binary-field",
         "type-length-value-decoder"
       ],
+      "do_not_use_when": [
+        "Need cursor bounds checking, variable-width integers, or streaming I/O."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -982,23 +1941,63 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [
+        "operations are total"
+      ],
       "focused_validation_commands": [
         "zig build test-endian-integer-codec",
         "zig build smoke-endian-integer-codec"
       ],
       "id": "22",
+      "integration_notes": [
+        "Read dependency contracts.",
+        "Import the canonical source path.",
+        "Run the dedicated test step."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Only fixed-width integer values are supported.",
+        "Cursor management and bounds checking belong to reader modules."
+      ],
       "matching_recipes": [
         "write-and-read-explicit-endian-record"
       ],
+      "minimal_usage": [
+        "const module = @import(\"endian-integer-codec\");",
+        "const Codec = EndianIntegerCodec(u32, .little);"
+      ],
       "module": "endian-integer-codec",
+      "operation_map": {
+        "decode": "decode",
+        "encode": "encode"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "runtime_bounded",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/22-endian-integer-codec/src/endian_integer_codec.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Fixed-width integer encoding with explicit byte order.",
+      "thread_safety": "immutable_reads_only",
       "transitive_dependencies": [],
       "transitive_dependents": [
         "elf64-file-header-parser",
         "elf64-program-header-parser",
         "length-prefixed-binary-field",
         "type-length-value-decoder"
+      ],
+      "use_when": [
+        "Separate external byte order from host representation."
       ]
     },
     {

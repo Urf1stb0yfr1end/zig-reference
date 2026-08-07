@@ -4,17 +4,35 @@
   "agent_index_version": "2.0.0",
   "generator": "tools/build-agent-index.py",
   "symbols": {
+    "AlignmentError": [
+      "aligned-address-and-size-helpers"
+    ],
+    "BitmapAllocator": [
+      "bitmap-allocator"
+    ],
     "BoundedDeterministicEventTrace": [
       "bounded-deterministic-event-trace"
     ],
+    "BoundedReader": [
+      "bounded-byte-reader"
+    ],
+    "ByteWriter": [
+      "byte-writer"
+    ],
     "CapacityConfiguration": [
       "bounded-system-resource-plan"
+    ],
+    "CheckedRange": [
+      "checked-half-open-range"
     ],
     "DependencyEdge": [
       "bounded-system-resource-plan"
     ],
     "Description": [
       "bounded-system-resource-plan"
+    ],
+    "EndianIntegerCodec": [
+      "endian-integer-codec"
     ],
     "EventInput": [
       "bounded-deterministic-event-trace"
@@ -31,17 +49,53 @@
     "FixedTopologicalGraph": [
       "fixed-capacity-topological-sort"
     ],
+    "FixedVector": [
+      "fixed-capacity-vector"
+    ],
+    "GuestPhysicalAddress": [
+      "distinct-memory-address-types"
+    ],
+    "GuestVirtualAddress": [
+      "distinct-memory-address-types"
+    ],
+    "HandleTable": [
+      "generational-handles"
+    ],
+    "HostVirtualAddress": [
+      "distinct-memory-address-types"
+    ],
     "NormalizedEvent": [
       "bounded-deterministic-event-trace"
     ],
     "ObjectPool": [
       "fixed-capacity-object-pool"
     ],
+    "PhysicalAddress": [
+      "distinct-memory-address-types"
+    ],
     "Planner": [
       "bounded-system-resource-plan"
     ],
     "PostSealAllocation": [
       "bounded-system-resource-plan"
+    ],
+    "alignDown": [
+      "aligned-address-and-size-helpers"
+    ],
+    "alignUp": [
+      "aligned-address-and-size-helpers"
+    ],
+    "checkedIntegerCast": [
+      "checked-integer-cast"
+    ],
+    "isAligned": [
+      "aligned-address-and-size-helpers"
+    ],
+    "isPowerOfTwo": [
+      "aligned-address-and-size-helpers"
+    ],
+    "paddingNeeded": [
+      "aligned-address-and-size-helpers"
     ]
   }
 }

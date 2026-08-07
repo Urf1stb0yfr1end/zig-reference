@@ -1231,5 +1231,131 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Checked power-of-two alignment arithmetic.",
+    "search_aliases": [
+      "alignment helpers",
+      "align up",
+      "align down",
+      "padding"
+    ],
+    "capability_ids": [
+      "alignment-validation",
+      "checked-align-up",
+      "align-down",
+      "padding-calculation"
+    ],
+    "use_when": [
+      "Centralize alignment validation, rounding, and padding calculations."
+    ],
+    "do_not_use_when": [
+      "Need address-domain typing or allocation."
+    ],
+    "entrypoint": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig",
+    "public_symbols": [
+      "AlignmentError",
+      "isPowerOfTwo",
+      "isAligned",
+      "alignDown",
+      "alignUp",
+      "paddingNeeded"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {},
+    "invalidation": {},
+    "failure_guarantees": [
+      "pure functions"
+    ],
+    "effects": [
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "immutable_reads_only",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [
+      "normalize-checked-memory-range"
+    ],
+    "validation_commands": [
+      "zig build test-aligned-address-and-size-helpers",
+      "zig build smoke-aligned-address-and-size-helpers"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "runtime_bounded",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "aligned-address-and-size-helpers",
+      "primary_symbol": "AlignmentError",
+      "initialization": "const aligned = try alignUp(size, 4096);"
+    },
+    "operation_map": {
+      "validate alignment": "isPowerOfTwo",
+      "check aligned": "isAligned",
+      "align down": "alignDown",
+      "align up": "alignUp",
+      "calculate padding": "paddingNeeded"
+    },
+    "error_map": [
+      {
+        "error": "InvalidAlignment",
+        "operation": "checked operations",
+        "meaning": "InvalidAlignment condition documented by the operation",
+        "handling": "retry only after correcting the failing condition"
+      },
+      {
+        "error": "Overflow",
+        "operation": "alignUp and paddingNeeded",
+        "meaning": "Overflow condition documented by the operation",
+        "handling": "retry only after correcting the failing condition"
+      }
+    ],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": [
+        "normalize-checked-memory-range"
+      ]
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "The helpers do not attach an address domain or ownership to integers."
+    ],
+    "minimal_usage": [
+      "const aligned = try alignment.alignUp(size, 4096);"
+    ],
+    "integration_notes": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ]
   }
 }

@@ -1207,5 +1207,130 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Type-distinct physical and virtual address domains with checked arithmetic.",
+    "search_aliases": [
+      "physical address",
+      "virtual address",
+      "guest physical",
+      "guest virtual",
+      "typed address"
+    ],
+    "capability_ids": [
+      "typed-physical-address",
+      "typed-virtual-address",
+      "guest-address-separation",
+      "checked-address-arithmetic"
+    ],
+    "use_when": [
+      "Prevent accidental interchange of address values belonging to different translation domains."
+    ],
+    "do_not_use_when": [
+      "Need mapping, canonical-address validation, alignment validation, or memory ownership."
+    ],
+    "entrypoint": "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig",
+    "public_symbols": [
+      "PhysicalAddress",
+      "HostVirtualAddress",
+      "GuestPhysicalAddress",
+      "GuestVirtualAddress"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {},
+    "invalidation": {},
+    "failure_guarantees": [
+      "immutable value operations"
+    ],
+    "effects": [
+      "reads_receiver",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "immutable_reads_only",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [
+      "validate-physical-page-frame"
+    ],
+    "validation_commands": [
+      "zig build test-distinct-memory-address-types",
+      "zig build smoke-distinct-memory-address-types"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "runtime_bounded",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "distinct-memory-address-types",
+      "primary_symbol": "PhysicalAddress",
+      "initialization": "const guest = GuestPhysicalAddress.init(raw);"
+    },
+    "operation_map": {
+      "construct": "init",
+      "unwrap": "raw",
+      "add offset": "add",
+      "subtract offset": "subtract"
+    },
+    "error_map": [
+      {
+        "error": "Overflow",
+        "operation": "add",
+        "meaning": "Overflow condition documented by the operation",
+        "handling": "retry only after correcting the failing condition"
+      },
+      {
+        "error": "Underflow",
+        "operation": "subtract",
+        "meaning": "Underflow condition documented by the operation",
+        "handling": "retry only after correcting the failing condition"
+      }
+    ],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": [
+        "validate-physical-page-frame"
+      ]
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Canonicality, alignment, translation, mapping, and ownership are not provided."
+    ],
+    "minimal_usage": [
+      "const guest = GuestPhysicalAddress.init(raw); const next = try guest.add(page_size);"
+    ],
+    "integration_notes": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ]
   }
 }

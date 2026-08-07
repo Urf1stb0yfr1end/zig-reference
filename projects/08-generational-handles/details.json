@@ -1251,5 +1251,136 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Fixed-capacity value table with generation-bearing handles that reject stale references.",
+    "search_aliases": [
+      "generational handles",
+      "handle table",
+      "slot map",
+      "stale handle"
+    ],
+    "capability_ids": [
+      "stale-handle-rejection",
+      "stable-resource-identity",
+      "fixed-capacity-handle-table"
+    ],
+    "use_when": [
+      "Store values behind index-plus-generation handles so removed and reused slots cannot be accessed through stale identifiers."
+    ],
+    "do_not_use_when": [
+      "Need dynamically growing storage or handles that survive removal."
+    ],
+    "entrypoint": "projects/08-generational-handles/src/generational_handles.zig",
+    "public_symbols": [
+      "HandleTable"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "caller"
+    },
+    "borrowing": {
+      "get": [
+        "Returned pointers borrow table storage until removal, table move, or destruction."
+      ]
+    },
+    "invalidation": {
+      "successful remove": [
+        "Handle: generation mismatch makes it stale"
+      ],
+      "remove, table move, or destruction": [
+        "pointer returned by get: pointer no longer valid"
+      ]
+    },
+    "failure_guarantees": [
+      "failed insertion and invalid handle operations preserve state"
+    ],
+    "effects": [
+      "mutates_receiver",
+      "reads_receiver",
+      "returns_borrow",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [
+      "create-stale-safe-object-registry"
+    ],
+    "validation_commands": [
+      "zig build test-generational-handles",
+      "zig build smoke-generational-handles"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": [
+        "capacity"
+      ]
+    },
+    "construction": {
+      "named_import": "generational-handles",
+      "primary_symbol": "HandleTable",
+      "initialization": "var table = HandleTable(u32, 16){};"
+    },
+    "operation_map": {
+      "insert": "insert",
+      "mutable lookup": "get",
+      "immutable lookup": "getConst",
+      "remove": "remove",
+      "count": "count"
+    },
+    "error_map": [
+      {
+        "error": "Full",
+        "operation": "insert",
+        "meaning": "Full condition documented by the operation",
+        "handling": "retry only after correcting the failing condition"
+      }
+    ],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": [
+        "create-stale-safe-object-registry"
+      ]
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Capacity is fixed at compile time.",
+      "Generation wrap behavior remains bounded by the generation field."
+    ],
+    "minimal_usage": [
+      "const HandleTable = @import(\"generational-handles\").HandleTable; var table = HandleTable(u32, 16){}; const h = try table.insert(42);"
+    ],
+    "integration_notes": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ]
   }
 }
