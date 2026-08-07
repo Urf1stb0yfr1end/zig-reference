@@ -1,0 +1,559 @@
+CODEX AGENTIC SNOWBALL BATCH 05 — DEBUG FAST PATH
+
+MISSION
+
+Finish the final five Agent Fast Path migrations and establish a durable Debug Fast Path for zig-reference.
+
+The Snowball must accumulate debugging knowledge as well as implementation knowledge. A known failure should not force every future coding agent to repeat the same investigation.
+
+Guiding rule:
+
+FAILED ONCE. DIAGNOSED COMPLETELY. REDISCOVERED NEVER.
+
+The engineering goal is to make zig-reference the lowest-cost correct path for covered systems work: cheap discovery, cheap integration, cheap diagnosis, local repair, explicit evidence, and exact validation. Do not try to force preference by instruction. Make reuse mechanically attractive by reducing token use, file reads, tool calls, wrong branches, repeated debugging, repair iterations, and unnecessary compute.
+
+A cold coding agent should not need a manual.
+
+STARTING STATE
+
+Work in ~/dev/zig-reference.
+Read AGENTS.md first and obey it.
+Activate the repository environment with source .venv/bin/activate.
+Verify jsonschema imports successfully. If it does not, use the existing tools/requirements.txt workflow. Do not change repository dependencies merely to repair the local environment.
+
+Expected starting state:
+
+Zig 0.14.0
+52 contracted modules
+47 full Agent Fast Path modules
+5 partial modules
+
+Expected partial frontier:
+
+semantic-version
+tagged-result
+source-span
+owned-byte-buffer
+intrusive-doubly-linked-list
+
+If actual state differs, inspect and explain it before changing anything. Do not force expected counts.
+
+OBJECTIVE 1 — FINISH THE FINAL FIVE
+
+Migrate exactly the five current partial modules if canonical source truth supports full status. Do not create or migrate any other module in this batch.
+
+For every migrated module derive integration truth from implementation, tests, public surface, dependencies, and evidence. Do not mechanically copy neighboring cards.
+
+No production construction or minimal_usage field may use std.testing.refAllDeclsRecursive or equivalent declaration-only/test-only traversal as integration guidance.
+
+Audit at minimum:
+
+identity
+primary symbol
+named import
+selection and rejection guidance
+real generic/comptime parameters
+construction
+minimal usage
+operation map
+error map
+ownership
+cleanup
+borrowing
+borrow lifetime
+invalidation
+resource profile
+boundedness
+allocation behavior
+environment constraints
+determinism
+thread safety
+composition
+dependencies
+known gaps
+focused validation
+evidence status
+
+Error maps must assign an error only to operations that can actually surface it according to canonical truth.
+
+Special attention:
+
+owned-byte-buffer: allocator ownership, cleanup, borrowed byte views, reallocation/mutation invalidation, capacity/growth behavior, failure atomicity, and real allocation errors.
+
+intrusive-doubly-linked-list: caller-owned nodes versus list ownership, node lifetime, linkage preconditions, insertion/removal semantics, aliasing, double insertion, stale links, and invalidation.
+
+tagged-result: success/error payload semantics, discriminant behavior, construction, inspection, and actual fallibility.
+
+semantic-version and source-span: remove copied resource limits, fake ownership, overbroad errors, or template residue.
+
+If a module cannot honestly satisfy full status, leave it partial and document why.
+
+Target only if source truth supports it:
+
+52 contracted
+52 full
+0 partial
+
+OBJECTIVE 2 — STANDARDIZED DEBUG FAST PATH
+
+Build a compact deterministic diagnostic substrate using ordinary engineering language plus stable zig-reference identities.
+
+Do not invent a private debugging language.
+Do not suppress or replace native Zig errors.
+Do not create SQLite, an opaque database, embeddings, a daemon, LSP, network service, or hidden model call.
+
+Stable diagnostic identities should use a predictable form such as:
+
+ZIGREF-CATEGORY-SPECIFIC-NAME
+
+Use a small controlled category vocabulary based on real needs. Prefer ordinary concepts such as:
+
+ENV
+INPUT
+BOUNDS
+ARITH
+OWNERSHIP
+LIFETIME
+STATE
+RESOURCE
+PARSE
+DEPENDENCY
+COMPOSITION
+PLATFORM
+PORTABILITY
+DETERMINISM
+EVIDENCE
+CONTRACT
+INDEX
+TOOLING
+VALIDATION
+
+Do not add categories simply to make the taxonomy look complete.
+
+A ZIGREF identity is a stable key into accumulated repair memory. Native error text remains visible.
+
+OBJECTIVE 3 — DIAGNOSTIC STABILITY
+
+Inventory all existing diagnostics before changing the schema or generator.
+
+Do not silently rename historical diagnostic IDs.
+Do not reuse an old ID for a different failure.
+Do not silently change the meaning of an ID.
+
+If normalization is necessary, preserve old identities as aliases or explicit replacements. Exact lookup by an old valid alias should resolve to the canonical diagnostic and expose the relationship.
+
+OBJECTIVE 4 — DIAGNOSTIC RECORD CONTRACT
+
+A known diagnostic must carry enough structured truth for a cold agent to act without source archaeology.
+
+Where genuinely known, expose:
+
+canonical id
+aliases
+category
+summary
+affected module/subsystem
+affected operation or phase
+violated invariant
+observed condition
+expected condition
+native error/symptom aliases
+evidence class
+evidence fixture or proof location
+repair status: known, partial, or unknown
+repair strategy when known
+exact focused validation command
+minimum useful file locations
+related diagnostics only when materially useful
+
+Do not force fields that would require fabricated information.
+Never invent a cause from a symptom.
+Never claim a repair is canonical if it is only a hypothesis.
+Generated diagnostic projections must never be more confident than canonical evidence.
+
+OBJECTIVE 5 — NO SILENT FAILURE IN SERIOUS REPOSITORY TOOLING
+
+Audit serious repository-owned agent/developer flows touched by this work.
+
+They must not:
+
+catch an error and return success
+silently skip a required validation phase
+print PASS while a required child failed
+lose the underlying nonzero exit status
+return an empty success-looking result for a real failure
+hide a known failing phase
+invent a ZIGREF cause for an unclassified failure
+
+For a recognized failure, surface the stable diagnostic identity when useful.
+
+For an unrecognized failure, preserve the native signal, failing phase, and exit status and say that it is unclassified. Give the narrowest useful next inspection command. Do not fabricate certainty.
+
+Unknown is acceptable.
+Silent is not.
+Confidently wrong is worse than unknown.
+
+OBJECTIVE 6 — DIAGNOSTIC DISCOVERY WITHOUT A MANUAL
+
+Keep exact lookup:
+
+python3 tools/query-reference.py agent diagnostic ID
+
+A cold agent may begin with a native error name or short symptom rather than a ZIGREF ID.
+
+If the current query architecture permits a small clean extension, add a deterministic command conceptually equivalent to:
+
+python3 tools/query-reference.py agent diagnose "TERM"
+
+It should search authored IDs, aliases, native error aliases, affected modules/operations, and concise summaries and return only a tiny candidate set with the reason each candidate matched.
+
+Requirements:
+
+deterministic
+bounded output
+text-first
+no network
+no embeddings
+no database
+no source scan at query time
+no fabricated confidence
+exact IDs and aliases rank above loose text matches
+unknown terms remain unknown
+
+If this cannot be implemented cleanly without redesign, do not force it. Document the gap and make sure canonical repository-owned tooling emits known IDs where possible.
+
+OBJECTIVE 7 — PROGRESSIVE DISCLOSURE
+
+Debugging must follow cheapest-sufficient-truth-first.
+
+Desired path:
+
+raw failure or known ID
+tiny identity/candidate result
+compact repair result
+evidence/details only when needed
+source only when modifying or compressed truth is insufficient
+
+Do not dump the entire diagnostic registry.
+
+Reuse existing projection/view machinery where practical. Add new views only if they materially reduce output and remain simple.
+
+Measure serialized byte size for at least one real diagnostic discovery/lookup/repair path. Do not invent token savings. Bytes are acceptable as a reproducible proxy.
+
+OBJECTIVE 8 — REPAIR MEMORY GRAPH
+
+Where evidence exists, a diagnostic should resolve cheaply to:
+
+failure identity
+affected component
+violated rule
+evidence
+repair
+validation
+minimum useful locations
+
+Reuse existing misuse/repair fixtures and generated/agent/diagnostics.json where possible. Do not create a second diagnostic database.
+
+All referenced files and commands must exist.
+
+OBJECTIVE 9 — ZERO-CONTEXT DEBUGGING ACCEPTANCE
+
+Extend the existing zero-context acceptance test so debugging is tested as an information-retrieval problem.
+
+Prove that a cold agent starting from a real known diagnostic can obtain without source archaeology:
+
+identity
+human-readable meaning
+affected component
+operation/phase when known
+violated rule when known
+repair guidance
+repair fixture/evidence when present
+focused validation command
+minimum useful locations
+
+If a diagnose command is implemented, also test discovery from at least one native error alias or short symptom.
+
+Acceptance must fail if:
+
+a diagnostic references a nonexistent module/file/fixture
+a concrete validation command does not exist
+an alias collision makes exact lookup ambiguous
+a canonical ID changes meaning
+a production card uses declaration traversal as integration guidance
+an error map mechanically contradicts the canonical public surface
+Developer Minimus becomes nested or exit-status-untruthful
+an unknown symptom receives a confident invented diagnosis
+
+Use objective invariants only. Avoid broad heuristics that reject legitimate Zig patterns.
+
+OBJECTIVE 10 — DIAGNOSTIC SELF-TESTS
+
+Add narrow negative tests for real protocol invariants. Where compatible with the final schema, reject:
+
+duplicate canonical ID
+alias collision
+unknown category
+nonexistent evidence fixture
+nonexistent repair fixture
+nonexistent affected module when declared
+nonexistent concrete validation command
+invalid repair status
+replacement pointing nowhere
+replacement cycle
+unsupported evidence/confidence claim if such a field is implemented
+
+Do not add fields merely so they can be validated.
+
+OBJECTIVE 11 — OUTSIDE-PROJECT REUSE
+
+A future agent may copy or integrate a module elsewhere and encounter its native Zig errors outside zig-reference.
+
+Where a module has documented native errors and known diagnostics, make the relationship discoverable from compact contract/diagnostic data without requiring test-source inspection.
+
+Do not claim every native error uniquely identifies a cause. One-to-many mappings should return a small candidate set rather than false certainty.
+
+Portable reuse should be able to retain:
+
+module identity
+Zig baseline
+contract
+known diagnostic IDs
+native error aliases
+repair evidence
+focused validation commands
+
+Keep this text-based and transparent.
+
+OBJECTIVE 12 — FIRST-CHOICE ECONOMICS
+
+The long-term goal is for a coding agent to prefer zig-reference in covered systems territory because using it is cheaper than rediscovering or rebuilding what already exists.
+
+Do not encode a rule saying an agent must choose zig-reference.
+
+Make the repository cheaply answer:
+
+Do you already have what I need?
+Which candidate is canonical?
+Why does it fit?
+When should I reject it?
+What does it own?
+What invalidates it?
+What can fail?
+What does this error mean?
+Have you seen this failure before?
+What fixed it?
+What proves the fix?
+What is still unknown?
+What is the minimum I need to read?
+
+Later controlled benchmarks will determine whether this produces first-choice behavior. Do not claim the benchmark result in this batch.
+
+OBJECTIVE 13 — COST MEASUREMENT
+
+For each final module and at least one diagnostic path, record in the Batch 05 report:
+
+select projection bytes
+integrate projection bytes
+repair/diagnostic projection bytes
+files needed for ordinary reuse
+whether implementation source was required
+whether repair required source inspection
+
+Do not fabricate token counts or percentages.
+
+DEVELOPER MINIMUS
+
+Preserve the repaired Batch 04 execution model.
+
+Canonical serious build-backed commands remain:
+
+python3 tools/developer-command.py smoke
+python3 tools/developer-command.py validate-repository
+python3 tools/developer-command.py verify-morphic-plan
+python3 tools/developer-command.py verify-morphic-trace
+
+Raw zig build steps are implementation surfaces and must not emit subordinate Minimus blocks.
+
+A canonical outer developer command must preserve normal output, wait for the underlying command to finish, then emit exactly one authoritative LOCATIONS followed by MINIMUS, and preserve the underlying exit status.
+
+If a known diagnostic materially explains a failure, include its stable ID in the final compact handoff. If unclassified, say unclassified. Do not dump the registry into Minimus.
+
+PERMANENT POLICY
+
+Update AGENTS.md minimally so future work preserves the Debug Fast Path mechanism:
+
+preserve native errors
+never swallow serious failures
+stable diagnostic IDs do not silently change meaning
+known failures point to evidence, repair, and validation
+unknown failures remain explicitly unknown
+repair output stays compact and progressively disclosed
+transparent deterministic text is preferred over opaque diagnostic state
+
+Do not turn AGENTS.md into a diagnostic tutorial.
+
+MANDATORY COMMAND MANUAL RULE
+
+Every Codex run that changes the repository must update COMMANDS.md before completion.
+
+Add every new runnable command.
+Update changed commands, arguments, purposes, and validation status.
+Remove or accurately mark obsolete commands.
+If command surface does not change, still record materially established workflow/validation information.
+Never document a command that does not exist.
+
+Run:
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+
+COMMANDS.md must be current when the run finishes.
+
+REPORT
+
+Create or update:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_05.md
+
+Report:
+
+starting commit and Zig version
+starting 47 full / 5 partial state
+five modules examined
+which were promoted and why
+any left partial and why
+semantic corrections found
+final full/partial counts
+diagnostic protocol actually implemented
+actual category vocabulary
+canonical ID grammar
+historical aliases/replacements
+real diagnostics added or normalized
+native aliases actually mapped
+zero-context diagnostic behavior
+diagnostic discovery command if implemented
+measured projection byte sizes
+source reads required or avoided
+silent/ambiguous failure paths repaired
+validation commands and outcomes
+known limitations
+unclassified failure behavior
+recommended next frontier
+
+Do not claim system_proven, Alpine boot, benchmark superiority, autonomous exponential growth, or external adoption.
+
+DETERMINISM AND POLICY
+
+Regenerate machine-readable projections with canonical tools.
+Run generation twice and require no second-pass diff.
+Never hand-edit generated indexes.
+Generated projections must not exceed canonical confidence.
+Preserve text-only policy.
+Do not add SQLite, binary indexes, caches, archives, or network state.
+Preserve the existing strict root Markdown allowlist and flagship root documents.
+Run the existing root-policy negative fixture.
+
+VALIDATION
+
+Run focused test and smoke validation for all five final modules.
+
+At minimum run current equivalents of:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+python3 tools/query-reference.py agent pending
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py
+PYTHONDONTWRITEBYTECODE=1 python3 tools/validate-agent-contracts.py --self-test
+PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py --check
+
+Exercise multiple real diagnostics through exact lookup:
+
+python3 tools/query-reference.py agent diagnostic ID
+
+Use more than one real failure category if evidence exists. Prove referenced files and commands exist.
+
+If diagnostic discovery is implemented, exercise:
+
+one canonical ID
+one historical alias if available
+one native error alias
+one short symptom
+one unknown term
+
+Unknown must remain unknown rather than produce a false confident diagnosis.
+
+Run:
+
+python3 tools/developer-command.py smoke
+python3 tools/developer-command.py verify-morphic-plan
+python3 tools/developer-command.py verify-morphic-trace
+python3 tools/developer-command.py validate-repository
+
+Complete repository validation must PASS with one truthful final outer Minimus.
+
+Also exercise canonical formatting, contracts, evidence, recipes, conformance, property, differential, fuzz-smoke, deterministic indexes, root-policy negative testing, and text-only policy through the repository's aggregate validation paths.
+
+Inspect git diff at the end for semantic copy residue, fabricated diagnostic certainty, broken aliases, generated noise, undocumented commands, root-document movement, unrelated changes, opaque state, or hand-edited generated files.
+
+Do not commit.
+Do not push.
+
+STOP CONDITIONS
+
+Stop and repair before completion if:
+
+a migrated card teaches declaration traversal instead of functional use
+a card contradicts source ownership/lifetime/allocation/boundedness/error truth
+a diagnostic has no real meaning/evidence
+a repair points to a nonexistent command/file
+a historical diagnostic silently changes meaning
+two canonical diagnostics claim the same unique alias
+a native symptom is assigned a false unique cause
+a serious repository-owned failure returns success
+a required phase fails silently
+a nested Minimus reports PASS inside a failing outer command
+an unknown failure is mislabeled as known
+generated projections exceed canonical confidence
+deterministic regeneration drifts
+full validation fails
+COMMANDS.md is stale
+root policy changes unintentionally
+text-only policy fails
+
+Do not weaken a gate to make the batch green.
+
+EXPECTED END STATE
+
+If canonical truth supports all five migrations:
+
+52 contracted
+52 full
+0 partial
+
+The repository has a deterministic Debug Fast Path using ordinary engineering language plus stable ZIGREF identities.
+
+Known failures preserve native signals and point cheaply to evidence, repair, validation, and minimum useful locations.
+
+Historical diagnostic identities remain resolvable or explicitly replaced.
+
+Serious repository-owned tooling does not silently turn failures into success.
+
+Unknown failures remain explicit and inspectable rather than receiving fabricated diagnoses.
+
+A cold agent can move from known error identity, and where implemented a native error/symptom, to a compact repair path without reading implementation source first.
+
+The repository remains Zig 0.14.0, deterministic, text-first, command-reference-current, and fully validated.
+
+This batch finishes the broad Fast Path migration and makes debugging memory a first-class Snowball substrate.
+
+The next phase should be evidence-driven whole-system composition and controlled cold-agent benchmarking, with Morphic as the flagship pressure test.
+
+FINAL OUTPUT
+
+Do not commit or push.
+Summarize actual changes and validation results.
+The final line must be exactly:
+
+AGENTIC SNOWBALL BATCH 05 PASSED
