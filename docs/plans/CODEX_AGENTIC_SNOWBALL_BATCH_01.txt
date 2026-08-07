@@ -1,0 +1,271 @@
+Work in the existing repository at ~/dev/zig-reference.
+
+Use Zig 0.14.0.
+
+MISSION
+
+Expand Agent Fast Path v2 by migrating the highest-leverage partial modules to full Agent Contract v2 coverage.
+
+This is the first AGENTIC SNOWBALL batch.
+
+The interface standard is already validated. Do not redesign it. Do not add a new agent framework, new query language, new database, new package manager, new daemon, new LSP, new chatbot, new schema family, or another parallel metadata system.
+
+The goal is simple:
+
+MAKE MORE OF THE EXISTING CORPUS CHEAP FOR AGENTS TO USE.
+
+The repository currently has 52 contracted modules, 7 full fast-path modules, and 45 partial modules.
+
+We want each migration to increase the usefulness of modules above it in the dependency graph. Prioritize modules that reduce future agent reading, selection, composition, and repair work for the largest number of downstream modules.
+
+FIRST: USE THE REPOSITORY'S OWN AGENT INTERFACE
+
+Before browsing broadly, run:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+
+Then use existing query operations rather than manually reconstructing the graph:
+
+python3 tools/query-reference.py agent impact MODULE
+python3 tools/query-reference.py agent card MODULE --view all
+python3 tools/query-reference.py agent compose CAPABILITY ...
+python3 tools/query-reference.py agent diagnostic ID
+
+Do not perform repository archaeology when a deterministic query already exposes the answer.
+
+BATCH SELECTION
+
+Rank all partial modules by practical snowball leverage.
+
+Use mechanically defensible signals already available in the repository, including:
+
+- direct dependents;
+- transitive dependents;
+- recipe participation;
+- dependency-closure frequency or obvious foundation position where derivable;
+- whether the module provides a primitive capability reused by several higher modules;
+- whether making it full removes a partial node from the closure of already-full modules.
+
+Do not invent a fake mathematical score if the repository does not contain enough evidence for one. A deterministic ranked rationale is sufficient.
+
+Migrate exactly 10 partial modules in this batch unless a repository invariant makes 10 unsafe. If that happens, stop at the largest safe batch and explain why.
+
+Expected high-value candidates include, but are not limited to:
+
+fixed-capacity-vector
+bounded-byte-reader
+byte-writer
+bitmap-allocator
+generational-handles
+checked-integer-cast
+aligned-address-and-size-helpers
+checked-half-open-range
+distinct-memory-address-types
+endian-integer-codec
+
+Do not blindly use this list. The current dependency graph and impact queries decide the final batch.
+
+MIGRATION STANDARD
+
+For every selected module, migrate it to the exact currently validated Agent Contract v2 standard used by the existing full modules.
+
+Do not change the meaning of the module merely to make metadata easier.
+
+Do not rewrite implementation code unless an actual contradiction, missing testable guarantee, or source/contract drift makes a small correction necessary.
+
+For each migrated module, ensure the existing canonical details.json gains a complete, truthful Agent Contract v2 projection with the currently required fields, including the repository's established concepts for:
+
+- summary;
+- search aliases;
+- capability IDs;
+- use_when;
+- do_not_use_when;
+- entrypoint;
+- public symbols;
+- direct dependency IDs;
+- ownership;
+- borrowing;
+- invalidation;
+- failure guarantees;
+- effects;
+- thread safety;
+- unsafe boundaries;
+- examples;
+- recipes;
+- validation commands;
+- proof contract;
+- diagnostics;
+- selection priority;
+- alternatives;
+- environment constraints;
+- resource profile;
+- construction;
+- operation map;
+- error map;
+- composition;
+- determinism;
+- known gaps;
+- minimal usage;
+- integration notes.
+
+Reuse the existing schema and existing full modules as exemplars.
+
+Do not add fields merely because they sound useful. Keep Agent Contract v2 stable.
+
+TRUTHFULNESS RULE
+
+A full fast-path module must be cheaper to understand, not more confident than the underlying evidence.
+
+Never claim:
+
+- hidden allocation is absent unless the canonical contract/source supports it;
+- freestanding support unless the existing compatibility contract supports it;
+- deterministic behavior unless its scope is explicit;
+- thread safety unless supported;
+- a runtime negative diagnostic without an actual assertion;
+- compile rejection unless Zig actually rejects the fixture;
+- proof stronger than the available evidence;
+- an alternative merely because another module has a similar name.
+
+If a fact is unknown, preserve that uncertainty.
+
+DIAGNOSTICS AND REPAIR
+
+Do not manufacture diagnostics just so every module has one.
+
+Add or migrate ZIGREF-* diagnostics only for meaningful, recognizable misuse or failure conditions that have mechanically honest evidence.
+
+Use the existing evidence classifications exactly.
+
+Where a useful public failure already exists, prefer a compact misuse fixture and canonical repair example when that materially reduces future agent repair cost.
+
+Do not turn ordinary documented errors into dozens of noisy diagnostics.
+
+MINIMUM READ SET
+
+After migration, a future agent should normally be able to answer these questions through the fast path without opening source:
+
+What is this?
+When should I choose it?
+When should I reject it?
+What does it own or borrow?
+What invalidates returned values?
+Does it allocate?
+Can it run hosted or freestanding?
+What does it depend on?
+How do I construct it?
+What are the important operations?
+What public failures must I handle?
+What exact commands validate it?
+What recipes use it?
+What changes if I modify it?
+
+Keep select and integrate cards compact. Do not paste prose documentation into generated indexes.
+
+SNOWBALL MEASUREMENT
+
+Create:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_01.md
+
+Record before and after values for:
+
+- full fast-path modules;
+- partial modules;
+- selected modules;
+- direct dependents unlocked or improved;
+- transitive dependents touched by the selected foundation set;
+- recipes whose dependency closures now contain more full modules;
+- select-card byte sizes;
+- integrate-card byte sizes;
+- number of source files that must be opened for ordinary use of each migrated module;
+- any contradictions or missing evidence discovered during migration.
+
+Use objective byte counts, not token estimates.
+
+Do not claim Discovery Compression Ratio or One-Shot Integration Rate from this migration alone unless you actually run a controlled before/after benchmark that supports the number.
+
+The report may describe this batch as increasing Foothold Density or Snowball Yield qualitatively, but quantitative claims must show their measurement method.
+
+FAST-PATH ACCEPTANCE
+
+After migration, exercise representative scenarios using only the intended zero-context route.
+
+At minimum test:
+
+1. selecting one migrated module from a natural-language requirement;
+2. rejecting one migrated module for a documented incompatibility;
+3. integrating one migrated module using card --view integrate;
+4. composing a capability that crosses at least three migrated dependencies;
+5. impact analysis on one migrated foundation;
+6. one diagnostic/repair path if the migrated batch contains a legitimate diagnostic;
+7. a case where the repository correctly reports something missing or ambiguous rather than guessing.
+
+The point is not to make every query return something. The point is to make correct uncertainty cheap.
+
+DETERMINISM
+
+Regenerate agent indexes.
+
+Run the generator twice and prove the second generation produces no diff.
+
+All generated views must remain deterministic and derived from canonical contracts.
+
+Do not hand-edit generated/agent files.
+
+VALIDATION
+
+Run, at minimum:
+
+python3 tools/query-reference.py agent doctor
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py
+PYTHONDONTWRITEBYTECODE=1 python3 tools/validate-agent-contracts.py --self-test
+PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py --check
+python3 tools/format-module-contracts.py --check
+zig fmt --check .
+python3 tools/check-command-reference.py --check
+zig build validate-agent-contracts --summary all
+zig build check --summary all
+zig build status --summary all
+zig build smoke --summary all
+zig build test --summary all
+zig build recipes --summary all
+zig build conformance --summary all
+zig build validate-repository --summary all
+git diff --check
+
+Do not weaken or skip an existing validation gate to make the batch pass.
+
+Do not change the Zig 0.14.0 baseline.
+
+Do not commit or push unless explicitly instructed.
+
+FINAL REPORT
+
+Report:
+
+- the 10 selected modules and the exact reason each was high leverage;
+- full/partial counts before and after;
+- any canonical contract corrections made;
+- diagnostics or repairs added, if any;
+- fast-path card byte sizes;
+- dependency/recipe snowball impact;
+- representative decide/card/compose/impact results;
+- deterministic-generation result;
+- validator self-test result;
+- complete repository validation result;
+- exact git status;
+- remaining highest-leverage partial frontier for the next batch.
+
+The work succeeds when Agent Fast Path v2 remains unchanged as a standard, but substantially more of the existing repository can be selected, understood, integrated, composed, repaired, and validated through that standard without source archaeology.
+
+The guiding principle is:
+
+DO NOT MAKE THE AGENT SMARTER THAN NECESSARY. MAKE THE REPOSITORY CHEAPER TO UNDERSTAND.
+
+We are not optimizing module count for its own sake. We are building a cumulative engineering corpus where every migrated foundation lowers the cost of future work.
+
+Final line exactly:
+
+AGENTIC SNOWBALL BATCH 01 PASSED
