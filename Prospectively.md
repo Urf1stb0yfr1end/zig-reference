@@ -342,8 +342,5 @@ Every successful composition enlarges the Foundation.
 
 The end state is aspirational, but deliberate:
 
-> **Build almost anything. Rediscover almost nothing.**
->
-> **Own it. Wrap it. Compose it.**
 >
 > **One Agent. One Foundation. A New World.**
