@@ -325,16 +325,65 @@
       ]
     },
     {
+      "aliases": [
+        "fifo",
+        "circular-buffer",
+        "fixed-capacity",
+        "freestanding"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "ring-buffer"
+      ],
       "change_impact": {
         "dependents": [],
         "recipes": []
+      },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "named_import": "ring-buffer",
+        "primary_symbol": "RingBuffer"
       },
       "dependency_build_order": [
         "ring-buffer"
       ],
       "details": "projects/02-ring-buffer/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [],
+      "do_not_use_when": [
+        "Need behavior outside this module’s documented queue responsibility."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "Full",
+          "handling": "Handle the error and retain or reject the input according to the canonical operation contract.",
+          "meaning": "The requested operation violates the documented ring-buffer constraints.",
+          "operation": "count, isEmpty, isFull, push, pop, peek, get, clear"
+        }
+      ],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -345,17 +394,60 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-ring-buffer",
         "zig build smoke-ring-buffer"
       ],
       "id": "02",
+      "integration_notes": [
+        "Use the canonical named import and public operations listed here.",
+        "Run the focused validation commands before integration."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Need behavior outside this module’s documented queue responsibility."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const subject = @import(\"ring-buffer\");",
+        "std.testing.refAllDeclsRecursive(subject);"
+      ],
       "module": "ring-buffer",
+      "operation_map": {
+        "RingBuffer": "RingBuffer",
+        "clear": "clear",
+        "count": "count",
+        "get": "get",
+        "isEmpty": "isEmpty",
+        "isFull": "isFull",
+        "peek": "peek",
+        "pop": "pop",
+        "push": "push"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/02-ring-buffer/src/ring_buffer.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Fixed-capacity FIFO with wrapped logical ordering.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
-      "transitive_dependents": []
+      "transitive_dependents": [],
+      "use_when": [
+        "Provide allocation-free FIFO storage while separating logical order from wrapped physical layout."
+      ]
     },
     {
       "aliases": [
@@ -669,19 +761,74 @@
       ]
     },
     {
+      "aliases": [
+        "lifo",
+        "composition",
+        "allocator",
+        "parser"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "stack"
+      ],
       "change_impact": {
         "dependents": [],
         "recipes": []
+      },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "named_import": "stack",
+        "primary_symbol": "Stack"
       },
       "dependency_build_order": [
         "dynamic-array",
         "stack"
       ],
       "details": "projects/05-stack/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [
         "dynamic-array"
       ],
       "direct_dependents": [],
+      "do_not_use_when": [
+        "Need behavior outside this module’s documented container-adapter responsibility."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "OutOfMemory",
+          "handling": "Handle the error and retain or reject the input according to the canonical operation contract.",
+          "meaning": "The requested operation violates the documented stack constraints.",
+          "operation": "init, deinit, len, isEmpty, push, pop, peek, clearRetainingCapacity"
+        },
+        {
+          "error": "Overflow",
+          "handling": "Handle the error and retain or reject the input according to the canonical operation contract.",
+          "meaning": "The requested operation violates the documented stack constraints.",
+          "operation": "init, deinit, len, isEmpty, push, pop, peek, clearRetainingCapacity"
+        }
+      ],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -692,19 +839,62 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-stack",
         "zig build smoke-stack"
       ],
       "id": "05",
+      "integration_notes": [
+        "Use the canonical named import and public operations listed here.",
+        "Run the focused validation commands before integration."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Need behavior outside this module’s documented container-adapter responsibility."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const subject = @import(\"stack\");",
+        "std.testing.refAllDeclsRecursive(subject);"
+      ],
       "module": "stack",
+      "operation_map": {
+        "Stack": "Stack",
+        "clearRetainingCapacity": "clearRetainingCapacity",
+        "deinit": "deinit",
+        "init": "init",
+        "isEmpty": "isEmpty",
+        "len": "len",
+        "peek": "peek",
+        "pop": "pop",
+        "push": "push"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/05-stack/src/stack.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Allocator-backed LIFO container composed over DynamicArray.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [
         "dynamic-array"
       ],
-      "transitive_dependents": []
+      "transitive_dependents": [],
+      "use_when": [
+        "Expose only last-in-first-out operations while reusing the dynamic array's ownership and growth guarantees."
+      ]
     },
     {
       "aliases": [],
@@ -1156,18 +1346,67 @@
       ]
     },
     {
+      "aliases": [
+        "transition",
+        "lifecycle",
+        "comptime",
+        "freestanding"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "state-machine"
+      ],
       "change_impact": {
         "dependents": [],
         "recipes": [
           "construct-bounded-state-machine"
         ]
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "named_import": "state-machine",
+        "primary_symbol": "StateMachine"
+      },
       "dependency_build_order": [
         "state-machine"
       ],
       "details": "projects/09-state-machine/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [],
+      "do_not_use_when": [
+        "Need behavior outside this module’s documented control-flow responsibility."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "InvalidTransition",
+          "handling": "Handle the error and retain or reject the input according to the canonical operation contract.",
+          "meaning": "The requested operation violates the documented state-machine constraints.",
+          "operation": "init, state, canApply, apply"
+        }
+      ],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -1178,19 +1417,58 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-state-machine",
         "zig build smoke-state-machine"
       ],
       "id": "09",
+      "integration_notes": [
+        "Use the canonical named import and public operations listed here.",
+        "Run the focused validation commands before integration."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Need behavior outside this module’s documented control-flow responsibility."
+      ],
       "matching_recipes": [
         "construct-bounded-state-machine"
       ],
+      "minimal_usage": [
+        "const subject = @import(\"state-machine\");",
+        "std.testing.refAllDeclsRecursive(subject);"
+      ],
       "module": "state-machine",
+      "operation_map": {
+        "StateMachine": "StateMachine",
+        "apply": "apply",
+        "canApply": "canApply",
+        "init": "init",
+        "state": "state"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/09-state-machine/src/state_machine.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Generic explicit state machine with compile-time transition policy and failure-atomic application.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
-      "transitive_dependents": []
+      "transitive_dependents": [],
+      "use_when": [
+        "Represent legal transitions in one compile-time function and reject invalid events without mutating current state."
+      ]
     },
     {
       "aliases": [
@@ -1329,16 +1607,65 @@
       ]
     },
     {
+      "aliases": [
+        "integer",
+        "nonzero",
+        "validated-type",
+        "freestanding"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "nonzero-integer"
+      ],
       "change_impact": {
         "dependents": [],
         "recipes": []
+      },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "named_import": "nonzero-integer",
+        "primary_symbol": "NonZeroInteger"
       },
       "dependency_build_order": [
         "nonzero-integer"
       ],
       "details": "projects/11-nonzero-integer/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [],
+      "do_not_use_when": [
+        "Need behavior outside this module’s documented validated-value responsibility."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "ZeroNotAllowed",
+          "handling": "Handle the error and retain or reject the input according to the canonical operation contract.",
+          "meaning": "The requested operation violates the documented nonzero-integer constraints.",
+          "operation": "init, get"
+        }
+      ],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -1349,17 +1676,54 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-nonzero-integer",
         "zig build smoke-nonzero-integer"
       ],
       "id": "11",
+      "integration_notes": [
+        "Use the canonical named import and public operations listed here.",
+        "Run the focused validation commands before integration."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Need behavior outside this module’s documented validated-value responsibility."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const subject = @import(\"nonzero-integer\");",
+        "std.testing.refAllDeclsRecursive(subject);"
+      ],
       "module": "nonzero-integer",
+      "operation_map": {
+        "NonZeroInteger": "NonZeroInteger",
+        "get": "get",
+        "init": "init"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/11-nonzero-integer/src/nonzero_integer.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Integer wrapper that rejects zero at construction.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
-      "transitive_dependents": []
+      "transitive_dependents": [],
+      "use_when": [
+        "Represent an integer whose stored value is guaranteed not to be zero."
+      ]
     },
     {
       "aliases": [
@@ -1493,16 +1857,58 @@
       ]
     },
     {
+      "aliases": [
+        "counter",
+        "saturating-arithmetic",
+        "quota",
+        "freestanding"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "saturating-counter"
+      ],
       "change_impact": {
         "dependents": [],
         "recipes": []
+      },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "named_import": "saturating-counter",
+        "primary_symbol": "SaturatingCounter"
       },
       "dependency_build_order": [
         "saturating-counter"
       ],
       "details": "projects/13-saturating-counter/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [],
+      "do_not_use_when": [
+        "Need behavior outside this module’s documented numeric-policy responsibility."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -1513,17 +1919,60 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-saturating-counter",
         "zig build smoke-saturating-counter"
       ],
       "id": "13",
+      "integration_notes": [
+        "Use the canonical named import and public operations listed here.",
+        "Run the focused validation commands before integration."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Need behavior outside this module’s documented numeric-policy responsibility."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const subject = @import(\"saturating-counter\");",
+        "std.testing.refAllDeclsRecursive(subject);"
+      ],
       "module": "saturating-counter",
+      "operation_map": {
+        "SaturatingCounter": "SaturatingCounter",
+        "add": "add",
+        "decrement": "decrement",
+        "get": "get",
+        "increment": "increment",
+        "init": "init",
+        "isSaturated": "isSaturated",
+        "reset": "reset",
+        "subtract": "subtract"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/13-saturating-counter/src/saturating_counter.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Unsigned counter that clamps between zero and a compile-time maximum.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
-      "transitive_dependents": []
+      "transitive_dependents": [],
+      "use_when": [
+        "Make clamping overflow policy explicit for counters, quotas, retries, telemetry, and resource pressure."
+      ]
     },
     {
       "aliases": [
@@ -2227,16 +2676,58 @@
       ]
     },
     {
+      "aliases": [
+        "wrapping",
+        "sequence",
+        "protocol",
+        "freestanding"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "wrapping-sequence-number"
+      ],
       "change_impact": {
         "dependents": [],
         "recipes": []
+      },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "named_import": "wrapping-sequence-number",
+        "primary_symbol": "WrappingSequenceNumber"
       },
       "dependency_build_order": [
         "wrapping-sequence-number"
       ],
       "details": "projects/19-wrapping-sequence-number/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [],
+      "do_not_use_when": [
+        "Need behavior outside this module’s documented numeric-policy responsibility."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -2247,29 +2738,111 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-wrapping-sequence-number",
         "zig build smoke-wrapping-sequence-number"
       ],
       "id": "19",
+      "integration_notes": [
+        "Use the canonical named import and public operations listed here.",
+        "Run the focused validation commands before integration."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Need behavior outside this module’s documented numeric-policy responsibility."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const subject = @import(\"wrapping-sequence-number\");",
+        "std.testing.refAllDeclsRecursive(subject);"
+      ],
       "module": "wrapping-sequence-number",
+      "operation_map": {
+        "WrappingSequenceNumber": "WrappingSequenceNumber",
+        "advance": "advance",
+        "distanceForward": "distanceForward",
+        "get": "get",
+        "init": "init",
+        "next": "next"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/19-wrapping-sequence-number/src/wrapping_sequence_number.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Unsigned modulo sequence value with explicit rollover.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
-      "transitive_dependents": []
+      "transitive_dependents": [],
+      "use_when": [
+        "Make sequence rollover a named domain policy."
+      ]
     },
     {
+      "aliases": [
+        "handle",
+        "optional",
+        "type-safety",
+        "freestanding"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "optional-typed-handle"
+      ],
       "change_impact": {
         "dependents": [],
         "recipes": []
+      },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "named_import": "optional-typed-handle",
+        "primary_symbol": "TypedHandle"
       },
       "dependency_build_order": [
         "optional-typed-handle"
       ],
       "details": "projects/20-optional-typed-handle/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [],
+      "do_not_use_when": [
+        "Need behavior outside this module’s documented identity responsibility."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -2280,29 +2853,109 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-optional-typed-handle",
         "zig build smoke-optional-typed-handle"
       ],
       "id": "20",
+      "integration_notes": [
+        "Use the canonical named import and public operations listed here.",
+        "Run the focused validation commands before integration."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Need behavior outside this module’s documented identity responsibility."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const subject = @import(\"optional-typed-handle\");",
+        "std.testing.refAllDeclsRecursive(subject);"
+      ],
       "module": "optional-typed-handle",
+      "operation_map": {
+        "OptionalTypedHandle": "OptionalTypedHandle",
+        "TypedHandle": "TypedHandle",
+        "init": "init",
+        "value": "value"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/20-optional-typed-handle/src/optional_typed_handle.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Tag-distinguished opaque handle with optional absence.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
-      "transitive_dependents": []
+      "transitive_dependents": [],
+      "use_when": [
+        "Prevent accidental interchange of unrelated integer handles and eliminate magic absent values."
+      ]
     },
     {
+      "aliases": [
+        "units",
+        "quantity",
+        "type-safety",
+        "freestanding"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "unit-safe-quantity"
+      ],
       "change_impact": {
         "dependents": [],
         "recipes": []
+      },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "named_import": "unit-safe-quantity",
+        "primary_symbol": "Quantity"
       },
       "dependency_build_order": [
         "unit-safe-quantity"
       ],
       "details": "projects/21-unit-safe-quantity/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [],
+      "do_not_use_when": [
+        "Need behavior outside this module’s documented value-type responsibility."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -2313,17 +2966,56 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-unit-safe-quantity",
         "zig build smoke-unit-safe-quantity"
       ],
       "id": "21",
+      "integration_notes": [
+        "Use the canonical named import and public operations listed here.",
+        "Run the focused validation commands before integration."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Need behavior outside this module’s documented value-type responsibility."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const subject = @import(\"unit-safe-quantity\");",
+        "std.testing.refAllDeclsRecursive(subject);"
+      ],
       "module": "unit-safe-quantity",
+      "operation_map": {
+        "Quantity": "Quantity",
+        "add": "add",
+        "get": "get",
+        "init": "init",
+        "subtract": "subtract"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/21-unit-safe-quantity/src/unit_safe_quantity.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Scalar quantity distinguished by a compile-time unit tag.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
-      "transitive_dependents": []
+      "transitive_dependents": [],
+      "use_when": [
+        "Prevent accidental interchange of values measured in different units."
+      ]
     },
     {
       "aliases": [
@@ -2461,16 +3153,65 @@
       ]
     },
     {
+      "aliases": [
+        "ascii",
+        "validation",
+        "lexer",
+        "freestanding"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "validated-ascii-byte"
+      ],
       "change_impact": {
         "dependents": [],
         "recipes": []
+      },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "named_import": "validated-ascii-byte",
+        "primary_symbol": "AsciiByte"
       },
       "dependency_build_order": [
         "validated-ascii-byte"
       ],
       "details": "projects/23-validated-ascii-byte/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [],
+      "do_not_use_when": [
+        "Need behavior outside this module’s documented text-boundary responsibility."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "NotAscii",
+          "handling": "Handle the error and retain or reject the input according to the canonical operation contract.",
+          "meaning": "The requested operation violates the documented validated-ascii-byte constraints.",
+          "operation": "init, get, isDigit, isAlphabetic"
+        }
+      ],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -2481,29 +3222,117 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-validated-ascii-byte",
         "zig build smoke-validated-ascii-byte"
       ],
       "id": "23",
+      "integration_notes": [
+        "Use the canonical named import and public operations listed here.",
+        "Run the focused validation commands before integration."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Need behavior outside this module’s documented text-boundary responsibility."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const subject = @import(\"validated-ascii-byte\");",
+        "std.testing.refAllDeclsRecursive(subject);"
+      ],
       "module": "validated-ascii-byte",
+      "operation_map": {
+        "AsciiByte": "AsciiByte",
+        "get": "get",
+        "init": "init",
+        "isAlphabetic": "isAlphabetic",
+        "isDigit": "isDigit"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/23-validated-ascii-byte/src/validated_ascii_byte.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Byte value proven to be ASCII.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
-      "transitive_dependents": []
+      "transitive_dependents": [],
+      "use_when": [
+        "Validate ASCII once and carry the range invariant forward."
+      ]
     },
     {
+      "aliases": [
+        "fourcc",
+        "signature",
+        "format",
+        "freestanding"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "fourcc-code"
+      ],
       "change_impact": {
         "dependents": [],
         "recipes": []
+      },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "named_import": "fourcc-code",
+        "primary_symbol": "FourCC"
       },
       "dependency_build_order": [
         "fourcc-code"
       ],
       "details": "projects/24-fourcc-code/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [],
+      "do_not_use_when": [
+        "Need behavior outside this module’s documented binary-value responsibility."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "InvalidLength",
+          "handling": "Handle the error and retain or reject the input according to the canonical operation contract.",
+          "meaning": "The requested operation violates the documented fourcc-code constraints.",
+          "operation": "init, fromString, asBytes, eql"
+        }
+      ],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -2514,17 +3343,56 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-fourcc-code",
         "zig build smoke-fourcc-code"
       ],
       "id": "24",
+      "integration_notes": [
+        "Use the canonical named import and public operations listed here.",
+        "Run the focused validation commands before integration."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Need behavior outside this module’s documented binary-value responsibility."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const subject = @import(\"fourcc-code\");",
+        "std.testing.refAllDeclsRecursive(subject);"
+      ],
       "module": "fourcc-code",
+      "operation_map": {
+        "FourCC": "FourCC",
+        "asBytes": "asBytes",
+        "eql": "eql",
+        "fromString": "fromString",
+        "init": "init"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/24-fourcc-code/src/fourcc_code.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Exact four-byte identifier independent of host endianness.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
-      "transitive_dependents": []
+      "transitive_dependents": [],
+      "use_when": [
+        "Represent four-byte format and protocol identifiers without implementation-defined integer constants."
+      ]
     },
     {
       "change_impact": {
@@ -3051,12 +3919,7 @@
       ]
     },
     {
-      "aliases": [
-        "physical-memory",
-        "page-frame",
-        "address",
-        "hypervisor"
-      ],
+      "aliases": [],
       "alternatives": [],
       "borrowing": {
         "borrows": [
@@ -3118,13 +3981,10 @@
         "type-length-value-decoder"
       ],
       "do_not_use_when": [
-        "hidden allocation",
-        "implicit synchronization"
+        "Not a replacement for a complete length prefixed binary field application policy."
       ],
       "environment_constraints": {
-        "architectures": [
-          "page policy currently architecture-neutral but fixed at 4 KiB"
-        ],
+        "architectures": [],
         "endianness": "unknown",
         "freestanding": "supported",
         "hosted": "supported",
@@ -3155,8 +4015,7 @@
       ],
       "invalidation": {},
       "known_gaps": [
-        "hidden allocation",
-        "implicit synchronization"
+        "Not a replacement for a complete length prefixed binary field application policy."
       ],
       "matching_recipes": [
         "parse-length-prefixed-record"
@@ -3205,12 +4064,7 @@
       ]
     },
     {
-      "aliases": [
-        "physical-memory",
-        "page-frame",
-        "address",
-        "hypervisor"
-      ],
+      "aliases": [],
       "alternatives": [],
       "borrowing": {
         "borrows": [
@@ -3267,13 +4121,10 @@
       ],
       "direct_dependents": [],
       "do_not_use_when": [
-        "hidden allocation",
-        "implicit synchronization"
+        "Not a replacement for a complete type length value decoder application policy."
       ],
       "environment_constraints": {
-        "architectures": [
-          "page policy currently architecture-neutral but fixed at 4 KiB"
-        ],
+        "architectures": [],
         "endianness": "independent",
         "freestanding": "supported",
         "hosted": "supported",
@@ -3304,8 +4155,7 @@
       ],
       "invalidation": {},
       "known_gaps": [
-        "hidden allocation",
-        "implicit synchronization"
+        "Not a replacement for a complete type length value decoder application policy."
       ],
       "matching_recipes": [],
       "minimal_usage": [
@@ -3854,12 +4704,7 @@
       ]
     },
     {
-      "aliases": [
-        "physical-memory",
-        "page-frame",
-        "address",
-        "hypervisor"
-      ],
+      "aliases": [],
       "alternatives": [],
       "borrowing": {
         "borrows": []
@@ -3918,13 +4763,10 @@
         "elf64-program-header-parser"
       ],
       "do_not_use_when": [
-        "hidden allocation",
-        "implicit synchronization"
+        "Not a replacement for a complete elf64 file header parser application policy."
       ],
       "environment_constraints": {
-        "architectures": [
-          "page policy currently architecture-neutral but fixed at 4 KiB"
-        ],
+        "architectures": [],
         "endianness": "little",
         "freestanding": "supported",
         "hosted": "supported",
@@ -3955,8 +4797,7 @@
       ],
       "invalidation": {},
       "known_gaps": [
-        "hidden allocation",
-        "implicit synchronization"
+        "Not a replacement for a complete elf64 file header parser application policy."
       ],
       "matching_recipes": [],
       "minimal_usage": [
@@ -4007,12 +4848,7 @@
       ]
     },
     {
-      "aliases": [
-        "physical-memory",
-        "page-frame",
-        "address",
-        "hypervisor"
-      ],
+      "aliases": [],
       "alternatives": [],
       "borrowing": {
         "borrows": []
@@ -4085,13 +4921,10 @@
       ],
       "direct_dependents": [],
       "do_not_use_when": [
-        "hidden allocation",
-        "implicit synchronization"
+        "Not a replacement for a complete elf64 program header parser application policy."
       ],
       "environment_constraints": {
-        "architectures": [
-          "page policy currently architecture-neutral but fixed at 4 KiB"
-        ],
+        "architectures": [],
         "endianness": "little",
         "freestanding": "supported",
         "hosted": "supported",
@@ -4122,8 +4955,7 @@
       ],
       "invalidation": {},
       "known_gaps": [
-        "hidden allocation",
-        "implicit synchronization"
+        "Not a replacement for a complete elf64 program header parser application policy."
       ],
       "matching_recipes": [],
       "minimal_usage": [

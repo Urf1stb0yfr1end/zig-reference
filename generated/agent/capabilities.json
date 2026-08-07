@@ -142,6 +142,9 @@
     "fixed-resource-storage-derivation": [
       "bounded-system-resource-plan"
     ],
+    "fourcc-code": [
+      "fourcc-code"
+    ],
     "growable-sequence": [
       "dynamic-array"
     ],
@@ -163,8 +166,14 @@
     "monotonic-allocation": [
       "fixed-bump-allocator"
     ],
+    "nonzero-integer": [
+      "nonzero-integer"
+    ],
     "normalized-event-recording": [
       "bounded-deterministic-event-trace"
+    ],
+    "optional-typed-handle": [
+      "optional-typed-handle"
     ],
     "owned-byte-writing": [
       "byte-writer"
@@ -199,6 +208,9 @@
     "replay-observation-foundation": [
       "bounded-deterministic-event-trace"
     ],
+    "ring-buffer": [
+      "ring-buffer"
+    ],
     "riscv-sfence-vma-invalidation": [
       "riscv-sfence-vma-invalidation"
     ],
@@ -210,6 +222,9 @@
     ],
     "safe-integer-narrowing": [
       "checked-integer-cast"
+    ],
+    "saturating-counter": [
+      "saturating-counter"
     ],
     "signedness-validation": [
       "checked-integer-cast"
@@ -223,9 +238,15 @@
     "stable-resource-identity": [
       "generational-handles"
     ],
+    "stack": [
+      "stack"
+    ],
     "stale-handle-rejection": [
       "fixed-capacity-object-pool",
       "generational-handles"
+    ],
+    "state-machine": [
+      "state-machine"
     ],
     "sv39-page-table-entry": [
       "riscv-sv39-page-table-entry"
@@ -242,6 +263,12 @@
     "typed-virtual-address": [
       "distinct-memory-address-types"
     ],
+    "unit-safe-quantity": [
+      "unit-safe-quantity"
+    ],
+    "validated-ascii-byte": [
+      "validated-ascii-byte"
+    ],
     "validated-bit-flags": [
       "validated-bit-flags"
     ],
@@ -253,6 +280,9 @@
     ],
     "virtual-address-indexing": [
       "riscv-sv39-virtual-address-indexing"
+    ],
+    "wrapping-sequence-number": [
+      "wrapping-sequence-number"
     ],
     "writer-checkpoint-rollback": [
       "byte-writer"

@@ -1039,5 +1039,114 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Generic explicit state machine with compile-time transition policy and failure-atomic application.",
+    "search_aliases": [
+      "transition",
+      "lifecycle",
+      "comptime",
+      "freestanding"
+    ],
+    "capability_ids": [
+      "state-machine"
+    ],
+    "use_when": [
+      "Represent legal transitions in one compile-time function and reject invalid events without mutating current state."
+    ],
+    "do_not_use_when": [
+      "Need behavior outside this module’s documented control-flow responsibility."
+    ],
+    "entrypoint": "projects/09-state-machine/src/state_machine.zig",
+    "public_symbols": [
+      "StateMachine"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "borrows": []
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "no_hidden_allocation",
+      "deterministic_order",
+      "mutates_receiver"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-state-machine",
+      "zig build smoke-state-machine"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "state-machine",
+      "primary_symbol": "StateMachine",
+      "initialization": "std.testing.refAllDeclsRecursive(subject);"
+    },
+    "operation_map": {
+      "StateMachine": "StateMachine",
+      "init": "init",
+      "state": "state",
+      "canApply": "canApply",
+      "apply": "apply"
+    },
+    "error_map": [
+      {
+        "error": "InvalidTransition",
+        "operation": "init, state, canApply, apply",
+        "meaning": "The requested operation violates the documented state-machine constraints.",
+        "handling": "Handle the error and retain or reject the input according to the canonical operation contract."
+      }
+    ],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Need behavior outside this module’s documented control-flow responsibility."
+    ],
+    "minimal_usage": [
+      "const subject = @import(\"state-machine\");",
+      "std.testing.refAllDeclsRecursive(subject);"
+    ],
+    "integration_notes": [
+      "Use the canonical named import and public operations listed here.",
+      "Run the focused validation commands before integration."
+    ]
   }
 }

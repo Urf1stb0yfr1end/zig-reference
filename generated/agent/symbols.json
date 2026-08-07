@@ -10,6 +10,9 @@
     "AlignmentError": [
       "aligned-address-and-size-helpers"
     ],
+    "AsciiByte": [
+      "validated-ascii-byte"
+    ],
     "BinaryCursorCheckpoint": [
       "binary-cursor-checkpoint"
     ],
@@ -94,6 +97,9 @@
     "FixedVector": [
       "fixed-capacity-vector"
     ],
+    "FourCC": [
+      "fourcc-code"
+    ],
     "GuestPhysicalAddress": [
       "distinct-memory-address-types"
     ],
@@ -119,11 +125,17 @@
     "Mutation": [
       "riscv-sv39-page-table-builder"
     ],
+    "NonZeroInteger": [
+      "nonzero-integer"
+    ],
     "NormalizedEvent": [
       "bounded-deterministic-event-trace"
     ],
     "ObjectPool": [
       "fixed-capacity-object-pool"
+    ],
+    "OptionalTypedHandle": [
+      "optional-typed-handle"
     ],
     "PageOwner": [
       "riscv-page-table-page-owner"
@@ -169,11 +181,20 @@
     "PostSealAllocation": [
       "bounded-system-resource-plan"
     ],
+    "Quantity": [
+      "unit-safe-quantity"
+    ],
     "RegionKind": [
       "physical-memory-region-set"
     ],
     "Result": [
       "riscv-sv39-page-table-walker"
+    ],
+    "RingBuffer": [
+      "ring-buffer"
+    ],
+    "SaturatingCounter": [
+      "saturating-counter"
     ],
     "Segment": [
       "elf64-program-header-parser"
@@ -181,11 +202,23 @@
     "SegmentType": [
       "elf64-program-header-parser"
     ],
+    "Stack": [
+      "stack"
+    ],
+    "StateMachine": [
+      "state-machine"
+    ],
     "TlvDecoder": [
       "type-length-value-decoder"
     ],
+    "TypedHandle": [
+      "optional-typed-handle"
+    ],
     "ValidatedBitFlags": [
       "validated-bit-flags"
+    ],
+    "WrappingSequenceNumber": [
+      "wrapping-sequence-number"
     ],
     "alignDown": [
       "aligned-address-and-size-helpers"

@@ -13,7 +13,7 @@ def load(name):
 
 
 def emit(value):
-    print(json.dumps(value, sort_keys=True, separators=(",", ":")))
+    print(json.dumps(value, sort_keys=True, separators=(",", ":")), flush=True)
 
 def words(value): return set(re.findall(r"[a-z0-9]+", value.lower()))
 
@@ -42,7 +42,10 @@ def agent_query(argv):
             checks.append({"component":component,"status":"ok" if ok else "error","reason":"check passed" if ok else (run.stderr.strip().splitlines()[-1] if run.stderr.strip() else "check failed"),"repair":"python3 tools/build-agent-index.py" if "index" in component and not ok else "python3 tools/validate-agent-contracts.py" if not ok else ""})
         zig=subprocess.run(["zig","version"],capture_output=True,text=True,timeout=5); version=zig.stdout.strip(); ok=zig.returncode==0 and version=="0.14.0"; bad|=not ok
         checks.append({"component":"zig","status":"ok" if ok else "error","reason":f"available version {version or 'unknown'}; expected 0.14.0","repair":"install Zig 0.14.0" if not ok else ""})
-        emit({"status":"error" if bad else "ok","query":{"operation":"doctor"},"results":checks,"diagnostics":[] if not bad else [{"code":"ZIGREF-ENV-UNUSABLE","reason":"one or more fast-path prerequisites failed","component":"doctor","repair":"inspect failing results"}]}); return 1 if bad else 0
+        emit({"status":"error" if bad else "ok","query":{"operation":"doctor"},"results":checks,"diagnostics":[] if not bad else [{"code":"ZIGREF-ENV-UNUSABLE","reason":"one or more fast-path prerequisites failed","component":"doctor","repair":"inspect failing results"}]})
+        if not bad:
+            subprocess.run([sys.executable,"tools/developer-minimus.py","--command","python3 tools/query-reference.py agent doctor","--summary","Agent Fast Path prerequisites, indexes, contracts, and Zig baseline are healthy.","--modules","--location","index=generated/agent/modules.json","--location","contracts=details.schema.json"],cwd=ROOT,check=True)
+        return 1 if bad else 0
     if kind == "pending":
         result = [x["module"] for x in modules if x["status"] == "partial"]
     elif kind == "module":
