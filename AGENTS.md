@@ -6,18 +6,115 @@
 
 The long-term goal is that large Zig systems can be assembled by discovering modules, reading their contracts, following dependencies, reusing validated implementations, and writing only project-specific orchestration.
 
+## Zero-context agent entry
+
+Assume every coding agent may arrive with no prior knowledge of this repository.
+
+The repository must explain itself through predictable, conventional, machine-readable paths instead of requiring broad source archaeology. A new agent should be able to determine what exists, what to choose, what to reject, how to integrate it, what can fail, what depends on it, and how to validate the result before reading large amounts of source.
+
+The preferred mental model is:
+
+```text
+task
+→ discover
+→ select or reject
+→ compose existing capabilities
+→ inspect the smallest useful integration contract
+→ write only genuinely missing code
+→ validate
+→ repair through known diagnostics
+```
+
+Do not make a new agent earn basic repository knowledge by recursively reading directories. Query tools and generated indexes are the fast path; canonical contracts provide the next level of detail; source is for implementation details, debugging internals, and genuinely new work.
+
+When extending agent tooling, prefer adding compact structured fields to existing canonical contracts and deriving indexes from them over creating more per-module files. Author only facts that cannot be derived reliably. Dependency closure, reverse dependents, build order, recipe relationships, evidence summaries, focused validation, and change impact should be generated whenever possible.
+
+A fast-path response should be substantially smaller than the documentation it summarizes. Do not copy large README, MASTERY, DETAILS, or source passages into generated agent indexes.
+
+## Standard vocabulary and diagnostics
+
+Agents should not need to learn a private language or repository-specific mini-DSL before they can work here.
+
+Use ordinary engineering terms, conventional JSON, exact Zig symbols, exact paths, exact commands, and stable identifiers. Prefer recognizable concepts such as dependency, capability, error, ownership, borrowing, invalidation, recipe, validation, diagnostic, repair, hosted, freestanding, and deterministic over clever local terminology.
+
+Repository-recognized misuse and repair knowledge uses the stable `ZIGREF-*` diagnostic namespace. A diagnostic identifier must keep the same meaning once published. New diagnostics should be literal enough that a brand-new agent can recognize the category without reading a glossary, for example `ZIGREF-EVENT-TRACE-FULL` or `ZIGREF-TOPO-CYCLE`.
+
+A useful diagnostic should lead directly to action. Where applicable, connect it to:
+
+- the violated rule;
+- the affected module or recipe;
+- the exact fixture or evidence classification;
+- the canonical repair example or repair strategy;
+- the focused validation command.
+
+Do not hide the important fact behind prose. The stable code, one-line reason, exact path, and next useful command should be easy to extract.
+
+Do not claim the compiler rejects a misuse when it does not. Distinguish real compile failures, runtime-negative tests, future-analyzer expectations, and documented misuse examples.
+
+## No silent failures and anti-stall rule
+
+Problems should be visible as early and locally as practical.
+
+Do not silently drop work, silently overwrite evidence, silently retry forever, silently substitute a fallback, or convert a failure into an apparent success. If a fallback is intentional, report that the fallback occurred and why.
+
+Tooling, generators, validators, recipes, and long-running workflows should emit minimal deterministic status at meaningful phase boundaries. Normal success output should remain compact. Failure output should become more specific, not more verbose everywhere.
+
+When a command can take noticeable time, print enough information for a new agent to know what is happening without enabling a separate debug framework. Prefer concise progress facts such as:
+
+```text
+phase or operation
+module / recipe / file currently being processed
+count or boundary discovered when useful
+stable diagnostic code on recognized failure
+exact reason
+exact affected path
+next focused command or repair path when known
+```
+
+Avoid chatty per-item logging for large scans. One phase-start marker, useful bounded progress for genuinely long work, and one phase-result marker are usually enough.
+
+External commands, subprocesses, and retry loops should be bounded where practical. A failure should identify the command that failed and preserve its exit status. Do not mask nonzero exits merely to keep an aggregate command moving.
+
+Generated state must fail closed on drift: stale indexes, missing references, unsupported evidence claims, inconsistent paths, and invalid contracts should be reported explicitly rather than ignored.
+
+The purpose of debug/status output is not human decoration. It is to prevent agents from wasting context guessing whether a process is hung, what failed, or where to look next.
+
+## Agent efficiency rule
+
+Every reusable addition should reduce future search and reasoning cost, not merely add code.
+
+Before adding metadata, ask whether the fact can be derived from existing canonical truth. Before adding prose, ask whether a controlled identifier, exact symbol, path, or command would answer the agent's question more cheaply. Before adding another file, ask whether the existing contract can express the fact cleanly.
+
+The repository should make these questions cheap to answer:
+
+- What module should I use?
+- What module should I reject for this task?
+- What capabilities are already solved?
+- What remains genuinely missing?
+- How do I import and initialize the selected module?
+- Which public operation matches the action I need?
+- What does the module own or borrow?
+- What invalidates returned values?
+- What can fail and what is the canonical response?
+- Which recipes already compose these capabilities?
+- What may break if I modify this shared foundation?
+- Which focused command verifies the change?
+
+The ideal project-building agent spends its reasoning budget on the unsolved portion of the requested system, not on rediscovering repository facts already known here.
+
 ## Required discovery order
 
 Before creating or modifying a module:
 
-1. Read `docs/catalog/MODULES.md`.
-2. Read root `docs/standards/DETAILS.md` and `details.schema.json`.
-3. Search existing module names and purposes before writing new mechanisms.
-4. Read candidate modules' `details.json` first.
-5. Read candidate modules' `DETAILS.md` for human explanation.
-6. Inspect source and tests only after the contracts identify the relevant module.
-7. Follow dependency links recursively.
-8. Reuse compatible modules instead of copying or recreating them.
+1. Query first with `tools/query-reference.py` and inspect generated indexes before broad searches.
+2. Read `docs/catalog/MODULES.md`.
+3. Read root `docs/standards/DETAILS.md` and `details.schema.json` when contract structure matters.
+4. Search existing module names, capabilities, symbols, errors, and recipes before writing new mechanisms.
+5. Read candidate modules' `details.json` before source.
+6. Read candidate modules' `DETAILS.md` when human explanation is needed.
+7. Inspect source and tests only after the contracts identify the relevant module or when implementation internals are the actual task.
+8. Follow dependency links recursively.
+9. Reuse compatible modules instead of copying or recreating them.
 
 ## Required module files
 
@@ -75,8 +172,8 @@ Do not use vague claims such as "safer" or "better" without naming the mechanism
 
 Before implementing a container, parser helper, byte primitive, allocator helper, state tracker, queue, writer, reader, or handle system:
 
-1. grep `docs/catalog/MODULES.md` and all `details.json` files;
-2. compare public surfaces, ownership, environment, and failure semantics;
+1. query generated capability/module/symbol indexes;
+2. compare candidate public surfaces, ownership, environment, resource profile, and failure semantics;
 3. import the existing module when compatible;
 4. wrap or adapt it only when the new environment requires different guarantees;
 5. document every dependency using exact repository paths and symbols;
@@ -92,20 +189,22 @@ Every `details.json` must validate conceptually against `details.schema.json` an
 - Use empty strings, empty arrays, empty objects, or `null` where the schema permits.
 - Never invent validation status, benchmarks, portability, or safety guarantees.
 - Public symbols, paths, errors, commands, and dependencies must match the repository.
-- Record direct dependencies and reverse dependents.
+- Record direct dependencies and reverse dependents according to the current schema and generation policy.
 - Record exact ownership and invalidation rules.
 - Record whether the module is compiler-validated.
 - Keep field order consistent with the schema for readable diffs.
+- Prefer compact structured agent-facing facts over repeating prose already available elsewhere.
+- Do not manually author graph facts that canonical repository tooling can derive reliably.
 
 ## Dependency graph rules
 
 Dependencies must form a comprehensible directed graph.
 
-- Prefer lower-numbered foundational modules as dependencies.
+- Prefer lower-numbered foundational modules as dependencies when they genuinely fit.
 - Avoid cycles.
-- Record exact source path, imported symbol, and reason for each edge.
-- Record expected dependents so reverse discovery is possible.
-- When a dependency changes its contract, inspect all declared dependents.
+- Record exact source path, imported symbol, and reason for each canonical edge.
+- Make reverse discovery available through generated indexes.
+- When a dependency changes its contract, inspect affected dependents and recipes.
 
 ## Build integration
 
@@ -125,16 +224,16 @@ Do not claim a module is validated until its command has run successfully with t
 
 For a request such as a hypervisor, database, server, compiler, or filesystem:
 
-1. Decompose the request into capabilities.
-2. Search `docs/catalog/MODULES.md` and `details.json` files by capability, input, output, environment, and expected dependents.
-3. Select the smallest compatible module set.
-4. Follow dependencies recursively.
+1. Decompose the request into capabilities and constraints.
+2. Query repository indexes before reading source broadly.
+3. Select the smallest compatible module set and explicitly reject incompatible candidates.
+4. Follow dependencies recursively and inspect matching recipes.
 5. Verify hosted versus freestanding assumptions.
-6. Verify allocator, thread-safety, endian, platform, and lifetime compatibility.
-7. Create an integration map before coding.
+6. Verify allocator, resource bounds, thread-safety, endian, platform, and lifetime compatibility.
+7. Create the smallest useful integration map before coding.
 8. Import existing modules through exact documented paths.
 9. Add only missing domain logic and orchestration.
-10. Run every dependency test and new integration tests.
+10. Run focused dependency/integration tests first, then the required aggregate validation.
 11. Update catalog and contracts when new reusable modules emerge.
 
 Do not promise that large systems require no reasoning or can always be completed instantly. The repository reduces rediscovery and duplication; it does not remove hardware, protocol, architecture, and integration complexity.
@@ -155,24 +254,26 @@ A module is complete only when:
 - root build steps exist;
 - `README.md`, `MASTERY.md`, `DETAILS.md`, and `details.json` exist;
 - paths and symbols match source;
-- dependencies and dependents are recorded;
+- dependencies and dependents are discoverable;
 - `docs/catalog/MODULES.md` is updated;
 - compatibility and validation status are honest;
-- no compatible repository module was unnecessarily recreated.
+- no compatible repository module was unnecessarily recreated;
+- recognized failures are visible and lead to a useful diagnostic or exact error path;
+- changed tooling does not leave agents with silent long-running phases or ambiguous failure output.
 
 ## Foundation workflow
 
 Future agents must follow this order:
 
 1. Query first with `tools/query-reference.py`.
-2. Read generated identity in `generated/modules.json`.
-3. Open the selected module's `details.json`.
+2. Read the smallest useful generated result rather than loading every contract.
+3. Open the selected module's `details.json` when the generated view is insufficient.
 4. Open `port.js` only for Zig-version work.
 5. Follow generated dependency/build order.
 6. Reuse compatible existing modules.
 7. Edit canonical sources only: source/tests, `details.json`, `port.js`, or ADRs according to authority.
 8. Regenerate committed textual views.
-9. Run repository validation under Zig 0.14.0.
+9. Run focused validation, then repository validation under Zig 0.14.0.
 10. Record executed validation evidence honestly; never mark skipped work passed.
 11. Never commit binary generated artifacts, databases, caches, executables, images, archives, or fuzz output.
 
@@ -185,3 +286,4 @@ Future agents must follow this order:
 - Never hand-edit generated indexes, duplicate modules without querying, add undeclared dependencies, bypass applicable smoke tests, ignore lifecycle replacements, or treat generated views as canonical.
 - Never change the Zig 0.14.0 baseline or claim later-version compatibility without evidence.
 - Never manually synchronize multiple copies of a fact, and never create SQLite or other opaque query state where transparent JSON suffices.
+- Preserve nonzero exit status on failure and make recognized failures visible enough that a new agent can identify the affected phase and next useful inspection point.
