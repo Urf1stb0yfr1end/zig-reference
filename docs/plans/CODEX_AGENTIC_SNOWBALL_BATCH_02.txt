@@ -1,0 +1,344 @@
+CODEX REQUEST — AGENTIC SNOWBALL BATCH 02
+
+Repository: ~/dev/zig-reference
+Baseline: Zig 0.14.0
+Agent interface: Agent Fast Path v2
+Starting corpus state: 52 contracted modules, 17 full fast-path modules, 35 partial modules.
+
+MISSION
+
+Continue the agentic snowball.
+
+This batch should make zig-reference materially easier for a zero-context coding agent to use without redesigning the agent interface. Increase the amount of existing systems-engineering knowledge that can be discovered, selected, rejected, composed, integrated, validated, and repaired through the same compact deterministic grammar.
+
+This batch has two equally explicit responsibilities:
+
+1. Restore the two intentional flagship vision documents to repository root and make repository policy recognize those exact root documents as intentional.
+2. Migrate the next highest-leverage batch of existing partial modules to the already-established Agent Contract v2 fast path.
+
+Do not redesign Agent Fast Path v2.
+Do not invent another metadata system.
+Do not change the Zig 0.14.0 baseline.
+Do not add unrelated functionality.
+Do not weaken repository validation.
+Do not mass-migrate modules merely to increase a count.
+Do not create opaque query state or a database.
+Do not commit or push.
+
+FIRST ACTIONS
+
+Read AGENTS.md first.
+
+Then run:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+
+Then inspect:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_01.md
+COMMANDS.md
+
+Use generated agent indexes, agent impact, dependency closure, recipe participation, and canonical contracts before broad source inspection.
+
+PART A — RESTORE THE TWO FLAGSHIP VISION DOCUMENTS TO ROOT
+
+These two documents are intentionally flagship root documents:
+
+MAYBE_THE_NEW_WORLD_FITS_IN_5_GB.md
+Prospectively.md
+
+They currently live under docs/vision/ because the root-document policy rejected them. That move solved the policy failure but not the intended information architecture.
+
+Restore them to repository root:
+
+docs/vision/MAYBE_THE_NEW_WORLD_FITS_IN_5_GB.md -> MAYBE_THE_NEW_WORLD_FITS_IN_5_GB.md
+docs/vision/Prospectively.md -> Prospectively.md
+
+Update repository policy so these exact two documents are approved root Markdown documents.
+
+The current static port checker contains an explicit root Markdown allowlist. Preserve the strict allowlist model. Add these exact filenames to the intentional allowlist rather than allowing arbitrary root Markdown.
+
+The resulting policy must still reject an unknown stray root Markdown file.
+
+Do not weaken the error message or silently ignore unknown root documentation.
+
+If more than one policy/checker independently governs root Markdown, inspect them all and make the smallest coherent change necessary. Avoid creating a new duplicated manual allowlist if an existing canonical policy source can be reused cheaply, but do not redesign unrelated tooling merely for abstraction purity.
+
+Acceptance for Part A:
+
+- both flagship documents are physically at repository root;
+- neither duplicate remains under docs/vision/;
+- both exact filenames pass repository validation;
+- an arbitrary unapproved root Markdown filename would still fail policy;
+- no blanket *.md exception is introduced;
+- git diff shows a clean move plus narrowly scoped policy changes.
+
+PART B — SELECT THE NEXT SNOWBALL FRONTIER MECHANICALLY
+
+Batch 01 ended at 17 full modules and 35 partial modules.
+
+Do not simply take the first ten module numbers.
+
+Recompute leverage from the current tree using repository-native information. Rank partial modules using mechanically explainable factors, in this order unless current graph evidence demonstrates a better deterministic ordering:
+
+1. transitive dependents improved;
+2. direct dependents improved;
+3. whether migration removes a partial foundation from the closure of an already-full module;
+4. recipe participation and recipe-closure completion;
+5. reuse as a low-level primitive across otherwise separate areas;
+6. ability to unlock a coherent next composition frontier.
+
+Use agent impact and generated dependency data. Do not invent a synthetic score unless a score already exists canonically.
+
+Batch 01 identified these likely next-frontier candidates, but re-evaluate them against current main instead of treating this list as authority:
+
+binary-cursor-checkpoint
+validated-enum-decoder
+bounded-binary-sub-reader
+bit-set
+dynamic-array
+physical-page-frame-number-and-address-conversion
+
+Also inspect all remaining partial modules for candidates with greater current mechanical leverage.
+
+Select exactly TEN partial modules for Batch 02 unless a real correctness blocker makes exactly ten impossible. If blocked, stop and report the blocker rather than silently changing the batch size.
+
+PART C — MIGRATE EXACTLY TEN EXISTING MODULES TO AGENT CONTRACT V2
+
+For each selected module, migrate the existing canonical details.json to the already-established Agent Contract v2 projection using the current schema and current generator behavior.
+
+Do not change implementation behavior merely to make metadata easier.
+
+Do not manufacture certainty.
+
+Every migrated module should expose, where supported by canonical truth:
+
+- concise summary;
+- aliases;
+- controlled capability IDs;
+- use_when;
+- do_not_use_when;
+- selection priority;
+- exact named import;
+- primary/public symbols;
+- environment constraints;
+- resource profile;
+- ownership;
+- borrowing;
+- invalidation;
+- thread-safety status;
+- determinism scope;
+- public operation map;
+- public error map;
+- failure guarantees;
+- direct dependencies;
+- dependency build order;
+- matching/preferred recipes;
+- composition relationships where genuinely supported;
+- known gaps;
+- minimal usage;
+- focused validation commands;
+- proof contract only when real evidence exists;
+- diagnostic IDs only when a real stable diagnostic exists.
+
+Do not create a diagnostic just so a field is non-empty.
+Do not claim compile-time rejection for behavior Zig does not reject.
+Do not mark hosted/freestanding compatibility supported unless canonical evidence supports it.
+Do not describe allocator-backed behavior as allocation-free.
+Do not erase lifetime or invalidation restrictions during projection.
+Do not make the generated projection more confident or less restrictive than canonical truth.
+
+If a module's canonical descriptive metadata is incomplete, improve only facts that are mechanically supportable from public signatures, dependencies, implementation, tests, existing docs, and build wiring. Preserve unknowns where uncertainty is real.
+
+PART D — KEEP PROGRESSIVE DISCLOSURE CHEAP
+
+The objective is not maximum metadata volume. The objective is minimum cost of correct use.
+
+For every migrated module verify that an ordinary external user can normally perform selection and integration using:
+
+agent card MODULE --view select
+agent card MODULE --view integrate
+
+without opening source merely to discover basic import, construction, ownership, borrowing, invalidation, failure, and focused-validation facts.
+
+Source remains authoritative for implementation internals, modification, debugging, or unresolved facts.
+
+Do not bloat cards with prose copied from README, DETAILS, MASTERY, or source.
+
+Measure exact select-card and integrate-card stdout byte sizes for all ten newly migrated modules.
+
+Record whether ordinary selection/integration requires opening source before and after migration, using the same methodology as Batch 01.
+
+PART E — COMMANDS.md IS MANDATORY FOR EVERY CODEX RUN
+
+This is now a permanent project rule.
+
+Every Codex run that changes this repository must review COMMANDS.md before completion.
+
+Update COMMANDS.md whenever this run changes or establishes repository commands, command arguments, workflow, command purpose, validation status, or important runnable operational knowledge.
+
+For this run specifically:
+
+- ensure the current Agent Fast Path commands are accurately represented;
+- ensure any policy-validation or new/changed runnable command used or introduced by this batch is accurately represented;
+- record materially established validation status only when it actually executed;
+- do not claim a command exists unless it exists;
+- do not claim a command passed unless it actually ran successfully.
+
+Even if no new command surface is introduced, inspect COMMANDS.md and make any update required to keep it current with the repository state established by this run.
+
+Run:
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+
+COMMANDS.md must be current when the run finishes.
+
+PART F — GENERATED STATE AND DETERMINISM
+
+Regenerate agent indexes from canonical contracts.
+
+Run the generator twice or otherwise prove deterministic regeneration. The second generation must produce no diff.
+
+Do not hand-edit generated/agent outputs.
+
+Verify:
+
+- module statuses move from partial to full only for the ten selected modules;
+- dependencies remain graph-derived and exact;
+- generated capability mappings contain no stale entries;
+- generated cards remain deterministic;
+- no duplicate diagnostic IDs are introduced;
+- no stale cross-module paths or symbols appear;
+- no projection drops canonical ownership, borrowing, invalidation, environment, or failure restrictions.
+
+PART G — NEGATIVE / FAIL-CLOSED TESTING
+
+Preserve and run the current Agent Contract validator negative self-tests.
+
+Add narrowly scoped regression coverage where needed for new failure modes discovered during this batch.
+
+At minimum prove that validation rejects or detects, as applicable:
+
+- an unapproved arbitrary root Markdown document;
+- nonexistent dependency references;
+- nonexistent recipe references;
+- invalid public/operation symbols;
+- unsupported evidence claims;
+- projection drift or generated index drift;
+- stale cross-module paths if such validation exists;
+- any new exact policy invariant introduced by this batch.
+
+Do not weaken existing negative cases to make the batch pass.
+
+PART H — REPORT THE SNOWBALL EFFECT
+
+Create:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_02.md
+
+The report must be factual and compact.
+
+Include:
+
+1. exact ten selected modules;
+2. mechanical ranking rationale;
+3. corpus state before and after;
+4. full vs partial module counts;
+5. unique direct dependents improved;
+6. unique transitive dependents touched;
+7. recipes whose closure gained full modules;
+8. exact select/integrate card byte sizes for the ten migrations;
+9. before/after source-file requirement for ordinary selection/integration;
+10. any canonical uncertainty intentionally preserved;
+11. any metadata contradictions or copy residue fixed;
+12. root vision-document policy change and proof arbitrary root Markdown is still rejected;
+13. COMMANDS.md changes or explicit reason no textual change was required after review;
+14. deterministic generation result;
+15. focused and aggregate validation executed;
+16. the next highest-leverage partial frontier after Batch 02.
+
+Do not call these numbers performance benchmarks unless the methodology truly warrants that label. They are repository measurements.
+
+PART I — REQUIRED SPOT CHECKS
+
+After migration, perform representative fast-path checks that demonstrate behavior rather than merely schema validity.
+
+At minimum:
+
+- agent bootstrap reports the expected new full/partial counts;
+- agent doctor is all ok;
+- agent decide selects an appropriate newly migrated module for at least two representative tasks;
+- agent card --view select exposes a meaningful rejection condition for at least two newly migrated modules;
+- agent card --view integrate exposes exact construction, ownership/lifetime/failure information for at least two newly migrated modules;
+- agent compose crosses multiple Batch 01 + Batch 02 foundations in at least one real composition;
+- agent impact on a newly migrated high-leverage foundation reports the expected direct/transitive dependents;
+- a deliberately nonexistent capability remains missing instead of being guessed;
+- an unknown diagnostic remains absent instead of receiving invented evidence.
+
+PART J — REQUIRED VALIDATION
+
+Run all focused unit and smoke commands for the ten selected modules.
+
+Then run at least:
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/validate-agent-contracts.py --self-test
+PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py
+python3 tools/format-module-contracts.py --check
+zig fmt --check .
+node tools/check-port-contracts.js
+zig build validate-agent-contracts --summary all
+zig build check --summary all
+zig build status --summary all
+zig build smoke --summary all
+zig build test --summary all
+zig build recipes --summary all
+zig build conformance --summary all
+zig build validate-repository --summary all
+git diff --check
+
+If current AGENTS.md or repository-standard validation requires additional gates, run them too.
+
+Do not hide a failure by continuing as if the run passed.
+
+A failed validation must remain failed until corrected or explicitly reported as the blocker.
+
+PART K — FINAL TREE / HANDOFF
+
+Do not commit.
+Do not push.
+
+Before completion print:
+
+- git status --short --branch;
+- git diff --stat;
+- the exact ten migrated modules;
+- before/after full and partial counts;
+- exact two restored root vision-document paths;
+- root-document negative-policy result;
+- COMMANDS.md status;
+- deterministic generation result;
+- focused validation summary;
+- aggregate repository validation summary;
+- next partial frontier.
+
+The final repository must contain the two flagship documents at these exact paths:
+
+MAYBE_THE_NEW_WORLD_FITS_IN_5_GB.md
+Prospectively.md
+
+The final line must be exactly:
+
+AGENTIC SNOWBALL BATCH 02 PASSED
+
+WHY THIS BATCH EXISTS
+
+The repository should become more capable without becoming harder to understand.
+
+Each migrated foundation should make more future projects cheaper for agents to reason about. Each validated contract should remove rediscovery work. Each composition should let an agent spend more of its context on genuinely unsolved domain logic rather than repository archaeology.
+
+The target is cumulative engineering memory with a stable machine-facing grammar: solve a mechanism once, describe it precisely once, derive compact views, validate continuously, and let future agents reuse it at progressively lower cost.
