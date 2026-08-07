@@ -2,7 +2,7 @@
 
 > **Aim:** make `zig-reference` the foundation from which coding agents can build almost any class of software as directly, correctly, and efficiently as possible.
 
-`zig-reference` began as a systems-programming reference. The long-range goal is larger: create a cumulative engineering corpus whose components, contracts, diagnostics, recipes, and validation rules let an agent move from hardware-adjacent code all the way to complete applications without repeatedly rediscovering solved knowledge.
+`zig-reference` began as a systems-programming reference. The long-range goal is larger: create a cumulative engineering corpus whose components, contracts, diagnostics, recipes, adapters, and validation rules let an agent move from hardware-adjacent code all the way to complete applications without repeatedly rediscovering solved knowledge.
 
 This roadmap is aspirational. It does not claim that every domain is already covered, that one language is universally best, or that all software can be reduced to a fixed recipe. The objective is to make the solved parts of software engineering maximally reusable so that future humans and agents spend their effort only on genuinely new work.
 
@@ -40,17 +40,21 @@ Browser and frontend applications
 Backend and cloud services
   ↓
 Distributed and networked applications
+  ↓
+Domain bridges, external systems, and platform adapters
 ```
 
 A coding agent should eventually be able to describe the capabilities a system needs and let the corpus answer:
 
 - which canonical modules already solve each requirement;
-- which implementation language is appropriate for each boundary;
+- which implementation language or platform boundary is appropriate;
 - what dependencies are required;
 - what is owned, borrowed, allocated, or invalidated;
 - what environments are supported;
 - what diagnostics and repair paths exist;
 - what exact commands prove the integration still works;
+- what external systems should be wrapped rather than reimplemented;
+- what composition recipe connects the pieces;
 - what genuinely new code remains to be written.
 
 The ideal interaction is capability-first, not language-first.
@@ -360,6 +364,7 @@ reference/
 ├── typescript/
 ├── go/
 ├── capabilities/
+├── adapters/
 ├── recipes/
 ├── diagnostics/
 └── generated/agent/
@@ -390,13 +395,138 @@ The corpus determines **where it should be done**.
 
 ---
 
-## 11. What "almost anything and everything" means
+## 11. Beyond the core quartet: domain bridges
+
+Zig, WebAssembly, TypeScript, and Go should form the core execution quartet, but they should not become an artificial boundary around what agents are allowed to build.
+
+The corpus should know how to cross the important boundaries of modern software engineering, including:
+
+- SQL and relational databases;
+- PostgreSQL and other mature data systems;
+- HTML and CSS;
+- GPU interfaces and shader languages;
+- mobile platforms;
+- Linux, Windows, and macOS APIs;
+- cloud providers and container environments;
+- object storage;
+- message queues;
+- observability systems;
+- machine-learning runtimes and model interfaces;
+- graphics APIs;
+- cryptographic libraries and platform trust stores;
+- HTTP, TLS, QUIC, DNS, and other protocols;
+- hardware and device specifications.
+
+The project does not need to rewrite every mature external system.
+
+It needs a canonical way to understand, select, connect, validate, and repair integrations with them.
+
+The goal is not to own every line of software.
+
+The goal is to have a trustworthy engineering path for nearly every recurring software capability.
+
+---
+
+## 12. Own it, wrap it, or compose it
+
+Every capability should eventually fall into one of three clear categories.
+
+### Own it
+
+The corpus contains the canonical implementation.
+
+Use this when the capability is foundational, broadly reusable, benefits strongly from the project's guarantees, or would otherwise be repeatedly reimplemented.
+
+### Wrap it
+
+A mature external system is the better implementation, and the corpus provides the canonical adapter, contract, lifecycle model, failure map, test recipe, and usage guidance.
+
+For example, a relational database requirement should not automatically trigger an attempt to rebuild PostgreSQL.
+
+Instead, the corpus may define:
+
+```text
+capability: relational-database
+canonical external system: PostgreSQL
+use_when: ...
+do_not_use_when: ...
+Go adapter: ...
+Zig adapter: ...
+transaction contract: ...
+pooling contract: ...
+failure modes: ...
+validation recipe: ...
+```
+
+The external system becomes known territory rather than an exit from the agent's map.
+
+### Compose it
+
+The requested capability already emerges from several existing canonical pieces.
+
+The corpus provides the recipe and the agent writes only the application-specific glue or policy.
+
+These three answers are enough to scale much farther than a project that insists on implementing everything itself.
+
+> **We do not need to own everything. We need to have an answer for everything.**
+
+---
+
+## 13. Application coverage
+
+The long-range project should measure not only module count but **Application Coverage**: how much of a representative software request can be satisfied by existing canonical implementations, adapters, and recipes before the agent writes novel code.
+
+A request such as:
+
+```text
+Build a collaborative image editor.
+```
+
+might decompose into:
+
+```text
+image codecs
+color conversion
+filters
+layers
+undo / redo
+project serialization
+GPU rendering
+browser or native UI
+file persistence
+cloud synchronization
+authentication
+realtime collaboration
+```
+
+The corpus should be able to report which pieces are already solved, which are wrapped, which are composable, and which remain genuinely novel.
+
+The desired progression is not a fictional 100 percent for every project.
+
+It is a steadily rising reusable share:
+
+```text
+new application
+→ decompose capabilities
+→ reuse canonical foundations
+→ reuse canonical adapters
+→ reuse canonical recipes
+→ generate only the missing application-specific portion
+```
+
+As successful projects contribute new reusable knowledge, future Application Coverage should rise.
+
+That is the Agentic Snowball operating at application scale.
+
+---
+
+## 14. What "almost anything and everything" means
 
 The project should aim very high, but define the phrase carefully.
 
 It does not mean every future application is already written.
 
-It means the repository family should progressively cover the reusable engineering foundations needed for nearly every major class of software:
+It means the engineering foundation should progressively cover, compose, or provide canonical integration paths for nearly every major class of software:
 
 - command-line tools;
 - embedded software;
@@ -410,13 +540,19 @@ It means the repository family should progressively cover the reusable engineeri
 - network services;
 - distributed systems;
 - game and simulation cores;
-- native desktop foundations;
-- WebAssembly libraries;
+- native desktop applications;
+- WebAssembly applications;
 - browser applications;
 - backend applications;
 - cloud services;
+- mobile applications;
 - developer tooling;
-- infrastructure software.
+- infrastructure software;
+- media applications;
+- scientific software;
+- collaborative applications;
+- data-processing systems;
+- GPU-accelerated applications.
 
 Application-specific business logic will still need to be written.
 
@@ -424,13 +560,15 @@ Novel research will still need to be done.
 
 Unknown hardware and protocols will still need investigation.
 
-But everything already solved should become progressively cheaper to discover, compose, verify, and repair.
+Platform-specific code will sometimes remain necessary.
+
+But everything already solved should become progressively cheaper to discover, compose, verify, port, and repair.
 
 That is the real meaning of universality for this project.
 
 ---
 
-## 12. Efficiency is part of correctness
+## 15. Efficiency is part of correctness
 
 The project is not only trying to produce correct implementations.
 
@@ -466,6 +604,7 @@ Important project measures include:
 - **Snowball Yield**
 - **Foothold Density**
 - **Corpus Scaling Advantage**
+- **Application Coverage**
 
 As the corpus grows, the target is not merely more capabilities.
 
@@ -473,7 +612,7 @@ The target is **more capabilities without proportionally increasing the agent's 
 
 ---
 
-## 13. The scaling law we want
+## 16. The scaling law we want
 
 Traditional large repositories often behave like this:
 
@@ -503,7 +642,7 @@ The project should be able to grow from tens of modules to hundreds or thousands
 
 ---
 
-## 14. Order of execution
+## 17. Order of execution
 
 The proposed order is:
 
@@ -517,16 +656,20 @@ The proposed order is:
 7. TypeScript agent-readable reference corpus
 8. Go agent-readable service/cloud corpus
 9. Cross-language recipes
-10. Capability federation and universal agent query surface
+10. Domain bridges and canonical external adapters
+11. Application Coverage benchmarks
+12. Capability federation and universal agent query surface
 ```
 
 These phases can overlap where doing so creates useful feedback, but later language expansion should not distract from proving the current Zig foundations first.
 
 ---
 
-## 15. Definition of full stack
+## 18. Definition of full stack
 
-For this project, "full stack" should eventually mean that the corpus can provide canonical, agent-readable foundations across:
+For this project, "full stack" should eventually mean more than frontend plus backend.
+
+It should mean that the corpus can provide canonical, agent-readable foundations or canonical integration paths across:
 
 ```text
 machine
@@ -537,41 +680,130 @@ machine
 → portable Wasm compute
 → browser frontend
 → backend service
-→ network/cloud deployment
+→ database / storage
+→ network / cloud deployment
+→ platform-specific adapters
+→ external mature systems
 ```
 
 When a new project crosses several of these layers, the agent should be able to compose them using shared contracts and cross-language recipes rather than treating each layer as a separate engineering expedition.
 
+The question should gradually cease to be:
+
+> Which ecosystem do I need to go learn now?
+
+and become:
+
+> Which capabilities does this system require, and what does the foundation already know about them?
+
 ---
 
-## 16. Final aspiration
+## 19. The universal request
 
-`zig-reference` should aim to become more than a Zig tutorial, more than a module collection, and more than one flagship system.
+The ultimate interface can be expressed with one deliberately simple request:
 
-It should become the seed of a general engineering corpus designed around a simple proposition:
+```text
+User:
+Build me ______.
+```
 
-> **A coding agent should never have to rediscover a solved engineering fact when the repository can state that fact once, expose it in a deterministic format, and prove it continuously.**
+The agent should be able to query the foundation and receive something like:
 
-The ambition is to make nearly any software project easier to construct because the known parts of the problem are already canonical, machine-readable, composable, and validated.
+```text
+87% of the required capability graph is already covered.
+
+OWN:
+  canonical modules ...
+
+WRAP:
+  canonical external systems and adapters ...
+
+COMPOSE:
+  canonical recipes ...
+
+NOVEL:
+  the remaining application-specific work ...
+
+VALIDATE:
+  the exact gates that prove the resulting system ...
+```
+
+On the next project, reused knowledge may cover more.
+
+On the project after that, more still.
+
+Each serious implementation should leave behind new footholds so the next agent begins farther ahead.
+
+The long-term objective is not zero new code.
+
+It is **zero unnecessary rediscovery**.
+
+---
+
+## 20. Final aspiration: One Agent. One Foundation. A New World.
+
+`zig-reference` should aim to become more than a Zig tutorial, more than a module collection, more than one flagship system, and eventually more than the boundaries of any single programming language.
+
+It should become the seed of a cumulative engineering world designed around a simple proposition:
+
+> **A coding agent should never have to rediscover a solved engineering fact when the foundation can state that fact once, expose it in a deterministic format, and prove it continuously.**
+
+The ambition is to make nearly any software project easier to construct because the known parts of the problem are already canonical, machine-readable, composable, validated, or connected through a known adapter.
 
 Zig remains the foundational systems language because it lets the project reach from low-level machine control to portable application cores with unusually little abstraction debt.
 
-WebAssembly extends those cores across execution environments.
+WebAssembly carries those cores across execution environments.
 
 TypeScript provides the browser and application surface.
 
 Go provides a highly regular service and cloud surface.
 
-Cross-language recipes bind them into one engineering vocabulary.
+Domain bridges connect mature external systems and platform-specific worlds without throwing away the common agentic grammar.
+
+Cross-language recipes bind everything into one engineering vocabulary.
 
 The end goal is not to force every problem into one language.
 
-The end goal is to make the **best known implementation of each recurring problem easy for an agent to find, understand, compose, validate, and reuse**.
+The end goal is not even to implement every component ourselves.
 
-If that succeeds, the corpus can stretch from hardware to browser while preserving the same operating philosophy:
+The end goal is to make the **best known path for each recurring engineering problem easy for an agent to find, understand, compose, validate, repair, and reuse**.
+
+A future coding agent should be able to inherit not merely source code, but an accumulated civilization of engineering decisions: what works, what fails, what owns what, what composes with what, what should be reused, what should be wrapped, what should never be repeated, and how every important claim can be tested.
+
+At that point, the foundation is no longer merely a place where code is stored.
+
+It is a world the agent can enter.
+
+A world where every solved problem becomes terrain.
+
+Every contract becomes a road sign.
+
+Every recipe becomes a known route.
+
+Every diagnostic becomes remembered experience.
+
+Every adapter becomes a bridge.
+
+Every validation becomes a law of the land.
+
+And every project leaves the world larger than it found it.
+
+The aspiration is deliberately enormous:
+
+> **One Agent. One Foundation. A New World.**
+
+One agent, given one sufficiently complete engineering foundation, should be able to move from the machine beneath an application to the interface in front of its user; from a page table to a database, from a protocol to a browser, from a hypervisor to a cloud service, while reusing the accumulated knowledge of every solved problem that came before.
+
+Not because the agent already knows everything.
+
+Because the world it enters remembers.
+
+That is the horizon:
+
+> **Build almost anything. Rediscover almost nothing.**
 
 > **Solved once. Documented completely. Reused forever.**
 
-And at application scale:
+And, at its most poetic and ambitious:
 
-> **Build almost anything. Rediscover almost nothing.**
+> **One Agent. One Foundation. A New World.**
