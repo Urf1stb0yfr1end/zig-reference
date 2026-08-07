@@ -906,5 +906,130 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Validated half-open byte offsets with bounded slicing of a caller source buffer.",
+    "search_aliases": [
+      "source range",
+      "byte span"
+    ],
+    "capability_ids": [
+      "source-span"
+    ],
+    "use_when": [
+      "Represent [start,end) byte offsets and safely borrow that region from a source slice."
+    ],
+    "do_not_use_when": [
+      "Need line/column tracking, UTF-8 scalar indexing, or ownership of source bytes."
+    ],
+    "entrypoint": "projects/27-source-span/src/source_span.zig",
+    "public_symbols": [
+      "SourceSpan"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "slice": [
+        "The returned slice borrows the source argument.",
+        "The source must outlive every returned slice."
+      ]
+    },
+    "invalidation": {
+      "slice": [
+        "Any mutation or deallocation of the source that invalidates its slices invalidates the returned slice."
+      ]
+    },
+    "failure_guarantees": [
+      "init rejects reversed endpoints without producing a span.",
+      "slice rejects an end beyond source length without mutation."
+    ],
+    "effects": [
+      "reads_receiver",
+      "returns_borrow",
+      "borrows_caller_memory",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "immutable_reads_only",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-source-span",
+      "zig build smoke-source-span"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "source-span",
+      "primary_symbol": "SourceSpan",
+      "initialization": "const spans = @import(\"source-span\");\nconst span = try spans.SourceSpan.init(1, 3);\nconst bytes = try span.slice(\"abcd\");"
+    },
+    "operation_map": {
+      "init": "SourceSpan.init",
+      "len": "SourceSpan.len",
+      "isEmpty": "SourceSpan.isEmpty",
+      "slice": "SourceSpan.slice"
+    },
+    "error_map": [
+      {
+        "error": "InvalidOrder",
+        "operation": "init",
+        "meaning": "end is less than start.",
+        "handling": "Reject or reorder the input endpoints."
+      },
+      {
+        "error": "OutOfBounds",
+        "operation": "slice",
+        "meaning": "The span end exceeds the supplied source length.",
+        "handling": "Supply the matching source or validate its length."
+      }
+    ],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Need line/column tracking, UTF-8 scalar indexing, or ownership of source bytes."
+    ],
+    "minimal_usage": [
+      "const spans = @import(\"source-span\");",
+      "const span = try spans.SourceSpan.init(1, 3);",
+      "const bytes = try span.slice(\"abcd\");"
+    ],
+    "integration_notes": [
+      "Use the canonical named import and public operations listed here.",
+      "Run the focused validation commands before integration."
+    ]
   }
 }

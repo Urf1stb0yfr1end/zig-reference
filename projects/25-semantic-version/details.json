@@ -725,5 +725,103 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Three-part semantic version value with lexicographic comparison and same-major compatibility.",
+    "search_aliases": [
+      "semver",
+      "version compatibility"
+    ],
+    "capability_ids": [
+      "semantic-version"
+    ],
+    "use_when": [
+      "Compare major, minor, and patch values or require same-major non-older compatibility."
+    ],
+    "do_not_use_when": [
+      "Need prerelease/build metadata, parsing, ranges, or Semantic Versioning major-zero special rules."
+    ],
+    "entrypoint": "projects/25-semantic-version/src/semantic_version.zig",
+    "public_symbols": [
+      "SemanticVersion"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "borrows": []
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "reads_receiver",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "immutable_reads_only",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-semantic-version",
+      "zig build smoke-semantic-version"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "semantic-version",
+      "primary_symbol": "SemanticVersion",
+      "initialization": "const semver = @import(\"semantic-version\");\nconst current = semver.SemanticVersion{ .major = 1, .minor = 4, .patch = 0 };\nconst compatible = current.isCompatibleWith(.{ .major = 1, .minor = 3, .patch = 0 });"
+    },
+    "operation_map": {
+      "compare": "SemanticVersion.compare",
+      "isCompatibleWith": "SemanticVersion.isCompatibleWith"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Need prerelease/build metadata, parsing, ranges, or Semantic Versioning major-zero special rules."
+    ],
+    "minimal_usage": [
+      "const semver = @import(\"semantic-version\");",
+      "const current = semver.SemanticVersion{ .major = 1, .minor = 4, .patch = 0 };",
+      "const compatible = current.isCompatibleWith(.{ .major = 1, .minor = 3, .patch = 0 });"
+    ],
+    "integration_notes": [
+      "Use the canonical named import and public operations listed here.",
+      "Run the focused validation commands before integration."
+    ]
   }
 }

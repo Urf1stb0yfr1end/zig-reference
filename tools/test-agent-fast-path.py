@@ -45,6 +45,16 @@ def main():
  assert {"bounded-system-resource-plan","fixed-capacity-priority-queue","bounded-deterministic-event-trace","fixed-bump-allocator"} <= set(d["results"]["solved_modules"]),d
  assert "bounded-deterministic-scheduling" in d["results"]["missing_capabilities"]
  _,d=run("diagnostic","ZIGREF-TOPO-CYCLE"); assert d["results"][0]["repair_strategy"]
+ _,d=run("diagnostic","ZIGREF-TOPOLOGICAL-CYCLE"); assert d["results"][0]["canonical_id"]=="ZIGREF-TOPO-CYCLE"
+ diagnostic=d["results"][0]
+ for key in ("meaning","module","operation","violated_rule","repair_strategy","misuse_fixture","focused_validation_command","locations"): assert diagnostic[key],key
+ _,d=run("diagnose","error.Cycle"); assert d["results"][0]["code"]=="ZIGREF-TOPO-CYCLE" and "native_error_alias" in d["results"][0]["matched_by"]
+ _,d=run("diagnose","cycle detected"); assert d["results"] and len(d["results"])<=5
+ _,d=run("diagnose","snowball-unknown-native-symptom"); assert d["status"]=="unknown" and not d["results"]
+ final_modules=("semantic-version","tagged-result","source-span","owned-byte-buffer","intrusive-doubly-linked-list")
+ for module in final_modules:
+  _,card=run("card",module,"--view","integrate"); guidance="\n".join([card["results"]["construction"]["initialization"],*card["results"]["minimal_usage"]])
+  assert "std.testing.refAllDeclsRecursive" not in guidance
  _,d=run("impact","fixed-capacity-vector"); assert d["results"]["direct_dependents"]
  index=ROOT/"generated/agent/modules.json"; original=index.read_text(); index.write_text(original+" ")
  try:

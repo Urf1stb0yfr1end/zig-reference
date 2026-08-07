@@ -150,7 +150,7 @@
     },
     "intrusive-doubly-linked-list": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "length-prefixed-binary-field": {
       "dependencies": [
@@ -175,7 +175,7 @@
         "byte-writer",
         "dynamic-array"
       ],
-      "status": "partial"
+      "status": "full"
     },
     "physical-memory-region-set": {
       "dependencies": [
@@ -248,11 +248,11 @@
     },
     "semantic-version": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "source-span": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "stack": {
       "dependencies": [
@@ -266,7 +266,7 @@
     },
     "tagged-result": {
       "dependencies": [],
-      "status": "partial"
+      "status": "full"
     },
     "type-length-value-decoder": {
       "dependencies": [

@@ -6,6 +6,28 @@ from repository import ROOT, GENERATED, contracts, dependencies
 OUT = GENERATED / "agent"
 VERSION = "2.0.0"
 
+# Authored compatibility/search metadata for published diagnostics. The module
+# contracts remain authoritative for meaning and evidence; this table only adds
+# stable lookup vocabulary that cannot be derived safely from prose.
+DIAGNOSTIC_METADATA = {
+    "ZIGREF-TOPO-CYCLE": {"aliases": ["ZIGREF-TOPOLOGICAL-CYCLE"], "category": "STATE", "native_error_aliases": ["error.Cycle", "cycle detected"]},
+    "ZIGREF-TOPO-INVALID-VERTEX": {"aliases": [], "category": "INPUT", "native_error_aliases": ["error.InvalidNode", "invalid vertex"]},
+    "ZIGREF-FREELIST-DOUBLE-RELEASE": {"aliases": [], "category": "STATE", "native_error_aliases": ["error.DoubleFree", "double free"]},
+    "ZIGREF-POOL-DOUBLE-RELEASE": {"aliases": [], "category": "STATE", "native_error_aliases": ["double release"]},
+    "ZIGREF-POOL-STALE-HANDLE": {"aliases": [], "category": "LIFETIME", "native_error_aliases": ["stale handle"]},
+    "ZIGREF-BUMP-USE-AFTER-RESET": {"aliases": [], "category": "LIFETIME", "native_error_aliases": ["use after reset"]},
+    "ZIGREF-PQUEUE-CAPACITY": {"aliases": [], "category": "RESOURCE", "native_error_aliases": ["error.Full", "queue full"]},
+    "ZIGREF-RESOURCE-PLAN-ARITHMETIC-OVERFLOW": {"aliases": [], "category": "ARITH", "native_error_aliases": ["error.ArithmeticOverflow"]},
+    "ZIGREF-RESOURCE-PLAN-INITIALIZATION-CYCLE": {"aliases": [], "category": "DEPENDENCY", "native_error_aliases": ["error.InitializationCycle"]},
+    "ZIGREF-RESOURCE-PLAN-INVALID-ALIGNMENT": {"aliases": [], "category": "INPUT", "native_error_aliases": ["error.InvalidAlignment"]},
+    "ZIGREF-RESOURCE-PLAN-INVALID-CAPACITY": {"aliases": [], "category": "RESOURCE", "native_error_aliases": ["error.InvalidCapacity"]},
+    "ZIGREF-RESOURCE-PLAN-MEMORY-EXCEEDED": {"aliases": [], "category": "RESOURCE", "native_error_aliases": ["error.MemoryExceeded"]},
+    "ZIGREF-EVENT-TRACE-FULL": {"aliases": [], "category": "RESOURCE", "native_error_aliases": ["error.TraceFull", "trace full"]},
+    "ZIGREF-EVENT-TRACE-INVALID-CAPACITY": {"aliases": [], "category": "RESOURCE", "native_error_aliases": ["invalid trace capacity"]},
+    "ZIGREF-EVENT-TRACE-OUTPUT-TOO-SMALL": {"aliases": [], "category": "BOUNDS", "native_error_aliases": ["error.OutputTooSmall"]},
+    "ZIGREF-EVENT-TRACE-SEQUENCE-EXHAUSTED": {"aliases": [], "category": "ARITH", "native_error_aliases": ["error.SequenceExhausted"]},
+}
+
 def dump(value): return json.dumps(value, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
 def header(**values): return {"_generated": True, "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY", "generator": "tools/build-agent-index.py", "agent_index_version": VERSION, **values}
 
@@ -43,7 +65,8 @@ def build():
             for x in a["public_symbols"]: symbols.setdefault(x,[]).append(n)
             for x in matching: recipes.setdefault(x,[]).append(n)
             for x in a["diagnostics"]:
-                diagnostics[x["id"]]={"module":n,"meaning":x["title"],"violated_rule":x["violated_rule"],"evidence_classification":x["fixture_classification"],"evidence_status":x["evidence_status"],"misuse_fixture":x["fixture"],"repair_example":x["repair_example"],"repair_strategy":x["repair_strategy"],"focused_validation_command":focused[0],"affected_path":d["locations"]["details_json"]}
+                metadata=DIAGNOSTIC_METADATA.get(x["id"], {"aliases":[],"category":"CONTRACT","native_error_aliases":[]})
+                diagnostics[x["id"]]={"aliases":metadata["aliases"],"category":metadata["category"],"native_error_aliases":metadata["native_error_aliases"],"module":n,"operation":"module contract invariant","meaning":x["title"],"violated_rule":x["violated_rule"],"observed_condition":x["title"],"expected_condition":x["violated_rule"],"evidence_classification":x["fixture_classification"],"evidence_status":x["evidence_status"],"repair_status":"known" if x["repair_strategy"] else "unknown","misuse_fixture":x["fixture"],"repair_example":x["repair_example"],"repair_strategy":x["repair_strategy"],"focused_validation_command":focused[0],"locations":[d["locations"]["details_json"],x["fixture"],x["repair_example"]]}
         modules.append(item); deps[n]={"dependencies":direct[n],"status":state}
     modules.sort(key=lambda x:x["id"])
     return {"modules.json":dump(header(modules=modules)),"modules.jsonl":"\n".join(json.dumps(x,sort_keys=True,separators=(",",":")) for x in modules)+"\n",
