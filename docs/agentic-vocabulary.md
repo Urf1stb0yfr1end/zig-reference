@@ -67,6 +67,33 @@ One-Shot Integration Rate is an empirical benchmark, not a promise that all soft
 
 The project aims to increase this rate by eliminating avoidable uncertainty before the first edit.
 
+## Codex Accelerator
+
+A repository or engineering corpus deliberately structured to reduce the amount of discovery, architectural reconstruction, reimplementation, debugging, and repair work Codex must perform before reaching a correct validated result.
+
+A Codex Accelerator does not make the model intrinsically faster or more intelligent. It makes the engineering environment cheaper to reason about by exposing solved knowledge in forms Codex can select, compose, and verify directly.
+
+For `zig-reference`, the long-term Codex Accelerator experience is:
+
+```text
+user request
+→ query the Foundation
+→ measure capability coverage
+→ select canonical components
+→ resolve dependency closure
+→ compose what is already solved
+→ implement Residual Novelty
+→ validate
+```
+
+The practical ambition is that attaching the Foundation to a Codex project should reduce tokens consumed, files inspected, wrong architectural starts, repair loops, and human intervention while increasing One-Shot Integration Rate.
+
+A Codex Accelerator claim must eventually be benchmarked against a comparable open-world run. Until measured, acceleration is a project goal rather than a guaranteed performance claim.
+
+The cultural aspiration is simple:
+
+> **Before starting a difficult Codex project, give the agent the Foundation.**
+
 ## Agent Navigation Cost
 
 The amount of work required for an agent to move from a user requirement to the exact module, contract, dependency closure, and validation path needed to act.
