@@ -39,6 +39,9 @@
     "bounded-deterministic-event-tracing": [
       "bounded-deterministic-event-trace"
     ],
+    "bounded-deterministic-scheduling": [
+      "bounded-deterministic-scheduler"
+    ],
     "bounded-integer": [
       "bounded-integer"
     ],
@@ -69,6 +72,9 @@
     ],
     "bounded-topological-sort": [
       "fixed-capacity-topological-sort"
+    ],
+    "caller-controlled-time": [
+      "bounded-deterministic-scheduler"
     ],
     "canonical-trace-rendering": [
       "bounded-deterministic-event-trace"
@@ -249,6 +255,9 @@
     ],
     "stable-resource-identity": [
       "generational-handles"
+    ],
+    "stable-runnable-order": [
+      "bounded-deterministic-scheduler"
     ],
     "stack": [
       "stack"

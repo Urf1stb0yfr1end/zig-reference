@@ -467,6 +467,15 @@
       "details": "projects/51-bounded-deterministic-event-trace/details.json",
       "unit_test_step": "test-bounded-deterministic-event-trace",
       "smoke_test_step": "smoke-bounded-deterministic-event-trace"
+    },
+    {
+      "id": "52",
+      "canonical_name": "bounded-deterministic-scheduler",
+      "directory": "projects/52-bounded-deterministic-scheduler",
+      "public_entrypoint": "projects/52-bounded-deterministic-scheduler/src/bounded_deterministic_scheduler.zig",
+      "details": "projects/52-bounded-deterministic-scheduler/details.json",
+      "unit_test_step": "test-bounded-deterministic-scheduler",
+      "smoke_test_step": "smoke-bounded-deterministic-scheduler"
     }
   ]
 }

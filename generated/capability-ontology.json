@@ -187,6 +187,7 @@
       ],
       "description": "Repository capability represented by: allocation-explicit.",
       "implementing_modules": [
+        "bounded-deterministic-scheduler",
         "bounded-system-resource-plan",
         "fixed-bump-allocator",
         "fixed-capacity-priority-queue",
@@ -537,6 +538,7 @@
       "description": "Repository capability represented by: bounded.",
       "implementing_modules": [
         "bounded-deterministic-event-trace",
+        "bounded-deterministic-scheduler",
         "bounded-system-resource-plan",
         "fixed-bump-allocator",
         "fixed-capacity-priority-queue",
@@ -850,6 +852,7 @@
       "description": "Repository capability represented by: capacity.",
       "implementing_modules": [
         "bounded-deterministic-event-trace",
+        "bounded-deterministic-scheduler",
         "bounded-system-resource-plan",
         "fixed-capacity-priority-queue",
         "fixed-capacity-topological-sort"
@@ -1636,6 +1639,7 @@
       "description": "Repository capability represented by: fixed.",
       "implementing_modules": [
         "bounded-deterministic-event-trace",
+        "bounded-deterministic-scheduler",
         "bounded-system-resource-plan",
         "fixed-bump-allocator",
         "fixed-capacity-priority-queue",
@@ -1853,6 +1857,7 @@
         "bitmap-allocator",
         "bounded-binary-sub-reader",
         "bounded-deterministic-event-trace",
+        "bounded-deterministic-scheduler",
         "bounded-integer",
         "bounded-system-resource-plan",
         "checked-half-open-range",
@@ -2843,6 +2848,7 @@
       ],
       "description": "Repository capability represented by: order bounded values without allocation and preserve insertion order for equal priorities..",
       "implementing_modules": [
+        "bounded-deterministic-scheduler",
         "fixed-capacity-priority-queue"
       ],
       "narrower_capabilities": [],
@@ -3313,6 +3319,7 @@
       ],
       "description": "Repository capability represented by: priority.",
       "implementing_modules": [
+        "bounded-deterministic-scheduler",
         "fixed-capacity-priority-queue"
       ],
       "narrower_capabilities": [],
@@ -3416,6 +3423,7 @@
       ],
       "description": "Repository capability represented by: queue.",
       "implementing_modules": [
+        "bounded-deterministic-scheduler",
         "fixed-capacity-priority-queue",
         "ring-buffer"
       ],
@@ -3605,6 +3613,7 @@
       ],
       "description": "Repository capability represented by: repeated bounded mechanism implementation.",
       "implementing_modules": [
+        "bounded-deterministic-scheduler",
         "bounded-system-resource-plan",
         "fixed-bump-allocator",
         "fixed-capacity-priority-queue",

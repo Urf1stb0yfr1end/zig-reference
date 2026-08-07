@@ -938,6 +938,24 @@
       "status": "experimental-unverified",
       "summary": "Store and canonically render bounded normalized deterministic events.",
       "target_maturity_level": 2
+    },
+    {
+      "aliases": [],
+      "declared_maturity": "experimental",
+      "deprecated_names": [],
+      "details": "projects/52-bounded-deterministic-scheduler/details.json",
+      "directory": "projects/52-bounded-deterministic-scheduler",
+      "display_name": "Bounded Deterministic Scheduler",
+      "id": "52",
+      "implementation_version": "1.0.0",
+      "lifecycle": "experimental",
+      "name": "bounded-deterministic-scheduler",
+      "public_contract_version": "1.0.0",
+      "replacement_module": "",
+      "source": "projects/52-bounded-deterministic-scheduler/src/bounded_deterministic_scheduler.zig",
+      "status": "experimental-unverified",
+      "summary": "Schedule a bounded set of copied tasks with caller-controlled time and stable deterministic ordering.",
+      "target_maturity_level": 2
     }
   ],
   "repository_index_version": "1.0.0"

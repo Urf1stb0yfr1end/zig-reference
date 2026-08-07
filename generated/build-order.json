@@ -43,6 +43,7 @@
     "riscv-sv39-page-table-walker",
     "stack",
     "bounded-binary-sub-reader",
+    "bounded-deterministic-scheduler",
     "elf64-file-header-parser",
     "fixed-capacity-object-pool",
     "fixed-capacity-topological-sort",

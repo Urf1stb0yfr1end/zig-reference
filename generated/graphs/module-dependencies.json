@@ -19,6 +19,10 @@
       "module": "bounded-binary-sub-reader"
     },
     {
+      "dependency": "fixed-capacity-priority-queue",
+      "module": "bounded-deterministic-scheduler"
+    },
+    {
       "dependency": "aligned-address-and-size-helpers",
       "module": "bounded-system-resource-plan"
     },

@@ -661,6 +661,19 @@
       "baselineValidated": false,
       "testedTargetVersions": [],
       "knownMigrationBlockers": []
+    },
+    {
+      "id": "52",
+      "canonicalName": "bounded-deterministic-scheduler",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/52-bounded-deterministic-scheduler/port.js",
+      "implementationPath": "projects/52-bounded-deterministic-scheduler/src/bounded_deterministic_scheduler.zig",
+      "dependenciesMustPortFirst": [
+        "fixed-capacity-priority-queue"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
     }
   ]
 }

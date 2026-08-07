@@ -54,6 +54,7 @@ const specs = [_]ModuleSpec{
     .{ .name = "riscv-sv39-page-table-builder", .source = "projects/49-riscv-sv39-page-table-builder/src/riscv_sv39_page_table_builder.zig", .dependencies = &.{ "riscv-sv39-page-table-entry", "riscv-sv39-virtual-address-indexing", "riscv-page-table-page-owner", "riscv-sv39-page-table-walker", "riscv-sfence-vma-invalidation" } },
     .{ .name = "bounded-system-resource-plan", .source = "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig", .dependencies = &.{ "bounded-integer", "checked-integer-cast", "aligned-address-and-size-helpers", "fixed-bump-allocator", "fixed-capacity-topological-sort" } },
     .{ .name = "bounded-deterministic-event-trace", .source = "projects/51-bounded-deterministic-event-trace/src/bounded_deterministic_event_trace.zig", .dependencies = &.{} },
+    .{ .name = "bounded-deterministic-scheduler", .source = "projects/52-bounded-deterministic-scheduler/src/bounded_deterministic_scheduler.zig", .dependencies = &.{"fixed-capacity-priority-queue"} },
 };
 
 const RecipeSpec = struct { name: []const u8, dependencies: []const []const u8 };
@@ -103,6 +104,7 @@ const recipe_specs = [_]RecipeSpec{
     .{ .name = "construct-and-verify-sv39-address-space", .dependencies = &.{ "riscv-sv39-page-table-entry", "riscv-sv39-virtual-address-indexing", "riscv-page-table-page-owner", "riscv-sv39-page-table-walker", "riscv-sfence-vma-invalidation", "riscv-sv39-page-table-builder" } },
     .{ .name = "plan-morphic-runtime", .dependencies = &.{"bounded-system-resource-plan"} },
     .{ .name = "trace-morphic-example", .dependencies = &.{"bounded-deterministic-event-trace"} },
+    .{ .name = "run-hosted-morphic-runtime", .dependencies = &.{ "bounded-system-resource-plan", "bounded-deterministic-scheduler", "bounded-deterministic-event-trace" } },
 };
 
 pub fn build(b: *std.Build) void {
@@ -224,6 +226,14 @@ pub fn build(b: *std.Build) void {
         const recipe_step = b.step(b.fmt("test-recipe-{s}", .{recipe.name}), b.fmt("Run {s} composition tests", .{recipe.name}));
         recipe_step.dependOn(&run_recipe.step);
         recipes_step.dependOn(&run_recipe.step);
+        if (std.mem.eql(u8, recipe.name, "run-hosted-morphic-runtime")) {
+            const executable = b.addExecutable(.{ .name = "run-hosted-morphic-runtime", .root_module = recipe_module });
+            const run_hosted = b.addRunArtifact(executable);
+            b.step("run-hosted-morphic-runtime", "Run deterministic hosted Morphic composition").dependOn(&run_hosted.step);
+            const verify_hosted = b.step("verify-hosted-morphic-runtime", "Verify hosted Morphic composition and dependencies");
+            verify_hosted.dependOn(&run_recipe.step);
+            verify_hosted.dependOn(agent_check_step);
+        }
         if (std.mem.eql(u8, recipe.name, "trace-morphic-example")) {
             const executable = b.addExecutable(.{ .name = "trace-morphic-example", .root_module = recipe_module });
             const run_trace = b.addRunArtifact(executable);

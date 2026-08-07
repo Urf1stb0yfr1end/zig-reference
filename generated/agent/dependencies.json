@@ -38,6 +38,12 @@
       "dependencies": [],
       "status": "full"
     },
+    "bounded-deterministic-scheduler": {
+      "dependencies": [
+        "fixed-capacity-priority-queue"
+      ],
+      "status": "full"
+    },
     "bounded-integer": {
       "dependencies": [],
       "status": "full"

@@ -42,8 +42,8 @@ def main():
  assert_candidate("exact bounded resource budget with deterministic initialization ordering","bounded-system-resource-plan")
  assert_candidate("fixed capacity deterministic normalized event recording with no timestamps or hidden allocation","bounded-deterministic-event-trace")
  _,d=run("compose","bounded-task-storage","bounded-priority-ordering","bounded-deterministic-event-tracing","fixed-memory-operation","bounded-deterministic-scheduling")
- assert {"bounded-system-resource-plan","fixed-capacity-priority-queue","bounded-deterministic-event-trace","fixed-bump-allocator"} <= set(d["results"]["solved_modules"]),d
- assert "bounded-deterministic-scheduling" in d["results"]["missing_capabilities"]
+ assert {"bounded-system-resource-plan","fixed-capacity-priority-queue","bounded-deterministic-event-trace","fixed-bump-allocator","bounded-deterministic-scheduler"} <= set(d["results"]["solved_modules"]),d
+ assert "bounded-deterministic-scheduling" not in d["results"]["missing_capabilities"]
  _,d=run("diagnostic","ZIGREF-TOPO-CYCLE"); assert d["results"][0]["repair_strategy"]
  _,d=run("diagnostic","ZIGREF-TOPOLOGICAL-CYCLE"); assert d["results"][0]["canonical_id"]=="ZIGREF-TOPO-CYCLE"
  diagnostic=d["results"][0]

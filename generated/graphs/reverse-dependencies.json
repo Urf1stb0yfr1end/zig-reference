@@ -38,6 +38,7 @@
       "type-length-value-decoder"
     ],
     "bounded-deterministic-event-trace": [],
+    "bounded-deterministic-scheduler": [],
     "bounded-integer": [
       "bounded-system-resource-plan"
     ],
@@ -84,6 +85,7 @@
     ],
     "fixed-capacity-object-pool": [],
     "fixed-capacity-priority-queue": [
+      "bounded-deterministic-scheduler",
       "fixed-capacity-topological-sort"
     ],
     "fixed-capacity-topological-sort": [
