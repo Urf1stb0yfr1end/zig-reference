@@ -1,0 +1,1080 @@
+Work in the existing repository at ~/dev/zig-reference.
+
+Use Zig 0.14.0.
+
+Read AGENTS.md first.
+
+This task is not about adding another Zig systems module.
+
+This task is about making zig-reference extraordinarily easy for any coding agent to use, including an agent that has never seen this repository before, has no prior conversation context, does not know our conventions, and is trying to minimize context, searches, retries, source reads, and wasted compute.
+
+The repository should become self-explanatory.
+
+A zero-context agent should be able to arrive, run one obvious bootstrap query, discover what the repository can do, select or reject modules, compose existing capabilities, obtain a tiny integration card, determine what remains genuinely missing, implement only that missing work, validate it, and repair recognized failures without recursively reading the repository.
+
+The intended future workflow is:
+
+task
+→ bootstrap
+→ decide
+→ select or reject
+→ compose
+→ integrate
+→ implement only missing work
+→ validate
+→ repair through stable diagnostics
+
+The desired end state is not “more documentation.”
+
+The desired end state is precomputed engineering memory.
+
+The repository should tell the agent what is already known so the agent can spend its reasoning budget on what is actually new.
+
+Do not create a branch, commit, push, tag, open a pull request, or otherwise modify GitHub. Work only in the local repository and leave completed changes uncommitted for review.
+
+CORE RULE: DO NOT SOLVE THIS WITH MORE PER-MODULE FILES
+
+Do not add agent.json, integration.json, selection.json, debug.json, or another family of per-module files.
+
+Use the structures the repository already has:
+
+details.json
+details.schema.json
+agent_contract
+PROOF.json
+recipes
+generated indexes
+generated/agent
+dependency indexes
+validation evidence
+query-reference.py
+validate-agent-contracts.py
+build-agent-index.py
+build-repository-index.py
+AGENTS.md
+COMMANDS.md
+
+Prefer adding approximately 10 to 20 high-value structured fields to the existing agent contract and existing generated structures rather than adding several new files to every module.
+
+Prefer derivation over duplication.
+
+If the repository already knows a fact mechanically, generate it.
+
+Do not make every module author repeat:
+
+transitive dependencies
+reverse dependents
+build order
+recipe relationships
+change impact
+evidence summaries
+validation state
+derived counts
+
+Those should come from canonical repository truth.
+
+ZERO-CONTEXT DESIGN REQUIREMENT
+
+Assume the agent knows nothing about zig-reference.
+
+It should not need to understand a proprietary vocabulary or read a glossary before getting useful results.
+
+Use ordinary software-engineering language and conventional structures:
+
+module
+capability
+dependency
+dependent
+error
+diagnostic
+ownership
+borrowing
+invalidation
+environment
+resource
+recipe
+validation
+repair
+hosted
+freestanding
+deterministic
+
+Use conventional JSON for machine-readable output.
+
+Do not invent a repository-specific query language.
+Do not create a mini programming language.
+Do not require embeddings, an LLM, network access, a database, or semantic infrastructure.
+
+Exact paths, exact symbols, exact commands, stable identifiers, controlled vocabulary, and short reason strings are preferred.
+
+STANDARD DIAGNOSTIC RULE
+
+Continue using the existing ZIGREF-* namespace for repository-recognized misuse and repair knowledge.
+
+Stable diagnostic IDs must remain stable in meaning.
+
+A brand-new agent seeing a code such as:
+
+ZIGREF-EVENT-TRACE-FULL
+ZIGREF-TOPO-CYCLE
+ZIGREF-POOL-STALE-HANDLE
+
+should already have a strong idea what happened before reading prose.
+
+Do not create clever opaque numeric codes when a literal stable code is clearer.
+
+Every recognized diagnostic should make the repair path obvious.
+
+Where applicable expose:
+
+code
+one-line reason
+affected module or recipe
+affected path
+violated rule
+evidence classification
+repair strategy
+repair example
+focused validation command
+
+Do not hide the important information behind paragraphs.
+
+Use the existing distinction between:
+
+zig_compile_fail
+runtime_negative_test
+future_analyzer_expectation
+documented_misuse_example
+
+Do not claim Zig rejects something unless an actual compile-fail fixture proves it.
+
+TOOL FAILURE STANDARD
+
+Agent-facing tooling must never silently fail.
+
+Use normal Unix conventions.
+
+Machine-readable command output belongs on stdout.
+Progress, debug/status information, and human-readable failure information belong on stderr so they never corrupt structured stdout.
+
+On failure:
+
+return a nonzero exit status
+identify the failed operation
+identify the affected path/module/recipe when known
+print a stable ZIGREF-* diagnostic when the failure has a known repository meaning
+print the exact reason
+print the next focused inspection or repair command when known
+
+Do not:
+
+silently skip malformed entries
+silently substitute a fallback
+silently retry forever
+silently ignore stale indexes
+silently ignore missing files
+silently swallow subprocess exit codes
+convert partial failure into success
+claim generated state is current when it is not
+
+If a fallback is deliberately supported, report that the fallback occurred and why.
+
+ANTI-STALL AND MINIMAL DEBUG LOGIC
+
+Add minimal debug/status logic to the repository tooling where it materially helps agents understand progress.
+
+Do not build a logging framework.
+Do not spam one message per item during large scans.
+
+For operations that may take noticeable time, expose concise phase boundaries.
+
+Useful information includes:
+
+phase name
+current high-level operation
+module/recipe/path when relevant
+number of items discovered
+number processed when useful
+success/failure result
+stable diagnostic on recognized failure
+next repair command when known
+
+A good long operation should look conceptually like:
+
+validating agent contracts: 7 full, 45 partial
+checking generated indexes
+checking recipe references
+checking diagnostic evidence
+PASS
+
+or, on failure:
+
+ZIGREF-INDEX-STALE
+generated/agent/modules.json is stale
+source: projects/41-fixed-bump-allocator/details.json
+repair: python3 tools/build-agent-index.py
+
+Do not require an agent to wonder whether a command is hung.
+
+Where subprocesses or retries exist, keep them bounded.
+Do not introduce arbitrary retries merely because retry support is requested.
+If a subprocess timeout is appropriate and can be added without destabilizing existing behavior, use a reasonable explicit timeout and report timeout failure clearly.
+Inspect existing shared Python helpers before duplicating status/debug code across tools.
+
+FIRST INSPECT
+
+Read and understand at minimum:
+
+AGENTS.md
+README.md
+COMMANDS.md
+details.schema.json
+schemas/module-proof.schema.json
+tools/query-reference.py
+tools/build-agent-index.py
+tools/validate-agent-contracts.py
+tools/build-repository-index.py
+tools/build-dependency-graphs.py
+tools/record-validation.py
+tools/repository.py or equivalent shared tooling
+generated/agent/*
+generated/modules.json
+generated/dependencies.json
+generated/reverse-dependencies.json
+generated/build-order.json
+generated/status.json or current equivalents
+all recipe contracts
+all currently agent-readable module contracts
+
+Inspect these agent-readable modules especially:
+
+projects/34-fixed-capacity-object-pool
+projects/40-fixed-free-list
+projects/41-fixed-bump-allocator
+projects/42-fixed-capacity-priority-queue
+projects/43-fixed-capacity-topological-sort
+projects/50-bounded-system-resource-plan
+projects/51-bounded-deterministic-event-trace
+
+Derive current module counts from repository truth.
+Do not hard-code module or migration counts into new logic.
+
+AGENT CONTRACT V2
+
+Extend the existing agent_contract.
+Do not create a replacement contract.
+Bump its schema version appropriately.
+Preserve existing useful fields.
+
+Add narrowly structured fields equivalent in purpose to the following.
+
+selection_priority
+
+Represent whether the module is:
+canonical
+specialized
+adapter
+alternative
+
+A canonical module is the normal first choice for the capability when its constraints fit.
+
+alternatives
+
+Structured entries containing:
+module
+choose_when
+reject_when
+
+Only include genuine alternatives.
+
+Do not manufacture alternatives merely to populate the field.
+
+environment_constraints
+
+Represent agent-relevant compatibility such as:
+hosted suitability
+freestanding suitability
+architecture restrictions
+OS dependency
+libc requirement
+endianness constraints
+privilege requirements
+
+Use controlled values where practical.
+Do not claim compatibility not supported by evidence.
+
+resource_profile
+
+Represent concise integration-relevant resource behavior:
+hidden allocation
+storage model
+capacity model
+bounded/unbounded
+caller-provided-memory requirement
+important compile-time resource parameters
+
+Avoid duplicating large existing sections.
+
+construction
+
+Give enough exact information for an agent to begin using the selected module without opening source:
+named import
+primary public type or factory
+normal initialization expression
+
+Every symbol must correspond to the real public surface.
+
+operation_map
+
+Map a small controlled action vocabulary to exact public symbols or endpoints.
+
+Examples include:
+allocate
+release
+append
+reset
+render
+sort
+plan
+inspect
+insert
+remove
+query
+
+Use only operations that actually apply to each module.
+
+This is not natural-language generation.
+It is a compact intent-to-symbol map.
+
+error_map
+
+For public errors relevant to normal integration, expose:
+error
+operation
+meaning
+canonical handling or recovery strategy
+
+Do not confuse runtime/API errors with misuse diagnostics.
+
+Runtime errors describe API behavior.
+ZIGREF diagnostics describe recognized misuse, invalid assumptions, validation failures, or canonical repair knowledge.
+
+composition
+
+Represent genuine relationships such as:
+commonly_with
+conflicts_with
+preferred_recipes
+
+References must exist.
+
+determinism
+
+Represent:
+whether behavior is deterministic under declared inputs
+what defines ordering
+what permitted external nondeterminism remains
+
+known_gaps
+
+Short, literal statements of capabilities callers commonly expect but this module deliberately does not provide.
+
+This is extremely important for preventing dead ends.
+An agent should discover an absence before trying to build around a false assumption.
+
+minimal_usage
+
+One extremely small canonical integration sequence.
+Not a tutorial.
+Not copied README prose.
+Just enough to show normal construction and use.
+
+integration_notes
+
+A short list containing only genuinely non-obvious integration facts not already expressed structurally.
+If there are no useful notes, allow an empty list.
+Do not fill fields with fluff.
+
+Consider whether one or two additional fields are genuinely required after inspecting the repository.
+Do not exceed the smallest useful schema.
+
+DERIVED AGENT INFORMATION
+
+Enrich the generated agent projection with mechanically derived information.
+
+Where applicable derive:
+
+direct_dependencies
+transitive_dependencies
+direct_dependents
+transitive_dependents
+dependency_build_order
+matching_recipes
+diagnostic_ids
+focused_validation_commands
+evidence_summary
+change_impact
+
+Do not require module authors to maintain these manually.
+
+Derive them from canonical contracts, proof records, recipe contracts, generated dependency graphs, build registration, and validation evidence.
+
+Prefer enriching:
+
+generated/agent/modules.json
+generated/agent/modules.jsonl
+
+over adding many new generated files.
+
+Only add a new generated root-level agent file when a clear measured benefit exists and the information cannot fit cleanly into current projections.
+
+AGENT BOOTSTRAP
+
+Add an obvious zero-context entry command equivalent to:
+
+python3 tools/query-reference.py agent bootstrap
+
+The output must be compact deterministic JSON.
+
+It should tell a brand-new agent only what it needs to begin:
+repository identity
+target Zig baseline
+current contracted module count
+full agent-fast-path module count
+partial/pending count derived dynamically
+available agent query operations
+recommended workflow
+important canonical generated paths
+one command for fast environment/repository health checking
+
+Do not dump documentation.
+
+The bootstrap command should be small enough that an agent can run it almost automatically at the beginning of a task.
+
+After bootstrap exists and is validated, update AGENTS.md so this becomes the first preferred command for a zero-context agent.
+
+AGENT DOCTOR
+
+Add a fast local health command equivalent to:
+
+python3 tools/query-reference.py agent doctor
+
+This is intended to prevent agents from beginning expensive work in a broken environment.
+
+Keep it fast.
+
+Check only things useful before work begins, such as:
+expected Zig baseline versus available Zig when practical
+required Python dependency availability
+presence/readability of core generated agent indexes
+whether the generated agent index passes its canonical drift check
+whether basic agent contract validation can run
+whether repository state exposes an immediately actionable problem
+
+Do not turn doctor into the entire repository validation pipeline.
+
+Return conventional deterministic JSON on stdout.
+Use stderr for progress/errors.
+
+Every detected issue must provide:
+status
+stable code when appropriate
+reason
+path or component
+repair command when known
+
+Doctor must return nonzero when the environment is unusable for the requested fast path.
+Do not silently repair the repository.
+
+AGENT CARD
+
+Extend query-reference.py with commands equivalent to:
+
+python3 tools/query-reference.py agent card MODULE --view select
+python3 tools/query-reference.py agent card MODULE --view integrate
+python3 tools/query-reference.py agent card MODULE --view repair
+python3 tools/query-reference.py agent card MODULE --view all
+
+All views must be deterministic.
+All views must support compact JSON.
+
+SELECT VIEW
+
+Include only information required to choose or reject the module, such as:
+module
+summary
+capabilities
+selection priority
+use_when
+do_not_use_when
+environment constraints
+resource profile
+known gaps
+alternatives
+
+Avoid source paths unless needed for the decision.
+
+INTEGRATE VIEW
+
+Include only what an agent needs after selection:
+module
+named import
+construction
+operation map
+dependencies
+dependency build order
+ownership
+borrowing
+invalidation
+errors
+minimal usage
+matching/preferred recipes
+focused validation commands
+integration notes
+
+Do not copy README prose.
+
+REPAIR VIEW
+
+Include:
+public errors
+stable diagnostic IDs
+meaning
+misuse classification
+repair strategy
+repair example
+affected path
+focused validation command
+
+Do not load unrelated diagnostics.
+
+ALL VIEW
+
+May combine the three, but avoid duplicate keys and repeated prose.
+
+TOKEN/CONTEXT EFFICIENCY
+
+Measure serialized byte size of every select, integrate, and repair card for each fully migrated module.
+
+Report those sizes.
+
+Do not claim token savings from byte sizes.
+Do not claim 10x savings until a separate benchmark proves it.
+
+The goal is to make the response materially smaller than opening details.json plus source.
+
+AGENT DECIDE
+
+Add a deterministic local command equivalent to:
+
+python3 tools/query-reference.py agent decide "TASK DESCRIPTION"
+
+This is not an LLM.
+Do not call a model.
+Do not use embeddings.
+Do not use a network.
+Do not claim semantic understanding.
+
+Use deterministic contract matching over standardized fields such as:
+capability_ids
+search_aliases
+use_when
+do_not_use_when
+selection_priority
+environment_constraints
+resource_profile
+known_gaps
+alternatives
+
+Return at most the best three candidates by default.
+
+For every candidate expose concise evidence:
+matched capabilities
+matched aliases or selection terms
+important satisfied constraints
+explicit contradictions
+selection priority
+
+An explicit contradiction must reject the candidate rather than merely lowering its score.
+
+Return an explicit rejected set when relevant.
+
+State in the output that this is deterministic contract matching and not proof of semantic compatibility.
+
+Do not hard-code acceptance-test sentences or module names into the scoring algorithm.
+
+AGENT COMPOSE
+
+Add a deterministic command equivalent to:
+
+python3 tools/query-reference.py agent compose CAPABILITY [CAPABILITY ...]
+
+It must answer:
+what is already solved
+which canonical modules provide it
+which alternatives are ambiguous
+what dependency closure comes with those choices
+what canonical build order applies
+what existing recipes already combine them
+what conflicts exist
+what requested capabilities are absent
+what focused validation commands apply
+
+Do not generate source code.
+Do not pretend a missing capability exists.
+Missing capability output is a useful result, not something to hide.
+Where composition is incomplete, return a partial result with a visible reason.
+
+AGENT IMPACT
+
+Add:
+
+python3 tools/query-reference.py agent impact MODULE
+
+Return a compact mechanically derived impact view:
+direct dependents
+transitive dependents
+recipes using the module
+affected agent-readable contracts if applicable
+focused module tests
+relevant recipe tests
+aggregate validation commands
+
+This should allow an agent changing a foundation to know where danger lies without grepping the whole repository.
+
+AGENT ERROR LOOKUP
+
+Preserve and improve the existing diagnostic query.
+
+A known diagnostic lookup should be one of the cheapest operations in the repository.
+
+Given a ZIGREF code, a brand-new agent should immediately receive:
+meaning
+module
+violated rule
+evidence classification
+misuse fixture
+repair example
+repair strategy
+focused validation command
+
+Do not require source inspection for known repair knowledge.
+
+STANDARD AGENT RESULT SHAPE
+
+Where practical, make new agent-facing JSON commands share ordinary predictable top-level concepts.
+
+Do not invent a DSL.
+
+Use conventional fields such as:
+status
+query
+results
+diagnostics
+
+Use status values with obvious meaning such as:
+ok
+partial
+error
+
+A partial result must explain what is missing.
+An error result plus process failure must remain nonzero.
+
+Do not mechanically rewrite every existing query output merely for aesthetic uniformity if doing so creates unnecessary compatibility breakage.
+Prefer additive compatibility.
+
+STANDARD TOOL DIAGNOSTICS
+
+Introduce only a small set of generic stable ZIGREF tool/fast-path diagnostics where they produce real value.
+Inspect existing diagnostics first.
+Do not duplicate an existing meaning.
+
+Potential categories that may deserve literal stable codes include:
+stale generated agent index
+invalid agent contract
+missing referenced module/recipe/path
+ambiguous selection requiring caller choice
+composition conflict
+unusable local environment
+unsupported agent contract version
+
+Choose final names consistent with existing ZIGREF style.
+Do not proliferate codes for trivial informational states.
+“No exact module currently provides requested capability” may be a normal compose result rather than a tool failure.
+
+NO SILENT DEAD ENDS
+
+This requirement applies both to zig-reference and to systems composed from its modules where the repository can reasonably make the behavior visible.
+
+Agent contracts should make major non-goals and known gaps machine-visible.
+
+If a module:
+cannot free individual allocations
+cannot grow
+requires caller-owned storage
+invalidates borrows on reset
+is hosted only
+is freestanding only
+is not synchronized
+does not perform replay
+does not provide persistence
+does not enforce an invariant the caller may expect
+
+the agent fast path should expose that before integration.
+
+The repository should be unusually good at telling an agent “do not use this for that.”
+
+AGENT-READABLE MIGRATION SCOPE
+
+Migrate the currently full agent-readable modules to Agent Contract v2.
+
+Derive the exact list from repository truth.
+
+It should currently include the existing pilot modules plus the bounded system resource planner and deterministic event trace, but do not hard-code the count.
+
+Do not migrate every pending module in this task.
+Pending modules remain valid.
+
+For pending modules, generate any useful information that can already be derived safely from existing details.json, dependency indexes, recipes, and public symbols.
+Label partial coverage honestly.
+Do not call a module broken because it has not yet received manually authored v2 selection metadata.
+
+ZERO-CONTEXT ACCEPTANCE TEST
+
+Create deterministic acceptance coverage for the experience of an agent that knows nothing except that it is inside zig-reference.
+
+The test should prove that, without recursive source scanning, the agent-facing commands can:
+bootstrap the repository
+find a likely module for a requirement
+reject a clearly incompatible module
+retrieve a compact selection card
+retrieve a compact integration card
+compose multiple known capabilities
+report a genuinely missing capability
+find a diagnostic repair
+determine impact of changing a foundation
+identify stale generated state
+identify an invalid contract reference
+
+Do not implement an actual LLM test.
+Test the deterministic repository interface.
+
+REPRESENTATIVE SELECTION ACCEPTANCE CASES
+
+Support scenarios equivalent in meaning to:
+
+I need aligned allocation from caller-owned fixed memory with no hidden heap.
+Strong expected candidate: fixed-bump-allocator
+
+I need arbitrary independent deallocation.
+fixed-bump-allocator must be rejected.
+
+I need stale-handle-safe bounded object storage.
+Strong expected candidate: fixed-capacity-object-pool
+
+I need deterministic bounded graph ordering with cycle detection.
+Strong expected candidate: fixed-capacity-topological-sort
+
+I need an exact bounded resource budget with deterministic initialization ordering.
+Strong expected candidate: bounded-system-resource-plan
+
+I need fixed-capacity deterministic normalized event recording with no timestamps or hidden allocation.
+Strong expected candidate: bounded-deterministic-event-trace
+
+Do not special-case those sentences.
+They test the general contract-driven mechanism.
+
+COMPOSITION ACCEPTANCE CASE
+
+Create a representative request for capabilities equivalent to:
+bounded task storage
+deterministic priority ordering
+deterministic event tracing
+fixed-memory operation
+
+The composition query should discover all already solved pieces it honestly can.
+It should return their dependency closure and recipes.
+
+If bounded deterministic scheduling itself does not yet exist, it must state that this capability remains missing rather than pretending the combination is already a scheduler.
+
+This is exactly the desired snowball behavior:
+solved
+solved
+solved
+missing
+
+The future coding agent then writes the missing piece.
+
+CHANGE-IMPACT ACCEPTANCE CASE
+
+For a foundational module with multiple downstream users, verify agent impact reports downstream dependents and recipes mechanically without recursively grepping project directories.
+
+DEBUG/ANTI-STALL ACCEPTANCE TESTS
+
+Test at least these failure behaviors:
+stale generated index
+missing referenced module
+missing referenced recipe
+malformed agent contract
+unsupported agent contract version
+invalid operation-map symbol
+invalid construction symbol
+subprocess failure where applicable
+
+For each case prove:
+failure is visible
+process status is nonzero when it is a true tool failure
+stable diagnostic is present when appropriate
+exact reason is present
+affected path/component is present
+repair/next command is present when known
+
+No self-test may simply print predetermined PASS.
+It must create or simulate malformed state and prove the validator/tool rejects it.
+
+VALIDATOR V2
+
+Extend validate-agent-contracts.py to validate the new contract fields.
+
+At minimum verify:
+agent contract version
+controlled selection-priority values
+alternative module references
+composition module references
+recipe references
+environment vocabulary
+resource profile vocabulary
+construction public symbols
+operation-map symbols
+error-map errors against declared public errors where applicable
+minimal usage references real symbols where mechanically checkable
+diagnostic uniqueness
+diagnostic evidence consistency
+generated derived graph fields against canonical dependency indexes
+generated recipe relationships
+generated validation commands
+no manually authored transitive/reverse graph data where derivation is authoritative
+generated index drift
+
+Extend --self-test with malformed examples for the new rules.
+
+GENERATOR V2
+
+Extend build-agent-index.py rather than building a parallel index system.
+Keep output deterministic.
+Sort all fields where semantic ordering is not meaningful.
+Preserve meaningful ordering where order is part of the contract.
+Never embed timestamps that create meaningless churn.
+Run generation twice.
+The second run must produce no diff.
+
+QUERY DETERMINISM
+
+Run representative bootstrap, doctor, card, decide, compose, impact, and diagnostic commands twice.
+Save stdout.
+Prove byte-for-byte identical output with diff.
+Status output on stderr may include phase information but should also be deterministic where practical.
+Do not put timestamps in default status output.
+
+EXTERNAL PROJECT USABILITY
+
+Document, in AGENTS.md or the smallest appropriate existing root documentation, how an outside project or coding agent using zig-reference should behave.
+
+The key rule is:
+Do not copy repository modules blindly into a new project and then lose their contracts.
+
+A consuming agent should retain enough identity to know which zig-reference module and contract it is using.
+
+Do not build a package manager in this task.
+Do not build vendoring machinery unless an existing simple mechanism already exists.
+
+Simply ensure the integration guidance tells an external agent:
+query first
+select exact module
+record exact module identity/version where current conventions support it
+preserve declared constraints
+run focused validation
+look up ZIGREF diagnostics before inventing repairs
+
+Systems using zig-reference should benefit from the same no-silent-failure philosophy.
+Where module contracts expose failure behavior, a composing agent should not silently discard those errors.
+Do not globally redesign application logging.
+This is guidance and metadata, not a new runtime logging framework.
+
+COMMAND DOCUMENTATION
+
+Update COMMANDS.md after commands exist.
+Do not document commands before they are implemented.
+
+Add concise entries for:
+agent bootstrap
+agent doctor
+agent card
+agent decide
+agent compose
+agent impact
+
+Preserve existing query commands.
+
+Update AGENTS.md only after the new fast-path commands actually work.
+
+The eventual first-time-agent workflow should become equivalent to:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+python3 tools/query-reference.py agent decide "..."
+python3 tools/query-reference.py agent card MODULE --view select
+python3 tools/query-reference.py agent compose ...
+python3 tools/query-reference.py agent card MODULE --view integrate
+
+Source should be opened only when implementation internals or debugging genuinely require it.
+
+REPOSITORY POLICY
+
+Do not add:
+SQLite
+binary indexes
+embeddings
+vector search
+network access
+LLM calls
+a chatbot
+a new programming language
+a new configuration language
+large opaque generated artifacts
+another systems module
+another family of per-module files
+
+Do not weaken:
+contract checks
+proof honesty
+fixture classification
+smoke tests
+unit tests
+recipe tests
+generated drift checks
+artifact policy
+
+Do not claim:
+semantic understanding
+formal proof
+10x token savings
+one-shot correctness
+automatic compatibility
+unmeasured performance gains
+
+The architecture should make those outcomes increasingly plausible, but evidence comes later.
+
+MEASURE WHAT WE CAN HONESTLY MEASURE NOW
+
+Produce a report with objective measurements:
+byte size of bootstrap output
+byte size of each select card
+byte size of each integrate card
+byte size of each repair card
+number of files an agent needs to open for each representative fast-path scenario
+number of commands required for each representative scenario
+whether source inspection was necessary
+number of generated versus manually authored v2 facts
+
+Compare these against the obvious previous route where useful:
+query
+→ details.json
+→ source
+→ recipes
+→ dependency queries
+
+Do not convert byte measurements into invented token counts.
+A later benchmark can measure real model tokens and task completion.
+
+FULL VALIDATION
+
+Use the repository-local Python environment.
+
+If needed:
+cd ~/dev/zig-reference
+source .venv/bin/activate
+
+Do not casually recreate the environment if it already exists.
+
+Run focused tests for all changed Python tooling.
+Run validator self-tests.
+Run deterministic index regeneration and prove the second run creates no diff.
+Run representative query determinism comparisons.
+
+Then run the complete repository validation workflow required by the current README and COMMANDS.md.
+
+At minimum:
+
+python3 tools/format-module-contracts.py --check
+zig fmt --check .
+PYTHONDONTWRITEBYTECODE=1 python3 tools/validate-agent-contracts.py --self-test
+zig build validate-agent-contracts --summary all
+zig build check --summary all
+zig build status --summary all
+zig build test --summary all
+zig build smoke --summary all
+zig build recipes --summary all
+zig build conformance --summary all
+zig build validate-repository --summary all
+git diff --check
+
+Regenerate canonical repository indexes, dependency graphs, agent indexes, and validation evidence through their defining tools when changes require it.
+Never manually fabricate evidence.
+Never manually edit generated files to make checks pass.
+Do not mark failed work “not applicable” merely to obtain green output.
+
+FINAL MANUAL TEST
+
+Pretend you are an agent who has never seen the repository.
+Without relying on memory from implementation, start with only AGENTS.md.
+Follow exactly the documented fast path.
+
+Verify that it is obvious:
+what first command to run
+what the repository contains
+how to find a module
+how to reject the wrong module
+how to compose capabilities
+how to see what remains missing
+how to integrate a chosen module
+how to know what might break after changing it
+how to find a known repair
+how to see repository/tool failure immediately
+
+If that path requires broad source browsing for routine selection or integration, improve the fast path before finishing.
+
+FINAL REPORT
+
+Provide a concise report containing:
+exact Agent Contract v2 fields added
+which fields are manually authored
+which fields are derived
+current full-fast-path module count
+current partial module count
+bootstrap command and output summary
+doctor command and checks
+card views
+decide behavior
+compose behavior
+impact behavior
+standard tool diagnostic behavior
+anti-stall/debug behavior
+no-silent-failure behavior
+representative acceptance results
+byte-size measurements
+number of files opened in representative fast-path cases
+validator self-tests
+deterministic generation result
+deterministic query result
+complete repository validation result
+remaining limitations
+exact git status
+
+Do not commit or push.
+
+The task is complete only when a brand-new coding agent can arrive with zero prior knowledge, discover the repository cheaply, avoid obvious dead ends, receive compact standardized integration knowledge, see failures immediately, find known repairs without source archaeology, and spend most of its reasoning budget on genuinely unsolved work.
+
+The final line must be exactly:
+
+AGENT FAST PATH V2 PASSED
