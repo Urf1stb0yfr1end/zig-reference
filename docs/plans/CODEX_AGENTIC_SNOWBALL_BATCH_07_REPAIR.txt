@@ -1,0 +1,419 @@
+CODEX AGENTIC SNOWBALL BATCH 07 REPAIR — ZERO-CONTEXT DISCOVERY + COMMAND TRUTH
+
+MISSION
+
+Repair the two real defects found by the independent semantic review of the merged Batch 07 Correct-Use Preflight implementation.
+
+This is a deliberately small repair batch.
+
+Do not begin Batch 08.
+Do not add new modules.
+Do not add a new Morphic feature.
+Do not redesign preflight.
+Do not expand the debugging architecture yet.
+
+The merged Batch 07 implementation is functionally healthy. Independent review reported:
+
+- 42 independent checks passed;
+- 2 independent checks failed;
+- 53 contracted modules;
+- 53 full Agent Fast Path modules;
+- 0 partial modules;
+- all representative preflight outputs were byte-deterministic and matched the exact reported byte sizes;
+- bounded-deterministic-scheduler preflight correctly exposed Task and BoundedDeterministicScheduler and did not expose FixedPriorityQueue as its public identity;
+- unknown preflight subjects remained explicit and nonzero;
+- port semantic consistency and the dependency/public-surface regression passed;
+- Developer Minimus regression passed;
+- raw hosted Morphic verification passed 66/66 steps and 32/32 tests;
+- hosted Morphic output remained 765 bytes and byte-identical across identical runs;
+- full repository validation passed 322/322 steps and 204/204 tests;
+- the worktree remained clean.
+
+The two failures were:
+
+1. The canonical zero-context bootstrap does not advertise the new supported preflight operation.
+2. COMMANDS.md still contains a stale current-state sentence claiming the Agent Fast Path projects 52 full contracts, while the actual current corpus is 53/53/0 and COMMANDS.md elsewhere correctly says 53.
+
+Repair exactly these defects and add the smallest durable regression guards that prevent equivalent drift.
+
+STARTING STATE
+
+Work in ~/dev/zig-reference.
+
+Read AGENTS.md first.
+Read COMMANDS.md.
+Read docs/agentic-vocabulary.md.
+Read docs/reports/AGENTIC_SNOWBALL_BATCH_07.md.
+Read docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_07_CORRECT_USE_PREFLIGHT.txt.
+
+IMPORTANT HISTORICAL RULE
+
+The Batch 07 request above has been restored to the exact historical version that Codex actually executed from base commit bda669e.
+
+Do not modify it.
+
+Do not rewrite docs/reports/AGENTIC_SNOWBALL_BATCH_07.md to pretend the original run already included this later repair.
+
+Preserve historical input and historical result.
+
+Create a separate repair report instead:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_07_REPAIR.md
+
+Use Zig 0.14.0 only.
+
+Do not modify, move, recreate, delete, or retag benchmark-pre-morphic-52.
+
+Before changing code, run at minimum:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+node tools/check-port-contracts.js
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py
+
+Confirm the two independent-review defects from current repository truth before repairing them.
+
+DEFECT 1 — ZERO-CONTEXT BOOTSTRAP OMITS PREFLIGHT
+
+Observed current bootstrap output advertises operations approximately as:
+
+bootstrap
+doctor
+decide
+card
+compose
+impact
+diagnostic
+diagnose
+
+and workflow approximately as:
+
+decide
+card select
+compose
+card integrate
+validate
+diagnose
+diagnostic repair
+
+But Batch 07 added a real canonical operation:
+
+python3 tools/query-reference.py agent preflight MODULE_OR_RECIPE
+
+AGENTS.md and COMMANDS.md already teach preflight as part of the correct-use path.
+
+Therefore a genuinely cold agent entering only through the canonical bootstrap can fail to discover a supported correctness surface that Batch 07 explicitly intended it to use before substantial integration.
+
+This is a real Agent Navigation Cost / Rediscovery Tax defect.
+
+REQUIRED REPAIR 1
+
+Update the canonical zero-context bootstrap so it truthfully advertises preflight.
+
+At minimum:
+
+- `preflight` must appear in the supported operation list;
+- the bootstrap workflow must place preflight in the correct semantic position after composition/selection and before substantial integration;
+- keep the bootstrap compact;
+- do not dump preflight fields into bootstrap;
+- preserve progressive disclosure;
+- do not make every normal query include correctness obligations by default.
+
+A reasonable workflow shape is:
+
+decide
+→ card select
+→ compose
+→ preflight
+→ card integrate
+→ validate
+→ diagnose
+→ diagnostic repair
+
+Use the repository's actual final conventions rather than blindly copying this formatting if another compact representation is cleaner.
+
+CRITICAL REGRESSION RULE
+
+Do not merely edit the literal bootstrap JSON.
+
+Strengthen the zero-context acceptance path so this class of omission is detected automatically in the future.
+
+The test should prove that canonical supported agent operations that are intentionally part of the zero-context workflow are discoverable from bootstrap.
+
+At minimum it must fail if `preflight` is a supported canonical operation but bootstrap omits it.
+
+Prefer deriving the assertion from the existing operation registry/parser where practical instead of introducing another unrelated manually duplicated full operation list.
+
+It is acceptable for low-level compatibility or specialized operations to remain outside the primary workflow when that is intentional; the guard should enforce truthful discovery without forcing every internal command into the beginner path.
+
+Do not bloat bootstrap to satisfy the test.
+
+DEFECT 2 — COMMANDS.md HAS CONTRADICTORY CURRENT CORPUS COUNTS
+
+Independent review found the stale current-tense sentence:
+
+Agent Fast Path v2 currently projects all 52 contracts as full contracts.
+
+Current repository truth is:
+
+53 contracted
+53 full
+0 partial
+
+COMMANDS.md elsewhere already describes 53/53 correctly.
+
+The current-state manual must not contradict itself.
+
+REQUIRED REPAIR 2
+
+Repair the stale current-state claim in COMMANDS.md.
+
+Prefer wording that remains useful and precise without creating unnecessary count duplication.
+
+If the sentence retains concrete current counts, they must agree with generated canonical Agent Fast Path state.
+
+Do not rewrite legitimate historical statements such as prior Batch 03 or Batch 05 counts when they are explicitly historical.
+
+CRITICAL REGRESSION RULE
+
+Do not stop at replacing `52` with `53`.
+
+Strengthen the existing command-reference/manual validation architecture so an equivalent stale CURRENT-STATE corpus claim is rejected in the future.
+
+Use the existing `tools/check-command-reference.py --check` path if appropriate.
+
+The guard should distinguish:
+
+- current-state claims that must agree with generated repository truth;
+- explicitly historical batch facts that are allowed to describe older states.
+
+Avoid a brittle global rule that forbids historical numbers or fails documentation merely because an older batch section correctly records its old count.
+
+Prefer deriving current contracted/full/partial truth from generated/agent/modules.json or another existing canonical generated source.
+
+Do not create a second manually maintained corpus-count database.
+
+The final command-reference check must still validate real commands, not become only a prose-count checker.
+
+PRESERVE BATCH 07 FUNCTIONAL TRUTH
+
+This repair must not change the semantics of the Batch 07 preflight unless a real defect is discovered while validating the two requested repairs.
+
+The following representative preflight outputs should remain byte-identical to the merged Batch 07 implementation unless a necessary truthful repair directly changes them:
+
+semantic-version: 1665 bytes
+owned-byte-buffer: 2450 bytes
+bounded-system-resource-plan: 4374 bytes
+bounded-deterministic-scheduler: 2371 bytes
+run-hosted-morphic-runtime: 7336 bytes
+
+Measure them again.
+
+If any size changes, explain exactly why in the repair report and prove that the change preserves Constraint-Preserving Compression and determinism.
+
+Scheduler preflight must still expose:
+
+Task
+BoundedDeterministicScheduler
+
+and must not substitute:
+
+FixedPriorityQueue
+
+Unknown preflight subjects must remain explicit and return nonzero.
+
+The hosted recipe preflight must still expose:
+
+python3 tools/developer-command.py verify-hosted-morphic-runtime
+
+as its serious outer verification.
+
+PRESERVE BATCH 06/MORPHIC TRUTH
+
+Do not regress the hosted Morphic runtime.
+
+Run it at least twice from identical inputs and compare complete output byte-for-byte.
+
+Expected current result is 765 bytes per run.
+
+If the exact byte count changes, stop and explain why; these two requested documentation/discovery repairs should not require changing Morphic runtime output.
+
+Preserve the canonical hosted Developer Minimus operation:
+
+python3 tools/developer-command.py verify-hosted-morphic-runtime
+
+It must continue to preserve ordinary output, preserve the underlying exit status, and append exactly one authoritative LOCATIONS then MINIMUS handoff.
+
+COMMANDS.md CUMULATIVE RULE
+
+Every Codex run that changes the repository must leave COMMANDS.md current.
+
+This remains cumulative across all prior batches.
+
+Before completion:
+
+- add any real new runnable command introduced by this repair, if any;
+- update changed command syntax/purpose if necessary;
+- backfill real supported commands from previous batches that are still missing;
+- repair stale current-state claims discovered by this run;
+- do not erase valid historical batch facts merely because current state moved on;
+- remove or accurately mark obsolete commands;
+- never document a command that does not actually exist;
+- do not mark a command verified unless it actually ran successfully.
+
+Run:
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+
+VOCABULARY DISCIPLINE
+
+The vocabulary already contains the newer terms Invariant-Guided Diagnosis and Failure State Capsule.
+
+Do not remove them.
+
+They were added after the historical Batch 07 implementation and are intentionally preserved for future work.
+
+This repair should not implement those future debugging systems.
+
+If this tiny repair somehow introduces a genuinely new project-specific formal term, add it to docs/agentic-vocabulary.md only if necessary.
+
+Do not invent terminology for ordinary implementation details.
+
+AGENTS.md DISCIPLINE
+
+AGENTS.md already teaches the preflight step.
+
+Do not turn AGENTS.md into a repair changelog.
+
+Only modify AGENTS.md if a durable workflow rule is actually wrong or missing after the repair.
+
+REPAIR REPORT
+
+Create:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_07_REPAIR.md
+
+Keep it concise and factual.
+
+Include:
+
+1. base commit and Zig version;
+2. independent-review starting result: 42 passed / 2 failed;
+3. defect 1 root cause;
+4. bootstrap repair;
+5. bootstrap regression guard;
+6. defect 2 root cause;
+7. COMMANDS.md repair;
+8. current-state documentation regression guard;
+9. confirmation that historical Batch 07 request/report were not rewritten;
+10. representative preflight byte sizes before/after;
+11. hosted Morphic byte-repeatability result;
+12. focused validation results;
+13. aggregate validation result;
+14. limits/anything intentionally not changed.
+
+If you include Snowball Yield bookkeeping, keep it factual and explicitly classify this as repair/consistency work, not a new composition benchmark.
+
+Do not estimate token savings.
+Do not invent Rust/C/Zig performance claims.
+
+QUALITY GATES
+
+Run all applicable focused checks.
+
+At minimum, when these commands exist:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py
+PYTHONDONTWRITEBYTECODE=1 python3 tools/validate-agent-contracts.py --self-test
+PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+node tools/check-port-contracts.js
+node tools/test-port-public-surface.js
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py
+zig fmt --check .
+zig build test-bounded-deterministic-scheduler --summary all
+zig build smoke-bounded-deterministic-scheduler --summary all
+zig build test-recipe-run-hosted-morphic-runtime --summary all
+zig build verify-hosted-morphic-runtime --summary all
+python3 tools/developer-command.py verify-hosted-morphic-runtime
+zig build check --summary all
+zig build test --summary all
+zig build recipes --summary all
+zig build conformance --summary all
+python3 tools/developer-command.py verify-morphic-plan
+python3 tools/developer-command.py verify-morphic-trace
+python3 tools/developer-command.py smoke
+python3 tools/developer-command.py validate-repository
+
+git diff --check
+
+Also rerun representative preflight commands twice each and compare exact output bytes:
+
+python3 tools/query-reference.py agent preflight semantic-version
+python3 tools/query-reference.py agent preflight owned-byte-buffer
+python3 tools/query-reference.py agent preflight bounded-system-resource-plan
+python3 tools/query-reference.py agent preflight bounded-deterministic-scheduler
+python3 tools/query-reference.py agent preflight run-hosted-morphic-runtime
+
+Run hosted Morphic twice and compare complete output byte-for-byte.
+
+Do not hand-edit generated indexes.
+If generated projections become stale because a canonical source changes, regenerate them through the documented generator.
+
+SUCCESS CRITERIA
+
+This repair is complete only if all of the following are true:
+
+- bootstrap advertises the canonical preflight operation;
+- the primary zero-context workflow places preflight before substantial integration;
+- a deterministic zero-context regression fails if preflight is again omitted;
+- bootstrap remains compact and progressive disclosure is preserved;
+- COMMANDS.md contains no stale current-state 52-full-contract claim;
+- current Agent Fast Path state remains 53 contracted / 53 full / 0 partial;
+- current-state corpus-count claims in COMMANDS.md are mechanically checked against canonical generated truth without invalidating legitimate historical counts;
+- the historical Batch 07 Codex request remains exactly the executed historical version;
+- the original Batch 07 report remains historical rather than being retroactively rewritten;
+- a separate Batch 07 repair report exists;
+- representative Batch 07 preflight outputs remain deterministic and truth-preserving;
+- scheduler public identity remains correct;
+- unknown preflight subjects remain explicit and nonzero;
+- port semantic consistency remains green;
+- Developer Minimus consistency remains green;
+- hosted Morphic verification remains green;
+- hosted Morphic output remains byte-identical across identical runs and should remain 765 bytes;
+- COMMANDS.md is cumulatively current;
+- the two newer debugging vocabulary terms remain present;
+- no new reusable module or recipe is created;
+- no Batch 08 architecture work begins;
+- benchmark-pre-morphic-52 remains untouched;
+- all applicable focused and aggregate validations pass;
+- final worktree contains no accidental generated binary artifacts.
+
+OUT OF SCOPE
+
+Do not implement Failure State Capsules in this repair.
+Do not implement Invariant-Guided Diagnosis infrastructure in this repair.
+Do not add a borrow checker.
+Do not add a Rust parser or rustc compatibility layer.
+Do not begin the Rust/C/Zig benchmark.
+Do not begin Alpine boot.
+Do not begin the RISC-V privileged backend.
+Do not add VirtIO or networking.
+Do not create a new module quota.
+
+This run exists only to make Batch 07's new capability discoverable from the canonical front door and make the command manual stop lying about current corpus size.
+
+Do not commit.
+Do not push.
+Do not create or move tags.
+Do not open a pull request.
+
+Leave completed changes uncommitted for review.
+
+Finish only when the requested work is genuinely complete and the final line of your response is exactly:
+
+AGENTIC SNOWBALL BATCH 07 REPAIR PASSED
