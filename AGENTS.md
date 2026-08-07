@@ -30,6 +30,7 @@ task
 → discover
 → select or reject
 → compose existing capabilities
+→ inspect compact correctness obligations with `agent preflight MODULE_OR_RECIPE`
 → inspect the smallest useful integration contract
 → write only genuinely missing code
 → validate

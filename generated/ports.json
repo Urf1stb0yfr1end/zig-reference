@@ -241,7 +241,8 @@
       "risks": [
         {
           "affectedEndpoints": [
-            "FixedPriorityQueue"
+            "Task",
+            "BoundedDeterministicScheduler"
           ],
           "consequence": "A syntactically successful port could violate the module contract.",
           "detectionTests": [
@@ -301,7 +302,14 @@
       "risks": [
         {
           "affectedEndpoints": [
-            "Planner"
+            "CapacityConfiguration",
+            "DependencyEdge",
+            "Description",
+            "HandleStorage",
+            "Planner",
+            "PostSealAllocation",
+            "TaskStorage",
+            "TraceEventStorage"
           ],
           "consequence": "A syntactically successful port could violate the module contract.",
           "detectionTests": [
@@ -519,6 +527,7 @@
         {
           "affectedEndpoints": [
             "Permission",
+            "Permissions",
             "SegmentType",
             "Segment",
             "ParseError",

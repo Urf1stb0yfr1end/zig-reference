@@ -56,6 +56,17 @@ def main():
   _,card=run("card",module,"--view","integrate"); guidance="\n".join([card["results"]["construction"]["initialization"],*card["results"]["minimal_usage"]])
   assert "std.testing.refAllDeclsRecursive" not in guidance
  _,d=run("impact","fixed-capacity-vector"); assert d["results"]["direct_dependents"]
+ for subject in ("semantic-version","owned-byte-buffer","bounded-system-resource-plan","bounded-deterministic-scheduler","run-hosted-morphic-runtime"):
+  first,data=run("preflight",subject); second=run("preflight",subject)[0]
+  assert first.stdout==second.stdout
+  result=data["results"]
+  for key in ("identity","ownership","cleanup","borrowing","invalidation","resources","failures","determinism","validation_closure","minimum_useful_locations","unknowns"): assert key in result,(subject,key)
+ _,scheduler=run("preflight","bounded-deterministic-scheduler")
+ identity=scheduler["results"]["identity"]
+ assert identity["public_symbols"]==["Task","BoundedDeterministicScheduler"] and identity["construction"]["primary_symbol"]=="BoundedDeterministicScheduler"
+ assert "FixedPriorityQueue" not in identity["public_symbols"]
+ _,hosted=run("preflight","run-hosted-morphic-runtime")
+ assert hosted["results"]["validation_closure"]["serious_outer"]=="python3 tools/developer-command.py verify-hosted-morphic-runtime"
  index=ROOT/"generated/agent/modules.json"; original=index.read_text(); index.write_text(original+" ")
  try:
   p=subprocess.run([sys.executable,"tools/build-agent-index.py","--check"],cwd=ROOT,capture_output=True,text=True); assert p.returncode and "ZIGREF-INDEX-STALE" in p.stderr

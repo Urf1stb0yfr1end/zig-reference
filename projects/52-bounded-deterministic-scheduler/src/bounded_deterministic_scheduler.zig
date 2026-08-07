@@ -28,8 +28,12 @@ pub fn BoundedDeterministicScheduler(comptime capacity: usize) type {
             return .{ .queue = Queue.init(), .now_value = initial_time };
         }
 
-        pub fn now(self: *const Self) u64 { return self.now_value; }
-        pub fn count(self: *const Self) usize { return self.queue.count(); }
+        pub fn now(self: *const Self) u64 {
+            return self.now_value;
+        }
+        pub fn count(self: *const Self) usize {
+            return self.queue.count();
+        }
 
         pub fn schedule(self: *Self, task: Task) ScheduleError!void {
             try self.queue.insert(task);

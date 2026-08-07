@@ -11,6 +11,7 @@ OPERATIONS = {
     "validate-repository": ("validate-repository", "complete repository validation pipeline", ["contracts=details.schema.json", "commands=COMMANDS.md"], True),
     "verify-morphic-plan": ("verify-morphic-plan", "Morphic plan verification", ["recipe=recipes/plan-morphic-runtime/recipe.json"], False),
     "verify-morphic-trace": ("verify-morphic-trace", "Morphic trace verification", ["recipe=recipes/trace-morphic-example/recipe.json"], False),
+    "verify-hosted-morphic-runtime": ("verify-hosted-morphic-runtime", "hosted Morphic runtime verification", ["recipe=recipes/run-hosted-morphic-runtime/recipe.json"], False),
 }
 
 def main() -> int:
