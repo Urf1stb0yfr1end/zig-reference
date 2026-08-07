@@ -204,7 +204,7 @@ Each module has `zig build test-<module>` and `zig build smoke-<module>` targets
 
 ## Agent-readable pilot commands
 
-Agent Fast Path v2 currently projects 47 full contracts and 5 partial contracts. The
+Agent Fast Path v2 currently projects all 52 contracts as full contracts. The
 root-document policy is checked by `node tools/check-port-contracts.js`; it accepts
 only the explicit flagship/root allowlist and rejects any other root Markdown file.
 
@@ -216,8 +216,11 @@ only the explicit flagship/root allowlist and rejects any other root Markdown fi
 | `python3 tools/query-reference.py agent capability TERM` | Discover pilot modules by controlled capability ID. |
 | `python3 tools/query-reference.py agent module NAME` | Inspect a compact pilot module projection. |
 | `python3 tools/query-reference.py agent diagnostic ID` | Locate misuse evidence and its repair. |
+| `python3 tools/query-reference.py agent diagnose TERM` | Return at most five deterministic diagnostic candidates matched from authored IDs, aliases, native errors, modules, operations, or summaries; unmatched terms remain explicitly unknown. |
 | `python3 tools/query-reference.py agent symbol SYMBOL` | Discover a pilot module by public symbol. |
 | `python3 tools/query-reference.py agent pending` | List modules awaiting migration without calling them invalid. |
+
+Batch 05 validated the 52-card projection and Debug Fast Path under Zig 0.14.0. Exact historical aliases resolve to canonical identities; `diagnose` is candidate discovery rather than causal inference, and native error text remains authoritative when a symptom is ambiguous or unknown.
 | `python3 tools/query-reference.py agent bootstrap` | Return the compact zero-context repository entry card. |
 | `python3 tools/query-reference.py agent doctor` | Check fast-path prerequisites, drift, contracts, and Zig 0.14.0. |
 | `python3 tools/query-reference.py agent card MODULE --view {select,integrate,repair,all}` | Return a purpose-sized module card. |

@@ -18,6 +18,23 @@ CLASSES = {
     "documented_misuse_example",
 }
 ASSERTION_MARKERS = ("testing.expect(", "testing.expectEqual(", "testing.expectError(")
+DIAGNOSTIC_CATEGORIES = {"ARITH", "BOUNDS", "CONTRACT", "DEPENDENCY", "INPUT", "LIFETIME", "RESOURCE", "STATE"}
+
+def validate_diagnostic_projection(document):
+    errors=[]; claimed={}; records=document.get("diagnostics",{})
+    build=(ROOT/"build.zig").read_text()
+    commands=(ROOT/"COMMANDS.md").read_text()
+    for code, record in records.items():
+        if record.get("category") not in DIAGNOSTIC_CATEGORIES: errors.append(f"{code}: unknown category")
+        if record.get("repair_status") not in {"known","partial","unknown"}: errors.append(f"{code}: invalid repair status")
+        for identity in [code]+record.get("aliases",[]):
+            if identity in claimed: errors.append(f"alias collision: {identity}")
+            claimed[identity]=code
+        for path in record.get("locations",[]):
+            if not (ROOT/path).is_file(): errors.append(f"{code}: nonexistent diagnostic location {path}")
+        command=record.get("focused_validation_command",""); step=command.removeprefix("zig build ")
+        if not command or (f'b.step("{step}"' not in build and command not in commands): errors.append(f"{code}: nonexistent concrete validation command")
+    return errors
 
 
 def validate_documents(cs):
@@ -227,6 +244,18 @@ def self_test():
                 raise RuntimeError(f"self-test failed to reject {label}: {errors}")
             print(f"PASS: validator rejected {label}")
 
+    projection=json.loads((ROOT/"generated/agent/diagnostics.json").read_text())
+    diagnostic_cases=[]
+    broken=copy.deepcopy(projection); first=next(iter(broken["diagnostics"].values())); first["category"]="MAGIC"; diagnostic_cases.append(("unknown diagnostic category",broken,"unknown category"))
+    broken=copy.deepcopy(projection); first=next(iter(broken["diagnostics"].values())); first["repair_status"]="certain-ish"; diagnostic_cases.append(("invalid repair status",broken,"invalid repair status"))
+    broken=copy.deepcopy(projection); keys=list(broken["diagnostics"]); broken["diagnostics"][keys[1]]["aliases"]=[keys[0]]; diagnostic_cases.append(("diagnostic alias collision",broken,"alias collision"))
+    broken=copy.deepcopy(projection); first=next(iter(broken["diagnostics"].values())); first["locations"]=["does/not/exist.zig"]; diagnostic_cases.append(("nonexistent diagnostic evidence",broken,"nonexistent diagnostic location"))
+    broken=copy.deepcopy(projection); first=next(iter(broken["diagnostics"].values())); first["focused_validation_command"]="zig build absent-step"; diagnostic_cases.append(("nonexistent diagnostic validation",broken,"nonexistent concrete validation command"))
+    for label, malformed, expected in diagnostic_cases:
+        errors=validate_diagnostic_projection(malformed)
+        if not any(expected in error for error in errors): raise RuntimeError(f"self-test failed to reject {label}: {errors}")
+        print(f"PASS: validator rejected {label}")
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -238,6 +267,8 @@ def main():
             self_test()
             return 0
         errors = validate_documents(contracts())
+        diagnostics_path=ROOT/"generated/agent/diagnostics.json"
+        if diagnostics_path.is_file(): errors.extend(validate_diagnostic_projection(json.loads(diagnostics_path.read_text())))
         if not args.quick:
             result = subprocess.run([sys.executable, "tools/build-agent-index.py", "--check"], cwd=ROOT, timeout=60)
             if result.returncode: errors.append("generated agent indexes are stale")

@@ -1187,5 +1187,145 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Allocator-backed owned byte sequence with growth, borrowed views, reset, and ownership transfer to ByteWriter.",
+    "search_aliases": [
+      "byte buffer",
+      "growable bytes"
+    ],
+    "capability_ids": [
+      "owned-byte-buffer"
+    ],
+    "use_when": [
+      "Need a mutable owned byte sequence that grows through an explicit allocator."
+    ],
+    "do_not_use_when": [
+      "Need fixed capacity, allocation-free storage, thread-safe mutation, or stable views across growth/reset."
+    ],
+    "entrypoint": "projects/33-owned-byte-buffer/src/owned_byte_buffer.zig",
+    "public_symbols": [
+      "OwnedByteBuffer"
+    ],
+    "dependency_ids": [
+      "dynamic-array",
+      "byte-writer"
+    ],
+    "ownership": {
+      "storage": "mixed",
+      "values": "copied",
+      "cleanup": "caller"
+    },
+    "borrowing": {
+      "bytes": [
+        "Returned slice borrows buffer storage until invalidated."
+      ],
+      "mutableBytes": [
+        "Returned mutable slice exclusively borrows initialized buffer storage until invalidated."
+      ]
+    },
+    "invalidation": {
+      "views": [
+        "appendByte, append, or reserve may reallocate and invalidate all prior views.",
+        "clearRetainingCapacity changes logical length and invalidates prior logical views.",
+        "reset, deinit, and intoWriter invalidate every prior view."
+      ]
+    },
+    "failure_guarantees": [
+      "Allocation failure from reserve, appendByte, or initCopy leaves existing logical bytes unchanged.",
+      "initCopy cleans partial allocation on failure.",
+      "intoWriter transfers storage and leaves the buffer empty and valid."
+    ],
+    "effects": [
+      "mutates_receiver",
+      "reads_receiver",
+      "returns_borrow",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-owned-byte-buffer",
+      "zig build smoke-owned-byte-buffer"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "mixed",
+      "capacity_model": "unbounded",
+      "bounded": false,
+      "caller_provided_memory": true,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "owned-byte-buffer",
+      "primary_symbol": "OwnedByteBuffer",
+      "initialization": "const buffers = @import(\"owned-byte-buffer\");\nvar buffer = buffers.OwnedByteBuffer.init(allocator);\ndefer buffer.deinit();\ntry buffer.append(\"abc\");"
+    },
+    "operation_map": {
+      "init": "OwnedByteBuffer.init",
+      "initCopy": "OwnedByteBuffer.initCopy",
+      "deinit": "OwnedByteBuffer.deinit",
+      "capacity": "OwnedByteBuffer.capacity",
+      "bytes": "OwnedByteBuffer.bytes",
+      "mutableBytes": "OwnedByteBuffer.mutableBytes",
+      "reserve": "OwnedByteBuffer.reserve",
+      "appendByte": "OwnedByteBuffer.appendByte",
+      "append": "OwnedByteBuffer.append",
+      "clearRetainingCapacity": "OwnedByteBuffer.clearRetainingCapacity",
+      "reset": "OwnedByteBuffer.reset",
+      "intoWriter": "OwnedByteBuffer.intoWriter"
+    },
+    "error_map": [
+      {
+        "error": "OutOfMemory",
+        "operation": "initCopy, reserve, appendByte, append",
+        "meaning": "The explicit allocator cannot provide required capacity.",
+        "handling": "Handle the allocation error; existing buffer bytes remain unchanged."
+      }
+    ],
+    "composition": {
+      "commonly_with": [
+        "dynamic-array",
+        "byte-writer"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Need fixed capacity, allocation-free storage, thread-safe mutation, or stable views across growth/reset."
+    ],
+    "minimal_usage": [
+      "const buffers = @import(\"owned-byte-buffer\");",
+      "var buffer = buffers.OwnedByteBuffer.init(allocator);",
+      "defer buffer.deinit();",
+      "try buffer.append(\"abc\");",
+      "const bytes = buffer.bytes();"
+    ],
+    "integration_notes": [
+      "The allocator is stored by value and must remain usable through deinit or ownership transfer.",
+      "Capacity growth is delegated to dynamic-array and is not a stable growth-factor contract."
+    ]
   }
 }

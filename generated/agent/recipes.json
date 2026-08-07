@@ -34,7 +34,8 @@
       "fixed-bump-allocator",
       "fixed-capacity-priority-queue",
       "fixed-capacity-topological-sort",
-      "fixed-free-list"
+      "fixed-free-list",
+      "intrusive-doubly-linked-list"
     ],
     "plan-morphic-runtime": [
       "bounded-system-resource-plan"

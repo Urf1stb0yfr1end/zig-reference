@@ -782,5 +782,110 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Generic discriminated union containing exactly one success or failure payload.",
+    "search_aliases": [
+      "result union",
+      "success failure payload"
+    ],
+    "capability_ids": [
+      "tagged-result"
+    ],
+    "use_when": [
+      "Represent an explicit domain outcome where both success and failure payload types are values."
+    ],
+    "do_not_use_when": [
+      "Need Zig error-union propagation or an operation that itself performs fallible work."
+    ],
+    "entrypoint": "projects/26-tagged-result/src/tagged_result.zig",
+    "public_symbols": [
+      "TaggedResult"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "payloads": [
+        "Payload values are copied into the selected union field; payload types may themselves contain references."
+      ]
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "reads_receiver",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "immutable_reads_only",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-tagged-result",
+      "zig build smoke-tagged-result"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": [
+        "Success: type",
+        "Failure: type"
+      ]
+    },
+    "construction": {
+      "named_import": "tagged-result",
+      "primary_symbol": "TaggedResult",
+      "initialization": "const tagged = @import(\"tagged-result\");\nconst Result = tagged.TaggedResult(u32, []const u8);\nconst outcome = Result{ .success = 42 };"
+    },
+    "operation_map": {
+      "TaggedResult": "TaggedResult",
+      "isSuccess": "isSuccess",
+      "successValue": "successValue",
+      "failureValue": "failureValue"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Need Zig error-union propagation or an operation that itself performs fallible work."
+    ],
+    "minimal_usage": [
+      "const tagged = @import(\"tagged-result\");",
+      "const Result = tagged.TaggedResult(u32, []const u8);",
+      "const outcome = Result{ .success = 42 };",
+      "const value = outcome.successValue().?;"
+    ],
+    "integration_notes": [
+      "Construction and inspection are not fallible; the failure tag is a domain payload, not a Zig error."
+    ]
   }
 }

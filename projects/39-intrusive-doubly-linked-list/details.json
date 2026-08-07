@@ -970,5 +970,134 @@
     "known_porting_blockers": [],
     "automatic_port_guaranteed": false,
     "notes": []
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Allocation-free generic doubly linked list over stable caller-owned nodes.",
+    "search_aliases": [
+      "intrusive list",
+      "doubly linked nodes"
+    ],
+    "capability_ids": [
+      "intrusive-doubly-linked-list"
+    ],
+    "use_when": [
+      "Need allocation-free insertion/removal of caller-owned nodes with constant-time endpoint operations."
+    ],
+    "do_not_use_when": [
+      "Need list-owned node allocation, movable linked nodes, synchronization, or insertion of one node into multiple lists."
+    ],
+    "entrypoint": "projects/39-intrusive-doubly-linked-list/src/intrusive_doubly_linked_list.zig",
+    "public_symbols": [
+      "IntrusiveDoublyLinkedList"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "caller_owned",
+      "values": "borrowed",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "nodes": [
+        "The list borrows every linked Node; caller keeps list and nodes at stable addresses until removal."
+      ]
+    },
+    "invalidation": {
+      "node_pointers": [
+        "Removing or popping a node clears its links but does not destroy it.",
+        "Moving or destroying a linked node or its owning list invalidates linkage and pointers."
+      ]
+    },
+    "failure_guarantees": [
+      "pushFront and pushBack return AlreadyLinked before mutating either list or node.",
+      "remove of a node not owned by this list returns false without mutation."
+    ],
+    "effects": [
+      "mutates_receiver",
+      "reads_receiver",
+      "borrows_caller_memory",
+      "returns_borrow",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-intrusive-doubly-linked-list",
+      "zig build smoke-intrusive-doubly-linked-list"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "caller_owned",
+      "capacity_model": "unbounded",
+      "bounded": false,
+      "caller_provided_memory": true,
+      "compile_time_parameters": [
+        "T: type"
+      ]
+    },
+    "construction": {
+      "named_import": "intrusive-doubly-linked-list",
+      "primary_symbol": "IntrusiveDoublyLinkedList",
+      "initialization": "const intrusive = @import(\"intrusive-doubly-linked-list\");\nconst List = intrusive.IntrusiveDoublyLinkedList(u8);\nvar list = List.init();\nvar node = List.Node{ .value = 1 };\ntry list.pushBack(&node);"
+    },
+    "operation_map": {
+      "IntrusiveDoublyLinkedList": "IntrusiveDoublyLinkedList",
+      "init": "init",
+      "count": "count",
+      "isEmpty": "isEmpty",
+      "pushFront": "pushFront",
+      "pushBack": "pushBack",
+      "remove": "remove",
+      "popFront": "popFront",
+      "popBack": "popBack"
+    },
+    "error_map": [
+      {
+        "error": "AlreadyLinked",
+        "operation": "pushFront, pushBack",
+        "meaning": "The node owner is non-null, including membership in this or another list.",
+        "handling": "Remove the node from its current owner before inserting it."
+      }
+    ],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Need list-owned node allocation, movable linked nodes, synchronization, or insertion of one node into multiple lists."
+    ],
+    "minimal_usage": [
+      "const intrusive = @import(\"intrusive-doubly-linked-list\");",
+      "const List = intrusive.IntrusiveDoublyLinkedList(u8);",
+      "var list = List.init();",
+      "var node = List.Node{ .value = 1 };",
+      "try list.pushBack(&node);",
+      "_ = list.remove(&node);"
+    ],
+    "integration_notes": [
+      "Node previous/next/owner fields are linkage state and must not be modified while linked."
+    ]
   }
 }

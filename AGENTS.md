@@ -62,6 +62,8 @@ Do not hide the important fact behind prose. The stable code, one-line reason, e
 
 Do not claim the compiler rejects a misuse when it does not. Distinguish real compile failures, runtime-negative tests, future-analyzer expectations, and documented misuse examples.
 
+Preserve native compiler and runtime errors when adding a `ZIGREF-*` identity. Published diagnostic identities must not silently change meaning; known failures point to evidence, repair, validation, and minimum useful locations. Serious tooling must preserve failed child exit status, while unknown failures remain explicitly unclassified. Keep diagnostic discovery compact, progressively disclosed, deterministic, and text based.
+
 ## No silent failures and anti-stall rule
 
 Problems should be visible as early and locally as practical.

@@ -160,6 +160,9 @@
     "integer-tag-validation": [
       "validated-enum-decoder"
     ],
+    "intrusive-doubly-linked-list": [
+      "intrusive-doubly-linked-list"
+    ],
     "length-prefixed-binary-field": [
       "length-prefixed-binary-field"
     ],
@@ -174,6 +177,9 @@
     ],
     "optional-typed-handle": [
       "optional-typed-handle"
+    ],
+    "owned-byte-buffer": [
+      "owned-byte-buffer"
     ],
     "owned-byte-writing": [
       "byte-writer"
@@ -226,8 +232,14 @@
     "saturating-counter": [
       "saturating-counter"
     ],
+    "semantic-version": [
+      "semantic-version"
+    ],
     "signedness-validation": [
       "checked-integer-cast"
+    ],
+    "source-span": [
+      "source-span"
     ],
     "speculative-parsing": [
       "binary-cursor-checkpoint"
@@ -253,6 +265,9 @@
     ],
     "sv39-virtual-address": [
       "riscv-sv39-virtual-address-indexing"
+    ],
+    "tagged-result": [
+      "tagged-result"
     ],
     "type-length-value-decoder": [
       "type-length-value-decoder"

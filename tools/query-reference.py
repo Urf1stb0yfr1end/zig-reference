@@ -19,7 +19,7 @@ def words(value): return set(re.findall(r"[a-z0-9]+", value.lower()))
 
 def agent_query(argv):
     """Query the compact v2 projection without rescanning canonical contracts."""
-    operations=("bootstrap","doctor","card","decide","compose","impact","capability","module","diagnostic","symbol","pending")
+    operations=("bootstrap","doctor","card","decide","compose","impact","capability","module","diagnostic","diagnose","symbol","pending")
     if not argv or argv[0] not in operations:
         raise SystemExit("usage: query-reference.py agent {"+"|".join(operations)+"} ...")
     kind = argv[0]
@@ -31,7 +31,7 @@ def agent_query(argv):
     by_name={x["module"]:x for x in modules}
     if kind == "bootstrap":
         full=sum(x["status"]=="full" for x in modules)
-        emit({"status":"ok","query":{"operation":"bootstrap"},"results":{"repository":"zig-reference","zig_baseline":"0.14.0","contracted_modules":len(modules),"full_fast_path_modules":full,"partial_modules":len(modules)-full,"operations":["bootstrap","doctor","decide","card","compose","impact","diagnostic"],"workflow":["decide","card select","compose","card integrate","validate","diagnostic repair"],"canonical_paths":["generated/agent/modules.json","generated/agent/diagnostics.json","docs/catalog/MODULES.md"],"doctor_command":"python3 tools/query-reference.py agent doctor"},"diagnostics":[]}); return 0
+        emit({"status":"ok","query":{"operation":"bootstrap"},"results":{"repository":"zig-reference","zig_baseline":"0.14.0","contracted_modules":len(modules),"full_fast_path_modules":full,"partial_modules":len(modules)-full,"operations":["bootstrap","doctor","decide","card","compose","impact","diagnostic","diagnose"],"workflow":["decide","card select","compose","card integrate","validate","diagnose","diagnostic repair"],"canonical_paths":["generated/agent/modules.json","generated/agent/diagnostics.json","docs/catalog/MODULES.md"],"doctor_command":"python3 tools/query-reference.py agent doctor"},"diagnostics":[]}); return 0
     if kind == "doctor":
         checks=[]; bad=False
         for component,path in [("agent modules",directory/"modules.json"),("agent diagnostics",directory/"diagnostics.json")]:
@@ -93,12 +93,35 @@ def agent_query(argv):
     elif kind == "impact":
         if term not in by_name: emit({"status":"error","query":{"operation":"impact","module":term},"results":[],"diagnostics":[{"code":"ZIGREF-MODULE-MISSING","reason":"module is not present","component":term,"repair":"python3 tools/query-reference.py module TERM"}]}); return 2
         m=by_name[term]; emit({"status":"ok","query":{"operation":"impact","module":term},"results":{"direct_dependents":m["direct_dependents"],"transitive_dependents":m["transitive_dependents"],"recipes":m["matching_recipes"],"affected_contracts":[by_name[x]["details"] for x in m["transitive_dependents"]],"focused_module_tests":m["focused_validation_commands"],"recipe_tests":[f"zig build test-recipe-{r}" for r in m["matching_recipes"]],"aggregate_validation_commands":["zig build check","zig build test","zig build validate-repository"]},"diagnostics":[]}); return 0
+    elif kind == "diagnose":
+        values = json.loads((directory / "diagnostics.json").read_text())["diagnostics"]
+        needle=term.casefold(); ranked=[]
+        for code, record in values.items():
+            exact=[]; loose=[]
+            if needle==code.casefold(): exact.append("canonical_id")
+            if any(needle==x.casefold() for x in record.get("aliases",[])): exact.append("alias")
+            if any(needle==x.casefold() for x in record.get("native_error_aliases",[])): exact.append("native_error_alias")
+            for field in ("meaning","module","operation","violated_rule"):
+                if needle and needle in str(record.get(field,"")).casefold(): loose.append(field)
+            for alias in record.get("native_error_aliases",[]):
+                if needle and needle in alias.casefold(): loose.append("native_error_alias")
+            reasons=exact or sorted(set(loose))
+            if reasons: ranked.append((0 if exact else 1,code,reasons,record))
+        ranked.sort(key=lambda x:(x[0],x[1])); result=[{"code":c,"matched_by":why,"summary":r["meaning"],"module":r["module"],"category":r["category"]} for _,c,why,r in ranked[:5]]
+        emit({"status":"ok" if result else "unknown","query":{"operation":"diagnose","term":term},"results":result,"diagnostics":[] if result else [{"code":"ZIGREF-DIAGNOSIS-UNKNOWN","reason":"no authored diagnostic matched; cause is unclassified","repair":"preserve the native error and inspect the failing phase"}]}); return 0
     else:
         collection = {"capability": "capabilities", "diagnostic": "diagnostics", "symbol": "symbols"}[kind]
         values = json.loads((directory / f"{collection}.json").read_text())[collection]
         matches = [key for key in values if term.lower() in key.lower()]
         result = [{"key": key, "value": values[key]} for key in sorted(matches)]
     if kind=="diagnostic":
+        exact = values.get(term)
+        if exact is not None:
+            result=[{"key":term,"value":exact}]
+        else:
+            aliases=[(code,record) for code,record in values.items() if term in record.get("aliases",[])]
+            if len(aliases)==1:
+                code,record=aliases[0]; result=[{"key":code,"value":record|{"requested_alias":term,"canonical_id":code}}]
         emit({"status":"ok" if result else "partial","query":{"operation":"diagnostic","term":term},"results":[x["value"]|{"code":x["key"]} for x in result],"diagnostics":[]}); return 0
     for item in result: print(item if isinstance(item, str) else json.dumps(item, sort_keys=True, separators=(",", ":")))
     return 0

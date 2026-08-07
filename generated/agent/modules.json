@@ -3445,16 +3445,56 @@
       ]
     },
     {
+      "aliases": [
+        "semver",
+        "version compatibility"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "borrows": []
+      },
+      "capabilities": [
+        "semantic-version"
+      ],
       "change_impact": {
         "dependents": [],
         "recipes": []
+      },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "const semver = @import(\"semantic-version\");\nconst current = semver.SemanticVersion{ .major = 1, .minor = 4, .patch = 0 };\nconst compatible = current.isCompatibleWith(.{ .major = 1, .minor = 3, .patch = 0 });",
+        "named_import": "semantic-version",
+        "primary_symbol": "SemanticVersion"
       },
       "dependency_build_order": [
         "semantic-version"
       ],
       "details": "projects/25-semantic-version/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [],
+      "do_not_use_when": [
+        "Need prerelease/build metadata, parsing, ranges, or Semantic Versioning major-zero special rules."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -3465,29 +3505,108 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-semantic-version",
         "zig build smoke-semantic-version"
       ],
       "id": "25",
+      "integration_notes": [
+        "Use the canonical named import and public operations listed here.",
+        "Run the focused validation commands before integration."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Need prerelease/build metadata, parsing, ranges, or Semantic Versioning major-zero special rules."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const semver = @import(\"semantic-version\");",
+        "const current = semver.SemanticVersion{ .major = 1, .minor = 4, .patch = 0 };",
+        "const compatible = current.isCompatibleWith(.{ .major = 1, .minor = 3, .patch = 0 });"
+      ],
       "module": "semantic-version",
+      "operation_map": {
+        "compare": "SemanticVersion.compare",
+        "isCompatibleWith": "SemanticVersion.isCompatibleWith"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/25-semantic-version/src/semantic_version.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Three-part semantic version value with lexicographic comparison and same-major compatibility.",
+      "thread_safety": "immutable_reads_only",
       "transitive_dependencies": [],
-      "transitive_dependents": []
+      "transitive_dependents": [],
+      "use_when": [
+        "Compare major, minor, and patch values or require same-major non-older compatibility."
+      ]
     },
     {
+      "aliases": [
+        "result union",
+        "success failure payload"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "payloads": [
+          "Payload values are copied into the selected union field; payload types may themselves contain references."
+        ]
+      },
+      "capabilities": [
+        "tagged-result"
+      ],
       "change_impact": {
         "dependents": [],
         "recipes": []
+      },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "const tagged = @import(\"tagged-result\");\nconst Result = tagged.TaggedResult(u32, []const u8);\nconst outcome = Result{ .success = 42 };",
+        "named_import": "tagged-result",
+        "primary_symbol": "TaggedResult"
       },
       "dependency_build_order": [
         "tagged-result"
       ],
       "details": "projects/26-tagged-result/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [],
+      "do_not_use_when": [
+        "Need Zig error-union propagation or an operation that itself performs fallible work."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -3498,29 +3617,127 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [],
       "focused_validation_commands": [
         "zig build test-tagged-result",
         "zig build smoke-tagged-result"
       ],
       "id": "26",
+      "integration_notes": [
+        "Construction and inspection are not fallible; the failure tag is a domain payload, not a Zig error."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Need Zig error-union propagation or an operation that itself performs fallible work."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const tagged = @import(\"tagged-result\");",
+        "const Result = tagged.TaggedResult(u32, []const u8);",
+        "const outcome = Result{ .success = 42 };",
+        "const value = outcome.successValue().?;"
+      ],
       "module": "tagged-result",
+      "operation_map": {
+        "TaggedResult": "TaggedResult",
+        "failureValue": "failureValue",
+        "isSuccess": "isSuccess",
+        "successValue": "successValue"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [
+          "Success: type",
+          "Failure: type"
+        ],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/26-tagged-result/src/tagged_result.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Generic discriminated union containing exactly one success or failure payload.",
+      "thread_safety": "immutable_reads_only",
       "transitive_dependencies": [],
-      "transitive_dependents": []
+      "transitive_dependents": [],
+      "use_when": [
+        "Represent an explicit domain outcome where both success and failure payload types are values."
+      ]
     },
     {
+      "aliases": [
+        "source range",
+        "byte span"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "slice": [
+          "The returned slice borrows the source argument.",
+          "The source must outlive every returned slice."
+        ]
+      },
+      "capabilities": [
+        "source-span"
+      ],
       "change_impact": {
         "dependents": [],
         "recipes": []
+      },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "const spans = @import(\"source-span\");\nconst span = try spans.SourceSpan.init(1, 3);\nconst bytes = try span.slice(\"abcd\");",
+        "named_import": "source-span",
+        "primary_symbol": "SourceSpan"
       },
       "dependency_build_order": [
         "source-span"
       ],
       "details": "projects/27-source-span/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [],
+      "do_not_use_when": [
+        "Need line/column tracking, UTF-8 scalar indexing, or ownership of source bytes."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "InvalidOrder",
+          "handling": "Reject or reorder the input endpoints.",
+          "meaning": "end is less than start.",
+          "operation": "init"
+        },
+        {
+          "error": "OutOfBounds",
+          "handling": "Supply the matching source or validate its length.",
+          "meaning": "The span end exceeds the supplied source length.",
+          "operation": "slice"
+        }
+      ],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -3531,17 +3748,63 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [
+        "init rejects reversed endpoints without producing a span.",
+        "slice rejects an end beyond source length without mutation."
+      ],
       "focused_validation_commands": [
         "zig build test-source-span",
         "zig build smoke-source-span"
       ],
       "id": "27",
+      "integration_notes": [
+        "Use the canonical named import and public operations listed here.",
+        "Run the focused validation commands before integration."
+      ],
+      "invalidation": {
+        "slice": [
+          "Any mutation or deallocation of the source that invalidates its slices invalidates the returned slice."
+        ]
+      },
+      "known_gaps": [
+        "Need line/column tracking, UTF-8 scalar indexing, or ownership of source bytes."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const spans = @import(\"source-span\");",
+        "const span = try spans.SourceSpan.init(1, 3);",
+        "const bytes = try span.slice(\"abcd\");"
+      ],
       "module": "source-span",
+      "operation_map": {
+        "init": "SourceSpan.init",
+        "isEmpty": "SourceSpan.isEmpty",
+        "len": "SourceSpan.len",
+        "slice": "SourceSpan.slice"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
       "source": "projects/27-source-span/src/source_span.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Validated half-open byte offsets with bounded slicing of a caller source buffer.",
+      "thread_safety": "immutable_reads_only",
       "transitive_dependencies": [],
-      "transitive_dependents": []
+      "transitive_dependents": [],
+      "use_when": [
+        "Represent [start,end) byte offsets and safely borrow that region from a source slice."
+      ]
     },
     {
       "aliases": [
@@ -4252,9 +4515,38 @@
       ]
     },
     {
+      "aliases": [
+        "byte buffer",
+        "growable bytes"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "bytes": [
+          "Returned slice borrows buffer storage until invalidated."
+        ],
+        "mutableBytes": [
+          "Returned mutable slice exclusively borrows initialized buffer storage until invalidated."
+        ]
+      },
+      "capabilities": [
+        "owned-byte-buffer"
+      ],
       "change_impact": {
         "dependents": [],
         "recipes": []
+      },
+      "composition": {
+        "commonly_with": [
+          "dynamic-array",
+          "byte-writer"
+        ],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "const buffers = @import(\"owned-byte-buffer\");\nvar buffer = buffers.OwnedByteBuffer.init(allocator);\ndefer buffer.deinit();\ntry buffer.append(\"abc\");",
+        "named_import": "owned-byte-buffer",
+        "primary_symbol": "OwnedByteBuffer"
       },
       "dependency_build_order": [
         "dynamic-array",
@@ -4262,11 +4554,37 @@
         "owned-byte-buffer"
       ],
       "details": "projects/33-owned-byte-buffer/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [
         "byte-writer",
         "dynamic-array"
       ],
       "direct_dependents": [],
+      "do_not_use_when": [
+        "Need fixed capacity, allocation-free storage, thread-safe mutation, or stable views across growth/reset."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "OutOfMemory",
+          "handling": "Handle the allocation error; existing buffer bytes remain unchanged.",
+          "meaning": "The explicit allocator cannot provide required capacity.",
+          "operation": "initCopy, reserve, appendByte, append"
+        }
+      ],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -4277,20 +4595,79 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [
+        "Allocation failure from reserve, appendByte, or initCopy leaves existing logical bytes unchanged.",
+        "initCopy cleans partial allocation on failure.",
+        "intoWriter transfers storage and leaves the buffer empty and valid."
+      ],
       "focused_validation_commands": [
         "zig build test-owned-byte-buffer",
         "zig build smoke-owned-byte-buffer"
       ],
       "id": "33",
+      "integration_notes": [
+        "The allocator is stored by value and must remain usable through deinit or ownership transfer.",
+        "Capacity growth is delegated to dynamic-array and is not a stable growth-factor contract."
+      ],
+      "invalidation": {
+        "views": [
+          "appendByte, append, or reserve may reallocate and invalidate all prior views.",
+          "clearRetainingCapacity changes logical length and invalidates prior logical views.",
+          "reset, deinit, and intoWriter invalidate every prior view."
+        ]
+      },
+      "known_gaps": [
+        "Need fixed capacity, allocation-free storage, thread-safe mutation, or stable views across growth/reset."
+      ],
       "matching_recipes": [],
+      "minimal_usage": [
+        "const buffers = @import(\"owned-byte-buffer\");",
+        "var buffer = buffers.OwnedByteBuffer.init(allocator);",
+        "defer buffer.deinit();",
+        "try buffer.append(\"abc\");",
+        "const bytes = buffer.bytes();"
+      ],
       "module": "owned-byte-buffer",
+      "operation_map": {
+        "append": "OwnedByteBuffer.append",
+        "appendByte": "OwnedByteBuffer.appendByte",
+        "bytes": "OwnedByteBuffer.bytes",
+        "capacity": "OwnedByteBuffer.capacity",
+        "clearRetainingCapacity": "OwnedByteBuffer.clearRetainingCapacity",
+        "deinit": "OwnedByteBuffer.deinit",
+        "init": "OwnedByteBuffer.init",
+        "initCopy": "OwnedByteBuffer.initCopy",
+        "intoWriter": "OwnedByteBuffer.intoWriter",
+        "mutableBytes": "OwnedByteBuffer.mutableBytes",
+        "reserve": "OwnedByteBuffer.reserve",
+        "reset": "OwnedByteBuffer.reset"
+      },
+      "ownership": {
+        "cleanup": "caller",
+        "storage": "mixed",
+        "values": "copied"
+      },
+      "resource_profile": {
+        "bounded": false,
+        "caller_provided_memory": true,
+        "capacity_model": "unbounded",
+        "compile_time_parameters": [],
+        "hidden_allocation": false,
+        "storage_model": "mixed"
+      },
+      "selection_priority": "canonical",
       "source": "projects/33-owned-byte-buffer/src/owned_byte_buffer.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Allocator-backed owned byte sequence with growth, borrowed views, reset, and ownership transfer to ByteWriter.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [
         "byte-writer",
         "dynamic-array"
       ],
-      "transitive_dependents": []
+      "transitive_dependents": [],
+      "use_when": [
+        "Need a mutable owned byte sequence that grows through an explicit allocator."
+      ]
     },
     {
       "aliases": [
@@ -5060,18 +5437,67 @@
       ]
     },
     {
+      "aliases": [
+        "intrusive list",
+        "doubly linked nodes"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "nodes": [
+          "The list borrows every linked Node; caller keeps list and nodes at stable addresses until removal."
+        ]
+      },
+      "capabilities": [
+        "intrusive-doubly-linked-list"
+      ],
       "change_impact": {
         "dependents": [],
         "recipes": [
           "plan-bounded-initialization"
         ]
       },
+      "composition": {
+        "commonly_with": [],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "const intrusive = @import(\"intrusive-doubly-linked-list\");\nconst List = intrusive.IntrusiveDoublyLinkedList(u8);\nvar list = List.init();\nvar node = List.Node{ .value = 1 };\ntry list.pushBack(&node);",
+        "named_import": "intrusive-doubly-linked-list",
+        "primary_symbol": "IntrusiveDoublyLinkedList"
+      },
       "dependency_build_order": [
         "intrusive-doubly-linked-list"
       ],
       "details": "projects/39-intrusive-doubly-linked-list/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Results depend only on explicit inputs and receiver state."
+      },
+      "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [],
+      "do_not_use_when": [
+        "Need list-owned node allocation, movable linked nodes, synchronization, or insertion of one node into multiple lists."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "AlreadyLinked",
+          "handling": "Remove the node from its current owner before inserting it.",
+          "meaning": "The node owner is non-null, including membership in this or another list.",
+          "operation": "pushFront, pushBack"
+        }
+      ],
       "evidence_summary": {
         "conformance_validated": false,
         "evidence_records": 1,
@@ -5082,19 +5508,75 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
+      "failure_guarantees": [
+        "pushFront and pushBack return AlreadyLinked before mutating either list or node.",
+        "remove of a node not owned by this list returns false without mutation."
+      ],
       "focused_validation_commands": [
         "zig build test-intrusive-doubly-linked-list",
         "zig build smoke-intrusive-doubly-linked-list"
       ],
       "id": "39",
+      "integration_notes": [
+        "Node previous/next/owner fields are linkage state and must not be modified while linked."
+      ],
+      "invalidation": {
+        "node_pointers": [
+          "Removing or popping a node clears its links but does not destroy it.",
+          "Moving or destroying a linked node or its owning list invalidates linkage and pointers."
+        ]
+      },
+      "known_gaps": [
+        "Need list-owned node allocation, movable linked nodes, synchronization, or insertion of one node into multiple lists."
+      ],
       "matching_recipes": [
         "plan-bounded-initialization"
       ],
+      "minimal_usage": [
+        "const intrusive = @import(\"intrusive-doubly-linked-list\");",
+        "const List = intrusive.IntrusiveDoublyLinkedList(u8);",
+        "var list = List.init();",
+        "var node = List.Node{ .value = 1 };",
+        "try list.pushBack(&node);",
+        "_ = list.remove(&node);"
+      ],
       "module": "intrusive-doubly-linked-list",
+      "operation_map": {
+        "IntrusiveDoublyLinkedList": "IntrusiveDoublyLinkedList",
+        "count": "count",
+        "init": "init",
+        "isEmpty": "isEmpty",
+        "popBack": "popBack",
+        "popFront": "popFront",
+        "pushBack": "pushBack",
+        "pushFront": "pushFront",
+        "remove": "remove"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "caller_owned",
+        "values": "borrowed"
+      },
+      "resource_profile": {
+        "bounded": false,
+        "caller_provided_memory": true,
+        "capacity_model": "unbounded",
+        "compile_time_parameters": [
+          "T: type"
+        ],
+        "hidden_allocation": false,
+        "storage_model": "caller_owned"
+      },
+      "selection_priority": "canonical",
       "source": "projects/39-intrusive-doubly-linked-list/src/intrusive_doubly_linked_list.zig",
-      "status": "partial",
+      "status": "full",
+      "summary": "Allocation-free generic doubly linked list over stable caller-owned nodes.",
+      "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
-      "transitive_dependents": []
+      "transitive_dependents": [],
+      "use_when": [
+        "Need allocation-free insertion/removal of caller-owned nodes with constant-time endpoint operations."
+      ]
     },
     {
       "aliases": [

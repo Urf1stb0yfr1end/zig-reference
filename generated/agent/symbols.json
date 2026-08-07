@@ -112,6 +112,9 @@
     "HostVirtualAddress": [
       "distinct-memory-address-types"
     ],
+    "IntrusiveDoublyLinkedList": [
+      "intrusive-doubly-linked-list"
+    ],
     "Kind": [
       "riscv-sv39-page-table-entry"
     ],
@@ -136,6 +139,9 @@
     ],
     "OptionalTypedHandle": [
       "optional-typed-handle"
+    ],
+    "OwnedByteBuffer": [
+      "owned-byte-buffer"
     ],
     "PageOwner": [
       "riscv-page-table-page-owner"
@@ -202,11 +208,20 @@
     "SegmentType": [
       "elf64-program-header-parser"
     ],
+    "SemanticVersion": [
+      "semantic-version"
+    ],
+    "SourceSpan": [
+      "source-span"
+    ],
     "Stack": [
       "stack"
     ],
     "StateMachine": [
       "state-machine"
+    ],
+    "TaggedResult": [
+      "tagged-result"
     ],
     "TlvDecoder": [
       "type-length-value-decoder"

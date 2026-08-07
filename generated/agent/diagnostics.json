@@ -4,194 +4,409 @@
   "agent_index_version": "2.0.0",
   "diagnostics": {
     "ZIGREF-BUMP-USE-AFTER-RESET": {
-      "affected_path": "projects/41-fixed-bump-allocator/details.json",
+      "aliases": [],
+      "category": "LIFETIME",
       "evidence_classification": "future_analyzer_expectation",
       "evidence_status": "future_analyzer_expectation",
+      "expected_condition": "Do not access a returned slice after reset.",
       "focused_validation_command": "zig build test-fixed-bump-allocator",
+      "locations": [
+        "projects/41-fixed-bump-allocator/details.json",
+        "projects/41-fixed-bump-allocator/tests/agent/misuse/bump_use_after_reset.zig",
+        "projects/41-fixed-bump-allocator/tests/agent/repair/bump_use_after_reset_repair.zig"
+      ],
       "meaning": "Use after bump reset",
       "misuse_fixture": "projects/41-fixed-bump-allocator/tests/agent/misuse/bump_use_after_reset.zig",
       "module": "fixed-bump-allocator",
+      "native_error_aliases": [
+        "use after reset"
+      ],
+      "observed_condition": "Use after bump reset",
+      "operation": "module contract invariant",
       "repair_example": "projects/41-fixed-bump-allocator/tests/agent/repair/bump_use_after_reset_repair.zig",
+      "repair_status": "known",
       "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
       "violated_rule": "Do not access a returned slice after reset."
     },
     "ZIGREF-EVENT-TRACE-FULL": {
-      "affected_path": "projects/51-bounded-deterministic-event-trace/details.json",
+      "aliases": [],
+      "category": "RESOURCE",
       "evidence_classification": "runtime_negative_test",
       "evidence_status": "tested",
+      "expected_condition": "Append requires remaining capacity.",
       "focused_validation_command": "zig build test-bounded-deterministic-event-trace",
+      "locations": [
+        "projects/51-bounded-deterministic-event-trace/details.json",
+        "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/full.zig",
+        "projects/51-bounded-deterministic-event-trace/tests/agent/repair/full_repair.zig"
+      ],
       "meaning": "Trace Full",
       "misuse_fixture": "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/full.zig",
       "module": "bounded-deterministic-event-trace",
+      "native_error_aliases": [
+        "error.TraceFull",
+        "trace full"
+      ],
+      "observed_condition": "Trace Full",
+      "operation": "module contract invariant",
       "repair_example": "projects/51-bounded-deterministic-event-trace/tests/agent/repair/full_repair.zig",
+      "repair_status": "known",
       "repair_strategy": "Choose valid bounds and handle the explicit failure before retrying.",
       "violated_rule": "Append requires remaining capacity."
     },
     "ZIGREF-EVENT-TRACE-INVALID-CAPACITY": {
-      "affected_path": "projects/51-bounded-deterministic-event-trace/details.json",
+      "aliases": [],
+      "category": "RESOURCE",
       "evidence_classification": "zig_compile_fail",
       "evidence_status": "tested",
+      "expected_condition": "Compile-time capacity must be greater than zero.",
       "focused_validation_command": "zig build test-bounded-deterministic-event-trace",
+      "locations": [
+        "projects/51-bounded-deterministic-event-trace/details.json",
+        "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/invalid_capacity.zig",
+        "projects/51-bounded-deterministic-event-trace/tests/agent/repair/invalid_capacity_repair.zig"
+      ],
       "meaning": "Invalid Capacity",
       "misuse_fixture": "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/invalid_capacity.zig",
       "module": "bounded-deterministic-event-trace",
+      "native_error_aliases": [
+        "invalid trace capacity"
+      ],
+      "observed_condition": "Invalid Capacity",
+      "operation": "module contract invariant",
       "repair_example": "projects/51-bounded-deterministic-event-trace/tests/agent/repair/invalid_capacity_repair.zig",
+      "repair_status": "known",
       "repair_strategy": "Choose valid bounds and handle the explicit failure before retrying.",
       "violated_rule": "Compile-time capacity must be greater than zero."
     },
     "ZIGREF-EVENT-TRACE-OUTPUT-TOO-SMALL": {
-      "affected_path": "projects/51-bounded-deterministic-event-trace/details.json",
+      "aliases": [],
+      "category": "BOUNDS",
       "evidence_classification": "runtime_negative_test",
       "evidence_status": "tested",
+      "expected_condition": "Caller output must hold the complete canonical rendering.",
       "focused_validation_command": "zig build test-bounded-deterministic-event-trace",
+      "locations": [
+        "projects/51-bounded-deterministic-event-trace/details.json",
+        "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/output_too_small.zig",
+        "projects/51-bounded-deterministic-event-trace/tests/agent/repair/output_too_small_repair.zig"
+      ],
       "meaning": "Output Too Small",
       "misuse_fixture": "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/output_too_small.zig",
       "module": "bounded-deterministic-event-trace",
+      "native_error_aliases": [
+        "error.OutputTooSmall"
+      ],
+      "observed_condition": "Output Too Small",
+      "operation": "module contract invariant",
       "repair_example": "projects/51-bounded-deterministic-event-trace/tests/agent/repair/output_too_small_repair.zig",
+      "repair_status": "known",
       "repair_strategy": "Choose valid bounds and handle the explicit failure before retrying.",
       "violated_rule": "Caller output must hold the complete canonical rendering."
     },
     "ZIGREF-EVENT-TRACE-SEQUENCE-EXHAUSTED": {
-      "affected_path": "projects/51-bounded-deterministic-event-trace/details.json",
+      "aliases": [],
+      "category": "ARITH",
       "evidence_classification": "documented_misuse_example",
       "evidence_status": "unproven",
+      "expected_condition": "Append requires a representable successor sequence.",
       "focused_validation_command": "zig build test-bounded-deterministic-event-trace",
+      "locations": [
+        "projects/51-bounded-deterministic-event-trace/details.json",
+        "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/sequence_exhausted.zig",
+        "projects/51-bounded-deterministic-event-trace/tests/agent/repair/sequence_exhausted_repair.zig"
+      ],
       "meaning": "Sequence Exhausted",
       "misuse_fixture": "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/sequence_exhausted.zig",
       "module": "bounded-deterministic-event-trace",
+      "native_error_aliases": [
+        "error.SequenceExhausted"
+      ],
+      "observed_condition": "Sequence Exhausted",
+      "operation": "module contract invariant",
       "repair_example": "projects/51-bounded-deterministic-event-trace/tests/agent/repair/sequence_exhausted_repair.zig",
+      "repair_status": "known",
       "repair_strategy": "Choose valid bounds and handle the explicit failure before retrying.",
       "violated_rule": "Append requires a representable successor sequence."
     },
     "ZIGREF-FREELIST-DOUBLE-RELEASE": {
-      "affected_path": "projects/40-fixed-free-list/details.json",
+      "aliases": [],
+      "category": "STATE",
       "evidence_classification": "runtime_negative_test",
       "evidence_status": "tested",
+      "expected_condition": "Release only currently allocated indices.",
       "focused_validation_command": "zig build test-fixed-free-list",
+      "locations": [
+        "projects/40-fixed-free-list/details.json",
+        "projects/40-fixed-free-list/tests/agent/misuse/freelist_double_release.zig",
+        "projects/40-fixed-free-list/tests/agent/repair/freelist_double_release_repair.zig"
+      ],
       "meaning": "Double slot release",
       "misuse_fixture": "projects/40-fixed-free-list/tests/agent/misuse/freelist_double_release.zig",
       "module": "fixed-free-list",
+      "native_error_aliases": [
+        "error.DoubleFree",
+        "double free"
+      ],
+      "observed_condition": "Double slot release",
+      "operation": "module contract invariant",
       "repair_example": "projects/40-fixed-free-list/tests/agent/repair/freelist_double_release_repair.zig",
+      "repair_status": "known",
       "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
       "violated_rule": "Release only currently allocated indices."
     },
     "ZIGREF-POOL-DOUBLE-RELEASE": {
-      "affected_path": "projects/34-fixed-capacity-object-pool/details.json",
+      "aliases": [],
+      "category": "STATE",
       "evidence_classification": "runtime_negative_test",
       "evidence_status": "tested",
+      "expected_condition": "A removed handle cannot remove a value again.",
       "focused_validation_command": "zig build test-fixed-capacity-object-pool",
+      "locations": [
+        "projects/34-fixed-capacity-object-pool/details.json",
+        "projects/34-fixed-capacity-object-pool/tests/agent/misuse/pool_double_release.zig",
+        "projects/34-fixed-capacity-object-pool/tests/agent/repair/pool_double_release_repair.zig"
+      ],
       "meaning": "Repeated pool removal",
       "misuse_fixture": "projects/34-fixed-capacity-object-pool/tests/agent/misuse/pool_double_release.zig",
       "module": "fixed-capacity-object-pool",
+      "native_error_aliases": [
+        "double release"
+      ],
+      "observed_condition": "Repeated pool removal",
+      "operation": "module contract invariant",
       "repair_example": "projects/34-fixed-capacity-object-pool/tests/agent/repair/pool_double_release_repair.zig",
+      "repair_status": "known",
       "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
       "violated_rule": "A removed handle cannot remove a value again."
     },
     "ZIGREF-POOL-STALE-HANDLE": {
-      "affected_path": "projects/34-fixed-capacity-object-pool/details.json",
+      "aliases": [],
+      "category": "LIFETIME",
       "evidence_classification": "runtime_negative_test",
       "evidence_status": "tested",
+      "expected_condition": "A handle must not be used after removal or reset.",
       "focused_validation_command": "zig build test-fixed-capacity-object-pool",
+      "locations": [
+        "projects/34-fixed-capacity-object-pool/details.json",
+        "projects/34-fixed-capacity-object-pool/tests/agent/misuse/pool_stale_handle.zig",
+        "projects/34-fixed-capacity-object-pool/tests/agent/repair/pool_stale_handle_repair.zig"
+      ],
       "meaning": "Stale pool handle",
       "misuse_fixture": "projects/34-fixed-capacity-object-pool/tests/agent/misuse/pool_stale_handle.zig",
       "module": "fixed-capacity-object-pool",
+      "native_error_aliases": [
+        "stale handle"
+      ],
+      "observed_condition": "Stale pool handle",
+      "operation": "module contract invariant",
       "repair_example": "projects/34-fixed-capacity-object-pool/tests/agent/repair/pool_stale_handle_repair.zig",
+      "repair_status": "known",
       "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
       "violated_rule": "A handle must not be used after removal or reset."
     },
     "ZIGREF-PQUEUE-CAPACITY": {
-      "affected_path": "projects/42-fixed-capacity-priority-queue/details.json",
+      "aliases": [],
+      "category": "RESOURCE",
       "evidence_classification": "runtime_negative_test",
       "evidence_status": "tested",
+      "expected_condition": "Insert only when count is below compile-time capacity.",
       "focused_validation_command": "zig build test-fixed-capacity-priority-queue",
+      "locations": [
+        "projects/42-fixed-capacity-priority-queue/details.json",
+        "projects/42-fixed-capacity-priority-queue/tests/agent/misuse/pqueue_capacity.zig",
+        "projects/42-fixed-capacity-priority-queue/tests/agent/repair/pqueue_capacity_repair.zig"
+      ],
       "meaning": "Priority queue capacity exceeded",
       "misuse_fixture": "projects/42-fixed-capacity-priority-queue/tests/agent/misuse/pqueue_capacity.zig",
       "module": "fixed-capacity-priority-queue",
+      "native_error_aliases": [
+        "error.Full",
+        "queue full"
+      ],
+      "observed_condition": "Priority queue capacity exceeded",
+      "operation": "module contract invariant",
       "repair_example": "projects/42-fixed-capacity-priority-queue/tests/agent/repair/pqueue_capacity_repair.zig",
+      "repair_status": "known",
       "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
       "violated_rule": "Insert only when count is below compile-time capacity."
     },
     "ZIGREF-RESOURCE-PLAN-ARITHMETIC-OVERFLOW": {
-      "affected_path": "projects/50-bounded-system-resource-plan/details.json",
+      "aliases": [],
+      "category": "ARITH",
       "evidence_classification": "runtime_negative_test",
       "evidence_status": "tested",
+      "expected_condition": "Every size product, alignment, and sum must be representable.",
       "focused_validation_command": "zig build test-bounded-system-resource-plan",
+      "locations": [
+        "projects/50-bounded-system-resource-plan/details.json",
+        "projects/50-bounded-system-resource-plan/tests/agent/misuse/arithmetic_overflow.zig",
+        "projects/50-bounded-system-resource-plan/tests/agent/repair/arithmetic_overflow_repair.zig"
+      ],
       "meaning": "Arithmetic Overflow",
       "misuse_fixture": "projects/50-bounded-system-resource-plan/tests/agent/misuse/arithmetic_overflow.zig",
       "module": "bounded-system-resource-plan",
+      "native_error_aliases": [
+        "error.ArithmeticOverflow"
+      ],
+      "observed_condition": "Arithmetic Overflow",
+      "operation": "module contract invariant",
       "repair_example": "projects/50-bounded-system-resource-plan/tests/agent/repair/arithmetic_overflow_repair.zig",
+      "repair_status": "known",
       "repair_strategy": "Correct the declared bounded configuration, then reconstruct and handle the explicit error result.",
       "violated_rule": "Every size product, alignment, and sum must be representable."
     },
     "ZIGREF-RESOURCE-PLAN-INITIALIZATION-CYCLE": {
-      "affected_path": "projects/50-bounded-system-resource-plan/details.json",
+      "aliases": [],
+      "category": "DEPENDENCY",
       "evidence_classification": "runtime_negative_test",
       "evidence_status": "tested",
+      "expected_condition": "Initialization dependencies must be acyclic.",
       "focused_validation_command": "zig build test-bounded-system-resource-plan",
+      "locations": [
+        "projects/50-bounded-system-resource-plan/details.json",
+        "projects/50-bounded-system-resource-plan/tests/agent/misuse/initialization_cycle.zig",
+        "projects/50-bounded-system-resource-plan/tests/agent/repair/initialization_cycle_repair.zig"
+      ],
       "meaning": "Initialization Cycle",
       "misuse_fixture": "projects/50-bounded-system-resource-plan/tests/agent/misuse/initialization_cycle.zig",
       "module": "bounded-system-resource-plan",
+      "native_error_aliases": [
+        "error.InitializationCycle"
+      ],
+      "observed_condition": "Initialization Cycle",
+      "operation": "module contract invariant",
       "repair_example": "projects/50-bounded-system-resource-plan/tests/agent/repair/initialization_cycle_repair.zig",
+      "repair_status": "known",
       "repair_strategy": "Correct the declared bounded configuration, then reconstruct and handle the explicit error result.",
       "violated_rule": "Initialization dependencies must be acyclic."
     },
     "ZIGREF-RESOURCE-PLAN-INVALID-ALIGNMENT": {
-      "affected_path": "projects/50-bounded-system-resource-plan/details.json",
+      "aliases": [],
+      "category": "INPUT",
       "evidence_classification": "runtime_negative_test",
       "evidence_status": "tested",
+      "expected_condition": "Page size must be a power of two and declared memory page aligned.",
       "focused_validation_command": "zig build test-bounded-system-resource-plan",
+      "locations": [
+        "projects/50-bounded-system-resource-plan/details.json",
+        "projects/50-bounded-system-resource-plan/tests/agent/misuse/invalid_alignment.zig",
+        "projects/50-bounded-system-resource-plan/tests/agent/repair/invalid_alignment_repair.zig"
+      ],
       "meaning": "Invalid Alignment",
       "misuse_fixture": "projects/50-bounded-system-resource-plan/tests/agent/misuse/invalid_alignment.zig",
       "module": "bounded-system-resource-plan",
+      "native_error_aliases": [
+        "error.InvalidAlignment"
+      ],
+      "observed_condition": "Invalid Alignment",
+      "operation": "module contract invariant",
       "repair_example": "projects/50-bounded-system-resource-plan/tests/agent/repair/invalid_alignment_repair.zig",
+      "repair_status": "known",
       "repair_strategy": "Correct the declared bounded configuration, then reconstruct and handle the explicit error result.",
       "violated_rule": "Page size must be a power of two and declared memory page aligned."
     },
     "ZIGREF-RESOURCE-PLAN-INVALID-CAPACITY": {
-      "affected_path": "projects/50-bounded-system-resource-plan/details.json",
+      "aliases": [],
+      "category": "RESOURCE",
       "evidence_classification": "runtime_negative_test",
       "evidence_status": "tested",
+      "expected_condition": "All declared capacities and the runtime node count must be nonzero and bounded.",
       "focused_validation_command": "zig build test-bounded-system-resource-plan",
+      "locations": [
+        "projects/50-bounded-system-resource-plan/details.json",
+        "projects/50-bounded-system-resource-plan/tests/agent/misuse/invalid_capacity.zig",
+        "projects/50-bounded-system-resource-plan/tests/agent/repair/invalid_capacity_repair.zig"
+      ],
       "meaning": "Invalid Capacity",
       "misuse_fixture": "projects/50-bounded-system-resource-plan/tests/agent/misuse/invalid_capacity.zig",
       "module": "bounded-system-resource-plan",
+      "native_error_aliases": [
+        "error.InvalidCapacity"
+      ],
+      "observed_condition": "Invalid Capacity",
+      "operation": "module contract invariant",
       "repair_example": "projects/50-bounded-system-resource-plan/tests/agent/repair/invalid_capacity_repair.zig",
+      "repair_status": "known",
       "repair_strategy": "Correct the declared bounded configuration, then reconstruct and handle the explicit error result.",
       "violated_rule": "All declared capacities and the runtime node count must be nonzero and bounded."
     },
     "ZIGREF-RESOURCE-PLAN-MEMORY-EXCEEDED": {
-      "affected_path": "projects/50-bounded-system-resource-plan/details.json",
+      "aliases": [],
+      "category": "RESOURCE",
       "evidence_classification": "runtime_negative_test",
       "evidence_status": "tested",
+      "expected_condition": "Declared memory must cover every page-aligned category.",
       "focused_validation_command": "zig build test-bounded-system-resource-plan",
+      "locations": [
+        "projects/50-bounded-system-resource-plan/details.json",
+        "projects/50-bounded-system-resource-plan/tests/agent/misuse/memory_exceeded.zig",
+        "projects/50-bounded-system-resource-plan/tests/agent/repair/memory_exceeded_repair.zig"
+      ],
       "meaning": "Memory Exceeded",
       "misuse_fixture": "projects/50-bounded-system-resource-plan/tests/agent/misuse/memory_exceeded.zig",
       "module": "bounded-system-resource-plan",
+      "native_error_aliases": [
+        "error.MemoryExceeded"
+      ],
+      "observed_condition": "Memory Exceeded",
+      "operation": "module contract invariant",
       "repair_example": "projects/50-bounded-system-resource-plan/tests/agent/repair/memory_exceeded_repair.zig",
+      "repair_status": "known",
       "repair_strategy": "Correct the declared bounded configuration, then reconstruct and handle the explicit error result.",
       "violated_rule": "Declared memory must cover every page-aligned category."
     },
     "ZIGREF-TOPO-CYCLE": {
-      "affected_path": "projects/43-fixed-capacity-topological-sort/details.json",
+      "aliases": [
+        "ZIGREF-TOPOLOGICAL-CYCLE"
+      ],
+      "category": "STATE",
       "evidence_classification": "runtime_negative_test",
       "evidence_status": "tested",
+      "expected_condition": "The graph must be acyclic for sort to return an order.",
       "focused_validation_command": "zig build test-fixed-capacity-topological-sort",
+      "locations": [
+        "projects/43-fixed-capacity-topological-sort/details.json",
+        "projects/43-fixed-capacity-topological-sort/tests/agent/misuse/topo_cycle.zig",
+        "projects/43-fixed-capacity-topological-sort/tests/agent/repair/topo_cycle_repair.zig"
+      ],
       "meaning": "Topological cycle",
       "misuse_fixture": "projects/43-fixed-capacity-topological-sort/tests/agent/misuse/topo_cycle.zig",
       "module": "fixed-capacity-topological-sort",
+      "native_error_aliases": [
+        "error.Cycle",
+        "cycle detected"
+      ],
+      "observed_condition": "Topological cycle",
+      "operation": "module contract invariant",
       "repair_example": "projects/43-fixed-capacity-topological-sort/tests/agent/repair/topo_cycle_repair.zig",
+      "repair_status": "known",
       "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
       "violated_rule": "The graph must be acyclic for sort to return an order."
     },
     "ZIGREF-TOPO-INVALID-VERTEX": {
-      "affected_path": "projects/43-fixed-capacity-topological-sort/details.json",
+      "aliases": [],
+      "category": "INPUT",
       "evidence_classification": "runtime_negative_test",
       "evidence_status": "tested",
+      "expected_condition": "Edge endpoints must be less than node_count.",
       "focused_validation_command": "zig build test-fixed-capacity-topological-sort",
+      "locations": [
+        "projects/43-fixed-capacity-topological-sort/details.json",
+        "projects/43-fixed-capacity-topological-sort/tests/agent/misuse/topo_invalid_vertex.zig",
+        "projects/43-fixed-capacity-topological-sort/tests/agent/repair/topo_invalid_vertex_repair.zig"
+      ],
       "meaning": "Invalid graph vertex",
       "misuse_fixture": "projects/43-fixed-capacity-topological-sort/tests/agent/misuse/topo_invalid_vertex.zig",
       "module": "fixed-capacity-topological-sort",
+      "native_error_aliases": [
+        "error.InvalidNode",
+        "invalid vertex"
+      ],
+      "observed_condition": "Invalid graph vertex",
+      "operation": "module contract invariant",
       "repair_example": "projects/43-fixed-capacity-topological-sort/tests/agent/repair/topo_invalid_vertex_repair.zig",
+      "repair_status": "known",
       "repair_strategy": "Check the documented state/capacity rule before the operation and handle the explicit result or error.",
       "violated_rule": "Edge endpoints must be less than node_count."
     }
