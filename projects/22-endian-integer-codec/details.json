@@ -783,5 +783,110 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Fixed-width integer encoding with explicit byte order.",
+    "search_aliases": [
+      "little endian",
+      "big endian",
+      "byte order"
+    ],
+    "capability_ids": [
+      "endian-integer-encoding",
+      "endian-integer-decoding",
+      "explicit-byte-order"
+    ],
+    "use_when": [
+      "Separate external byte order from host representation."
+    ],
+    "do_not_use_when": [
+      "Need cursor bounds checking, variable-width integers, or streaming I/O."
+    ],
+    "entrypoint": "projects/22-endian-integer-codec/src/endian_integer_codec.zig",
+    "public_symbols": [
+      "EndianIntegerCodec"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {},
+    "invalidation": {},
+    "failure_guarantees": [
+      "operations are total"
+    ],
+    "effects": [
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "immutable_reads_only",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [
+      "write-and-read-explicit-endian-record"
+    ],
+    "validation_commands": [
+      "zig build test-endian-integer-codec",
+      "zig build smoke-endian-integer-codec"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "runtime_bounded",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "endian-integer-codec",
+      "primary_symbol": "EndianIntegerCodec",
+      "initialization": "const Codec = EndianIntegerCodec(u32, .little);"
+    },
+    "operation_map": {
+      "encode": "encode",
+      "decode": "decode"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": [
+        "write-and-read-explicit-endian-record"
+      ]
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Only fixed-width integer values are supported.",
+      "Cursor management and bounds checking belong to reader modules."
+    ],
+    "minimal_usage": [
+      "const module = @import(\"endian-integer-codec\");",
+      "const Codec = EndianIntegerCodec(u32, .little);"
+    ],
+    "integration_notes": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ]
   }
 }

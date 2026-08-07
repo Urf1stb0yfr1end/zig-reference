@@ -1247,5 +1247,138 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Fixed-capacity integer-slot allocator backed by the repository fixed bit set.",
+    "search_aliases": [
+      "bitmap allocator",
+      "slot allocator",
+      "index allocator"
+    ],
+    "capability_ids": [
+      "fixed-capacity-slot-allocation",
+      "bitmap-allocation",
+      "double-free-detection"
+    ],
+    "use_when": [
+      "Allocate and free integer slot indices while detecting exhaustion, out-of-range release, and double free."
+    ],
+    "do_not_use_when": [
+      "Need byte allocation, variable-sized blocks, or runtime growth."
+    ],
+    "entrypoint": "projects/07-bitmap-allocator/src/bitmap_allocator.zig",
+    "public_symbols": [
+      "BitmapAllocator"
+    ],
+    "dependency_ids": [
+      "bit-set"
+    ],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {},
+    "invalidation": {
+      "free or reset": [
+        "allocated index: index no longer denotes an allocated slot"
+      ]
+    },
+    "failure_guarantees": [
+      "all validation precedes occupancy mutation"
+    ],
+    "effects": [
+      "mutates_receiver",
+      "reads_receiver",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-bitmap-allocator",
+      "zig build smoke-bitmap-allocator"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": [
+        "capacity"
+      ]
+    },
+    "construction": {
+      "named_import": "bitmap-allocator",
+      "primary_symbol": "BitmapAllocator",
+      "initialization": "var slots = BitmapAllocator(64){};"
+    },
+    "operation_map": {
+      "allocate slot": "allocate",
+      "release slot": "free",
+      "query slot": "isAllocated",
+      "reset": "reset"
+    },
+    "error_map": [
+      {
+        "error": "Full",
+        "operation": "allocate",
+        "meaning": "Full condition documented by the operation",
+        "handling": "retry only after correcting the failing condition"
+      },
+      {
+        "error": "IndexOutOfBounds",
+        "operation": "free",
+        "meaning": "IndexOutOfBounds condition documented by the operation",
+        "handling": "retry only after correcting the failing condition"
+      },
+      {
+        "error": "DoubleFree",
+        "operation": "free",
+        "meaning": "DoubleFree condition documented by the operation",
+        "handling": "retry only after correcting the failing condition"
+      }
+    ],
+    "composition": {
+      "commonly_with": [
+        "bit-set"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "The module allocates integer slot identities, not memory blocks.",
+      "Capacity is fixed at compile time."
+    ],
+    "minimal_usage": [
+      "const BitmapAllocator = @import(\"bitmap-allocator\").BitmapAllocator; var slots = BitmapAllocator(64){}; const index = try slots.allocate();"
+    ],
+    "integration_notes": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ]
   }
 }

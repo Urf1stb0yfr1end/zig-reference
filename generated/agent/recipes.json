@@ -5,7 +5,15 @@
   "generator": "tools/build-agent-index.py",
   "recipes": {
     "create-stale-safe-object-registry": [
-      "fixed-capacity-object-pool"
+      "fixed-capacity-object-pool",
+      "generational-handles"
+    ],
+    "normalize-checked-memory-range": [
+      "aligned-address-and-size-helpers",
+      "checked-half-open-range"
+    ],
+    "parse-length-prefixed-record": [
+      "bounded-byte-reader"
     ],
     "plan-bounded-initialization": [
       "fixed-bump-allocator",
@@ -18,6 +26,14 @@
     ],
     "trace-morphic-example": [
       "bounded-deterministic-event-trace"
+    ],
+    "validate-physical-page-frame": [
+      "distinct-memory-address-types"
+    ],
+    "write-and-read-explicit-endian-record": [
+      "bounded-byte-reader",
+      "byte-writer",
+      "endian-integer-codec"
     ]
   }
 }

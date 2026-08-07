@@ -1402,5 +1402,127 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Validated half-open usize interval with checked length construction.",
+    "search_aliases": [
+      "range",
+      "half-open range",
+      "checked interval",
+      "memory region"
+    ],
+    "capability_ids": [
+      "checked-half-open-range",
+      "range-overlap-detection",
+      "range-intersection"
+    ],
+    "use_when": [
+      "Provide one overflow-safe boundary convention for regions and extents."
+    ],
+    "do_not_use_when": [
+      "Need unit-typed endpoints, address-domain typing, or inclusive-end ranges."
+    ],
+    "entrypoint": "projects/17-checked-half-open-range/src/checked_half_open_range.zig",
+    "public_symbols": [
+      "CheckedRange"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {},
+    "invalidation": {},
+    "failure_guarantees": [
+      "pure value construction and queries"
+    ],
+    "effects": [
+      "reads_receiver",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "immutable_reads_only",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [
+      "normalize-checked-memory-range"
+    ],
+    "validation_commands": [
+      "zig build test-checked-half-open-range",
+      "zig build smoke-checked-half-open-range"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "runtime_bounded",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "checked-half-open-range",
+      "primary_symbol": "CheckedRange",
+      "initialization": "const region = try CheckedRange.fromStartAndLength(base, size);"
+    },
+    "operation_map": {
+      "construct endpoints": "init",
+      "construct length": "fromStartAndLength",
+      "length": "length",
+      "containment": "containsRange",
+      "overlap": "overlaps",
+      "intersection": "intersection"
+    },
+    "error_map": [
+      {
+        "error": "InvalidRange",
+        "operation": "init",
+        "meaning": "InvalidRange condition documented by the operation",
+        "handling": "retry only after correcting the failing condition"
+      },
+      {
+        "error": "Overflow",
+        "operation": "fromStartAndLength",
+        "meaning": "Overflow condition documented by the operation",
+        "handling": "retry only after correcting the failing condition"
+      }
+    ],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": [
+        "normalize-checked-memory-range"
+      ]
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Unit and address-domain typing are intentionally not provided."
+    ],
+    "minimal_usage": [
+      "const region = try CheckedRange.fromStartAndLength(base, size);"
+    ],
+    "integration_notes": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ]
   }
 }

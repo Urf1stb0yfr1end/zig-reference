@@ -1630,5 +1630,144 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Borrowed binary input cursor with checked, failure-atomic reads.",
+    "search_aliases": [
+      "byte reader",
+      "binary parser",
+      "cursor",
+      "bounded input",
+      "endian reader"
+    ],
+    "capability_ids": [
+      "bounded-byte-reading",
+      "binary-decoding",
+      "explicit-endian-reading",
+      "bounded-sub-reader"
+    ],
+    "use_when": [
+      "Read structured values from a borrowed byte slice without advancing beyond its bounds or consuming input on failed reads."
+    ],
+    "do_not_use_when": [
+      "Need ownership of the input bytes or streaming input."
+    ],
+    "entrypoint": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig",
+    "public_symbols": [
+      "BoundedReader"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "caller_owned",
+      "values": "borrowed",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "input": [
+        "The reader and returned slices borrow the input byte slice for their entire use."
+      ]
+    },
+    "invalidation": {
+      "source input becomes invalid": [
+        "returned slices and child readers: all borrowed data invalid"
+      ]
+    },
+    "failure_guarantees": [
+      "Bounds are checked using count <= input.len - cursor before cursor mutation."
+    ],
+    "effects": [
+      "mutates_receiver",
+      "reads_receiver",
+      "borrows_caller_memory",
+      "returns_borrow",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [
+      "parse-length-prefixed-record",
+      "write-and-read-explicit-endian-record"
+    ],
+    "validation_commands": [
+      "zig build test-bounded-byte-reader",
+      "zig build smoke-bounded-byte-reader"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "caller_owned",
+      "capacity_model": "caller_buffer",
+      "bounded": true,
+      "caller_provided_memory": true,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "bounded-byte-reader",
+      "primary_symbol": "BoundedReader",
+      "initialization": "var reader = BoundedReader.init(bytes);"
+    },
+    "operation_map": {
+      "remaining bytes": "remaining",
+      "read bytes": "readBytes",
+      "skip bytes": "skip",
+      "read integer": "readU32Le",
+      "create bounded child": "subReader",
+      "seek": "seek"
+    },
+    "error_map": [
+      {
+        "error": "UnexpectedEnd",
+        "operation": "readBytes/skip/integer reads/subReader",
+        "meaning": "UnexpectedEnd condition documented by the operation",
+        "handling": "retry only after correcting the failing condition"
+      },
+      {
+        "error": "InvalidPosition",
+        "operation": "seek",
+        "meaning": "position exceeds input extent",
+        "handling": "retry with position no greater than extent"
+      }
+    ],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": [
+        "parse-length-prefixed-record",
+        "write-and-read-explicit-endian-record"
+      ]
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "The reader borrows rather than owns input bytes.",
+      "Streaming input is not provided."
+    ],
+    "minimal_usage": [
+      "var reader = BoundedReader.init(bytes);",
+      "const magic = try reader.readU32Le();"
+    ],
+    "integration_notes": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ]
   }
 }

@@ -751,5 +751,110 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Fallible integer conversion that rejects unrepresentable values.",
+    "search_aliases": [
+      "checked cast",
+      "integer conversion",
+      "range cast"
+    ],
+    "capability_ids": [
+      "checked-integer-cast",
+      "safe-integer-narrowing",
+      "signedness-validation"
+    ],
+    "use_when": [
+      "Convert an integer to another integer type without truncation, wrapping, or sign loss."
+    ],
+    "do_not_use_when": [
+      "Need saturating, wrapping, or truncating conversion semantics."
+    ],
+    "entrypoint": "projects/10-checked-integer-cast/src/checked_integer_cast.zig",
+    "public_symbols": [
+      "checkedIntegerCast"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {},
+    "invalidation": {},
+    "failure_guarantees": [
+      "stateless"
+    ],
+    "effects": [
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "immutable_reads_only",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-checked-integer-cast",
+      "zig build smoke-checked-integer-cast"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "runtime_bounded",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "checked-integer-cast",
+      "primary_symbol": "checkedIntegerCast",
+      "initialization": "const value = try checkedIntegerCast(u16, raw);"
+    },
+    "operation_map": {
+      "convert integer": "checkedIntegerCast"
+    },
+    "error_map": [
+      {
+        "error": "OutOfRange",
+        "operation": "checkedIntegerCast",
+        "meaning": "OutOfRange condition documented by the operation",
+        "handling": "retry only after correcting the failing condition"
+      }
+    ],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results are determined by inputs, explicit byte order, and receiver state; no external nondeterminism is used.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Only integer-to-integer representability is handled."
+    ],
+    "minimal_usage": [
+      "const cast = @import(\"checked-integer-cast\"); const value = try cast.checkedIntegerCast(u16, raw);"
+    ],
+    "integration_notes": [
+      "Read dependency contracts.",
+      "Import the canonical source path.",
+      "Run the dedicated test step."
+    ]
   }
 }

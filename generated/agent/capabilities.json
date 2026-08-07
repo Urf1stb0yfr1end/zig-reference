@@ -3,11 +3,29 @@
   "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY",
   "agent_index_version": "2.0.0",
   "capabilities": {
+    "align-down": [
+      "aligned-address-and-size-helpers"
+    ],
     "aligned-allocation": [
       "fixed-bump-allocator"
     ],
+    "alignment-validation": [
+      "aligned-address-and-size-helpers"
+    ],
+    "allocation-free-container": [
+      "fixed-capacity-vector"
+    ],
+    "binary-decoding": [
+      "bounded-byte-reader"
+    ],
+    "bitmap-allocation": [
+      "bitmap-allocator"
+    ],
     "bounded-allocation": [
       "fixed-bump-allocator"
+    ],
+    "bounded-byte-reading": [
+      "bounded-byte-reader"
     ],
     "bounded-deterministic-event-tracing": [
       "bounded-deterministic-event-trace"
@@ -18,8 +36,14 @@
     "bounded-priority-ordering": [
       "fixed-capacity-priority-queue"
     ],
+    "bounded-sequence": [
+      "fixed-capacity-vector"
+    ],
     "bounded-slot-allocation": [
       "fixed-free-list"
+    ],
+    "bounded-sub-reader": [
+      "bounded-byte-reader"
     ],
     "bounded-system-resource-planning": [
       "bounded-system-resource-plan"
@@ -33,6 +57,18 @@
     "canonical-trace-rendering": [
       "bounded-deterministic-event-trace"
     ],
+    "checked-address-arithmetic": [
+      "distinct-memory-address-types"
+    ],
+    "checked-align-up": [
+      "aligned-address-and-size-helpers"
+    ],
+    "checked-half-open-range": [
+      "checked-half-open-range"
+    ],
+    "checked-integer-cast": [
+      "checked-integer-cast"
+    ],
     "cycle-detection": [
       "fixed-capacity-topological-sort"
     ],
@@ -45,6 +81,30 @@
     "deterministic-slot-reuse": [
       "fixed-free-list"
     ],
+    "double-free-detection": [
+      "bitmap-allocator"
+    ],
+    "endian-integer-decoding": [
+      "endian-integer-codec"
+    ],
+    "endian-integer-encoding": [
+      "endian-integer-codec"
+    ],
+    "explicit-byte-order": [
+      "endian-integer-codec"
+    ],
+    "explicit-endian-reading": [
+      "bounded-byte-reader"
+    ],
+    "explicit-endian-writing": [
+      "byte-writer"
+    ],
+    "fixed-capacity-handle-table": [
+      "generational-handles"
+    ],
+    "fixed-capacity-slot-allocation": [
+      "bitmap-allocator"
+    ],
     "fixed-capacity-trace-storage": [
       "bounded-deterministic-event-trace"
     ],
@@ -54,8 +114,14 @@
     "fixed-resource-storage-derivation": [
       "bounded-system-resource-plan"
     ],
+    "guest-address-separation": [
+      "distinct-memory-address-types"
+    ],
     "host-target-trace-comparison-foundation": [
       "bounded-deterministic-event-trace"
+    ],
+    "inline-storage": [
+      "fixed-capacity-vector"
     ],
     "monotonic-allocation": [
       "fixed-bump-allocator"
@@ -63,14 +129,45 @@
     "normalized-event-recording": [
       "bounded-deterministic-event-trace"
     ],
+    "owned-byte-writing": [
+      "byte-writer"
+    ],
+    "padding-calculation": [
+      "aligned-address-and-size-helpers"
+    ],
+    "range-intersection": [
+      "checked-half-open-range"
+    ],
+    "range-overlap-detection": [
+      "checked-half-open-range"
+    ],
     "replay-observation-foundation": [
       "bounded-deterministic-event-trace"
+    ],
+    "safe-integer-narrowing": [
+      "checked-integer-cast"
+    ],
+    "signedness-validation": [
+      "checked-integer-cast"
     ],
     "stable-priority-ordering": [
       "fixed-capacity-priority-queue"
     ],
+    "stable-resource-identity": [
+      "generational-handles"
+    ],
     "stale-handle-rejection": [
-      "fixed-capacity-object-pool"
+      "fixed-capacity-object-pool",
+      "generational-handles"
+    ],
+    "typed-physical-address": [
+      "distinct-memory-address-types"
+    ],
+    "typed-virtual-address": [
+      "distinct-memory-address-types"
+    ],
+    "writer-checkpoint-rollback": [
+      "byte-writer"
     ]
   },
   "generator": "tools/build-agent-index.py"
