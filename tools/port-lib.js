@@ -94,4 +94,11 @@ function contractFor(dir) {
 }
 function index(contracts) { return { schemaVersion: "1.0.0", generatedFrom: "projects/*/port.js", modules: contracts.map((c) => ({ id: c.module.id, canonicalName: c.module.canonicalName, currentZigVersion: c.baseline.zigVersion, portContract: c.module.portContract, implementationPath: c.module.publicEntrypoint, dependenciesMustPortFirst: c.dependencies.repository.filter((d) => d.mustPortFirst).map((d) => d.canonicalName), baselineValidated: c.baseline.baselineCompilerValidated && c.baseline.baselineUnitTestsPassed && c.baseline.baselineSmokeTestsPassed, testedTargetVersions: c.testedTargets.map((t) => t.zigVersion), knownMigrationBlockers: c.untestedTargets.flatMap((t) => t.knownBlockers) })) };
 }
-module.exports = { root, rel, requiredCategories, implementedModules, readDetails, parseContract, writeContract, contractFor, index };
+function publicSurfaceErrors(contract, expected, label = "port.js") {
+  const errors = [];
+  for (const key of ["publicSymbols", "publicTypes", "publicFunctions", "publicMethods", "publicConstants", "publicErrors"])
+    if (JSON.stringify(contract.publicContract[key]) !== JSON.stringify(expected.publicContract[key]))
+      errors.push(`${label}: publicContract.${key} differs from canonical details.json public_surface`);
+  return errors;
+}
+module.exports = { root, rel, requiredCategories, implementedModules, readDetails, parseContract, writeContract, contractFor, index, publicSurfaceErrors };

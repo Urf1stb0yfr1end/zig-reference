@@ -54,6 +54,7 @@ module.exports = {
   "publicContract": {
     "publicSymbols": [
       "Permission",
+      "Permissions",
       "SegmentType",
       "Segment",
       "ParseError",
@@ -64,6 +65,10 @@ module.exports = {
       {
         "name": "Permission",
         "kind": "public declaration"
+      },
+      {
+        "name": "Permissions",
+        "kind": "validated bit-flags type alias"
       },
       {
         "name": "SegmentType",
@@ -469,6 +474,7 @@ module.exports = {
       "reason": "Unknown future Zig releases can change inference, standard-library contracts, or build graph identity.",
       "affectedSymbols": [
         "Permission",
+        "Permissions",
         "SegmentType",
         "Segment",
         "ParseError",
@@ -493,6 +499,7 @@ module.exports = {
       "consequence": "A syntactically successful port could violate the module contract.",
       "affectedEndpoints": [
         "Permission",
+        "Permissions",
         "SegmentType",
         "Segment",
         "ParseError",
@@ -705,6 +712,10 @@ module.exports = {
     "symbolsToFiles": [
       {
         "symbol": "Permission",
+        "file": "projects/38-elf64-program-header-parser/src/elf64_program_header_parser.zig"
+      },
+      {
+        "symbol": "Permissions",
         "file": "projects/38-elf64-program-header-parser/src/elf64_program_header_parser.zig"
       },
       {

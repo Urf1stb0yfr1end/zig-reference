@@ -53,11 +53,16 @@ module.exports = {
   },
   "publicContract": {
     "publicSymbols": [
-      "FixedPriorityQueue"
+      "Task",
+      "BoundedDeterministicScheduler"
     ],
     "publicTypes": [
       {
-        "name": "FixedPriorityQueue",
+        "name": "Task",
+        "kind": "public declaration"
+      },
+      {
+        "name": "BoundedDeterministicScheduler",
         "kind": "public declaration"
       }
     ],
@@ -90,8 +95,7 @@ module.exports = {
       }
     ],
     "standardLibrary": [
-      "std.math.maxInt",
-      "std.mem.swap",
+      "std.testing.expect",
       "std.testing.expectEqual",
       "std.testing.expectError"
     ],
@@ -101,7 +105,8 @@ module.exports = {
     "used": [],
     "versionSensitive": [
       "@This",
-      "@as"
+      "@as",
+      "@compileError"
     ],
     "notes": []
   },
@@ -139,6 +144,20 @@ module.exports = {
         "portingRisk": "medium",
         "likelyChangeCategory": "syntax_or_type_semantics",
         "notes": []
+      },
+      {
+        "name": "@compileError",
+        "files": [
+          {
+            "path": "projects/52-bounded-deterministic-scheduler/src/bounded_deterministic_scheduler.zig",
+            "lines": [],
+            "symbols": []
+          }
+        ],
+        "baselineBehavior": "Zig 0.14.0 @compileError behavior as exercised by this module",
+        "portingRisk": "medium",
+        "likelyChangeCategory": "syntax_or_type_semantics",
+        "notes": []
       }
     ],
     "notUsed": []
@@ -146,27 +165,14 @@ module.exports = {
   "standardLibraryUsage": {
     "imports": [
       {
-        "path": "std.math.maxInt",
+        "path": "std.testing.expect",
         "symbols": [
-          "std.math.maxInt"
+          "std.testing.expect"
         ],
         "files": [
-          "projects/52-bounded-deterministic-scheduler/src/bounded_deterministic_scheduler.zig"
+          "projects/52-bounded-deterministic-scheduler/tests/smoke_test.zig"
         ],
-        "purpose": "implementation support",
-        "versionSensitivity": "medium",
-        "knownChanges": [],
-        "migrationNotes": []
-      },
-      {
-        "path": "std.mem.swap",
-        "symbols": [
-          "std.mem.swap"
-        ],
-        "files": [
-          "projects/52-bounded-deterministic-scheduler/src/bounded_deterministic_scheduler.zig"
-        ],
-        "purpose": "implementation support",
+        "purpose": "test assertions and test allocation",
         "versionSensitivity": "medium",
         "knownChanges": [],
         "migrationNotes": []
@@ -200,15 +206,14 @@ module.exports = {
       }
     ],
     "testingApis": [
+      "std.testing.expect",
       "std.testing.expectEqual",
       "std.testing.expectError"
     ],
     "allocatorApis": [],
     "ioApis": [],
     "endianApis": [],
-    "mathApis": [
-      "std.math.maxInt"
-    ],
+    "mathApis": [],
     "metadataApis": []
   },
   "buildSystemUsage": {
@@ -258,7 +263,7 @@ module.exports = {
     "notes": []
   },
   "pointerAndMemoryUsage": {
-    "pointerSensitive": true,
+    "pointerSensitive": false,
     "builtins": [],
     "borrowedMemoryRules": [],
     "notes": []
@@ -290,6 +295,7 @@ module.exports = {
       "projects/52-bounded-deterministic-scheduler/tests/smoke_test.zig"
     ],
     "testingApis": [
+      "std.testing.expect",
       "std.testing.expectEqual",
       "std.testing.expectError"
     ],
@@ -302,7 +308,8 @@ module.exports = {
       "topic": "semantic and build compatibility",
       "reason": "Unknown future Zig releases can change inference, standard-library contracts, or build graph identity.",
       "affectedSymbols": [
-        "FixedPriorityQueue"
+        "Task",
+        "BoundedDeterministicScheduler"
       ],
       "affectedFiles": [
         "projects/52-bounded-deterministic-scheduler/src/bounded_deterministic_scheduler.zig"
@@ -321,7 +328,8 @@ module.exports = {
       "risk": "Preserve the documented bounded-deterministic-scheduler public behavior, boundaries, and failure semantics.",
       "consequence": "A syntactically successful port could violate the module contract.",
       "affectedEndpoints": [
-        "FixedPriorityQueue"
+        "Task",
+        "BoundedDeterministicScheduler"
       ],
       "detectionTests": [
         "zig build test-bounded-deterministic-scheduler",
@@ -396,16 +404,16 @@ module.exports = {
     "searchTerms": [
       "@This",
       "@as",
-      "std.math.maxInt",
-      "std.mem.swap",
+      "@compileError",
+      "std.testing.expect",
       "std.testing.expectEqual",
       "std.testing.expectError"
     ],
     "likelyCompilerFailureAreas": [
       "@This",
       "@as",
-      "std.math.maxInt",
-      "std.mem.swap",
+      "@compileError",
+      "std.testing.expect",
       "std.testing.expectEqual",
       "std.testing.expectError"
     ],
@@ -437,19 +445,19 @@ module.exports = {
           "projects/52-bounded-deterministic-scheduler/src/bounded_deterministic_scheduler.zig",
           "projects/52-bounded-deterministic-scheduler/tests/smoke_test.zig"
         ]
+      },
+      {
+        "builtin": "@compileError",
+        "files": [
+          "projects/52-bounded-deterministic-scheduler/src/bounded_deterministic_scheduler.zig"
+        ]
       }
     ],
     "standardLibraryToFiles": [
       {
-        "api": "std.math.maxInt",
+        "api": "std.testing.expect",
         "files": [
-          "projects/52-bounded-deterministic-scheduler/src/bounded_deterministic_scheduler.zig"
-        ]
-      },
-      {
-        "api": "std.mem.swap",
-        "files": [
-          "projects/52-bounded-deterministic-scheduler/src/bounded_deterministic_scheduler.zig"
+          "projects/52-bounded-deterministic-scheduler/tests/smoke_test.zig"
         ]
       },
       {
@@ -468,7 +476,11 @@ module.exports = {
     ],
     "symbolsToFiles": [
       {
-        "symbol": "FixedPriorityQueue",
+        "symbol": "Task",
+        "file": "projects/52-bounded-deterministic-scheduler/src/bounded_deterministic_scheduler.zig"
+      },
+      {
+        "symbol": "BoundedDeterministicScheduler",
         "file": "projects/52-bounded-deterministic-scheduler/src/bounded_deterministic_scheduler.zig"
       }
     ]

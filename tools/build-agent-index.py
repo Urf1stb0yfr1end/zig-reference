@@ -57,7 +57,7 @@ def build():
               "matching_recipes":matching,"focused_validation_commands":focused,"evidence_summary":status_records.get(n,{}),
               "change_impact":{"dependents":closure(reverse,n),"recipes":matching}}
         if a:
-            for key in ("summary","search_aliases","capability_ids","use_when","do_not_use_when","selection_priority","alternatives","environment_constraints","resource_profile","construction","operation_map","error_map","composition","determinism","known_gaps","minimal_usage","integration_notes","ownership","borrowing","invalidation","failure_guarantees","thread_safety"):
+            for key in ("summary","search_aliases","capability_ids","public_symbols","use_when","do_not_use_when","selection_priority","alternatives","environment_constraints","resource_profile","construction","operation_map","error_map","composition","determinism","known_gaps","minimal_usage","integration_notes","ownership","borrowing","invalidation","failure_guarantees","thread_safety"):
                 item[key]=a[key]
             item["aliases"]=item.pop("search_aliases"); item["capabilities"]=item.pop("capability_ids")
             item["diagnostic_ids"]=sorted(x["id"] for x in a["diagnostics"])

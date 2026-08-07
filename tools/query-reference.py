@@ -19,7 +19,7 @@ def words(value): return set(re.findall(r"[a-z0-9]+", value.lower()))
 
 def agent_query(argv):
     """Query the compact v2 projection without rescanning canonical contracts."""
-    operations=("bootstrap","doctor","card","decide","compose","impact","capability","module","diagnostic","diagnose","symbol","pending")
+    operations=("bootstrap","doctor","card","preflight","decide","compose","impact","capability","module","diagnostic","diagnose","symbol","pending")
     if not argv or argv[0] not in operations:
         raise SystemExit("usage: query-reference.py agent {"+"|".join(operations)+"} ...")
     kind = argv[0]
@@ -48,6 +48,22 @@ def agent_query(argv):
         return 1 if bad else 0
     if kind == "pending":
         result = [x["module"] for x in modules if x["status"] == "partial"]
+    elif kind == "preflight":
+        diagnostic_index=json.loads((directory/"diagnostics.json").read_text())["diagnostics"]
+        def module_preflight(m):
+            unknown=[]
+            if not m.get("borrowing"): unknown.append("borrow obligations are unrepresented beyond the canonical contract's empty projection")
+            if not m.get("failure_guarantees"): unknown.append("failure atomicity is unrepresented")
+            diagnostics=[{"code":x,"meaning":diagnostic_index[x]["meaning"],"repair":diagnostic_index[x]["repair_strategy"],"validation":diagnostic_index[x]["focused_validation_command"]} for x in m.get("diagnostic_ids",[]) if x in diagnostic_index]
+            return {"identity":{"kind":"module","name":m["module"],"public_symbols":m.get("public_symbols",[]),"construction":m.get("construction",{})},"zig_baseline":"0.14.0","environment":m.get("environment_constraints",{}),"dependency_build_order":m.get("dependency_build_order",[]),"ownership":m.get("ownership",{}),"cleanup":m.get("ownership",{}).get("cleanup","unknown"),"borrowing":m.get("borrowing",{}),"invalidation":m.get("invalidation",{}),"resources":m.get("resource_profile",{}),"state":{"thread_safety":m.get("thread_safety","unknown")},"failures":{"errors":m.get("error_map",[]),"guarantees":m.get("failure_guarantees",[])},"determinism":m.get("determinism",{}),"known_diagnostics":diagnostics,"validation_closure":{"focused":m.get("focused_validation_commands",[]),"aggregate":"python3 tools/developer-command.py validate-repository"},"minimum_useful_locations":[m["details"],m["source"]],"unknowns":unknown}
+        if term in by_name:
+            answer=module_preflight(by_name[term])
+        else:
+            recipe_path=ROOT/"recipes"/term/"recipe.json"
+            if not recipe_path.is_file(): emit({"status":"error","query":{"operation":"preflight","subject":term},"results":[],"diagnostics":[{"code":"ZIGREF-MODULE-MISSING","reason":"module or recipe is not present","repair":"python3 tools/query-reference.py agent decide \"TASK\""}]}); return 2
+            recipe=json.loads(recipe_path.read_text()); selected=[by_name[x] for x in recipe.get("selected_modules",[]) if x in by_name]
+            answer={"identity":{"kind":"recipe","name":term,"public_endpoints_used":recipe.get("public_endpoints_used",[])},"zig_baseline":"0.14.0","environment":[{"module":m["module"],"constraints":m.get("environment_constraints",{})} for m in selected],"dependency_build_order":recipe.get("dependency_order",[]),"ownership":[{"module":m["module"],"obligations":m.get("ownership",{})} for m in selected],"cleanup":[{"module":m["module"],"obligation":m.get("ownership",{}).get("cleanup","unknown")} for m in selected],"borrowing":[{"module":m["module"],"obligations":m.get("borrowing",{})} for m in selected],"invalidation":[{"module":m["module"],"rules":m.get("invalidation",{})} for m in selected],"resources":[{"module":m["module"],"profile":m.get("resource_profile",{})} for m in selected],"failures":[{"module":m["module"],"errors":m.get("error_map",[]),"guarantees":m.get("failure_guarantees",[])} for m in selected],"determinism":[{"module":m["module"],"contract":m.get("determinism",{})} for m in selected],"known_diagnostics":sorted({x for m in selected for x in m.get("diagnostic_ids",[])}),"validation_closure":{"focused":recipe.get("intended_build_commands",[]),"serious_outer":f"python3 tools/developer-command.py verify-hosted-morphic-runtime" if term=="run-hosted-morphic-runtime" else None,"aggregate":"python3 tools/developer-command.py validate-repository"},"minimum_useful_locations":[str(recipe_path.relative_to(ROOT))]+[m["details"] for m in selected],"unknowns":["composition-level borrowing, cleanup, and failure atomicity are inherited module-by-module where recipe.json does not state stronger guarantees"]}
+        emit({"status":"ok","query":{"operation":"preflight","subject":term},"results":answer,"diagnostics":[]}); return 0
     elif kind == "module":
         lowered = term.lower()
         result = [x for x in modules if x["module"] == lowered or lowered in [a.lower() for a in x.get("aliases", [])]]

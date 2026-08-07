@@ -225,6 +225,7 @@ Batch 05 validated the 52-card projection and Debug Fast Path under Zig 0.14.0. 
 | `python3 tools/query-reference.py agent bootstrap` | Return the compact zero-context repository entry card. |
 | `python3 tools/query-reference.py agent doctor` | Check fast-path prerequisites, drift, contracts, and Zig 0.14.0. |
 | `python3 tools/query-reference.py agent card MODULE --view {select,integrate,repair,all}` | Return a purpose-sized module card. |
+| `python3 tools/query-reference.py agent preflight MODULE_OR_RECIPE` | Return deterministic compact JSON containing correctness obligations, explicit unknowns, minimum locations, and validation closure before integration. |
 | `python3 tools/query-reference.py agent decide "TASK"` | Rank or reject up to three modules by deterministic contract matching. |
 | `python3 tools/query-reference.py agent compose CAPABILITY [...]` | Resolve provided, ambiguous, and missing capabilities plus closure and recipes. |
 | `python3 tools/query-reference.py agent impact MODULE` | Derive downstream modules, recipes, and validation commands. |
@@ -251,7 +252,9 @@ Raw `zig build` commands remain implementation surfaces and preserve normal Zig 
 | `python3 tools/developer-command.py validate-repository` | Run `zig build validate-repository --summary all` and append the final complete-validation handoff. |
 | `python3 tools/developer-command.py verify-morphic-plan` | Run `zig build verify-morphic-plan --summary all` and append the final plan-verification handoff. |
 | `python3 tools/developer-command.py verify-morphic-trace` | Run `zig build verify-morphic-trace --summary all` and append the final trace-verification handoff. |
+| `python3 tools/developer-command.py verify-hosted-morphic-runtime` | Run `zig build verify-hosted-morphic-runtime --summary all` and append the final hosted-runtime verification handoff. |
 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py` | Test deterministic formatting, ordering, existing locations, doctor output, controlled success/failure, singular handoffs, and exit preservation. |
+| `node tools/test-port-public-surface.js` | Regression-test rejection of a dependency/public-surface substitution in a port contract. |
 
 The implementation prerequisite steps ending in `-checks` and the raw public build steps never emit subordinate Minimus blocks. Agent Fast Path v2 now projects 53 contracted modules as 53 full cards with no partial cards. Batch 04 repair replaced test-only integration snippets with functional public API usage and corrected the promoted cards' semantic projections.
 
@@ -266,3 +269,5 @@ Batch 06 established these Zig 0.14.0 command surfaces and validated them in thi
 - `zig build test-recipe-run-hosted-morphic-runtime` checks bounded execution, explicit output exhaustion, and byte repeatability.
 - `zig build run-hosted-morphic-runtime` prints the canonical capturable output followed by its normalized event trace.
 - `zig build verify-hosted-morphic-runtime` validates the hosted recipe and Agent Fast Path contracts.
+
+The raw `zig build verify-hosted-morphic-runtime` step is an implementation surface. The canonical serious outer verification is `python3 tools/developer-command.py verify-hosted-morphic-runtime`, which preserves Zig output and exit status and appends exactly one `LOCATIONS` then `MINIMUS` handoff.

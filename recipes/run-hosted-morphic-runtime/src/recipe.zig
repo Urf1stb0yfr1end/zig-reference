@@ -31,20 +31,27 @@ pub fn run(output: []u8, trace_output: []u8) RunError!struct { output: []const u
 }
 
 pub fn main() !void {
-    var output: [128]u8 = undefined; var trace: [2048]u8 = undefined;
+    var output: [128]u8 = undefined;
+    var trace: [2048]u8 = undefined;
     const result = try run(&output, &trace);
     try std.io.getStdOut().writer().writeAll(result.output);
     try std.io.getStdOut().writer().writeAll(result.trace);
 }
 
 test "hosted Morphic run is byte repeatable" {
-    var oa: [128]u8 = undefined; var ob: [128]u8 = undefined; var ta: [2048]u8 = undefined; var tb: [2048]u8 = undefined;
-    const a = try run(&oa, &ta); const b = try run(&ob, &tb);
-    try std.testing.expectEqualStrings(a.output, b.output); try std.testing.expectEqualStrings(a.trace, b.trace);
+    var oa: [128]u8 = undefined;
+    var ob: [128]u8 = undefined;
+    var ta: [2048]u8 = undefined;
+    var tb: [2048]u8 = undefined;
+    const a = try run(&oa, &ta);
+    const b = try run(&ob, &tb);
+    try std.testing.expectEqualStrings(a.output, b.output);
+    try std.testing.expectEqualStrings(a.trace, b.trace);
     try std.testing.expectEqualStrings("task 1 at 5\ntask 2 at 5\n", a.output);
 }
 
 test "output exhaustion is explicit" {
-    var output: [1]u8 = undefined; var trace: [2048]u8 = undefined;
+    var output: [1]u8 = undefined;
+    var trace: [2048]u8 = undefined;
     try std.testing.expectError(error.OutputTooSmall, run(&output, &trace));
 }

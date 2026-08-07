@@ -53,11 +53,46 @@ module.exports = {
   },
   "publicContract": {
     "publicSymbols": [
-      "Planner"
+      "CapacityConfiguration",
+      "DependencyEdge",
+      "Description",
+      "HandleStorage",
+      "Planner",
+      "PostSealAllocation",
+      "TaskStorage",
+      "TraceEventStorage"
     ],
     "publicTypes": [
       {
+        "name": "CapacityConfiguration",
+        "kind": "public declaration"
+      },
+      {
+        "name": "DependencyEdge",
+        "kind": "public declaration"
+      },
+      {
+        "name": "Description",
+        "kind": "public declaration"
+      },
+      {
+        "name": "HandleStorage",
+        "kind": "public declaration"
+      },
+      {
         "name": "Planner",
+        "kind": "public declaration"
+      },
+      {
+        "name": "PostSealAllocation",
+        "kind": "public declaration"
+      },
+      {
+        "name": "TaskStorage",
+        "kind": "public declaration"
+      },
+      {
+        "name": "TraceEventStorage",
         "kind": "public declaration"
       }
     ],
@@ -461,7 +496,14 @@ module.exports = {
       "topic": "semantic and build compatibility",
       "reason": "Unknown future Zig releases can change inference, standard-library contracts, or build graph identity.",
       "affectedSymbols": [
-        "Planner"
+        "CapacityConfiguration",
+        "DependencyEdge",
+        "Description",
+        "HandleStorage",
+        "Planner",
+        "PostSealAllocation",
+        "TaskStorage",
+        "TraceEventStorage"
       ],
       "affectedFiles": [
         "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig"
@@ -480,7 +522,14 @@ module.exports = {
       "risk": "Preserve the documented bounded-system-resource-plan public behavior, boundaries, and failure semantics.",
       "consequence": "A syntactically successful port could violate the module contract.",
       "affectedEndpoints": [
-        "Planner"
+        "CapacityConfiguration",
+        "DependencyEdge",
+        "Description",
+        "HandleStorage",
+        "Planner",
+        "PostSealAllocation",
+        "TaskStorage",
+        "TraceEventStorage"
       ],
       "detectionTests": [
         "zig build test-bounded-system-resource-plan",
@@ -705,7 +754,35 @@ module.exports = {
     ],
     "symbolsToFiles": [
       {
+        "symbol": "CapacityConfiguration",
+        "file": "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig"
+      },
+      {
+        "symbol": "DependencyEdge",
+        "file": "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig"
+      },
+      {
+        "symbol": "Description",
+        "file": "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig"
+      },
+      {
+        "symbol": "HandleStorage",
+        "file": "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig"
+      },
+      {
         "symbol": "Planner",
+        "file": "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig"
+      },
+      {
+        "symbol": "PostSealAllocation",
+        "file": "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig"
+      },
+      {
+        "symbol": "TaskStorage",
+        "file": "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig"
+      },
+      {
+        "symbol": "TraceEventStorage",
         "file": "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig"
       }
     ]

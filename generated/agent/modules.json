@@ -140,6 +140,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "FixedVector"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -303,6 +306,9 @@
         "storage": "caller_owned",
         "values": "copied"
       },
+      "public_symbols": [
+        "DynamicArray"
+      ],
       "resource_profile": {
         "bounded": false,
         "caller_provided_memory": true,
@@ -434,6 +440,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "RingBuffer"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -572,6 +581,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "BitSet"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -741,6 +753,9 @@
         "storage": "caller_owned",
         "values": "borrowed"
       },
+      "public_symbols": [
+        "BoundedReader"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": true,
@@ -894,6 +909,9 @@
         "storage": "caller_owned",
         "values": "copied"
       },
+      "public_symbols": [
+        "Stack"
+      ],
       "resource_profile": {
         "bounded": false,
         "caller_provided_memory": false,
@@ -1038,6 +1056,9 @@
         "storage": "mixed",
         "values": "copied"
       },
+      "public_symbols": [
+        "ByteWriter"
+      ],
       "resource_profile": {
         "bounded": false,
         "caller_provided_memory": true,
@@ -1191,6 +1212,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "BitmapAllocator"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -1343,6 +1367,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "HandleTable"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -1474,6 +1501,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "StateMachine"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -1608,6 +1638,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "checkedIntegerCast"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -1735,6 +1768,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "NonZeroInteger"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -1866,6 +1902,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "BoundedInteger"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -1988,6 +2027,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "SaturatingCounter"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -2117,6 +2159,10 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "decodeEnum",
+        "isValidEnumValue"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -2266,6 +2312,14 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "AlignmentError",
+        "isPowerOfTwo",
+        "isAligned",
+        "alignDown",
+        "alignUp",
+        "paddingNeeded"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -2388,6 +2442,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "ValidatedBitFlags"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -2536,6 +2593,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "CheckedRange"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -2687,6 +2747,12 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "PhysicalAddress",
+        "HostVirtualAddress",
+        "GuestPhysicalAddress",
+        "GuestVirtualAddress"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -2809,6 +2875,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "WrappingSequenceNumber"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -2926,6 +2995,10 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "TypedHandle",
+        "OptionalTypedHandle"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -3045,6 +3118,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "Quantity"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -3178,6 +3254,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "EndianIntegerCodec"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -3305,6 +3384,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "AsciiByte"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -3427,6 +3509,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "FourCC"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -3537,6 +3622,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "SemanticVersion"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -3651,6 +3739,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "TaggedResult"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -3789,6 +3880,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "SourceSpan"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -3930,6 +4024,10 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "PageSize",
+        "PhysicalPageFrameNumber"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -4067,6 +4165,11 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "BinaryCursorCheckpoint",
+        "capture",
+        "restore"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -4207,6 +4310,10 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "AdvancementPolicy",
+        "BoundedBinarySubReader"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -4351,6 +4458,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "LengthPrefixedField"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -4490,6 +4600,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "TlvDecoder"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -4649,6 +4762,9 @@
         "storage": "mixed",
         "values": "copied"
       },
+      "public_symbols": [
+        "OwnedByteBuffer"
+      ],
       "resource_profile": {
         "bounded": false,
         "caller_provided_memory": true,
@@ -4802,6 +4918,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "ObjectPool"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -4955,6 +5074,11 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "RegionKind",
+        "PhysicalMemoryRegion",
+        "PhysicalMemoryRegionSet"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -5104,6 +5228,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "PhysicalPageFrameAllocator"
+      ],
       "resource_profile": {
         "bounded": false,
         "caller_provided_memory": false,
@@ -5248,6 +5375,13 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "ElfEndian",
+        "ElfType",
+        "Elf64FileHeader",
+        "ParseError",
+        "parse"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -5406,6 +5540,15 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "Permission",
+        "Permissions",
+        "SegmentType",
+        "Segment",
+        "ParseError",
+        "parseOne",
+        "parseTable"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -5559,6 +5702,9 @@
         "storage": "caller_owned",
         "values": "borrowed"
       },
+      "public_symbols": [
+        "IntrusiveDoublyLinkedList"
+      ],
       "resource_profile": {
         "bounded": false,
         "caller_provided_memory": true,
@@ -5705,6 +5851,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "FixedFreeList"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -5866,6 +6015,9 @@
         "storage": "caller_owned",
         "values": "borrowed"
       },
+      "public_symbols": [
+        "FixedBumpAllocator"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": true,
@@ -6031,6 +6183,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "FixedPriorityQueue"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -6203,6 +6358,9 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "FixedTopologicalGraph"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -6341,6 +6499,13 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "DecodeError",
+        "Entry",
+        "Kind",
+        "Level",
+        "Permissions"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -6470,6 +6635,17 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "Error",
+        "Level",
+        "Parts",
+        "construct",
+        "decompose",
+        "isCanonical",
+        "pageSize",
+        "requireAligned",
+        "validateRange"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -6600,6 +6776,11 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "Error",
+        "PageOwner",
+        "entries_per_page"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": true,
@@ -6733,6 +6914,11 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "Error",
+        "Result",
+        "walk"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -6861,6 +7047,14 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "Plan",
+        "executeUnsafe",
+        "forAddress",
+        "forAddressAsid",
+        "forAsid",
+        "global"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -7001,6 +7195,11 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "Builder",
+        "Error",
+        "Mutation"
+      ],
       "resource_profile": {
         "bounded": false,
         "caller_provided_memory": false,
@@ -7183,6 +7382,13 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "Planner",
+        "Description",
+        "CapacityConfiguration",
+        "DependencyEdge",
+        "PostSealAllocation"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -7339,6 +7545,11 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "NormalizedEvent",
+        "EventInput",
+        "BoundedDeterministicEventTrace"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
@@ -7490,6 +7701,10 @@
         "storage": "inline",
         "values": "copied"
       },
+      "public_symbols": [
+        "Task",
+        "BoundedDeterministicScheduler"
+      ],
       "resource_profile": {
         "bounded": true,
         "caller_provided_memory": false,
