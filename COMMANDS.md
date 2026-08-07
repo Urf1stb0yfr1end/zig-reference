@@ -204,6 +204,10 @@ Each module has `zig build test-<module>` and `zig build smoke-<module>` targets
 
 ## Agent-readable pilot commands
 
+Agent Fast Path v2 currently projects 27 full contracts and 25 partial contracts. The
+root-document policy is checked by `node tools/check-port-contracts.js`; it accepts
+only the explicit flagship/root allowlist and rejects any other root Markdown file.
+
 | Command | Purpose |
 |---|---|
 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py [--check]` | Generate or check the compact deterministic agent projection. |

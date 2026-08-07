@@ -740,5 +740,116 @@
     "known_porting_blockers": [],
     "automatic_port_guaranteed": false,
     "notes": []
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Checked canonical Sv39 virtual-address decomposition, reconstruction, alignment, and ranges.",
+    "search_aliases": [
+      "sv39 virtual address",
+      "vpn indexing"
+    ],
+    "capability_ids": [
+      "sv39-virtual-address",
+      "virtual-address-indexing"
+    ],
+    "use_when": [
+      "Validate and decompose canonical RISC-V Sv39 virtual addresses."
+    ],
+    "do_not_use_when": [
+      "Target address format is not RISC-V Sv39."
+    ],
+    "entrypoint": "projects/45-riscv-sv39-virtual-address-indexing/src/riscv_sv39_virtual_address_indexing.zig",
+    "public_symbols": [
+      "Error",
+      "Level",
+      "Parts",
+      "construct",
+      "decompose",
+      "isCanonical",
+      "pageSize",
+      "requireAligned",
+      "validateRange"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "borrows": []
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "deterministic_order",
+      "no_hidden_allocation"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-riscv-sv39-virtual-address-indexing",
+      "zig build smoke-riscv-sv39-virtual-address-indexing"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [
+        "riscv64 Sv39; hosted modeling on any target"
+      ],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "runtime_bounded",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "riscv-sv39-virtual-address-indexing",
+      "primary_symbol": "Error",
+      "initialization": "Construct Error as documented by its public API."
+    },
+    "operation_map": {
+      "construct": "construct",
+      "decompose": "decompose",
+      "isCanonical": "isCanonical",
+      "pageSize": "pageSize",
+      "requireAligned": "requireAligned",
+      "validateRange": "validateRange"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Target address format is not RISC-V Sv39."
+    ],
+    "minimal_usage": [
+      "const api = @import(\"riscv-sv39-virtual-address-indexing\");"
+    ],
+    "integration_notes": [
+      "Import the canonical named module.",
+      "Honor ownership, lifetime, and failure rules.",
+      "Run the focused validation commands."
+    ]
   }
 }

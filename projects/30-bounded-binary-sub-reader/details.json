@@ -883,5 +883,111 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Confine a child reader and make parent advancement policy explicit.",
+    "search_aliases": [
+      "bounded subreader",
+      "binary child reader"
+    ],
+    "capability_ids": [
+      "bounded-sub-reader",
+      "binary-region-parsing"
+    ],
+    "use_when": [
+      "Confine parsing to a child byte region with explicit parent advancement."
+    ],
+    "do_not_use_when": [
+      "The child may read beyond its declared byte region."
+    ],
+    "entrypoint": "projects/30-bounded-binary-sub-reader/src/bounded_binary_sub_reader.zig",
+    "public_symbols": [
+      "AdvancementPolicy",
+      "BoundedBinarySubReader"
+    ],
+    "dependency_ids": [
+      "binary-cursor-checkpoint",
+      "bounded-byte-reader"
+    ],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "borrows": []
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "deterministic_order",
+      "no_hidden_allocation"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-bounded-binary-sub-reader",
+      "zig build smoke-bounded-binary-sub-reader"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [
+        "page policy currently architecture-neutral but fixed at 4 KiB"
+      ],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "runtime_bounded",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "bounded-binary-sub-reader",
+      "primary_symbol": "AdvancementPolicy",
+      "initialization": "Construct AdvancementPolicy as documented by its public API."
+    },
+    "operation_map": {
+      "create": "create",
+      "reader": "reader",
+      "unread": "unread",
+      "commit": "commit",
+      "rollback": "rollback"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "The child may read beyond its declared byte region."
+    ],
+    "minimal_usage": [
+      "const api = @import(\"bounded-binary-sub-reader\");"
+    ],
+    "integration_notes": [
+      "Import the canonical named module.",
+      "Honor ownership, lifetime, and failure rules.",
+      "Run the focused validation commands."
+    ]
   }
 }

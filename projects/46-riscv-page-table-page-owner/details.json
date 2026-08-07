@@ -737,5 +737,111 @@
     "known_porting_blockers": [],
     "automatic_port_guaranteed": false,
     "notes": []
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Bounded explicit ownership and injected access to zeroed page-table pages.",
+    "search_aliases": [
+      "page table owner",
+      "sv39 table pages"
+    ],
+    "capability_ids": [
+      "page-table-page-ownership",
+      "bounded-page-table-storage"
+    ],
+    "use_when": [
+      "Manage bounded explicit ownership and access to zeroed page-table pages."
+    ],
+    "do_not_use_when": [
+      "Unbounded allocation or a non-Sv39 page-table layout is required."
+    ],
+    "entrypoint": "projects/46-riscv-page-table-page-owner/src/riscv_page_table_page_owner.zig",
+    "public_symbols": [
+      "Error",
+      "PageOwner",
+      "entries_per_page"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "borrows": []
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "deterministic_order",
+      "no_hidden_allocation"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-riscv-page-table-page-owner",
+      "zig build smoke-riscv-page-table-page-owner"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [
+        "riscv64 Sv39; hosted modeling on any target"
+      ],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "runtime_bounded",
+      "bounded": true,
+      "caller_provided_memory": true,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "riscv-page-table-page-owner",
+      "primary_symbol": "Error",
+      "initialization": "Construct Error as documented by its public API."
+    },
+    "operation_map": {
+      "PageOwner": "PageOwner",
+      "allocate": "allocate",
+      "count": "count",
+      "deinit": "deinit",
+      "read": "read",
+      "release": "release",
+      "write": "write"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Unbounded allocation or a non-Sv39 page-table layout is required."
+    ],
+    "minimal_usage": [
+      "const api = @import(\"riscv-page-table-page-owner\");"
+    ],
+    "integration_notes": [
+      "Import the canonical named module.",
+      "Honor ownership, lifetime, and failure rules.",
+      "Run the focused validation commands."
+    ]
   }
 }

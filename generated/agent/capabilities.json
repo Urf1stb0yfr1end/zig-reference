@@ -15,8 +15,17 @@
     "allocation-free-container": [
       "fixed-capacity-vector"
     ],
+    "allocator-backed-container": [
+      "dynamic-array"
+    ],
+    "binary-cursor-checkpoint": [
+      "binary-cursor-checkpoint"
+    ],
     "binary-decoding": [
       "bounded-byte-reader"
+    ],
+    "binary-region-parsing": [
+      "bounded-binary-sub-reader"
     ],
     "bitmap-allocation": [
       "bitmap-allocator"
@@ -30,8 +39,14 @@
     "bounded-deterministic-event-tracing": [
       "bounded-deterministic-event-trace"
     ],
+    "bounded-integer": [
+      "bounded-integer"
+    ],
     "bounded-object-storage": [
       "fixed-capacity-object-pool"
+    ],
+    "bounded-page-table-storage": [
+      "riscv-page-table-page-owner"
     ],
     "bounded-priority-ordering": [
       "fixed-capacity-priority-queue"
@@ -43,6 +58,7 @@
       "fixed-free-list"
     ],
     "bounded-sub-reader": [
+      "bounded-binary-sub-reader",
       "bounded-byte-reader"
     ],
     "bounded-system-resource-planning": [
@@ -68,6 +84,9 @@
     ],
     "checked-integer-cast": [
       "checked-integer-cast"
+    ],
+    "compact-boolean-state": [
+      "bit-set"
     ],
     "cycle-detection": [
       "fixed-capacity-topological-sort"
@@ -99,6 +118,9 @@
     "explicit-endian-writing": [
       "byte-writer"
     ],
+    "fixed-bit-set": [
+      "bit-set"
+    ],
     "fixed-capacity-handle-table": [
       "generational-handles"
     ],
@@ -114,6 +136,9 @@
     "fixed-resource-storage-derivation": [
       "bounded-system-resource-plan"
     ],
+    "growable-sequence": [
+      "dynamic-array"
+    ],
     "guest-address-separation": [
       "distinct-memory-address-types"
     ],
@@ -122,6 +147,9 @@
     ],
     "inline-storage": [
       "fixed-capacity-vector"
+    ],
+    "integer-tag-validation": [
+      "validated-enum-decoder"
     ],
     "monotonic-allocation": [
       "fixed-bump-allocator"
@@ -134,6 +162,18 @@
     ],
     "padding-calculation": [
       "aligned-address-and-size-helpers"
+    ],
+    "page-frame-number": [
+      "physical-page-frame-number-and-address-conversion"
+    ],
+    "page-table-entry-validation": [
+      "riscv-sv39-page-table-entry"
+    ],
+    "page-table-page-ownership": [
+      "riscv-page-table-page-owner"
+    ],
+    "physical-page-conversion": [
+      "physical-page-frame-number-and-address-conversion"
     ],
     "range-intersection": [
       "checked-half-open-range"
@@ -150,6 +190,9 @@
     "signedness-validation": [
       "checked-integer-cast"
     ],
+    "speculative-parsing": [
+      "binary-cursor-checkpoint"
+    ],
     "stable-priority-ordering": [
       "fixed-capacity-priority-queue"
     ],
@@ -160,11 +203,26 @@
       "fixed-capacity-object-pool",
       "generational-handles"
     ],
+    "sv39-page-table-entry": [
+      "riscv-sv39-page-table-entry"
+    ],
+    "sv39-virtual-address": [
+      "riscv-sv39-virtual-address-indexing"
+    ],
     "typed-physical-address": [
       "distinct-memory-address-types"
     ],
     "typed-virtual-address": [
       "distinct-memory-address-types"
+    ],
+    "validated-enum-decoding": [
+      "validated-enum-decoder"
+    ],
+    "validated-scalar": [
+      "bounded-integer"
+    ],
+    "virtual-address-indexing": [
+      "riscv-sv39-virtual-address-indexing"
     ],
     "writer-checkpoint-rollback": [
       "byte-writer"

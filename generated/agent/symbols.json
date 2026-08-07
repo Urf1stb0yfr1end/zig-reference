@@ -4,14 +4,29 @@
   "agent_index_version": "2.0.0",
   "generator": "tools/build-agent-index.py",
   "symbols": {
+    "AdvancementPolicy": [
+      "bounded-binary-sub-reader"
+    ],
     "AlignmentError": [
       "aligned-address-and-size-helpers"
+    ],
+    "BinaryCursorCheckpoint": [
+      "binary-cursor-checkpoint"
+    ],
+    "BitSet": [
+      "bit-set"
     ],
     "BitmapAllocator": [
       "bitmap-allocator"
     ],
+    "BoundedBinarySubReader": [
+      "bounded-binary-sub-reader"
+    ],
     "BoundedDeterministicEventTrace": [
       "bounded-deterministic-event-trace"
+    ],
+    "BoundedInteger": [
+      "bounded-integer"
     ],
     "BoundedReader": [
       "bounded-byte-reader"
@@ -25,14 +40,27 @@
     "CheckedRange": [
       "checked-half-open-range"
     ],
+    "DecodeError": [
+      "riscv-sv39-page-table-entry"
+    ],
     "DependencyEdge": [
       "bounded-system-resource-plan"
     ],
     "Description": [
       "bounded-system-resource-plan"
     ],
+    "DynamicArray": [
+      "dynamic-array"
+    ],
     "EndianIntegerCodec": [
       "endian-integer-codec"
+    ],
+    "Entry": [
+      "riscv-sv39-page-table-entry"
+    ],
+    "Error": [
+      "riscv-page-table-page-owner",
+      "riscv-sv39-virtual-address-indexing"
     ],
     "EventInput": [
       "bounded-deterministic-event-trace"
@@ -64,14 +92,36 @@
     "HostVirtualAddress": [
       "distinct-memory-address-types"
     ],
+    "Kind": [
+      "riscv-sv39-page-table-entry"
+    ],
+    "Level": [
+      "riscv-sv39-page-table-entry",
+      "riscv-sv39-virtual-address-indexing"
+    ],
     "NormalizedEvent": [
       "bounded-deterministic-event-trace"
     ],
     "ObjectPool": [
       "fixed-capacity-object-pool"
     ],
+    "PageOwner": [
+      "riscv-page-table-page-owner"
+    ],
+    "PageSize": [
+      "physical-page-frame-number-and-address-conversion"
+    ],
+    "Parts": [
+      "riscv-sv39-virtual-address-indexing"
+    ],
+    "Permissions": [
+      "riscv-sv39-page-table-entry"
+    ],
     "PhysicalAddress": [
       "distinct-memory-address-types"
+    ],
+    "PhysicalPageFrameNumber": [
+      "physical-page-frame-number-and-address-conversion"
     ],
     "Planner": [
       "bounded-system-resource-plan"
@@ -85,17 +135,50 @@
     "alignUp": [
       "aligned-address-and-size-helpers"
     ],
+    "capture": [
+      "binary-cursor-checkpoint"
+    ],
     "checkedIntegerCast": [
       "checked-integer-cast"
+    ],
+    "construct": [
+      "riscv-sv39-virtual-address-indexing"
+    ],
+    "decodeEnum": [
+      "validated-enum-decoder"
+    ],
+    "decompose": [
+      "riscv-sv39-virtual-address-indexing"
+    ],
+    "entries_per_page": [
+      "riscv-page-table-page-owner"
     ],
     "isAligned": [
       "aligned-address-and-size-helpers"
     ],
+    "isCanonical": [
+      "riscv-sv39-virtual-address-indexing"
+    ],
     "isPowerOfTwo": [
       "aligned-address-and-size-helpers"
     ],
+    "isValidEnumValue": [
+      "validated-enum-decoder"
+    ],
     "paddingNeeded": [
       "aligned-address-and-size-helpers"
+    ],
+    "pageSize": [
+      "riscv-sv39-virtual-address-indexing"
+    ],
+    "requireAligned": [
+      "riscv-sv39-virtual-address-indexing"
+    ],
+    "restore": [
+      "binary-cursor-checkpoint"
+    ],
+    "validateRange": [
+      "riscv-sv39-virtual-address-indexing"
     ]
   }
 }

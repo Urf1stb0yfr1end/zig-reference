@@ -791,5 +791,114 @@
     "known_porting_blockers": [],
     "automatic_port_guaranteed": false,
     "notes": []
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Typed validation and encoding of Sv39 page-table entries.",
+    "search_aliases": [
+      "sv39 pte",
+      "riscv page entry"
+    ],
+    "capability_ids": [
+      "sv39-page-table-entry",
+      "page-table-entry-validation"
+    ],
+    "use_when": [
+      "Validate and encode RISC-V Sv39 page-table entries."
+    ],
+    "do_not_use_when": [
+      "Target paging format is not RISC-V Sv39."
+    ],
+    "entrypoint": "projects/44-riscv-sv39-page-table-entry/src/riscv_sv39_page_table_entry.zig",
+    "public_symbols": [
+      "DecodeError",
+      "Entry",
+      "Kind",
+      "Level",
+      "Permissions"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "borrows": []
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "deterministic_order",
+      "no_hidden_allocation"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-riscv-sv39-page-table-entry",
+      "zig build smoke-riscv-sv39-page-table-entry"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [
+        "riscv64 Sv39; hosted modeling on any target"
+      ],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "runtime_bounded",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "riscv-sv39-page-table-entry",
+      "primary_symbol": "DecodeError",
+      "initialization": "Construct DecodeError as documented by its public API."
+    },
+    "operation_map": {
+      "address": "address",
+      "branch": "branch",
+      "decode": "decode",
+      "invalid": "invalid",
+      "kind": "kind",
+      "leaf": "leaf",
+      "permissions": "permissions",
+      "validateAtLevel": "validateAtLevel"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Target paging format is not RISC-V Sv39."
+    ],
+    "minimal_usage": [
+      "const api = @import(\"riscv-sv39-page-table-entry\");"
+    ],
+    "integration_notes": [
+      "Import the canonical named module.",
+      "Honor ownership, lifetime, and failure rules.",
+      "Run the focused validation commands."
+    ]
   }
 }

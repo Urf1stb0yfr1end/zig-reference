@@ -863,5 +863,110 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Validates integer tags before converting them into enum values.",
+    "search_aliases": [
+      "enum validation",
+      "integer tag decoder"
+    ],
+    "capability_ids": [
+      "validated-enum-decoding",
+      "integer-tag-validation"
+    ],
+    "use_when": [
+      "Validate an integer tag before constructing an enum value."
+    ],
+    "do_not_use_when": [
+      "Unknown tags must be retained rather than rejected."
+    ],
+    "entrypoint": "projects/14-validated-enum-decoder/src/validated_enum_decoder.zig",
+    "public_symbols": [
+      "decodeEnum",
+      "isValidEnumValue"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "borrows": []
+    },
+    "invalidation": {},
+    "failure_guarantees": [],
+    "effects": [
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "immutable_reads_only",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-validated-enum-decoder",
+      "zig build smoke-validated-enum-decoder"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "runtime_bounded",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "validated-enum-decoder",
+      "primary_symbol": "decodeEnum",
+      "initialization": "Use the public functions directly."
+    },
+    "operation_map": {
+      "decodeEnum": "decodeEnum",
+      "isValidEnumValue": "isValidEnumValue"
+    },
+    "error_map": [
+      {
+        "error": "InvalidEnumValue",
+        "operation": "decodeEnum, isValidEnumValue",
+        "meaning": "The documented InvalidEnumValue condition occurred.",
+        "handling": "Correct the input or state before retrying."
+      }
+    ],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Unknown tags must be retained rather than rejected."
+    ],
+    "minimal_usage": [
+      "const decodeEnum = @import(\"validated-enum-decoder\").decodeEnum; const kind = try decodeEnum(Kind, raw);"
+    ],
+    "integration_notes": [
+      "Import the canonical named module.",
+      "Honor ownership, lifetime, and failure rules.",
+      "Run the focused validation commands."
+    ]
   }
 }

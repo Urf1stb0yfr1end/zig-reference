@@ -1485,5 +1485,135 @@
     "notes": [
       "Later Zig releases remain unverified until their exact compiler and semantic checks run."
     ]
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Allocator-backed growable contiguous sequence.",
+    "search_aliases": [
+      "growable sequence",
+      "allocator-backed vector"
+    ],
+    "capability_ids": [
+      "growable-sequence",
+      "allocator-backed-container"
+    ],
+    "use_when": [
+      "Need runtime-sized contiguous storage with explicit allocator ownership."
+    ],
+    "do_not_use_when": [
+      "Need allocation-free or compile-time bounded storage."
+    ],
+    "entrypoint": "projects/01-dynamic-array/src/dynamic_array.zig",
+    "public_symbols": [
+      "DynamicArray"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "caller_owned",
+      "values": "copied",
+      "cleanup": "caller"
+    },
+    "borrowing": {
+      "borrows": []
+    },
+    "invalidation": {
+      "capacity growth or deinit": [
+        "items slices and element pointers: address invalid"
+      ],
+      "pop or clear": [
+        "logical element references: element no longer logically present"
+      ]
+    },
+    "failure_guarantees": [],
+    "effects": [
+      "mutates_receiver",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "zig build test-dynamic-array",
+      "zig build smoke-dynamic-array"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "caller_owned",
+      "capacity_model": "unbounded",
+      "bounded": false,
+      "caller_provided_memory": true,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "dynamic-array",
+      "primary_symbol": "DynamicArray",
+      "initialization": "var values = DynamicArray(u32).init(allocator);"
+    },
+    "operation_map": {
+      "DynamicArray": "DynamicArray",
+      "init": "init",
+      "deinit": "deinit",
+      "capacity": "capacity",
+      "items": "items",
+      "constItems": "constItems",
+      "append": "append",
+      "pop": "pop",
+      "get": "get",
+      "clearRetainingCapacity": "clearRetainingCapacity",
+      "ensureUnusedCapacity": "ensureUnusedCapacity"
+    },
+    "error_map": [
+      {
+        "error": "OutOfMemory",
+        "operation": "DynamicArray, init, deinit, capacity, items, constItems, append, pop, get, clearRetainingCapacity, ensureUnusedCapacity",
+        "meaning": "The documented OutOfMemory condition occurred.",
+        "handling": "Correct the input or state before retrying."
+      },
+      {
+        "error": "Overflow",
+        "operation": "DynamicArray, init, deinit, capacity, items, constItems, append, pop, get, clearRetainingCapacity, ensureUnusedCapacity",
+        "meaning": "The documented Overflow condition occurred.",
+        "handling": "Correct the input or state before retrying."
+      }
+    ],
+    "composition": {
+      "commonly_with": [],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Results depend only on explicit inputs and receiver state.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Need allocation-free or compile-time bounded storage."
+    ],
+    "minimal_usage": [
+      "const DynamicArray = @import(\"dynamic-array\").DynamicArray;",
+      "var values = DynamicArray(u32).init(allocator);",
+      "defer values.deinit();",
+      "try values.append(1);"
+    ],
+    "integration_notes": [
+      "Import the canonical named module.",
+      "Honor ownership, lifetime, and failure rules.",
+      "Run the focused validation commands."
+    ]
   }
 }
