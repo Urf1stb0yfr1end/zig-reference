@@ -1,0 +1,572 @@
+CODEX AGENTIC SNOWBALL BATCH 07 — CORRECT-USE PREFLIGHT
+
+MISSION
+
+Strengthen zig-reference so a coding agent can discover the correctness obligations of a module or composition before it writes substantial integration code.
+
+This batch exists to answer a serious competitive question:
+
+Why should an autonomous coding agent choose zig-reference over beginning from Rust, C, raw Zig, or a pile of unrelated libraries?
+
+Do not answer with rhetoric.
+
+Make the repository cheaper to use correctly.
+
+Rust has a powerful compiler that rejects many ownership, borrowing, lifetime, and type mistakes in newly written code. zig-reference must not pretend to replace rustc, clone a borrow checker, or reproduce every compiler diagnostic.
+
+Instead, zig-reference should make the comparison structurally different:
+
+- reuse validated canonical code instead of rewriting solved mechanisms;
+- expose ownership, borrowing, invalidation, state, resource, environment, and failure constraints before integration;
+- make invalid states harder to represent in Zig APIs where practical;
+- mechanically validate repository-specific invariants the language cannot know;
+- surface known misuse and repair knowledge cheaply;
+- tell the agent exactly what remains uncertain;
+- preserve native compiler errors and exact source truth;
+- keep the ordinary decision surface compact enough that using the repository costs less context than rediscovering it.
+
+The governing idea is simple:
+
+The safest newly written systems code is the code the agent discovers it did not need to write.
+
+And for the code that genuinely must be written:
+
+Expose the important correctness obligations before the first edit.
+
+This batch should make that practical and measurable without inventing a private programming language, a new type system, or a giant static-analysis project.
+
+PRECONDITION — BATCH 06 MUST EXIST
+
+Work in ~/dev/zig-reference.
+
+Read AGENTS.md first.
+Read COMMANDS.md before inventing or guessing commands.
+Read docs/agentic-vocabulary.md.
+Read docs/standards/SNOWBALL_YIELD.md.
+Read docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_06_MORPHIC_COMPOSITION.txt.
+Read docs/reports/AGENTIC_SNOWBALL_BATCH_06.md if it exists.
+
+Activate the repository environment:
+
+source .venv/bin/activate
+
+Use Zig 0.14.0 only.
+
+Before implementation, run:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py
+
+Batch 07 is intended to follow a completed Batch 06 hosted Morphic composition.
+
+If Batch 06 has not actually been implemented and validated yet, do not fake its state, do not invent its modules, and do not silently implement Batch 06 inside Batch 07.
+
+In that case, stop implementation after producing an honest short note in docs/reports/AGENTIC_SNOWBALL_BATCH_07.md that the precondition is unmet, and do not print the final PASSED line.
+
+If Batch 06 exists and is green, continue.
+
+Do not modify, move, recreate, or retag benchmark-pre-morphic-52.
+
+OBJECTIVE 1 — DEFINE THE CORRECTNESS BOUNDARY CLEARLY
+
+Do not compete with language compilers by duplicating what they already know.
+
+Native Zig compiler output remains authoritative for Zig syntax, typing, comptime behavior, and compilation.
+
+zig-reference should add only higher-level engineering truth that changes an agent's next decision, such as:
+
+- who owns storage;
+- what is borrowed;
+- how long a borrow remains valid;
+- what operations invalidate a view or handle;
+- what state transitions are legal;
+- what resources are bounded;
+- what may allocate;
+- what must be initialized first;
+- what a failed mutation preserves;
+- what ordering is deterministic;
+- what environment assumptions apply;
+- what known misuse means;
+- what exact repair and focused validation are known.
+
+Do not author thousands of possible error descriptions.
+
+Prefer a small number of high-value correctness obligations and evidenced diagnostics over exhaustive prose.
+
+The repository should preserve native failures and add repository-specific context only where the repository genuinely knows more than the compiler.
+
+OBJECTIVE 2 — ADD A COMPACT PRE-INTEGRATION CORRECTNESS VIEW
+
+Inspect the existing Agent Fast Path and query-reference architecture before changing it.
+
+Add the smallest coherent machine-facing operation that lets a zero-context coding agent ask:
+
+"What must I preserve to use this module or composition correctly?"
+
+Prefer extending the existing query-reference interface rather than creating a second tool.
+
+A command shaped approximately like this is acceptable if it fits the existing CLI cleanly:
+
+python3 tools/query-reference.py agent preflight MODULE_OR_RECIPE
+
+The exact syntax may differ if the current parser or conventions make another form more coherent. Do not create a private DSL.
+
+The preflight response must be deterministic JSON and derived from existing canonical contracts/indexes wherever possible.
+
+Do not create a parallel authored metadata system just for this view.
+
+For a module or composition, return only correctness-critical obligations that the agent should know before integration.
+
+Where applicable, include compact fields covering:
+
+- subject identity;
+- subject kind: module or recipe/composition;
+- Zig baseline;
+- environment constraints;
+- dependency/build order or closure reference;
+- ownership obligations;
+- cleanup obligations;
+- borrowing obligations;
+- invalidation rules;
+- resource/capacity/allocation constraints;
+- state-transition constraints;
+- failure/error obligations;
+- failure atomicity when known;
+- deterministic ordering/time assumptions when relevant;
+- known diagnostics relevant to misuse;
+- focused validation or validation closure;
+- minimum useful locations;
+- unresolved or unrepresented correctness facts, if any.
+
+Do not include empty prose sections merely for symmetry.
+Do not copy long documentation passages.
+Do not dump all tests, all symbols, all diagnostics, or all source paths.
+
+The default output should be the cheapest sufficient correctness surface.
+
+If a full contract has all information needed, ordinary preflight must not require implementation-source inspection.
+
+OBJECTIVE 3 — NO FALSE SAFETY
+
+The preflight view must never become more permissive than canonical truth.
+
+This is Constraint-Preserving Compression.
+
+If a correctness-critical fact is absent from the compact projection but present in canonical metadata, repair the projection.
+
+If the repository does not know a fact, return an explicit unknown/unrepresented state instead of guessing.
+
+Examples:
+
+- unknown lifetime must not become "stable";
+- unknown allocation behavior must not become "allocation-free";
+- missing failure-atomicity evidence must not become "atomic";
+- a documented misuse example must not become a compile-time guarantee;
+- runtime-negative evidence must not become proof of impossibility;
+- a compiler-checked property may be described as compiler-checked only when that claim is actually demonstrated by the source/build path.
+
+Add negative tests that reject or expose projection loss for correctness-critical fields.
+
+OBJECTIVE 4 — MAKE INVALID USE HARDER WHERE ZIG CAN EXPRESS IT CLEANLY
+
+Use the Batch 06 Morphic composition and a small high-leverage sample of existing modules as a pressure test.
+
+Do not redesign every module in the repository.
+
+Select the smallest set of modules/composition boundaries whose semantics meaningfully exercise:
+
+- ownership;
+- borrowed views;
+- invalidation;
+- bounded resource use;
+- stable identity/handles;
+- state transitions;
+- deterministic ordering;
+- allocation after initialization;
+- explicit cleanup.
+
+The sample should include the new/changed Batch 06 Morphic foundations and may include existing modules such as owned-byte-buffer, intrusive-doubly-linked-list, optional-typed-handle, fixed-capacity-object-pool, state-machine, or other better-fitting current modules.
+
+For each selected boundary, inspect whether a correctness rule currently exists only as prose but can be moved into ordinary Zig structure without making the API worse.
+
+Prefer, where appropriate:
+
+- precise types instead of raw integers;
+- opaque or typed handles instead of ambiguous indices;
+- explicit error unions instead of sentinel states;
+- caller-owned storage when that is the contract;
+- compile-time capacity where that is truly part of the type;
+- explicit initialization/deinitialization;
+- state-machine APIs that reject invalid transitions;
+- checked conversions;
+- explicit invalidation/reacquisition behavior;
+- narrow public APIs rather than mutable internal state exposure.
+
+Do not contort normal Zig merely to imitate Rust.
+Do not add lifetimes as a private annotation language.
+Do not add procedural macros, code-generation frameworks, or a second compiler.
+
+Only change an existing public API when the correctness improvement materially justifies it and affected dependents can be migrated safely in the same run.
+
+OBJECTIVE 5 — BUILD MISUSE FIXTURES THAT TEACH THE AGENT WHAT THE COMPILER CANNOT
+
+For the selected high-leverage boundaries, create focused misuse/negative fixtures when current evidence is insufficient.
+
+Test actual repository contracts, not hypothetical bug lists.
+
+Examples where applicable:
+
+- stale handle after generation change;
+- use of a borrowed view after an invalidating mutation;
+- double insertion of an intrusive node;
+- invalid state transition;
+- resource exhaustion at exact capacity;
+- forbidden post-initialization allocation;
+- deterministic tie ordering;
+- cleanup/ownership misuse that can be detected safely;
+- output/trace capacity exhaustion;
+- failure atomicity after a rejected mutation.
+
+Distinguish evidence classes honestly.
+
+If Zig can reject a misuse at compile time, preserve compiler output in the evidence path.
+If the misuse can only be detected at runtime, say so.
+If the rule is documented but cannot currently be mechanically enforced, say so.
+
+Do not convert a runtime test into a stronger type-system claim.
+
+OBJECTIVE 6 — CONNECT KNOWN MISUSE TO THE DEBUG FAST PATH
+
+Use existing ZIGREF diagnostics where they already represent the exact stable meaning.
+
+If the pressure test reveals a recurring, generally useful misuse with a stable meaning and repair path, add a new ZIGREF diagnostic only when evidence supports it.
+
+A useful diagnostic should let a cold agent reach, cheaply:
+
+native symptom/error
+→ stable diagnostic identity
+→ violated repository rule
+→ likely operation/component
+→ repair strategy
+→ minimum useful locations
+→ focused validation
+
+Do not duplicate native compiler diagnostics just to increase diagnostic count.
+Do not create one ZIGREF ID for every compiler message.
+Do not hide native errors.
+Do not invent a cause for an unknown symptom.
+
+Optimize for Diagnostic Reach and Repair Locality, not raw diagnostic volume.
+
+OBJECTIVE 7 — VALIDATION CLOSURE MUST BE CHEAP
+
+The preflight result should expose the smallest meaningful validation path for the selected module/composition.
+
+Do not make a coding agent run the entire repository after every edit when focused validation exists.
+
+Where current generated metadata can derive Validation Closure, use it.
+
+Where it cannot, improve the existing derivation architecture rather than hand-maintaining a second command list.
+
+For a typical module integration, the agent should be able to identify:
+
+- focused unit command;
+- focused smoke command;
+- directly relevant recipe/composition validation when applicable;
+- stronger aggregate gate required before completion.
+
+The repository should minimize Validation Distance while preserving final repository-wide validation.
+
+OBJECTIVE 8 — MEASURE CONTEXT SIZE, NOT IMAGINARY TOKEN SAVINGS
+
+Measure the exact UTF-8 byte size of representative preflight responses.
+
+At minimum measure:
+
+- one simple value-like module;
+- one ownership/lifetime-sensitive module;
+- one bounded-resource module;
+- the Batch 06 Morphic hosted composition/recipe.
+
+Record exact bytes.
+
+Do not convert bytes to tokens and call the result measured tokens.
+Do not claim a speedup over Rust, C, raw Zig, or another agent run.
+Do not claim compiler-equivalent safety.
+
+The goal is factual bookkeeping:
+
+How much correctness-critical repository knowledge can be supplied before integration without opening source?
+
+If a typical response becomes unexpectedly large, inspect why and reduce redundant explanation while preserving correctness-critical constraints.
+
+OBJECTIVE 9 — ZERO-CONTEXT ACCEPTANCE TEST
+
+Extend or add a focused deterministic agent test that simulates a cold agent with no repository history.
+
+The test must prove that, using structured interfaces only, the cold agent can answer for representative targets:
+
+- what is this component/composition?;
+- what does it own?;
+- what must the caller clean up?;
+- what is borrowed?;
+- what invalidates the borrow/handle/state?;
+- what can fail?;
+- what resources are bounded or dynamic?;
+- what environment assumptions apply?;
+- what ordering/determinism constraints apply?;
+- what known diagnostic applies to a selected misuse?;
+- what exact focused command validates correct integration?;
+- what remains unknown, if anything?;
+
+The acceptance path should not open implementation source for ordinary reuse of full contracts.
+
+If it cannot answer a correctness-critical question because the canonical contract genuinely lacks the fact, fix the canonical contract when source truth supports the answer.
+
+If source truth itself does not establish the answer, keep it unknown rather than manufacturing metadata.
+
+OBJECTIVE 10 — PRESSURE TEST THE "WRITE LESS" THESIS
+
+Use the Batch 06 Morphic hosted composition as the primary system-level case.
+
+Before adding any helper, wrapper, container, scheduler mechanism, identity system, trace mechanism, resource mechanism, or output mechanism during this run:
+
+query first.
+
+If an existing canonical module or recipe satisfies the need, reuse it.
+
+Record when a tempting new implementation was avoided because the repository already had the capability.
+
+Do not create artificial code merely to demonstrate reuse.
+
+The Batch 07 report should distinguish:
+
+- reused existing engineering;
+- genuinely new correctness infrastructure;
+- project-specific orchestration;
+- source reads required because the agent-facing surface was insufficient;
+- new code avoided because an existing foundation was discovered.
+
+This is a continuation of Snowball Yield bookkeeping, not a marketing benchmark.
+
+OBJECTIVE 11 — UPDATE AGENTS.md ONLY WITH DURABLE RULES
+
+If the new preflight operation becomes a real supported canonical agent surface, update AGENTS.md concisely so a future zero-context agent knows to use it before substantial integration work when correctness obligations matter.
+
+Do not turn AGENTS.md into a Batch 07 changelog.
+
+A durable rule should be approximately:
+
+query/select/compose first
+→ inspect compact correctness obligations before integration
+→ write only the residual project-specific code
+→ validate narrowly
+→ diagnose through stable known repair memory
+→ validate strongly before completion
+
+Use the repository's actual final command syntax.
+
+If no canonical preflight command is ultimately justified, do not document one.
+
+OBJECTIVE 12 — VOCABULARY DISCIPLINE
+
+Do not invent project-specific terminology merely to make this work sound novel.
+
+Prefer existing vocabulary such as:
+
+- Cost of Correct Use;
+- Agent Brief;
+- Minimum Read Set;
+- Constraint-Preserving Compression;
+- Projection Loss;
+- Validation Closure;
+- Validation Distance;
+- Diagnostic Reach;
+- Repair Locality;
+- Snowball Yield;
+- Rediscovery Tax;
+- Reimplementation Tax.
+
+If this batch introduces a genuinely reusable project-specific formal term that is not already defined in docs/agentic-vocabulary.md, add a concise definition there.
+
+Do not add ordinary software-engineering words to the vocabulary merely because they appeared in this request.
+
+OBJECTIVE 13 — COMMANDS.md IS CUMULATIVE AND MANDATORY
+
+Every Codex run that changes the repository must leave COMMANDS.md current.
+
+Before completion:
+
+- add every new real runnable command introduced by this run;
+- update changed command syntax/purpose/status;
+- backfill supported commands from previous batches that are still missing;
+- remove or mark obsolete commands accurately;
+- do not document a command that does not exist;
+- do not mark a command verified unless it was actually executed successfully in the reported environment;
+- preserve the distinction between proposed and runnable commands.
+
+Run:
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+
+If the preflight operation exists, COMMANDS.md must teach it compactly with real examples.
+
+OBJECTIVE 14 — REPORT THE RESULT HONESTLY
+
+Create:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_07.md
+
+The report must include:
+
+1. base commit and Zig version;
+2. Batch 06 precondition result;
+3. correctness-boundary design decision;
+4. exact canonical preflight command, if one exists;
+5. fields derived and their source of truth;
+6. representative output byte measurements;
+7. selected semantic pressure-test modules/compositions;
+8. invalid-use rules moved into Zig structure, if any;
+9. misuse fixtures/evidence added;
+10. diagnostics reused or added;
+11. Projection Loss found and repaired;
+12. source reads required for ordinary reuse, when knowable;
+13. commands added/backfilled in COMMANDS.md;
+14. focused validation run;
+15. aggregate validation run;
+16. limits and remaining unknowns;
+17. a factual Snowball Yield section following docs/standards/SNOWBALL_YIELD.md.
+
+Do not claim:
+
+- parity with the Rust borrow checker;
+- that Zig now prevents every memory error;
+- that zig-reference is safer than Rust in general;
+- measured token savings when tokens were not measured;
+- universal superiority over Rust, C, or any other ecosystem;
+- that an agent will always choose zig-reference.
+
+The evidence should instead support the narrower, valuable result:
+
+A cold coding agent can obtain high-value repository-specific correctness obligations, known misuse repair paths, and focused validation before writing substantial integration code, while reusing already-solved mechanisms instead of reimplementing them.
+
+OBJECTIVE 15 — PROTECT PROGRESSIVE DISCLOSURE
+
+The new correctness surface must not make bootstrap, decide, select-card, diagnose, or ordinary module lookup substantially noisier.
+
+Do not dump preflight obligations into every existing query by default.
+
+A cold agent should request deeper correctness information only when needed.
+
+Preserve the normal path:
+
+bootstrap
+→ decide
+→ select
+→ compose
+→ compact correctness preflight when integrating
+→ integrate
+→ focused validate
+→ diagnose/repair when needed
+→ strong validation before completion
+
+The repository can grow richer without forcing every query to grow with it.
+
+OBJECTIVE 16 — QUALITY GATES
+
+Run all applicable focused checks for changed modules, recipes, diagnostics, and tools.
+
+At minimum, when the commands exist in the current repository, run:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py
+PYTHONDONTWRITEBYTECODE=1 python3 tools/validate-agent-contracts.py --self-test
+PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py
+node tools/check-port-contracts.js
+zig fmt --check .
+zig build check --summary all
+zig build smoke --summary all
+zig build test --summary all
+zig build recipes --summary all
+zig build conformance --summary all
+python3 tools/developer-command.py verify-morphic-plan
+python3 tools/developer-command.py verify-morphic-trace
+python3 tools/developer-command.py validate-repository
+
+git diff --check
+
+Use the canonical developer wrapper where repository policy requires it.
+
+If Batch 06 introduced a canonical hosted Morphic runtime validation command, run that exact command as well and include it in COMMANDS.md if it is not already present.
+
+If command names differ because Batch 06 established a different truthful surface, use the actual commands rather than fabricating the names above.
+
+OBJECTIVE 17 — DEVELOPER MINIMUS
+
+Preserve the current Developer Minimus contract.
+
+Serious developer-facing aggregate commands must preserve their ordinary output and then finish with one authoritative:
+
+LOCATIONS
+MINIMUS
+
+The outer command's final Minimus must reflect the real outer exit status.
+Nested prerequisites must not print a misleading authoritative PASS for a failing outer run.
+Clickable durable file:// locations must remain valid.
+
+Do not regress this behavior while adding new commands.
+
+OUT OF SCOPE
+
+Do not begin Alpine boot.
+Do not begin the RISC-V privileged-machine implementation merely because it is next on the roadmap.
+Do not add VirtIO.
+Do not add networking.
+Do not implement a hypervisor.
+Do not implement a Rust parser, borrow checker, rustc compatibility layer, or language comparison benchmark.
+Do not create an LSP.
+Do not create a general theorem prover.
+Do not create a private lifetime annotation DSL.
+Do not add a database or embeddings service.
+Do not perform the formal benchmark against benchmark-pre-morphic-52 yet.
+
+This batch is about making correct reuse cheaper and more mechanically legible before the next major architecture expansion.
+
+SUCCESS CRITERIA
+
+Batch 07 is complete only if all of the following are true:
+
+- Batch 06 precondition was genuinely satisfied;
+- a cold agent has a deterministic compact way to retrieve correctness obligations for representative modules/compositions;
+- the new view is derived from canonical truth rather than duplicated authored metadata;
+- unknown/unrepresented correctness facts stay explicitly unknown;
+- representative ownership/lifetime/resource/state/determinism semantics survive compression;
+- selected high-leverage misuse rules have honest mechanical evidence;
+- native compiler errors remain preserved;
+- known repository misuse can reach stable repair guidance when evidence exists;
+- the Morphic composition reuses canonical mechanisms instead of recreating them;
+- representative preflight byte sizes are measured and reported;
+- the zero-context test proves the path without ordinary source archaeology;
+- COMMANDS.md is cumulatively current;
+- AGENTS.md is updated only if a durable supported workflow changed;
+- vocabulary is updated only for genuinely new formal project terms;
+- Snowball Yield is recorded factually;
+- Developer Minimus semantics remain correct;
+- all applicable focused and aggregate validations pass;
+- the worktree contains no accidental generated binary artifacts;
+- no unsupported Rust-vs-Zig safety claim is made.
+
+Do not commit.
+Do not push.
+Do not create or move tags.
+Do not open a pull request.
+
+Leave completed changes uncommitted for review.
+
+Finish only when the requested work is genuinely complete and the final line of your response is exactly:
+
+AGENTIC SNOWBALL BATCH 07 PASSED
