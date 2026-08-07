@@ -333,6 +333,43 @@ The proportion of known misuse classes that can be reached through stable diagno
 
 Higher Diagnostic Reach means more failures enter a predictable repair path instead of becoming open-ended debugging sessions.
 
+## Invariant-Guided Diagnosis
+
+A debugging approach that classifies failures by identifying which canonical component or system invariant was violated, rather than attempting to catalog every possible error permutation independently.
+
+The desired path is:
+
+```text
+native failure or symptom
+→ component + operation
+→ relevant observed state
+→ violated invariant, if known
+→ stable diagnostic or explicit unknown
+→ repair
+→ focused validation
+```
+
+Invariant-Guided Diagnosis favors a small set of strong, reusable laws over an ever-growing encyclopedia of superficially different failures. One invariant may explain many symptoms.
+
+A diagnosis must remain evidence-honest. If the available state does not establish which invariant failed, the result remains unknown rather than guessing a cause.
+
+## Failure State Capsule
+
+The smallest deterministic machine-readable snapshot of failure state that preserves the facts needed to continue diagnosis or repair without replaying broad repository archaeology.
+
+Where available, a Failure State Capsule may contain:
+
+- component and operation;
+- native error or symptom;
+- relevant observed values;
+- expected invariant or boundary;
+- mutation/rollback status;
+- stable diagnostic identity when known;
+- minimum useful locations;
+- focused validation or next inspection command.
+
+A Failure State Capsule is not a raw log dump. Its purpose is to preserve the decisive state with high Context Efficiency. Unknown or unavailable facts must remain explicit rather than being synthesized.
+
 ## Repair Compression Ratio
 
 The ratio between ordinary debugging effort and the effort required when a stable diagnostic leads directly to the relevant rule and repair.
