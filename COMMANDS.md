@@ -205,8 +205,10 @@ Each module has `zig build test-<module>` and `zig build smoke-<module>` targets
 
 ## Agent-readable pilot commands
 
-Agent Fast Path v2 currently projects all 52 contracts as full contracts. The
-root-document policy is checked by `node tools/check-port-contracts.js`; it accepts
+<!-- CURRENT AGENT CORPUS -->
+Agent Fast Path v2 currently projects 53 contracted modules as 53 full cards with 0 partial cards.
+The Batch 07 repair revalidated bootstrap/doctor discovery, deterministic preflight, command-reference drift, ports, Developer Minimus, hosted Morphic verification, and the complete repository pipeline under Zig 0.14.0; exact results are recorded in `docs/reports/AGENTIC_SNOWBALL_BATCH_07_REPAIR.md`.
+The root-document policy is checked by `node tools/check-port-contracts.js`; it accepts
 only the explicit flagship/root allowlist and rejects any other root Markdown file.
 
 | Command | Purpose |
@@ -256,7 +258,7 @@ Raw `zig build` commands remain implementation surfaces and preserve normal Zig 
 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py` | Test deterministic formatting, ordering, existing locations, doctor output, controlled success/failure, singular handoffs, and exit preservation. |
 | `node tools/test-port-public-surface.js` | Regression-test rejection of a dependency/public-surface substitution in a port contract. |
 
-The implementation prerequisite steps ending in `-checks` and the raw public build steps never emit subordinate Minimus blocks. Agent Fast Path v2 now projects 53 contracted modules as 53 full cards with no partial cards. Batch 04 repair replaced test-only integration snippets with functional public API usage and corrected the promoted cards' semantic projections.
+The implementation prerequisite steps ending in `-checks` and the raw public build steps never emit subordinate Minimus blocks. Batch 04 repair replaced test-only integration snippets with functional public API usage and corrected the promoted cards' semantic projections.
 
 Raw prerequisite commands are `zig build smoke-checks`, `zig build validate-repository-checks`, `zig build verify-morphic-plan-checks`, and `zig build verify-morphic-trace-checks`. They exist for build-graph composition and deliberately emit no handoff. `python3 tools/developer-minimus.py --command COMMAND --summary TEXT [--status {PASS,FAIL,PARTIAL}] [--failure TEXT] [--next COMMAND] [--modules] [--location LABEL=RELATIVE_PATH ...]` is the internal deterministic formatter used by the doctor and outer driver; developers normally use the canonical surfaces above.
 

@@ -12,6 +12,14 @@ def assert_candidate(text,module):
  _,d=run("decide",text); assert d["results"]["candidates"][0]["module"]==module,d
 
 def main():
+ _,bootstrap=run("bootstrap")
+ operations=bootstrap["results"]["operations"]
+ workflow=bootstrap["results"]["workflow"]
+ assert "preflight" in operations,bootstrap
+ assert "preflight" in workflow and workflow.index("compose") < workflow.index("preflight") < workflow.index("card integrate"),bootstrap
+ # Every canonical operation named by the beginner workflow must remain discoverable
+ # through bootstrap; specialized operations may intentionally remain progressive.
+ assert {step.split()[0] for step in workflow if step != "validate"} <= set(operations),bootstrap
  for args in [("bootstrap",),("card","fixed-bump-allocator","--view","select"),("card","fixed-bump-allocator","--view","integrate"),("impact","fixed-capacity-vector"),("diagnostic","ZIGREF-TOPO-CYCLE")]:
   a=run(*args)[0].stdout; b=run(*args)[0].stdout; assert a==b,args
  assert_candidate("aligned allocation from caller-owned fixed memory with no hidden heap","fixed-bump-allocator")
