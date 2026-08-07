@@ -1336,14 +1336,23 @@
       "dynamic-array"
     ],
     "ownership": {
-      "storage": "inline",
+      "storage": "caller_owned",
       "values": "copied",
-      "cleanup": "none"
+      "cleanup": "caller"
     },
     "borrowing": {
-      "borrows": []
+      "borrows": [
+        "The Stack retains the allocator supplied to init; the allocator must remain valid through deinit."
+      ]
     },
-    "invalidation": {},
+    "invalidation": {
+      "deinit": [
+        "Stack value and owned allocation become invalid"
+      ],
+      "push": [
+        "internal allocation may move; the public API exposes no element references"
+      ]
+    },
     "failure_guarantees": [],
     "effects": [
       "no_hidden_allocation",
@@ -1373,16 +1382,18 @@
     },
     "resource_profile": {
       "hidden_allocation": false,
-      "storage_model": "inline",
-      "capacity_model": "compile_time",
-      "bounded": true,
+      "storage_model": "caller_owned",
+      "capacity_model": "unbounded",
+      "bounded": false,
       "caller_provided_memory": false,
-      "compile_time_parameters": []
+      "compile_time_parameters": [
+        "T"
+      ]
     },
     "construction": {
       "named_import": "stack",
       "primary_symbol": "Stack",
-      "initialization": "std.testing.refAllDeclsRecursive(subject);"
+      "initialization": "const stack_module = @import(\"stack\");\nvar stack = stack_module.Stack(u8).init(allocator);\ndefer stack.deinit();\ntry stack.push(7);\nconst value = stack.pop();"
     },
     "operation_map": {
       "Stack": "Stack",
@@ -1398,13 +1409,13 @@
     "error_map": [
       {
         "error": "OutOfMemory",
-        "operation": "init, deinit, len, isEmpty, push, pop, peek, clearRetainingCapacity",
+        "operation": "push",
         "meaning": "The requested operation violates the documented stack constraints.",
         "handling": "Handle the error and retain or reject the input according to the canonical operation contract."
       },
       {
         "error": "Overflow",
-        "operation": "init, deinit, len, isEmpty, push, pop, peek, clearRetainingCapacity",
+        "operation": "push",
         "meaning": "The requested operation violates the documented stack constraints.",
         "handling": "Handle the error and retain or reject the input according to the canonical operation contract."
       }
@@ -1423,8 +1434,11 @@
       "Need behavior outside this module’s documented container-adapter responsibility."
     ],
     "minimal_usage": [
-      "const subject = @import(\"stack\");",
-      "std.testing.refAllDeclsRecursive(subject);"
+      "const stack_module = @import(\"stack\");",
+      "var stack = stack_module.Stack(u8).init(allocator);",
+      "defer stack.deinit();",
+      "try stack.push(7);",
+      "const value = stack.pop();"
     ],
     "integration_notes": [
       "Use the canonical named import and public operations listed here.",

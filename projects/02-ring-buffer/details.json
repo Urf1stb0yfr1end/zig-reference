@@ -1378,12 +1378,15 @@
       "capacity_model": "compile_time",
       "bounded": true,
       "caller_provided_memory": false,
-      "compile_time_parameters": []
+      "compile_time_parameters": [
+        "T",
+        "capacity"
+      ]
     },
     "construction": {
       "named_import": "ring-buffer",
       "primary_symbol": "RingBuffer",
-      "initialization": "std.testing.refAllDeclsRecursive(subject);"
+      "initialization": "const ring_buffer = @import(\"ring-buffer\");\nvar queue = ring_buffer.RingBuffer(u8, 4){};\ntry queue.push(7);\nconst value = queue.pop();"
     },
     "operation_map": {
       "RingBuffer": "RingBuffer",
@@ -1399,7 +1402,7 @@
     "error_map": [
       {
         "error": "Full",
-        "operation": "count, isEmpty, isFull, push, pop, peek, get, clear",
+        "operation": "push",
         "meaning": "The requested operation violates the documented ring-buffer constraints.",
         "handling": "Handle the error and retain or reject the input according to the canonical operation contract."
       }
@@ -1418,8 +1421,10 @@
       "Need behavior outside this module’s documented queue responsibility."
     ],
     "minimal_usage": [
-      "const subject = @import(\"ring-buffer\");",
-      "std.testing.refAllDeclsRecursive(subject);"
+      "const ring_buffer = @import(\"ring-buffer\");",
+      "var queue = ring_buffer.RingBuffer(u8, 4){};",
+      "try queue.push(7);",
+      "const value = queue.pop();"
     ],
     "integration_notes": [
       "Use the canonical named import and public operations listed here.",

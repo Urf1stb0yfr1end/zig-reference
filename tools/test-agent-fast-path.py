@@ -26,6 +26,17 @@ def main():
  assert d["results"]["construction"]["primary_symbol"]=="Entry",d
  assert "Entry.decode" in d["results"]["construction"]["initialization"],d
  assert d["results"]["construction"]["primary_symbol"]!="DecodeError",d
+ batch04=("ring-buffer","stack","state-machine","nonzero-integer","saturating-counter","wrapping-sequence-number","optional-typed-handle","unit-safe-quantity","validated-ascii-byte","fourcc-code")
+ for module in batch04:
+  _,card=run("card",module,"--view","integrate"); result=card["results"]
+  assert result["construction"]["primary_symbol"]
+  guidance="\n".join([result["construction"]["initialization"],*result["minimal_usage"]])
+  assert guidance.strip() and "std.testing.refAllDeclsRecursive" not in guidance
+ _,stack=run("card","stack","--view","all"); stack=stack["results"]
+ assert stack["resource_profile"]["storage_model"]=="caller_owned" and not stack["resource_profile"]["bounded"]
+ assert stack["ownership"]["cleanup"]=="caller"
+ _,ring=run("card","ring-buffer","--view","integrate"); assert ring["results"]["error_map"][0]["operation"]=="push"
+ _,machine=run("card","state-machine","--view","integrate"); assert machine["results"]["error_map"][0]["operation"]=="apply"
  assert_candidate("stale handle safe bounded object storage","fixed-capacity-object-pool")
  assert_candidate("deterministic bounded graph ordering with cycle detection","fixed-capacity-topological-sort")
  assert_candidate("exact bounded resource budget with deterministic initialization ordering","bounded-system-resource-plan")

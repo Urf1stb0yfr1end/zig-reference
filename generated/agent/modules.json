@@ -348,7 +348,7 @@
         "preferred_recipes": []
       },
       "construction": {
-        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "initialization": "const ring_buffer = @import(\"ring-buffer\");\nvar queue = ring_buffer.RingBuffer(u8, 4){};\ntry queue.push(7);\nconst value = queue.pop();",
         "named_import": "ring-buffer",
         "primary_symbol": "RingBuffer"
       },
@@ -381,7 +381,7 @@
           "error": "Full",
           "handling": "Handle the error and retain or reject the input according to the canonical operation contract.",
           "meaning": "The requested operation violates the documented ring-buffer constraints.",
-          "operation": "count, isEmpty, isFull, push, pop, peek, get, clear"
+          "operation": "push"
         }
       ],
       "evidence_summary": {
@@ -410,8 +410,10 @@
       ],
       "matching_recipes": [],
       "minimal_usage": [
-        "const subject = @import(\"ring-buffer\");",
-        "std.testing.refAllDeclsRecursive(subject);"
+        "const ring_buffer = @import(\"ring-buffer\");",
+        "var queue = ring_buffer.RingBuffer(u8, 4){};",
+        "try queue.push(7);",
+        "const value = queue.pop();"
       ],
       "module": "ring-buffer",
       "operation_map": {
@@ -434,7 +436,10 @@
         "bounded": true,
         "caller_provided_memory": false,
         "capacity_model": "compile_time",
-        "compile_time_parameters": [],
+        "compile_time_parameters": [
+          "T",
+          "capacity"
+        ],
         "hidden_allocation": false,
         "storage_model": "inline"
       },
@@ -769,7 +774,9 @@
       ],
       "alternatives": [],
       "borrowing": {
-        "borrows": []
+        "borrows": [
+          "The Stack retains the allocator supplied to init; the allocator must remain valid through deinit."
+        ]
       },
       "capabilities": [
         "stack"
@@ -784,7 +791,7 @@
         "preferred_recipes": []
       },
       "construction": {
-        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "initialization": "const stack_module = @import(\"stack\");\nvar stack = stack_module.Stack(u8).init(allocator);\ndefer stack.deinit();\ntry stack.push(7);\nconst value = stack.pop();",
         "named_import": "stack",
         "primary_symbol": "Stack"
       },
@@ -820,13 +827,13 @@
           "error": "OutOfMemory",
           "handling": "Handle the error and retain or reject the input according to the canonical operation contract.",
           "meaning": "The requested operation violates the documented stack constraints.",
-          "operation": "init, deinit, len, isEmpty, push, pop, peek, clearRetainingCapacity"
+          "operation": "push"
         },
         {
           "error": "Overflow",
           "handling": "Handle the error and retain or reject the input according to the canonical operation contract.",
           "meaning": "The requested operation violates the documented stack constraints.",
-          "operation": "init, deinit, len, isEmpty, push, pop, peek, clearRetainingCapacity"
+          "operation": "push"
         }
       ],
       "evidence_summary": {
@@ -849,14 +856,24 @@
         "Use the canonical named import and public operations listed here.",
         "Run the focused validation commands before integration."
       ],
-      "invalidation": {},
+      "invalidation": {
+        "deinit": [
+          "Stack value and owned allocation become invalid"
+        ],
+        "push": [
+          "internal allocation may move; the public API exposes no element references"
+        ]
+      },
       "known_gaps": [
         "Need behavior outside this module’s documented container-adapter responsibility."
       ],
       "matching_recipes": [],
       "minimal_usage": [
-        "const subject = @import(\"stack\");",
-        "std.testing.refAllDeclsRecursive(subject);"
+        "const stack_module = @import(\"stack\");",
+        "var stack = stack_module.Stack(u8).init(allocator);",
+        "defer stack.deinit();",
+        "try stack.push(7);",
+        "const value = stack.pop();"
       ],
       "module": "stack",
       "operation_map": {
@@ -871,17 +888,19 @@
         "push": "push"
       },
       "ownership": {
-        "cleanup": "none",
-        "storage": "inline",
+        "cleanup": "caller",
+        "storage": "caller_owned",
         "values": "copied"
       },
       "resource_profile": {
-        "bounded": true,
+        "bounded": false,
         "caller_provided_memory": false,
-        "capacity_model": "compile_time",
-        "compile_time_parameters": [],
+        "capacity_model": "unbounded",
+        "compile_time_parameters": [
+          "T"
+        ],
         "hidden_allocation": false,
-        "storage_model": "inline"
+        "storage_model": "caller_owned"
       },
       "selection_priority": "canonical",
       "source": "projects/05-stack/src/stack.zig",
@@ -1371,7 +1390,7 @@
         "preferred_recipes": []
       },
       "construction": {
-        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "initialization": "const state_machine = @import(\"state-machine\");\nconst Machine = state_machine.StateMachine(State, Event, transition);\nvar machine = Machine.init(initial_state);\nconst next = try machine.apply(event);",
         "named_import": "state-machine",
         "primary_symbol": "StateMachine"
       },
@@ -1404,7 +1423,7 @@
           "error": "InvalidTransition",
           "handling": "Handle the error and retain or reject the input according to the canonical operation contract.",
           "meaning": "The requested operation violates the documented state-machine constraints.",
-          "operation": "init, state, canApply, apply"
+          "operation": "apply"
         }
       ],
       "evidence_summary": {
@@ -1435,8 +1454,10 @@
         "construct-bounded-state-machine"
       ],
       "minimal_usage": [
-        "const subject = @import(\"state-machine\");",
-        "std.testing.refAllDeclsRecursive(subject);"
+        "const state_machine = @import(\"state-machine\");",
+        "const Machine = state_machine.StateMachine(State, Event, transition);",
+        "var machine = Machine.init(initial_state);",
+        "const next = try machine.apply(event);"
       ],
       "module": "state-machine",
       "operation_map": {
@@ -1455,7 +1476,11 @@
         "bounded": true,
         "caller_provided_memory": false,
         "capacity_model": "compile_time",
-        "compile_time_parameters": [],
+        "compile_time_parameters": [
+          "State",
+          "Event",
+          "transition"
+        ],
         "hidden_allocation": false,
         "storage_model": "inline"
       },
@@ -1630,7 +1655,7 @@
         "preferred_recipes": []
       },
       "construction": {
-        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "initialization": "const nonzero = @import(\"nonzero-integer\");\nconst NonZeroU32 = nonzero.NonZeroInteger(u32);\nconst value = try NonZeroU32.init(7);\nconst raw = value.get();",
         "named_import": "nonzero-integer",
         "primary_symbol": "NonZeroInteger"
       },
@@ -1663,7 +1688,7 @@
           "error": "ZeroNotAllowed",
           "handling": "Handle the error and retain or reject the input according to the canonical operation contract.",
           "meaning": "The requested operation violates the documented nonzero-integer constraints.",
-          "operation": "init, get"
+          "operation": "init"
         }
       ],
       "evidence_summary": {
@@ -1692,8 +1717,10 @@
       ],
       "matching_recipes": [],
       "minimal_usage": [
-        "const subject = @import(\"nonzero-integer\");",
-        "std.testing.refAllDeclsRecursive(subject);"
+        "const nonzero = @import(\"nonzero-integer\");",
+        "const NonZeroU32 = nonzero.NonZeroInteger(u32);",
+        "const value = try NonZeroU32.init(7);",
+        "const raw = value.get();"
       ],
       "module": "nonzero-integer",
       "operation_map": {
@@ -1710,7 +1737,9 @@
         "bounded": true,
         "caller_provided_memory": false,
         "capacity_model": "compile_time",
-        "compile_time_parameters": [],
+        "compile_time_parameters": [
+          "T"
+        ],
         "hidden_allocation": false,
         "storage_model": "inline"
       },
@@ -1880,7 +1909,7 @@
         "preferred_recipes": []
       },
       "construction": {
-        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "initialization": "const counter_module = @import(\"saturating-counter\");\nvar counter = counter_module.SaturatingCounter(u8, 10).init(8);\ncounter.increment();\nconst value = counter.get();",
         "named_import": "saturating-counter",
         "primary_symbol": "SaturatingCounter"
       },
@@ -1935,8 +1964,10 @@
       ],
       "matching_recipes": [],
       "minimal_usage": [
-        "const subject = @import(\"saturating-counter\");",
-        "std.testing.refAllDeclsRecursive(subject);"
+        "const counter_module = @import(\"saturating-counter\");",
+        "var counter = counter_module.SaturatingCounter(u8, 10).init(8);",
+        "counter.increment();",
+        "const value = counter.get();"
       ],
       "module": "saturating-counter",
       "operation_map": {
@@ -1959,7 +1990,10 @@
         "bounded": true,
         "caller_provided_memory": false,
         "capacity_model": "compile_time",
-        "compile_time_parameters": [],
+        "compile_time_parameters": [
+          "T",
+          "maximum"
+        ],
         "hidden_allocation": false,
         "storage_model": "inline"
       },
@@ -2699,7 +2733,7 @@
         "preferred_recipes": []
       },
       "construction": {
-        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "initialization": "const sequence = @import(\"wrapping-sequence-number\");\nconst Sequence = sequence.WrappingSequenceNumber(u8);\nconst next = Sequence.init(255).next();\nconst raw = next.get();",
         "named_import": "wrapping-sequence-number",
         "primary_symbol": "WrappingSequenceNumber"
       },
@@ -2754,8 +2788,10 @@
       ],
       "matching_recipes": [],
       "minimal_usage": [
-        "const subject = @import(\"wrapping-sequence-number\");",
-        "std.testing.refAllDeclsRecursive(subject);"
+        "const sequence = @import(\"wrapping-sequence-number\");",
+        "const Sequence = sequence.WrappingSequenceNumber(u8);",
+        "const next = Sequence.init(255).next();",
+        "const raw = next.get();"
       ],
       "module": "wrapping-sequence-number",
       "operation_map": {
@@ -2775,7 +2811,9 @@
         "bounded": true,
         "caller_provided_memory": false,
         "capacity_model": "compile_time",
-        "compile_time_parameters": [],
+        "compile_time_parameters": [
+          "T"
+        ],
         "hidden_allocation": false,
         "storage_model": "inline"
       },
@@ -2814,7 +2852,7 @@
         "preferred_recipes": []
       },
       "construction": {
-        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "initialization": "const handles = @import(\"optional-typed-handle\");\nconst Handle = handles.TypedHandle(ResourceTag, u32);\nconst present: handles.OptionalTypedHandle(ResourceTag, u32) = Handle.init(7);\nconst raw = present.?.value();",
         "named_import": "optional-typed-handle",
         "primary_symbol": "TypedHandle"
       },
@@ -2869,8 +2907,10 @@
       ],
       "matching_recipes": [],
       "minimal_usage": [
-        "const subject = @import(\"optional-typed-handle\");",
-        "std.testing.refAllDeclsRecursive(subject);"
+        "const handles = @import(\"optional-typed-handle\");",
+        "const Handle = handles.TypedHandle(ResourceTag, u32);",
+        "const present: handles.OptionalTypedHandle(ResourceTag, u32) = Handle.init(7);",
+        "const raw = present.?.value();"
       ],
       "module": "optional-typed-handle",
       "operation_map": {
@@ -2888,7 +2928,10 @@
         "bounded": true,
         "caller_provided_memory": false,
         "capacity_model": "compile_time",
-        "compile_time_parameters": [],
+        "compile_time_parameters": [
+          "Tag",
+          "Integer"
+        ],
         "hidden_allocation": false,
         "storage_model": "inline"
       },
@@ -2927,7 +2970,7 @@
         "preferred_recipes": []
       },
       "construction": {
-        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "initialization": "const quantities = @import(\"unit-safe-quantity\");\nconst Bytes = quantities.Quantity(BytesTag, usize);\nconst total = Bytes.init(4).add(Bytes.init(8));\nconst raw = total.get();",
         "named_import": "unit-safe-quantity",
         "primary_symbol": "Quantity"
       },
@@ -2982,8 +3025,10 @@
       ],
       "matching_recipes": [],
       "minimal_usage": [
-        "const subject = @import(\"unit-safe-quantity\");",
-        "std.testing.refAllDeclsRecursive(subject);"
+        "const quantities = @import(\"unit-safe-quantity\");",
+        "const Bytes = quantities.Quantity(BytesTag, usize);",
+        "const total = Bytes.init(4).add(Bytes.init(8));",
+        "const raw = total.get();"
       ],
       "module": "unit-safe-quantity",
       "operation_map": {
@@ -3002,7 +3047,10 @@
         "bounded": true,
         "caller_provided_memory": false,
         "capacity_model": "compile_time",
-        "compile_time_parameters": [],
+        "compile_time_parameters": [
+          "Unit",
+          "Scalar"
+        ],
         "hidden_allocation": false,
         "storage_model": "inline"
       },
@@ -3176,7 +3224,7 @@
         "preferred_recipes": []
       },
       "construction": {
-        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "initialization": "const ascii = @import(\"validated-ascii-byte\");\nconst value = try ascii.AsciiByte.init('A');\nconst raw = value.get();",
         "named_import": "validated-ascii-byte",
         "primary_symbol": "AsciiByte"
       },
@@ -3209,7 +3257,7 @@
           "error": "NotAscii",
           "handling": "Handle the error and retain or reject the input according to the canonical operation contract.",
           "meaning": "The requested operation violates the documented validated-ascii-byte constraints.",
-          "operation": "init, get, isDigit, isAlphabetic"
+          "operation": "init"
         }
       ],
       "evidence_summary": {
@@ -3238,8 +3286,9 @@
       ],
       "matching_recipes": [],
       "minimal_usage": [
-        "const subject = @import(\"validated-ascii-byte\");",
-        "std.testing.refAllDeclsRecursive(subject);"
+        "const ascii = @import(\"validated-ascii-byte\");",
+        "const value = try ascii.AsciiByte.init('A');",
+        "const raw = value.get();"
       ],
       "module": "validated-ascii-byte",
       "operation_map": {
@@ -3297,7 +3346,7 @@
         "preferred_recipes": []
       },
       "construction": {
-        "initialization": "std.testing.refAllDeclsRecursive(subject);",
+        "initialization": "const fourcc = @import(\"fourcc-code\");\nconst riff = try fourcc.FourCC.fromString(\"RIFF\");\nconst bytes = riff.asBytes();",
         "named_import": "fourcc-code",
         "primary_symbol": "FourCC"
       },
@@ -3330,7 +3379,7 @@
           "error": "InvalidLength",
           "handling": "Handle the error and retain or reject the input according to the canonical operation contract.",
           "meaning": "The requested operation violates the documented fourcc-code constraints.",
-          "operation": "init, fromString, asBytes, eql"
+          "operation": "fromString"
         }
       ],
       "evidence_summary": {
@@ -3359,8 +3408,9 @@
       ],
       "matching_recipes": [],
       "minimal_usage": [
-        "const subject = @import(\"fourcc-code\");",
-        "std.testing.refAllDeclsRecursive(subject);"
+        "const fourcc = @import(\"fourcc-code\");",
+        "const riff = try fourcc.FourCC.fromString(\"RIFF\");",
+        "const bytes = riff.asBytes();"
       ],
       "module": "fourcc-code",
       "operation_map": {

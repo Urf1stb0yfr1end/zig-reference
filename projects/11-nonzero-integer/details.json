@@ -950,12 +950,14 @@
       "capacity_model": "compile_time",
       "bounded": true,
       "caller_provided_memory": false,
-      "compile_time_parameters": []
+      "compile_time_parameters": [
+        "T"
+      ]
     },
     "construction": {
       "named_import": "nonzero-integer",
       "primary_symbol": "NonZeroInteger",
-      "initialization": "std.testing.refAllDeclsRecursive(subject);"
+      "initialization": "const nonzero = @import(\"nonzero-integer\");\nconst NonZeroU32 = nonzero.NonZeroInteger(u32);\nconst value = try NonZeroU32.init(7);\nconst raw = value.get();"
     },
     "operation_map": {
       "NonZeroInteger": "NonZeroInteger",
@@ -965,7 +967,7 @@
     "error_map": [
       {
         "error": "ZeroNotAllowed",
-        "operation": "init, get",
+        "operation": "init",
         "meaning": "The requested operation violates the documented nonzero-integer constraints.",
         "handling": "Handle the error and retain or reject the input according to the canonical operation contract."
       }
@@ -984,8 +986,10 @@
       "Need behavior outside this module’s documented validated-value responsibility."
     ],
     "minimal_usage": [
-      "const subject = @import(\"nonzero-integer\");",
-      "std.testing.refAllDeclsRecursive(subject);"
+      "const nonzero = @import(\"nonzero-integer\");",
+      "const NonZeroU32 = nonzero.NonZeroInteger(u32);",
+      "const value = try NonZeroU32.init(7);",
+      "const raw = value.get();"
     ],
     "integration_notes": [
       "Use the canonical named import and public operations listed here.",

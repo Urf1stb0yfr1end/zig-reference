@@ -998,12 +998,14 @@
       "capacity_model": "compile_time",
       "bounded": true,
       "caller_provided_memory": false,
-      "compile_time_parameters": []
+      "compile_time_parameters": [
+        "T"
+      ]
     },
     "construction": {
       "named_import": "wrapping-sequence-number",
       "primary_symbol": "WrappingSequenceNumber",
-      "initialization": "std.testing.refAllDeclsRecursive(subject);"
+      "initialization": "const sequence = @import(\"wrapping-sequence-number\");\nconst Sequence = sequence.WrappingSequenceNumber(u8);\nconst next = Sequence.init(255).next();\nconst raw = next.get();"
     },
     "operation_map": {
       "WrappingSequenceNumber": "WrappingSequenceNumber",
@@ -1028,8 +1030,10 @@
       "Need behavior outside this module’s documented numeric-policy responsibility."
     ],
     "minimal_usage": [
-      "const subject = @import(\"wrapping-sequence-number\");",
-      "std.testing.refAllDeclsRecursive(subject);"
+      "const sequence = @import(\"wrapping-sequence-number\");",
+      "const Sequence = sequence.WrappingSequenceNumber(u8);",
+      "const next = Sequence.init(255).next();",
+      "const raw = next.get();"
     ],
     "integration_notes": [
       "Use the canonical named import and public operations listed here.",

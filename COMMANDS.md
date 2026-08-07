@@ -236,12 +236,19 @@ Batch 03 established the prior 37/15 projection, including explicit DynamicArray
 - `zig build test-recipe-trace-morphic-example` tests the 4096-capacity composition.
 - `zig build verify-morphic-trace` runs module unit, external smoke, recipe, and agent checks.
 
-## Developer handoff output (Batch 04)
+## Developer handoff output (Batch 04 repair)
 
-Every repository-changing Codex run maintains this manual, even when only materially established workflow or validation facts change. Serious aggregate developer checks preserve their complete ordinary output and then append `LOCATIONS` followed by a deterministic `MINIMUS` of at most 200 lines. Literal `file://` locations resolve from the active worktree. The following implemented surfaces append this handoff: `python3 tools/query-reference.py agent doctor`, `zig build smoke`, `zig build validate-repository`, `zig build verify-morphic-plan`, and `zig build verify-morphic-trace`. No covered surface creates a diagnostic `.txt` log, so this batch adds no log files.
+Raw `zig build` commands remain implementation surfaces and preserve normal Zig output; they do not claim to append output after Zig's own final Build Summary. Use the single canonical outer driver below for build-backed serious checks. It streams the underlying command's ordinary output, waits for completion, appends exactly one `LOCATIONS` then `MINIMUS` handoff for the invoked outer operation, and preserves the underlying exit status. Direct Agent Fast Path doctor remains a canonical Python surface.
 
-`python3 tools/developer-minimus.py --command COMMAND --summary TEXT [--modules] [--location LABEL=RELATIVE_PATH ...]` is the reusable formatter; a missing location fails nonzero. `PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py` verifies deterministic ordering, existing literal locations, the 200-line bound, preserved doctor output, and exit status.
+| Canonical command | Purpose |
+|---|---|
+| `python3 tools/query-reference.py agent doctor` | Check Agent Fast Path prerequisites and end its JSON output with its own handoff. |
+| `python3 tools/developer-command.py smoke` | Run `zig build smoke --summary all` and append the final aggregate-smoke handoff. |
+| `python3 tools/developer-command.py validate-repository` | Run `zig build validate-repository --summary all` and append the final complete-validation handoff. |
+| `python3 tools/developer-command.py verify-morphic-plan` | Run `zig build verify-morphic-plan --summary all` and append the final plan-verification handoff. |
+| `python3 tools/developer-command.py verify-morphic-trace` | Run `zig build verify-morphic-trace --summary all` and append the final trace-verification handoff. |
+| `PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py` | Test deterministic formatting, ordering, existing locations, doctor output, controlled success/failure, singular handoffs, and exit preservation. |
 
-Agent Fast Path v2 now projects 47 full contracts and 5 partial contracts. Batch 04 migrated ring-buffer, stack, state-machine, nonzero-integer, saturating-counter, wrapping-sequence-number, optional-typed-handle, unit-safe-quantity, validated-ascii-byte, and fourcc-code. The parser/ELF Batch 03 cards were also repaired to remove unrelated physical-page projection residue.
+The implementation prerequisite steps ending in `-checks` and the raw public build steps never emit subordinate Minimus blocks. Agent Fast Path v2 remains 52 contracted modules, 47 full cards, and the five documented partial cards. Batch 04 repair replaced test-only integration snippets with functional public API usage and corrected the promoted cards' semantic projections.
 
-The build graph also exposes implementation prerequisite steps `zig build smoke-checks`, `zig build validate-repository-checks`, `zig build verify-morphic-plan-checks`, and `zig build verify-morphic-trace-checks`. They preserve the pre-handoff checks for dependency ordering; developers should use the corresponding public commands without `-checks` to receive the required appended handoff.
+Raw prerequisite commands are `zig build smoke-checks`, `zig build validate-repository-checks`, `zig build verify-morphic-plan-checks`, and `zig build verify-morphic-trace-checks`. They exist for build-graph composition and deliberately emit no handoff. `python3 tools/developer-minimus.py --command COMMAND --summary TEXT [--status {PASS,FAIL,PARTIAL}] [--failure TEXT] [--next COMMAND] [--modules] [--location LABEL=RELATIVE_PATH ...]` is the internal deterministic formatter used by the doctor and outer driver; developers normally use the canonical surfaces above.

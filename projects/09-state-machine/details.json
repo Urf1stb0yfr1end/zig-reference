@@ -1105,12 +1105,16 @@
       "capacity_model": "compile_time",
       "bounded": true,
       "caller_provided_memory": false,
-      "compile_time_parameters": []
+      "compile_time_parameters": [
+        "State",
+        "Event",
+        "transition"
+      ]
     },
     "construction": {
       "named_import": "state-machine",
       "primary_symbol": "StateMachine",
-      "initialization": "std.testing.refAllDeclsRecursive(subject);"
+      "initialization": "const state_machine = @import(\"state-machine\");\nconst Machine = state_machine.StateMachine(State, Event, transition);\nvar machine = Machine.init(initial_state);\nconst next = try machine.apply(event);"
     },
     "operation_map": {
       "StateMachine": "StateMachine",
@@ -1122,7 +1126,7 @@
     "error_map": [
       {
         "error": "InvalidTransition",
-        "operation": "init, state, canApply, apply",
+        "operation": "apply",
         "meaning": "The requested operation violates the documented state-machine constraints.",
         "handling": "Handle the error and retain or reject the input according to the canonical operation contract."
       }
@@ -1141,8 +1145,10 @@
       "Need behavior outside this module’s documented control-flow responsibility."
     ],
     "minimal_usage": [
-      "const subject = @import(\"state-machine\");",
-      "std.testing.refAllDeclsRecursive(subject);"
+      "const state_machine = @import(\"state-machine\");",
+      "const Machine = state_machine.StateMachine(State, Event, transition);",
+      "var machine = Machine.init(initial_state);",
+      "const next = try machine.apply(event);"
     ],
     "integration_notes": [
       "Use the canonical named import and public operations listed here.",
