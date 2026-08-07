@@ -1,0 +1,533 @@
+CODEX AGENTIC SNOWBALL BATCH 06 — MORPHIC COMPOSITION
+
+MISSION
+
+Begin the composition era of zig-reference.
+
+The repository now has a complete 52-module Agent Fast Path and a Debug Fast Path. The next job is not to add an arbitrary batch of modules. The next job is to make a real Morphic subsystem consume the existing corpus, identify the smallest genuine capability gap, add only the reusable missing foundations, and leave the repository cheaper for the next system-building agent.
+
+The long-term objective is not to instruct coding agents to prefer zig-reference. It is to make zig-reference the rational first choice for covered engineering because the Cost of Correct Use is lower: less repository archaeology, fewer source reads, fewer guessed commands, fewer wrong implementations, fewer repair loops, less wasted context and compute, and stronger correctness evidence.
+
+The repository should win selection by engineering economics, not by rhetoric.
+
+Guiding loop:
+
+QUERY
+→ SELECT
+→ COMPOSE WHAT IS ALREADY SOLVED
+→ IDENTIFY ONLY THE REAL GAP
+→ IMPLEMENT THE GAP
+→ VALIDATE NARROWLY
+→ REPAIR THROUGH ACCUMULATED KNOWLEDGE
+→ ENCODE REUSABLE TRUTH
+→ VALIDATE THE COMPOSITION
+→ LEAVE THE NEXT AGENT LESS WORK
+
+STARTING STATE
+
+Work in ~/dev/zig-reference.
+Read AGENTS.md first and obey it.
+Read COMMANDS.md before inventing or guessing any command.
+Read docs/agentic-vocabulary.md for project terms.
+Read docs/standards/SNOWBALL_YIELD.md before planning implementation.
+
+Activate the repository environment with:
+
+source .venv/bin/activate
+
+Verify jsonschema imports successfully. If it does not, use the existing tools/requirements.txt workflow. Do not change repository dependencies merely to repair the local environment.
+
+Expected functional baseline:
+
+Zig 0.14.0
+52 contracted modules
+52 full Agent Fast Path modules
+0 partial modules
+Debug Fast Path available
+benchmark-pre-morphic-52 exists as the frozen pre-Morphic historical tag
+
+The frozen tag is historical evidence. Do not move it, recreate it, delete it, retag it, or develop on it. Work on the current branch/current main descendant only.
+
+The exact current commit may be newer than the tag because planning/standards documentation may have been added afterward. Record the actual base commit before changing implementation.
+
+Before editing implementation, run at minimum:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+
+If actual state differs materially, inspect and explain the difference before changing anything. Do not force expected counts.
+
+DO NOT START BY BROWSING SOURCE
+
+This batch is itself a pressure test of the Agent Fast Path.
+
+Before broad source inspection:
+
+1. query existing capabilities;
+2. use agent decide/card/compose as applicable;
+3. inspect generated dependency/composition information;
+4. read the smallest sufficient contract view;
+5. open canonical details.json only when the compact projection is insufficient;
+6. open implementation source only when implementation truth is genuinely required.
+
+Do not reward a missing agent-facing fact by silently doing repository archaeology. If ordinary reuse required a source read because the compact/canonical contract did not expose necessary integration truth, record that fact in the Batch 06 report and repair the reusable knowledge surface when justified.
+
+OBJECTIVE 1 — PERSIST THE COMPOSITION-ERA WORKFLOW
+
+Update AGENTS.md concisely so future zero-context agents know that major composition runs must record factual Snowball Yield according to docs/standards/SNOWBALL_YIELD.md.
+
+Do not turn AGENTS.md into a history log. Add only the durable operational rule.
+
+The durable rule should establish that major composition work:
+
+- freezes a requirement/capability map before implementation;
+- classifies what the repository already satisfies versus what is genuinely missing;
+- adds only generally reusable missing foundations as canonical modules/recipes;
+- records actual reuse, new reusable work, diagnostic use, source reads when knowable, and validation;
+- marks unmeasured quantities as unmeasured rather than estimating them;
+- does not convert bookkeeping into universal benchmark claims.
+
+Snowball Yield already exists in docs/agentic-vocabulary.md at the expected baseline. Do not create a duplicate definition. If the current vocabulary differs, reconcile it conservatively with the standard. If this run introduces any other genuinely project-specific formal term, define it in docs/agentic-vocabulary.md. Do not invent terminology merely to sound novel.
+
+OBJECTIVE 2 — MAKE COMMANDS.md CUMULATIVE, NOT BATCH-LOCAL
+
+MANDATORY COMMAND MANUAL RULE
+
+Every Codex run that changes the repository must update COMMANDS.md before completion.
+
+- Add every new runnable command introduced by the run.
+- Update changed commands, arguments, purposes, or validation status.
+- Remove or mark obsolete commands accurately.
+- If the command surface itself did not change, still update COMMANDS.md with the validation/workflow information materially established by this run.
+- Never document a command that does not actually exist.
+- Run:
+  PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+- COMMANDS.md must be current when the run finishes.
+
+This maintenance is cumulative. Do not limit the audit to commands introduced by Batch 06.
+
+Inventory the real current runnable command surfaces, including commands introduced by earlier Agent Fast Path, Debug Fast Path, Developer Minimus, Morphic plan/trace, recipe, validation, and tooling batches. If a real supported command exists but COMMANDS.md currently omits it, add it even though it predates this run. If documentation names an obsolete or nonexistent command, correct it.
+
+Do not manufacture new wrappers merely to make the manual look complete. The command manual follows real command truth.
+
+OBJECTIVE 3 — FREEZE THE MORPHIC HOSTED-RUNTIME REQUIREMENT MAP BEFORE CODING
+
+The concrete system target for this batch is the first real Morphic hosted deterministic runtime composition.
+
+Before implementing anything, create the initial requirement map in the Batch 06 report using docs/standards/SNOWBALL_YIELD.md.
+
+The target behavior is:
+
+- hosted Linux execution under Zig 0.14.0;
+- deterministic behavior from explicit inputs;
+- bounded runtime resources;
+- no hidden allocation after initialization in the canonical deterministic execution path;
+- explicit initialization ordering;
+- deterministic scheduling of a bounded set of runnable work;
+- deterministic caller-controlled time rather than dependence on wall-clock time in canonical tests;
+- a target-neutral console/output boundary with a deterministic capture path for tests;
+- normalized event recording through the existing Morphic trace foundation;
+- resource derivation through the existing Morphic resource-plan foundation;
+- exact repeatability of the canonical hosted run/trace for identical inputs;
+- a composition shape that can later receive a freestanding/RISC-V backend without rewriting target-independent policy.
+
+This is a hosted foundation, not the Linux boot milestone.
+
+Do NOT implement in this batch:
+
+- Alpine boot;
+- QEMU boot orchestration;
+- RISC-V privilege transitions;
+- CSR access;
+- trap entry/exit;
+- SBI calls;
+- FDT parsing merely for future use;
+- UART hardware drivers;
+- VirtIO;
+- networking;
+- a hypervisor;
+- a new language, DSL, framework runtime, daemon, database, embeddings service, or opaque generated state.
+
+Those are later capability gaps. Do not pre-build them just because they will eventually be useful.
+
+OBJECTIVE 4 — QUERY THE CORPUS AND MINIMIZE NEW CODE
+
+Translate the hosted-runtime target into explicit reusable engineering capabilities and constraints.
+
+Use the current agent interface to ask what is already solved.
+
+At minimum investigate existing foundations relevant to:
+
+- bounded resource planning;
+- deterministic event tracing;
+- fixed-capacity storage;
+- priority/order handling;
+- stable handles/identity;
+- state machines;
+- checked arithmetic/bounds;
+- allocation strategy;
+- dependency ordering;
+- output/byte writing;
+- any current recipe that already composes part of the target.
+
+Do not assume the above list requires new modules. It is a search list, not an implementation list.
+
+For every requirement, classify it before implementation as required by docs/standards/SNOWBALL_YIELD.md.
+
+Where an existing module is compatible, reuse it.
+Where an existing module is close but insufficient, prefer a generally useful lower-level improvement only if that improvement preserves existing users and is genuinely reusable.
+Where a thin adapter is sufficient, do not fork the mechanism.
+Where no compatible reusable foundation exists, add the smallest coherent missing capability.
+
+Do not choose a target number of new modules.
+Do not add ten modules because previous batches added ten.
+Do not create modules to make the Snowball Yield numbers look impressive.
+
+The capability graph determines the work.
+
+OBJECTIVE 5 — BUILD THE SMALLEST CORRECT HOSTED MORPHIC RUNTIME FOUNDATION
+
+Implement the smallest composition that satisfies the frozen target.
+
+A likely design may need concepts such as deterministic bounded scheduling, caller-controlled deterministic time, or a target-neutral console boundary, but these are requirements to resolve, not mandatory filenames or APIs. Query first and let existing corpus truth determine whether each requires a new module, a recipe-level adapter, or no new code.
+
+Prefer ordinary Zig:
+
+- structs;
+- functions;
+- explicit allocators;
+- compile-time parameters where they materially simplify specialization;
+- caller-owned storage where appropriate;
+- explicit error unions;
+- explicit state transitions.
+
+Avoid clever metaprogramming, unnecessary dynamic dispatch, private mini-languages, or architectural indirection whose only justification is a hypothetical future target.
+
+The hosted composition must use the existing canonical Morphic resource-plan and deterministic event-trace foundations rather than recreating their behavior.
+
+The deterministic scheduler/runtime behavior must have a clearly stated ordering rule. Equal-priority/equal-time behavior must not depend on hash order, pointer address, OS scheduling, ambient time, allocator placement, or unspecified iteration order.
+
+The canonical deterministic test path must not call real wall-clock time.
+
+The canonical deterministic output path must be capturable and byte-comparable without relying on terminal behavior.
+
+Any allocator-backed initialization must make ownership and cleanup explicit. If the runtime promises no allocation after initialization, test that claim using a mechanism that can actually detect forbidden later allocation rather than documenting the intent only.
+
+OBJECTIVE 6 — NEW REUSABLE FOUNDATIONS MUST ENTER THE SNOWBALL COMPLETE
+
+Every genuinely new reusable module created by this batch must satisfy the repository's normal complete-module standard from the same run.
+
+It must include:
+
+README.md
+MASTERY.md
+DETAILS.md
+details.json
+src implementation/tests
+root build registration
+unit target
+external smoke target
+catalog/index integration
+Agent Fast Path v2 full contract when source truth supports it
+exact ownership/borrowing/invalidation/resource/error semantics
+honest environment constraints
+focused validation
+port contract according to current repository policy
+validation evidence according to current repository policy
+
+Do not intentionally create a new partial Agent Fast Path card as technical debt if the module itself is being declared complete.
+
+If a reusable module cannot be honestly completed, either narrow the module until it can be completed or leave the capability at recipe/project orchestration level and explain why.
+
+OBJECTIVE 7 — CREATE A REAL COMPOSITION RECIPE
+
+Create or extend the canonical Morphic recipe surface so an agent can discover and validate the hosted runtime composition as a composition, not merely as a pile of modules.
+
+The recipe should expose:
+
+- purpose;
+- selected canonical modules;
+- dependency closure;
+- target/environment assumptions;
+- resource assumptions;
+- deterministic ordering rule;
+- initialization sequence;
+- ownership/cleanup boundaries;
+- failure behavior;
+- exact validation command(s);
+- known gaps to the later freestanding/RISC-V target.
+
+Do not duplicate facts the generator can derive. Keep the recipe human-reviewable and machine-discoverable through existing repository conventions.
+
+The canonical hosted example/test should exercise the composition functionally rather than using declaration traversal.
+
+OBJECTIVE 8 — MAKE DETERMINISM OBSERVABLE
+
+Provide a canonical hosted Morphic run or test that produces a normalized event trace using the existing bounded-deterministic-event-trace module.
+
+Run the same deterministic scenario at least twice from the same inputs and prove the normalized trace/output is byte-identical.
+
+The trace should make useful system behavior observable without becoming chatty. Prefer a small sequence such as initialization, runnable selection, deterministic time progression, work completion, and shutdown/idle boundary.
+
+Do not claim cross-target equivalence yet because no new freestanding target is part of this batch.
+
+Record exactly what was compared.
+
+OBJECTIVE 9 — USE THE DEBUG FAST PATH AS THE DEFAULT REPAIR ENTRY
+
+When a failure occurs during this batch:
+
+1. preserve the native error/output;
+2. query the Debug Fast Path before broad debugging when a known symptom may apply;
+3. follow a known diagnostic's repair/evidence path when it matches;
+4. keep unknown failures explicitly unknown;
+5. inspect source only as deeply as needed to understand genuinely new behavior.
+
+If the run discovers a repeatable, generally useful failure mode that deserves durable repair memory, add a ZIGREF diagnostic only when evidence supports a stable meaning and repair path.
+
+Do not add diagnostics merely because an error appeared once.
+Do not replace native Zig errors.
+Do not fabricate a cause.
+
+Any new diagnostic must satisfy current validator, alias, evidence, location, and focused-validation rules.
+
+OBJECTIVE 10 — RECORD SNOWBALL YIELD FACTUALLY
+
+Create:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_06.md
+
+The report must include a `## Snowball Yield` section following docs/standards/SNOWBALL_YIELD.md.
+
+The initial requirement classification must be written before implementation and preserved in a reviewable form. If new requirements are discovered later, mark them as discovered during the run rather than rewriting history.
+
+At minimum record actual names and counts for:
+
+- requirements at start;
+- requirements satisfied by existing canonical modules;
+- requirements satisfied by existing recipes/compositions;
+- missing reusable capabilities at start;
+- project-specific orchestration;
+- out-of-scope requirements;
+- requirements discovered during implementation;
+- existing modules actually reused;
+- existing recipes/compositions actually reused;
+- new reusable modules created;
+- new reusable recipes/compositions created;
+- known diagnostic lookups actually used;
+- unknown diagnostic lookups;
+- new evidenced diagnostics added;
+- source reads required for ordinary reuse when reliably knowable;
+- focused validations executed;
+- aggregate validations executed.
+
+Where deterministic agent command output is relevant, measure exact byte size with ordinary local tooling if useful. Do not estimate tokens from bytes and call them measured tokens.
+
+If token counts, hidden compute, or any other quantity are unavailable, write `unmeasured`.
+
+Do not claim a speedup against an agent without zig-reference. That is a later controlled benchmark using the frozen benchmark-pre-morphic-52 baseline.
+
+The Batch 06 report should make the compounding mechanism inspectable without turning it into marketing copy.
+
+OBJECTIVE 11 — PROTECT PROGRESSIVE DISCLOSURE
+
+Do not make ordinary queries larger merely because the composition report contains more knowledge.
+
+A cold agent should still be able to:
+
+bootstrap
+→ decide
+→ inspect select card
+→ compose
+→ inspect integrate card
+→ validate
+→ diagnose/repair
+
+without loading the Batch 06 report, Snowball Yield history, or long human documentation.
+
+If new module/recipe projections become materially larger, inspect why. Preserve correctness-critical constraints, but do not copy explanatory prose into machine-facing indexes.
+
+The cheapest sufficient representation remains the default.
+
+OBJECTIVE 12 — QUALITY PRESSURE TESTS
+
+For every new module or changed reusable foundation, test the semantics that matter rather than only successful construction.
+
+Relevant tests may include, where applicable:
+
+- zero capacity rejection;
+- full capacity behavior;
+- deterministic tie ordering;
+- sequence/clock overflow;
+- invalid task/handle/state identity;
+- repeated removal/completion;
+- initialization failure atomicity;
+- no post-init allocation claim;
+- output buffer exhaustion;
+- reset/reuse behavior;
+- ownership cleanup;
+- borrowed-view invalidation;
+- deterministic repeated run equality.
+
+Do not add irrelevant tests to satisfy a checklist. Test the actual contract.
+
+OBJECTIVE 13 — KEEP MORPHIC TARGET-INDEPENDENT TRUTH SEPARATE FROM HOSTED ADAPTERS
+
+The hosted runtime is the first executable twin, not the definition of Morphic itself.
+
+Keep target-independent policy and contracts separate from hosted-only mechanisms where the distinction is real.
+
+A later RISC-V backend should be able to replace environment-specific console/clock/machine operations while preserving the same higher-level runtime policy and normalized behavior where the contracts say it should.
+
+Do not prematurely implement the RISC-V side. Merely avoid baking Linux-host assumptions into target-independent code when a clean ordinary boundary is justified now.
+
+OBJECTIVE 14 — DOCUMENT LIMITS HONESTLY
+
+At completion, the report must clearly state what exists and what does not.
+
+A successful Batch 06 means approximately:
+
+- current corpus queried before implementation;
+- first requirement map recorded;
+- existing foundations materially reused;
+- only genuine missing reusable capabilities added;
+- hosted deterministic Morphic runtime composition works;
+- repeat execution is deterministically comparable;
+- new reusable foundations are fully agent-readable and validated;
+- Debug Fast Path used/extended honestly;
+- Snowball Yield recorded factually;
+- COMMANDS.md reconciled cumulatively;
+- repository remains green.
+
+It does NOT mean:
+
+- Morphic boots Linux;
+- Morphic boots Alpine;
+- RISC-V backend exists;
+- hosted and freestanding traces have been proven equivalent;
+- hypervisor exists;
+- the repository has proven a token-speedup benchmark;
+- zig-reference is universally best for every coding task.
+
+Those claims require later evidence.
+
+COMMAND MANUAL AUDIT
+
+Before completion, inspect actual runnable command definitions and reconcile COMMANDS.md.
+
+At minimum ensure currently supported surfaces are represented accurately when they exist:
+
+- Agent Fast Path bootstrap/doctor/decide/card/compose/impact;
+- Debug Fast Path diagnostic/diagnose;
+- generated-agent index/contract validation;
+- Developer Minimus canonical outer operations;
+- Morphic plan and trace verification;
+- current recipe commands;
+- any new hosted Morphic composition command(s);
+- current repository aggregate validation;
+- module unit/smoke command pairs;
+- relevant supporting tool entrypoints.
+
+This list is an audit prompt, not permission to document nonexistent commands.
+
+DEVELOPER MINIMUS
+
+Preserve the established Developer Minimus semantics.
+
+Serious developer-facing aggregate health/smoke/doctor/verification/validation/diagnostic/support flows preserve ordinary output and append exactly one authoritative top-level handoff only after the underlying operation fully finishes:
+
+LOCATIONS
+<small durable clickable file:///absolute/path URIs>
+
+MINIMUS
+status: PASS|FAIL|PARTIAL
+command: ...
+useful counts/boundaries
+material summary/warnings/failure
+exact next command/repair path
+
+Do not emit misleading nested PASS handoffs for prerequisites.
+The final status reflects the outer command.
+Preserve the original exit code.
+Keep output bounded and useful.
+Tiny focused module tests remain excluded.
+
+VALIDATION
+
+Run focused validation as work proceeds. Before completion run every applicable current gate, including at minimum:
+
+zig version
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/validate-agent-contracts.py --self-test
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py
+
+python3 tools/query-reference.py agent doctor
+
+all focused unit/smoke tests for every new or changed module
+all focused recipe/composition tests for the hosted Morphic runtime
+
+python3 tools/developer-command.py smoke
+python3 tools/developer-command.py verify-morphic-plan
+python3 tools/developer-command.py verify-morphic-trace
+python3 tools/developer-command.py validate-repository
+
+git diff --check
+
+Also run any new deterministic repeatability check and any other gate that current AGENTS.md/COMMANDS.md/repository policy requires.
+
+If command names differ in the actual current repository, use the real current command and reconcile COMMANDS.md. Do not create a fake compatibility command merely to satisfy this request.
+
+All repository checks must pass under Zig 0.14.0.
+
+If a validation failure is environmental rather than repository-caused, record the exact failure honestly and do not mark the batch passed.
+
+FINAL REPORT
+
+The Batch 06 report must include:
+
+- actual base and final commit/worktree state;
+- target and scope;
+- frozen requirement map;
+- existing foundations selected and why;
+- important rejected candidates and why when decision-relevant;
+- new reusable capabilities and why they were genuinely missing;
+- hosted Morphic composition architecture;
+- deterministic ordering/time/output rules;
+- ownership/resource behavior;
+- diagnostic/repair behavior encountered;
+- exact validation executed;
+- exact limitations;
+- Snowball Yield record;
+- recommendation for the next smallest Morphic capability frontier.
+
+Do not invent benchmark results.
+Do not claim tokens saved unless an actual token meter supplied the number.
+Do not make language-superiority claims.
+Do not claim the hosted twin proves the future RISC-V implementation.
+
+REPOSITORY HYGIENE
+
+Do not add binaries, caches, databases, build artifacts, logs, screenshots, images, archives, generated fuzz corpora, or opaque state to the repository.
+
+Keep generated committed state text-only and deterministic according to current policy.
+
+Do not modify benchmark-pre-morphic-52.
+Do not begin the formal cold-agent benchmark.
+Do not begin Alpine work.
+Do not begin the RISC-V privileged-machine implementation.
+Do not commit or push.
+
+SUCCESS CONDITION
+
+This batch succeeds when a cold future agent can enter the repository, discover the hosted Morphic runtime composition cheaply, understand which existing foundations it reuses, integrate or extend it without broad archaeology, diagnose known failures through the Debug Fast Path, reproduce its deterministic behavior, and see a factual record of how much engineering was already present versus newly added.
+
+The deeper standard is:
+
+SOLVED ENGINEERING SHOULD BECOME CHEAPER TO REUSE THAN TO REDISCOVER.
+
+Finish only when the repository is clean except for the intended uncommitted Batch 06 changes, every required validation gate has passed, COMMANDS.md is cumulatively current, the report is complete, and the final line printed to the user is exactly:
+
+AGENTIC SNOWBALL BATCH 06 PASSED
