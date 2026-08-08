@@ -26,6 +26,11 @@ var observed_scause: usize = 0;
 var observed_stval: usize = 0;
 var observed_sstatus: usize = 0;
 var trap_count: usize = 0;
+var timer_sepc: usize = 0;
+var timer_scause: usize = 0;
+var timer_sstatus: usize = 0;
+export var timer_trap_count: usize = 0;
+var timer_policy_complete: bool = false;
 
 export fn supervisorTrapEntry() linksection(".text.trap") callconv(.naked) void {
     asm volatile (
@@ -112,13 +117,33 @@ export fn supervisorTrapEntry() linksection(".text.trap") callconv(.naked) void 
 }
 
 export fn recordTrap(frame: *TrapFrame) callconv(.c) void {
-    observed_sepc = frame.sepc;
-    observed_sstatus = frame.sstatus;
-    observed_scause = frame.scause;
-    observed_stval = frame.stval;
-    trap_count += 1;
-    // This policy applies only to the known 32-bit EBREAK probe below.
-    frame.sepc += 4;
+    const interrupt = frame.scause >> 63;
+    const cause = frame.scause & 0x7fff_ffff_ffff_ffff;
+    if (interrupt == 1 and cause == 5) {
+        timer_sepc = frame.sepc;
+        timer_scause = frame.scause;
+        timer_sstatus = frame.sstatus;
+        timer_trap_count += 1;
+        // One shot means both mask STIE and move the firmware timer deadline
+        // to the maximum RV64 value before returning. Interrupt sepc is kept.
+        asm volatile ("li t0, 32; csrc sie, t0" ::: "t0", "memory");
+        _ = sbiCall(0, 0, std.math.maxInt(usize), 0);
+        timer_policy_complete = true;
+        return;
+    }
+    if (interrupt == 0 and cause == 3) {
+        observed_sepc = frame.sepc;
+        observed_sstatus = frame.sstatus;
+        observed_scause = frame.scause;
+        observed_stval = frame.stval;
+        trap_count += 1;
+        // This policy applies only to the known 32-bit EBREAK probe below.
+        frame.sepc += 4;
+        return;
+    }
+    // Unknown traps do not inherit either supported class's resume policy.
+    trap_count = std.math.maxInt(usize);
+    asm volatile ("csrci sstatus, 2" ::: "memory");
 }
 
 comptime {
@@ -150,6 +175,43 @@ comptime {
 }
 
 extern fn trapProbe() callconv(.c) usize;
+
+comptime {
+    asm (
+        \\.global timerProbe
+        \\.global timerWaitBegin
+        \\.global timerWaitEnd
+        \\.type timerProbe,@function
+        \\timerProbe:
+        \\mv t3, sp
+        \\li t0, 0x45678
+        \\li t1, 0x56789
+        \\li a0, 0x6789a
+        \\li t2, 32
+        \\csrs sie, t2
+        \\csrsi sstatus, 2
+        \\timerWaitBegin:
+        \\wfi
+        \\la t2, timer_trap_count
+        \\ld t2, 0(t2)
+        \\beqz t2, timerWaitBegin
+        \\timerWaitEnd:
+        \\csrci sstatus, 2
+        \\li t2, 0x45678
+        \\bne t0, t2, 1f
+        \\li t2, 0x56789
+        \\bne t1, t2, 1f
+        \\li t2, 0x6789a
+        \\bne a0, t2, 1f
+        \\bne sp, t3, 1f
+        \\li a0, 1
+        \\ret
+        \\1: li a0, 0
+        \\ret
+    );
+}
+
+extern fn timerProbe() callconv(.c) usize;
 
 export fn _start() linksection(".text.entry") callconv(.naked) noreturn {
     asm volatile (
@@ -224,6 +286,35 @@ export fn freestandingMain() callconv(.c) noreturn {
         shutdown();
     }
     write("ZIGREF_TRAP_RETURNED\n");
+    const now = asm volatile ("rdtime %[value]"
+        : [value] "=r" (-> usize),
+    );
+    _ = sbiCall(0, 0, now +% 100_000, 0); // Legacy SBI set_timer, RV64 deadline.
+    const timer_registers_preserved = timerProbe() == 1;
+    write("ZIGREF_TIMER_BEGIN\ncount=");
+    write(if (timer_trap_count == 1) "1" else "INVALID");
+    write("\ncause=");
+    writeUsizeHex(timer_scause & 0x7fff_ffff_ffff_ffff);
+    write("\ninterrupt=");
+    write(if (timer_scause >> 63 == 1) "1" else "0");
+    write("\nsepc=");
+    writeUsizeHex(timer_sepc);
+    write("\nsepc_policy=unchanged\npolicy=mask-stie-and-set-timer-max\npolicy_complete=");
+    write(if (timer_policy_complete) "PASS" else "FAIL");
+    write("\nregisters=");
+    write(if (timer_registers_preserved) "PASS" else "FAIL");
+    write("\nstack=");
+    write(if (timer_registers_preserved) "PASS" else "FAIL");
+    write("\nsstatus=");
+    writeUsizeHex(timer_sstatus);
+    write("\nZIGREF_TIMER_END\n");
+    if (timer_trap_count != 1 or timer_scause != (1 << 63) | 5 or
+        !timer_policy_complete or !timer_registers_preserved)
+    {
+        write("ZIGREF_TIMER_FAILURE\n");
+        shutdown();
+    }
+    write("ZIGREF_TIMER_RETURNED\n");
     var output: [128]u8 = undefined;
     var trace: [2048]u8 = undefined;
     const result = morphic.runFake(&output, &trace) catch {

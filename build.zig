@@ -236,6 +236,7 @@ pub fn build(b: *std.Build) void {
             freestanding_module.addImport("morphic-core", recipe_module);
             const freestanding = b.addExecutable(.{ .name = "morphic-freestanding-riscv64", .root_module = freestanding_module });
             freestanding.entry = .disabled;
+            freestanding.root_module.strip = false;
             freestanding.setLinkerScript(b.path("recipes/run-hosted-morphic-runtime/freestanding-riscv64.ld"));
             const install_freestanding = b.addInstallArtifact(freestanding, .{});
             b.step("install-freestanding-riscv64-morphic-runtime", "Build and install the freestanding RISC-V Morphic payload")
