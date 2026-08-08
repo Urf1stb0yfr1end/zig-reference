@@ -234,6 +234,7 @@ pub fn build(b: *std.Build) void {
             const freestanding_target = b.resolveTargetQuery(.{ .cpu_arch = .riscv64, .os_tag = .freestanding, .abi = .none });
             const freestanding_module = b.createModule(.{ .root_source_file = b.path("recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig"), .target = freestanding_target, .optimize = .ReleaseSmall, .code_model = .medium });
             freestanding_module.addImport("morphic-core", recipe_module);
+            freestanding_module.addImport("bounded-deterministic-scheduler", findModule("bounded-deterministic-scheduler", &modules));
             const freestanding = b.addExecutable(.{ .name = "morphic-freestanding-riscv64", .root_module = freestanding_module });
             freestanding.entry = .disabled;
             freestanding.root_module.strip = false;

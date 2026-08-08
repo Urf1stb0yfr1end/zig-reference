@@ -45,16 +45,18 @@
   ],
   "inherited_guarantees": [
     "Fixed resource derivation, stable runnable ordering, caller-controlled time, bounded trace storage, and explicit capacity failures.",
-    "One shared core owns planning, scheduling, tracing, and output formatting; hosted and fake machines provide bounded task output, while the freestanding RISC-V adapter adds entry, stack, transport, shutdown, and panic behavior plus one bounded resumable S-mode breakpoint trap, one bounded asynchronous supervisor timer interrupt, and a separate four-tick bounded monotonic supervisor timer phase around the same shared execution path.",
-    "The synchronous breakpoint alone advances sepc by its ELF-proven 32-bit instruction width. Timer interrupts leave sepc unchanged. The one-shot masks STIE and sets the deadline to maximum; each non-final repeated tick re-arms from newly observed time plus 100000 counter units, and the fourth tick masks STIE and sets the deadline to maximum before sret."
+    "One shared core owns planning, scheduling, tracing, and output formatting; hosted and fake machines provide bounded task output, while the freestanding RISC-V adapter adds entry, stack, transport, shutdown, and panic behavior plus one bounded resumable S-mode breakpoint trap, one bounded asynchronous supervisor timer interrupt, and a separate four-tick bounded monotonic supervisor timer phase around the same shared execution path. A small freestanding-only adapter consumes the four recorded rdtime observations through BoundedDeterministicScheduler.advanceTo after all corresponding sret returns and records bounded readiness/order evidence.",
+    "The synchronous breakpoint alone advances sepc by its ELF-proven 32-bit instruction width. Timer interrupts leave sepc unchanged. The one-shot masks STIE and sets the deadline to maximum; each non-final repeated tick re-arms from newly observed time plus 100000 counter units, and the fourth tick masks STIE and sets the deadline to maximum before sret.",
+    "Scheduler-facing machine time uses the raw RV64 rdtime value as u64 through an identity mapping, so the bridge performs no narrowing or arithmetic; advanceTo retains the scheduler time-reversal rejection and ordering semantics."
   ],
   "gaps_discovered": [
-    "The hosted path still relies on Linux userspace. The freestanding riscv64 path proves one fixed-frame resumable synchronous breakpoint trap, one one-shot supervisor timer interrupt, and one finite four-delivery monotonic repeated-tick phase; indefinite periodic ticking, timekeeping accuracy, preemption, nested traps/interrupts, multiple harts, floating-point/vector context, virtual-memory activation, hardware discovery, and Linux/POSIX/Alpine compatibility remain out of scope or unimplemented."
+    "The hosted path still relies on Linux userspace. The freestanding riscv64 path proves one fixed-frame resumable synchronous breakpoint trap, one one-shot supervisor timer interrupt, one finite four-delivery monotonic repeated-tick phase, and non-preemptive scheduler decisions driven by those observations after sret; indefinite periodic ticking, timekeeping accuracy, preemption, sleeping tasks, clock accuracy, nested traps/interrupts, multiple harts, floating-point/vector context, virtual-memory activation, hardware discovery, and Linux/POSIX/Alpine compatibility remain out of scope or unimplemented."
   ],
   "future_systems_enabled": [
     "hosted runtime experiments",
     "freestanding riscv64 runtime experiments",
-    "later bounded scheduler-facing time-source and machine-boundary work without preemption"
+    "later bounded scheduler-facing time-source and machine-boundary work without preemption",
+    "later non-preemptive timeout orchestration using an explicitly declared counter-unit policy"
   ],
   "intended_build_commands": [
     "zig build run-hosted-morphic-runtime",
@@ -67,7 +69,8 @@
     "python3 tools/verify-freestanding-riscv64-morphic-runtime.py",
     "python3 tools/verify-freestanding-riscv64-supervisor-trap.py",
     "python3 tools/verify-freestanding-riscv64-supervisor-timer.py",
-    "python3 tools/verify-freestanding-riscv64-supervisor-ticks.py"
+    "python3 tools/verify-freestanding-riscv64-supervisor-ticks.py",
+    "python3 tools/verify-freestanding-riscv64-scheduler-time.py"
   ],
   "intended_smoke_commands": [],
   "validation_evidence_references": []

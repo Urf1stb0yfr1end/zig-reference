@@ -1,5 +1,6 @@
 const std = @import("std");
 const morphic = @import("morphic-core");
+const scheduler_module = @import("bounded-deterministic-scheduler");
 
 const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
@@ -465,6 +466,63 @@ export fn freestandingMain() callconv(.c) noreturn {
         shutdown();
     }
     write("ZIGREF_TICKS_RETURNED\n");
+    // This adapter deliberately runs only after ticksProbe has observed all
+    // four returns through sret. It maps the raw rdtime observations directly
+    // to the target-neutral scheduler's u64 time; no conversion or addition
+    // can overflow, and scheduling policy remains in the scheduler module.
+    var scheduler = scheduler_module.BoundedDeterministicScheduler(4).init(tick_observed_time[0]);
+    scheduler.schedule(.{ .id = 1, .ready_at = tick_observed_time[0], .priority = 0 }) catch unreachable;
+    scheduler.schedule(.{ .id = 2, .ready_at = tick_observed_time[1], .priority = 1 }) catch unreachable;
+    scheduler.schedule(.{ .id = 3, .ready_at = tick_observed_time[1], .priority = 1 }) catch unreachable;
+    scheduler.schedule(.{ .id = 4, .ready_at = tick_observed_time[3], .priority = 0 }) catch unreachable;
+    var selected: [4]u32 = [_]u32{0} ** 4;
+    var selected_at: [4]usize = [_]usize{0} ** 4;
+    var selected_count: usize = 0;
+    var ready_counts: [expected_tick_count]usize = [_]usize{0} ** expected_tick_count;
+    for (tick_observed_time, 0..) |machine_time, observation| {
+        scheduler.advanceTo(machine_time) catch {
+            write("ZIGREF_SCHEDULER_TIME_FAILURE\n");
+            shutdown();
+        };
+        while (scheduler.nextReady()) |task| {
+            if (selected_count >= selected.len) {
+                write("ZIGREF_SCHEDULER_TIME_FAILURE\n");
+                shutdown();
+            }
+            selected[selected_count] = task.id;
+            selected_at[selected_count] = observation;
+            selected_count += 1;
+            ready_counts[observation] += 1;
+        }
+    }
+    write("ZIGREF_SCHEDULER_TIME_BEGIN\nobservations=4\nmapping=identity-rdtime-u64\nreturns_before_decisions=");
+    write(if (tick_return_count == expected_tick_count) "4" else "INVALID");
+    write("\nthresholds=");
+    for ([_]usize{ tick_observed_time[0], tick_observed_time[1], tick_observed_time[1], tick_observed_time[3] }, 0..) |value, index| {
+        if (index != 0) write(",");
+        writeUsizeHex(value);
+    }
+    for (tick_observed_time, 0..) |machine_time, index| {
+        write("\nobservation=");
+        writeUsizeHex(index);
+        write(",machine=");
+        writeUsizeHex(machine_time);
+        write(",scheduler=");
+        writeUsizeHex(machine_time);
+        write(",ready_count=");
+        writeUsizeHex(ready_counts[index]);
+        write(",decision_phase=after-sret");
+    }
+    write("\nselected=");
+    for (selected[0..selected_count], 0..) |id, index| {
+        if (index != 0) write(",");
+        writeUsizeHex(id);
+        write("@");
+        writeUsizeHex(selected_at[index]);
+    }
+    write("\nremaining=");
+    writeUsizeHex(scheduler.count());
+    write("\ncomplete=PASS\nZIGREF_SCHEDULER_TIME_END\nZIGREF_SCHEDULER_TIME_RETURNED\n");
     var output: [128]u8 = undefined;
     var trace: [2048]u8 = undefined;
     const result = morphic.runFake(&output, &trace) catch {
