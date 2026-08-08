@@ -181,6 +181,43 @@ The principle may be evaluated with measurements such as new project-specific li
 
 **Less-Lines Paradigm** may be used informally for the broader worldview produced when this principle compounds across a large corpus, but **Less-Lines Principle** is the formal project term.
 
+## 0-to-Done Speed
+
+The elapsed engineering time required to transform a high-level specification into a complete, validated, usable result, including requirement decomposition, discovery, composition, Residual Novelty, repair, and validation.
+
+0-to-Done Speed measures whole-task completion rather than the speed of producing code. A result is not "done" because it compiles, launches, or produces a plausible artifact. "Done" must be tied to explicit acceptance criteria and the validation evidence appropriate to the task.
+
+Conceptually:
+
+```text
+high-level request
+→ decompose requirements
+→ query canonical capabilities
+→ compose what is already solved
+→ identify Residual Novelty
+→ implement the missing remainder
+→ validate declared acceptance criteria
+→ DONE
+```
+
+The long-horizon ambition is that sufficiently mature agents operating over a sufficiently capable Foundation can complete projects that traditionally require large amounts of human implementation within a single bounded agent run. A request as large as "build me an operating system with these specifications" could, in principle, become a rapid composition-and-validation task when most required capability is already canonical and discoverable.
+
+This is not a present claim that arbitrary large systems can be produced in minutes. It is a measurable research target. A valid 0-to-Done benchmark must freeze the requested specification, define "done" before execution, count failed attempts and human intervention, and verify the final artifact against the declared requirements.
+
+0-to-Done Speed is strengthened by the Less-Lines Principle, Reconstruction Coverage, Snowball Yield, low Cost of Correct Use, and low Residual Novelty. The desired relationship is:
+
+```text
+more solved knowledge
+→ less rediscovery and reimplementation
+→ smaller residual novelty
+→ fewer new lines and fewer repair loops
+→ shorter validated 0-to-Done time
+```
+
+The aspirational summary is:
+
+> **0-to-Done is what happens when the agent spends its time assembling solved knowledge instead of reenacting the history required to discover it.**
+
 ## Choice Entropy
 
 The uncertainty created by multiple plausible components, APIs, patterns, or implementations for the same requirement.
