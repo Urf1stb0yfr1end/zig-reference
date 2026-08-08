@@ -27,10 +27,21 @@ def run(command: list[str], *, timeout: int | None = None) -> bytes:
                           stderr=subprocess.STDOUT, timeout=timeout).stdout
 
 
+def symbol_value(table: str, name: str) -> int:
+    matches: list[int] = []
+    for line in table.splitlines():
+        parts = line.split()
+        if len(parts) >= 8 and parts[-1] == name and re.fullmatch(r"[0-9A-Fa-f]+", parts[1]):
+            matches.append(int(parts[1], 16))
+    if len(matches) != 1:
+        raise RuntimeError(f"ELF symbol {name} must appear exactly once")
+    return matches[0]
+
+
 def parse_trap(raw: bytes) -> dict[str, str]:
     if raw.count(TRAP_BEGIN) != 1 or raw.count(TRAP_END) != 1 or raw.count(RETURNED) != 1:
         raise RuntimeError("machine output requires exactly one complete trap record and return marker")
-    before, rest = raw.split(TRAP_BEGIN, 1)
+    _, rest = raw.split(TRAP_BEGIN, 1)
     record, after = rest.split(TRAP_END, 1)
     if RETURNED not in after or b"ZIGREF_MORPHIC_BEGIN" not in after:
         raise RuntimeError("trap return and post-trap Morphic execution are not both evidenced")
@@ -70,6 +81,9 @@ def self_test() -> int:
              b"sstatus=8000000200006000\nregisters=PASS\nstack=PASS\n" + TRAP_END + b"\n" +
              RETURNED + b"\nZIGREF_MORPHIC_BEGIN\n00\nZIGREF_MORPHIC_END\n")
     assert parse_trap(valid)["cause"].endswith("3")
+    symbols = """\n    21: 0000000080201234     0 NOTYPE  GLOBAL DEFAULT    1 trapProbeBreakpoint\n    22: 0000000080201238     0 NOTYPE  GLOBAL DEFAULT    1 trapProbeResume\n"""
+    assert symbol_value(symbols, "trapProbeBreakpoint") == 0x80201234
+    assert symbol_value(symbols, "trapProbeResume") - symbol_value(symbols, "trapProbeBreakpoint") == 4
     for invalid in (valid.replace(b"count=1", b"count=2"), valid.replace(b"interrupt=0", b"interrupt=1"),
                     valid.replace(RETURNED, b""), valid + TRAP_BEGIN, valid.replace(b"registers=PASS", b"registers=FAIL")):
         try:
@@ -78,7 +92,14 @@ def self_test() -> int:
             pass
         else:
             raise AssertionError("invalid trap evidence was accepted")
-    print("PASS: trap framing, cause, interrupt, resume, preservation, return, and ambiguity rejection")
+    for bad_symbols in (symbols.replace("trapProbeResume", "other"), symbols + symbols.splitlines()[1] + "\n"):
+        try:
+            symbol_value(bad_symbols, "trapProbeBreakpoint") if "other" not in bad_symbols else symbol_value(bad_symbols, "trapProbeResume")
+        except RuntimeError:
+            pass
+        else:
+            raise AssertionError("invalid ELF symbol evidence was accepted")
+    print("PASS: trap framing, cause, interrupt, ELF-anchored resume, preservation, return, and ambiguity rejection")
     return 0
 
 
@@ -100,6 +121,11 @@ def main() -> int:
                 raise RuntimeError("artifact is not a RISC-V executable ELF")
             if morphic_verifier.field(header, "Entry point address") != "0x80200000" or "INTERP" in run([readelf, "-l", str(artifact)]).decode():
                 raise RuntimeError("artifact does not satisfy the static firmware payload identity")
+            symbols = run([readelf, "-Ws", str(artifact)]).decode()
+            breakpoint_pc = symbol_value(symbols, "trapProbeBreakpoint")
+            resume_pc = symbol_value(symbols, "trapProbeResume")
+            if resume_pc - breakpoint_pc != 4:
+                raise RuntimeError("compiled breakpoint/resume symbols do not establish the expected 32-bit instruction boundary")
             native = [run(["zig", "build", "run-hosted-morphic-runtime"]) for _ in range(2)]
             fake = [run(["zig", "build", "run-fake-morphic-runtime"]) for _ in range(2)]
             command = [qemu, "-machine", "virt", "-nographic", "-bios", "default", "-kernel", str(artifact)]
@@ -109,9 +135,11 @@ def main() -> int:
             payloads = [morphic_verifier.extract(value) for value in raw]
             if traps[0] != traps[1]:
                 raise RuntimeError("trap evidence is not deterministic across machine runs")
+            if int(traps[0]["sepc"], 16) != breakpoint_pc:
+                raise RuntimeError("observed sepc does not equal the compiled EBREAK address")
             if not (native[0] == native[1] == fake[0] == fake[1] == payloads[0] == payloads[1]):
                 raise RuntimeError("post-trap canonical Morphic payload comparison failed")
-            print(f"result: PASS: cause=3 interrupt=0 sepc={traps[0]['sepc']} resume_delta=4 registers=PASS stack=PASS", flush=True)
+            print(f"result: PASS: cause=3 interrupt=0 sepc={traps[0]['sepc']} resume=0x{resume_pc:016x} delta=4 registers=PASS stack=PASS", flush=True)
             print(f"result: PASS: trap returned and native/fake/two system-QEMU payloads matched at {len(payloads[0])} bytes", flush=True)
     except (OSError, UnicodeError, subprocess.CalledProcessError, subprocess.TimeoutExpired, RuntimeError) as error:
         print(f"supervisor-trap-execution-lab: FAIL: {error}", file=sys.stderr)
