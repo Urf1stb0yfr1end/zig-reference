@@ -10,6 +10,7 @@
       "evidence_status": "future_analyzer_expectation",
       "expected_condition": "Do not access a returned slice after reset.",
       "focused_validation_command": "zig build test-fixed-bump-allocator",
+      "invariant_id": null,
       "locations": [
         "projects/41-fixed-bump-allocator/details.json",
         "projects/41-fixed-bump-allocator/tests/agent/misuse/bump_use_after_reset.zig",
@@ -35,6 +36,7 @@
       "evidence_status": "tested",
       "expected_condition": "Append requires remaining capacity.",
       "focused_validation_command": "zig build test-bounded-deterministic-event-trace",
+      "invariant_id": "event-trace-capacity",
       "locations": [
         "projects/51-bounded-deterministic-event-trace/details.json",
         "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/full.zig",
@@ -48,7 +50,7 @@
         "trace full"
       ],
       "observed_condition": "Trace Full",
-      "operation": "module contract invariant",
+      "operation": "append",
       "repair_example": "projects/51-bounded-deterministic-event-trace/tests/agent/repair/full_repair.zig",
       "repair_status": "known",
       "repair_strategy": "Choose valid bounds and handle the explicit failure before retrying.",
@@ -61,6 +63,7 @@
       "evidence_status": "tested",
       "expected_condition": "Compile-time capacity must be greater than zero.",
       "focused_validation_command": "zig build test-bounded-deterministic-event-trace",
+      "invariant_id": null,
       "locations": [
         "projects/51-bounded-deterministic-event-trace/details.json",
         "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/invalid_capacity.zig",
@@ -86,6 +89,7 @@
       "evidence_status": "tested",
       "expected_condition": "Caller output must hold the complete canonical rendering.",
       "focused_validation_command": "zig build test-bounded-deterministic-event-trace",
+      "invariant_id": null,
       "locations": [
         "projects/51-bounded-deterministic-event-trace/details.json",
         "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/output_too_small.zig",
@@ -111,6 +115,7 @@
       "evidence_status": "unproven",
       "expected_condition": "Append requires a representable successor sequence.",
       "focused_validation_command": "zig build test-bounded-deterministic-event-trace",
+      "invariant_id": null,
       "locations": [
         "projects/51-bounded-deterministic-event-trace/details.json",
         "projects/51-bounded-deterministic-event-trace/tests/agent/misuse/sequence_exhausted.zig",
@@ -136,6 +141,7 @@
       "evidence_status": "tested",
       "expected_condition": "Release only currently allocated indices.",
       "focused_validation_command": "zig build test-fixed-free-list",
+      "invariant_id": null,
       "locations": [
         "projects/40-fixed-free-list/details.json",
         "projects/40-fixed-free-list/tests/agent/misuse/freelist_double_release.zig",
@@ -162,6 +168,7 @@
       "evidence_status": "tested",
       "expected_condition": "A removed handle cannot remove a value again.",
       "focused_validation_command": "zig build test-fixed-capacity-object-pool",
+      "invariant_id": null,
       "locations": [
         "projects/34-fixed-capacity-object-pool/details.json",
         "projects/34-fixed-capacity-object-pool/tests/agent/misuse/pool_double_release.zig",
@@ -187,6 +194,7 @@
       "evidence_status": "tested",
       "expected_condition": "A handle must not be used after removal or reset.",
       "focused_validation_command": "zig build test-fixed-capacity-object-pool",
+      "invariant_id": null,
       "locations": [
         "projects/34-fixed-capacity-object-pool/details.json",
         "projects/34-fixed-capacity-object-pool/tests/agent/misuse/pool_stale_handle.zig",
@@ -212,6 +220,7 @@
       "evidence_status": "tested",
       "expected_condition": "Insert only when count is below compile-time capacity.",
       "focused_validation_command": "zig build test-fixed-capacity-priority-queue",
+      "invariant_id": null,
       "locations": [
         "projects/42-fixed-capacity-priority-queue/details.json",
         "projects/42-fixed-capacity-priority-queue/tests/agent/misuse/pqueue_capacity.zig",
@@ -238,6 +247,7 @@
       "evidence_status": "tested",
       "expected_condition": "Every size product, alignment, and sum must be representable.",
       "focused_validation_command": "zig build test-bounded-system-resource-plan",
+      "invariant_id": null,
       "locations": [
         "projects/50-bounded-system-resource-plan/details.json",
         "projects/50-bounded-system-resource-plan/tests/agent/misuse/arithmetic_overflow.zig",
@@ -263,6 +273,7 @@
       "evidence_status": "tested",
       "expected_condition": "Initialization dependencies must be acyclic.",
       "focused_validation_command": "zig build test-bounded-system-resource-plan",
+      "invariant_id": null,
       "locations": [
         "projects/50-bounded-system-resource-plan/details.json",
         "projects/50-bounded-system-resource-plan/tests/agent/misuse/initialization_cycle.zig",
@@ -288,6 +299,7 @@
       "evidence_status": "tested",
       "expected_condition": "Page size must be a power of two and declared memory page aligned.",
       "focused_validation_command": "zig build test-bounded-system-resource-plan",
+      "invariant_id": null,
       "locations": [
         "projects/50-bounded-system-resource-plan/details.json",
         "projects/50-bounded-system-resource-plan/tests/agent/misuse/invalid_alignment.zig",
@@ -313,6 +325,7 @@
       "evidence_status": "tested",
       "expected_condition": "All declared capacities and the runtime node count must be nonzero and bounded.",
       "focused_validation_command": "zig build test-bounded-system-resource-plan",
+      "invariant_id": null,
       "locations": [
         "projects/50-bounded-system-resource-plan/details.json",
         "projects/50-bounded-system-resource-plan/tests/agent/misuse/invalid_capacity.zig",
@@ -338,6 +351,7 @@
       "evidence_status": "tested",
       "expected_condition": "Declared memory must cover every page-aligned category.",
       "focused_validation_command": "zig build test-bounded-system-resource-plan",
+      "invariant_id": "resource-plan-memory-bound",
       "locations": [
         "projects/50-bounded-system-resource-plan/details.json",
         "projects/50-bounded-system-resource-plan/tests/agent/misuse/memory_exceeded.zig",
@@ -350,11 +364,38 @@
         "error.MemoryExceeded"
       ],
       "observed_condition": "Memory Exceeded",
-      "operation": "module contract invariant",
+      "operation": "plan",
       "repair_example": "projects/50-bounded-system-resource-plan/tests/agent/repair/memory_exceeded_repair.zig",
       "repair_status": "known",
       "repair_strategy": "Correct the declared bounded configuration, then reconstruct and handle the explicit error result.",
       "violated_rule": "Declared memory must cover every page-aligned category."
+    },
+    "ZIGREF-SCHEDULER-TIME-REVERSED": {
+      "aliases": [],
+      "category": "STATE",
+      "evidence_classification": "runtime_negative_test",
+      "evidence_status": "tested",
+      "expected_condition": "Caller-controlled logical time must not move backward.",
+      "focused_validation_command": "zig build test-bounded-deterministic-scheduler",
+      "invariant_id": "scheduler-time-monotonic",
+      "locations": [
+        "projects/52-bounded-deterministic-scheduler/details.json",
+        "projects/52-bounded-deterministic-scheduler/tests/agent/misuse/time_reversed.zig",
+        "projects/52-bounded-deterministic-scheduler/tests/agent/repair/time_reversed_repair.zig"
+      ],
+      "meaning": "Scheduler Time Reversed",
+      "misuse_fixture": "projects/52-bounded-deterministic-scheduler/tests/agent/misuse/time_reversed.zig",
+      "module": "bounded-deterministic-scheduler",
+      "native_error_aliases": [
+        "error.TimeReversed",
+        "TimeReversed"
+      ],
+      "observed_condition": "Scheduler Time Reversed",
+      "operation": "advanceTo",
+      "repair_example": "projects/52-bounded-deterministic-scheduler/tests/agent/repair/time_reversed_repair.zig",
+      "repair_status": "known",
+      "repair_strategy": "Pass monotonic caller-controlled time and rerun the scheduler test.",
+      "violated_rule": "Caller-controlled logical time must not move backward."
     },
     "ZIGREF-TOPO-CYCLE": {
       "aliases": [
@@ -365,6 +406,7 @@
       "evidence_status": "tested",
       "expected_condition": "The graph must be acyclic for sort to return an order.",
       "focused_validation_command": "zig build test-fixed-capacity-topological-sort",
+      "invariant_id": null,
       "locations": [
         "projects/43-fixed-capacity-topological-sort/details.json",
         "projects/43-fixed-capacity-topological-sort/tests/agent/misuse/topo_cycle.zig",
@@ -391,6 +433,7 @@
       "evidence_status": "tested",
       "expected_condition": "Edge endpoints must be less than node_count.",
       "focused_validation_command": "zig build test-fixed-capacity-topological-sort",
+      "invariant_id": null,
       "locations": [
         "projects/43-fixed-capacity-topological-sort/details.json",
         "projects/43-fixed-capacity-topological-sort/tests/agent/misuse/topo_invalid_vertex.zig",

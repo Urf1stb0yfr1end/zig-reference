@@ -26,6 +26,7 @@ DIAGNOSTIC_METADATA = {
     "ZIGREF-EVENT-TRACE-INVALID-CAPACITY": {"aliases": [], "category": "RESOURCE", "native_error_aliases": ["invalid trace capacity"]},
     "ZIGREF-EVENT-TRACE-OUTPUT-TOO-SMALL": {"aliases": [], "category": "BOUNDS", "native_error_aliases": ["error.OutputTooSmall"]},
     "ZIGREF-EVENT-TRACE-SEQUENCE-EXHAUSTED": {"aliases": [], "category": "ARITH", "native_error_aliases": ["error.SequenceExhausted"]},
+    "ZIGREF-SCHEDULER-TIME-REVERSED": {"aliases": [], "category": "STATE", "native_error_aliases": ["error.TimeReversed", "TimeReversed"]},
 }
 
 def dump(value): return json.dumps(value, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
@@ -61,12 +62,14 @@ def build():
                 item[key]=a[key]
             item["aliases"]=item.pop("search_aliases"); item["capabilities"]=item.pop("capability_ids")
             item["diagnostic_ids"]=sorted(x["id"] for x in a["diagnostics"])
+            item["canonical_invariants"]=a.get("canonical_invariants", [])
             for x in a["capability_ids"]: capabilities.setdefault(x,[]).append(n)
             for x in a["public_symbols"]: symbols.setdefault(x,[]).append(n)
             for x in matching: recipes.setdefault(x,[]).append(n)
             for x in a["diagnostics"]:
                 metadata=DIAGNOSTIC_METADATA.get(x["id"], {"aliases":[],"category":"CONTRACT","native_error_aliases":[]})
-                diagnostics[x["id"]]={"aliases":metadata["aliases"],"category":metadata["category"],"native_error_aliases":metadata["native_error_aliases"],"module":n,"operation":"module contract invariant","meaning":x["title"],"violated_rule":x["violated_rule"],"observed_condition":x["title"],"expected_condition":x["violated_rule"],"evidence_classification":x["fixture_classification"],"evidence_status":x["evidence_status"],"repair_status":"known" if x["repair_strategy"] else "unknown","misuse_fixture":x["fixture"],"repair_example":x["repair_example"],"repair_strategy":x["repair_strategy"],"focused_validation_command":focused[0],"locations":[d["locations"]["details_json"],x["fixture"],x["repair_example"]]}
+                invariant=next((i for i in a.get("canonical_invariants",[]) if i["diagnostic_id"]==x["id"]), None)
+                diagnostics[x["id"]]={"aliases":metadata["aliases"],"category":metadata["category"],"native_error_aliases":metadata["native_error_aliases"],"module":n,"operation":invariant["operation"] if invariant else "module contract invariant","invariant_id":invariant["id"] if invariant else None,"meaning":x["title"],"violated_rule":x["violated_rule"],"observed_condition":x["title"],"expected_condition":x["violated_rule"],"evidence_classification":x["fixture_classification"],"evidence_status":x["evidence_status"],"repair_status":"known" if x["repair_strategy"] else "unknown","misuse_fixture":x["fixture"],"repair_example":x["repair_example"],"repair_strategy":x["repair_strategy"],"focused_validation_command":invariant["focused_validation"] if invariant else focused[0],"locations":[d["locations"]["details_json"],x["fixture"],x["repair_example"]]}
         modules.append(item); deps[n]={"dependencies":direct[n],"status":state}
     modules.sort(key=lambda x:x["id"])
     return {"modules.json":dump(header(modules=modules)),"modules.jsonl":"\n".join(json.dumps(x,sort_keys=True,separators=(",",":")) for x in modules)+"\n",

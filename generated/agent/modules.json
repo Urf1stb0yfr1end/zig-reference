@@ -18,6 +18,7 @@
           "Returned slices borrow inline container storage until mutation or container destruction."
         ]
       },
+      "canonical_invariants": [],
       "capabilities": [
         "bounded-sequence",
         "inline-storage",
@@ -184,6 +185,7 @@
           "immutable []const T returned by constItems() borrowed from DynamicArray-owned allocation; valid until capacity growth, deinit, or removal of the referenced element"
         ]
       },
+      "canonical_invariants": [],
       "capabilities": [
         "growable-sequence",
         "allocator-backed-container"
@@ -343,6 +345,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "ring-buffer"
       ],
@@ -474,6 +477,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "fixed-bit-set",
         "compact-boolean-state"
@@ -621,6 +625,7 @@
           "The reader and returned slices borrow the input byte slice for their entire use."
         ]
       },
+      "canonical_invariants": [],
       "capabilities": [
         "bounded-byte-reading",
         "binary-decoding",
@@ -795,6 +800,7 @@
           "The Stack retains the allocator supplied to init; the allocator must remain valid through deinit."
         ]
       },
+      "canonical_invariants": [],
       "capabilities": [
         "stack"
       ],
@@ -943,6 +949,7 @@
           "The returned slice borrows writer-owned storage until mutation or deinit."
         ]
       },
+      "canonical_invariants": [],
       "capabilities": [
         "owned-byte-writing",
         "explicit-endian-writing",
@@ -1090,6 +1097,7 @@
       ],
       "alternatives": [],
       "borrowing": {},
+      "canonical_invariants": [],
       "capabilities": [
         "fixed-capacity-slot-allocation",
         "bitmap-allocation",
@@ -1254,6 +1262,7 @@
           "Returned pointers borrow table storage until removal, table move, or destruction."
         ]
       },
+      "canonical_invariants": [],
       "capabilities": [
         "stale-handle-rejection",
         "stable-resource-identity",
@@ -1404,6 +1413,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "state-machine"
       ],
@@ -1535,6 +1545,7 @@
       ],
       "alternatives": [],
       "borrowing": {},
+      "canonical_invariants": [],
       "capabilities": [
         "checked-integer-cast",
         "safe-integer-narrowing",
@@ -1677,6 +1688,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "nonzero-integer"
       ],
@@ -1801,6 +1813,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "bounded-integer",
         "validated-scalar"
@@ -1937,6 +1950,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "saturating-counter"
       ],
@@ -2061,6 +2075,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "validated-enum-decoding",
         "integer-tag-validation"
@@ -2196,6 +2211,7 @@
       ],
       "alternatives": [],
       "borrowing": {},
+      "canonical_invariants": [],
       "capabilities": [
         "alignment-validation",
         "checked-align-up",
@@ -2354,6 +2370,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "validated-bit-flags"
       ],
@@ -2475,6 +2492,7 @@
       ],
       "alternatives": [],
       "borrowing": {},
+      "canonical_invariants": [],
       "capabilities": [
         "checked-half-open-range",
         "range-overlap-detection",
@@ -2630,6 +2648,7 @@
       ],
       "alternatives": [],
       "borrowing": {},
+      "canonical_invariants": [],
       "capabilities": [
         "typed-physical-address",
         "typed-virtual-address",
@@ -2788,6 +2807,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "wrapping-sequence-number"
       ],
@@ -2910,6 +2930,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "optional-typed-handle"
       ],
@@ -3032,6 +3053,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "unit-safe-quantity"
       ],
@@ -3151,6 +3173,7 @@
       ],
       "alternatives": [],
       "borrowing": {},
+      "canonical_invariants": [],
       "capabilities": [
         "endian-integer-encoding",
         "endian-integer-decoding",
@@ -3292,6 +3315,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "validated-ascii-byte"
       ],
@@ -3417,6 +3441,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "fourcc-code"
       ],
@@ -3540,6 +3565,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "semantic-version"
       ],
@@ -3655,6 +3681,7 @@
           "Payload values are copied into the selected union field; payload types may themselves contain references."
         ]
       },
+      "canonical_invariants": [],
       "capabilities": [
         "tagged-result"
       ],
@@ -3776,6 +3803,7 @@
           "The source must outlive every returned slice."
         ]
       },
+      "canonical_invariants": [],
       "capabilities": [
         "source-span"
       ],
@@ -3911,6 +3939,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "physical-page-conversion",
         "page-frame-number"
@@ -4061,6 +4090,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "binary-cursor-checkpoint",
         "speculative-parsing"
@@ -4206,6 +4236,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "bounded-sub-reader",
         "binary-region-parsing"
@@ -4348,6 +4379,7 @@
           "payload/value slices and bounded readers borrowed from input bytes; valid no longer than the input byte buffer"
         ]
       },
+      "canonical_invariants": [],
       "capabilities": [
         "length-prefixed-binary-field"
       ],
@@ -4496,6 +4528,7 @@
           "payload/value slices and bounded readers borrowed from input bytes; valid no longer than the input byte buffer"
         ]
       },
+      "canonical_invariants": [],
       "capabilities": [
         "type-length-value-decoder"
       ],
@@ -4643,6 +4676,7 @@
           "Returned mutable slice exclusively borrows initialized buffer storage until invalidated."
         ]
       },
+      "canonical_invariants": [],
       "capabilities": [
         "owned-byte-buffer"
       ],
@@ -4802,6 +4836,7 @@
           "Returned pointer borrows pool storage until removal or reset."
         ]
       },
+      "canonical_invariants": [],
       "capabilities": [
         "bounded-object-storage",
         "stale-handle-rejection"
@@ -4957,6 +4992,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "physical-memory-region-set"
       ],
@@ -5117,6 +5153,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "physical-page-frame-allocator"
       ],
@@ -5265,6 +5302,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "elf64-file-header-parser"
       ],
@@ -5416,6 +5454,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "elf64-program-header-parser"
       ],
@@ -5592,6 +5631,7 @@
           "The list borrows every linked Node; caller keeps list and nodes at stable addresses until removal."
         ]
       },
+      "canonical_invariants": [],
       "capabilities": [
         "intrusive-doubly-linked-list"
       ],
@@ -5734,6 +5774,7 @@
       ],
       "alternatives": [],
       "borrowing": {},
+      "canonical_invariants": [],
       "capabilities": [
         "bounded-slot-allocation",
         "deterministic-slot-reuse"
@@ -5887,6 +5928,7 @@
           "Returned slices borrow the caller-owned backing buffer."
         ]
       },
+      "canonical_invariants": [],
       "capabilities": [
         "aligned-allocation",
         "bounded-allocation",
@@ -6053,6 +6095,7 @@
           "Returned pointer borrows queue storage until mutation."
         ]
       },
+      "canonical_invariants": [],
       "capabilities": [
         "bounded-priority-ordering",
         "stable-priority-ordering"
@@ -6223,6 +6266,7 @@
       ],
       "alternatives": [],
       "borrowing": {},
+      "canonical_invariants": [],
       "capabilities": [
         "bounded-topological-sort",
         "cycle-detection",
@@ -6397,6 +6441,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "sv39-page-table-entry",
         "page-table-entry-validation"
@@ -6537,6 +6582,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "sv39-virtual-address",
         "virtual-address-indexing"
@@ -6677,6 +6723,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "page-table-page-ownership",
         "bounded-page-table-storage"
@@ -6809,6 +6856,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "riscv-sv39-page-table-walker"
       ],
@@ -6950,6 +6998,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "riscv-sfence-vma-invalidation"
       ],
@@ -7082,6 +7131,7 @@
       "borrowing": {
         "borrows": []
       },
+      "canonical_invariants": [],
       "capabilities": [
         "riscv-sv39-page-table-builder"
       ],
@@ -7233,6 +7283,21 @@
       ],
       "alternatives": [],
       "borrowing": {},
+      "canonical_invariants": [
+        {
+          "description": "Required page-aligned storage must not exceed declared total memory.",
+          "diagnostic_id": "ZIGREF-RESOURCE-PLAN-MEMORY-EXCEEDED",
+          "focused_validation": "zig build test-bounded-system-resource-plan",
+          "id": "resource-plan-memory-bound",
+          "observed_relation": {
+            "left": "required_bytes",
+            "relation": "greater_than",
+            "right": "total_memory"
+          },
+          "operation": "plan",
+          "repair": "Increase total_memory or reduce the bounded resource categories."
+        }
+      ],
       "capabilities": [
         "bounded-system-resource-planning",
         "bounded-task-storage",
@@ -7426,6 +7491,21 @@
       ],
       "alternatives": [],
       "borrowing": {},
+      "canonical_invariants": [
+        {
+          "description": "The trace cannot append when its logical count has reached capacity.",
+          "diagnostic_id": "ZIGREF-EVENT-TRACE-FULL",
+          "focused_validation": "zig build test-bounded-deterministic-event-trace",
+          "id": "event-trace-capacity",
+          "observed_relation": {
+            "left": "count",
+            "relation": "greater_than_or_equal",
+            "right": "capacity"
+          },
+          "operation": "append",
+          "repair": "Drain or reset the trace, or increase its compile-time capacity."
+        }
+      ],
       "capabilities": [
         "bounded-deterministic-event-tracing",
         "normalized-event-recording",
@@ -7579,6 +7659,21 @@
       ],
       "alternatives": [],
       "borrowing": {},
+      "canonical_invariants": [
+        {
+          "description": "Caller-controlled logical time must not move backward.",
+          "diagnostic_id": "ZIGREF-SCHEDULER-TIME-REVERSED",
+          "focused_validation": "zig build test-bounded-deterministic-scheduler",
+          "id": "scheduler-time-monotonic",
+          "observed_relation": {
+            "left": "new_time",
+            "relation": "less_than",
+            "right": "current_time"
+          },
+          "operation": "advanceTo",
+          "repair": "Pass a new_time greater than or equal to current_time."
+        }
+      ],
       "capabilities": [
         "bounded-deterministic-scheduling",
         "caller-controlled-time",
@@ -7616,7 +7711,9 @@
         "external_nondeterminism": [],
         "ordering": "Defined by inputs, insertion order, and documented capacity rules."
       },
-      "diagnostic_ids": [],
+      "diagnostic_ids": [
+        "ZIGREF-SCHEDULER-TIME-REVERSED"
+      ],
       "direct_dependencies": [
         "fixed-capacity-priority-queue"
       ],

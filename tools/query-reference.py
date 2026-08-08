@@ -62,7 +62,7 @@ def agent_query(argv):
             if not m.get("borrowing"): unknown.append("borrow obligations are unrepresented beyond the canonical contract's empty projection")
             if not m.get("failure_guarantees"): unknown.append("failure atomicity is unrepresented")
             diagnostics=[{"code":x,"meaning":diagnostic_index[x]["meaning"],"repair":diagnostic_index[x]["repair_strategy"],"validation":diagnostic_index[x]["focused_validation_command"]} for x in m.get("diagnostic_ids",[]) if x in diagnostic_index]
-            return {"identity":{"kind":"module","name":m["module"],"public_symbols":m.get("public_symbols",[]),"construction":m.get("construction",{})},"zig_baseline":"0.14.0","environment":m.get("environment_constraints",{}),"dependency_build_order":m.get("dependency_build_order",[]),"ownership":m.get("ownership",{}),"cleanup":m.get("ownership",{}).get("cleanup","unknown"),"borrowing":m.get("borrowing",{}),"invalidation":m.get("invalidation",{}),"resources":m.get("resource_profile",{}),"state":{"thread_safety":m.get("thread_safety","unknown")},"failures":{"errors":m.get("error_map",[]),"guarantees":m.get("failure_guarantees",[])},"determinism":m.get("determinism",{}),"known_diagnostics":diagnostics,"validation_closure":{"focused":m.get("focused_validation_commands",[]),"aggregate":"python3 tools/developer-command.py validate-repository"},"minimum_useful_locations":[m["details"],m["source"]],"unknowns":unknown}
+            return {"identity":{"kind":"module","name":m["module"],"public_symbols":m.get("public_symbols",[]),"construction":m.get("construction",{})},"zig_baseline":"0.14.0",**({"canonical_invariants":m["canonical_invariants"]} if m.get("canonical_invariants") else {}),"environment":m.get("environment_constraints",{}),"dependency_build_order":m.get("dependency_build_order",[]),"ownership":m.get("ownership",{}),"cleanup":m.get("ownership",{}).get("cleanup","unknown"),"borrowing":m.get("borrowing",{}),"invalidation":m.get("invalidation",{}),"resources":m.get("resource_profile",{}),"state":{"thread_safety":m.get("thread_safety","unknown")},"failures":{"errors":m.get("error_map",[]),"guarantees":m.get("failure_guarantees",[])},"determinism":m.get("determinism",{}),"known_diagnostics":diagnostics,"validation_closure":{"focused":m.get("focused_validation_commands",[]),"aggregate":"python3 tools/developer-command.py validate-repository"},"minimum_useful_locations":[m["details"],m["source"]],"unknowns":unknown}
         if term in by_name:
             answer=module_preflight(by_name[term])
         else:
@@ -118,6 +118,36 @@ def agent_query(argv):
         m=by_name[term]; emit({"status":"ok","query":{"operation":"impact","module":term},"results":{"direct_dependents":m["direct_dependents"],"transitive_dependents":m["transitive_dependents"],"recipes":m["matching_recipes"],"affected_contracts":[by_name[x]["details"] for x in m["transitive_dependents"]],"focused_module_tests":m["focused_validation_commands"],"recipe_tests":[f"zig build test-recipe-{r}" for r in m["matching_recipes"]],"aggregate_validation_commands":["zig build check","zig build test","zig build validate-repository"]},"diagnostics":[]}); return 0
     elif kind == "diagnose":
         values = json.loads((directory / "diagnostics.json").read_text())["diagnostics"]
+        if term == "--capsule":
+            path = ROOT / argv[2] if len(argv) > 2 else None
+            try:
+                capsule = json.loads(path.read_text())
+                required = ("schema_version", "component", "operation", "observed")
+                if not isinstance(capsule, dict) or capsule.get("schema_version") != "1.0.0" or any(k not in capsule for k in required) or not isinstance(capsule["observed"], dict):
+                    raise ValueError("required schema_version, component, operation, and observed fields are missing or invalid")
+            except Exception as exc:
+                emit({"status":"error","query":{"operation":"diagnose","mode":"failure_state_capsule"},"results":[],"diagnostics":[{"code":"ZIGREF-FAILURE-CAPSULE-INVALID","reason":str(exc),"repair":"validate against schemas/failure-state-capsule.schema.json"}]}); return 2
+            module = by_name.get(capsule["component"])
+            matches=[]
+            if module:
+                for invariant in module.get("canonical_invariants",[]):
+                    if invariant["operation"] != capsule["operation"]: continue
+                    relation=invariant["observed_relation"]; observed=capsule["observed"]
+                    if relation["left"] not in observed or relation["right"] not in observed: continue
+                    left,right=observed[relation["left"]],observed[relation["right"]]
+                    established={"less_than":left < right,"greater_than":left > right,"greater_than_or_equal":left >= right}[relation["relation"]]
+                    if established: matches.append(invariant)
+            if len(matches)==1:
+                invariant=matches[0]; diagnostic=values[invariant["diagnostic_id"]]
+                result={"classification":"KNOWN","component":capsule["component"],"operation":capsule["operation"],"invariant":{"id":invariant["id"],"description":invariant["description"]},"evidence":{"observed":capsule["observed"],"relation":invariant["observed_relation"]},"diagnostic":invariant["diagnostic_id"],"repair":invariant["repair"],"focused_validation":invariant["focused_validation"],"minimum_useful_locations":diagnostic["locations"]}
+                emit({"status":"ok","query":{"operation":"diagnose","mode":"failure_state_capsule","path":str(path.relative_to(ROOT))},"results":result,"diagnostics":[]}); return 0
+            missing=[]
+            if module:
+                for invariant in module.get("canonical_invariants",[]):
+                    if invariant["operation"]==capsule["operation"]:
+                        relation=invariant["observed_relation"]
+                        missing += [x for x in (relation["left"],relation["right"]) if x not in capsule["observed"]]
+            emit({"status":"unknown","query":{"operation":"diagnose","mode":"failure_state_capsule","path":str(path.relative_to(ROOT))},"results":{"classification":"UNKNOWN","component":capsule["component"],"operation":capsule["operation"],"missing_observed":sorted(set(missing)),"next":"inspect the failing operation and add only decisive observed values"},"diagnostics":[{"code":"ZIGREF-DIAGNOSIS-UNKNOWN","reason":"capsule evidence does not establish exactly one canonical invariant violation","repair":"preserve the native error and collect the listed decisive state"}]}); return 0
         needle=term.casefold(); ranked=[]
         for code, record in values.items():
             exact=[]; loose=[]

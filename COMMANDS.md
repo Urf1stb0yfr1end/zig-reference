@@ -273,3 +273,14 @@ Batch 06 established these Zig 0.14.0 command surfaces and validated them in thi
 - `zig build verify-hosted-morphic-runtime` validates the hosted recipe and Agent Fast Path contracts.
 
 The raw `zig build verify-hosted-morphic-runtime` step is an implementation surface. The canonical serious outer verification is `python3 tools/developer-command.py verify-hosted-morphic-runtime`, which preserves Zig output and exit status and appends exactly one `LOCATIONS` then `MINIMUS` handoff.
+
+## Invariant-Guided Diagnosis (Batch 08)
+
+Free-text `python3 tools/query-reference.py agent diagnose TERM` remains bounded deterministic candidate discovery; it does not claim causality. Structured diagnosis uses `python3 tools/query-reference.py agent diagnose --capsule PATH`, validates the JSON Failure State Capsule, and returns `KNOWN` only when observed values establish one canonical invariant. Insufficient evidence returns explicit `UNKNOWN`; malformed capsules return nonzero with `ZIGREF-FAILURE-CAPSULE-INVALID`.
+
+| Command | Purpose |
+|---|---|
+| `python3 tools/query-reference.py agent diagnose --capsule PATH` | Diagnose a schema-valid Failure State Capsule from canonical generated invariant truth. |
+| `PYTHONDONTWRITEBYTECODE=1 python3 tools/test-invariant-diagnosis.py` | Validate capsule fixtures, known/unknown/invalid behavior, and byte-repeatability. |
+
+The canonical capsule schema is `schemas/failure-state-capsule.schema.json`. Batch 08 pressure-tested temporal progression, declared resource bounds, and bounded trace capacity without adding a module or recipe; Agent Fast Path remains 53 contracted / 53 full / 0 partial.

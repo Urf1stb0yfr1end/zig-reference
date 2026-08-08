@@ -1,5 +1,13 @@
 {
   "schema_version": "1.0.0",
   "module": "bounded-deterministic-scheduler",
-  "expectations": []
+  "expectations": [
+    {
+      "diagnostic_id": "ZIGREF-SCHEDULER-TIME-REVERSED",
+      "fixture": "projects/52-bounded-deterministic-scheduler/tests/agent/misuse/time_reversed.zig",
+      "classification": "runtime_negative_test",
+      "zig_rejects": false,
+      "repair_example": "projects/52-bounded-deterministic-scheduler/tests/agent/repair/time_reversed_repair.zig"
+    }
+  ]
 }

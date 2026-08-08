@@ -1,0 +1,1 @@
+{"schema_version":"1.0.0","component":"bounded-system-resource-plan","operation":"plan","native_error":"MemoryExceeded","observed":{"required_bytes":8192,"total_memory":4096}}

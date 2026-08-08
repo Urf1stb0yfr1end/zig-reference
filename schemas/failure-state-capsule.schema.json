@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zig-reference.dev/schemas/failure-state-capsule.schema.json",
+  "title": "Failure State Capsule",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "component", "operation", "observed"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "component": {"type": "string", "minLength": 1},
+    "operation": {"type": "string", "minLength": 1},
+    "native_error": {"type": "string", "minLength": 1},
+    "symptom": {"type": "string", "minLength": 1},
+    "observed": {"type": "object", "additionalProperties": {"type": ["integer", "number", "string", "boolean", "null"]}}
+  }
+}

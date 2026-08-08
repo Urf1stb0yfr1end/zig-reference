@@ -134,6 +134,16 @@ def validate_documents(cs):
         if set(expected_by_id) != diagnostic_ids:
             errors.append(f"{name}: fixture expectations disagree with diagnostics")
 
+        invariant_ids = [item["id"] for item in agent.get("canonical_invariants", [])]
+        if len(invariant_ids) != len(set(invariant_ids)):
+            errors.append(f"{name}: duplicate canonical invariant ID")
+        operations = set(agent.get("operation_map", {}).values())
+        for invariant in agent.get("canonical_invariants", []):
+            if invariant["operation"] not in operations:
+                errors.append(f"{name}: invariant references nonexistent operation {invariant['operation']}")
+            if invariant["diagnostic_id"] not in diagnostic_ids:
+                errors.append(f"{name}: invariant references nonexistent diagnostic {invariant['diagnostic_id']}")
+
         for diagnostic in agent["diagnostics"]:
             diagnostic_id = diagnostic["id"]
             if diagnostic_id in seen:
