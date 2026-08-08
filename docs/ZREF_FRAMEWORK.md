@@ -405,6 +405,139 @@ Alpz should understand and host Linux/Alpine-facing contracts without blindly in
 
 ---
 
+# Semantic bridge naming
+
+Avoiding false equivalence must not require throwing away decades of transferable engineering knowledge.
+
+A fresh agent or engineer may already know what Linux `mmap`, `stat`, `epoll`, a VMA, or a process abstraction generally does. Z-Ref should exploit that prior knowledge where it is useful, while preventing the familiar name from silently importing capabilities that Alpz does not possess.
+
+The goal is a **semantic bridge**:
+
+> **Preserve recognizable lineage where that improves knowledge transfer, but mark Alpz-native machinery strongly enough that resemblance can never be mistaken for identity.**
+
+This creates three useful naming cases.
+
+## 1. Exact external contract: preserve the established name
+
+At a compatibility boundary, if the thing being exposed really is the Linux/POSIX/ELF contract, use its established name.
+
+```text
+mmap
+fork
+execve
+epoll
+errno
+/proc
+ELF
+signals
+sockets
+```
+
+The external name tells the agent which contract must be satisfied. Z-Ref separately records whether the implementation status is EXACT, SUBSET, PARTIAL, or otherwise qualified.
+
+## 2. Related Alpz-native machinery: use a bridge name
+
+When an Alpz concept is intentionally analogous to a familiar external concept but is not semantically identical, prefer a distinct Alpz/Z-Ref name that can retain enough of the familiar root to make the relationship obvious.
+
+One possible convention is a `z`-marked cognate where that remains clear:
+
+```text
+Linux mmap     <-> possible Alpz bridge name: zmmap
+Linux stat     <-> possible Alpz bridge name: zstat
+Linux epoll    <-> possible Alpz bridge name: zepoll
+```
+
+These examples are illustrative, not a requirement that every Alpz concept receive a `z` prefix. The naming rule matters more than any particular spelling.
+
+The extra marker performs two jobs at once:
+
+1. **Knowledge transfer.** An engineer or model that already understands `mmap` immediately has a useful conceptual starting point for `zmmap`.
+2. **Semantic quarantine.** The changed name is a warning that Linux assumptions are not automatically Alpz facts.
+
+A one-character distinction can therefore save substantial explanation while preventing substantial confusion.
+
+## 3. No safe correspondence: use a fully Alpz-native name
+
+If a Linux-derived name would create more false assumptions than useful transfer, Z-Ref should prefer a genuinely native name rather than forcing a superficial resemblance.
+
+The objective is not to decorate Linux terms. It is to minimize the translation cost between known engineering concepts and Alpz while preserving semantic honesty.
+
+---
+
+# Machine-readable semantic mappings
+
+Bridge naming must never be left to human intuition alone.
+
+Every externally familiar concept should be able to map explicitly to the Alpz machinery that implements or resembles it.
+
+For example:
+
+```text
+external: linux.mmap
+relation: ADAPTER
+implemented-by:
+  alpz.mapping
+  alpz.address-space
+
+external: linux.process
+relation: ADAPTER
+implemented-by:
+  alpz.task
+  alpz.address-space
+  alpz.handle-table
+
+external: linux.epoll
+relation: ADAPTER
+implemented-by:
+  alpz.readiness-set
+```
+
+If a bridge name is used, the mapping should expose both directions:
+
+```text
+name: alpz.zmmap
+recognizable-analogue: linux.mmap
+relation: ANALOGUE
+inherits-assumptions: none unless explicitly declared
+preserves:
+  page-oriented mapping concept
+  address-space placement concept
+differs:
+  <machine-readable differences>
+unsupported:
+  <machine-readable unsupported semantics>
+```
+
+A Z-Ref implementation should eventually support questions such as:
+
+```text
+zref translate linux.mmap
+zref analogue alpz.zmmap
+zref differences linux.mmap alpz.zmmap
+zref implements linux.mmap
+zref compatibility linux.mmap
+```
+
+Exact command spellings may evolve, but the bidirectional mapping capability should not.
+
+This gives an agent a cheap escalation path. If it knows the conventional concept but not the Alpz implementation, it can cross the semantic bridge instead of beginning from zero. If it knows the Alpz component but needs to understand compatibility obligations, it can cross the bridge in the other direction.
+
+The intended result is **knowledge transmission without semantic leakage**.
+
+A model should be able to think:
+
+```text
+I know what mmap means in Linux.
+Z-Ref tells me which parts of that knowledge transfer to zmmap.
+Z-Ref tells me which parts do not.
+I do not need to relearn the entire concept.
+I also do not get to assume the missing semantics.
+```
+
+This is a core Z-Ref efficiency mechanism, not a cosmetic naming convention.
+
+---
+
 # Canonicality
 
 Z-Ref should make accidental multiplicity expensive.
@@ -523,6 +656,9 @@ What must happen before or after it?
 What resource bounds apply?
 What can fail?
 What external semantics does it implement?
+What familiar concept does it map to, if any?
+Which assumptions from that familiar concept are preserved?
+Which assumptions must not transfer?
 What is partial, unsupported, or unknown?
 What might change if this component changes?
 What focused validator proves the relevant behavior?
@@ -644,6 +780,7 @@ smaller implementation surface
 + explicit invariants
 + explicit rejection conditions
 + explicit compatibility mappings
++ bridge naming for safe knowledge transfer
 + focused validation
 + evidence-backed success
 + constructive memory
@@ -683,21 +820,25 @@ Multiple valid implementations require declared selection rules.
 
 ## 6. No silent semantic borrowing.
 
-External names must not imply unsupported external behavior.
+External names must not imply unsupported external behavior. When an Alpz concept resembles a familiar concept without being identical, the relationship and differences must be explicit.
 
-## 7. No failure without the best available explanation.
+## 7. No wasted prior knowledge.
+
+When a safe semantic relationship exists, Z-Ref should make it cheap to translate between established engineering concepts and Alpz-native machinery rather than forcing agents and engineers to relearn equivalent ideas from zero.
+
+## 8. No failure without the best available explanation.
 
 Failure output should preserve causal context and point toward the smallest useful next investigation.
 
-## 8. No solved problem without asking what should compound.
+## 9. No solved problem without asking what should compound.
 
 Reusable discoveries should become contracts, validators, diagnostics, dependency knowledge, or preventables.
 
-## 9. No compression that outruns truth.
+## 10. No compression that outruns truth.
 
 Task projections may reduce context only while preserving the information required for correct decisions.
 
-## 10. No agent-specific magic required.
+## 11. No agent-specific magic required.
 
 The framework should remain useful to fresh capable agents, independent engineers, and future model families without hidden Alpz-specific prompting.
 
@@ -714,6 +855,9 @@ where that capability is implemented
 which implementation is canonical
 which alternatives are invalid
 which facts govern correctness
+what familiar external concept maps to it
+which prior assumptions safely transfer
+which prior assumptions must be rejected
 what minimum source must be read
 what existing code should be reused
 what may be affected
