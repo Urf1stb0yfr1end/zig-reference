@@ -8,6 +8,8 @@ This is the canonical human-readable inventory of repository operations. Command
 
 ## Fast start
 
+Provision dependency-backed Python validation once with `python3 -m venv .venv && .venv/bin/python -m pip install -r tools/requirements.txt`. Canonical build-backed checks select that interpreter through `python3 tools/python-environment.py`; prior shell activation is not required. `python3 tools/python-environment.py --check` fails early with the same repair when the environment or a declared dependency is unusable. `PYTHONDONTWRITEBYTECODE=1 python3 tools/test-python-environment.py` exercises both unactivated success and isolated missing-environment failure.
+
 1. Inspect with `git status --short --branch`.
 2. Validate contracts with the Python and Node contract checkers.
 3. Regenerate indexes with `python3 tools/build-repository-index.py`.
@@ -32,7 +34,7 @@ This is the canonical human-readable inventory of repository operations. Command
 
 | Category | Commands | Status | Source of truth |
 |---|---|---|---|
-| Environment | `zig version`, `python3 --version`, `node --version`, `git status`, `git diff --stat`, `git diff --numstat`, `git diff --check` | Python, Node, Git text-verified; Zig pending | installed tools |
+| Environment | `zig version`, `python3 --version`, `python3 tools/python-environment.py [--check]`, `PYTHONDONTWRITEBYTECODE=1 python3 tools/test-python-environment.py`, `node --version`, `git status`, `git diff --stat`, `git diff --numstat`, `git diff --check` | Python environment selection and regression compiler-executed in Batch 09 | installed tools, `tools/requirements.txt` |
 | Contracts | `python3 tools/module-contract-consistency-checker.py`; `python3 tools/format-module-contracts.py [--check]`; `python3 tools/create-module-contract-template.py --module-id ID --canonical-name NAME [--force]` | Available | tool source |
 | Ports | `node tools/check-port-contracts.js`; `node tools/port-contract-consistency-checker.js`; `node tools/format-port-contracts.js [--check]`; `node tools/generate-port-index.js`; `node tools/create-port-contract.js --module PATH [--force]`; `node tools/portability-smoke-test.js` | Available; execution status is reported separately | tool source, `port.js` |
 | Indexes | `python3 tools/build-repository-index.py [--check]` | Text-verified | `tools/build-repository-index.py` |
@@ -270,6 +272,7 @@ Batch 06 established these Zig 0.14.0 command surfaces and validated them in thi
 - `zig build smoke-bounded-deterministic-scheduler` runs its external-consumer smoke test.
 - `zig build test-recipe-run-hosted-morphic-runtime` checks bounded execution, explicit output exhaustion, and byte repeatability.
 - `zig build run-hosted-morphic-runtime` prints the canonical capturable output followed by its normalized event trace.
+- `zig build run-fake-morphic-runtime` executes the same core through the deterministic bounded fake machine and prints the comparable output and trace.
 - `zig build verify-hosted-morphic-runtime` validates the hosted recipe and Agent Fast Path contracts.
 
 The raw `zig build verify-hosted-morphic-runtime` step is an implementation surface. The canonical serious outer verification is `python3 tools/developer-command.py verify-hosted-morphic-runtime`, which preserves Zig output and exit status and appends exactly one `LOCATIONS` then `MINIMUS` handoff.
