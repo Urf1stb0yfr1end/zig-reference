@@ -9,13 +9,20 @@
     "physical-memory-region-set",
     "physical-page-frame-allocator",
     "distinct-memory-address-types",
-    "physical-page-frame-number-and-address-conversion"
+    "physical-page-frame-number-and-address-conversion",
+    "riscv-sv39-page-table-entry",
+    "riscv-sv39-virtual-address-indexing",
+    "riscv-sv39-page-table-walker",
+    "riscv-sfence-vma-invalidation",
+    "riscv-sv39-page-table-builder",
+    "riscv-page-table-page-owner"
   ],
   "selection_reasons": [
     "The resource planner derives fixed storage and initialization order.",
     "The scheduler owns target-neutral time and runnable ordering policy.",
     "The event trace records normalized bounded behavior.",
-    "The existing physical-region and page-frame modules turn only the eight-page linker-reserved interval into deterministic owned frames; address types and PFN conversion preserve domain and alignment truth."
+    "The existing physical-region and page-frame modules turn only the eight-page linker-reserved interval into deterministic owned frames; address types and PFN conversion preserve domain and alignment truth.",
+    "The freestanding-only owner adapter binds the existing generic Sv39 builder, entry, indexing, walker, and SFENCE.VMA semantics to page-table frames allocated from the linker-owned physical pool."
   ],
   "direct_dependencies": [
     "bounded-system-resource-plan",
@@ -24,7 +31,13 @@
     "physical-memory-region-set",
     "physical-page-frame-allocator",
     "distinct-memory-address-types",
-    "physical-page-frame-number-and-address-conversion"
+    "physical-page-frame-number-and-address-conversion",
+    "riscv-sv39-page-table-entry",
+    "riscv-sv39-virtual-address-indexing",
+    "riscv-sv39-page-table-walker",
+    "riscv-sfence-vma-invalidation",
+    "riscv-sv39-page-table-builder",
+    "riscv-page-table-page-owner"
   ],
   "dependency_order": [
     "fixed-capacity-vector",
@@ -41,7 +54,13 @@
     "validated-enum-decoder",
     "physical-page-frame-number-and-address-conversion",
     "physical-memory-region-set",
-    "physical-page-frame-allocator"
+    "physical-page-frame-allocator",
+    "riscv-sv39-page-table-entry",
+    "riscv-sv39-virtual-address-indexing",
+    "riscv-page-table-page-owner",
+    "riscv-sv39-page-table-walker",
+    "riscv-sfence-vma-invalidation",
+    "riscv-sv39-page-table-builder"
   ],
   "public_endpoints_used": [
     "Planner.plan",
@@ -62,7 +81,13 @@
     "PhysicalPageFrameAllocator.release",
     "PhysicalPageFrameAllocator.freeCount",
     "PhysicalPageFrameAllocator.allocatedCount",
-    "PhysicalPageFrameNumber.toAddress"
+    "PhysicalPageFrameNumber.toAddress",
+    "Entry.leaf",
+    "Builder.init",
+    "Builder.mapPage",
+    "Builder.query",
+    "global",
+    "executeUnsafe"
   ],
   "adapters_required": [
     "recipes/run-hosted-morphic-runtime/src/recipe.zig",
@@ -73,18 +98,20 @@
     "One shared core owns planning, scheduling, tracing, and output formatting; hosted and fake machines provide bounded task output, while the freestanding RISC-V adapter adds entry, stack, transport, shutdown, and panic behavior plus one bounded resumable S-mode breakpoint trap, one bounded asynchronous supervisor timer interrupt, and a separate four-tick bounded monotonic supervisor timer phase around the same shared execution path. A small freestanding-only adapter consumes the four recorded rdtime observations through BoundedDeterministicScheduler.advanceTo after all corresponding sret returns and records bounded readiness/order evidence.",
     "The synchronous breakpoint alone advances sepc by its ELF-proven 32-bit instruction width. Timer interrupts leave sepc unchanged. The one-shot masks STIE and sets the deadline to maximum; each non-final repeated tick re-arms from newly observed time plus 100000 counter units, and the fourth tick masks STIE and sets the deadline to maximum before sret.",
     "Scheduler-facing machine time uses the raw RV64 rdtime value as u64 through an identity mapping, so the bridge performs no narrowing or arithmetic; advanceTo retains the scheduler time-reversal rejection and ordering semantics.",
-    "The freestanding adapter reserves one eight-page, 4096-byte-aligned NOLOAD pool in its ELF, reads the linker bounds and actual satp CSR, registers exactly that interval as usable, and exercises the existing allocator. Direct access is valid only for the mechanically observed Bare mode; this is neither platform RAM discovery nor a production PMM, and Sv39 remains inactive."
+    "The freestanding adapter reserves one eight-page, 4096-byte-aligned NOLOAD pool in its ELF, reads the linker bounds and actual satp CSR, registers exactly that interval as usable, and exercises the existing allocator. Direct access is valid only for the mechanically observed Bare mode; this is neither platform RAM discovery nor a production PMM, and Sv39 remains inactive during that preserved phase; Batch 17 activates it only afterward.",
+    "After the preserved Bare physical-memory phase, four zeroed page-table pages from the same owned pool map the exact page-aligned ELF continuation span with 4 KiB leaves and one bounded non-identity alias; satp installs Sv39 with ASID 0 and the owned root PPN, then the canonical global SFENCE.VMA execution boundary runs before continued Zig and Morphic execution."
   ],
   "gaps_discovered": [
-    "The hosted path still relies on Linux userspace. The freestanding riscv64 path proves one fixed-frame resumable synchronous breakpoint trap, one one-shot supervisor timer interrupt, one finite four-delivery monotonic repeated-tick phase, and non-preemptive scheduler decisions driven by those observations after sret; indefinite periodic ticking, timekeeping accuracy, preemption, sleeping tasks, clock accuracy, nested traps/interrupts, multiple harts, floating-point/vector context, virtual-memory activation, hardware discovery, and Linux/POSIX/Alpine compatibility remain out of scope or unimplemented.",
-    "Physical-memory ownership is limited to the linker-reserved eight-page pool. No DTB/RAM discovery, reclamation, general allocator policy, active Sv39, or virtual mapping is claimed."
+    "The hosted path still relies on Linux userspace. The freestanding riscv64 path proves one fixed-frame resumable synchronous breakpoint trap, one one-shot supervisor timer interrupt, one finite four-delivery monotonic repeated-tick phase, and non-preemptive scheduler decisions driven by those observations after sret; indefinite periodic ticking, timekeeping accuracy, preemption, sleeping tasks, clock accuracy, nested traps/interrupts, multiple harts, floating-point/vector context, hardware discovery, and Linux/POSIX/Alpine compatibility remain out of scope or unimplemented.",
+    "Physical-memory ownership is limited to the linker-reserved eight-page pool. No DTB/RAM discovery, reclamation, general allocator policy, a general VMM, or virtual mapping policy beyond the bounded active-Sv39 proof is claimed."
   ],
   "future_systems_enabled": [
     "hosted runtime experiments",
     "freestanding riscv64 runtime experiments",
     "later bounded scheduler-facing time-source and machine-boundary work without preemption",
     "later non-preemptive timeout orchestration using an explicitly declared counter-unit policy",
-    "later active-Sv39 work using explicitly owned frames rather than guessed platform RAM"
+    "later active-Sv39 work using explicitly owned frames rather than guessed platform RAM",
+    "active Sv39 experiments over the linker-owned pool"
   ],
   "intended_build_commands": [
     "zig build run-hosted-morphic-runtime",
@@ -99,7 +126,8 @@
     "python3 tools/verify-freestanding-riscv64-supervisor-timer.py",
     "python3 tools/verify-freestanding-riscv64-supervisor-ticks.py",
     "python3 tools/verify-freestanding-riscv64-scheduler-time.py",
-    "python3 tools/verify-freestanding-riscv64-physical-memory.py"
+    "python3 tools/verify-freestanding-riscv64-physical-memory.py",
+    "python3 tools/verify-freestanding-riscv64-active-sv39.py"
   ],
   "intended_smoke_commands": [],
   "validation_evidence_references": []

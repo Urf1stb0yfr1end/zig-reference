@@ -6464,7 +6464,8 @@
           "riscv-sv39-page-table-walker"
         ],
         "recipes": [
-          "construct-and-verify-sv39-address-space"
+          "construct-and-verify-sv39-address-space",
+          "run-hosted-morphic-runtime"
         ]
       },
       "composition": {
@@ -6533,7 +6534,8 @@
         "Target paging format is not RISC-V Sv39."
       ],
       "matching_recipes": [
-        "construct-and-verify-sv39-address-space"
+        "construct-and-verify-sv39-address-space",
+        "run-hosted-morphic-runtime"
       ],
       "minimal_usage": [
         "const Entry = @import(\"riscv-sv39-page-table-entry\").Entry;",
@@ -6605,7 +6607,8 @@
           "riscv-sv39-page-table-walker"
         ],
         "recipes": [
-          "construct-and-verify-sv39-address-space"
+          "construct-and-verify-sv39-address-space",
+          "run-hosted-morphic-runtime"
         ]
       },
       "composition": {
@@ -6674,7 +6677,8 @@
         "Target address format is not RISC-V Sv39."
       ],
       "matching_recipes": [
-        "construct-and-verify-sv39-address-space"
+        "construct-and-verify-sv39-address-space",
+        "run-hosted-morphic-runtime"
       ],
       "minimal_usage": [
         "const api = @import(\"riscv-sv39-virtual-address-indexing\");"
@@ -6746,7 +6750,8 @@
           "riscv-sv39-page-table-walker"
         ],
         "recipes": [
-          "construct-and-verify-sv39-address-space"
+          "construct-and-verify-sv39-address-space",
+          "run-hosted-morphic-runtime"
         ]
       },
       "composition": {
@@ -6815,7 +6820,8 @@
         "Unbounded allocation or a non-Sv39 page-table layout is required."
       ],
       "matching_recipes": [
-        "construct-and-verify-sv39-address-space"
+        "construct-and-verify-sv39-address-space",
+        "run-hosted-morphic-runtime"
       ],
       "minimal_usage": [
         "const api = @import(\"riscv-page-table-page-owner\");"
@@ -6877,7 +6883,8 @@
           "riscv-sv39-page-table-builder"
         ],
         "recipes": [
-          "construct-and-verify-sv39-address-space"
+          "construct-and-verify-sv39-address-space",
+          "run-hosted-morphic-runtime"
         ]
       },
       "composition": {
@@ -6957,7 +6964,8 @@
         "Sv39x4, hgatp, full hypervisor, guest-stage translation"
       ],
       "matching_recipes": [
-        "construct-and-verify-sv39-address-space"
+        "construct-and-verify-sv39-address-space",
+        "run-hosted-morphic-runtime"
       ],
       "minimal_usage": [
         "const api = @import(\"riscv-sv39-page-table-walker\");",
@@ -7019,7 +7027,8 @@
           "riscv-sv39-page-table-builder"
         ],
         "recipes": [
-          "construct-and-verify-sv39-address-space"
+          "construct-and-verify-sv39-address-space",
+          "run-hosted-morphic-runtime"
         ]
       },
       "composition": {
@@ -7088,7 +7097,8 @@
         "Sv39x4, hgatp, full hypervisor, guest-stage translation"
       ],
       "matching_recipes": [
-        "construct-and-verify-sv39-address-space"
+        "construct-and-verify-sv39-address-space",
+        "run-hosted-morphic-runtime"
       ],
       "minimal_usage": [
         "const api = @import(\"riscv-sfence-vma-invalidation\");",
@@ -7150,7 +7160,8 @@
       "change_impact": {
         "dependents": [],
         "recipes": [
-          "construct-and-verify-sv39-address-space"
+          "construct-and-verify-sv39-address-space",
+          "run-hosted-morphic-runtime"
         ]
       },
       "composition": {
@@ -7234,7 +7245,8 @@
         "Sv39x4, hgatp, full hypervisor, guest-stage translation"
       ],
       "matching_recipes": [
-        "construct-and-verify-sv39-address-space"
+        "construct-and-verify-sv39-address-space",
+        "run-hosted-morphic-runtime"
       ],
       "minimal_usage": [
         "const api = @import(\"riscv-sv39-page-table-builder\");",

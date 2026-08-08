@@ -239,6 +239,9 @@ pub fn build(b: *std.Build) void {
             freestanding_module.addImport("physical-page-frame-number-and-address-conversion", findModule("physical-page-frame-number-and-address-conversion", &modules));
             freestanding_module.addImport("physical-memory-region-set", findModule("physical-memory-region-set", &modules));
             freestanding_module.addImport("physical-page-frame-allocator", findModule("physical-page-frame-allocator", &modules));
+            freestanding_module.addImport("riscv-sv39-page-table-entry", findModule("riscv-sv39-page-table-entry", &modules));
+            freestanding_module.addImport("riscv-sv39-page-table-builder", findModule("riscv-sv39-page-table-builder", &modules));
+            freestanding_module.addImport("riscv-sfence-vma-invalidation", findModule("riscv-sfence-vma-invalidation", &modules));
             const freestanding = b.addExecutable(.{ .name = "morphic-freestanding-riscv64", .root_module = freestanding_module });
             freestanding.entry = .disabled;
             freestanding.root_module.strip = false;

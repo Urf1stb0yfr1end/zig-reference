@@ -3,6 +3,7 @@ ENTRY(_start)
 
 SECTIONS {
   . = 0x80200000;
+  __image_begin = .;
   .text : {
     *(.text.entry)
     . = ALIGN(4);

@@ -47,7 +47,13 @@
       "distinct-memory-address-types",
       "physical-memory-region-set",
       "physical-page-frame-allocator",
-      "physical-page-frame-number-and-address-conversion"
+      "physical-page-frame-number-and-address-conversion",
+      "riscv-page-table-page-owner",
+      "riscv-sfence-vma-invalidation",
+      "riscv-sv39-page-table-builder",
+      "riscv-sv39-page-table-entry",
+      "riscv-sv39-page-table-walker",
+      "riscv-sv39-virtual-address-indexing"
     ],
     "trace-morphic-example": [
       "bounded-deterministic-event-trace"
