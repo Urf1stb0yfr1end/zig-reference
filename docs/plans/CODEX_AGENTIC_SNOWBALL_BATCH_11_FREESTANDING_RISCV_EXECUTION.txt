@@ -1,0 +1,603 @@
+CODEX AGENTIC SNOWBALL BATCH 11 — FREESTANDING RISC-V EXECUTION
+
+MISSION
+
+Remove Linux userspace from beneath the already-settled Morphic execution path without rewriting Morphic semantics.
+
+Batch 10 proved that the same Morphic runCore can execute as native hosted code, through the deterministic fake machine, and as real riscv64-linux-musl machine code under QEMU user-mode while producing byte-identical canonical output.
+
+Batch 11 must answer the next smaller and harder question:
+
+CAN THE SAME MORPHIC SEMANTIC CORE EXECUTE AS A FREESTANDING RISCV64 PAYLOAD UNDER A CONVENTIONAL SYSTEM EMULATOR, WITH NO LINUX USERSPACE, WHILE PRESERVING THE SAME CANONICAL OBSERVABLE BYTES?
+
+ONE CORE.
+NO LINUX USERSPACE.
+MINIMAL BOOTSTRAP.
+MINIMAL MACHINE/FIRMWARE BOUNDARY.
+MECHANICAL BYTE EVIDENCE.
+NO SECOND SEMANTIC IMPLEMENTATION.
+
+This is not a kernel batch.
+This is not an Alpine batch.
+This is not a hypervisor batch.
+This is the smallest honest pressure that removes the Linux process/runtime layer from the Batch 10 proof.
+
+PREFERRED EXECUTION SHAPE
+
+Prefer a conventional riscv64 system-emulation path using QEMU virt and a small freestanding Zig payload.
+
+A firmware-assisted launch through OpenSBI is explicitly permitted if it is the smallest conventional path available in the environment. In that case OpenSBI is external execution infrastructure, not Morphic semantic truth.
+
+A reasonable target shape is:
+
+QEMU system emulator
+-> conventional RISC-V firmware boundary, if needed
+-> freestanding riscv64 Zig entry/bootstrap
+-> the existing Morphic runCore
+-> bounded output storage
+-> minimal transport of the canonical payload
+-> deterministic shutdown/termination
+
+Do not assume the exact implementation before discovery. If a simpler conventional freestanding path exists in the supplied environment, use it only after recording why it is smaller and equally truthful.
+
+The preferred Zig target is a freestanding riscv64 target such as riscv64-freestanding-none if that is the actual Zig 0.14.0 spelling supported by the toolchain. Discover the real target spelling mechanically; do not force a guessed string from this document.
+
+SCOPE BOUNDARY
+
+Permitted if actually required by the freestanding pressure:
+
+- a tiny freestanding entrypoint;
+- a tiny stack/bootstrap mechanism;
+- a linker script or equivalent build/link placement;
+- a tiny machine/firmware adapter;
+- a minimal ecall wrapper if firmware transport requires it;
+- a minimal output transport;
+- a minimal shutdown/reset path;
+- deterministic framing used only to delimit the canonical Morphic payload from emulator/firmware text;
+- build/test/verifier orchestration;
+- a small reusable primitive only when execution pressure proves it is genuinely reusable and not project-specific glue.
+
+Forbidden unless this batch itself mechanically proves they are unavoidable for the minimal payload:
+
+- Linux kernel or initramfs;
+- Alpine boot;
+- a general-purpose kernel;
+- a hypervisor;
+- H-extension work;
+- VS-mode guest entry;
+- page-table activation;
+- a full SBI library;
+- a broad CSR framework;
+- trap handling framework;
+- interrupt controller support;
+- timer subsystem;
+- FDT parser;
+- PLIC/CLINT framework;
+- VirtIO;
+- filesystem;
+- networking;
+- allocator redesign;
+- multi-hart/SMP support;
+- a universal HAL;
+- a RISC-V copy of scheduler/resource/trace/output semantics.
+
+Do not create a module merely because it will probably be useful in a later hypervisor or kernel batch.
+
+If the entire freestanding boundary can truthfully remain one or two small project-specific files, that is a strong Snowball result.
+
+WORKSPACE BOOTSTRAP
+
+Use the repository checkout supplied to the Codex task.
+Do not assume it lives at ~/dev/zig-reference.
+Do not require a Git remote merely to begin.
+
+1. Resolve the root with git rev-parse --show-toplevel.
+2. cd to that root.
+3. Record root, branch, HEAD, git status, and git remote -v.
+4. Read AGENTS.md first.
+5. Read COMMANDS.md before inventing commands.
+6. Read docs/agentic-vocabulary.md.
+7. Read docs/standards/SNOWBALL_YIELD.md if present.
+8. Read docs/reports/AGENTIC_SNOWBALL_BATCH_10.md.
+9. Read docs/reports/codex-notes.md if present, especially the Batch 10 process/audit notes.
+10. Read the run-hosted-morphic-runtime contract through the Agent Fast Path before broad source reading.
+11. Read preflight for bounded-system-resource-plan, bounded-deterministic-event-trace, and bounded-deterministic-scheduler before opening implementation source.
+
+Synchronization rule:
+
+- If a usable origin exists and the checkout is intended to track current main, run git pull --ff-only origin main before editing.
+- If no remote exists, record that fact and continue from the supplied checkout.
+- Never invent a remote simply to satisfy this request.
+- Before implementation, verify that this exact Batch 11 plan exists in the supplied checkout.
+- If the Batch 11 plan is missing, stop and report the missing artifact rather than reconstructing it from memory.
+
+Use Zig 0.14.0 only.
+Do not move, delete, or repoint benchmark-pre-morphic-52.
+
+EXPECTED STARTING EVIDENCE
+
+Expected after Batch 10 merge commit 334d7ff48480e01bd853dc5a72cea49e07370327 and its follow-up audit note:
+
+- 53 contracted modules;
+- 53 full Agent Fast Path modules;
+- 0 partial modules;
+- one shared Morphic runCore;
+- native hosted/fake canonical equality;
+- real riscv64 Linux userspace execution under qemu-riscv64 established by Batch 10;
+- Batch 10 canonical scenario measured at 765 bytes in its recorded environment;
+- zero target-specific Zig semantic copies added by Batch 10;
+- ordinary repository validation remains independent of QEMU;
+- benchmark-pre-morphic-52 remains frozen.
+
+These are expected baseline facts, not permission to force counts or skip measurement. If the supplied checkout differs, record actual truth.
+
+PHASE 0 — ENVIRONMENT AND SYSTEM-EMULATION GATE
+
+Before editing, inspect at minimum:
+
+zig version
+python3 tools/python-environment.py --check
+python3 tools/query-reference.py agent doctor
+command -v qemu-system-riscv64 || true
+qemu-system-riscv64 --version  # only if present
+command -v qemu-riscv64 || true
+command -v readelf || true
+
+Also discover whether a conventional OpenSBI firmware image is already available if the preferred firmware-assisted path is used. Do not guess its location.
+
+PACKAGE PROVISIONING RULE — EXPLICITLY REPAIRED AFTER BATCH 10
+
+Batch 10 had a process contradiction: the plan said to stop rather than use privileged package installation, while the agent nevertheless provisioned QEMU with apt-get.
+
+For Batch 11, conventional execution-tool provisioning is explicitly allowed under these narrow conditions:
+
+- never use sudo;
+- never request or use user credentials;
+- never add third-party package repositories;
+- never curl/wget and execute opaque binaries or scripts;
+- only use the task environment's ordinary distribution package manager;
+- only install conventional emulator/firmware packages needed for this execution lab, such as the package providing qemu-system-riscv64 and, if justified, OpenSBI;
+- the task environment must already permit the package-manager operation non-interactively without elevation prompts;
+- record exact package names, versions where available, and commands in the Batch 11 report.
+
+This conventional package provisioning is approved for Batch 11 and is not itself a stop condition.
+
+If system-mode RISC-V execution still cannot be established through installed tools or the approved conventional package mechanism, stop and report the external execution blocker. Cross-compilation alone is not PASS.
+
+PHASE 1 — PRACTICE THE SNOWBALL BEFORE DESIGN
+
+Run the smallest useful discovery surfaces first, including:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+python3 tools/query-reference.py agent decide "execute the existing deterministic Morphic runtime as a freestanding riscv64 payload with no Linux userspace and compare its canonical bytes with native execution"
+python3 tools/query-reference.py agent preflight run-hosted-morphic-runtime
+python3 tools/query-reference.py agent preflight bounded-system-resource-plan
+python3 tools/query-reference.py agent preflight bounded-deterministic-event-trace
+python3 tools/query-reference.py agent preflight bounded-deterministic-scheduler
+
+Use capability/compose/search surfaces where current repository grammar supports them. Search the current corpus for existing RISC-V entry, address, page, fence, SBI/ecall, and freestanding-adjacent capabilities before opening broad source or inventing new modules.
+
+Do not guess capability IDs.
+Do not assume an SBI module does or does not exist.
+
+Before implementation changes, create:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_11.md
+
+Freeze requirements using ordinary categories:
+
+- existing module;
+- existing recipe/composition;
+- existing toolchain capability;
+- existing RISC-V capability, if any;
+- missing reusable capability;
+- project-specific bootstrap/glue;
+- external execution dependency;
+- out of scope.
+
+Do not choose a module quota.
+Do not decide in advance that Batch 11 needs a new reusable module.
+
+PHASE 2 — FREEZE THE NATIVE CANONICAL BASELINE
+
+Before changing Morphic semantics or freestanding build behavior:
+
+1. Run native hosted twice.
+2. Run native fake twice.
+3. Capture exact program bytes to files without terminal decoration.
+4. Prove hosted run 1 == hosted run 2 byte-for-byte.
+5. Prove fake run 1 == fake run 2 byte-for-byte.
+6. Prove hosted == fake byte-for-byte.
+7. Record actual current byte count.
+
+If the existing Batch 10 user-mode verifier can run with already-present dependencies, run it as additional regression evidence. Do not provision qemu-user solely to satisfy this optional baseline if it is absent; Batch 11's required external proof is system-mode freestanding execution.
+
+Do not assume 765 bytes. Measure current truth.
+
+If native equality fails, diagnose that before implementing Batch 11.
+
+PHASE 3 — ATTEMPT THE CHEAPEST FREESTANDING COMPILE
+
+The first implementation question is not "what RISC-V subsystem should we build?"
+
+It is:
+
+WHAT IS THE SMALLEST BOUNDARY REQUIRED TO CALL THE EXISTING runCore WITHOUT A LINUX PROCESS?
+
+Attempt to reuse the existing target-neutral Morphic implementation directly.
+
+A target-specific freestanding root may import the same core. It may perform only machine-boundary responsibilities such as:
+
+- establish any required stack/bootstrap;
+- construct or reuse a bounded machine/output buffer;
+- call runCore;
+- transport the resulting canonical bytes;
+- terminate/reset in a deterministic way.
+
+Forbidden:
+
+- copying runCore;
+- copying scheduler policy;
+- copying resource planning;
+- copying trace semantics;
+- copying task ordering;
+- reformatting the canonical Morphic artifact separately for RISC-V;
+- a second canonical scenario encoded in the freestanding root.
+
+If the existing FakeMachine or another current bounded machine can compile freestanding and provide the exact in-memory output boundary, reuse it rather than creating a near-copy.
+
+If a hidden hosted assumption prevents freestanding compilation, classify it before repair:
+
+- stdlib dependence;
+- process/stdout dependence;
+- allocation dependence;
+- panic/runtime dependence;
+- target/configuration issue;
+- architecture-width assumption;
+- other known invariant;
+- unknown.
+
+Repair shared code only when the repair is genuinely target-neutral and evidence-backed.
+
+PHASE 4 — MINIMAL ENTRY, STACK, LINK, TRANSPORT, EXIT
+
+Implement only what the freestanding execution actually requires.
+
+ENTRY / STACK
+
+Discover the actual entry contract of the chosen system-emulation/firmware path. Do not assume Linux process startup.
+
+If the environment/firmware does not establish a usable Zig stack, provide the smallest explicit static stack/bootstrap required to enter ordinary Zig code safely.
+
+Keep startup code tiny and auditable.
+Do not build a generic boot framework.
+
+LINK PLACEMENT
+
+Use a tiny linker script or Zig build configuration only if required by the chosen QEMU/firmware loading contract.
+
+Record the load/entry address and how it was derived from the actual execution environment.
+Do not cargo-cult an address without evidence.
+
+OUTPUT TRANSPORT
+
+The Morphic canonical artifact must remain the output of the existing semantic core.
+
+Firmware/emulator text may appear before or after the program payload. If so, add deterministic transport framing outside the canonical Morphic bytes, for example a short BEGIN marker and END marker, solely so the verifier can mechanically extract the payload.
+
+The verifier must compare the extracted payload bytes exactly against native canonical bytes.
+Do not normalize whitespace, newlines, numbers, or trace content.
+Do not treat visual similarity as equality.
+
+If firmware calls are used for console output, implement the smallest truthful call boundary. Do not build a full SBI abstraction unless current execution pressure actually justifies reusable structure.
+
+EXIT / SHUTDOWN
+
+Prefer a deterministic firmware or emulator-supported shutdown/reset mechanism over hanging forever and relying on a human to kill QEMU.
+
+A timeout may exist as a verifier safety bound, but timeout termination alone should not be treated as successful program completion when a conventional deterministic shutdown path is available.
+
+Record exactly how completion is signaled and how the verifier distinguishes success from failure.
+
+PANIC / FAILURE
+
+Do not silently rely on Linux panic behavior.
+If freestanding Zig requires an explicit panic boundary, make it minimal and deterministic.
+If runCore fails, produce a mechanically distinguishable failure result and ensure the verifier fails.
+
+PHASE 5 — EXECUTE REAL FREESTANDING RISC-V MACHINE CODE
+
+Execute the payload under qemu-system-riscv64 or a justified equivalent conventional system emulator.
+
+Record at minimum:
+
+- exact Zig target;
+- exact build command;
+- exact ELF path;
+- readelf architecture/entry evidence where available;
+- exact qemu-system-riscv64 path and version;
+- exact machine/firmware arguments;
+- firmware path/version when determinable;
+- whether Linux is absent from the execution path;
+- termination mechanism;
+- exit status or equivalent deterministic completion evidence;
+- raw emulator/serial capture path;
+- extracted canonical payload byte count;
+- two-run repeatability.
+
+Run the freestanding payload at least twice.
+
+Mechanically prove:
+
+native hosted == native fake
+freestanding run 1 payload == freestanding run 2 payload
+native hosted == freestanding extracted payload
+
+If the emulator/firmware emits banners, preserve the raw capture as evidence and mechanically extract only the framed Morphic payload. Never pretend the entire serial stream equals native output if it contains firmware framing.
+
+Cross-compilation without execution is not PASS.
+Booting firmware without reaching runCore is not PASS.
+Printing a custom "hello" from the adapter is not PASS.
+The canonical Morphic payload itself must be produced by the same runCore and observed externally.
+
+PHASE 6 — PROVE THE LINUX DEPENDENCY ACTUALLY DISAPPEARED
+
+A reviewer must be able to establish cheaply that the Batch 11 execution does not invoke:
+
+- qemu-riscv64 user-mode as the required Batch 11 path;
+- a Linux guest kernel;
+- an initramfs;
+- a Linux dynamic loader;
+- libc/musl as the freestanding execution environment;
+- host stdout as the payload's direct runtime output mechanism.
+
+The build/verifier may of course run on a Linux host. The claim is about the executed RISC-V payload's runtime environment.
+
+Do not overclaim "bare metal" if OpenSBI or another firmware layer is present. Use precise language such as "freestanding firmware-assisted riscv64 payload under QEMU system emulation" when that is what actually ran.
+
+PHASE 7 — LET PRESSURE DECIDE REUSABLE CAPABILITIES
+
+Permitted outcomes:
+
+A. ZERO NEW REUSABLE MODULES
+A tiny project-specific entry/transport boundary is sufficient. This is an excellent result.
+
+B. SMALL TARGET-NEUTRAL REPAIR
+A hosted assumption in shared Morphic code was exposed. Repair it generically and test native + freestanding behavior.
+
+C. ONE SMALL REUSABLE RISC-V/FIRMWARE PRIMITIVE
+Only when the same primitive is genuinely required in more than one operation or clearly belongs in the existing corpus grammar, and the abstraction can be stated with ordinary engineering semantics.
+
+D. EXPLICIT UNKNOWN / BLOCKER
+If the smallest boundary cannot be established without entering substantially broader boot/privileged work, stop and document the exact missing capability rather than fabricating a framework.
+
+Do not reward the batch for creating modules. Reward it for minimizing new semantic code.
+
+PHASE 8 — AGENT-NATIVE DISCOVERY AND COMMAND TRUTH
+
+Keep repository grammar ordinary:
+
+requirement -> decide/query -> preflight -> build -> execute -> extract -> compare -> validate
+
+Document every real new public command in COMMANDS.md.
+Do not create a second command catalog.
+Do not invent formal vocabulary for entrypoints, stacks, linker scripts, ecalls, firmware, QEMU, or byte extraction.
+
+If a serious developer-facing aggregate verifier is added, it must preserve normal output and append exactly one:
+
+LOCATIONS
+MINIMUS
+
+while preserving exit status.
+
+Raw focused build/run commands need not emit Minimus unless current policy requires it.
+
+COMMANDS.md — MANDATORY CUMULATIVE RULE
+
+Every repository-changing Codex run must leave COMMANDS.md current.
+
+- Add new commands that actually exist.
+- Update changed syntax/purpose.
+- Backfill real supported commands omitted from previous batches when discovered.
+- Remove or mark obsolete claims accurately.
+- Never document nonexistent commands.
+- Never mark an unexecuted command validated.
+- Preserve canonical versus raw command distinctions.
+
+Run:
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+
+PHASE 9 — EXTERNAL INFRASTRUCTURE TRUTH
+
+QEMU and firmware are execution infrastructure.
+They are not Morphic semantic truth.
+
+Do not silently make ordinary validate-repository depend on qemu-system-riscv64/OpenSBI.
+
+A dedicated freestanding execution verifier/profile is preferred.
+If CI coverage is added, provision external tools conventionally and explicitly in that dedicated job/profile.
+
+The report must distinguish:
+
+- what ordinary repository validation proves;
+- what the freestanding execution verifier additionally proves;
+- whether CI itself reproduces the freestanding proof or only normal repository integrity.
+
+Never claim CI covers QEMU system execution unless the workflow actually invokes it.
+
+PHASE 10 — SNOWBALL YIELD
+
+Create/update docs/reports/AGENTIC_SNOWBALL_BATCH_11.md with factual bookkeeping including:
+
+- actual repository root, branch, base commit, and synchronization availability;
+- Zig version;
+- emulator/firmware path and version where available;
+- conventional packages provisioned, if any;
+- frozen requirements;
+- existing modules/recipes reused;
+- existing RISC-V capabilities reused;
+- missing reusable capabilities before and during implementation;
+- new reusable modules/recipes;
+- project-specific bootstrap/glue files;
+- target-specific source files;
+- linker/bootstrap/transport/exit responsibilities;
+- source reads before selection and after preflight;
+- diagnostic lookups and unknowns;
+- exact native output bytes;
+- exact freestanding extracted payload bytes;
+- raw framing/capture behavior;
+- two-run repeatability;
+- native-versus-freestanding equality;
+- focused and aggregate validation;
+- external dependencies;
+- limits/non-claims;
+- the smallest evidence-backed next pressure for Batch 12.
+
+No invented token savings.
+No invented development speedup.
+No hardware-equivalence claims.
+No claim of a kernel, hypervisor, Alpine boot, or bare metal unless the evidence literally proves it.
+
+PHASE 11 — IDENTIFY THE NEXT PRESSURE, DO NOT SWALLOW IT
+
+After the freestanding canonical Morphic payload executes successfully, identify the next smallest missing boundary on the route toward an original RISC-V machine environment.
+
+Candidates may include, based on evidence:
+
+- explicit privilege/CSR state;
+- trap entry and saved state;
+- firmware contract generalization;
+- FDT discovery;
+- timer/interrupt delivery;
+- memory/page-table activation.
+
+Do not implement the next batch merely because time remains.
+Batch 11 ends when freestanding execution and equality are proven.
+
+VALIDATION — FOCUSED FIRST
+
+At minimum where applicable:
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-python-environment.py
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-invariant-diagnosis.py
+PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/validate-agent-contracts.py --self-test
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py
+python3 tools/query-reference.py agent doctor
+
+Also run:
+
+- hosted/fake Morphic recipe tests;
+- native hosted/fake two-run raw-byte comparisons;
+- freestanding build;
+- architecture/entry inspection;
+- real qemu-system-riscv64 execution at least twice;
+- mechanical payload extraction;
+- freestanding two-run raw-byte equality;
+- native-versus-freestanding exact payload equality;
+- focused tests for any new bootstrap/firmware primitive;
+- canonical full repository validation last;
+- git diff --check;
+- final intended-diff review.
+
+Do not mark skipped gates passed.
+
+INDEPENDENT REVIEW ACCEPTANCE
+
+A cold reviewer should be able to verify mechanically:
+
+1. A real freestanding riscv64 artifact was built.
+2. It executed under a conventional RISC-V system emulator.
+3. No Linux userspace or Linux guest kernel supplied the payload runtime.
+4. One Morphic semantic runCore remains.
+5. Native hosted == native fake.
+6. Two freestanding executions produce byte-identical extracted payloads.
+7. The freestanding extracted payload equals the native canonical payload byte-for-byte.
+8. Emulator/firmware framing is mechanically separated rather than normalized by eye.
+9. Entry/stack/link/transport/exit code is narrow and non-semantic.
+10. Any new reusable module was justified by observed pressure rather than future speculation.
+11. COMMANDS.md is cumulatively current.
+12. Ordinary repository validation remains truthful about external emulator coverage.
+13. Full repository validation passes.
+14. benchmark-pre-morphic-52 is unchanged.
+15. Final diff contains only intended Batch 11 work.
+
+STOP CONDITIONS
+
+Stop and report honestly if:
+
+- this Batch 11 plan is missing from the supplied checkout;
+- system-mode riscv64 execution cannot be performed with installed or explicitly approved conventional package tools;
+- only cross-compilation is possible;
+- the only available path requires sudo, credentials, third-party package repositories, or opaque downloads;
+- executing the existing runCore requires a material semantic rewrite;
+- the freestanding payload cannot be mechanically distinguished from firmware/emulator output;
+- deterministic program completion cannot be established without materially broader machine work;
+- a semantic mismatch cannot be causally established;
+- canonical contract truth conflicts with executable behavior and cannot safely be repaired;
+- a pre-existing validation failure cannot be separated from Batch 11 work.
+
+Do NOT stop merely because:
+
+- ~/dev/zig-reference is absent;
+- the supplied checkout is /workspace/zig-reference;
+- origin is absent;
+- the supplied branch is named work or another task branch;
+- qemu-system-riscv64/OpenSBI needs installation through the explicitly approved ordinary package mechanism described above.
+
+COMPLETION STANDARD
+
+Batch 11 passes only when the existing Morphic semantic core executes as a real freestanding riscv64 payload under conventional system emulation with no Linux userspace beneath the payload, and the externally observed canonical Morphic payload is mechanically proven byte-identical to native hosted/fake output across repeated runs.
+
+A firmware-assisted result is valid if described precisely and if firmware framing is kept outside the canonical payload comparison.
+
+Cross-compilation alone is insufficient.
+A custom freestanding hello-world alone is insufficient.
+Firmware boot alone is insufficient.
+A second RISC-V semantic implementation is forbidden.
+
+PUBLICATION — REQUIRED ON PASS
+
+Unlike Batch 10, do not intentionally strand successful work uncommitted.
+
+After all required validation passes:
+
+1. Review git status, git diff --stat, git diff --name-status, and git diff --check.
+2. Do not dump a huge generated diff into the final response.
+3. Commit the intended Batch 11 changes with a clear commit message.
+4. Publish the commit to a suitable task branch and open a pull request against main using the task's available GitHub/Codex publication mechanism.
+5. If the worktree has no configured remote, absence of origin is not by itself a publication blocker; use the normal Codex/GitHub task publication integration if available.
+6. If publication is genuinely unavailable, preserve a local commit and report its exact SHA. Do not discard or redo the implementation.
+7. Never modify benchmark-pre-morphic-52.
+
+The PR body must state:
+
+- exactly what executed;
+- whether firmware was used;
+- whether Linux was absent from the payload runtime;
+- exact emulator/firmware mechanism;
+- native/freestanding byte counts and equality result;
+- new reusable modules/recipes, if any;
+- target-specific bootstrap files;
+- external dependencies/provisioning;
+- important limitations/non-claims;
+- focused and aggregate validation results.
+
+FINAL RESPONSE
+
+On successful publication, report concisely:
+
+branch:
+commit:
+PR:
+freestanding execution:
+byte equality:
+validation:
+
+The final line must be exactly:
+
+AGENTIC SNOWBALL BATCH 11 PASSED
