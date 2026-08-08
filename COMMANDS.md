@@ -274,6 +274,10 @@ Batch 06 established these Zig 0.14.0 command surfaces and validated them in thi
 - `zig build run-hosted-morphic-runtime` prints the canonical capturable output followed by its normalized event trace.
 - `zig build run-fake-morphic-runtime` executes the same core through the deterministic bounded fake machine and prints the comparable output and trace.
 - `zig build verify-hosted-morphic-runtime` validates the hosted recipe and Agent Fast Path contracts.
+- `zig build install-riscv64-morphic-runtime -Dtarget=riscv64-linux-musl --prefix PATH` cross-compiles and installs the same Morphic executable as a static riscv64 Linux userspace artifact at `PATH/bin/run-hosted-morphic-runtime`; it does not execute the artifact.
+- `python3 tools/verify-riscv64-morphic-runtime.py` is the canonical execution-lab verification: it builds that artifact, confirms its RISC-V ELF machine identity with `readelf`, executes native hosted/fake and QEMU riscv64 runs twice, compares all canonical bytes, and appends one Developer Minimus handoff. It requires external `qemu-riscv64` and `readelf` commands and is intentionally not part of ordinary repository validation.
+
+Batch 10 executed the canonical execution-lab verification with QEMU 8.2.2: both native paths and both real riscv64 runs produced the same 765-byte artifact. After validation evidence was refreshed at the supplied base revision, canonical repository validation passed 322/322 steps and 206/206 tests. Ordinary repository validation still does not invoke QEMU.
 
 The raw `zig build verify-hosted-morphic-runtime` step is an implementation surface. The canonical serious outer verification is `python3 tools/developer-command.py verify-hosted-morphic-runtime`, which preserves Zig output and exit status and appends exactly one `LOCATIONS` then `MINIMUS` handoff.
 

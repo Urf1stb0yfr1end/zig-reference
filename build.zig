@@ -228,6 +228,9 @@ pub fn build(b: *std.Build) void {
         recipes_step.dependOn(&run_recipe.step);
         if (std.mem.eql(u8, recipe.name, "run-hosted-morphic-runtime")) {
             const executable = b.addExecutable(.{ .name = "run-hosted-morphic-runtime", .root_module = recipe_module });
+            const install_riscv64 = b.addInstallArtifact(executable, .{});
+            b.step("install-riscv64-morphic-runtime", "Cross-compile and install the Morphic executable selected by -Dtarget")
+                .dependOn(&install_riscv64.step);
             const run_hosted = b.addRunArtifact(executable);
             b.step("run-hosted-morphic-runtime", "Run deterministic hosted Morphic composition").dependOn(&run_hosted.step);
             const fake_module = b.createModule(.{ .root_source_file = b.path("recipes/run-hosted-morphic-runtime/src/fake.zig"), .target = target, .optimize = optimize });
