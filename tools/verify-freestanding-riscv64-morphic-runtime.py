@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Build, inspect, execute, and byte-verify freestanding riscv64 Morphic."""
 
-import shutil
 import binascii
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -23,38 +23,71 @@ def field(text: str, name: str) -> str | None:
     return None
 
 
+def elf_type(text: str) -> str | None:
+    value = field(text, "Type")
+    if value is None:
+        return None
+    return value.split(None, 1)[0]
+
+
 def extract(raw: bytes) -> bytes:
     if raw.count(BEGIN) != 1 or raw.count(END) != 1:
         raise RuntimeError("raw machine output must contain exactly one BEGIN and one END marker")
-    before, payload_and_end = raw.split(BEGIN)
-    payload, after = payload_and_end.split(END)
-    if not before or after.strip():
-        raise RuntimeError("machine output framing is incomplete or has bytes after completion")
+    _, payload_and_end = raw.split(BEGIN, 1)
+    payload, after = payload_and_end.split(END, 1)
+    if after.strip():
+        raise RuntimeError("machine output has bytes after completion")
+    encoded = b"".join(payload.split())
+    if not encoded:
+        raise RuntimeError("framed machine payload is empty")
     try:
-        return binascii.unhexlify(b"".join(payload.split()))
+        return binascii.unhexlify(encoded)
     except (binascii.Error, ValueError) as error:
         raise RuntimeError("framed machine payload is not canonical hexadecimal transport") from error
 
 
 def handoff(status: str, failure: str | None = None) -> int:
-    args = [sys.executable, "tools/developer-minimus.py", "--command", COMMAND,
-            "--status", status, "--summary", "native and two freestanding system-QEMU Morphic payloads compared byte-for-byte",
-            "--location", "recipe=recipes/run-hosted-morphic-runtime/recipe.json",
-            "--location", "report=docs/reports/AGENTIC_SNOWBALL_BATCH_11.md"]
+    args = [
+        sys.executable,
+        "tools/developer-minimus.py",
+        "--command",
+        COMMAND,
+        "--status",
+        status,
+        "--summary",
+        "native and two freestanding system-QEMU Morphic payloads compared byte-for-byte",
+        "--location",
+        "recipe=recipes/run-hosted-morphic-runtime/recipe.json",
+        "--location",
+        "report=docs/reports/AGENTIC_SNOWBALL_BATCH_11.md",
+    ]
     if failure:
         args += ["--failure", failure, "--next", COMMAND]
     return subprocess.call(args, cwd=ROOT)
 
 
 def run(command: list[str], *, timeout: int | None = None) -> bytes:
-    return subprocess.run(command, cwd=ROOT, check=True, stdout=subprocess.PIPE,
-                          stderr=subprocess.STDOUT, timeout=timeout).stdout
+    return subprocess.run(
+        command,
+        cwd=ROOT,
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        timeout=timeout,
+    ).stdout
 
 
 def self_test() -> int:
     assert field(" Machine:\t RISC-V\n", "Machine") == "RISC-V"
+    assert elf_type(" Type:\t EXEC (Executable file)\n") == "EXEC"
+    assert extract(BEGIN + b"7061796c6f61640a\n" + END) == b"payload\n"
     assert extract(b"firmware\n" + BEGIN + b"7061796c6f61640a\n" + END) == b"payload\n"
-    for invalid in (BEGIN + END, b"firmware\n" + BEGIN + b"partial", b"firmware\n" + BEGIN + END + b"extra"):
+    for invalid in (
+        BEGIN + END,
+        b"firmware\n" + BEGIN + b"partial",
+        b"firmware\n" + BEGIN + b"00" + END + b"extra",
+        BEGIN + b"zz" + END,
+    ):
         try:
             extract(invalid)
         except RuntimeError:
@@ -67,7 +100,7 @@ def self_test() -> int:
         pass
     else:
         raise AssertionError("timeout regression did not fail closed")
-    print("PASS: field parsing, framing rejection, and timeout failure path")
+    print("PASS: semantic ELF fields, optional preamble framing, rejection paths, and timeout failure path")
     return 0
 
 
@@ -83,13 +116,17 @@ def main() -> int:
     try:
         with tempfile.TemporaryDirectory(prefix="zigref-freestanding-riscv64-") as prefix:
             print("phase: build riscv64-freestanding-none Morphic payload", flush=True)
-            subprocess.run(["zig", "build", "install-freestanding-riscv64-morphic-runtime", "--prefix", prefix], cwd=ROOT, check=True)
+            subprocess.run(
+                ["zig", "build", "install-freestanding-riscv64-morphic-runtime", "--prefix", prefix],
+                cwd=ROOT,
+                check=True,
+            )
             artifact = Path(prefix) / "bin" / "morphic-freestanding-riscv64"
             header = run([readelf, "-h", str(artifact)]).decode()
-            if field(header, "Machine") != "RISC-V" or field(header, "Type") != "EXEC (Executable file)":
+            if field(header, "Machine") != "RISC-V" or elf_type(header) != "EXEC":
                 raise RuntimeError("artifact is not a RISC-V executable ELF")
             if field(header, "Entry point address") != "0x80200000":
-                raise RuntimeError("artifact entry is not the documented OpenSBI payload address")
+                raise RuntimeError("artifact entry is not the documented QEMU virt firmware payload address")
             program_headers = run([readelf, "-l", str(artifact)]).decode()
             if "INTERP" in program_headers:
                 raise RuntimeError("freestanding artifact unexpectedly has a dynamic interpreter")
@@ -101,8 +138,14 @@ def main() -> int:
             payload = [extract(value) for value in raw]
             if not (native[0] == native[1] == fake[0] == fake[1] == payload[0] == payload[1]):
                 raise RuntimeError("canonical payload byte comparison failed")
-            print(f"result: PASS: native={len(native[0])} freestanding={len(payload[0])} raw={len(raw[0])},{len(raw[1])} bytes", flush=True)
-            print("result: PASS: riscv64-freestanding-none ELF, no INTERP, OpenSBI S-mode, repeatable exact payload", flush=True)
+            print(
+                f"result: PASS: native={len(native[0])} freestanding={len(payload[0])} raw={len(raw[0])},{len(raw[1])} bytes",
+                flush=True,
+            )
+            print(
+                "result: PASS: riscv64-freestanding-none ELF, no INTERP, system-QEMU execution, repeatable exact payload",
+                flush=True,
+            )
     except (OSError, UnicodeError, subprocess.CalledProcessError, subprocess.TimeoutExpired, RuntimeError) as error:
         print(f"freestanding-execution-lab: FAIL: {error}", file=sys.stderr)
         handoff("FAIL", str(error))
