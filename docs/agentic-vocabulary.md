@@ -873,3 +873,159 @@ The project's farthest horizon can therefore be summarized as:
 > **Build almost anything. Rediscover almost nothing.**
 >
 > **One Agent. One Foundation. A New World.**
+
+---
+
+# Compatibility and Transfer Vocabulary
+
+The following terms capture a second long-horizon goal discussed by the project: preserve familiar programming and ecosystem contracts while replacing or reconstructing the machinery underneath them. These are project design terms, not claims that compatibility has already been achieved.
+
+## Pretrained Convention Leverage
+
+The reduction in agent adaptation work obtained by expressing repository concepts through programming conventions that capable coding agents are already likely to understand from training.
+
+Examples include ordinary engineering terms, conventional JSON, standard CLI behavior, familiar exit-status semantics, explicit APIs, normal dependency graphs, stable error identities, and established ownership, state, invariant, and validation concepts.
+
+The principle is not to make Zig imitate another language. Zig remains the implementation language and should be used idiomatically. The leverage comes from avoiding unnecessary private dialects around it.
+
+The intended effect is:
+
+```text
+familiar engineering concepts
++ predictable repository conventions
++ idiomatic Zig
+→ less repository-specific learning
+```
+
+## Novelty Isolation
+
+The design principle that genuinely new project-specific concepts should be introduced only where existing programming practice, standards, or Zig itself do not provide a sufficient answer.
+
+Novelty Isolation keeps experimentation concentrated at the places where it creates real value instead of forcing agents and humans to relearn ordinary concepts under new names.
+
+A useful test is:
+
+> If an established term, interface shape, or convention already communicates the correct meaning, what concrete problem would a new one solve?
+
+## Compatibility Surface
+
+The externally observable behavior that another program, package, library, userspace, or ecosystem depends upon, independent of the internal implementation that provides it.
+
+A Compatibility Surface may include ABI details, syscalls, file semantics, process behavior, signals, memory mapping, sockets, paths, device interfaces, timing rules, error behavior, or other observable contracts.
+
+Compatibility work should target the required surface rather than attempting to clone an implementation line-for-line.
+
+## Substrate Substitution
+
+Replacing a lower implementation layer while preserving the Compatibility Surface expected by the software above it.
+
+For the proposed Alpine/Linux direction, the long-horizon form is:
+
+```text
+Alpine userspace
+→ musl
+→ Linux-compatible userspace contract
+→ new kernel implementation
+```
+
+The internal kernel may be completely different while existing userspace continues to behave as though the expected substrate were present.
+
+The project shorthand for the idea is:
+
+> **Keep the culture. Replace the machinery.**
+
+## Ecosystem Absorption
+
+The progressive ability of a replacement implementation to host an existing software ecosystem without requiring that ecosystem to adopt new package formats, APIs, developer rituals, or terminology merely because the substrate changed.
+
+For Alpine, Ecosystem Absorption would mean progressively inheriting the practical value of its existing package repositories, musl expectations, filesystem conventions, service tooling, build systems, and developer knowledge rather than recreating an incompatible parallel ecosystem.
+
+Ecosystem Absorption is demonstrated by compatibility evidence, not by naming similarity.
+
+## Compatibility Pressure
+
+Using real existing software as an executable source of requirements that exposes missing behavior in a replacement implementation.
+
+Typical loop:
+
+```text
+run real program or package
+→ observe exact incompatibility
+→ identify missing contract or capability
+→ implement the smallest general solution
+→ canonicalize reusable knowledge
+→ validate
+→ run the real program again
+```
+
+Compatibility Pressure is preferred over speculative bulk implementation because it lets real software reveal which missing semantics actually matter.
+
+## Compatibility Ladder
+
+A sequence of increasingly demanding compatibility milestones used to measure progress toward hosting an existing ecosystem.
+
+A possible Linux/Alpine ladder is:
+
+```text
+static Linux-ABI program
+→ static BusyBox
+→ Alpine /init
+→ interactive Alpine shell
+→ OpenRC userspace
+→ apk repository access
+→ common packages
+→ large real workloads
+→ broad package-corpus compatibility
+```
+
+A Compatibility Ladder keeps claims precise: reaching one rung does not imply the higher rungs already work.
+
+## Package-Corpus Compatibility
+
+The empirically measured ability of the replacement system to run, install, build, or otherwise satisfy a declared set of packages from an existing ecosystem without package-specific source modification.
+
+The benchmark must identify the package corpus, versions, architecture, test method, and definition of success.
+
+Conceptually:
+
+```text
+Package-Corpus Compatibility = passing declared packages / declared package corpus
+```
+
+This is more meaningful than saying a kernel is broadly "Linux compatible" without defining what real software has actually been demonstrated.
+
+## Fresh-Agent Reconstruction Test
+
+A reconstruction experiment in which a new coding agent, without relying on the previous run's conversational state or undocumented human guidance, receives a declared Foundation snapshot and is asked to reproduce an already-achieved system milestone.
+
+The purpose is to distinguish:
+
+```text
+we built it once
+```
+
+from:
+
+```text
+the Foundation now remembers enough that another agent can build it again cheaply
+```
+
+Useful measurements include Residual Novelty, source reads, outside lookups, new reusable capabilities, repair loops, validation count, and total Cost of Correct Use.
+
+The Fresh-Agent Reconstruction Test is a concrete local form of the New World Test.
+
+## External Truth Boundary
+
+The explicit boundary between engineering knowledge the Foundation can provide from canonical repository truth and facts that must come from an authoritative external specification, platform, hardware source, protocol definition, or other outside authority.
+
+The repository should make this boundary visible rather than allowing a model to fill missing external facts from uncertain memory.
+
+Desired behavior:
+
+```text
+known canonical fact       → use it
+known authoritative input  → cite or encode it
+missing external truth     → explicit UNKNOWN / BLOCKED
+```
+
+A mature Foundation should reduce its Reconstruction Escape Rate by deliberately incorporating legally and technically appropriate external truth, but it must never fabricate that truth merely to make a reconstruction appear complete.
