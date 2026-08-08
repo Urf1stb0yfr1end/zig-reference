@@ -464,6 +464,129 @@ The objective is not to decorate Linux terms. It is to minimize the translation 
 
 ---
 
+# Z-Ref Cognates and predictive probing
+
+A useful bridge name can do more than improve recognition after an agent has already found the component. It can make the component **predictable before discovery**.
+
+This is a deliberate Z-Ref convention.
+
+If an agent already knows a conventional command or concept `X`, the cheapest first probe in a Z-Ref-native environment should often be the cognate `zX`.
+
+```text
+known command or concept: X
+          ↓
+try the predictable cognate: zX
+          ↓
+exists?
+  YES -> inspect declared relationship and use it within those guarantees
+  NO  -> ask Z-Ref for the actual translation or native equivalent
+```
+
+Examples might include:
+
+```text
+stat   -> zstat
+mmap   -> zmmap
+epoll  -> zepoll
+X      -> zX
+```
+
+The exact inventory must be designed carefully. The important property is **semantic predictability**.
+
+A future model should not need to memorize every Z-Ref-native operation independently. If it knows the conventional ecosystem, the single-letter transformation gives it a low-cost hypothesis about the corresponding Z-Ref operation.
+
+That creates a form of **semantic prediction**:
+
+> **Try what you already know, marked with `z`, before paying for repository archaeology.**
+
+The probe must be cheap and safe.
+
+If `zX` exists, its existence means only that Z-Ref has deliberately registered it as a cognate of `X`. It does not by itself mean that every behavior of `X` is present.
+
+The cognate must declare its relation:
+
+```text
+name: zstat
+origin: stat
+relation: EXACT
+```
+
+or:
+
+```text
+name: zmmap
+origin: mmap
+relation: SUBSET
+supported:
+  <declared semantics>
+unsupported:
+  <declared semantics>
+```
+
+or:
+
+```text
+name: zfoo
+origin: foo
+relation: ANALOGUE
+safe-assumptions:
+  <declared transferable knowledge>
+rejected-assumptions:
+  <knowledge that must not transfer>
+```
+
+Therefore the strong rule is not:
+
+> If `zX` runs, assume it is identical to `X`.
+
+The safe rule is:
+
+> **If `zX` exists, assume it is the registered Z-Ref cognate of `X`; then trust exactly the compatibility and semantics that the cognate declares.**
+
+For an `EXACT` cognate, this may allow the agent to proceed almost exactly as it would with the original operation. For a `SUBSET`, `ADAPTER`, or `ANALOGUE`, Z-Ref must make the boundary obvious before the agent relies on unsupported behavior.
+
+Absence is useful too.
+
+If the agent tries:
+
+```text
+zfoo
+```
+
+and no cognate exists, Z-Ref should prefer a structured response over a dead end:
+
+```text
+zfoo: no registered cognate
+
+closest mapping:
+  foo -> alpz.bar
+
+next:
+  zref translate foo
+```
+
+One failed probe should therefore cost almost nothing and should immediately narrow the next search.
+
+This makes the `z` marker more than branding. It becomes a **predictive namespace**.
+
+A model can use prior knowledge to guess a likely Z-Ref operation with one character of transformation. When the guess succeeds, established knowledge is reused. When it fails, the system immediately routes the model toward the correct native concept.
+
+The desired effect is:
+
+```text
+prior ecosystem knowledge
+        +
+predictable z-cognate
+        +
+declared semantic relation
+        =
+cheap orientation without false equivalence
+```
+
+This convention should remain selective. A `zX` cognate should exist only when the relationship to `X` is strong enough that prediction saves more work than it creates confusion. If no such relationship exists, a fully native Alpz name plus `zref translate X` is preferable.
+
+---
+
 # Machine-readable semantic mappings
 
 Bridge naming must never be left to human intuition alone.
@@ -657,6 +780,7 @@ What resource bounds apply?
 What can fail?
 What external semantics does it implement?
 What familiar concept does it map to, if any?
+Does it have a predictable Z-Ref cognate?
 Which assumptions from that familiar concept are preserved?
 Which assumptions must not transfer?
 What is partial, unsupported, or unknown?
@@ -781,6 +905,7 @@ smaller implementation surface
 + explicit rejection conditions
 + explicit compatibility mappings
 + bridge naming for safe knowledge transfer
++ predictive z-cognates for low-cost semantic probing
 + focused validation
 + evidence-backed success
 + constructive memory
@@ -826,19 +951,23 @@ External names must not imply unsupported external behavior. When an Alpz concep
 
 When a safe semantic relationship exists, Z-Ref should make it cheap to translate between established engineering concepts and Alpz-native machinery rather than forcing agents and engineers to relearn equivalent ideas from zero.
 
-## 8. No failure without the best available explanation.
+## 8. Predict before searching when prediction is safe.
+
+Where a strong semantic cognate exists, the predictable `X -> zX` transformation should give agents a cheap first probe before they pay for broader discovery. A missing cognate should immediately route into structured translation rather than unbounded search.
+
+## 9. No failure without the best available explanation.
 
 Failure output should preserve causal context and point toward the smallest useful next investigation.
 
-## 9. No solved problem without asking what should compound.
+## 10. No solved problem without asking what should compound.
 
 Reusable discoveries should become contracts, validators, diagnostics, dependency knowledge, or preventables.
 
-## 10. No compression that outruns truth.
+## 11. No compression that outruns truth.
 
 Task projections may reduce context only while preserving the information required for correct decisions.
 
-## 11. No agent-specific magic required.
+## 12. No agent-specific magic required.
 
 The framework should remain useful to fresh capable agents, independent engineers, and future model families without hidden Alpz-specific prompting.
 
@@ -851,6 +980,7 @@ A mature Z-Ref-native repository should allow an unfamiliar coding agent to rece
 ```text
 what the request means
 what capability it touches
+whether a predictable z-cognate exists
 where that capability is implemented
 which implementation is canonical
 which alternatives are invalid
