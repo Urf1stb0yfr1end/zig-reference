@@ -1,0 +1,737 @@
+CODEX AGENTIC SNOWBALL BATCH 15 — SCHEDULER-FACING MONOTONIC TIME
+
+MISSION
+
+Extend the now-proven Batch 14 RISC-V timer boundary by exactly one semantic bridge:
+
+CONNECT REAL SUPERVISOR-VISIBLE MONOTONIC TIME TO THE EXISTING BOUNDED DETERMINISTIC SCHEDULER WITHOUT INTRODUCING PREEMPTION, CONTEXT SWITCHING, GENERIC CLOCK APIs, OR LINUX/POSIX TIME CLAIMS.
+
+Batch 14 proved that the freestanding RISC-V machine can:
+
+OpenSBI
+→ enter our S-mode payload
+→ use our direct stvec boundary
+→ preserve the existing fixed TrapFrame
+→ take multiple real asynchronous supervisor timer interrupts
+→ observe strictly monotonic rdtime values
+→ explicitly re-arm each non-final timer event
+→ return through sret after every expected delivery
+→ explicitly neutralize the final event
+→ reject extra delivery
+→ preserve Batch 12 and Batch 13 proofs
+→ preserve the canonical Morphic bytes
+
+The repository already contains a reusable target-neutral scheduler:
+
+projects/52-bounded-deterministic-scheduler
+
+That scheduler was intentionally designed around caller-controlled monotonic time and stable deterministic ordering. Batch 08 already records time monotonicity as one of its canonical invariants.
+
+Batch 15 asks the next narrow question:
+
+CAN REAL MONOTONIC MACHINE TIME BE FED THROUGH A SMALL TRUTHFUL ADAPTER INTO THE EXISTING TARGET-NEUTRAL SCHEDULER SO THAT SCHEDULED WORK BECOMES READY AT PROVEN MACHINE-OBSERVED TIMES, WHILE THE INTERRUPT HANDLER REMAINS NON-PREEMPTIVE AND THE SCHEDULER RETAINS ITS EXISTING DETERMINISTIC SEMANTICS?
+
+The intended bridge is:
+
+real RISC-V rdtime
+→ small machine-time observation boundary
+→ explicit monotonicity validation
+→ existing BoundedDeterministicScheduler time input
+→ scheduler advance / readiness decision outside interrupt context
+→ deterministic ready-task selection
+→ evidence relating real observed time to scheduler-visible time
+→ unchanged Morphic semantics
+
+Do not leap ahead.
+
+This is NOT a preemption batch.
+This is NOT a context-switch batch.
+This is NOT a sleep syscall batch.
+This is NOT a POSIX clock batch.
+This is NOT a Linux compatibility batch.
+This is NOT an Alpine boot batch.
+
+It is the smallest trustworthy bridge between a proven hardware-emulated time source and an already-existing target-neutral scheduling primitive.
+
+
+CANONICAL BATCH 14 BASELINE
+
+The canonical merged Batch 14 revision independently reproduced by the maintainer is:
+
+b4893c9da3caa59d3b74b14b10d6e144fd7caf55
+
+The permanent evidence tag is:
+
+morphic-riscv-first-bounded-monotonic-supervisor-ticks
+
+Treat that tag as immutable historical evidence if available.
+Do not move, recreate, delete, or repurpose it.
+
+Earlier historical anchors also remain immutable:
+
+morphic-riscv-first-supervisor-timer-interrupt
+post-batch-13-supervisor-timer-baseline
+pre-batch-12-freestanding-riscv-baseline
+morphic-freestanding-riscv-first-boot
+benchmark-pre-morphic-52
+
+The Batch 14 locally reproduced proof established, among other things:
+
+- exactly four real asynchronous supervisor timer deliveries per machine run;
+- interrupt bit 1 and cause 5;
+- strictly monotonic rdtime observations;
+- three explicit fresh-time-relative re-arms;
+- final STIE masking and maximum timer deadline;
+- four post-sret returns;
+- no accepted fifth repeated delivery;
+- Batch 12 and 13 preservation;
+- native/fake/two real machine equality at 765 canonical Morphic bytes.
+
+Do not replace those claims with weaker prose. Preserve them mechanically.
+
+
+FIRST EXECUTABLE GATE
+
+Before implementing Batch 15, establish the supplied checkout's current truth.
+
+Resolve repository root and current HEAD.
+
+Then run at minimum:
+
+python3 tools/verify-freestanding-riscv64-supervisor-ticks.py --self-test
+python3 tools/verify-freestanding-riscv64-supervisor-ticks.py
+
+Batch 15 begins only if the current checkout genuinely preserves the Batch 14 machine proof.
+
+If the plan file exists but the implementation baseline does not, the existence of the plan is not evidence of capability.
+
+If the supplied branch contains legitimate later commits, do not destructively reset merely to obtain the historical SHA. Prove semantic equivalence with the current verifiers instead.
+
+
+WHY THIS PRESSURE IS NEXT
+
+The Batch 14 report explicitly narrowed the next evidenced pressure to either:
+
+1. consolidate trap/timer phase dispatch only if real duplication now justifies it; or
+2. expose a non-preemptive scheduler-facing monotonic time input.
+
+Choose the scheduler-facing time bridge unless source inspection reveals an actual correctness defect or unavoidable duplication in the current trap dispatch that must be repaired first.
+
+Do not perform cleanup solely for aesthetic reasons.
+
+The existing scheduler is already reusable capability. The new work should therefore prefer composition/adaptation over a new generic module.
+
+Before writing code, use Z-Ref discovery to confirm:
+
+- the scheduler's canonical source path;
+- its public surface;
+- its monotonic-time invariant;
+- ownership/resource/failure constraints;
+- focused validation commands;
+- how the existing Morphic recipe currently advances scheduler time;
+- which portion of the freestanding adapter is truly target-specific.
+
+If an existing module already expresses the needed boundary exactly, reuse it.
+If not, add only the smallest target-specific adapter/glue required by the executable proof.
+
+Do not create a new reusable module merely because this is a new Batch number.
+
+
+Z-REF EXECUTION DOCTRINE
+
+Read AGENTS.md first.
+Read COMMANDS.md before inventing commands.
+Use the Agent Fast Path and preflight surfaces before broad source archaeology.
+
+Treat the repository as accumulated executable knowledge.
+
+The governing rules remain:
+
+1. DO NOT REDISCOVER TRUTH THAT IS ALREADY KNOWN.
+2. DO NOT CLAIM SUCCESS THAT HAS NOT BEEN PROVEN.
+3. WRITE NEW TRUTH ONCE, THEN PROJECT OR DERIVE OTHER VIEWS WHEN PRACTICAL.
+4. PRESERVE EXISTING CONTRACT NAMES AND SEMANTICS UNLESS THE CONTRACT ITSELF IS INTENTIONALLY CHANGED.
+5. A FAMILIAR NAME IS A COMPATIBILITY CLAIM, NOT A STATEMENT OF RESEMBLANCE.
+
+Use explicit UNKNOWN when evidence is genuinely unavailable.
+A confident guess is not a proof.
+
+Construct a compact Task Projection before implementation. Record at least:
+
+- requested capability;
+- reusable existing scheduler capability;
+- existing machine timer capability;
+- exact semantic boundary between them;
+- dependencies actually needed;
+- scheduler monotonicity invariant;
+- machine-time monotonicity evidence;
+- interrupt-context restrictions;
+- current unknowns;
+- rejected alternatives;
+- minimum trustworthy read set;
+- focused validators;
+- success evidence;
+- non-claims.
+
+Widen the read set only when evidence demands it.
+
+
+SEMANTIC REQUIREMENT
+
+The scheduler must continue to own scheduling semantics.
+The machine adapter must only provide truthful machine observations and narrow orchestration.
+
+Do NOT rewrite BoundedDeterministicScheduler into a RISC-V-specific scheduler.
+Do NOT teach the target-neutral scheduler about CSRs, SBI, OpenSBI, QEMU, stvec, scause, sepc, or rdtime.
+Do NOT place generic scheduling policy inside the trap handler.
+
+A preferred conceptual boundary is:
+
+Machine observes monotonic counter value T
+→ adapter validates/translates T only as required by the existing scheduler's time representation
+→ scheduler receives T through its established public operation
+→ scheduler determines readiness/order using its existing deterministic rules
+
+The exact public operation must be discovered from current repository truth rather than guessed from this plan.
+
+Do not invent a new public scheduler method if an established method already expresses the operation correctly.
+
+
+INTERRUPT-CONTEXT RULE
+
+Batch 15 must remain non-preemptive.
+
+The timer handler may:
+
+- record bounded evidence;
+- capture the real monotonic counter value;
+- perform the already-required timer re-arm or neutralization policy;
+- update the minimum bounded state required to communicate an observation to normal supervisor execution.
+
+The timer handler must NOT:
+
+- execute arbitrary scheduled tasks;
+- invoke general task callbacks;
+- context-switch between tasks;
+- mutate scheduler queues through a broad hidden path unless the scheduler's contract explicitly allows interrupt-context use and the repository can prove the required invariants;
+- allocate;
+- block;
+- perform unbounded loops;
+- claim preemption.
+
+Prefer scheduler advancement and ready-task selection after sret, in normal S-mode execution, using the recorded machine observation.
+
+If the exact implementation can safely be even narrower, choose the narrower design.
+
+
+MACHINE-TIME TRUTH
+
+Use established RISC-V terminology where it is exact.
+
+rdtime means rdtime.
+SBI set-timer means the SBI timer operation actually used.
+Supervisor timer interrupt means the proven cause-5 asynchronous event.
+
+Do not call the resulting bridge clock_gettime, POSIX time, Linux jiffies, CLOCK_MONOTONIC, or another established external contract unless it actually satisfies that contract.
+
+Do not invent z-prefixed names merely for style. If a new Alpz-native public cognate is actually required and is not equivalent to an established external API, apply the repository's semantic naming doctrine truthfully.
+
+This batch should preferably avoid introducing a broad public Alpz clock name at all. The pressure is an internal scheduler-facing time observation, not a user ABI.
+
+
+OVERFLOW AND MONOTONICITY POLICY
+
+Batch 14's bounded proof uses wrapping arithmetic when forming future timer deadlines, while its verifier requires the demonstrated deadline sequence itself to remain strictly monotonic.
+
+Batch 15 must inspect this deliberately.
+
+Do not silently promote wrapping arithmetic into a reusable scheduler-time policy.
+
+For the scheduler-facing bridge, define and prove an explicit bounded policy for any conversion/addition that could overflow the scheduler's time representation.
+
+Acceptable outcomes include, depending on existing contracts:
+
+- use the raw observed machine counter directly when no addition is needed;
+- checked conversion with explicit failure;
+- checked/saturating operation if and only if that matches declared semantics;
+- retain wrapping behavior only inside the narrowly bounded machine timer experiment while preventing it from being presented as a generic scheduler clock guarantee.
+
+The resulting behavior must be documented as a contract, not left as accidental integer behavior.
+
+Do not redesign Batch 14 merely to make this task larger. Harden only what the new bridge actually requires or what current proof exposes as unsound.
+
+
+MINIMUM EXECUTABLE SCENARIO
+
+Create the smallest bounded scenario that proves the bridge.
+
+The proof should contain several scheduler entries with distinct ready times chosen so that the real machine observations cross meaningful readiness boundaries.
+
+Example shape only; discover the existing scheduler API and use its native semantics:
+
+- task A becomes ready at scheduler time threshold A;
+- task B becomes ready at later threshold B;
+- task C shares a threshold or otherwise exercises the scheduler's existing stable ordering rule;
+- real supervisor timer observations provide monotonically increasing scheduler-visible times;
+- after each returned timer event, normal S-mode code advances/consults the scheduler;
+- tasks that are not yet eligible remain not-ready;
+- newly eligible tasks become visible exactly when the scheduler contract says they should;
+- selected ready tasks follow the existing stable deterministic ordering semantics.
+
+Do not require the real rdtime values to equal fixed golden constants. They are relational evidence.
+
+The proof must establish relationships such as:
+
+machine_time[0] < machine_time[1] < ...
+
+scheduler_time[i] corresponds to the declared mapping from machine_time[i]
+
+scheduler_time never moves backward
+
+readiness before threshold = false
+readiness at/after threshold = true
+
+stable ready ordering = existing scheduler contract
+
+No fabricated software-only time increments may stand in for the real machine observations in the real-QEMU proof.
+
+A fake/hosted path may continue to use deterministic synthetic time for target-neutral tests. That is desirable. The real-machine proof must show the scheduler bridge actually consumed values derived from the machine observations.
+
+
+EVIDENCE FRAMING
+
+Add a distinct bounded evidence frame for Batch 15 rather than overloading the Batch 14 frame until old parsers silently change meaning.
+
+Use a clear ZIGREF_* framing convention consistent with prior batches.
+
+The frame should be minimal but sufficient to prove, mechanically:
+
+- number of machine observations consumed;
+- monotonic machine observations;
+- scheduler-visible time values;
+- declared mapping relationship;
+- scheduler did not move backward;
+- readiness transitions;
+- selected task/order evidence;
+- all scheduler decisions occurred after the corresponding interrupt returned, not from inside the handler;
+- completion/return marker;
+- preservation of previous machine frames;
+- continuation to Morphic execution.
+
+Do not print a PASS string and treat it as proof.
+The verifier must independently parse raw fields and recompute the relationships.
+
+Do not store unbounded telemetry.
+Use fixed capacity and compiled expected limits.
+
+
+FOCUSED VERIFIER
+
+Add one canonical focused verifier, with a name consistent with the existing sequence, for example:
+
+tools/verify-freestanding-riscv64-scheduler-time.py
+
+The exact name may differ if current repository naming gives a better canonical choice.
+
+It must provide:
+
+--self-test
+
+and real execution mode.
+
+The self-test must be rejection-oriented.
+
+At minimum reject:
+
+- missing frame;
+- duplicate frame;
+- duplicate/unexpected fields;
+- wrong machine observation count;
+- malformed fixed-width evidence where fixed width is part of the format;
+- non-monotonic machine observation;
+- non-monotonic scheduler-visible time;
+- incorrect machine→scheduler mapping;
+- claimed readiness before its threshold;
+- failure to expose readiness after threshold when required;
+- wrong deterministic order for simultaneously eligible tasks;
+- scheduler decision claimed before the corresponding sret/return evidence;
+- missing final completion marker;
+- regression of Batch 12 trap frame;
+- regression of Batch 13 one-shot timer frame;
+- regression of Batch 14 repeated-tick frame;
+- Morphic payload drift.
+
+Real mode must:
+
+1. Build the current freestanding RISC-V artifact.
+2. Inspect relevant ELF identity/symbols as needed.
+3. Run at least two bounded real qemu-system-riscv64 machines.
+4. Enforce a finite timeout.
+5. Parse the current Batch 12, 13, and 14 frames with their existing parsers/verifiers where practical rather than duplicating logic.
+6. Parse the new scheduler-time frame independently.
+7. Prove machine observations are strictly monotonic.
+8. Prove scheduler-visible time obeys the declared mapping and never regresses.
+9. Prove scheduler readiness/ordering behavior matches the existing scheduler contract.
+10. Prove scheduler decisions occur after trap return rather than in interrupt context.
+11. Compare canonical Morphic output against native hosted/fake baselines exactly.
+12. Fail nonzero on malformed, missing, duplicate, contradictory, timed-out, or stale evidence.
+13. End through the repository's Developer Minimus handoff convention.
+
+Do not weaken old verifiers to make the new work pass.
+
+
+TARGET-NEUTRAL PRESERVATION
+
+The existing hosted/fake Morphic paths are valuable because they prove that scheduling semantics are not inherently RISC-V-specific.
+
+Preserve that architecture.
+
+Where practical, add focused target-neutral tests proving that a sequence of supplied monotonic times produces the same scheduler decisions regardless of whether those times originate from:
+
+- deterministic fake/hosted input; or
+- the RISC-V machine-time adapter.
+
+Do not require real-machine rdtime numeric values to match fake numeric values. Compare semantic scheduling relationships/results, not environmental counter constants.
+
+If the settled canonical Morphic output is intentionally unchanged by this proof scenario, keep it unchanged and require exact equality.
+
+If changing the canonical Morphic scenario is genuinely necessary, stop and justify why before doing so. The default expectation is that it remains unchanged.
+
+
+NO PREEMPTION
+
+This requirement is strict.
+
+A timer interrupt must not directly switch the currently executing task.
+
+Batch 15 success should look conceptually like:
+
+interrupt
+→ record real time
+→ re-arm/neutralize as declared
+→ restore context
+→ sret
+→ normal supervisor execution
+→ feed observation to scheduler
+→ scheduler computes readiness
+→ bounded proof action
+
+NOT:
+
+interrupt
+→ scheduler picks another task
+→ trap return resumes a different execution context
+
+The latter belongs to a future preemption/context-switch batch and requires substantially stronger context, stack, privilege, and scheduling proofs.
+
+
+DO NOT BUILD THESE YET
+
+Do not implement:
+
+- preemptive scheduling;
+- task context switching;
+- per-task kernel stacks unless independently required by another existing contract and directly necessary here;
+- U-mode;
+- process address spaces;
+- Sv39 activation;
+- syscall entry;
+- Linux ABI compatibility;
+- POSIX clock APIs;
+- nanosleep;
+- timerfd;
+- signals;
+- wall-clock/calendar time;
+- multiple harts;
+- SMP scheduling;
+- VirtIO;
+- filesystem work;
+- networking;
+- musl;
+- BusyBox;
+- Alpine /init;
+- OpenRC;
+- apk;
+- generic HAL architecture;
+- generic production timer framework.
+
+Those are later executable pressures.
+
+
+LONG-HORIZON ALPZ DIRECTION
+
+The long-horizon direction remains:
+
+KEEP ALPINE. REPLACE LINUX.
+
+FAMILIAR OUTSIDE. EXPLICIT INSIDE.
+
+A future Alpz kernel needs truthful time to support sleeping, timeouts, maintenance, scheduling, process accounting, and eventually Linux-compatible clock behavior.
+
+But Linux compatibility names are earned by semantic equivalence.
+
+This batch should therefore build the internal machine→scheduler evidence bridge first, without prematurely calling it a Linux clock.
+
+The sequence toward Alpine remains broadly:
+
+machine/trap/time foundation
+→ physical-memory ownership
+→ active virtual memory
+→ U-mode
+→ syscall boundary
+→ userspace ELF/process machinery
+→ file descriptors/VFS
+→ Linux ABI slices
+→ musl/BusyBox
+→ Alpine /init
+
+Batch 15 strengthens the first line. It does not skip the others.
+
+
+SOURCE AND CONTRACT DISCIPLINE
+
+Prefer edits to the existing:
+
+- freestanding RISC-V adapter;
+- run-hosted-morphic-runtime recipe orchestration;
+- focused verifier tooling;
+- recipe contract;
+- command reference;
+- Batch 15 report;
+
+before inventing new repository-wide infrastructure.
+
+If a reusable abstraction genuinely falls out of the work, justify it with actual reuse pressure and update all required module artifacts/contracts consistently.
+
+Do not create a new module because a plan expected one. This plan expects no quota.
+
+Preserve the scheduler's canonical module identity and public surface unless a real contract defect is discovered.
+
+If a contract change is required, update source truth first, regenerate derived views, and explain compatibility impact.
+
+
+BATCH 15 REPORT
+
+Create:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_15.md
+
+Record factual evidence only.
+
+Include:
+
+- exact starting revision and branch;
+- available relevant tags;
+- Task Projection;
+- scheduler contract reused;
+- machine-time facts relied upon;
+- adapter/bridge design;
+- overflow/conversion policy;
+- interrupt-context boundary;
+- real QEMU evidence;
+- rejection-oriented self-test coverage;
+- preservation matrix for Batches 10–14 as applicable;
+- canonical Morphic equality result;
+- aggregate validation result;
+- Snowball Yield;
+- One-Sentence Preventables;
+- explicit non-claims;
+- smallest next evidenced pressure.
+
+Do not record benchmark claims that were not measured.
+Do not record real-hardware claims from QEMU.
+Do not call counter units seconds/nanoseconds without evidence.
+
+
+COMMANDS.MD
+
+Append the new canonical Batch 15 command surfaces to COMMANDS.md.
+
+Preserve all prior Batch 10–14 command entries.
+
+Do not remove historical commands merely because a newer verifier composes them.
+
+The repository should become increasingly easy for a later agent to traverse without losing the older independently useful proofs.
+
+
+RECIPE CONTRACT
+
+Update recipes/run-hosted-morphic-runtime/recipe.json truthfully.
+
+It should distinguish:
+
+- existing target-neutral scheduler behavior;
+- existing one-shot and repeated machine timer proofs;
+- new scheduler-facing real monotonic-time bridge;
+- what is still not implemented.
+
+Do not claim:
+
+- preemption;
+- clock accuracy;
+- POSIX/Linux time compatibility;
+- sleeping tasks;
+- U-mode;
+- Alpine compatibility.
+
+Keep gap/non-claim language explicit.
+
+
+PRESERVATION MATRIX
+
+Run the strongest applicable focused surfaces, including the existing sequence:
+
+python3 tools/verify-riscv64-morphic-runtime.py --self-test
+python3 tools/verify-freestanding-riscv64-morphic-runtime.py --self-test
+python3 tools/verify-freestanding-riscv64-supervisor-trap.py --self-test
+python3 tools/verify-freestanding-riscv64-supervisor-timer.py --self-test
+python3 tools/verify-freestanding-riscv64-supervisor-ticks.py --self-test
+
+python3 tools/verify-riscv64-morphic-runtime.py
+python3 tools/verify-freestanding-riscv64-morphic-runtime.py
+python3 tools/verify-freestanding-riscv64-supervisor-trap.py
+python3 tools/verify-freestanding-riscv64-supervisor-timer.py
+python3 tools/verify-freestanding-riscv64-supervisor-ticks.py
+
+Then run the new Batch 15 self-test and real execution lab.
+
+If current COMMANDS.md or repository tooling identifies a more canonical cumulative command, use it as well rather than deleting the explicit focused evidence.
+
+
+AGGREGATE VALIDATION
+
+At minimum preserve the repository's current aggregate gates:
+
+zig build test
+zig build smoke
+zig build recipes
+zig build conformance
+zig build property
+zig build fuzz-smoke
+zig build differential
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/build-repository-index.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/build-dependency-graphs.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py --check
+
+python3 tools/format-module-contracts.py --check
+
+Use the repository's canonical tracked Zig formatting command from COMMANDS.md / CI rather than invoking bare `zig fmt --check` with no paths.
+
+Run:
+
+python3 tools/developer-command.py validate-repository
+
+Also run any focused scheduler tests and port/contract tests required by changed metadata.
+
+Do not claim PASS for commands not actually executed.
+
+
+FAIL-CLOSED SUCCESS CRITERIA
+
+Batch 15 is complete only if all of the following are mechanically demonstrated:
+
+1. Current Batch 14 real repeated-tick proof passes before or after implementation on the same final source revision.
+2. Real machine-observed time values are consumed by the scheduler-facing bridge.
+3. The scheduler-visible time sequence is monotonic according to the existing scheduler invariant.
+4. The machine→scheduler mapping is explicit and independently validated.
+5. Scheduled readiness transitions are proven against declared scheduler thresholds.
+6. Stable ordering behavior remains the existing scheduler behavior.
+7. Scheduler decisions occur after the corresponding timer handler returned through sret; no hidden preemptive scheduling occurs in interrupt context.
+8. Timer re-arm/final-neutralization behavior remains valid.
+9. Batch 12 synchronous breakpoint semantics remain valid.
+10. Batch 13 one-shot supervisor timer semantics remain valid.
+11. Batch 14 repeated timer semantics remain valid.
+12. No undeclared extra timer delivery is accepted.
+13. No unbounded allocation or unbounded telemetry is introduced into the freestanding proof path.
+14. Overflow/conversion behavior for scheduler-facing time is explicit rather than accidental.
+15. Native/fake/freestanding Morphic semantics remain equal where the canonical scenario is intended to remain unchanged.
+16. New parser/verifier self-tests reject contradictory evidence.
+17. Full repository validation passes.
+18. COMMANDS.md, recipe metadata, generated views, and report truth agree.
+19. A mergeable PR is produced.
+
+Do not call a software counter increment evidence of a machine-time bridge.
+Do not infer scheduler correctness merely because QEMU exited zero.
+Do not infer sret completion merely because the handler ran.
+Do not infer monotonic time from the presence of four records without comparing their values.
+
+
+SNOWBALL YIELD
+
+Record factual Snowball Yield.
+
+Especially note whether Batch 15 required:
+
+- a new reusable module;
+- or only a small target-specific adapter around the existing scheduler and machine proof.
+
+Measure what is actually available, such as:
+
+- existing modules reused;
+- existing verifier code reused;
+- existing parsers reused;
+- new lines/files where factual;
+- commands required to reproduce the proof;
+- broad archaeology avoided because Agent Fast Path / contracts identified the needed surfaces.
+
+Do not invent token/time savings numbers unless captured.
+
+This batch should ideally demonstrate the Less-Lines direction:
+
+A previously large conceptual jump — "make the real machine's time useful to scheduling" — should increasingly collapse into a small amount of orchestration because the scheduler semantics and machine-timer semantics are already separately solved and proven.
+
+
+GIT / PUBLICATION DISCIPLINE
+
+Use a normal feature branch for implementation.
+
+Do not force-push over historical evidence branches or tags.
+Do not move existing tags.
+Do not rewrite main history.
+
+Before committing:
+
+- inspect git diff;
+- inspect git diff --check;
+- run focused validation;
+- run aggregate validation;
+- ensure generated artifacts are legitimate repository text artifacts only;
+- do not commit caches, executables, temporary QEMU artifacts, logs, databases, or unrelated binaries.
+
+Commit the completed Batch 15 implementation and report.
+Push the branch.
+Open a mergeable PR targeting main.
+
+The PR body should contain concise Motivation, Description, Testing, and Non-claims sections with exact commands actually executed.
+
+Do not merge the PR yourself unless the repository/task environment explicitly instructs you to do so. Leave it ready for independent audit.
+
+
+FINAL RESPONSE
+
+Return a concise completion summary containing:
+
+- branch;
+- final commit SHA;
+- PR URL;
+- files changed;
+- real-QEMU scheduler-time proof result;
+- exact machine observation count used by the proof;
+- scheduler readiness/order result;
+- explicit statement that scheduling remained non-preemptive;
+- Batch 12/13/14 preservation result;
+- Morphic equality result;
+- aggregate validation result;
+- any residual limitation or truthful UNKNOWN;
+- recommended next evidenced pressure.
+
+Do not bury a failed command.
+Do not claim a PR exists if publication failed.
+Do not claim Batch 15 PASS if the real machine-time values were not actually consumed by the scheduler-facing path.
+
+
+ONE-SENTENCE TASK
+
+Prove that real monotonic RISC-V supervisor-visible time can drive the existing bounded deterministic scheduler through a small explicit non-preemptive adapter, with scheduler decisions made after sret, exact relational evidence for monotonicity/readiness/order, preservation of Batches 12–14 and canonical Morphic semantics, and no Linux/POSIX/preemption claims.
