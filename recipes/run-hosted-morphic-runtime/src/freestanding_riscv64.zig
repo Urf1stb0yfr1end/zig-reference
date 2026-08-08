@@ -124,13 +124,17 @@ export fn recordTrap(frame: *TrapFrame) callconv(.c) void {
 comptime {
     asm (
         \\.global trapProbe
+        \\.global trapProbeBreakpoint
+        \\.global trapProbeResume
         \\.type trapProbe,@function
         \\trapProbe:
         \\mv t3, sp
         \\li t0, 0x12345
         \\li t1, 0x23456
         \\li a0, 0x34567
+        \\trapProbeBreakpoint:
         \\.4byte 0x00100073
+        \\trapProbeResume:
         \\li t2, 0x12345
         \\bne t0, t2, 1f
         \\li t2, 0x23456
