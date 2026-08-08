@@ -7,11 +7,11 @@
   "direct_dependencies": ["bounded-system-resource-plan", "bounded-deterministic-scheduler", "bounded-deterministic-event-trace"],
   "dependency_order": ["fixed-capacity-vector", "fixed-capacity-priority-queue", "fixed-capacity-topological-sort", "fixed-bump-allocator", "bounded-system-resource-plan", "bounded-deterministic-scheduler", "bounded-deterministic-event-trace"],
   "public_endpoints_used": ["Planner.plan", "BoundedDeterministicScheduler", "schedule", "advanceTo", "nextReady", "BoundedDeterministicEventTrace", "append", "render", "runCore", "HostedMachine.writeTask", "FakeMachine.writeTask"],
-  "adapters_required": ["recipes/run-hosted-morphic-runtime/src/recipe.zig"],
+  "adapters_required": ["recipes/run-hosted-morphic-runtime/src/recipe.zig", "recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig"],
   "inherited_guarantees": ["Fixed resource derivation, stable runnable ordering, caller-controlled time, bounded trace storage, and explicit capacity failures.", "One shared core owns planning, scheduling, tracing, and output formatting; hosted and fake machines only provide bounded task output."],
   "gaps_discovered": ["Linux userspace supplies process entry, stdout, exit, stack/bootstrap, and panic behavior; privileged execution, boot orchestration, firmware output, and hardware remain out of scope."],
   "future_systems_enabled": ["hosted runtime experiments", "later freestanding Morphic backend"],
-  "intended_build_commands": ["zig build run-hosted-morphic-runtime", "zig build run-fake-morphic-runtime", "zig build test-recipe-run-hosted-morphic-runtime", "zig build verify-hosted-morphic-runtime", "zig build install-riscv64-morphic-runtime -Dtarget=riscv64-linux-musl --prefix PATH", "python3 tools/verify-riscv64-morphic-runtime.py"],
+  "intended_build_commands": ["zig build run-hosted-morphic-runtime", "zig build run-fake-morphic-runtime", "zig build test-recipe-run-hosted-morphic-runtime", "zig build verify-hosted-morphic-runtime", "zig build install-riscv64-morphic-runtime -Dtarget=riscv64-linux-musl --prefix PATH", "python3 tools/verify-riscv64-morphic-runtime.py", "zig build install-freestanding-riscv64-morphic-runtime --prefix PATH", "python3 tools/verify-freestanding-riscv64-morphic-runtime.py"],
   "intended_smoke_commands": [],
   "validation_evidence_references": []
 }

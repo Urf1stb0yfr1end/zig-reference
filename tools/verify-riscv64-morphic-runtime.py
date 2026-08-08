@@ -10,10 +10,19 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 COMMAND = "python3 tools/verify-riscv64-morphic-runtime.py"
+EMULATOR_TIMEOUT_SECONDS = 15
 
 
-def run_bytes(command: list[str]) -> bytes:
-    return subprocess.run(command, cwd=ROOT, check=True, stdout=subprocess.PIPE).stdout
+def run_bytes(command: list[str], *, timeout: int | None = None) -> bytes:
+    return subprocess.run(command, cwd=ROOT, check=True, stdout=subprocess.PIPE, timeout=timeout).stdout
+
+
+def readelf_field(header: str, name: str) -> str | None:
+    for line in header.splitlines():
+        field, separator, value = line.partition(":")
+        if separator and field.strip() == name:
+            return value.strip()
+    return None
 
 
 def handoff(status: str, failure: str | None = None) -> int:
@@ -37,6 +46,14 @@ def handoff(status: str, failure: str | None = None) -> int:
 
 
 def main() -> int:
+    if sys.argv[1:] == ["--self-test"]:
+        assert readelf_field("Machine:\tRISC-V\n", "Machine") == "RISC-V"
+        try:
+            run_bytes([sys.executable, "-c", "import time; time.sleep(1)"], timeout=0.01)
+        except subprocess.TimeoutExpired:
+            print("PASS: whitespace-insensitive Machine parsing and emulator timeout")
+            return 0
+        raise AssertionError("timeout regression did not fail closed")
     qemu = shutil.which("qemu-riscv64")
     readelf = shutil.which("readelf")
     if not qemu or not readelf:
@@ -55,21 +72,21 @@ def main() -> int:
             )
             executable = Path(prefix) / "bin" / "run-hosted-morphic-runtime"
             header = subprocess.run([readelf, "-h", executable], check=True, text=True, stdout=subprocess.PIPE).stdout
-            if "Machine:                           RISC-V" not in header:
+            if readelf_field(header, "Machine") != "RISC-V":
                 raise RuntimeError(f"readelf did not identify {executable} as RISC-V")
 
             print("phase: execute native hosted and fake scenarios twice", flush=True)
             hosted = [run_bytes(["zig", "build", "run-hosted-morphic-runtime"]) for _ in range(2)]
             fake = [run_bytes(["zig", "build", "run-fake-morphic-runtime"]) for _ in range(2)]
             print(f"phase: execute {executable.name} twice with {qemu}", flush=True)
-            riscv64 = [run_bytes([qemu, str(executable)]) for _ in range(2)]
+            riscv64 = [run_bytes([qemu, str(executable)], timeout=EMULATOR_TIMEOUT_SECONDS) for _ in range(2)]
 
             comparisons = [hosted[0] == hosted[1], fake[0] == fake[1], hosted[0] == fake[0], riscv64[0] == riscv64[1], hosted[0] == riscv64[0]]
             if not all(comparisons):
                 raise RuntimeError("canonical output byte comparison failed")
             print(f"result: PASS: hosted={len(hosted[0])} fake={len(fake[0])} riscv64={len(riscv64[0])} bytes", flush=True)
             print("result: PASS: hosted-repeat fake-repeat hosted-fake riscv64-repeat native-riscv64", flush=True)
-    except (OSError, subprocess.CalledProcessError, RuntimeError) as error:
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired, RuntimeError) as error:
         print(f"execution-lab: FAIL: {error}", file=sys.stderr)
         handoff("FAIL", str(error))
         return error.returncode if isinstance(error, subprocess.CalledProcessError) else 1
