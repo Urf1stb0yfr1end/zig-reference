@@ -2,34 +2,36 @@ CODEX AGENTIC SNOWBALL BATCH 09 — MORPHIC MACHINE OPERATIONS
 
 MISSION
 
-Begin the next system-expansion phase by giving Morphic one small target-neutral machine-operations boundary and proving that the same core runtime logic can execute through more than one implementation without becoming more than one implementation.
+Continue the Agentic Snowball from a verified Batch 08 foundation, but first remove one repeatedly observed repository-environment ambiguity: Python-dependent validation must not succeed or fail merely because a previous shell happened to activate `.venv`.
 
-Batch 06 established the hosted deterministic Morphic runtime and explicitly identified the next smallest frontier as a target-neutral machine-operations interface plus a deterministic fake adapter before attempting a privileged RISC-V backend.
+After that environment gate is repaired and mechanically protected, begin the next system-expansion phase by giving Morphic the smallest evidence-backed target-neutral machine-operations boundary and proving that one shared core runtime can execute through the existing hosted implementation and one deterministic fake implementation without duplicating runtime semantics.
 
-Batch 07 established Correct-Use Preflight.
-Batch 08 established Invariant-Guided Diagnosis.
+The governing ideas are:
 
-Batch 09 must now use those foundations while expanding the system.
-
-The governing idea is:
-
+CANONICAL COMMANDS MUST SELECT THEIR REQUIRED ENVIRONMENT.
 ONE CORE RUNTIME.
 MULTIPLE MACHINE IMPLEMENTATIONS.
 NO SECOND SEMANTIC IMPLEMENTATION.
 
-This batch is not about making a large abstraction framework. It is about finding the smallest ordinary Zig boundary that isolates machine-specific operations from the already-working bounded deterministic runtime.
+Batch 09 is not a universal environment manager, package manager, HAL, simulator, or RISC-V backend. It is a narrow reliability repair followed by one narrow Morphic expansion.
 
-The machine boundary must be cheap for a coding agent to discover, inspect, satisfy, validate, and diagnose.
+DO NOT:
 
-Do not begin Alpine.
-Do not begin Linux boot handoff.
-Do not begin a privileged RISC-V CSR/trap/SBI implementation.
-Do not begin UART, FDT, PLIC, CLINT, VirtIO, networking, or a hypervisor.
-Do not create a universal HAL.
-Do not create a new DSL, interface language, macro system, daemon, database, source scanner, or compiler substitute.
-Do not create speculative machine operations merely because future systems might someday need them.
+- globally install Python packages as the repository fix;
+- rely on `source .venv/bin/activate` as the permanent fix;
+- hardcode `/home/...`, a username, or any machine-specific absolute interpreter path;
+- vendor `jsonschema` into the repository;
+- replace normal Python packaging concepts with a project-specific dependency language;
+- create a universal Python launcher if a smaller conventional solution exists;
+- begin Alpine;
+- begin Linux boot handoff;
+- implement privileged RISC-V CSR/trap/SBI behavior;
+- begin UART, FDT, PLIC, CLINT, VirtIO, networking, or a hypervisor;
+- create a universal HAL;
+- create a new DSL, interface language, macro system, daemon, database, source scanner, or compiler substitute;
+- create speculative machine operations merely because future systems may need them.
 
-Build only the boundary demonstrated by real current composition pressure.
+Build only what current evidence demonstrates.
 
 STARTING STATE
 
@@ -44,30 +46,141 @@ Read docs/reports/AGENTIC_SNOWBALL_BATCH_07.md.
 Read docs/reports/AGENTIC_SNOWBALL_BATCH_07_REPAIR.md if present.
 Read docs/reports/AGENTIC_SNOWBALL_BATCH_08.md.
 Read the existing hosted Morphic recipe contract and source.
-Read the current contracts for bounded-system-resource-plan, bounded-deterministic-event-trace, and bounded-deterministic-scheduler through the Agent Fast Path before opening implementation source.
+Read the current Agent Fast Path/preflight contracts for bounded-system-resource-plan, bounded-deterministic-event-trace, and bounded-deterministic-scheduler before opening implementation source.
 
-Sync current main if the environment has an origin remote. If it does not, record the limitation and continue from the supplied current checkout. Never hide environment limitations.
+Sync current main if an `origin` remote exists. If the execution environment lacks it, record that limitation and continue from the supplied checkout. Never hide environment limitations.
 
 Record the actual base commit.
 Use Zig 0.14.0 only.
 
-Expected independently verified starting state on main:
+The latest independently observed Batch 08 user-side state before this request was:
 
 - 53 contracted modules;
 - 53 full Agent Fast Path modules;
 - 0 partial modules;
-- hosted Morphic runtime verification green;
-- full repository validation green;
-- Failure State Capsule regression green;
-- benchmark-pre-morphic-52 remains frozen and must not be modified, moved, recreated, deleted, or retagged.
+- Failure State Capsule focused regression green;
+- three evidence-backed structured KNOWN diagnoses green;
+- insufficient and unsupported capsules remain UNKNOWN;
+- malformed capsules fail closed;
+- hosted Morphic verification green at 66/66 steps and 32/32 tests;
+- full repository validation green at 322/322 steps and 204/204 tests;
+- working tree clean;
+- benchmark-pre-morphic-52 frozen.
 
-If actual state differs, inspect and explain it before changing anything. Never force expected counts.
+Do not assume those counts/results remain current. Verify actual state and record differences honestly.
 
-BEFORE EDITING — FREEZE THE REQUIREMENT MAP
+IMPORTANT REPEATED ENVIRONMENT EVIDENCE
 
-This batch must practice the Snowball instead of assuming what needs to be built.
+A recurring Codex log has shown:
 
-Run the smallest useful existing discovery surfaces first. At minimum:
+AGENT CONTRACT ERROR: No module named 'jsonschema'
+verify-hosted-morphic-runtime +- validate-agent-contracts +- run python3 failure
+
+This has appeared even though the repository `.venv` can contain working `jsonschema` and the same validation succeeds after activating that environment.
+
+Treat this as a repository-level execution-environment pressure case, not as proof of a specific implementation bug until traced.
+
+The canonical dependency declaration remains tools/requirements.txt. Do not create a second dependency list.
+
+PHASE 0 — PYTHON EXECUTION ENVIRONMENT MUST BE BORING
+
+Before Morphic architecture work, reproduce and trace the Python interpreter selection used by Python-dependent build and canonical verification paths.
+
+At minimum inspect:
+
+- tools/requirements.txt;
+- every build.zig path that launches Python-dependent repository validation;
+- tools/developer-command.py where relevant;
+- tools/query-reference.py doctor behavior;
+- tools/validate-agent-contracts.py;
+- tools/test-invariant-diagnosis.py;
+- existing setup instructions in README/AGENTS/COMMANDS.
+
+Answer factually in the Batch 09 report:
+
+1. Which interpreter executes direct Python tools when `.venv` is active?
+2. Which interpreter executes Python tools launched transitively by `zig build`?
+3. Can those differ?
+4. Which Python-dependent tools import `jsonschema`?
+5. Is the recurring failure caused by ambient PATH/interpreter selection, missing setup, or something else?
+
+Do not state the cause until demonstrated.
+
+PHASE 0A — DEFINE ONE CANONICAL RULE
+
+Implement the smallest conventional rule that makes repository validation predictable.
+
+Required outcome:
+
+- Python-dependent canonical/build-backed validation does not accidentally depend on whether an earlier shell activation happened to persist;
+- the interpreter/dependency environment used by the command is deterministic enough for a cold agent to understand;
+- tools/requirements.txt remains the source of Python dependency truth;
+- a missing or unusable required Python environment fails early and clearly with an actionable conventional repair path;
+- repository commands do not silently install dependencies;
+- no global pip/uv install is required as the fix;
+- no machine-specific absolute path is committed;
+- normal Python, virtual-environment, PATH, subprocess, and Zig build concepts are used rather than a private environment DSL.
+
+Prefer the smallest implementation. If build.zig can resolve one repository-approved interpreter cleanly and reuse it for Python-dependent steps, do not create a larger framework. If one tiny shared resolver is genuinely needed by multiple command surfaces, centralize it rather than duplicating selection logic.
+
+Do not require every dependency-free Python helper to run through a heavyweight wrapper merely for symmetry.
+
+PHASE 0B — DOCTOR MUST TELL THE TRUTH
+
+A cold agent should not discover missing Python validation dependencies only after a deep Morphic build fails.
+
+Strengthen the existing `agent doctor` only as much as necessary so it reports the Python validation environment truth relevant to canonical agent-contract validation.
+
+A healthy result should make clear, in deterministic compact output, enough of the following to act correctly:
+
+- whether the canonical validation interpreter is usable;
+- whether required Python validation dependencies are importable;
+- the relevant dependency declaration location;
+- an exact repair/setup command or canonical setup path when unhealthy.
+
+Do not dump `pip freeze` or environment noise.
+Do not expose irrelevant host details.
+Do not turn doctor into a package manager.
+
+If a new stable ZIGREF diagnostic is justified by this repeated failure class, add one only if it maps cleanly to canonical evidence and existing diagnostic architecture. Do not contort the Batch 08 numeric invariant representation merely to force an environment error into it. An ordinary deterministic doctor failure is acceptable if that is the cleaner design.
+
+PHASE 0C — REGRESSION MUST PROVE SHELL ACTIVATION IS NOT THE CONTRACT
+
+Add the smallest durable regression that would fail if a future change again makes serious Python-dependent validation depend on incidental venv activation.
+
+The regression must exercise actual repository command behavior, not merely inspect a source string.
+
+At minimum demonstrate both of these states where the local environment permits it:
+
+A. provisioned repository environment, ordinary activated shell -> canonical validation passes;
+B. same provisioned repository environment, fresh/unactivated shell semantics -> canonical build-backed validation still selects the intended environment and passes.
+
+If the intended final design instead deliberately requires an explicit canonical environment command rather than automatic `.venv` resolution, then state that rule clearly and make the serious canonical command invoke/require it deterministically. The user must not need to remember an undocumented prior `source` command.
+
+Also test the negative path without destructively moving the real `.venv`: use an isolated temporary fixture, resolver seam, subprocess environment, or other safe technique. It must prove that missing/unusable Python dependencies fail with the intended clear diagnostic/repair rather than a deep unexplained `ModuleNotFoundError`.
+
+Do not make the regression specific only to the literal string `jsonschema`; protect the interpreter/dependency-selection rule that caused the class of failure.
+
+PHASE 0 EXIT GATE
+
+Do not begin Morphic machine-operations edits until all of the following are true:
+
+- root cause is recorded;
+- environment-selection repair is implemented or the evidence proves no repair is necessary;
+- focused regression passes;
+- agent doctor is truthful;
+- `PYTHONDONTWRITEBYTECODE=1 python3 tools/validate-agent-contracts.py --self-test` passes in its intended direct environment;
+- `PYTHONDONTWRITEBYTECODE=1 python3 tools/test-invariant-diagnosis.py` passes;
+- hosted Morphic canonical verification passes without relying on undocumented shell state;
+- command reference remains current.
+
+If Phase 0 cannot be made correct without a broad unrelated packaging redesign, stop and report instead of hiding the problem under global installation.
+
+BEFORE MORPHIC EDITING — FREEZE THE REQUIREMENT MAP
+
+After Phase 0 is green, practice the Snowball instead of assuming what needs to be built.
+
+Run the smallest useful existing discovery surfaces, using the repaired canonical environment rules:
 
 python3 tools/query-reference.py agent bootstrap
 python3 tools/query-reference.py agent doctor
@@ -83,9 +196,9 @@ PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py --check
 PYTHONDONTWRITEBYTECODE=1 python3 tools/validate-agent-contracts.py --self-test
 PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py
 
-Use agent compose/capability queries where the current vocabulary supports the requirement. Do not guess capability IDs merely to satisfy this request.
+Use agent compose/capability queries where current canonical vocabulary supports the requirement. Do not invent capability IDs merely to satisfy this request.
 
-Before implementation, write a frozen requirement map into the Batch 09 report with each requirement classified as one of:
+Before machine-operations implementation, write a frozen requirement map into docs/reports/AGENTIC_SNOWBALL_BATCH_09.md with every requirement classified as:
 
 - existing module;
 - existing recipe/composition;
@@ -93,60 +206,43 @@ Before implementation, write a frozen requirement map into the Batch 09 report w
 - project-specific orchestration;
 - out of scope.
 
+Include the Python execution-environment requirement as a separate Phase 0 repair item, not as a fake Morphic capability.
+
 Do not choose an arbitrary module quota.
 Do not decide in advance that a new module must exist.
 Do not recreate a mechanism already present under a different name.
 
-The requirement map is the first Snowball Yield evidence for this run.
-
-BASELINE THE EXISTING HOSTED BEHAVIOR
+BASELINE EXISTING HOSTED BEHAVIOR
 
 Before changing Morphic runtime behavior, capture the current canonical hosted output twice and prove it is byte-identical.
 
-Use the existing documented command from COMMANDS.md rather than inventing a new one.
+Use the documented canonical command from COMMANDS.md.
 
 Record:
 
 - exact command;
 - output byte count;
-- whether two identical executions compare byte-for-byte;
+- byte equality across two identical executions;
 - relevant validation command;
-- exact current hosted recipe identity.
+- exact hosted recipe identity.
 
-Preserve the existing canonical output exactly unless a change is required by a correctness defect discovered in canonical truth. If a defect requires changing output, explain it, test it, and do not describe the change as mere refactoring.
+The latest independently observed value was 765 bytes. Treat that as a regression clue, not as truth to force. Preserve exact output unless a demonstrated correctness repair requires a change. Explain and test any legitimate change.
 
-ARCHITECTURAL OBJECTIVE 1 — THE SMALLEST MACHINE-OPERATIONS BOUNDARY
+ARCHITECTURAL OBJECTIVE 1 — SMALLEST MACHINE-OPERATIONS BOUNDARY
 
-Derive the machine-specific boundary from operations the current Morphic scenario actually needs.
+Derive the machine-specific boundary only from operations the current hosted Morphic scenario actually needs.
 
-The boundary should answer a narrow question:
+The boundary answers:
 
-"What must the core runtime ask a machine implementation to do, while everything else remains target-neutral?"
+What must the shared core runtime ask a machine implementation to do while the rest remains target-neutral?
 
-Prefer ordinary Zig structure and compile-time composition. Do not invent runtime dynamic dispatch unless actual requirements justify it.
+Prefer ordinary Zig structure and compile-time composition. Do not use runtime dynamic dispatch unless actual requirements justify it.
 
-Potential operation classes include output and caller-controlled logical time only if the current runtime genuinely needs them through the machine boundary. These examples are not mandates.
+Potential operation classes such as output or caller-controlled logical time are examples only. Derive the real set from current code and tests.
 
-Do not add speculative operations for:
+Do not add speculative operations for interrupts, page tables, privilege changes, CSRs, SBI, MMIO, UART, FDT, disks, networking, allocation, threading, wall-clock time, or halt/shutdown unless the Batch 09 scenario actually exercises them.
 
-- interrupts;
-- page tables;
-- privilege changes;
-- CSRs;
-- SBI;
-- MMIO;
-- UART;
-- FDT;
-- disks;
-- networking;
-- allocation;
-- threading;
-- wall-clock time;
-- shutdown/halt;
-
-unless the existing Batch 09 scenario provides concrete, tested need. Future usefulness is not sufficient evidence.
-
-The boundary must keep important semantics visible:
+The boundary must make relevant semantics explicit:
 
 - ownership;
 - borrowing;
@@ -158,19 +254,15 @@ The boundary must keep important semantics visible:
 - state transitions;
 - invalidation where relevant;
 - environment assumptions;
-- exact validation.
+- focused validation.
 
-If an operation can fail, expose the failure honestly. Do not swallow it behind a convenience wrapper.
-
-If no standalone reusable module is needed, keep the boundary in the smallest canonical composition location and explain why a module would have added unnecessary surface area.
-
-If actual pressure demonstrates a generally reusable standalone mechanism, create the minimum module that satisfies it and give it the full repository contract, Agent Fast Path, tests, diagnostics/evidence where justified, and command registration required by AGENTS.md.
+If no standalone reusable module is justified, keep the boundary in the smallest canonical composition location and explain why. If real pressure demonstrates a generally reusable standalone mechanism, create only the minimum module and give it the full repository contract/test/discovery treatment required by current policy.
 
 ARCHITECTURAL OBJECTIVE 2 — DETERMINISTIC FAKE MACHINE
 
-Add a deterministic fake machine implementation that satisfies the same machine-operations boundary used by the hosted implementation.
+Add one deterministic fake implementation of exactly the same demonstrated boundary.
 
-The fake exists to make machine behavior cheap to test without operating-system I/O or a future hardware backend.
+It exists to test target-neutral semantics without operating-system I/O or future hardware.
 
 It must be deliberately boring:
 
@@ -179,241 +271,187 @@ It must be deliberately boring:
 - no network;
 - no wall clock;
 - no hidden global state;
-- no hidden post-initialization allocation unless canonical requirements make it unavoidable;
+- no hidden post-initialization allocation unless canonically required;
 - caller-controlled or fixed state where appropriate;
-- explicit failure for exhausted caller-provided capacity when that boundary exists;
-- easy to instantiate in a focused test;
-- easy for a coding agent to understand from the compact contract/preflight surface.
+- explicit failure for exhausted caller-provided capacity where applicable;
+- cheap to instantiate and understand.
 
-Do not turn the fake into a simulator for RISC-V hardware.
-Do not model devices that the Batch 09 scenario does not use.
-
-The fake should be useful as a future semantic oracle for real machine implementations, but Batch 09 must not claim cross-target equivalence before such a target exists.
+Do not turn it into a RISC-V simulator.
+Do not model unused devices.
+Do not claim cross-target equivalence before a real target exists.
 
 ARCHITECTURAL OBJECTIVE 3 — ONE CORE RUNTIME, TWO IMPLEMENTATIONS
 
-Refactor only as necessary so one canonical runtime/composition path can execute against:
+Refactor only as necessary so one canonical runtime path executes against:
 
-1. the existing hosted implementation; and
+1. the existing hosted implementation;
 2. the deterministic fake implementation.
 
-Do not copy the scheduler/resource/trace orchestration into two implementations.
-Do not create hosted_core.zig and fake_core.zig copies of the same runtime logic.
-Do not duplicate canonical task scheduling policy, resource planning, trace semantics, or output formatting.
+Do not copy scheduler/resource/trace orchestration.
+Do not create hosted_core.zig and fake_core.zig copies.
+Do not duplicate scheduling policy, resource planning, trace semantics, or output formatting.
 
-The machine implementations may differ only where the machine boundary requires them to differ.
+Prefer a single generic/comptime core function instantiated with both implementations if that is the cleanest ordinary Zig 0.14.0 design.
 
-The test must make duplication visible. Prefer a single generic/comptime core function instantiated with both implementations over two similar functions maintained separately, if that is the cleanest Zig 0.14.0 design.
+For identical canonical input, mechanically compare every meaningful observable that can honestly be compared, including where applicable:
 
-Prove, for the same canonical input scenario, every equivalence that is actually meaningful and observable.
+- normalized event trace;
+- captured logical output;
+- deterministic ordering;
+- explicit bounded-output/capacity failure behavior.
 
-At minimum investigate:
-
-- normalized event trace equality;
-- captured logical output equality;
-- deterministic ordering equality;
-- explicit failure behavior for a bounded output/capacity condition if applicable.
-
-Only claim byte-for-byte equivalence for artifacts actually compared byte-for-byte.
-
-Do not claim machine equivalence beyond the tested observable surface.
+Only claim byte equality for artifacts actually compared byte-for-byte.
+Do not claim broader machine equivalence than tested.
 
 ARCHITECTURAL OBJECTIVE 4 — AGENT-NATIVE DISCOVERY
 
-A cold agent must be able to discover and use this boundary without broad source archaeology.
+A cold agent must be able to discover and correctly use the new boundary without broad source archaeology.
 
-After implementation, test the cheapest sufficient path:
+Test the cheapest sufficient path:
 
 requirement
-→ decide/query
-→ selection
-→ preflight
-→ minimum useful contract
-→ compose
-→ focused validation
+-> decide/query
+-> selection
+-> preflight
+-> minimum useful contract
+-> compose
+-> focused validation
 
-If the new composition or reusable mechanism is not discoverable through the current Agent Fast Path, add the smallest canonical metadata/projection necessary to make it discoverable.
+If discoverability is insufficient, add only the smallest canonical metadata/projection required. Do not create a second catalog, hand-author generated files, dump source into projections, or inflate every module card.
 
-Do not create a second catalog.
-Do not add hand-maintained generated facts.
-Do not dump implementation source into projections.
-Do not increase every module card because three Morphic components need a new fact.
+Measure exact byte sizes for representative changed agent projections and report them. Do not invent token estimates.
 
-Use progressive disclosure.
+ARCHITECTURAL OBJECTIVE 5 — USE BATCH 08, DO NOT DECORATE WITH IT
 
-If recipe/composition preflight needs a small stronger fact to describe the shared machine boundary safely, derive it from canonical recipe/module truth rather than manually maintaining duplicate prose.
+Preflight should expose relevant correct-use obligations before integration.
 
-Measure exact output bytes for representative new or changed agent projections. Record bytes, not invented token estimates.
+If real implementation pressure produces a repeated failure class whose violated canonical invariant is established by executable evidence, add the smallest justified invariant/diagnostic/Failure State Capsule path.
 
-ARCHITECTURAL OBJECTIVE 5 — PRE-FLIGHT / POST-FAILURE SYMMETRY
-
-Use Batch 07 and Batch 08 rather than bypassing them.
-
-Before executing the new composition, preflight should expose the obligations necessary for correct use.
-
-If implementation pressure exposes a real repeated failure class with a canonical invariant and executable evidence, add the smallest justified invariant/diagnostic/Failure State Capsule path.
-
-Do not add a diagnostic merely because an error occurred once during implementation.
-Do not manufacture a canonical invariant to make Batch 08 appear more broadly used.
-Do not convert a compiler typo into a permanent ZIGREF identity.
+Do not add a diagnostic because a compiler typo occurred once.
+Do not manufacture an invariant to make Batch 08 look busy.
 Do not infer causality from a native error string alone.
-
-Known failures must remain evidence-backed.
-Unknown failures must remain UNKNOWN.
-Native Zig errors remain authoritative and visible.
+Known remains evidence-backed.
+Unknown remains UNKNOWN.
+Native Zig errors remain authoritative.
 
 ARCHITECTURAL OBJECTIVE 6 — PREPARE, DO NOT IMPLEMENT, THE RISC-V DIFFERENCE
 
-The Batch 09 result should leave a future RISC-V implementation with a narrow visible target-specific surface.
+Leave a future RISC-V implementation with a narrow, explicit target-specific surface.
 
-Record in the Batch 09 report:
+Record:
 
-- the exact machine operations a future implementation would need to satisfy for the tested scenario;
-- which current semantics remain entirely target-neutral;
-- which future RISC-V concerns are intentionally outside the current boundary;
-- what the next smallest evidence-backed RISC-V step appears to be.
+- exact machine operations a future implementation must satisfy for the tested scenario;
+- semantics that remain target-neutral;
+- future RISC-V concerns intentionally outside the boundary;
+- next smallest evidence-backed RISC-V step.
 
-Do not implement that RISC-V step in this batch.
+Do not implement that RISC-V step in Batch 09.
 
-The desired result is that a later agent can see the target-specific difference without reading the entire hosted runtime.
+CORRECTNESS AND STANDARD-PRACTICE DISCIPLINE
 
-This is not a promise that all architecture differences will remain small. It is an explicit boundary for the semantics demonstrated so far.
+This repository deliberately tries to exploit the programming grammar a capable coding agent was already trained on. Keep ordinary concepts ordinary.
 
-CORRECTNESS AND CODE QUALITY
+For new or changed code:
 
-The purpose of this repository is not to win agent preference by slogans. Make the implementation the rational choice by being cheaper to discover, safer to reuse, easier to validate, and clearer to repair.
-
-For all new or changed code:
-
-- prefer simple ordinary Zig over clever metaprogramming;
+- prefer idiomatic, straightforward Zig over clever metaprogramming;
+- use normal Python packaging/virtual-environment concepts for Python tooling;
+- use normal JSON/schema/test/error/dependency terminology;
 - keep interfaces minimal;
 - make ownership and resource use explicit;
-- avoid hidden allocation;
-- avoid hidden ambient state;
-- preserve deterministic behavior;
+- avoid hidden allocation and ambient state;
+- preserve determinism;
 - keep error sets truthful;
-- preserve failure atomicity where the existing contract promises it;
+- preserve promised failure atomicity;
 - test boundaries and negative paths;
-- use exact public symbols in examples;
-- keep compiler output authoritative;
-- do not add abstraction layers with only one demonstrated reason to exist;
-- do not optimize for line count at the expense of correctness;
-- do optimize the agent-facing representation for high information density.
+- use exact public symbols;
+- keep compiler/runtime output authoritative;
+- introduce project-specific vocabulary only when an ordinary established term is insufficient.
 
-The best compact representation is the smallest one that preserves the facts required for a correct decision.
-
-Do not make intelligence pay twice for settled engineering knowledge.
+Where established programming practice and Zig already provide a good answer, require evidence before inventing a different one.
 
 COMMAND MANUAL — MANDATORY CUMULATIVE RULE
 
-Every Codex run that changes the repository must update COMMANDS.md before completion.
+Every repository-changing Codex run must update COMMANDS.md before completion.
 
 This is cumulative, not batch-local.
 
-- Add every new runnable command introduced by this run.
-- Update changed commands, arguments, purposes, and validation status.
-- Backfill real supported commands introduced by PREVIOUS batches that COMMANDS.md currently omits.
+- Add new runnable commands.
+- Update changed commands, arguments, purposes, setup requirements, and canonical-vs-raw status.
+- Backfill real supported commands from previous batches that remain omitted.
 - Remove or accurately mark obsolete/nonexistent commands.
-- Never document a command that does not actually exist.
-- Never call a command validated unless it actually executed successfully in the reported environment.
-- Preserve the distinction between raw build/prerequisite surfaces and canonical serious Developer Minimus outer surfaces.
-- Run:
+- Never document nonexistent commands.
+- Never call a command validated unless it actually passed in the reported environment.
+- Document the canonical Python validation/setup rule if Phase 0 changes it.
+- Preserve Developer Minimus distinctions.
+
+Run:
 
 PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
 
-COMMANDS.md must be current when the run finishes.
+If a new serious aggregate verification command is genuinely justified, it must preserve ordinary output, then append exactly one LOCATIONS block followed by exactly one MINIMUS block, and preserve the underlying exit status.
 
-If a new serious developer-facing aggregate verification surface is introduced, it must obey Developer Minimus exactly:
-
-ordinary output first
-LOCATIONS
-MINIMUS
-
-Exactly one authoritative top-level handoff after the underlying command completes. Preserve the underlying exit code. No nested misleading PASS.
-
-Do not create a new serious aggregate command merely to make the batch look important. Add one only if the new machine-operations boundary has a genuine reusable verification role.
+Do not create an aggregate command merely for ceremony.
 
 VOCABULARY DISCIPLINE
 
-Read docs/agentic-vocabulary.md before naming a new project-specific concept.
+Use existing project terms when they actually fit, including Cost of Correct Use, Minimum Read Set, Context Efficiency, Correct-Use Preflight, Invariant-Guided Diagnosis, Failure State Capsule, Repair Locality, Snowball Yield, and Agentic Snowball.
 
-Use existing terms when they fit, including:
+Use ordinary terms for interpreter, virtual environment, dependency, adapter, interface, backend, fake, deterministic, target-neutral, and target-specific.
 
-- Cost of Correct Use;
-- Minimum Read Set;
-- Context Efficiency;
-- Correct-Use Preflight;
-- Invariant-Guided Diagnosis;
-- Failure State Capsule;
-- Repair Locality;
-- Snowball Yield;
-- Agentic Snowball.
-
-Do not rename existing terms.
+Do not rename ordinary concepts for branding.
 Do not add synonyms.
 
-Use ordinary programming language for ordinary concepts such as machine operations, adapter, implementation, interface, backend, fake, deterministic, target-neutral, and target-specific.
-
-Only if implementation pressure genuinely requires a new project-specific formal term, add one precise definition to docs/agentic-vocabulary.md and use it consistently. Do not expand the vocabulary for rhetorical effect.
+Modify docs/agentic-vocabulary.md only if implementation pressure genuinely requires a new project-specific concept that ordinary terminology cannot express.
 
 AGENTS.md DISCIPLINE
 
 Do not add Batch 09 history to AGENTS.md.
 
-Modify AGENTS.md only if this batch discovers a durable rule that every future cold agent must follow to use or extend the repository correctly and that is not already expressed there.
+Modify AGENTS.md only if Phase 0 or machine-operations work discovers a durable rule every future cold agent must know and the rule is not already represented by canonical commands/doctor/setup surfaces.
 
-If no such durable rule is discovered, leave AGENTS.md unchanged.
+Prefer executable discovery over another prose instruction.
 
 SNOWBALL YIELD — REQUIRED FACTUAL BOOKKEEPING
 
-Create:
+Create/update:
 
 docs/reports/AGENTIC_SNOWBALL_BATCH_09.md
 
-Record Snowball Yield according to docs/standards/SNOWBALL_YIELD.md and canonical project vocabulary.
+Record factual Snowball Yield according to docs/standards/SNOWBALL_YIELD.md.
 
 At minimum record:
 
-composition name;
-actual base commit;
-Zig baseline;
-requirements frozen before implementation;
-requirements already satisfied by existing modules;
-requirements already satisfied by existing recipes/compositions;
-missing reusable capabilities;
-project-specific orchestration;
-out-of-scope requirements;
-requirements discovered during implementation;
-existing modules actually reused;
-existing recipes/compositions actually reused;
-new reusable modules created;
-new reusable recipes/compositions created;
-known diagnostic lookups used;
-unknown diagnostic lookups;
-new evidenced diagnostics added;
-source reads required for ordinary reuse;
-focused validation executed;
-aggregate validation executed;
-exact deterministic projection/output sizes where measured;
-unmeasured fields;
-limits and non-claims.
+- actual base commit and Zig baseline;
+- Phase 0 reproduced environment symptom;
+- demonstrated root cause;
+- existing mechanisms reused for environment repair;
+- new environment mechanism, if any;
+- whether an unactivated-shell canonical validation succeeds after repair;
+- requirement map frozen before Morphic implementation;
+- requirements already satisfied by modules;
+- requirements already satisfied by recipes/compositions;
+- missing reusable capabilities;
+- project-specific orchestration;
+- out-of-scope requirements;
+- existing modules/recipes actually reused;
+- new reusable modules/recipes created;
+- known and unknown diagnostic lookups actually used;
+- new evidenced diagnostics/invariants, if any;
+- source reads required during authoring;
+- source reads required for ordinary reuse after canonicalization;
+- focused validation executed;
+- aggregate validation executed;
+- exact deterministic output/projection sizes measured;
+- unmeasured fields;
+- limits and non-claims.
 
-Do not invent:
-
-- token savings;
-- percentage speedups;
-- hypothetical baseline costs;
-- hidden compute estimates;
-- Rust/C/Zig benchmark conclusions;
-- agent preference rates.
-
-If a field was not measured, say unmeasured.
+Do not invent token savings, speedups, baseline costs, hidden compute, language benchmark conclusions, or agent preference rates.
 
 VALIDATION — FOCUSED FIRST
 
-Use actual commands discovered from COMMANDS.md and the implementation rather than blindly preserving examples in this request if the command surface changed.
+Use actual canonical commands from COMMANDS.md after Phase 0 repairs. Do not blindly preserve a command from this request if the canonical surface legitimately changes.
 
-The final validation set must include, where applicable:
+Final validation must include the relevant equivalents of:
 
 PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py
 PYTHONDONTWRITEBYTECODE=1 python3 tools/test-invariant-diagnosis.py
@@ -421,73 +459,94 @@ PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py --check
 PYTHONDONTWRITEBYTECODE=1 python3 tools/validate-agent-contracts.py --self-test
 PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
 PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py
+node tools/check-port-contracts.js
+node tools/test-port-public-surface.js
 python3 tools/query-reference.py agent doctor
 
-Run focused tests for every new or changed module/recipe.
-Run hosted Morphic verification.
-Run the new machine-operations/fake-adapter verification if a canonical command is created.
-Run the canonical full repository validation last.
+Also run:
 
-At minimum, the final repository state must demonstrate:
+- the new Phase 0 interpreter/dependency-selection regression;
+- a canonical Python-dependent build verification from fresh/unactivated shell semantics where safely reproducible;
+- focused tests for every new/changed module or recipe;
+- hosted Morphic verification;
+- machine-operations/fake verification if a canonical surface is created;
+- hosted runtime twice for byte repeatability;
+- fake runtime/scenario twice for byte repeatability;
+- zig fmt --check .;
+- git diff --check;
+- zig build check --summary all;
+- zig build test --summary all;
+- zig build recipes --summary all;
+- zig build conformance --summary all;
+- python3 tools/developer-command.py verify-morphic-plan;
+- python3 tools/developer-command.py verify-morphic-trace;
+- python3 tools/developer-command.py smoke;
+- python3 tools/developer-command.py validate-repository last.
 
-- current Agent Fast Path contracts/indexes pass;
-- current Failure State Capsule regression passes;
-- hosted Morphic behavior remains correct;
-- the core runtime is not duplicated across machine implementations;
+Run repository property/fuzz/differential/policy gates through the canonical aggregate pipeline as defined by current repository truth. Do not claim skipped gates passed.
+
+The final repository must demonstrate:
+
+- Python-dependent serious validation no longer accidentally depends on prior shell activation;
+- missing Python validation dependencies fail clearly and early;
+- doctor exposes relevant environment health;
+- Agent Fast Path remains truthful;
+- Failure State Capsule regression remains green;
+- hosted Morphic remains correct and deterministic;
+- one shared Morphic core exists rather than copied hosted/fake logic;
 - fake implementation is deterministic;
-- meaningful same-input hosted/fake observables compare exactly where claimed;
-- invalid/bounded behavior is tested where applicable;
-- generated views are not stale;
+- claimed same-input hosted/fake observables compare mechanically;
+- generated views are current;
 - COMMANDS.md is current;
 - Developer Minimus remains truthful;
 - full repository validation passes;
-- git diff --check passes;
-- final worktree contains only intended task changes before task completion.
-
-Run any existing repository policy, port, recipe, conformance, property, fuzz-smoke, differential, Morphic plan, Morphic trace, and smoke gates required by the canonical repository validation pipeline. Do not mark a skipped gate passed.
+- final worktree contains only intended task changes before completion.
 
 INDEPENDENT-REVIEW FRIENDLINESS
 
-Make the Batch 09 report and changed surfaces easy for a separate cold reviewer to test.
+A cold reviewer should be able to answer mechanically and cheaply:
 
-A reviewer should be able to answer cheaply:
+1. What caused the repeated `No module named 'jsonschema'` failure?
+2. Can the repaired canonical build-backed validation pass without relying on prior `source .venv/bin/activate` shell state?
+3. Does the negative missing-dependency path fail with a clear repair instead of a deep ModuleNotFoundError?
+4. Is there really one core Morphic runtime rather than copied hosted/fake logic?
+5. Are machine operations minimal and actually exercised?
+6. Does fake satisfy the same boundary?
+7. Did hosted behavior remain byte-identical to baseline unless a correctness repair required otherwise?
+8. Are deterministic fake runs byte-identical?
+9. Are same-input logical output/trace artifacts equal where claimed?
+10. Can a cold agent discover preflight/validation/environment requirements without broad source archaeology?
+11. Were only evidence-backed diagnostics/invariants added?
+12. Is the entire repository green and the worktree clean?
 
-1. Is there really one core runtime rather than copied hosted/fake logic?
-2. Are the machine operations minimal and actually exercised?
-3. Does the fake satisfy the same boundary?
-4. Does hosted behavior remain byte-identical to the pre-edit baseline when no correctness repair required a change?
-5. Are deterministic fake runs byte-identical?
-6. Are same-input logical output/trace artifacts equal where claimed?
-7. Are all new public commands in COMMANDS.md?
-8. Does preflight expose the relevant obligations without source archaeology?
-9. Did the run add only evidence-backed diagnostics/invariants?
-10. Is the whole repository still green and the worktree clean?
-
-Do not require the reviewer to trust prose that can be checked mechanically.
+Do not require a reviewer to trust prose that can be checked mechanically.
 
 STOP CONDITIONS
 
-Stop and explain instead of forcing the requested architecture if any of these are true:
+Stop and explain rather than forcing the architecture if:
 
-- the current hosted runtime cannot be separated from machine-specific operations without changing its semantics materially;
-- the proposed machine boundary would require speculative operations not exercised by the scenario;
-- a reusable module would only duplicate an existing capability;
-- the fake requires a second copy of core runtime logic;
+- Phase 0 reveals that the recurring Python failure cannot be distinguished from an external environment limitation safely in scope;
+- the environment repair requires a broad package-management system instead of a small repository rule;
+- current hosted runtime cannot be separated from machine-specific operations without materially changing semantics;
+- the proposed machine boundary requires speculative unused operations;
+- a reusable module would duplicate an existing capability;
+- fake requires a second copy of core runtime logic;
 - canonical contract truth conflicts with executable source and cannot be repaired safely in scope;
-- a required validation gate fails for a pre-existing reason that cannot be distinguished from this batch;
-- the environment lacks a required external tool and there is no repository-approved way to proceed honestly.
+- a required external tool is absent and there is no repository-approved truthful repair path.
 
-Record the limitation. Do not hide it.
+Record limitations. Do not hide them.
 
 COMPLETION STANDARD
 
-Batch 09 is complete only when the repository has demonstrated the smallest useful target-neutral machine-operations boundary with one shared Morphic core and at least hosted + deterministic fake implementations, with evidence-honest agent discovery, preflight, validation, and Snowball Yield bookkeeping.
+Batch 09 is complete only when BOTH are true:
 
-The result should make the future RISC-V implementation smaller and more obvious without implementing it prematurely.
+A. Python-dependent canonical validation has a mechanically tested, conventional, non-machine-specific environment rule that eliminates accidental reliance on prior venv activation and gives a clear negative path.
 
-Do not claim victory because files were added.
-The proof is reduced duplication, explicit boundaries, deterministic behavior, and mechanical validation.
+B. Morphic demonstrates the smallest useful target-neutral machine-operations boundary with one shared core and at least hosted + deterministic fake implementations, with truthful agent discovery, preflight, validation, and Snowball Yield bookkeeping.
 
-Finish the task only when all required validation succeeds and the final task summary ends with exactly:
+Do not claim success because files were added.
+The proof is reduced environment ambiguity, reduced runtime duplication, explicit boundaries, deterministic behavior, and mechanical validation.
+
+Finish only when every required gate that applies has passed and the final task summary ends with exactly:
 
 AGENTIC SNOWBALL BATCH 09 PASSED
