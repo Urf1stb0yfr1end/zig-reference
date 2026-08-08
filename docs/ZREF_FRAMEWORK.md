@@ -375,13 +375,34 @@ This is preferable to a confident answer assembled from partial resemblance to L
 
 # Semantic name integrity
 
-Z-Ref should preserve established vocabulary when established semantics are genuinely inherited.
+Z-Ref should preserve established vocabulary only when the established contract is actually satisfied.
 
-Linux, POSIX, ELF, musl, Alpine, and other standard terms are valuable because agents already understand them.
+Linux, POSIX, ELF, musl, Alpine, and other standard terms are valuable because agents already understand them. That familiarity is useful precisely because those names already carry expectations. Reusing one therefore creates a semantic obligation.
 
-But familiar names become dangerous when they imply capabilities or semantics that the implementation does not provide.
+## Naming contract disclaimer
 
-Therefore a borrowed external concept should declare its relationship explicitly:
+> **A familiar name is a compatibility claim, not a statement of resemblance.**
+
+Established technical names are reserved for implementations that satisfy the established contract at the boundary where that name is exposed. An Alpz-native operation must not inherit a familiar name merely because it serves a similar purpose, shares conceptual lineage, or implements a useful approximation of the same idea.
+
+When the relationship is strong enough to aid recognition but the semantics are not fully interchangeable, Z-Ref should preserve the lineage while making the non-equivalence visible. The preferred convention is a `z`-prefixed cognate:
+
+```text
+mmap
+  established mmap contract
+
+zmmap
+  Alpz-native operation related to mmap
+  semantics and differences must be declared
+```
+
+The `z` prefix is therefore a semantic boundary marker. It tells an agent that prior knowledge of the familiar operation may provide useful orientation, but that the familiar operation's complete behavior must not be assumed. If an Alpz implementation later becomes fully compatible with the established contract at the exposed boundary, the established unprefixed name is appropriate there.
+
+If there is no strong and useful correspondence to an established concept, the operation should receive an ordinary descriptive Alpz-native name rather than a forced `z` cognate.
+
+> **Familiar terminology should transfer knowledge, never unsupported assumptions.**
+
+Therefore any externally borrowed concept or internally related cognate should declare its relationship explicitly:
 
 ```text
 EXACT
@@ -433,7 +454,7 @@ signals
 sockets
 ```
 
-The external name tells the agent which contract must be satisfied. Z-Ref separately records whether the implementation status is EXACT, SUBSET, PARTIAL, or otherwise qualified.
+The external name tells the agent which contract may be relied upon. Under this naming rule, an unprefixed established name is reserved for a compatibility surface that is fully supported and evidenced as the established contract. A partial, restricted, approximate, or otherwise non-interchangeable operation must use a distinct name, normally the `zX` cognate when that relationship is useful.
 
 ## 2. Related Alpz-native machinery: use a bridge name
 
@@ -447,7 +468,7 @@ Linux stat     <-> possible Alpz bridge name: zstat
 Linux epoll    <-> possible Alpz bridge name: zepoll
 ```
 
-These examples are illustrative, not a requirement that every Alpz concept receive a `z` prefix. The naming rule matters more than any particular spelling.
+These examples are illustrative, not a requirement that every Alpz concept receive a `z` prefix. The prefix is appropriate when a strong familiar cognate exists but semantic identity does not. Fully compatible exposed contracts keep the established name; concepts without a useful familiar cognate receive ordinary Alpz-native names.
 
 The extra marker performs two jobs at once:
 
@@ -503,12 +524,16 @@ The probe must be cheap and safe.
 
 If `zX` exists, its existence means only that Z-Ref has deliberately registered it as a cognate of `X`. It does not by itself mean that every behavior of `X` is present.
 
-The cognate must declare its relation:
+The cognate must declare its relation and the boundary of safe assumption:
 
 ```text
 name: zstat
 origin: stat
-relation: EXACT
+relation: SUBSET
+supported:
+  <declared semantics>
+unsupported:
+  <declared semantics>
 ```
 
 or:
@@ -516,10 +541,10 @@ or:
 ```text
 name: zmmap
 origin: mmap
-relation: SUBSET
-supported:
+relation: ADAPTER
+preserves:
   <declared semantics>
-unsupported:
+differs:
   <declared semantics>
 ```
 
@@ -543,7 +568,7 @@ The safe rule is:
 
 > **If `zX` exists, assume it is the registered Z-Ref cognate of `X`; then trust exactly the compatibility and semantics that the cognate declares.**
 
-For an `EXACT` cognate, this may allow the agent to proceed almost exactly as it would with the original operation. For a `SUBSET`, `ADAPTER`, or `ANALOGUE`, Z-Ref must make the boundary obvious before the agent relies on unsupported behavior.
+A `zX` cognate exists specifically to prevent semantic identity from being inferred from resemblance. For a `SUBSET`, `ADAPTER`, or `ANALOGUE`, Z-Ref must make the boundary obvious before the agent relies on unsupported behavior. When the exposed operation becomes fully interchangeable with `X`, the compatibility surface should use the established name `X` rather than asking agents to reinterpret `zX` as identical.
 
 Absence is useful too.
 
