@@ -500,3 +500,67 @@ The coding agent becomes more useful because it discovers and composes establish
 That is the world Morphic purports to provide:
 
 > A world in which systems can move between simulation, hardware, testing, firmware, and virtualization without becoming different creatures along the way.
+
+---
+
+## Current implementation direction: Morphic remains the flagship
+
+The core vision above remains the governing idea. The direction has become clearer as the freestanding work has become real.
+
+**Morphic is the flagship composition of `zig-reference`. Alpz is the current flagship real-machine and kernel embodiment of Morphic, not a replacement for Morphic.**
+
+The relationship we intend to preserve is:
+
+```text
+                    zig-reference / Z-Ref
+             reusable mechanisms + contracts + evidence
+                              |
+                              v
+                         Morphic core
+                shared system meaning and policy
+                              |
+          +-------------------+--------------------+
+          |                   |                    |
+          v                   v                    v
+     hosted/fake          Alpz kernel         future bodies
+     replay/tests        RISC-V first       microvisor/hypervisor
+                                              other architectures
+                                              embedded/firmware
+                                              other kernel adapters
+```
+
+Recent Alpz work is therefore also Morphic work. The real RISC-V path has been used as an increasingly serious machine body while the hosted and deterministic fake paths remain preservation references. Exact Morphic output equality across those forms is deliberately treated as machine-substitution evidence: the machine underneath can become more capable without silently changing the shared computation above it.
+
+The current kernel line is intentionally making Alpz more real in stages: traps, timer interrupts, repeated timer events, real monotonic time, scheduler-facing time, physical memory ownership, then virtual memory, user mode, syscalls, processes, and eventually broad Linux-userspace compatibility. That work should strengthen the environmental boundary rather than pull RISC-V- or Alpz-specific policy into the Morphic core.
+
+The current Linux direction has also changed the role of virtualization. The primary Alpz path is now to run real, unmodified Linux userspace directly on the Alpz kernel by progressively satisfying the Linux userspace contract. A hypervisor or microvisor is still a valuable Morphic embodiment, but it is no longer the mandatory next identity or the sole destination of the flagship.
+
+The implementation rule is therefore:
+
+```text
+Morphic semantics and reusable policy
+        remain shared
+
+machine-specific mechanisms
+        remain adapters or embodiments
+
+Alpz may become a serious kernel
+        without becoming the definition of Morphic
+
+new machines should reuse the accumulated core
+        instead of recreating its semantics
+```
+
+The intended progression is:
+
+1. Keep every new Alpz machine milestone compatible with the established Morphic semantic result and preservation evidence where that comparison is meaningful.
+2. Strengthen explicit Morphic boundaries for resource planning, scheduling, ownership, tracing, replay, diagnostics, and other genuinely shared policy as real-machine pressure exposes them.
+3. Continue Alpz as the flagship kernel embodiment through memory management, Sv39, U-mode, syscalls, process machinery, and Linux-userspace compatibility.
+4. After the shared core is sufficiently mature, add parallel embodiments rather than forks of the meaning: a microvisor/hypervisor, additional CPU architectures, replay/fuzz bodies, embedded/firmware forms, and eventually adapters for unrelated kernels where appropriate.
+5. Measure whether a fresh engineering agent can construct or port these bodies mostly by composing established Z-Ref knowledge and Morphic contracts rather than rediscovering or duplicating solved mechanisms.
+
+This makes the flagship claim stronger, not smaller:
+
+> **The repository is not trying merely to produce one remarkable kernel. It is trying to prove that one accumulated body of systems knowledge can produce a family of machines without requiring a family of semantic rewrites.**
+
+Alpz is currently where that claim is being subjected to the hardest real-machine pressure.
