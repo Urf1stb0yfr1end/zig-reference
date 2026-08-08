@@ -181,6 +181,47 @@ The principle may be evaluated with measurements such as new project-specific li
 
 **Less-Lines Paradigm** may be used informally for the broader worldview produced when this principle compounds across a large corpus, but **Less-Lines Principle** is the formal project term.
 
+## Instruction Compression
+
+The reduction in explicit human or agent instruction required to produce a correct validated engineering result because the corpus can discover and compose settled knowledge without requiring those decisions to be restated.
+
+Instruction Compression is not prompt cleverness, vagueness, or hidden assumptions. It is earned when repeated engineering decisions have become canonical, discoverable, composable, and mechanically verifiable.
+
+The desired direction is:
+
+```text
+more canonical solved knowledge
+→ fewer settled decisions must be restated
+→ fewer explicit instructions
+→ equal or greater validated consequence
+```
+
+The strongest form of the idea is:
+
+> **New instruction should increasingly correspond to new intent.**
+
+## Less-Lines Convergence
+
+The combined tendency for both newly written implementation and required explicit instruction to shrink as a reusable engineering corpus matures, while the amount of validated system consequence that can be mobilized grows.
+
+Conceptually:
+
+```text
+implementation compression:
+new project code → Residual Novelty + unavoidable glue
+
+instruction compression:
+explicit instruction → user-specific intent + genuinely unresolved policy
+```
+
+Less-Lines Convergence does not reward terse prompts or short code by themselves. The compression is valid only when correctness, explicit uncertainty, and validation are preserved.
+
+The practical intuition is:
+
+> **The lines shrink while the consequence grows.**
+
+A mature corpus should therefore require less explanation to mobilize more of what has already been solved. See `docs/concepts/LESS_LINES_CONVERGENCE.md` for the visual model and fuller explanation.
+
 ## 0-to-Done Speed
 
 The elapsed engineering time required to transform a high-level specification into a complete, validated, usable result, including requirement decomposition, discovery, composition, Residual Novelty, repair, and validation.
@@ -204,7 +245,7 @@ The long-horizon ambition is that sufficiently mature agents operating over a su
 
 This is not a present claim that arbitrary large systems can be produced in minutes. It is a measurable research target. A valid 0-to-Done benchmark must freeze the requested specification, define "done" before execution, count failed attempts and human intervention, and verify the final artifact against the declared requirements.
 
-0-to-Done Speed is strengthened by the Less-Lines Principle, Reconstruction Coverage, Snowball Yield, low Cost of Correct Use, and low Residual Novelty. The desired relationship is:
+0-to-Done Speed is strengthened by the Less-Lines Principle, Instruction Compression, Less-Lines Convergence, Reconstruction Coverage, Snowball Yield, low Cost of Correct Use, and low Residual Novelty. The desired relationship is:
 
 ```text
 more solved knowledge
