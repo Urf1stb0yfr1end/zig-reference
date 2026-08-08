@@ -12,7 +12,9 @@ jobs:
       - uses: mlugg/setup-zig@v2
         with:
           version: 0.14.0
-      - run: python3 -m pip install -r tools/requirements.txt
+      - run: python3 -m venv .venv
+      - run: .venv/bin/python -m pip install -r tools/requirements.txt
+      - run: python3 tools/python-environment.py --check
       - run: python3 tools/format-module-contracts.py --check
       - run: zig fmt --check build.zig projects recipes conformance
       - run: zig build check
