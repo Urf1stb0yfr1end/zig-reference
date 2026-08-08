@@ -1,0 +1,804 @@
+CODEX AGENTIC SNOWBALL BATCH 12 — SUPERVISOR TRAP ENTRY AND BOUNDED SAVED STATE
+
+MISSION
+
+Extend the proven Batch 11 freestanding RISC-V execution boundary by exactly one machine capability:
+
+TAKE A REAL SYNCHRONOUS SUPERVISOR TRAP, CAPTURE A FIXED BOUNDED INTERRUPTED STATE, RETURN CORRECTLY WITH SRET, AND THEN CONTINUE INTO THE SAME SETTLED MORPHIC SEMANTICS.
+
+Batch 11 proved:
+
+OpenSBI / conventional firmware
+→ RISC-V S-mode
+→ explicit freestanding Zig entry + stack
+→ existing target-neutral Morphic core
+→ SBI output/shutdown
+→ exact canonical Morphic bytes
+
+Batch 12 asks:
+
+CAN OUR FREESTANDING S-MODE PAYLOAD ESTABLISH ITS OWN SUPERVISOR TRAP VECTOR, SURVIVE A DELIBERATE SYNCHRONOUS TRAP, PRESERVE THE INTERRUPTED EXECUTION STATE, RETURN TO THE CORRECT NEXT INSTRUCTION, AND STILL PRODUCE THE SAME CANONICAL MORPHIC RESULT?
+
+The intended evidence chain is:
+
+OpenSBI
+→ our S-mode entry
+→ install stvec
+→ deliberate known synchronous trap
+→ our trap entry
+→ bounded TrapFrame
+→ mechanically observed scause/sepc/stval/sstatus
+→ correct resume PC
+→ sret
+→ post-trap execution proof
+→ unchanged Morphic core
+→ exact canonical Morphic bytes
+→ SBI shutdown
+
+This is the next smallest evidence-backed pressure identified by the merged Batch 11 report. Batch 11 explicitly left trap entry plus bounded saved state as the next boundary because truthful exceptions are prerequisite knowledge for later timer interrupts, faults, virtual memory, userspace, and Linux-compatible kernel work.
+
+Do not leap ahead.
+
+
+FROZEN PRE-BATCH-12 BASELINE
+
+The user created and pushed the annotated tag:
+
+pre-batch-12-freestanding-riscv-baseline
+
+Its peeled commit MUST be treated as the frozen pre-Batch-12 engineering baseline:
+
+87978fdf6e9b6c814b57932253885427b1c51f9a
+
+The annotated tag object observed by the user was:
+
+ff45832336669890d8dbe63b6c5225abacbe0e08
+
+Do not move, recreate, delete, or retarget this tag.
+
+The baseline includes:
+
+- merged Batch 11 freestanding RISC-V Morphic execution;
+- the repaired Batch 10 Linux-user RISC-V verifier;
+- the repaired Batch 11 system-QEMU verifier;
+- Agentic Vocabulary additions for Less-Lines Principle and 0-to-Done Speed;
+- docs/concepts/LESS_LINES_CONVERGENCE.md;
+- Agentic Vocabulary additions for Instruction Compression and Less-Lines Convergence.
+
+The Batch 12 plan itself is necessarily committed AFTER that frozen tag. Do not reset the working branch to the tag if doing so removes this plan. Instead, use the tag as the comparison/evidence baseline and work from the supplied current branch containing this request.
+
+If the tag is available locally, verify:
+
+git rev-parse pre-batch-12-freestanding-riscv-baseline^{}
+
+and confirm it resolves to:
+
+87978fdf6e9b6c814b57932253885427b1c51f9a
+
+If the tag is absent but a legitimate origin exists, fetching that exact tag is permitted. If no remote exists, record the absence and continue from the supplied checkout after verifying the baseline commit is an ancestor or the corresponding baseline content is present. Do not invent a remote and do not stop solely because a task sandbox omitted tags.
+
+The older benchmark-pre-morphic-52 tag remains frozen and untouched.
+
+
+GOVERNING PRINCIPLES
+
+ONE CORE.
+SAME MORPHIC SCENARIO.
+ONE NEW MACHINE BOUNDARY.
+STANDARD RISC-V TERMS AND INTERFACES.
+FIXED BOUNDED STATE.
+MECHANICAL TRAP EVIDENCE.
+RETURN, DO NOT MERELY CRASH.
+FAIL CLOSED.
+QUERY BEFORE BROWSE.
+CORRECTNESS BEFORE CONTEXT.
+NEW CODE SHOULD INCREASINGLY CORRESPOND TO NEW KNOWLEDGE.
+NEW INSTRUCTION SHOULD INCREASINGLY CORRESPOND TO NEW INTENT.
+THE LINES SHRINK WHILE THE CONSEQUENCE GROWS.
+
+Less-Lines does NOT mean code golf.
+
+Instruction Compression does NOT mean vague prompts.
+
+0-to-Done does NOT mean declaring success because something compiled.
+
+The desired result is a small amount of explicit new machine-boundary code because most semantics are already solved and reused, together with strong enough evidence that future work does not have to rediscover this boundary.
+
+
+LONG-HORIZON DIRECTION — ALPZ
+
+The long-horizon direction remains compatibility-first Alpz:
+
+FAMILIAR OUTSIDE.
+EXPLICIT INSIDE.
+
+The future goal is to preserve Linux/Alpine-facing expectations while replacing implementation beneath them with an explicit Zig-owned substrate whose engineering truth is cheap for agents to discover, compose, diagnose, and validate.
+
+Trap entry matters because a useful supervisor eventually must handle exceptions and interrupts truthfully. But Batch 12 is NOT permission to implement the future kernel in bulk.
+
+Do NOT begin:
+
+- timer interrupt scheduling;
+- preemption;
+- interrupt controller support;
+- external interrupts;
+- nested traps;
+- multiple harts;
+- U-mode processes;
+- syscall ABI;
+- Linux ABI;
+- userspace ELF loading;
+- virtual memory activation;
+- page-fault policy;
+- broad page-table work;
+- FDT parsing;
+- VirtIO;
+- block devices;
+- filesystems;
+- networking;
+- musl integration;
+- BusyBox;
+- Alpine /init;
+- OpenRC;
+- apk;
+- hypervisor work;
+- a universal HAL;
+- a generic interrupt framework.
+
+Those are later pressures.
+
+Batch 12 proves one synchronous S-mode trap boundary and bounded resumable state.
+
+
+WORKSPACE BOOTSTRAP
+
+Use the repository checkout supplied to this Codex task.
+
+1. Resolve the actual repository root:
+
+   git rev-parse --show-toplevel
+
+2. cd to that root.
+3. Record actual branch, HEAD, dirty status, user identity, remotes, and visible tags.
+4. Read AGENTS.md FIRST.
+5. Read COMMANDS.md before inventing commands.
+6. Read docs/agentic-vocabulary.md.
+7. Read docs/concepts/LESS_LINES_CONVERGENCE.md.
+8. Read docs/standards/SNOWBALL_YIELD.md if present.
+9. Read docs/reports/AGENTIC_SNOWBALL_BATCH_11.md.
+10. Read docs/reports/codex-notes.md.
+11. Read THIS Batch 12 request from the repository in full.
+
+Do not assume ~/dev/zig-reference.
+Do not assume /workspace/zig-reference.
+Do not assume the branch is named main.
+Do not require a Git remote to begin useful engineering work.
+Do not stop merely because the task checkout is detached, uses a work branch, or lacks origin.
+
+Use Zig 0.14.0 only.
+
+Record the actual implementation base commit and its relationship to the frozen baseline tag.
+
+Historical request files are immutable evidence. Do not edit completed Batch 01–11 request files.
+
+
+PHASE 0 — VERIFY AND PRESERVE THE BATCH 11 EXECUTION BASELINE
+
+Before trap implementation, establish current truth.
+
+At minimum run the current supported equivalents of:
+
+zig version
+python3 tools/python-environment.py --check
+python3 tools/query-reference.py agent doctor
+python3 tools/verify-riscv64-morphic-runtime.py --self-test
+python3 tools/verify-freestanding-riscv64-morphic-runtime.py --self-test
+
+When external QEMU dependencies are available, run:
+
+python3 tools/verify-freestanding-riscv64-morphic-runtime.py
+
+and, where useful:
+
+python3 tools/verify-riscv64-morphic-runtime.py
+
+The Batch 11 system-QEMU proof is a prerequisite, not disposable scaffolding.
+
+Preserve these facts unless current evidence proves a regression:
+
+- the Batch 10 riscv64-linux-musl command keeps its Linux-userspace meaning;
+- the Batch 11 freestanding command keeps its freestanding Morphic meaning;
+- the existing Morphic core remains one target-neutral semantic source of truth;
+- native hosted and fake executions remain deterministic;
+- the freestanding canonical Morphic payload remains byte-identical to the canonical native payload;
+- historical 765-byte size is an observation, never a hard-coded correctness condition;
+- ordinary repository validation remains independent of QEMU execution-lab requirements.
+
+If the current Batch 11 verifier fails for a real pre-existing reason, diagnose that regression before adding trap semantics.
+
+Do not mask a baseline regression with Batch 12 changes.
+
+
+PHASE 1 — QUERY BEFORE BROWSE; FREEZE THE REQUIREMENT MAP
+
+Run the current supported equivalents of:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+python3 tools/query-reference.py agent decide "establish a resumable synchronous supervisor trap boundary for the existing freestanding riscv64 Morphic payload with fixed bounded saved state"
+python3 tools/query-reference.py agent preflight run-hosted-morphic-runtime
+
+Query existing RISC-V, state, bounded storage, address, result, and related capabilities through the Agent Fast Path before broad source archaeology.
+
+Do not invent capability IDs that the repository does not expose.
+
+Before implementation, create/update:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_12.md
+
+Freeze requirements into at least:
+
+- existing reusable modules;
+- existing recipe/composition;
+- existing freestanding RISC-V boundary;
+- existing standard/toolchain capability;
+- missing reusable capability, if any;
+- project-specific trap orchestration;
+- external emulator/firmware dependency;
+- explicit non-goals.
+
+Do NOT choose a module quota.
+
+A new reusable module is justified only if the executable pressure establishes a genuinely reusable capability with a clear contract. Tiny target-specific glue may remain target-specific.
+
+The strongest Batch 12 result may again be very little new code.
+
+
+PHASE 2 — ESTABLISH THE ACTUAL CURRENT RISC-V/FIRMWARE FACTS
+
+Inspect the current environment rather than trusting a remembered OpenSBI banner.
+
+At minimum record:
+
+command -v qemu-system-riscv64 || true
+qemu-system-riscv64 --version || true
+command -v readelf || true
+command -v llvm-readelf || true
+
+When available, capture the firmware boot evidence from the actual QEMU path used by the repository.
+
+The user independently observed on the tagged local baseline:
+
+- OpenSBI v1.7;
+- payload next address 0x80200000;
+- next mode S-mode;
+- MEDELEG included breakpoint delegation in that observed environment;
+- the Batch 11 freestanding Morphic payload executed and shut down in under a second.
+
+Those are useful prior observations, not universal constants.
+
+For Batch 12, distinguish:
+
+- architectural facts from the RISC-V privileged model;
+- firmware/package facts;
+- directly observed environment facts;
+- repository conventions.
+
+Do not make a success claim that depends on one OpenSBI version string or one exact banner format unless that text itself is intentionally part of the verifier contract.
+
+
+PACKAGE PROVISIONING
+
+For the Codex task environment:
+
+- never use sudo;
+- never request interactive privilege escalation;
+- never curl-pipe an installer;
+- never download opaque binaries;
+- never add untrusted third-party repositories;
+- never globally install Python packages outside repository policy;
+- direct conventional distro package-manager installation is permitted only when the supplied environment already allows it without sudo or interaction;
+- install only the smallest conventional QEMU/firmware packages actually required;
+- record exact package/install commands and versions when provisioning occurs.
+
+If system-QEMU execution cannot be obtained without prohibited provisioning, produce the maximum tested useful partial implementation and report the external blocker precisely. Do not falsely mark the system execution proof PASS.
+
+
+PHASE 3 — CHOOSE ONE DELIBERATE SYNCHRONOUS TRAP
+
+The trap must be intentional, deterministic, repeatable, and simple enough that success/failure is mechanically recognizable.
+
+Preferred current hypothesis:
+
+- use a known 32-bit EBREAK instruction as the deliberate probe;
+- install stvec in direct mode to a known aligned trap entry;
+- expect a synchronous breakpoint exception when the current machine/firmware delegates it to S-mode;
+- prove the actual observed scause in the trap frame rather than merely assuming the cause from the source instruction;
+- resume at the instruction immediately following the known 32-bit probe.
+
+This is a preferred hypothesis, NOT permission to blindly hard-code an environment assumption.
+
+If the actual current QEMU/OpenSBI path does not deliver the selected probe to S-mode, determine the smallest conventional deterministic synchronous exception that does. Record why.
+
+Do not use a timer interrupt in Batch 12 merely to force trap entry.
+Do not use semihosting.
+Do not fake trap evidence by directly calling the handler as a normal function.
+Do not declare success from a compile-only assembly fixture.
+
+A real RISC-V trap must transfer control through stvec under system emulation for full PASS.
+
+
+PHASE 4 — DEFINE THE SMALLEST HONEST BOUNDED TRAP STATE
+
+Use standard terminology: TrapFrame / trap frame, register context, stvec, sepc, scause, stval, sstatus, sret.
+
+Do not invent private names for concepts the RISC-V ecosystem already has.
+
+The trap frame must be fixed-size and allocation-free.
+
+It must preserve enough state to resume arbitrary execution within the declared Batch 12 boundary without corrupting the interrupted code.
+
+Preferred minimum for a genuinely resumable synchronous trap entry:
+
+- interrupted general-purpose register state required for correct restoration;
+- original stack pointer represented correctly;
+- sepc;
+- sstatus;
+- scause;
+- stval.
+
+If the implementation claims preservation of all normal integer GPR state, preserve x1–x31 correctly and test that claim as far as practical. x0 is architectural zero and need not be stored as mutable state.
+
+Do not save floating-point/vector state unless the current execution pressure actually requires it. If not preserved, state that boundary explicitly.
+
+Do not add dynamic allocation.
+Do not add unbounded recursion.
+Do not add nested trap support.
+Do not add a second general-purpose scheduler stack.
+Do not create a separate trap stack unless executable evidence shows the current known-good stack is insufficient for this bounded probe.
+
+The fixed frame layout must not silently drift away from assembly offsets.
+
+Use one canonical layout source where Zig 0.14.0 permits it, or add mechanical compile-time/regression checks that make offset/size drift fail decisively.
+
+A trap-frame layout mismatch is a classic One-Sentence Preventable. Do not leave it as tribal knowledge.
+
+
+PHASE 5 — IMPLEMENT REAL TRAP ENTRY AND RETURN
+
+The target-specific path may perform only the machine work needed for this proof.
+
+At minimum:
+
+1. establish an aligned trap entry;
+2. write stvec intentionally;
+3. execute the deliberate trap probe;
+4. enter through the hardware trap path;
+5. capture the bounded trap frame before clobbering interrupted state;
+6. expose the observed trap state to a tiny target-neutral or target-specific recorder as appropriate;
+7. establish the resume PC according to the known probe instruction;
+8. restore the interrupted register state;
+9. execute sret;
+10. prove execution continued after the trapped instruction.
+
+For a deliberately emitted known 32-bit EBREAK probe, advancing sepc by 4 is acceptable only at that narrow probe boundary. Do not turn that into a universal exception-resume rule. Real future exceptions may require different policy or instruction-length handling.
+
+Preserve the causal state before mutating sepc for return. The verifier/report should be able to distinguish observed fault PC from resume PC or resume delta.
+
+If the trap handler cannot safely return, Batch 12 is not complete. Printing a trap and shutting down is useful partial evidence but does not satisfy the mission.
+
+
+PHASE 6 — PROVE REGISTER PRESERVATION, NOT JUST CONTROL TRANSFER
+
+A handler that reaches stvec but corrupts interrupted state is not a usable trap boundary.
+
+Create the smallest practical mechanical probe that establishes restoration.
+
+Preferred approach:
+
+- use a tiny controlled assembly/Zig boundary to place sentinel values into a declared set of GPRs;
+- execute the deliberate trap;
+- return with sret;
+- check the sentinel values after return;
+- fail decisively on corruption.
+
+If testing every stored GPR directly would require disproportionate brittle machinery, test a representative declared set plus structural frame-layout assertions, and narrow the claim accordingly.
+
+Do not claim more preservation than the evidence supports.
+
+The proof must include at least the registers that the trap-entry/handler path itself necessarily clobbers during capture and dispatch.
+
+Stack restoration must be mechanically established because sp is part of the resumable boundary.
+
+
+PHASE 7 — KEEP TRAP EVIDENCE OUTSIDE THE CANONICAL MORPHIC PAYLOAD
+
+The Morphic output remains settled semantic evidence.
+
+Trap proof bytes are machine-boundary evidence and must not become part of the canonical Morphic payload.
+
+Use a distinct deterministic trap-proof framing or another mechanically unambiguous transport surface.
+
+A good shape is conceptually:
+
+firmware text
+ZIGREF_TRAP_BEGIN
+<deterministic trap evidence>
+ZIGREF_TRAP_END
+ZIGREF_TRAP_RETURNED
+ZIGREF_MORPHIC_BEGIN
+<existing canonical Morphic payload transport>
+ZIGREF_MORPHIC_END
+shutdown
+
+Exact names may follow existing project conventions, but do not overload the existing Morphic frame.
+
+The existing Batch 11 verifier was deliberately repaired to tolerate firmware/preamble before the Morphic BEGIN marker while failing on ambiguous/trailing completion evidence. Preserve that property.
+
+Batch 12 should ideally arrange trap evidence before the Morphic frame so the old Batch 11 verifier can continue proving the old property without knowing Batch 12 semantics.
+
+Do not weaken Batch 11 framing rules merely to accommodate Batch 12.
+
+The strongest regression result is:
+
+Batch 11 verifier still PASS
++
+Batch 12 trap verifier PASS
+
+on the same current source tree.
+
+
+PHASE 8 — BUILD A DISTINCT BATCH 12 SERIOUS VERIFICATION SURFACE
+
+Add the smallest canonical serious verification command needed to prove this new boundary.
+
+Preferred naming direction, subject to current repository conventions:
+
+python3 tools/verify-freestanding-riscv64-supervisor-trap.py
+
+or an equally clear conventional name.
+
+Do not rename or overload historical Batch 10/11 verifier commands.
+
+The Batch 12 verifier must, at minimum:
+
+- fail clearly if qemu-system-riscv64 is unavailable;
+- use a finite emulator timeout;
+- build the intended freestanding RISC-V artifact/probe;
+- inspect enough ELF identity to reject an accidental hosted/Linux artifact;
+- execute system QEMU for real;
+- require exactly one successful trap-proof record;
+- establish that trap entry occurred through the expected current synchronous cause;
+- establish interrupt=false for the synchronous Batch 12 probe;
+- establish saved sepc and the explicit resume relationship;
+- establish the trap returned;
+- establish register-preservation probe success;
+- extract the Morphic frame with the existing strict rules or reuse canonical parser code without duplicating semantic logic;
+- compare the Morphic payload against native hosted/fake canonical bytes;
+- repeat the machine run at least twice and compare deterministic evidence where deterministic equality is meaningful;
+- fail on missing, duplicate, malformed, truncated, contradictory, or ambiguous evidence;
+- preserve ordinary subprocess/emulator errors rather than swallowing them;
+- append the required Developer Minimus handoff.
+
+Do not hard-code absolute code addresses that are merely linker outcomes unless an address is part of the explicit load contract.
+
+Absolute sepc may be recorded as observed evidence. Correctness should focus on semantic relationships such as expected cause and resume delta unless a fixed address is itself contractual.
+
+If shared parsing or runner logic already exists, reuse it rather than copying another verifier wholesale. Do not create an abstraction larger than the duplication it removes.
+
+Add --self-test or the repository's current equivalent for parser/failure-path behavior that does not require QEMU.
+
+
+PHASE 9 — FAIL CLOSED; REMOVE SILENT-FAILURE CASCADES
+
+Batch 12 introduces several ways a machine could appear to continue while the proof is false.
+
+At minimum fail decisively on:
+
+- stvec never reached;
+- unexpected trap cause;
+- interrupt bit unexpectedly set;
+- duplicate trap when exactly one is required;
+- missing trap end evidence;
+- malformed trap record;
+- incorrect resume relation;
+- trap handler returns to itself or loops;
+- register sentinel corruption;
+- stack corruption;
+- machine timeout;
+- QEMU launch failure;
+- unexpected ELF identity;
+- Morphic payload mismatch;
+- false success where Morphic executes but the trap probe was skipped;
+- false success where the trap happened but sret never returned;
+- false success where the trap returned but corrupted later semantics.
+
+A good success proof should make these three states mechanically distinct:
+
+TRAP TAKEN
+TRAP RETURNED
+POST-TRAP MORPHIC SEMANTICS PRESERVED
+
+Do not collapse them into one marker.
+
+Actively capture durable One-Sentence Preventables discovered during implementation at the smallest canonical decision surface.
+
+Examples of candidate facts, only if established by the run:
+
+- trap-frame assembly offsets must be tied mechanically to the canonical frame layout;
+- a known 32-bit probe may advance sepc by 4, but that is not a universal exception policy;
+- synchronous scause must have the interrupt bit clear;
+- trap evidence must not be inferred merely because later code ran if the probe can be optimized/elided;
+- previous Morphic proof must remain independently verifiable.
+
+Do not add speculative rules that the run did not establish.
+
+
+PHASE 10 — OPERATIONALIZE LESS-LINES AND INSTRUCTION COMPRESSION WITHOUT GAMING THEM
+
+The latest tagged baseline explicitly includes:
+
+- Less-Lines Principle;
+- Instruction Compression;
+- Less-Lines Convergence;
+- 0-to-Done Speed.
+
+Use them as engineering constraints, not slogans.
+
+For Batch 12:
+
+1. Reuse the existing freestanding machine boundary and Morphic core rather than creating a second runtime.
+2. Query existing reusable capabilities before implementing a new abstraction.
+3. Keep the new machine code near the irreducible novelty of trap entry/state restoration.
+4. Prefer one canonical serious Batch 12 verifier command over a long manual ritual.
+5. Preserve enough structured evidence that Batch 13 should not need a long prompt explaining how Batch 12 traps work.
+6. Do not reduce source lines by hiding complexity in opaque generated code or duplicated assembly strings.
+7. Do not reduce prompt lines by omitting correctness requirements.
+
+In the Batch 12 report, add a factual Less-Lines / Instruction Compression bookkeeping section containing only measurements that can actually be established, such as:
+
+- existing reusable components reused;
+- new reusable components added;
+- project-specific files added/changed;
+- new implementation LOC by relevant target files if cheaply/mechanically measurable;
+- whether one canonical verifier command now mobilizes the complete Batch 12 proof;
+- source reads before selection if known;
+- residual missing capability exposed by the run;
+- Snowball Yield facts.
+
+Do not invent token savings.
+Do not claim a formal 0-to-Done benchmark unless its benchmark prerequisites were frozen and measured.
+Do not claim superiority from a low line count.
+
+The point is:
+
+LESS REIMPLEMENTATION.
+MORE COMPOSITION.
+LESS REPEATED EXPLANATION.
+MORE VALIDATED CONSEQUENCE.
+
+
+PHASE 11 — COMMANDS, CONTRACTS, REPORTS, AND AGENT TRUTH
+
+Every Codex run must update COMMANDS.md cumulatively.
+
+Do not replace it with a Batch 12-only list.
+Do not remove real commands from prior batches.
+Backfill any supported commands from previous work that are genuinely missing.
+
+Document the Batch 12 build/probe/self-test/verifier commands accurately.
+
+If a new reusable module or recipe is added, provide the repository-standard complete contract surface, tests, smoke path, agent-readable metadata, dependencies, diagnostics/repair information where appropriate, and validation integration.
+
+If no new reusable module/recipe is justified, say so explicitly in the Batch 12 report.
+
+Update:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_12.md
+
+docs/reports/codex-notes.md
+
+with factual execution evidence, environment facts, blockers, architectural decisions, One-Sentence Preventables, Silent-Failure Cascade removals, remaining unknowns, and next pressure.
+
+Read docs/agentic-vocabulary.md before inventing any new project-specific term. If a genuinely necessary new term is introduced, define it there. Prefer standard RISC-V/programming terminology whenever it is sufficient.
+
+Modify AGENTS.md only if Batch 12 discovers a genuinely repository-wide durable operational law. Do not put transient trap implementation details there.
+
+Do not modify the frozen historical Batch 11 request to explain Batch 12.
+
+
+PHASE 12 — VALIDATION
+
+Run focused validation first, then aggregate validation.
+
+At minimum, successful final evidence should include current equivalents of:
+
+python3 tools/python-environment.py --check
+python3 tools/query-reference.py agent doctor
+python3 tools/verify-riscv64-morphic-runtime.py --self-test
+python3 tools/verify-freestanding-riscv64-morphic-runtime.py --self-test
+<new Batch 12 trap verifier> --self-test
+python3 tools/verify-freestanding-riscv64-morphic-runtime.py
+<new Batch 12 trap verifier>
+python3 tools/developer-command.py validate-repository
+
+Run the Batch 10 real qemu-riscv64 Linux-user verifier as well when its external dependency is conventionally available and doing so remains useful.
+
+Also run all repository-standard formatting, command-reference, generated-index/evidence, contract, smoke, recipe, conformance, property, fuzz-smoke, differential, policy, and secret-pattern checks required by current AGENTS.md / COMMANDS.md / validation tooling.
+
+Do not hard-code historical aggregate counts such as 322/322 or 206/206. Record the current truth.
+
+System-QEMU execution of the real trap path is mandatory for full Batch 12 PASS.
+
+Ordinary CI may remain independent of system QEMU. If so, state that exactly. A green ordinary CI run is not proof that the system-QEMU trap lab executed.
+
+
+DEVELOPER MINIMUS
+
+All serious verification output must preserve ordinary command output and then append exactly one final:
+
+LOCATIONS
+
+section followed by exactly one:
+
+MINIMUS
+
+section, following current repository conventions.
+
+MINIMUS must remain at most 200 lines and summarize the essence for a serious developer.
+
+Do not emit nested/subordinate Minimus blocks from implementation-only prerequisite steps.
+
+The Batch 12 serious verifier must fail with nonzero exit status when the proof fails and must preserve the causal failure rather than replacing it with a generic success-looking summary.
+
+
+PHASE 13 — REVIEW THE DIFF AS AN ADVERSARIAL SYSTEMS ENGINEER
+
+Before publication, inspect the complete diff and actively ask:
+
+- Did we really take a hardware-mediated S-mode trap through stvec?
+- Could the handler have been called normally and still pass?
+- Did we prove return with sret?
+- Did we preserve interrupted register state?
+- Is the original stack restored?
+- Could the trap marker print even if the trap was skipped?
+- Could Morphic pass while the trap proof failed?
+- Could the trap proof pass while Morphic semantics changed?
+- Is scause interpreted with the interrupt bit correctly?
+- Are sepc and resume semantics narrow and truthful?
+- Could frame layout drift silently from assembly offsets?
+- Is any firmware observation being overclaimed as a universal RISC-V fact?
+- Did we accidentally begin interrupts, paging, userspace, or a generic HAL?
+- Did we add a module because it was useful, or merely to increase module count?
+- Did Less-Lines pressure make anything less explicit or less testable?
+- Does one canonical command reproduce the complete new proof?
+- Does the old Batch 11 verifier still pass unchanged in meaning?
+- Is the pre-batch-12 tag still untouched?
+
+Repair defects before declaring completion.
+
+
+PHASE 14 — COMMIT, PUBLISH, AND OPEN A MERGEABLE PR
+
+The requested deliverable is a PR I CAN MERGE, not a stop-only analysis report.
+
+Ordinary implementation blockers are work to solve, not reasons to stop early.
+
+When the task environment permits normal GitHub publication:
+
+- review git status;
+- review the full diff;
+- commit the tested implementation and documentation;
+- push a task branch;
+- open a pull request against the appropriate base branch;
+- include focused and aggregate validation evidence in the PR body;
+- identify whether system-QEMU was executed in the task environment;
+- identify any external provisioning performed;
+- identify any remaining partial/unknown behavior precisely.
+
+Do not modify or move the frozen baseline tag.
+
+If publication is impossible because the task environment has no usable remote/credentials, leave the complete tested commits ready for publication and report that external publication blocker. Do not discard useful tested work merely because GitHub publication is unavailable.
+
+If a fundamental technical blocker prevents full system-QEMU PASS, still produce the maximum correct tested partial PR/commit with exact PARTIAL status and the smallest next action. Never manufacture PASS.
+
+
+FULL PASS ACCEPTANCE CRITERIA
+
+Batch 12 is fully successful only if all of the following are demonstrated:
+
+1. The frozen tag pre-batch-12-freestanding-riscv-baseline remains unchanged and resolves to the historical baseline when available.
+2. Zig remains exactly 0.14.0.
+3. Batch 10 Linux-user semantics remain preserved.
+4. Batch 11 freestanding Morphic verification remains preserved.
+5. The freestanding payload enters S-mode through the established conventional firmware boundary.
+6. The payload intentionally installs its own S-mode trap vector.
+7. A real deterministic synchronous trap transfers control through stvec under qemu-system-riscv64.
+8. The observed trap cause is mechanically checked.
+9. The synchronous trap is not misclassified as an interrupt.
+10. A fixed bounded allocation-free TrapFrame captures the declared interrupted state.
+11. Trap-frame layout/assembly offset drift fails mechanically rather than silently.
+12. The handler establishes a correct narrow resume PC for the deliberate probe.
+13. The handler restores the declared register/stack state.
+14. Execution returns with sret.
+15. Post-trap code mechanically proves return occurred.
+16. Exactly the intended trap count is observed.
+17. The existing canonical Morphic scenario executes after the trap return.
+18. Native hosted/fake Morphic semantics remain deterministic.
+19. Freestanding Morphic canonical bytes remain exactly equal to the native canonical bytes.
+20. Trap evidence remains outside the canonical Morphic payload.
+21. Emulator runs are bounded by finite timeout.
+22. Failure paths fail closed.
+23. One canonical serious Batch 12 verifier command reproduces the whole new proof.
+24. The new verifier has focused self-tests for parser/failure behavior that do not require QEMU where practical.
+25. COMMANDS.md is cumulatively current.
+26. Batch 12 report records factual Snowball Yield and Less-Lines / Instruction Compression bookkeeping without fake benchmark claims.
+27. Current aggregate repository validation passes.
+28. Serious verification ends with exactly one LOCATIONS section and one MINIMUS section.
+29. The implementation does not silently begin out-of-scope timers, paging, U-mode, Linux ABI, VirtIO, networking, or broad kernel work.
+30. The final work is committed and, where credentials permit, presented as a mergeable PR.
+
+
+EXPECTED SHAPE OF THE RESULT
+
+Do not force this exact file layout, but a healthy result will likely resemble:
+
+existing Morphic core                     unchanged semantic truth
+existing Batch 11 freestanding adapter    preserved/reused
+small S-mode trap entry glue               new irreducible machine boundary
+fixed TrapFrame                            bounded resumable state
+small deliberate trap probe                executable pressure
+new focused system-QEMU verifier           mechanical proof
+Batch 11 verifier                          still independently PASS
+docs/reports/AGENTIC_SNOWBALL_BATCH_12.md  factual record
+COMMANDS.md                                cumulative command truth
+
+The result should feel like the repository learned one important machine fact permanently, not like it started writing a whole kernel at once.
+
+
+NEXT-PRESSURE RULE
+
+At the end of Batch 12, do not automatically implement the next feature.
+
+Use the actual executed evidence to identify the smallest next missing capability.
+
+A likely future pressure is timer interrupt entry and bounded interrupt acknowledgement/state, because once synchronous trap entry is proven, asynchronous timer delivery becomes a natural next step toward preemption and timekeeping.
+
+But that is only a hypothesis.
+
+Record the next pressure from evidence and stop Batch 12 at its declared boundary.
+
+
+FINAL HANDOFF
+
+Return:
+
+- concise implementation summary;
+- exact base commit and relationship to pre-batch-12-freestanding-riscv-baseline;
+- exact tag verification result;
+- exact changed files;
+- exact reusable modules/recipes added or reused;
+- trap cause and observed trap evidence;
+- trap-frame contract and preservation claim;
+- exact focused verifier results;
+- Batch 11 regression verifier result;
+- aggregate repository validation result;
+- system-QEMU version/firmware evidence actually used;
+- factual Snowball Yield;
+- factual Less-Lines / Instruction Compression bookkeeping;
+- One-Sentence Preventables captured;
+- Silent-Failure Cascades removed;
+- explicit non-claims / remaining unknowns;
+- exact commit(s);
+- PR URL when publication is available;
+- final Developer Minimus handoff.
+
+The desired final statement is not:
+
+"we have interrupts now."
+
+It is something closer to:
+
+"A real synchronous RISC-V supervisor trap entered our own stvec handler under system QEMU, a fixed bounded register/CSR frame was captured, the interrupted context was restored, sret resumed execution, and the unchanged canonical Morphic scenario still matched native execution exactly."
+
+That is enough for Batch 12.
