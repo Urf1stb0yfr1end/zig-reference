@@ -1,5 +1,19 @@
 # Codex Notes
 
+## Batch 12 — resumable supervisor trap
+
+- The existing freestanding Morphic payload now takes one real delegated S-mode
+  breakpoint exception through its own direct `stvec`, restores its declared
+  integer context, returns with `sret`, and only then runs the unchanged Morphic
+  scenario.
+- A first executable linked the newly introduced trap routine at the conventional
+  firmware load address even though the ELF header entry pointed later; explicit
+  entry/trap sections now keep `_start` at `0x80200000`. This is why entry ordering
+  and ELF identity remain mechanical verifier obligations.
+- QEMU 8.2.2/OpenSBI 1.3 executed the path twice with cause 3, interrupt false,
+  resume delta 4, preservation probes PASS, and identical 765-byte Morphic output.
+  Ordinary CI still does not imply this execution-lab proof.
+
 ## Issues
 
 ### Batch 10 — RISC-V Execution Probe / PR #30
