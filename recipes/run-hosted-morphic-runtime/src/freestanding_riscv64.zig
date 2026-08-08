@@ -5,6 +5,9 @@ const addresses = @import("distinct-memory-address-types");
 const frames = @import("physical-page-frame-number-and-address-conversion");
 const region_sets = @import("physical-memory-region-set");
 const frame_allocators = @import("physical-page-frame-allocator");
+const sv39_entries = @import("riscv-sv39-page-table-entry");
+const sv39_builders = @import("riscv-sv39-page-table-builder");
+const sfence_vma = @import("riscv-sfence-vma-invalidation");
 
 const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
@@ -12,6 +15,59 @@ const physical_pool_pages = 8;
 
 extern var __physical_page_pool_begin: u8;
 extern var __physical_page_pool_end: u8;
+extern var __image_begin: u8;
+extern var __image_end: u8;
+
+const sv39_alias: usize = 0x8040_0000;
+var sv39_continuation_marker: usize = 0;
+
+fn RealPageOwner(comptime Allocator: type) type {
+    return struct {
+        const Self = @This();
+        allocator: *Allocator,
+        pages: [physical_pool_pages]usize = [_]usize{0} ** physical_pool_pages,
+        page_count: usize = 0,
+
+        pub fn allocate(self: *Self) !u64 {
+            if (self.page_count == self.pages.len) return error.Exhausted;
+            const frame = try self.allocator.allocate();
+            const address = (frame.toAddress() catch unreachable).raw();
+            const page: *volatile [frames.PageSize]u8 = @ptrFromInt(address);
+            for (0..frames.PageSize) |index| page[index] = 0;
+            self.pages[self.page_count] = address;
+            self.page_count += 1;
+            return address;
+        }
+
+        pub fn release(self: *Self, address: u64) !void {
+            var index: usize = 0;
+            while (index < self.page_count and self.pages[index] != address) : (index += 1) {}
+            if (index == self.page_count) return error.ForeignFrame;
+            const frame = frames.PhysicalPageFrameNumber.fromAddress(addresses.PhysicalAddress.init(address)) catch return error.ForeignFrame;
+            try self.allocator.release(frame);
+            self.page_count -= 1;
+            self.pages[index] = self.pages[self.page_count];
+            self.pages[self.page_count] = 0;
+        }
+
+        pub fn read(self: *Self, address: u64, index: usize) !u64 {
+            if (index >= 512 or !self.owns(address)) return error.InvalidAccess;
+            const entries: *volatile [512]u64 = @ptrFromInt(address);
+            return entries[index];
+        }
+
+        pub fn write(self: *Self, address: u64, index: usize, value: u64) !void {
+            if (index >= 512 or !self.owns(address)) return error.InvalidAccess;
+            const entries: *volatile [512]u64 = @ptrFromInt(address);
+            entries[index] = value;
+        }
+
+        fn owns(self: *const Self, address: u64) bool {
+            for (self.pages[0..self.page_count]) |page| if (page == address) return true;
+            return false;
+        }
+    };
+}
 
 /// Fixed, allocation-free integer supervisor context. x0 is architectural zero;
 /// x2 is the interrupted sp. Floating-point/vector state and nested traps are
@@ -627,6 +683,112 @@ export fn freestandingMain() callconv(.c) noreturn {
         shutdown();
     }
     write("ZIGREF_PHYSICAL_MEMORY_RETURNED\n");
+    // Batch 16 has returned every frame. Reserve one owned data frame, then
+    // let the generic builder obtain and zero only real page-table frames from
+    // the same allocator. The bounded first address space maps the exact ELF
+    // image/pool span with 4 KiB RWX leaves plus one non-identity RW alias.
+    const alias_frame = allocator.allocate() catch {
+        write("ZIGREF_SV39_ACTIVE_FAILURE\n");
+        shutdown();
+    };
+    const alias_physical = (alias_frame.toAddress() catch unreachable).raw();
+    const Allocator = @TypeOf(allocator);
+    var page_owner = RealPageOwner(Allocator){ .allocator = &allocator };
+    var builder = sv39_builders.Builder(@TypeOf(page_owner)).init(&page_owner) catch {
+        write("ZIGREF_SV39_ACTIVE_FAILURE\n");
+        shutdown();
+    };
+    const image_begin = @intFromPtr(&__image_begin);
+    const image_end = @intFromPtr(&__image_end);
+    const mapped_begin = image_begin & ~@as(usize, frames.PageSize - 1);
+    const mapped_end = (image_end + frames.PageSize - 1) & ~@as(usize, frames.PageSize - 1);
+    const permissions = sv39_entries.Permissions{ .read = true, .write = true, .execute = true, .accessed = true, .dirty = true };
+    var address = mapped_begin;
+    while (address < mapped_end) : (address += frames.PageSize) {
+        _ = builder.mapPage(address, address, .page_4k, permissions) catch {
+            write("ZIGREF_SV39_ACTIVE_FAILURE\n");
+            shutdown();
+        };
+    }
+    _ = builder.mapPage(sv39_alias, alias_physical, .page_4k, .{ .read = true, .write = true, .accessed = true, .dirty = true }) catch {
+        write("ZIGREF_SV39_ACTIVE_FAILURE\n");
+        shutdown();
+    };
+    const alias_query = builder.query(sv39_alias) catch {
+        write("ZIGREF_SV39_ACTIVE_FAILURE\n");
+        shutdown();
+    };
+    const root_physical = builder.root;
+    const satp_after_expected = (@as(usize, 8) << 60) | (root_physical >> 12);
+    asm volatile ("csrw satp, %[value]"
+        :
+        : [value] "r" (satp_after_expected),
+        : "memory"
+    );
+    sfence_vma.executeUnsafe(sfence_vma.global());
+    const satp_after = asm volatile ("csrr %[value], satp"
+        : [value] "=r" (-> usize),
+    );
+    var stack_probe: usize = 0x51a9_17;
+    stack_probe +%= 1;
+    sv39_continuation_marker = stack_probe;
+    const alias_pointer: *volatile usize = @ptrFromInt(sv39_alias + 128);
+    const identity_pointer: *volatile usize = @ptrFromInt(alias_physical + 128);
+    const alias_sentinel: usize = 0xa117_5a39_c0de_0011;
+    alias_pointer.* = alias_sentinel;
+    const alias_read = alias_pointer.*;
+    const identity_read = identity_pointer.*;
+    write("ZIGREF_SV39_ACTIVE_BEGIN\npage_size=");
+    writeUsizeHex(frames.PageSize);
+    write("\npool_begin=");
+    writeUsizeHex(pool_begin);
+    write("\npool_end=");
+    writeUsizeHex(pool_end);
+    write("\nsatp_before=");
+    writeUsizeHex(satp);
+    write("\nroot_physical=");
+    writeUsizeHex(root_physical);
+    write("\npage_table_count=");
+    writeUsizeHex(page_owner.page_count);
+    for (page_owner.pages[0..page_owner.page_count], 0..) |page, index| {
+        write("\npage_table=");
+        writeUsizeHex(index);
+        write(",address=");
+        writeUsizeHex(page);
+    }
+    write("\nmapped_begin=");
+    writeUsizeHex(mapped_begin);
+    write("\nmapped_end=");
+    writeUsizeHex(mapped_end);
+    write("\nmapping_count=");
+    writeUsizeHex((mapped_end - mapped_begin) / frames.PageSize + 1);
+    write("\npermissions=kernel-rwx-ad\nalias=");
+    writeUsizeHex(sv39_alias);
+    write("\nalias_physical=");
+    writeUsizeHex(alias_physical);
+    write("\nalias_permissions=rw-ad\nalias_query=");
+    writeUsizeHex(alias_query.physical_address);
+    write("\nsatp_after=");
+    writeUsizeHex(satp_after);
+    write("\nmode=8\nasid=0\nroot_ppn=");
+    writeUsizeHex(root_physical >> 12);
+    write("\nsfence_vma=global-executed\nstack_global_marker=");
+    writeUsizeHex(sv39_continuation_marker);
+    write("\nalias_wrote=");
+    writeUsizeHex(alias_sentinel);
+    write("\nalias_read=");
+    writeUsizeHex(alias_read);
+    write("\nidentity_read=");
+    writeUsizeHex(identity_read);
+    write("\npost_switch_morphic=next\ncomplete=PASS\nZIGREF_SV39_ACTIVE_END\n");
+    if (satp_after != satp_after_expected or alias_query.physical_address != alias_physical or
+        alias_read != alias_sentinel or identity_read != alias_sentinel or
+        sv39_continuation_marker != 0x51a9_18)
+    {
+        write("ZIGREF_SV39_ACTIVE_FAILURE\n");
+        shutdown();
+    }
+    write("ZIGREF_SV39_ACTIVE_RETURNED\n");
     var output: [128]u8 = undefined;
     var trace: [2048]u8 = undefined;
     const result = morphic.runFake(&output, &trace) catch {
