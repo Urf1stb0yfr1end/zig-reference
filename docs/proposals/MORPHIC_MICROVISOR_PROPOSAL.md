@@ -1247,3 +1247,89 @@ That is a worthwhile, difficult, testable ambition.
 ## Implemented planning foundation
 
 `projects/50-bounded-system-resource-plan` and `recipes/plan-morphic-runtime` now provide the hosted-only deterministic resource-planning slice described by this proposal. They reuse bounded values, checked casts, alignment helpers, fixed bump layout, and bounded deterministic topological ordering. They do **not** implement the Morphic Microvisor, a scheduler, tracing, RISC-V startup, traps, devices, or post-seal enforcement. The remaining hosted runtime must supply those mechanisms and apply the returned policy.
+
+---
+
+## EDIT: 2026-08-08 — Current flagship interpretation
+
+This proposal is preserved as written because it records the project's original flagship framing. Its central thesis remains active: **one system, many machines, no second semantic implementation.**
+
+The implementation direction has, however, become more precise than the original Stage A → Stage B sequence above.
+
+The current interpretation is:
+
+**Morphic itself is the flagship composition of `zig-reference`. Alpz is the current flagship real-machine/kernel embodiment of Morphic. The microvisor/hypervisor is a future parallel Morphic embodiment, not the mandatory second identity of the project and not the critical path to the current operating-system goal.**
+
+In particular, the wording above that treats the "true microvisor" as the inevitable Stage B destination should now be read as the historical proposal rather than the sole current roadmap.
+
+The architecture we intend to preserve is:
+
+```text
+                     zig-reference / Z-Ref
+            reusable mechanisms + semantic contracts
+            evidence + dependency knowledge + repairs
+                               |
+                               v
+                          Morphic core
+                 shared meaning and reusable policy
+                               |
+          +--------------------+---------------------+
+          |                    |                     |
+          v                    v                     v
+    hosted / fake          Alpz kernel          future bodies
+    replay / fuzz          RISC-V first         microvisor/hypervisor
+                                                AArch64 / x86_64
+                                                embedded / firmware
+                                                other kernel adapters
+```
+
+Alpz is currently the hardest real-machine pressure test for the Morphic thesis. The kernel path deliberately introduces increasingly difficult environmental facts while attempting to preserve shared semantics above them: freestanding boot, direct trap entry, asynchronous timers, repeated timer delivery, real monotonic machine time, deterministic scheduler composition, physical ownership, then virtual memory, user mode, syscalls, process machinery, filesystems, drivers, networking, and Linux-userspace compatibility.
+
+Recent Alpz batches already use preservation across hosted, deterministic fake, and real QEMU execution as a mechanical acceptance condition. That is an early form of the machine-substitution proof Morphic was designed to make possible: the body becomes more real while the governed computation remains the same.
+
+### Current operating-system path
+
+The primary Alpz operating-system objective is now:
+
+```text
+hardware / QEMU
+      -> Alpz kernel
+      -> progressively satisfied Linux userspace contract
+      -> unmodified real Linux userspace
+```
+
+The immediate long-horizon proof is therefore not "run Alpine as a guest beneath a new hypervisor." It is "run real Alpine userspace directly on Alpz, then broaden the same Linux-facing contract across additional distributions and package ecosystems."
+
+That route gives Alpz a demanding systems target while keeping Morphic's original question intact: how much of the system's policy, contracts, evidence, and construction knowledge can remain shared as the concrete machine changes?
+
+A Morphic microvisor or hypervisor remains desirable. When pursued, it should be added as another body consuming the same accumulated mechanisms and Morphic semantics, not as a fork that redefines the project around virtualization.
+
+### Revised implementation sequence
+
+The current practical sequence is:
+
+1. **Preserve Morphic identity while Alpz grows.** Every Alpz milestone should continue to prove existing hosted/fake/real equivalence or another explicit preservation relation wherever the semantics are meant to remain common.
+2. **Turn real-machine pressure into reusable contracts.** Keep RISC-V, SBI, trap-entry, page-table activation, device and other irreducibly environmental facts at the adapter/body boundary. Promote only genuinely machine-independent policy into the Morphic core.
+3. **Mature Alpz as the flagship kernel body.** Physical ownership, Sv39, U-mode, syscalls, processes, VFS, drivers, networking, and Linux-userspace semantics provide the current strongest pressure sequence.
+4. **Prove broad real userspace without redefining Morphic.** Alpine is the first compact proof target; Debian and Fedora can later provide different musl/glibc/package-system compatibility pressure. These are evidence for the Alpz body and the Linux userspace contract, not definitions of the Morphic core.
+5. **Add parallel embodiments after the shared boundaries are strong enough.** The microvisor/hypervisor, additional CPU architectures, hosted replay/fuzz forms, embedded/firmware bodies, and eventually adapters for unrelated kernels should reuse the same solved knowledge rather than create independent semantic worlds.
+6. **Benchmark the repository as a machine factory.** A mature test should ask whether fresh agents can construct, port, or reconstruct new Morphic bodies by composing Z-Ref contracts and evidence with comparatively little rediscovery and comparatively little new code for already-solved engineering.
+
+### What has not changed
+
+The most important laws in the original proposal remain exactly the right ones:
+
+- one semantic core where semantics are genuinely shared;
+- multiple concrete embodiments;
+- explicit resource and ownership behavior;
+- deterministic evidence where determinism is claimed;
+- no second scheduler, parser, resource planner, state machine, or trace interpretation merely because the machine changed;
+- the flagship consumes reusable `zig-reference` modules rather than swallowing them;
+- environmental adapters may differ, but they must not quietly become alternate system policies;
+- claims are earned by executable evidence.
+
+The updated flagship thesis is therefore broader than "build the Morphic Microvisor":
+
+> **Use Morphic to prove that one accumulated body of systems knowledge can inhabit a serious kernel, simulators, replay/fuzz forms, virtualization, other architectures, and other machine bodies without forcing each embodiment to rediscover or rewrite the same system meaning.**
+
+Alpz is the current flagship body because it gives that claim the strongest real-machine pressure available to us now. The microvisor remains one of the bodies the same architecture should eventually be able to produce.
