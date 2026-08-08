@@ -1,0 +1,640 @@
+CODEX AGENTIC SNOWBALL BATCH 16 — BOUNDED FREESTANDING PHYSICAL MEMORY OWNERSHIP
+
+MISSION
+
+Advance Alpz toward active virtual memory by exactly one foundational step:
+
+CONNECT THE EXISTING PHYSICAL-MEMORY REGION AND PAGE-FRAME ALLOCATION MACHINERY TO THE REAL FREESTANDING RISC-V EXECUTION PATH THROUGH AN EXPLICITLY LINKER-OWNED, PAGE-ALIGNED PHYSICAL PAGE POOL, AND PROVE OWNERSHIP, BOUNDS, ALLOCATION, RELEASE, EXHAUSTION, AND REAL MEMORY ACCESS WITHOUT ACTIVATING SV39 OR INVENTING A GENERAL PLATFORM MEMORY MANAGER.
+
+Batch 15 proved:
+
+real RISC-V rdtime
+→ bounded real supervisor timer interrupts
+→ sret returns
+→ recorded machine observations
+→ existing target-neutral BoundedDeterministicScheduler
+→ deterministic readiness/order outside interrupt context
+→ unchanged canonical Morphic semantics
+
+Batch 16 intentionally leaves time and scheduling alone and begins the memory-foundation path required for later page tables, address spaces, U-mode, syscalls, ELF userspace, and Linux userspace compatibility.
+
+The repository already contains reusable memory foundations, especially:
+
+projects/35-physical-memory-region-set
+projects/36-physical-page-frame-allocator
+projects/18-distinct-memory-address-types
+projects/28-physical-page-frame-number-and-address-conversion
+
+It also contains later Sv39-oriented modules, but Batch 16 must not activate paging merely because those modules exist.
+
+The intended bridge is:
+
+freestanding ELF/linker layout
+→ explicitly reserved page-aligned linker-owned memory pool
+→ mechanically proven pool begin/end symbols
+→ truthful PhysicalMemoryRegionSet usable region
+→ existing PhysicalPageFrameAllocator
+→ bounded allocation/release/exhaustion exercise
+→ direct real memory access only while Bare translation is proven
+→ independent verifier checks every allocated frame lies inside the owned pool
+→ previous Batch 12/13/14/15 proofs remain intact
+→ canonical Morphic bytes remain exact
+
+This is NOT an Sv39 activation batch.
+This is NOT a virtual-address-space batch.
+This is NOT a U-mode batch.
+This is NOT a syscall batch.
+This is NOT a Linux ABI batch.
+This is NOT hardware memory-map discovery.
+This is NOT a DTB parser batch.
+This is NOT a general production physical-memory manager.
+
+It is the smallest truthful step from “we possess reusable physical-memory primitives” to “our real freestanding kernel owns and safely exercises a bounded set of actual page frames.”
+
+
+CANONICAL BATCH 15 BASELINE
+
+The merged Batch 15 revision independently reproduced by the maintainer is:
+
+8779bab919e31abf84e3601f874cd1e388451a08
+
+The maintainer reproduced this revision locally with Zig 0.14.0 and QEMU 11.0.3 and observed:
+
+- Batch 14 repeated-tick self-test PASS;
+- Batch 15 rejection-oriented self-test PASS;
+- two real Batch 14 QEMU runs with four monotonic cause-5 timer deliveries and four returns each;
+- two real Batch 15 QEMU runs with four real rdtime observations each;
+- identity rdtime→scheduler mapping;
+- readiness [1,2,0,1];
+- stable selection [1@0,2@1,3@1,4@3];
+- scheduler decisions after the corresponding sret returns;
+- Batch 12/13/14 preservation;
+- exact native/fake/two-machine Morphic equality at 765 bytes;
+- repository validation 322/322 steps and 206/206 tests;
+- 53 contracted modules, 53 full agent-readable, 0 partial.
+
+If an immutable Batch 15 evidence tag exists by the time this task runs, preserve it exactly. Do not move, recreate, delete, or repurpose any historical evidence tag. Do not create a new milestone tag unless explicitly requested by the maintainer.
+
+Earlier historical anchors remain immutable.
+
+
+FIRST EXECUTABLE GATE
+
+Before implementing Batch 16, establish the supplied checkout's current truth.
+
+Resolve repository root and current HEAD.
+Read AGENTS.md and COMMANDS.md first.
+Use the repository's canonical Python environment/bootstrap if required.
+
+Run at minimum:
+
+python3 tools/verify-freestanding-riscv64-scheduler-time.py --self-test
+python3 tools/verify-freestanding-riscv64-scheduler-time.py
+
+Batch 16 begins only if the current checkout genuinely preserves the Batch 15 real-machine proof.
+
+Do not weaken, skip, replace, or reinterpret this gate.
+If QEMU or another required executable dependency is genuinely unavailable, report that truth and do not claim the real-machine gate passed.
+
+
+WHY PHYSICAL MEMORY OWNERSHIP IS NEXT
+
+Batch 15's report identified bounded timeout/wake orchestration as the smallest continuation of the timer/scheduler line unless active virtual-memory ownership became the independently prioritized foundation.
+
+For the long-horizon Alpz goal, memory ownership is now the prioritized foundation.
+
+The intended future ladder is approximately:
+
+owned physical frames
+→ active Sv39 page tables
+→ controlled kernel mappings
+→ U-mode entry/return
+→ syscall boundary
+→ user address spaces
+→ ELF userspace loading
+→ process/file-descriptor/VFS work
+→ Linux userspace contracts
+→ real Alpine userspace
+
+Do not skip directly to a later rung.
+
+Batch 16 should also be a Snowball test: the repository already solved physical regions and page-frame allocation as reusable target-neutral components. The new work should primarily compose those capabilities into the real machine path rather than invent a second allocator.
+
+
+Z-REF EXECUTION DOCTRINE
+
+Treat the repository as accumulated executable knowledge.
+
+Before broad source reading, use the Agent Fast Path / preflight / contract surfaces to determine:
+
+- canonical physical-region implementation;
+- canonical page-frame allocator implementation;
+- exact public operations and error contracts;
+- page size and physical-address/frame conversion semantics;
+- allocator capacity and exhaustion semantics;
+- ownership and release semantics;
+- failure atomicity and rejection behavior;
+- current freestanding linker layout;
+- current stack placement;
+- current execution translation mode / satp truth;
+- focused validation commands;
+- dependencies needed by the freestanding target.
+
+Construct a compact Task Projection before implementation and record it in the Batch 16 report.
+
+At minimum record:
+
+requested capability
+reused modules
+machine-specific adapter boundary
+owned pool definition
+page size
+pool capacity
+linker symbols
+translation-mode assumption and evidence
+allocation/release invariants
+rejection cases
+unknowns
+non-claims
+minimum trustworthy read set
+focused validators
+preservation validators
+success evidence
+Snowball Yield
+
+Do not create a new reusable module merely because this is a new Batch number.
+If the existing physical-memory modules already express the required semantics, reuse them directly.
+If a genuine correctness defect is discovered in an existing module, repair the smallest canonical layer and add regression evidence rather than routing around it.
+
+
+OWNERSHIP RULE
+
+Batch 16 must not call arbitrary QEMU RAM “free memory.”
+
+Do not infer ownership merely from a platform address range such as 0x80000000 onward.
+Do not allocate from memory merely because it appears writable.
+Do not overwrite OpenSBI, the loaded kernel image, stack, evidence storage, MMIO, DTB memory, or any region whose ownership has not been established.
+
+Instead establish ownership mechanically through the freestanding image itself.
+
+Preferred design:
+
+- extend the existing freestanding linker layout with one fixed-capacity, page-aligned NOLOAD physical page pool;
+- expose explicit linker symbols such as pool begin/end using repository-consistent names;
+- ensure the pool occupies bytes reserved as part of the kernel image's own memory extent;
+- keep the pool disjoint from text, rodata, data, ordinary bss, stack, and other explicitly reserved regions;
+- use the exact linker-derived begin/end values at runtime;
+- register only that exact range as usable for the Batch 16 allocator scenario.
+
+The exact symbol names and placement should follow current source/linker conventions.
+Do not hard-code duplicate numeric pool addresses in Zig if linker symbols can remain the canonical source of truth.
+
+The pool should be deliberately small and bounded. A value such as 8 pages is sufficient unless current constraints justify another small fixed count.
+
+The verifier must independently inspect the ELF symbols and recompute the pool interval rather than trusting a printed PASS claim.
+
+
+BARE-TRANSLATION TRUTH
+
+The current freestanding path has not yet claimed active Sv39 virtual memory.
+
+Directly dereferencing physical addresses is valid for this bounded exercise only if the machine is actually executing with address translation disabled / Bare in the relevant phase.
+
+Do not silently assume a linker address equals a physical address.
+
+Batch 16 must mechanically establish the translation-mode condition used by the proof. Prefer evidence tied to the actual satp state on the real machine and independently parsed by the verifier.
+
+The verifier should reject evidence that claims direct physical-frame access while the declared translation mode is not Bare.
+
+Do not introduce an Alpz virtual-memory compatibility name yet.
+
+ONE-SENTENCE PREVENTABLE:
+
+Do not treat a linker address as a directly dereferenceable physical frame unless the ELF placement, pool bounds, and actual translation mode make that identity relationship explicit.
+
+
+USE THE EXISTING MEMORY MODULES
+
+The preferred composition is conceptually:
+
+linker-owned pool begin/end
+→ PhysicalAddress
+→ PhysicalMemoryRegionSet(...).add(..., .usable)
+→ PhysicalPageFrameAllocator(...).initFromRegions(...)
+→ allocate / release using the existing public contract
+
+Discover and use the exact current APIs rather than reconstructing them from this prose.
+
+The allocator should remain target-neutral.
+Do not teach projects/36-physical-page-frame-allocator about:
+
+RISC-V CSRs
+OpenSBI
+QEMU
+ELF symbols
+linker scripts
+stvec
+satp policy
+Morphic output
+
+Machine-specific ownership setup belongs at the freestanding integration boundary.
+
+Do not generalize the allocator to multiple regions, NUMA, DMA, zones, buddy allocation, per-CPU caches, or production kernel policy unless a concrete correctness requirement of this bounded proof makes such work unavoidable.
+
+
+MINIMUM REAL-MACHINE SCENARIO
+
+Create the smallest scenario that proves actual ownership and allocator behavior.
+
+A strong bounded scenario should prove all of the following on each real machine run:
+
+1. The linker-owned pool begins and ends at page-aligned addresses.
+2. Pool size is an exact positive multiple of the repository's canonical page size.
+3. Runtime-reported pool bounds match the compiled ELF symbols.
+4. Translation mode is the declared Bare mode during direct frame access.
+5. The pool is represented through the existing physical-memory region machinery.
+6. The existing PhysicalPageFrameAllocator initializes from that usable region.
+7. Exactly the declared bounded number of frames can be allocated.
+8. Every allocated frame is page aligned and entirely within the owned pool.
+9. Allocated frame addresses are unique while simultaneously owned.
+10. At least a small representative subset, preferably every frame in the tiny pool, is actually written through and read back on the real machine using bounded sentinel data.
+11. One additional allocation after full ownership returns the allocator's declared exhaustion error.
+12. At least one owned frame is released successfully.
+13. Releasing that same frame again produces the declared double-free rejection.
+14. Releasing a definitely foreign frame produces the declared foreign-frame rejection.
+15. A released frame can be allocated again according to the allocator's existing deterministic semantics, if that behavior is part of current implementation truth and can be proven without adding a new guarantee accidentally.
+16. Final owned/free counts reconcile exactly.
+17. The scenario terminates and normal Morphic execution continues.
+
+Do not fabricate addresses in the real-machine proof.
+Do not use a software-only fake allocator as evidence that real physical addresses were exercised.
+
+If the exact allocator contract makes one requested real-machine rejection awkward to expose without contaminating the integration boundary, keep that rejection in focused module/self-test evidence and document the split. Do not add unnatural public APIs solely to print an error.
+
+
+REAL MEMORY ACCESS
+
+The proof should demonstrate that allocated frames correspond to actual writable memory in the real QEMU machine, not merely integers returned by an allocator.
+
+Use bounded deterministic sentinel patterns.
+
+For example, for each allocated frame:
+
+- derive the physical address through the canonical frame/address conversion machinery where appropriate;
+- write a small fixed amount of data at a defined offset inside the owned frame;
+- read it back;
+- emit enough raw evidence for the verifier to check the relationship.
+
+Do not scan entire pages.
+Do not perform unbounded memory tests.
+Do not claim ECC, cache coherency, persistence, DMA suitability, hardware health, or production memory-test coverage.
+
+The verifier should validate relationships, not merely trust `write-read=PASS` strings.
+
+
+EVIDENCE FRAMING
+
+Add a distinct bounded Batch 16 frame rather than changing the meaning of Batch 15 evidence.
+
+Use a repository-consistent ZIGREF_* frame, for example conceptually:
+
+ZIGREF_PHYSICAL_MEMORY_BEGIN
+...
+ZIGREF_PHYSICAL_MEMORY_END
+ZIGREF_PHYSICAL_MEMORY_RETURNED
+
+The exact field names should be compact and deterministic.
+
+The frame must expose enough independent raw facts to prove:
+
+- compiled pool page count;
+- page size;
+- runtime pool begin/end;
+- translation mode / satp evidence;
+- region count/kind needed for this scenario;
+- initial free/allocated counts;
+- allocated frame numbers or addresses;
+- uniqueness/bounds/alignment;
+- memory write/read sentinel evidence;
+- exhaustion result;
+- release result;
+- double-free/foreign-frame rejection evidence where exercised;
+- reacquisition result if applicable;
+- final counts;
+- completion/return marker;
+- continuation to previous evidence/Morphic execution.
+
+Use fixed-capacity telemetry and deterministic formatting.
+No unbounded logs or heap allocation.
+
+A PASS string alone is never sufficient evidence.
+
+
+FOCUSED VERIFIER
+
+Add one canonical verifier consistent with the existing sequence, preferably:
+
+tools/verify-freestanding-riscv64-physical-memory.py
+
+It must support:
+
+--self-test
+
+and real execution mode.
+
+The self-test must be rejection-oriented.
+
+At minimum reject malformed evidence for:
+
+- missing frame;
+- duplicate frame;
+- duplicate/unexpected fields;
+- missing completion/return marker;
+- wrong page size;
+- non-page-aligned pool begin/end;
+- zero or inconsistent pool size;
+- runtime pool bounds that disagree with ELF symbols;
+- non-Bare translation evidence when direct physical access is claimed;
+- wrong frame count;
+- duplicate simultaneously allocated frame;
+- frame outside the owned pool;
+- unaligned frame;
+- missing or contradictory sentinel readback;
+- exhaustion not observed at the declared bound;
+- ownership/free-count mismatch;
+- malformed release/rejection evidence;
+- regression/malformed Batch 12/13/14/15 frames;
+- Morphic payload drift.
+
+Real mode must:
+
+1. Build the current freestanding RISC-V artifact.
+2. Inspect ELF identity and the actual pool begin/end symbols.
+3. Prove the linker-owned pool is page aligned and has the declared bounded size.
+4. Run at least two bounded real qemu-system-riscv64 machines with finite timeout.
+5. Parse the new physical-memory frame independently.
+6. Recompute every allocation bound/alignment/uniqueness relationship from raw evidence.
+7. Tie runtime pool bounds to ELF symbols.
+8. Prove the declared translation mode needed for direct memory access.
+9. Check the real write/read sentinel relationship.
+10. Check exhaustion and ownership-count reconciliation.
+11. Reuse existing Batch 12/13/14/15 parsers/verifiers where practical instead of duplicating their semantics.
+12. Preserve exact canonical Morphic equality across native hosted, fake, and both real machine runs.
+13. Fail nonzero on timeout, malformed, duplicate, missing, contradictory, stale, or out-of-bounds evidence.
+14. End through Developer Minimus.
+
+The two real runs do not need different page addresses if the ELF layout is deterministic. They must independently execute the real machine scenario and prove the same ownership relationships.
+
+
+PRESERVE PREVIOUS MACHINE PROOFS
+
+Batch 16 must preserve all established machine milestones.
+
+At minimum preserve mechanically:
+
+Batch 12:
+real synchronous breakpoint trap and sret return
+
+Batch 13:
+real one-shot supervisor timer interrupt and explicit neutralization
+
+Batch 14:
+four real monotonic supervisor timer ticks, three re-arms, final neutralization, four returns, no extra delivery
+
+Batch 15:
+real rdtime observations consumed by the existing scheduler, readiness [1,2,0,1], stable order [1@0,2@1,3@1,4@3], decisions after sret
+
+Morphic:
+exact canonical 765-byte equality across hosted/fake/real machine paths unless current repository truth has deliberately changed before execution; if so, establish the new baseline mechanically rather than silently weakening equality.
+
+Do not edit old verifiers merely to make preservation easier.
+
+
+DO NOT BUILD THESE YET
+
+Do not implement:
+
+Sv39 activation
+satp page-table installation
+sfence.vma policy beyond existing reusable module tests
+kernel virtual-address remapping
+higher-half kernel
+U-mode
+per-process address spaces
+copy-on-write
+page faults as allocation policy
+user memory copy helpers
+syscall entry
+ELF user loading
+fork/clone/execve
+Linux mmap/brk
+POSIX memory APIs
+DTB parsing
+platform RAM discovery
+general RAM reclamation
+buddy/slab allocator
+heap allocator
+DMA allocator
+NUMA
+SMP/per-hart allocators
+VirtIO
+filesystem
+networking
+musl
+BusyBox
+Alpine /init
+
+Those are later pressures.
+
+
+LINKER AND IMAGE INTEGRITY
+
+Any linker-script change is part of the proof surface.
+
+The new page pool must not overlap the existing stack or silently move required trap/entry symbols into an invalid relationship.
+
+The verifier should inspect enough ELF symbol information to establish:
+
+pool_begin < pool_end
+pool_begin % PageSize == 0
+pool_end % PageSize == 0
+pool_end - pool_begin == expected_pool_pages * PageSize
+
+and, where symbols are available or can be exposed cleanly, disjointness from the stack interval and relevant image-owned intervals.
+
+Do not rely solely on source-text inspection of the linker script.
+Use the built ELF as evidence.
+
+
+COMMANDS, RECIPE TRUTH, AND DOCUMENTATION
+
+Update COMMANDS.md with the canonical Batch 16 self-test and real execution commands.
+
+Update the relevant recipe contract/metadata so it truthfully states:
+
+- the freestanding path now owns one bounded linker-reserved physical page pool;
+- the existing physical region/frame allocator machinery is exercised against it;
+- direct physical access is proven only under the declared Bare translation condition;
+- the proof is bounded and not platform RAM discovery or a production PMM;
+- Sv39 remains inactive.
+
+Do not overclaim.
+
+Add:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_16.md
+
+The report must include:
+
+Starting point
+First executable gate
+Task Projection
+Existing capabilities reused
+Linker-owned pool design
+Bare-translation proof
+Real allocation/access scenario
+Rejection-oriented verifier
+Preservation matrix
+Snowball Yield
+One-Sentence Preventables
+Non-claims
+Next smallest pressure
+
+Snowball Yield must be factual bookkeeping, not benchmark marketing.
+Record what existing machinery was reused, what genuinely new glue/proof machinery was added, and whether any reusable module had to change.
+
+If a new vocabulary term is introduced that is absent from the repository's canonical vocabulary documentation, add it there. Do not invent terminology unnecessarily.
+
+
+VALIDATION
+
+Before publication, run the focused Batch 16 self-test and real lab plus the established preservation surfaces.
+
+At minimum:
+
+python3 tools/verify-freestanding-riscv64-physical-memory.py --self-test
+python3 tools/verify-freestanding-riscv64-physical-memory.py
+python3 tools/verify-freestanding-riscv64-scheduler-time.py --self-test
+python3 tools/verify-freestanding-riscv64-scheduler-time.py
+
+Then run the repository's canonical aggregate validation from COMMANDS.md / Developer Minimus guidance, including the ordinary repository validation pipeline.
+
+Do not invent stale validation commands if COMMANDS.md provides canonical equivalents.
+
+Correct any generated/index/contract artifacts required by repository policy.
+
+Do not manually edit generated evidence when the repository provides a generator.
+
+
+SUCCESS STANDARD
+
+Batch 16 is PASS only if all of the following are mechanically demonstrated:
+
+- current Batch 15 proof passes before implementation;
+- a fixed page-aligned memory pool is owned by the freestanding image through linker-defined bounds;
+- runtime bounds match the built ELF symbols;
+- the translation state required for direct physical access is explicitly proven;
+- the existing PhysicalMemoryRegionSet represents the owned range truthfully;
+- the existing PhysicalPageFrameAllocator is actually used by the real freestanding path;
+- the bounded declared number of frames can be allocated and no more;
+- every allocated frame is unique, aligned, and inside the owned interval;
+- real memory at allocated frame addresses is written/read successfully through bounded sentinel evidence;
+- release/exhaustion/ownership semantics are validated to the extent declared by the scenario;
+- final allocation/free accounting reconciles;
+- no arbitrary platform RAM is claimed or touched;
+- no Sv39 activation, U-mode, syscall, Linux ABI, or unrelated subsystem is introduced;
+- Batch 12/13/14/15 machine proofs remain valid;
+- canonical Morphic equality remains exact;
+- rejection-oriented self-tests pass;
+- two real bounded QEMU runs pass;
+- repository aggregate validation passes;
+- COMMANDS.md and recipe truth are updated;
+- Batch 16 report and Snowball Yield are recorded;
+- changes are committed and published;
+- a mergeable pull request is produced.
+
+Do not claim PASS based only on compilation, unit tests, printed PASS strings, or synthetic allocator behavior.
+
+
+FAILURE DISCIPLINE
+
+If the real integration exposes a defect in the existing memory modules, do not hide it behind freestanding-only special cases.
+
+Localize the failure.
+Determine whether the problem belongs to:
+
+linker ownership
+physical address conversion
+region representation
+allocator semantics
+freestanding adapter
+Bare-translation assumption
+verifier
+
+Repair the canonical layer when appropriate.
+Add focused regression evidence.
+Record the newly reusable fact.
+
+If evidence is insufficient, report UNKNOWN rather than inventing ownership.
+
+
+PUBLICATION
+
+Complete the implementation rather than stopping at analysis.
+
+Before handing off:
+
+- implementation complete;
+- focused self-test complete;
+- two-run real QEMU proof complete;
+- previous machine proofs preserved;
+- exact Morphic equality preserved;
+- aggregate repository validation complete;
+- documentation/contracts/generated truth updated;
+- Batch 16 report complete;
+- Snowball Yield complete;
+- commits created;
+- branch published;
+- mergeable PR opened.
+
+Do not create, move, delete, or rewrite historical evidence tags unless explicitly instructed by the maintainer.
+
+
+LONG-HORIZON ALPZ DIRECTION
+
+The long-horizon objective remains:
+
+KEEP LINUX USERSPACE. REPLACE LINUX AT THE KERNEL BOUNDARY.
+
+Linux is the external contract.
+Alpine is intended as the first major distribution proof.
+Debian and Fedora are later broad compatibility proofs, not separate kernel ABIs.
+
+Batch 16 earns none of those compatibility claims.
+
+What it should earn is much narrower and foundational:
+
+Alpz can prove ownership of a bounded set of real physical page frames in its freestanding RISC-V execution and exercise the repository's existing physical-memory allocator against those frames without guessing about platform memory.
+
+That is enough.
+
+The likely next pressure after a clean Batch 16 is active Sv39 page-table ownership and installation using the now-proven physical-page foundation, still in a bounded kernel-only scenario before U-mode.
+
+
+FINAL RULE
+
+DO NOT REDISCOVER WHAT Z-REF ALREADY KNOWS.
+DO NOT CLAIM MEMORY YOU DO NOT OWN.
+DO NOT CALL AN ADDRESS PHYSICAL BECAUSE IT LOOKS PHYSICAL.
+DO NOT ACTIVATE PAGING UNTIL THIS OWNERSHIP BOUNDARY IS PROVEN.
+DO NOT CLAIM PASS WITHOUT REAL MACHINE EVIDENCE.
+
+The desired Batch 16 result is deliberately small in concept and large in consequence:
+
+real owned page frames
++
+existing reusable allocator
++
+mechanical evidence
+=
+first trustworthy physical-memory foundation for the future Alpz virtual-memory path.
