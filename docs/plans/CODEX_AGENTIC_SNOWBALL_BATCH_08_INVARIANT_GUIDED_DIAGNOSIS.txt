@@ -1,0 +1,836 @@
+CODEX AGENTIC SNOWBALL BATCH 08 — INVARIANT-GUIDED DIAGNOSIS
+
+MISSION
+
+Build the smallest reusable architecture that lets an agent continue from a concrete failure state to an evidence-backed diagnosis, repair path, and focused validation without reopening the whole subsystem.
+
+This is the first architecture batch after Batch 07 Correct-Use Preflight and its independent repair.
+
+Batch 07 established the forward correct-use path:
+
+goal
+→ decide
+→ card/select
+→ compose
+→ preflight
+→ integrate
+→ validate
+
+Batch 08 establishes the beginning of the reverse failure path:
+
+failure
+→ Failure State Capsule
+→ Invariant-Guided Diagnosis
+→ stable diagnosis OR explicit UNKNOWN
+→ repair
+→ focused validation
+
+The governing idea is symmetry:
+
+PRE-FLIGHT:
+"These are the invariants and obligations you must preserve."
+
+POST-FAILURE:
+"These are the observed facts. Which canonical invariant, if any, do they establish was violated?"
+
+Do not build a universal debugger.
+Do not catalog every Zig compiler error.
+Do not imitate rustc.
+Do not add a custom debugging language merely to make the architecture look sophisticated.
+Do not guess causality.
+Do not begin Batch 09 system-expansion work.
+
+Use ordinary programming concepts and ordinary machine-readable forms wherever possible:
+
+- JSON;
+- schemas;
+- component;
+- operation;
+- error/symptom;
+- observed values;
+- invariant;
+- expected/observed;
+- ownership/state/resource facts;
+- repair;
+- validation;
+- explicit unknown.
+
+The repository should exploit the programming grammar capable agents were already trained on. Zig is the implementation substrate; the surrounding engineering vocabulary should remain conventional unless the project already has a justified formal term.
+
+STARTING STATE
+
+Work in ~/dev/zig-reference.
+
+Read AGENTS.md first.
+Read COMMANDS.md before inventing or guessing commands.
+Read docs/agentic-vocabulary.md.
+Read docs/reports/AGENTIC_SNOWBALL_BATCH_07.md.
+Read docs/reports/AGENTIC_SNOWBALL_BATCH_07_REPAIR.md.
+Read docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_07_CORRECT_USE_PREFLIGHT.txt for historical architecture context, but DO NOT modify it.
+Read docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_07_REPAIR.txt for historical repair context, but DO NOT modify it.
+
+Record the actual base commit after syncing current main.
+Use Zig 0.14.0 only.
+
+Current independently verified state before Batch 08:
+
+- Batch 07 repair independent review: 42 passed / 0 failed;
+- 53 contracted modules;
+- 53 full Agent Fast Path modules;
+- 0 partial modules;
+- bootstrap advertises preflight in the correct zero-context workflow position;
+- current corpus truth in COMMANDS.md is mechanically checked;
+- representative preflight projections are deterministic;
+- hosted Morphic runtime output is 765 bytes and byte-identical across identical runs;
+- canonical full repository validation is green;
+- benchmark-pre-morphic-52 remains frozen at its historical target.
+
+Do not modify, move, recreate, delete, or retag benchmark-pre-morphic-52.
+
+BEFORE EDITING
+
+Run enough existing truth surfaces to understand the present architecture before changing it.
+
+At minimum:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+python3 tools/query-reference.py agent diagnose TimeReversed
+python3 tools/query-reference.py agent preflight bounded-deterministic-scheduler
+python3 tools/query-reference.py agent preflight bounded-system-resource-plan
+python3 tools/query-reference.py agent preflight owned-byte-buffer
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/validate-agent-contracts.py --self-test
+node tools/check-port-contracts.js
+node tools/test-port-public-surface.js
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py
+
+Inspect the existing diagnostic schema/index/generator and the actual authored contracts for the pressure modules before choosing a data model.
+
+Do not assume a field or diagnostic exists merely because this request discusses it conceptually.
+
+EXISTING DEBUG FAST PATH MUST REMAIN TRUE
+
+The existing command:
+
+python3 tools/query-reference.py agent diagnose TERM
+
+is symptom/candidate discovery.
+
+Preserve that behavior and its semantic honesty.
+
+It may return deterministic diagnostic candidates for a term, alias, native error, module, operation, or summary.
+
+It is NOT currently causal proof.
+
+Do not silently redefine ordinary free-text `diagnose TERM` into a causal oracle.
+
+Batch 08 may extend the existing `diagnose` operation with an explicit structured-input mode, or may add the smallest conventional adjacent surface if that produces a materially cleaner CLI. Prefer extending the existing concept rather than inventing a second unrelated debugging vocabulary.
+
+If a new public agent operation is introduced and it belongs in the normal zero-context workflow, bootstrap must advertise it and the zero-context acceptance regression must enforce that. Do not repeat the Batch 07 discoverability mistake.
+
+VOCABULARY ALREADY EXISTS
+
+The following formal project terms already exist in docs/agentic-vocabulary.md and must be used consistently:
+
+Invariant-Guided Diagnosis
+Failure State Capsule
+Repair Locality
+Diagnostic Reach
+Repair Compression Ratio
+Evidence Honesty
+Context Efficiency
+Constraint-Preserving Compression
+Snowball Yield
+
+Do not rename them.
+Do not add synonyms for them.
+
+The existing definitions are authoritative:
+
+Invariant-Guided Diagnosis:
+classify a failure by component + operation + relevant observed state + violated canonical invariant when evidence establishes it, then stable diagnostic or explicit unknown, repair, focused validation.
+
+Failure State Capsule:
+the smallest deterministic machine-readable snapshot of failure state that preserves decisive facts for continued diagnosis/repair without broad repository archaeology; not a raw log dump; unknown facts remain explicit.
+
+Only modify docs/agentic-vocabulary.md if implementation pressure reveals a genuine ambiguity in these definitions or introduces a truly necessary new project-specific concept.
+
+ARCHITECTURAL REQUIREMENT 1 — CANONICAL INVARIANTS
+
+A diagnosis must point to canonical engineering truth, not to a second manually maintained explanation of the same rule.
+
+Determine the smallest durable way to represent correctness-relevant invariants in the canonical contract architecture.
+
+Requirements:
+
+- invariants must have stable machine-readable identity;
+- invariants must be attached to the component/operation/state where they actually apply;
+- wording should use normal programming language;
+- the source of truth must be canonical and mechanically validated;
+- generated agent projections may derive from canonical invariants but must not become a second authored database;
+- diagnostics may reference invariants but must not copy their truth into an independently drifting prose field;
+- invariants should be optional where a module genuinely has no currently authored invariant evidence;
+- do not manufacture superficial invariants merely to increase coverage;
+- do not require all 53 modules to be rewritten in this batch.
+
+If the existing contract schema already contains an equivalent fact under another normal field, reuse/strengthen it rather than creating a duplicate representation.
+
+Prefer a small number of strong invariants over an exhaustive list of restated implementation details.
+
+Examples of the KIND of invariant intended, not mandated exact text:
+
+- logical time does not move backward;
+- a bounded container cannot accept an element beyond capacity;
+- a sealed resource plan cannot acquire resources outside the established plan;
+- an address/mapping operation requires alignment or non-overlap when that is actually true in the canonical implementation.
+
+Do not add an invariant unless source, contract, and executable evidence support it.
+
+ARCHITECTURAL REQUIREMENT 2 — FAILURE STATE CAPSULE
+
+Create the smallest conventional machine-readable representation necessary to carry decisive failure state into diagnosis.
+
+Use JSON and the repository's existing schema placement/versioning conventions.
+
+Do not invent a bespoke textual DSL.
+Do not require agents to parse human logs when structured facts are available.
+Do not stuff raw stack traces or arbitrary complete program state into the capsule.
+Do not make the capsule a duplicate of the full module contract.
+
+A capsule should contain only facts that are useful for diagnosis continuation.
+
+Based on actual pressure evidence, likely useful categories include:
+
+- schema/version identity if the repository convention requires one;
+- component;
+- operation;
+- native error or symptom when available;
+- relevant observed values/state;
+- relevant boundary/expected value only when factual and available;
+- mutation/rollback status only when actually established;
+- minimum useful locations when known;
+- explicit unknown/unavailable facts where needed.
+
+Those are requirements-by-purpose, not a mandated exact schema.
+
+Design the schema from real pressure cases.
+
+The capsule must be:
+
+- deterministic;
+- compact;
+- schema-valid;
+- evidence-honest;
+- easy for a generic coding agent to understand from standard terminology;
+- sufficient to distinguish at least the known pressure diagnoses from deliberately ambiguous/insufficient cases.
+
+If a field is unnecessary to establish any pressure diagnosis, question whether it belongs in the first version.
+
+ARCHITECTURAL REQUIREMENT 3 — INVARIANT-GUIDED DIAGNOSIS
+
+Add a deterministic structured diagnosis path that consumes a valid Failure State Capsule and attempts to identify a violated canonical invariant.
+
+The normal path should not parse implementation source.
+
+The normal path should use canonical/generated repository truth already intended for machine consumption.
+
+The result must clearly distinguish at least:
+
+KNOWN
+- evidence establishes a specific canonical invariant violation;
+- identify component and operation;
+- identify invariant by stable identity;
+- surface the matching stable diagnostic when one exists/was justified;
+- give the repair strategy/evidence path;
+- give focused validation;
+- give the minimum useful locations.
+
+UNKNOWN / INSUFFICIENT EVIDENCE
+- evidence does not establish a unique invariant;
+- do not rank a guess as causal truth;
+- return the existing explicit unknown diagnostic semantics (`ZIGREF-DIAGNOSIS-UNKNOWN`) or the repository's actual canonical equivalent;
+- explain which decisive evidence is absent or ambiguous when this can be stated mechanically;
+- provide the smallest next inspection/query step.
+
+INVALID CAPSULE
+- malformed/unsupported structured input;
+- nonzero exit;
+- stable repository error identity if existing conventions justify one;
+- repair should point to schema/usage rather than guessing about the underlying program failure.
+
+A native error name alone is not automatically enough to claim invariant causality unless the canonical contract proves that the error uniquely establishes that invariant.
+
+A caller-provided assertion like `violated_invariant = X` must not be blindly trusted as diagnosis evidence. The system's purpose is to derive or verify the diagnosis from canonical truth + observed state, not simply echo the caller's conclusion.
+
+ARCHITECTURAL REQUIREMENT 4 — PREFLIGHT / DIAGNOSIS SYMMETRY
+
+Batch 07 preflight is the forward correctness model.
+Batch 08 diagnosis should be the reverse model.
+
+For pilot modules with canonical invariants, preflight should expose the smallest useful invariant information needed to avoid the failure before integration.
+
+After failure, structured diagnosis should reference the same canonical invariant identity.
+
+Do not author separate "preflight invariant" and "diagnostic invariant" databases.
+
+Desired conceptual symmetry:
+
+preflight:
+  invariant I
+  obligation/boundary
+  failure surface
+
+failure capsule:
+  component/operation
+  observed state
+  native symptom
+
+diagnosis:
+  invariant I violated
+  evidence used
+  repair
+  focused validation
+
+If adding invariant projections changes representative preflight byte sizes, that is allowed in Batch 08 because it is a deliberate new correctness surface.
+
+However:
+
+- measure exact before/after bytes;
+- preserve determinism;
+- explain every change in the report;
+- keep Constraint-Preserving Compression;
+- do not bloat every preflight with unrelated diagnostic prose.
+
+ARCHITECTURAL REQUIREMENT 5 — PRESSURE SET, NOT MASS MIGRATION
+
+Use 3 to 5 existing components to pressure-test the architecture across meaningfully different failure classes.
+
+Required pressure subject:
+
+1. bounded-deterministic-scheduler
+
+Use at least the existing monotonic-time / `TimeReversed` behavior if executable/canonical evidence confirms the expected semantics.
+
+Strong candidate pressure subjects:
+
+2. bounded-system-resource-plan
+3. owned-byte-buffer
+4. one existing Sv39/page-table component with a strong deterministic failure invariant
+
+But do not force a candidate if its current implementation/contracts do not provide a clean evidence-backed failure.
+
+If one of those candidates is unsuitable, choose another existing module with stronger real negative evidence and explain the substitution.
+
+The final pressure set must cover at least three distinct kinds of correctness constraint, such as:
+
+- temporal/state progression;
+- bounded capacity/resource exhaustion;
+- ownership/lifecycle;
+- address/alignment/range/mapping;
+- state transition legality.
+
+Do not create new modules simply to manufacture diagnostic examples.
+
+For each pressure module, establish:
+
+- canonical invariant identity;
+- operation/context;
+- concrete failing fixture or deterministic negative case;
+- smallest sufficient capsule;
+- known diagnosis OR explicit reason it remains unknown;
+- repair path when known;
+- focused validation command;
+- whether diagnosis required implementation-source reading before and after canonicalization.
+
+At least one pressure case must deliberately be INSUFFICIENT/AMBIGUOUS and return UNKNOWN rather than a guessed cause.
+
+At least one negative regression must prove that removing a decisive capsule fact turns a previously known diagnosis into UNKNOWN.
+
+If actual repository evidence supports multiple distinct symptoms explained by one invariant, demonstrate that as a factual example. If not, report that no such pressure case was established; do not invent one merely to satisfy a narrative.
+
+ARCHITECTURAL REQUIREMENT 6 — STABLE DIAGNOSTICS, SPARINGLY
+
+Reuse existing diagnostic identities whenever they already express the established invariant failure.
+
+Add a new stable ZIGREF diagnostic only when all of the following are true:
+
+- the failure class is real and reproducible;
+- canonical invariant evidence establishes it;
+- the repair is specific enough to be useful;
+- focused validation exists;
+- the identity will reduce future rediscovery/repair work.
+
+Do not create one diagnostic per superficial error string.
+
+One strong invariant may explain several symptoms.
+
+Do not add diagnostic IDs solely to increase Diagnostic Reach numerically.
+
+Native compiler/runtime error text remains authoritative evidence and must not be rewritten or hidden.
+
+ARCHITECTURAL REQUIREMENT 7 — NO SECRET REPOSITORY LANGUAGE
+
+A random capable coding agent should not need a primer on a private framework before using Batch 08.
+
+Prefer conventional names and structures.
+
+Good:
+
+component
+operation
+symptom
+observed
+expected
+invariant
+error
+repair
+validation
+unknown
+
+Be skeptical of introducing project-specific synonyms for those concepts.
+
+The formal project terms `Failure State Capsule` and `Invariant-Guided Diagnosis` already exist because they identify reusable architecture concepts. Do not proliferate terminology beneath them.
+
+ARCHITECTURAL REQUIREMENT 8 — SOURCE AVOIDANCE AFTER THE FIRST DIAGNOSIS
+
+It is acceptable to read source while authoring/auditing the initial pressure invariants and fixtures.
+
+It should not be necessary for an ordinary future agent to reread source merely to recognize an already-canonicalized known failure.
+
+For each known pressure case, measure and report:
+
+- source files read while establishing the canonical diagnosis in this Batch 08 authoring run;
+- source files required by the ordinary structured diagnosis path after the reusable truth exists.
+
+Target for the ordinary known-diagnosis path: zero implementation-source reads.
+
+Do not turn this target into a false claim if the implemented architecture still requires source.
+
+ARCHITECTURAL REQUIREMENT 9 — DETERMINISM AND SIZE
+
+Structured diagnosis must be deterministic.
+
+Identical capsule + identical repository state must produce byte-identical output.
+
+For each canonical pressure capsule:
+
+- run diagnosis at least twice;
+- compare bytes;
+- record exact output byte size in the report.
+
+Record capsule byte size too.
+
+If a real pre-existing raw fixture/log is available for the same failure, you may record its byte size for factual comparison.
+
+Do not fabricate a "raw log" solely to claim compression.
+Do not convert bytes into token claims unless actually measured with a named tokenizer.
+Do not estimate speedup.
+
+ARCHITECTURAL REQUIREMENT 10 — FAILURE ATOMICITY / MUTATION TRUTH
+
+Where a pressure component already has a documented failure guarantee such as no mutation on reported error, expose that truth through the invariant/diagnosis path only when the canonical contract and executable evidence support it.
+
+Do not infer rollback semantics merely from an error return.
+
+If mutation state is unavailable, capsule/diagnosis must say unknown or omit the claim according to the schema's normal semantics.
+
+If the system can mechanically link a known failure to an existing failure guarantee, prefer deriving that relation rather than duplicating prose.
+
+AGENT INDEX / GENERATED TRUTH
+
+If canonical invariant fields need to become available to ordinary agent queries, project them through the existing generated agent index architecture.
+
+Do not hand-edit generated/agent/*.json or generated/agent/*.jsonl.
+
+Update the generator and regenerate deterministically.
+
+Strengthen drift checks so authored canonical invariants and generated invariant projections cannot silently diverge.
+
+Do not make the generated projection more permissive than the canonical contract.
+
+PORT CONTRACTS
+
+Do not broaden Batch 08 into port redesign.
+
+If canonical public surfaces are unchanged, port contracts should remain unchanged except for genuinely necessary machine-facing metadata already governed by the port architecture.
+
+Preserve the Batch 06/07 semantic public-surface regression:
+
+node tools/test-port-public-surface.js
+
+COMMANDS.md — PERMANENT CUMULATIVE RULE
+
+Every repository-changing Codex run must leave COMMANDS.md current.
+
+This rule remains mandatory.
+
+Before completion:
+
+- document every real new public command introduced by Batch 08;
+- update changed syntax or semantics of `agent diagnose` if extended;
+- document the structured Failure State Capsule diagnosis path;
+- preserve the distinction between symptom candidate discovery and causal invariant-guided diagnosis;
+- backfill any real supported command from earlier batches that is still missing;
+- keep current-state corpus claims mechanically truthful;
+- preserve legitimate historical counts/statements;
+- remove or mark obsolete command claims;
+- never document a command that does not exist;
+- never say a command is verified unless it actually ran successfully.
+
+Run:
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+
+If the command checker needs strengthening because Batch 08 introduces a new public operation, add the smallest regression that prevents COMMANDS.md and bootstrap/CLI truth from drifting.
+
+BOOTSTRAP / ZERO-CONTEXT DISCOVERY
+
+The current normal workflow is:
+
+decide
+→ card select
+→ compose
+→ preflight
+→ card integrate
+→ validate
+→ diagnose
+→ diagnostic repair
+
+If Batch 08 extends `diagnose` without adding a new operation, the existing workflow may already be sufficient.
+
+If Batch 08 adds a distinct public operation required for ordinary repair, then bootstrap must expose it and tests must enforce its discoverability.
+
+Do not add low-level internal helpers to bootstrap merely because they exist.
+
+AGENTS.md DISCIPLINE
+
+Modify AGENTS.md only if Batch 08 changes a durable normal agent workflow rule.
+
+Do not turn AGENTS.md into a changelog or architecture essay.
+
+A cold agent should continue to enter through bootstrap and ordinary machine-facing interfaces rather than being forced to read long prose.
+
+MORPHIC / EXISTING SYSTEM PRESERVATION
+
+Batch 08 is diagnosis architecture, not a new Morphic feature batch.
+
+Do not redesign the hosted Morphic runtime.
+
+Preserve:
+
+python3 tools/developer-command.py verify-morphic-plan
+python3 tools/developer-command.py verify-morphic-trace
+python3 tools/developer-command.py verify-hosted-morphic-runtime
+
+Preserve hosted Morphic byte determinism.
+
+Current historical expectation before Batch 08 is 765 bytes for identical hosted runs.
+
+These diagnosis changes should not require changing hosted Morphic output.
+
+If it changes, stop and establish a real causal reason before accepting the change.
+
+DEVELOPER MINIMUS
+
+Preserve the canonical outer rule:
+
+serious developer-facing aggregate/verification flows preserve ordinary output, then append exactly:
+
+LOCATIONS
+MINIMUS
+
+The outer Minimus remains authoritative and exit-status truthful.
+
+If Batch 08 creates a new serious aggregate verifier, it must either receive a canonical Developer Minimus wrapper or be explicitly classified as a focused/raw implementation surface according to existing repository policy.
+
+Do not add Minimus to every tiny query.
+
+FAILURE STATE CAPSULE FIXTURES
+
+Commit small deterministic fixtures for the pressure cases if fixtures are the repository's established way to preserve reusable diagnosis evidence.
+
+Each fixture should be the smallest fact set needed for its intended test.
+
+At minimum preserve fixtures/tests for:
+
+- one known scheduler diagnosis;
+- at least two other known diagnoses across distinct failure classes, if actual evidence supports them;
+- one ambiguous/insufficient diagnosis;
+- one malformed capsule rejection;
+- one regression where a decisive observed fact is removed and the result falls back to UNKNOWN.
+
+Do not use giant copied logs as fixtures.
+
+TEST THE ARCHITECTURE, NOT JUST HAPPY PATH OUTPUT
+
+Add negative/self-tests that prove at least:
+
+- duplicate invariant identities are rejected;
+- a diagnostic cannot reference a nonexistent invariant;
+- an invariant cannot reference a nonexistent operation/public context when such validation is mechanically possible;
+- malformed capsule input is rejected;
+- unknown component is rejected or explicitly unresolved according to the chosen schema semantics;
+- insufficient evidence returns UNKNOWN rather than a guessed known diagnosis;
+- removing decisive evidence from a known capsule returns UNKNOWN;
+- structured diagnosis is deterministic;
+- known diagnosis links to an actually existing focused validation command/evidence path;
+- preflight and diagnosis reference the same canonical invariant identity for pilot modules;
+- generated invariant projection drift is detected;
+- symptom-only `diagnose TERM` keeps its candidate-discovery semantics and does not falsely claim causality.
+
+Do not make tests depend on incidental JSON key order unless canonical deterministic serialization already defines it.
+
+REPAIR LOCALITY PRESSURE
+
+For each known pressure diagnosis, the returned machine-facing result should make the repair path narrow.
+
+A strong result normally gives enough to answer:
+
+- what component failed?
+- during what operation?
+- which invariant is established as violated?
+- what observed facts establish that?
+- what stable diagnostic identifies the known failure, if one exists?
+- what should be repaired?
+- what is the narrowest useful validation command?
+- what files/locations are actually relevant?
+
+Avoid returning unrelated module documentation.
+
+The ordinary known path should be compact enough that a future agent does not need to open the full contract unless it is modifying/auditing the component.
+
+SNOWBALL YIELD — FACTUAL BOOKKEEPING
+
+Record Snowball Yield for Batch 08 in the report using factual bookkeeping only.
+
+At minimum record:
+
+- requirements at start;
+- existing modules/recipes reused;
+- pressure modules selected and why;
+- canonical invariants added/reused;
+- stable diagnostics added/reused;
+- Failure State Capsule schema/fixtures added;
+- new reusable modules created (expected 0 unless pressure proves one genuinely necessary);
+- new recipes created (expected 0 unless pressure proves one genuinely necessary);
+- source reads required to establish the first canonical diagnoses;
+- source reads required by ordinary structured known-diagnosis queries after canonicalization;
+- capsule byte sizes;
+- diagnosis output byte sizes;
+- unknown/ambiguous cases preserved;
+- diagnostic lookups performed;
+- focused validation commands used;
+- anything still requiring repository archaeology.
+
+Do not claim hypothetical token savings.
+Do not claim speedups without measurement.
+Do not claim superiority over rustc/Rust/C/Zig.
+
+The long-term competition is Cost of Correct Use, but Batch 08 reports evidence, not marketing.
+
+BATCH 08 REPORT
+
+Create:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_08.md
+
+Include:
+
+1. actual base commit and Zig version;
+2. mission and non-goals;
+3. architecture discovered under pressure;
+4. exact Failure State Capsule representation and why each required field survived pressure;
+5. canonical invariant representation and source-of-truth location;
+6. generated/projected invariant path, if any;
+7. structured diagnosis command syntax;
+8. preserved symptom-only diagnosis syntax/semantics;
+9. pressure set and distinct failure classes;
+10. known diagnosis examples;
+11. explicit UNKNOWN example;
+12. malformed capsule behavior;
+13. preflight/diagnosis symmetry evidence;
+14. stable diagnostic additions/reuse;
+15. exact capsule and diagnosis byte sizes;
+16. deterministic repeatability results;
+17. source-read/archaeology bookkeeping;
+18. focused validations;
+19. aggregate validation results;
+20. Snowball Yield factual bookkeeping;
+21. limits and intentionally unsupported inference.
+
+Keep the report factual.
+
+Do not imply that structured diagnosis proves arbitrary program causality.
+It proves only what the canonical invariants + supplied observed state establish.
+
+PREFLIGHT SIZE REGRESSION BOOKKEEPING
+
+Before modifying preflight projection behavior, record the current exact byte sizes for at least:
+
+semantic-version
+owned-byte-buffer
+bounded-system-resource-plan
+bounded-deterministic-scheduler
+run-hosted-morphic-runtime
+
+Historical Batch 07/repair sizes were:
+
+semantic-version: 1665
+owned-byte-buffer: 2450
+bounded-system-resource-plan: 4374
+bounded-deterministic-scheduler: 2371
+run-hosted-morphic-runtime: 7336
+
+Re-measure current main before editing rather than blindly trusting history.
+
+After Batch 08, record new exact sizes.
+
+Unchanged non-pressure subjects should not grow merely because diagnosis exists elsewhere.
+
+If all preflight outputs gain a new universal field, justify why that global cost is necessary rather than projecting invariants only where they exist.
+
+UNKNOWN IS A FIRST-CLASS CORRECT RESULT
+
+This requirement is absolute.
+
+When evidence does not establish one canonical violated invariant, the diagnosis must remain UNKNOWN.
+
+Examples of insufficient evidence may include:
+
+- only a vague symptom string;
+- missing decisive observed values;
+- multiple invariants compatible with the state;
+- component/operation mismatch;
+- unsupported external state;
+- failure outside current corpus knowledge.
+
+The structured system must not promote candidate ranking into causal certainty.
+
+A useful UNKNOWN response should make the next evidence-gathering step cheap when possible.
+
+But it must never invent the missing fact.
+
+QUALITY GATES
+
+Run every applicable focused and aggregate check.
+
+At minimum, when commands exist:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+python3 tools/query-reference.py agent diagnose TimeReversed
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py
+PYTHONDONTWRITEBYTECODE=1 python3 tools/validate-agent-contracts.py --self-test
+PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+node tools/check-port-contracts.js
+node tools/test-port-public-surface.js
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py
+zig fmt --check .
+git diff --check
+
+Run the new Failure State Capsule schema/fixture self-tests and structured diagnosis regression suite through their actual implemented commands.
+
+Run every pressure module's focused unit/smoke/negative validation.
+
+At minimum preserve:
+
+zig build test-bounded-deterministic-scheduler --summary all
+zig build smoke-bounded-deterministic-scheduler --summary all
+zig build test-recipe-run-hosted-morphic-runtime --summary all
+zig build verify-hosted-morphic-runtime --summary all
+python3 tools/developer-command.py verify-hosted-morphic-runtime
+
+Run representative preflights twice and compare exact bytes.
+
+Run every canonical known Failure State Capsule diagnosis at least twice and compare exact bytes.
+
+Run hosted Morphic at least twice and compare exact complete output bytes; expected current result is 765 bytes unless a separately justified unrelated change is discovered, which should normally not happen in this batch.
+
+Run aggregate repository gates:
+
+zig build check --summary all
+zig build test --summary all
+zig build recipes --summary all
+zig build conformance --summary all
+python3 tools/developer-command.py verify-morphic-plan
+python3 tools/developer-command.py verify-morphic-trace
+python3 tools/developer-command.py smoke
+python3 tools/developer-command.py validate-repository
+
+The final worktree must contain no accidental generated binary artifacts.
+
+SUCCESS CRITERIA
+
+Batch 08 is complete only if all of the following are true:
+
+- a small canonical invariant representation exists or an existing representation was proven sufficient and strengthened;
+- invariant identities are stable and mechanically validated;
+- a compact deterministic Failure State Capsule representation exists;
+- Failure State Capsules use conventional JSON/schema rather than a private DSL;
+- structured diagnosis can consume a capsule through a documented machine-facing command;
+- ordinary free-text `diagnose TERM` retains candidate-discovery semantics;
+- at least three distinct real failure classes pressure-test the architecture;
+- bounded-deterministic-scheduler is included;
+- known pressure diagnoses point to canonical invariant identity;
+- known diagnoses expose repair + focused validation + minimum useful locations;
+- at least one insufficient/ambiguous capsule returns explicit UNKNOWN;
+- removing decisive evidence from a known capsule causes UNKNOWN rather than a guess;
+- malformed structured input is rejected nonzero;
+- structured diagnosis is deterministic and byte-repeatable;
+- ordinary known diagnosis requires no implementation-source read after canonical truth exists, or any remaining source dependency is explicitly reported rather than hidden;
+- preflight and diagnosis share the same canonical invariant truth for pilot modules;
+- generated invariant projections cannot silently drift from canonical contracts;
+- diagnostics reference real invariant/evidence/validation paths;
+- no giant error encyclopedia is introduced;
+- no universal debugger is attempted;
+- no custom invariant expression language is introduced unless actual pressure proves it unavoidable and the report explains why ordinary data representation was insufficient;
+- COMMANDS.md is cumulatively current;
+- bootstrap remains truthful about any normal public operation introduced;
+- AGENTS.md remains compact and policy-oriented;
+- the historical Batch 07 request/report and repair request/report are not rewritten;
+- current Agent Fast Path corpus remains 53 contracted / 53 full / 0 partial unless a genuinely new reusable module is independently justified by pressure;
+- no module-count quota is used;
+- no new recipe is created merely to demonstrate the architecture;
+- hosted Morphic verification remains green;
+- hosted Morphic complete output remains byte-identical across identical runs and should remain 765 bytes;
+- Developer Minimus remains truthful and singular;
+- benchmark-pre-morphic-52 remains untouched;
+- all applicable focused and aggregate validations pass;
+- Batch 08 report exists and contains factual Snowball Yield bookkeeping.
+
+OUT OF SCOPE
+
+Do not build a general tracing framework.
+Do not build a universal debugger.
+Do not catalog every Zig compiler error.
+Do not parse arbitrary stack traces with heuristics.
+Do not implement probabilistic causal diagnosis.
+Do not hide uncertainty behind confidence scores.
+Do not imitate the Rust borrow checker.
+Do not build a Rust parser or rustc compatibility layer.
+Do not start the Rust/C/Zig comparison benchmark.
+Do not begin Alpine boot.
+Do not begin the privileged RISC-V backend.
+Do not add VirtIO, storage, networking, processes, or drivers merely because they are future goals.
+Do not mass-migrate all 53 modules to authored invariants without pressure evidence.
+Do not invent module quotas.
+Do not create terminology for ordinary programming concepts.
+
+The goal is much narrower and more fundamental:
+
+A future agent encountering a failure the repository already understands should be able to hand the repository the smallest decisive state, receive an evidence-backed invariant diagnosis, repair locally, and validate narrowly — without relearning the subsystem.
+
+Do not commit.
+Do not push.
+Do not create or move tags.
+Do not open a pull request.
+
+Leave completed changes uncommitted for review.
+
+Finish only when the requested work is genuinely complete and the final line of your response is exactly:
+
+AGENTIC SNOWBALL BATCH 08 PASSED
