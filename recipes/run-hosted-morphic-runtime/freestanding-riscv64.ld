@@ -18,4 +18,10 @@ SECTIONS {
     . += 64K;
     __stack_top = .;
   }
+  .physical_page_pool (NOLOAD) : ALIGN(4096) {
+    __physical_page_pool_begin = .;
+    . += 8 * 4096;
+    __physical_page_pool_end = .;
+  }
+  __image_end = .;
 }

@@ -43,7 +43,11 @@
     "run-hosted-morphic-runtime": [
       "bounded-deterministic-event-trace",
       "bounded-deterministic-scheduler",
-      "bounded-system-resource-plan"
+      "bounded-system-resource-plan",
+      "distinct-memory-address-types",
+      "physical-memory-region-set",
+      "physical-page-frame-allocator",
+      "physical-page-frame-number-and-address-conversion"
     ],
     "trace-morphic-example": [
       "bounded-deterministic-event-trace"

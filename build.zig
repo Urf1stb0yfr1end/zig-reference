@@ -235,6 +235,10 @@ pub fn build(b: *std.Build) void {
             const freestanding_module = b.createModule(.{ .root_source_file = b.path("recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig"), .target = freestanding_target, .optimize = .ReleaseSmall, .code_model = .medium });
             freestanding_module.addImport("morphic-core", recipe_module);
             freestanding_module.addImport("bounded-deterministic-scheduler", findModule("bounded-deterministic-scheduler", &modules));
+            freestanding_module.addImport("distinct-memory-address-types", findModule("distinct-memory-address-types", &modules));
+            freestanding_module.addImport("physical-page-frame-number-and-address-conversion", findModule("physical-page-frame-number-and-address-conversion", &modules));
+            freestanding_module.addImport("physical-memory-region-set", findModule("physical-memory-region-set", &modules));
+            freestanding_module.addImport("physical-page-frame-allocator", findModule("physical-page-frame-allocator", &modules));
             const freestanding = b.addExecutable(.{ .name = "morphic-freestanding-riscv64", .root_module = freestanding_module });
             freestanding.entry = .disabled;
             freestanding.root_module.strip = false;

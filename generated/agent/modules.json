@@ -2663,6 +2663,7 @@
           "physical-page-frame-number-and-address-conversion"
         ],
         "recipes": [
+          "run-hosted-morphic-runtime",
           "validate-physical-page-frame"
         ]
       },
@@ -2749,6 +2750,7 @@
         "Canonicality, alignment, translation, mapping, and ownership are not provided."
       ],
       "matching_recipes": [
+        "run-hosted-morphic-runtime",
         "validate-physical-page-frame"
       ],
       "minimal_usage": [
@@ -3950,6 +3952,7 @@
           "physical-page-frame-allocator"
         ],
         "recipes": [
+          "run-hosted-morphic-runtime",
           "validate-physical-page-frame"
         ]
       },
@@ -4035,6 +4038,7 @@
         "The page size is not 4 KiB or unaligned addresses must be accepted."
       ],
       "matching_recipes": [
+        "run-hosted-morphic-runtime",
         "validate-physical-page-frame"
       ],
       "minimal_usage": [
@@ -5000,7 +5004,9 @@
         "dependents": [
           "physical-page-frame-allocator"
         ],
-        "recipes": []
+        "recipes": [
+          "run-hosted-morphic-runtime"
+        ]
       },
       "composition": {
         "commonly_with": [
@@ -5084,7 +5090,9 @@
         "hidden allocation",
         "implicit synchronization"
       ],
-      "matching_recipes": [],
+      "matching_recipes": [
+        "run-hosted-morphic-runtime"
+      ],
       "minimal_usage": [
         "const api = @import(\"physical-memory-region-set\");",
         "var regions = PhysicalMemoryRegionSet(capacity).init();"
@@ -5159,7 +5167,9 @@
       ],
       "change_impact": {
         "dependents": [],
-        "recipes": []
+        "recipes": [
+          "run-hosted-morphic-runtime"
+        ]
       },
       "composition": {
         "commonly_with": [
@@ -5246,7 +5256,9 @@
         "hidden allocation",
         "implicit synchronization"
       ],
-      "matching_recipes": [],
+      "matching_recipes": [
+        "run-hosted-morphic-runtime"
+      ],
       "minimal_usage": [
         "const api = @import(\"physical-page-frame-allocator\");",
         "var frames = PhysicalPageFrameAllocator(capacity).init(regions);"
