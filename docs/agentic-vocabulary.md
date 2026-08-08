@@ -145,6 +145,42 @@ The snowball goal is to reduce Integration Distance over time.
 
 As more mechanisms become canonical modules and recipes, a future agent should spend more effort on genuinely novel policy and less on reconstructing solved infrastructure.
 
+## Less-Lines Principle
+
+A project principle stating that, as a reusable engineering corpus matures, the amount of newly written code required to deliver a comparable new capability should trend toward the irreducible novelty of the task.
+
+The Less-Lines Principle is not code golf and does not claim that shorter source is automatically better. Moving complexity into unreadable expressions, generated blobs, hidden dependencies, or unvalidated abstractions does not satisfy the principle. Correctness, legibility, explicit boundaries, and validation remain mandatory.
+
+The desired progression is:
+
+```text
+requirement
+→ discover what is already solved
+→ select canonical capabilities
+→ resolve dependency closure
+→ compose settled mechanisms
+→ implement only Residual Novelty and unavoidable integration glue
+→ validate
+→ canonicalize reusable novelty
+→ future equivalent work requires still fewer new lines
+```
+
+Conceptually, for a mature covered domain:
+
+```text
+new project-specific code ≈ Residual Novelty + unavoidable integration glue
+```
+
+As Reconstruction Coverage, Knowledge Reuse Yield, and Snowball Yield increase, repeated infrastructure should stop reappearing as freshly written project code. The important reduction is therefore not the number of lines inside the whole system, but the number of *new* lines demanded from the next correct implementation.
+
+The strongest form of the idea is:
+
+> **New code should increasingly correspond to new knowledge.**
+
+The principle may be evaluated with measurements such as new project-specific lines, reusable capabilities selected, unnecessary reimplementation avoided, residual capability gaps, and validated completion cost. Line count is supporting evidence, not a standalone optimization target; a result that uses fewer lines by becoming less correct, less explicit, or harder to validate is a regression.
+
+**Less-Lines Paradigm** may be used informally for the broader worldview produced when this principle compounds across a large corpus, but **Less-Lines Principle** is the formal project term.
+
 ## Choice Entropy
 
 The uncertainty created by multiple plausible components, APIs, patterns, or implementations for the same requirement.
