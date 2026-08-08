@@ -1,0 +1,795 @@
+CODEX AGENTIC SNOWBALL BATCH 17 — ACTIVE SV39 KERNEL CONTINUATION
+
+MISSION
+
+Advance Alpz by exactly one memory-management rung:
+
+TAKE THE REAL LINKER-OWNED PHYSICAL FRAMES PROVEN IN BATCH 16, USE THE EXISTING SV39 PAGE-TABLE MACHINERY TO CONSTRUCT REAL PAGE TABLES IN THOSE OWNED FRAMES, ACTIVATE SV39 ON THE REAL FREESTANDING RISC-V MACHINE, AND MECHANICALLY PROVE THAT THE CURRENT KERNEL CONTINUES EXECUTING UNDER THE NEW ADDRESS SPACE WITHOUT INTRODUCING U-MODE, PROCESSES, SYSCALLS, LINUX ABI CLAIMS, OR A GENERAL VIRTUAL-MEMORY MANAGER.
+
+Batch 16 established the first real physical-memory ownership boundary:
+
+freestanding ELF/linker-owned page pool
+→ exact ELF/runtime pool agreement
+→ actual Bare satp evidence
+→ existing PhysicalMemoryRegionSet
+→ existing PhysicalPageFrameAllocator
+→ eight unique bounded real frames
+→ real sentinel write/read
+→ exhaustion/release/double-free/foreign-frame proof
+→ previous Batch 12/13/14/15 machine proofs preserved
+→ canonical Morphic bytes unchanged
+
+Batch 17 must convert that owned-memory foundation into the first ACTIVE virtual-memory proof.
+
+The intended bridge is:
+
+Batch 16 linker-owned physical frames
+→ small real page-table-page adapter at the freestanding boundary
+→ existing Sv39 entry/index/walker/builder/invalidation machinery
+→ real root page and intermediate page-table pages allocated from owned frames
+→ exact mappings required for safe kernel continuation
+→ satp transition from Bare to Sv39
+→ architecturally appropriate SFENCE.VMA execution
+→ real instruction/data/stack continuation under translation
+→ one explicit non-identity virtual alias proving translation is not merely identity coincidence
+→ canonical Morphic execution while Sv39 remains active
+→ previous machine proofs remain mechanically valid
+
+This is the first active-Sv39 batch.
+
+This is NOT a U-mode batch.
+This is NOT a process-address-space batch.
+This is NOT a syscall batch.
+This is NOT a Linux ABI batch.
+This is NOT mmap/brk.
+This is NOT a general VMM.
+This is NOT a higher-half-kernel redesign.
+This is NOT page-fault-driven demand paging.
+This is NOT a platform RAM discovery batch.
+This is NOT SMP/hart address-space coordination.
+
+The goal is deliberately narrow:
+
+PROVE THAT ALPZ CAN BUILD A TRUTHFUL SV39 PAGE TABLE FROM MEMORY IT ACTUALLY OWNS, INSTALL IT ON A REAL MACHINE, SURVIVE THE TRANSITION, EXERCISE A REAL TRANSLATED ALIAS, AND CONTINUE RUNNING THE EXISTING MORPHIC WORKLOAD UNDER ACTIVE PAGING.
+
+
+CURRENT FLAGSHIP DOCTRINE
+
+Morphic remains the flagship system-scale composition of zig-reference.
+Alpz is the current flagship real-machine/kernel embodiment used to pressure the Morphic and Z-Ref contracts against increasingly serious machine reality.
+
+Batch 17 must preserve that relationship.
+
+Do not move Alpz-specific page-table activation policy into reusable target-neutral modules unless a genuine reusable correctness defect requires a narrow canonical repair.
+Do not redefine Morphic in terms of RISC-V or Sv39.
+The machine body changes; shared semantics remain shared.
+
+A successful Batch 17 should make the Morphic preservation claim stronger:
+
+hosted Morphic
+=
+deterministic fake Morphic
+=
+real RISC-V Morphic under active Sv39
+
+for the canonical observable payload.
+
+
+CANONICAL BATCH 16 MERGED BASELINE
+
+The merged Batch 16 main revision is:
+
+8ff90a267c1b84940ef0d033bc237fa9aa199f28
+
+At plan-authoring time this merged revision has passed GitHub repository validation and the Batch 16 PR reported successful real-QEMU evidence, but do not invent an independent maintainer reproduction that has not been supplied to the checkout.
+
+If the maintainer has since created an immutable Batch 16 evidence tag, preserve it exactly.
+Do not move, recreate, delete, or repurpose any historical evidence tag.
+Do not create a new milestone tag unless explicitly requested by the maintainer.
+
+
+FIRST EXECUTABLE GATE
+
+Before implementing Batch 17, prove current repository truth mechanically.
+
+Resolve the supplied checkout and current HEAD.
+Read AGENTS.md and COMMANDS.md first.
+Use the repository's canonical Python environment/bootstrap if required.
+
+Run at minimum:
+
+python3 tools/verify-freestanding-riscv64-physical-memory.py --self-test
+python3 tools/verify-freestanding-riscv64-physical-memory.py
+
+The real Batch 16 QEMU proof is mandatory.
+
+Batch 17 begins only if the supplied checkout genuinely proves:
+
+- exact linker-owned eight-page pool bounds;
+- actual Bare translation during the Batch 16 direct-access phase;
+- real frame allocation and sentinel access;
+- exhaustion/release/rejection/accounting semantics;
+- Batch 12/13/14/15 preservation;
+- exact canonical Morphic equality.
+
+Do not weaken or replace this gate.
+If QEMU/readelf/another required executable is unavailable, report that truth and do not claim the real-machine gate passed.
+
+
+WHY ACTIVE SV39 IS NEXT
+
+Batch 16's own report identifies the next memory rung as an explicitly reviewed active-Sv39 composition using proven owned frames.
+
+The long-horizon Alpz ladder is approximately:
+
+owned physical frames                [Batch 16]
+→ active Sv39 kernel continuation    [Batch 17]
+→ refined kernel/user mapping policy
+→ first U-mode entry/return
+→ syscall trap/return
+→ user memory copy/validation
+→ ELF userspace loading
+→ process/file-descriptor/VFS work
+→ Linux userspace contracts
+→ real Alpine userspace
+
+Do not skip the active-address-space proof and jump directly to U-mode or Linux compatibility.
+
+Batch 17 is also a major Snowball test because zig-reference already contains:
+
+projects/44-riscv-sv39-page-table-entry
+projects/45-riscv-sv39-virtual-address-indexing
+projects/46-riscv-page-table-page-owner
+projects/47-riscv-sv39-page-table-walker
+projects/48-riscv-sfence-vma-invalidation
+projects/49-riscv-sv39-page-table-builder
+recipes/construct-and-verify-sv39-address-space
+
+The implementation should compose those established semantics with the real physical ownership proven in Batch 16 rather than inventing an unrelated page-table implementation.
+
+
+Z-REF EXECUTION DOCTRINE
+
+Treat the repository as accumulated executable knowledge.
+
+Before broad source reading, use the Agent Fast Path / preflight / human contracts / details.json / recipe surfaces to discover:
+
+- exact Sv39 page-table entry semantics;
+- canonical virtual-address decomposition and alignment semantics;
+- page-table builder Owner interface;
+- page-table walker behavior;
+- builder rollback/failure semantics;
+- invalidation planning and privileged execution boundary;
+- physical-frame conversion semantics;
+- Batch 16 allocator contract and owned-pool truth;
+- current freestanding ELF/linker memory layout;
+- current console mechanism and whether any MMIO pages are actually required after translation activates;
+- current stack/data/evidence storage that must remain addressable;
+- exact current Morphic continuation path;
+- focused validation commands for every reused module and recipe.
+
+Construct a compact Task Projection before implementation and record it in docs/reports/AGENTIC_SNOWBALL_BATCH_17.md.
+
+At minimum record:
+
+requested capability
+canonical Batch 16 gate
+reused modules
+reused recipe knowledge
+real page-table owner/provider adapter boundary
+page-table frame source
+root-frame ownership
+mapping policy
+kernel continuation range(s)
+permissions policy
+translation probe alias
+satp encoding
+ASID policy
+SFENCE.VMA policy
+pre/post activation invariants
+rollback/failure behavior
+unknowns
+non-claims
+minimum trustworthy read set
+focused validators
+preservation validators
+success evidence
+Snowball Yield
+One-Sentence Preventables
+
+Do not create a new reusable module merely because this is a new batch.
+If the necessary real-page provider belongs only to the current freestanding body, keep it a small adapter there.
+If a genuinely reusable abstraction is missing, justify it from current contracts and keep it narrowly reusable outside Alpz.
+
+
+IMPORTANT EXISTING-OWNER DISTINCTION
+
+The existing riscv-page-table-page-owner module is a bounded semantic owner/provider used by the existing Sv39 machinery and hosted composition.
+
+Do not assume it automatically owns the real physical pages proven in Batch 16.
+Discover its actual implementation and contract.
+
+The real machine proof requires page-table pages whose physical addresses come from the Batch 16-owned allocator range and whose entries are actually stored in those physical pages.
+
+Preferred architecture:
+
+existing PhysicalPageFrameAllocator
+→ small freestanding real-page-table Owner/provider adapter
+→ existing generic Sv39 Builder(Owner)
+→ existing Walker/Entry/Indexing semantics
+
+The adapter may need to:
+
+- allocate one frame through the existing physical allocator;
+- zero the complete page before exposing it as a page-table page;
+- read/write one of the 512 64-bit page-table entries at a checked index;
+- release a frame when builder rollback semantics require it;
+- expose only real physical frame addresses from the proven pool;
+- remain bounded and allocation-free;
+- avoid RISC-V policy that belongs in the builder or higher activation logic.
+
+Do not modify the target-neutral physical allocator to understand Sv39.
+Do not teach the generic builder about linker symbols, QEMU, OpenSBI, or Morphic.
+Do not silently use synthetic page-frame numbers as if they were real machine frames.
+
+
+REAL PAGE-TABLE PAGE OWNERSHIP
+
+Every page-table page used in the installed satp root must be proven to come from the Batch 16 linker-owned pool.
+
+At minimum mechanically prove:
+
+1. root page physical address lies inside the linker-owned pool;
+2. every intermediate page-table page lies inside the same owned pool;
+3. page-table pages are 4096-byte aligned;
+4. no page-table frame is simultaneously treated as free;
+5. each newly allocated page-table page is zeroed before use;
+6. page-table page count remains within the fixed Batch 16 pool capacity;
+7. builder failure paths do not leak or silently retain newly allocated intermediate frames;
+8. the verifier can independently reconcile root/intermediate frames from raw evidence with pool bounds.
+
+Do not claim the entire QEMU RAM map is owned.
+The only physical frames available to this proof are those whose ownership is established by the existing linker-owned pool and allocator contract.
+
+
+MAPPING POLICY
+
+The first active Sv39 address space should be intentionally small and truthful.
+
+Do not install a gratuitous 1 GiB identity map merely because it is easy.
+Do not map arbitrary QEMU RAM as valid kernel memory.
+Do not map all MMIO ranges unless the current execution path actually requires them.
+
+Discover the exact current freestanding continuation footprint from the linker/ELF and source.
+
+Map the minimum page-aligned regions necessary for the kernel to survive the transition and continue the proof, including as actually required:
+
+- executing code after satp activation;
+- read-only data used afterward;
+- writable data/BSS used afterward;
+- active stack;
+- linker-owned physical page pool and page-table pages if they remain accessed by virtual address after activation;
+- any real device/MMIO page genuinely used by the post-activation console or shutdown path, but only if current source proves it is required.
+
+Prefer 4 KiB mappings for the first proof because they make exact coverage and permissions mechanically visible and avoid implying ownership of unused surrounding megabytes.
+
+Use the existing Builder and page-table entry Permissions semantics rather than hand-encoding PTEs.
+
+Do not silently make the whole image RWX if current ELF/linker information permits a narrow and mechanically provable split at modest complexity.
+At minimum document exactly what permissions are installed and why.
+If the first bounded proof must temporarily use a simpler permission policy to preserve continuity, keep the claim narrow, record the gap explicitly, and do not call it a hardened kernel mapping policy.
+
+
+ACTIVE SATP TRANSITION
+
+Batch 17 must prove an actual architectural transition, not merely construct page tables in memory.
+
+Before activation:
+
+- actual satp must still prove Bare for the Batch 16 direct-access phase;
+- page tables must be fully constructed in owned frames;
+- the intended root physical address and root PPN must be known;
+- the verifier must be able to recompute the intended satp value.
+
+Activation must use the current RISC-V privileged contract truth.
+For RV64 Sv39, mechanically prove the installed satp MODE identifies Sv39 and the root PPN corresponds to the actual owned root frame.
+Use ASID 0 unless current repository policy already establishes another bounded value; do not invent an ASID subsystem.
+
+Execute the architecturally required translation-cache invalidation/order boundary using the existing riscv-sfence-vma-invalidation privileged execution surface where applicable.
+Do not duplicate SFENCE.VMA assembly if the existing module already expresses the required operation.
+
+After activation:
+
+- read actual satp back from hardware;
+- prove MODE=Sv39;
+- prove the encoded root PPN matches the allocated root page;
+- prove control returned to normal Zig code after the write and fence;
+- keep Sv39 active through the new translation probe and canonical Morphic execution.
+
+Do not switch back to Bare merely to make the existing workload pass.
+
+ONE-SENTENCE PREVENTABLE:
+
+Constructed page tables are not an active address space: require real satp MODE=Sv39, the owned root PPN, a real post-switch translated access, and continued execution before claiming paging works.
+
+
+NON-IDENTITY TRANSLATION PROBE
+
+An identity-mapped kernel continuing to run is necessary but should not be the only translation evidence.
+
+Add one tiny, bounded, explicit non-identity mapping that proves the hardware is using the new page tables rather than merely surviving coincidentally at equal virtual/physical addresses.
+
+Preferred proof shape:
+
+- reserve/choose one real owned data frame not used as a page-table page;
+- choose one canonical page-aligned virtual alias that does not overlap the kernel continuation mappings and is not already mapped;
+- map exactly that virtual page to the selected owned physical frame with the existing Builder;
+- record the selected virtual alias and physical frame as raw evidence;
+- after satp activation, write a deterministic sentinel through the virtual alias;
+- read the sentinel back through the alias;
+- where safely possible, also prove the corresponding identity-mapped physical-pool address observes the same underlying data;
+- independently verify the alias and physical addresses differ;
+- independently verify the Builder/Walker mapping resolves the alias to the intended physical frame;
+- keep accesses strictly within the one owned page.
+
+Do not use an alias that could accidentally already be identity mapped.
+Do not fabricate a high address without checking Sv39 canonicality.
+Do not map arbitrary foreign physical memory.
+
+The non-identity alias is a proof instrument, not a general kernel virtual-address ABI.
+Do not name it as a stable user/kernel mapping convention.
+
+
+POST-ACTIVATION CONTINUATION PROOF
+
+The proof must establish more than “satp readback looked right.”
+
+After enabling Sv39, perform bounded operations that require the active mappings to be correct.
+
+At minimum prove:
+
+- instruction execution continues after satp write/fence;
+- active stack reads/writes continue;
+- at least one writable global/static datum remains usable;
+- the non-identity alias translation works;
+- the evidence output path still works;
+- the existing canonical Morphic workload executes after the transition while Sv39 remains active;
+- the machine reaches bounded shutdown normally.
+
+The verifier must reject output in which the Sv39 frame appears only after Morphic execution or after switching back to Bare.
+
+The strongest simple acceptance relation is:
+
+Batch 12/13/14/15/16 proofs occur
+→ Batch 17 page tables built
+→ satp becomes Sv39
+→ non-identity alias works
+→ canonical Morphic payload emitted under active Sv39
+→ clean bounded termination
+
+
+BATCH 17 EVIDENCE FRAME
+
+Add a distinct bounded evidence frame rather than changing Batch 16 semantics.
+
+Use repository-consistent framing, for example:
+
+ZIGREF_SV39_ACTIVE_BEGIN
+...
+ZIGREF_SV39_ACTIVE_END
+ZIGREF_SV39_ACTIVE_RETURNED
+
+Choose compact deterministic fields.
+
+The frame must expose enough raw evidence for independent recomputation, including at minimum:
+
+- page size;
+- linker-owned pool begin/end;
+- satp-before raw value;
+- root physical address and/or root PPN;
+- number of page-table pages allocated;
+- physical addresses of all page-table pages used;
+- mapping count or exact declared mapping ranges;
+- representative raw mapping/query evidence for kernel continuation;
+- virtual alias address;
+- alias target physical frame;
+- alias permissions;
+- alias walker/query resolution;
+- satp-after raw value;
+- decoded MODE expectation;
+- decoded ASID expectation;
+- decoded root PPN expectation;
+- SFENCE.VMA execution evidence tied to the transition;
+- post-switch stack/global continuation marker;
+- alias sentinel write/read evidence;
+- post-switch Morphic-order marker;
+- completion/return marker.
+
+Do not emit only “sv39=PASS.”
+The verifier must be able to recompute relationships from raw values.
+
+Keep telemetry fixed-capacity and deterministic.
+No heap allocation.
+
+
+FOCUSED BATCH 17 VERIFIER
+
+Add one canonical verifier consistent with prior machine labs, preferably:
+
+tools/verify-freestanding-riscv64-active-sv39.py
+
+It must support:
+
+--self-test
+
+and real execution mode.
+
+The self-test must be rejection-oriented.
+
+At minimum reject malformed/contradictory evidence for:
+
+- missing/duplicate Batch 17 frame;
+- missing/duplicate completion/return marker;
+- unexpected fields;
+- malformed fixed-width values;
+- satp-before not Bare when the pre-switch direct-access phase is claimed;
+- root frame outside the linker-owned pool;
+- unaligned root or intermediate page-table frame;
+- duplicate page-table frame identity;
+- page-table frame count exceeding the bounded pool;
+- satp-after not Sv39;
+- satp root PPN not matching the owned root frame;
+- unexpected ASID;
+- missing SFENCE.VMA transition evidence;
+- noncanonical or misaligned alias;
+- alias equal to physical target when a non-identity probe is claimed;
+- alias target outside owned memory;
+- alias walker/query mismatch;
+- missing/contradictory alias sentinel readback;
+- post-switch continuation marker missing;
+- Morphic execution occurring before activation rather than after it;
+- Batch 12/13/14/15/16 evidence regression;
+- canonical Morphic payload drift.
+
+Real mode must:
+
+1. Build the current freestanding RISC-V artifact.
+2. Inspect ELF identity and exact linker symbols required to establish kernel/pool/stack bounds.
+3. Recompute the exact page-aligned continuation ranges expected from current ELF/linker truth.
+4. Run at least two bounded real qemu-system-riscv64 machines with finite timeout.
+5. Parse the Batch 17 frame independently.
+6. Prove every page-table frame belongs to the exact Batch 16-owned pool.
+7. Recompute satp MODE/ASID/root PPN from raw satp-after.
+8. Prove satp root PPN equals the real owned root frame.
+9. Prove the non-identity alias is canonical, distinct from its physical target, and maps to that owned target.
+10. Prove alias sentinel write/read relationships from raw evidence.
+11. Prove the active transition happens before canonical Morphic execution and remains active through it.
+12. Reuse existing Batch 12/13/14/15/16 parsers/verifiers where practical rather than cloning their semantics.
+13. Preserve exact Morphic equality across native hosted, deterministic fake, and both real machines.
+14. Fail nonzero on timeout, malformed, duplicate, missing, contradictory, stale, out-of-pool, or ordering-invalid evidence.
+15. End through Developer Minimus.
+
+The two real runs may use the same deterministic root/alias addresses if the image layout is deterministic. They must independently perform the architectural transition.
+
+
+PRESERVE BATCH 16 AS ITS OWN TRUTH
+
+Do not rewrite Batch 16 to claim Sv39.
+
+Batch 16's direct physical sentinel exercise was explicitly proven while satp was Bare.
+That remains an important historical and semantic distinction.
+
+Preferred execution order:
+
+Batch 12 trap proof
+Batch 13 timer proof
+Batch 14 repeated tick proof
+Batch 15 scheduler-time proof
+Batch 16 physical-memory proof while Bare
+Batch 17 construct/install active Sv39
+Morphic execution under Sv39
+
+The Batch 16 frame should continue to say Bare for its own phase.
+The Batch 17 frame should separately prove the later transition.
+
+This phase distinction is evidence, not inconsistency.
+
+
+MORPHIC PRESERVATION
+
+The canonical Morphic result must remain exact unless current repository truth has intentionally changed before this task begins.
+
+Run hosted and deterministic fake paths and compare them against both real post-Sv39 machine runs.
+
+Do not move Morphic execution before activation to preserve equality.
+The intended proof is specifically that the same canonical Morphic computation runs after active paging is installed.
+
+If the canonical payload remains 765 bytes, preserve exact byte equality.
+If current main has deliberately changed the canonical artifact before Batch 17 begins, mechanically establish and report the new baseline rather than hard-coding an obsolete number or weakening equality.
+
+
+FOCUSED MODULE/RECIPE VALIDATION
+
+Run the focused tests/smokes for every directly reused Sv39 module and memory module.
+
+At minimum include current canonical equivalents of:
+
+zig build test-riscv-sv39-page-table-entry
+zig build smoke-riscv-sv39-page-table-entry
+zig build test-riscv-sv39-virtual-address-indexing
+zig build smoke-riscv-sv39-virtual-address-indexing
+zig build test-riscv-page-table-page-owner
+zig build smoke-riscv-page-table-page-owner
+zig build test-riscv-sv39-page-table-walker
+zig build smoke-riscv-sv39-page-table-walker
+zig build test-riscv-sfence-vma-invalidation
+zig build smoke-riscv-sfence-vma-invalidation
+zig build test-riscv-sv39-page-table-builder
+zig build smoke-riscv-sv39-page-table-builder
+zig build test-recipe-construct-and-verify-sv39-address-space
+zig build test-physical-page-frame-allocator
+zig build smoke-physical-page-frame-allocator
+
+Discover the authoritative current command names from COMMANDS.md/build.zig rather than assuming this prose is perfect.
+
+Do not execute privileged SFENCE.VMA in hosted tests merely to satisfy coverage. The real QEMU Batch 17 lab is the privileged proof.
+
+
+REJECTION AND FAILURE BEHAVIOR
+
+The implementation must remain bounded on failure.
+
+Explicitly test or prove appropriate failures for:
+
+- insufficient page-table frames;
+- invalid/noncanonical alias;
+- mapping conflict;
+- mapping outside declared policy;
+- provider read/write failure where current reusable tests already expose those semantics;
+- wrong root frame;
+- malformed satp evidence;
+- duplicate frame evidence;
+- missing required kernel continuation mapping in self-test/model evidence where feasible;
+- alias sentinel contradiction;
+- previous-proof regression.
+
+Do not intentionally install a broken real page table merely to prove that the CPU faults.
+Rejection-oriented parser/model tests are the correct place for destructive malformed evidence cases unless a safe bounded real-machine negative test already exists.
+
+
+DO NOT BUILD THESE YET
+
+Do not implement:
+
+U-mode
+user page tables
+per-process address spaces
+address-space switching
+ASID allocator
+context switching
+preemption
+page-fault allocation policy
+demand paging
+copy-on-write
+swap
+kernel heap
+buddy/slab allocator
+mmap
+brk
+mprotect Linux semantics
+copy_to_user/copy_from_user
+syscall entry
+ELF user loading
+fork/clone/execve
+signals
+futexes
+VFS
+filesystems
+VirtIO
+networking
+musl
+BusyBox
+Alpine /init
+higher-half kernel migration
+KASLR
+SMP shootdowns
+multi-hart TLB coordination
+full W^X/hardening claims
+production MMU abstraction
+
+Those are later pressures.
+
+
+SEMANTIC NAMING DISCIPLINE
+
+Do not borrow established Linux/POSIX names for partial native operations.
+
+Batch 17 is RISC-V Sv39 kernel machinery, not Linux mmap/mprotect/brk.
+Use precise native or architectural names.
+
+A familiar established name is a compatibility claim, not a resemblance claim.
+
+Do not introduce a Linux-facing API merely because active paging now exists.
+
+
+COMMANDS AND RECIPE TRUTH
+
+Update COMMANDS.md with:
+
+- Batch 17 self-test command;
+- Batch 17 real execution command;
+- exactly what each proves;
+- explicit non-claims.
+
+Update recipes/run-hosted-morphic-runtime/recipe.json and build wiring truthfully for every newly consumed module and new focused verifier command.
+
+If the current recipe metadata would falsely imply that the hosted path activates Sv39, keep environment-specific claims explicit.
+
+Regenerate deterministic repository/agent/validation indexes through canonical tooling.
+Do not hand-edit generated outputs beyond what repository tooling requires.
+
+
+BATCH 17 REPORT
+
+Create:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_17.md
+
+The report must contain at minimum:
+
+Starting point
+First executable gate
+Task Projection
+Existing capabilities reused
+Real page-table owner/provider adapter
+Owned page-table frame accounting
+Mapping policy
+Kernel continuation footprint
+Permissions policy
+satp transition proof
+SFENCE.VMA boundary
+Non-identity alias proof
+Post-activation continuation
+Rejection-oriented verifier
+Preservation matrix
+Morphic equality
+Snowball Yield
+One-Sentence Preventables
+Non-claims
+Next smallest pressure
+
+Record actual tool versions and actual measured evidence.
+Do not paste intended numbers as if they were observed.
+
+
+SNOWBALL YIELD
+
+Record factual bookkeeping rather than grand benchmark claims.
+
+At minimum record:
+
+reusable modules directly consumed
+existing recipe knowledge reused
+new reusable modules created
+existing reusable modules modified
+new target-specific adapter code
+new verifier code
+new integration/build/doc code
+number of real QEMU executions in final proof
+whether page-table representation/indexing/walking/mutation/invalidation were reused instead of rewritten
+whether Morphic semantics changed
+whether previous machine verifiers required semantic modification
+
+The desired outcome is approximately:
+
+new knowledge:
+- real physical provider binding
+- controlled active satp transition
+- exact continuation mapping policy
+- hardware translation proof
+
+reused knowledge:
+- physical ownership/allocation
+- Sv39 entries
+- Sv39 indexing
+- walker
+- builder
+- invalidation
+- scheduler/timer/trap machinery
+- Morphic execution
+
+Do not manufacture a percentage improvement if none was measured.
+
+
+AGGREGATE REPOSITORY VALIDATION
+
+Before claiming completion, run the complete repository validation through the current canonical command, including the current equivalent of:
+
+python3 tools/developer-command.py validate-repository
+
+Also run relevant generated/index/command-reference/policy checks required by current AGENTS.md/COMMANDS.md.
+
+Do not weaken a repository gate to make Batch 17 pass.
+Fix the implementation or metadata.
+
+
+PUBLICATION AND PR REQUIREMENTS
+
+Complete the implementation, validation, report, generated artifacts, and documentation.
+
+Commit the work in a coherent state.
+Publish the branch if repository remote access is available.
+Open a mergeable pull request targeting main if PR tooling/credentials are available.
+
+The PR must state:
+
+- exact starting revision;
+- exact head revision;
+- modules reused;
+- mapping policy;
+- real page-table frame ownership evidence;
+- actual satp-before/satp-after semantics;
+- real non-identity translation proof;
+- QEMU run count;
+- previous proof preservation;
+- Morphic equality;
+- full validation result;
+- explicit non-claims.
+
+Do not stop at analysis if implementation and publication are possible.
+Do not claim PASS without the real machine proof.
+Do not create or move milestone tags.
+
+
+FINAL ACCEPTANCE CRITERIA
+
+Batch 17 is PASS only if all of the following are mechanically true:
+
+[ ] The supplied checkout first passes Batch 16 self-test and real two-run QEMU proof.
+[ ] Real page-table pages are allocated only from the exact linker-owned Batch 16 pool.
+[ ] Root and intermediate page-table frames are page aligned, unique, bounded, and accounted for.
+[ ] Real page-table pages are zeroed before use.
+[ ] Existing Sv39 entry/index/walker/builder/invalidation semantics are reused rather than reimplemented without cause.
+[ ] The installed mapping set is explicit and bounded rather than a gratuitous whole-RAM mapping.
+[ ] Required post-switch code/data/stack/pool/device edges are mapped truthfully.
+[ ] satp-before is mechanically Bare for the Batch 16 direct-access phase.
+[ ] satp-after is mechanically Sv39.
+[ ] satp-after root PPN equals the actual owned root page.
+[ ] ASID policy is explicit and bounded.
+[ ] The required SFENCE.VMA privileged boundary actually executes on real RISC-V.
+[ ] Instruction execution continues after activation.
+[ ] Stack/global state remains functional after activation.
+[ ] A canonical non-identity virtual alias maps to one real owned physical frame.
+[ ] The alias and physical target are provably different addresses.
+[ ] Real post-switch sentinel access through the alias succeeds and is independently checked.
+[ ] Batch 12 trap proof remains valid.
+[ ] Batch 13 one-shot timer proof remains valid.
+[ ] Batch 14 repeated-tick proof remains valid.
+[ ] Batch 15 scheduler-time proof remains valid.
+[ ] Batch 16 physical-memory Bare-phase proof remains valid.
+[ ] Canonical Morphic execution happens after Sv39 activation, not before it.
+[ ] Hosted/fake/two-real-machine Morphic bytes remain exact.
+[ ] Batch 17 rejection-oriented self-test passes.
+[ ] At least two real system-QEMU Batch 17 runs pass with finite timeout.
+[ ] Focused Sv39/memory module and recipe validation passes.
+[ ] COMMANDS.md and recipe metadata describe current truth.
+[ ] Batch 17 report records actual evidence and Snowball Yield.
+[ ] Generated repository/agent/validation artifacts are current.
+[ ] Full repository validation passes.
+[ ] Changes are committed and, where available, published as a mergeable PR.
+[ ] No U-mode, process, syscall, Linux ABI, or unrelated kernel claims are introduced.
+
+
+INTENDED HISTORICAL MEANING
+
+If successful, Batch 17 should justify a statement like:
+
+“Alpz first activated a real Sv39 address space built from kernel-owned physical frames, continued executing through the transition, proved a non-identity hardware translation, and ran the unchanged canonical Morphic workload while paging remained active.”
+
+That is the milestone.
+
+Not “we have virtual memory finished.”
+Not “we have processes.”
+Not “we can run Linux.”
+
+It is the first time the real Alpz machine stops relying on Bare translation and continues as the same governed system under an address space it constructed from memory it actually owns.
