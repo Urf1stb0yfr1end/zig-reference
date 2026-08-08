@@ -1,9 +1,17 @@
 const std = @import("std");
 const morphic = @import("morphic-core");
 const scheduler_module = @import("bounded-deterministic-scheduler");
+const addresses = @import("distinct-memory-address-types");
+const frames = @import("physical-page-frame-number-and-address-conversion");
+const region_sets = @import("physical-memory-region-set");
+const frame_allocators = @import("physical-page-frame-allocator");
 
 const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
+const physical_pool_pages = 8;
+
+extern var __physical_page_pool_begin: u8;
+extern var __physical_page_pool_end: u8;
 
 /// Fixed, allocation-free integer supervisor context. x0 is architectural zero;
 /// x2 is the interrupted sp. Floating-point/vector state and nested traps are
@@ -523,6 +531,102 @@ export fn freestandingMain() callconv(.c) noreturn {
     write("\nremaining=");
     writeUsizeHex(scheduler.count());
     write("\ncomplete=PASS\nZIGREF_SCHEDULER_TIME_END\nZIGREF_SCHEDULER_TIME_RETURNED\n");
+    const pool_begin = @intFromPtr(&__physical_page_pool_begin);
+    const pool_end = @intFromPtr(&__physical_page_pool_end);
+    const satp = asm volatile ("csrr %[value], satp"
+        : [value] "=r" (-> usize),
+    );
+    var regions = region_sets.PhysicalMemoryRegionSet(1){};
+    regions.add(addresses.PhysicalAddress.init(pool_begin), pool_end - pool_begin, .usable) catch {
+        write("ZIGREF_PHYSICAL_MEMORY_FAILURE\n");
+        shutdown();
+    };
+    var allocator = frame_allocators.PhysicalPageFrameAllocator(physical_pool_pages).initFromRegions(1, &regions) catch {
+        write("ZIGREF_PHYSICAL_MEMORY_FAILURE\n");
+        shutdown();
+    };
+    const initial_free = allocator.freeCount();
+    var owned: [physical_pool_pages]frames.PhysicalPageFrameNumber = undefined;
+    var sentinels: [physical_pool_pages]usize = undefined;
+    for (&owned, 0..) |*slot, index| {
+        slot.* = allocator.allocate() catch {
+            write("ZIGREF_PHYSICAL_MEMORY_FAILURE\n");
+            shutdown();
+        };
+        const address = (slot.toAddress() catch unreachable).raw();
+        const sentinel = @as(usize, 0x5a17_0000_0000_0000) | index;
+        const pointer: *volatile usize = @ptrFromInt(address + 64);
+        pointer.* = sentinel;
+        sentinels[index] = pointer.*;
+    }
+    const exhausted = if (allocator.allocate()) |_| false else |err| err == error.Exhausted;
+    allocator.release(owned[2]) catch {
+        write("ZIGREF_PHYSICAL_MEMORY_FAILURE\n");
+        shutdown();
+    };
+    const double_free = if (allocator.release(owned[2])) |_| false else |err| err == error.DoubleFree;
+    const foreign = frames.PhysicalPageFrameNumber.fromAddress(addresses.PhysicalAddress.init(pool_end)) catch unreachable;
+    const foreign_rejected = if (allocator.release(foreign)) |_| false else |err| err == error.ForeignFrame;
+    const reacquired = allocator.allocate() catch {
+        write("ZIGREF_PHYSICAL_MEMORY_FAILURE\n");
+        shutdown();
+    };
+    const reacquired_matches = reacquired.value == owned[2].value;
+    for (owned) |frame| allocator.release(frame) catch {
+        // The reacquired frame is owned again, so every original frame is now releasable.
+        write("ZIGREF_PHYSICAL_MEMORY_FAILURE\n");
+        shutdown();
+    };
+    write("ZIGREF_PHYSICAL_MEMORY_BEGIN\npages=0000000000000008\npage_size=");
+    writeUsizeHex(frames.PageSize);
+    write("\npool_begin=");
+    writeUsizeHex(pool_begin);
+    write("\npool_end=");
+    writeUsizeHex(pool_end);
+    write("\nsatp=");
+    writeUsizeHex(satp);
+    write("\ntranslation=bare\nregion_count=");
+    writeUsizeHex(regions.count());
+    write("\nregion_kind=usable\ninitial_free=");
+    writeUsizeHex(initial_free);
+    write("\ninitial_allocated=0000000000000000");
+    for (owned, 0..) |frame, index| {
+        write("\nframe=");
+        writeUsizeHex(index);
+        write(",pfn=");
+        writeUsizeHex(frame.value);
+        write(",address=");
+        writeUsizeHex((frame.toAddress() catch unreachable).raw());
+        write(",offset=0000000000000040,wrote=");
+        writeUsizeHex(@as(usize, 0x5a17_0000_0000_0000) | index);
+        write(",read=");
+        writeUsizeHex(sentinels[index]);
+    }
+    write("\nexhausted=");
+    write(if (exhausted) "Exhausted" else "INVALID");
+    write("\nreleased_index=0000000000000002\ndouble_free=");
+    write(if (double_free) "DoubleFree" else "INVALID");
+    write("\nforeign_pfn=");
+    writeUsizeHex(foreign.value);
+    write("\nforeign_release=");
+    write(if (foreign_rejected) "ForeignFrame" else "INVALID");
+    write("\nreacquired_pfn=");
+    writeUsizeHex(reacquired.value);
+    write("\nreacquired_matches=");
+    write(if (reacquired_matches) "PASS" else "FAIL");
+    write("\nfinal_free=");
+    writeUsizeHex(allocator.freeCount());
+    write("\nfinal_allocated=");
+    writeUsizeHex(allocator.allocatedCount());
+    write("\ncomplete=PASS\nZIGREF_PHYSICAL_MEMORY_END\n");
+    if (satp != 0 or initial_free != physical_pool_pages or !exhausted or !double_free or
+        !foreign_rejected or !reacquired_matches or allocator.freeCount() != physical_pool_pages or
+        allocator.allocatedCount() != 0)
+    {
+        write("ZIGREF_PHYSICAL_MEMORY_FAILURE\n");
+        shutdown();
+    }
+    write("ZIGREF_PHYSICAL_MEMORY_RETURNED\n");
     var output: [128]u8 = undefined;
     var trace: [2048]u8 = undefined;
     const result = morphic.runFake(&output, &trace) catch {
