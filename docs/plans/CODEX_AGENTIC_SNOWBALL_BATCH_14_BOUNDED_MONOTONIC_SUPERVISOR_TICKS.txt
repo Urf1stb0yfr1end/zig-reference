@@ -1,0 +1,763 @@
+CODEX AGENTIC SNOWBALL BATCH 14 — BOUNDED MONOTONIC SUPERVISOR TICKS
+
+MISSION
+
+Extend the proven Batch 13 RISC-V supervisor timer boundary by exactly one machine capability:
+
+TURN THE SINGLE PROVEN ASYNCHRONOUS SUPERVISOR TIMER EVENT INTO A FINITE, BOUNDED, MONOTONIC SEQUENCE OF REAL SUPERVISOR TIMER TICKS, RE-ARM EACH EXPECTED EVENT EXPLICITLY, RETURN THROUGH SRET AFTER EACH DELIVERY, TERMINATE THE SEQUENCE WITHOUT AN INTERRUPT STORM, AND PRESERVE THE SETTLED MORPHIC SEMANTICS.
+
+Batch 11 proved:
+
+OpenSBI / conventional firmware
+→ RISC-V S-mode
+→ explicit freestanding Zig entry + stack
+→ existing target-neutral Morphic core
+→ SBI output/shutdown
+→ exact canonical Morphic bytes
+
+Batch 12 proved:
+
+our S-mode entry
+→ direct stvec
+→ deliberate synchronous 32-bit EBREAK
+→ bounded 288-byte integer TrapFrame
+→ real synchronous cause=3 exception
+→ ELF-anchored breakpoint/resume relationship
+→ register/stack preservation
+→ sret
+→ unchanged canonical Morphic bytes
+
+Batch 13 proved:
+
+our existing stvec / TrapFrame
+→ one real asynchronous supervisor timer interrupt
+→ scause interrupt bit = 1
+→ supervisor timer cause = 5
+→ interrupted sepc remains interrupt-state sepc
+→ explicit one-shot neutralization policy
+→ context restoration
+→ sret
+→ no second undeclared one-shot delivery
+→ unchanged canonical Morphic bytes
+
+Batch 14 asks exactly one new question:
+
+CAN THE SAME MACHINE BOUNDARY REPRESENT A SMALL MONOTONIC CLOCK/TICK SEQUENCE RATHER THAN A SINGLE EVENT, WITH EACH REAL TIMER DELIVERY EXPLICITLY RE-ARMED AND BOUNDED, WITHOUT PREEMPTION, DRIFT CLAIMS WE HAVE NOT PROVEN, INTERRUPT STORMS, OR CHANGES TO THE SETTLED MORPHIC RESULT?
+
+The intended evidence chain is:
+
+OpenSBI
+→ our S-mode entry
+→ existing stvec / fixed TrapFrame
+→ preserve Batch 12 synchronous-breakpoint proof
+→ preserve Batch 13 one-shot timer proof
+→ establish a small finite expected tick count
+→ read the conventional supervisor-visible monotonic time source
+→ program a first future timer deadline
+→ enable only the minimum required timer interrupt state
+→ real asynchronous supervisor timer delivery
+→ capture time / deadline / sepc / cause evidence
+→ explicit next-deadline policy
+→ re-arm the next expected event
+→ restore context
+→ sret
+→ repeat only until the compiled bounded tick target is reached
+→ final explicit timer neutralization / masking policy
+→ prove no extra undeclared delivery
+→ unchanged Morphic core
+→ exact canonical Morphic bytes
+→ SBI shutdown
+
+This is the smallest evidence-backed next pressure recorded by the Batch 13 report.
+
+Do not leap ahead.
+
+
+EXPECTED BATCH 13 EVIDENCE BASELINE
+
+The independently reproduced Batch 13 implementation commit is:
+
+fa2c0f502efd0381b2ad32c24b50ce89d4dc148c
+
+PR #33:
+
+Prove one-shot supervisor timer interrupt and add focused verifier
+
+The local milestone was independently reproduced with Zig 0.14.0 and QEMU 11.0.3, including real asynchronous supervisor timer delivery, cause=5 / interrupt-bit=1 evidence, bounded ELF PC evidence, one-shot neutralization, sret return, preservation of the Batch 12 breakpoint proof, exact canonical Morphic equality, and full repository validation.
+
+The intended historical evidence tag is:
+
+morphic-riscv-first-supervisor-timer-interrupt
+
+If that tag is available, treat it as a frozen historical evidence anchor. Do not move, recreate, or repurpose it.
+
+Earlier frozen / historical anchors also remain immutable:
+
+benchmark-pre-morphic-52
+pre-batch-12-freestanding-riscv-baseline
+morphic-freestanding-riscv-first-boot
+
+IMPORTANT BASELINE NOTE
+
+This Batch 14 plan may be present on main before PR #33 is merged. The existence of this plan is NOT evidence that Batch 13 implementation is present in the supplied checkout.
+
+Before Batch 14 implementation, establish current truth mechanically.
+
+The supplied checkout must contain the Batch 13 capability either through the exact implementation commit above or through an equivalent merge/squash/rebase that is proven by the current Batch 13 verifier and repository state.
+
+Do not destructively reset to fa2c0f502efd0381b2ad32c24b50ce89d4dc148c merely to satisfy history. Later legitimate documentation, planning, or merge commits may exist.
+
+If current main still predates the Batch 13 implementation, safely synchronize when a usable remote permits it. If Batch 13 is still not present, do not reimplement Batch 13 as part of Batch 14 and do not claim Batch 14 progress. Report the baseline blocker precisely.
+
+The first executable gate for this batch is therefore:
+
+python3 tools/verify-freestanding-riscv64-supervisor-timer.py --self-test
+python3 tools/verify-freestanding-riscv64-supervisor-timer.py
+
+Batch 14 work begins only after the existing Batch 13 proof is real in the current checkout.
+
+
+Z-REF EXECUTION DOCTRINE FOR THIS BATCH
+
+Treat Z-Ref as the semantic and evidentiary interface between the repository and the agent engineering it.
+
+The two governing rules remain:
+
+1. DO NOT REDISCOVER TRUTH THAT IS ALREADY KNOWN.
+2. DO NOT CLAIM SUCCESS THAT HAS NOT BEEN PROVEN.
+
+Optimize for minimum unnecessary engineering work subject to preserving truth.
+
+A cheap wrong answer is failure.
+An explicit UNKNOWN is acceptable when the repository genuinely does not know.
+
+Before implementation, construct the smallest trustworthy Task Projection you can from repository truth. It should identify at least:
+
+- requested capability;
+- canonical component(s);
+- dependencies actually required;
+- invariants governing the timer / trap boundary;
+- bounded tick-count and termination conditions;
+- external RISC-V / SBI semantics relied upon;
+- current unknowns;
+- rejected alternatives;
+- likely minimum source set;
+- focused validators;
+- evidence required for success.
+
+Widen the read set only when needed.
+
+No silent success:
+
+- exit zero is not proof of repeated timer delivery;
+- printing N tick markers is not proof that N hardware-emulated interrupts occurred;
+- one interrupt followed by software-generated counter increments is not success;
+- a pending timer that is never taken is not success;
+- a trap that does not return through sret is not success;
+- a timer sequence that prints expected evidence and then hangs is not success;
+- an extra undeclared timer delivery is not success;
+- non-monotonic observed time is not success;
+- a timer interrupt that receives breakpoint-style sepc advancement is not success;
+- a fallback to Linux user-mode, semihosting, or another execution route is not success;
+- stale evidence from another source revision is not current evidence.
+
+Every durable fact discovered should be considered for constructive memory: canonical contract, rejection condition, One-Sentence Preventable, focused validator, diagnostic, dependency edge, or evidence rule.
+
+Do not manufacture a generic timer framework, scheduler abstraction, or module quota merely to make the batch look architecturally large.
+
+Use standard RISC-V, SBI, Zig, ELF, QEMU, OpenSBI, timer, tick, deadline, interrupt, trap, CSR, monotonic clock, and scheduler terminology where those terms are already established.
+
+
+SEMANTIC NAMING INTEGRITY
+
+Read the current canonical Z-Ref framework document, including its semantic naming disclaimer.
+
+The governing naming principle is:
+
+A familiar name is a compatibility claim, not a statement of resemblance.
+
+This batch is primarily a RISC-V machine-boundary batch, so do not invent Linux/POSIX compatibility names where none are needed.
+
+If new Alpz-native machinery is introduced and it is merely analogous to a familiar external operation rather than fully interchangeable with that established contract, do not borrow the familiar unprefixed name. Use a truthful Alpz-native name or, where a strong useful cognate exists, the declared z-prefixed cognate convention.
+
+Do not invent z-prefixed names merely for branding. The prefix exists to prevent false assumptions, not to decorate ordinary internal concepts.
+
+
+LONG-HORIZON DIRECTION — ALPZ
+
+The long-horizon direction remains:
+
+KEEP ALPINE. REPLACE LINUX.
+
+FAMILIAR OUTSIDE. EXPLICIT INSIDE.
+
+Batch 14 is not an Alpine boot batch.
+
+It exists because a future kernel needs a truthful monotonic time and repeated timer-event foundation before it can responsibly support sleeping tasks, timeouts, periodic maintenance, scheduling quanta, or preemption.
+
+Do not begin:
+
+- preemptive scheduling;
+- U-mode processes;
+- Linux syscall compatibility;
+- ELF userspace loading beyond existing parser foundations;
+- musl integration;
+- BusyBox;
+- Alpine /init;
+- OpenRC;
+- apk;
+- VirtIO;
+- persistent filesystems;
+- networking;
+- multiple harts;
+- generic device discovery;
+- Linux clock_gettime compatibility;
+- POSIX timers;
+- signals;
+- a generic kernel HAL.
+
+Those are later executable pressures.
+
+
+WORKSPACE BOOTSTRAP
+
+Use the repository checkout supplied to this Codex task.
+
+1. Resolve the actual repository root:
+
+   git rev-parse --show-toplevel
+
+2. cd there.
+3. Record actual branch, HEAD, dirty status, user identity, remotes, and relevant tag availability.
+4. Read AGENTS.md first.
+5. Read COMMANDS.md before inventing commands.
+6. Read docs/ZREF_FRAMEWORK.md if present.
+7. Read docs/agentic-vocabulary.md.
+8. Read docs/concepts/LESS_LINES_CONVERGENCE.md.
+9. Read docs/standards/SNOWBALL_YIELD.md if present.
+10. Read docs/reports/AGENTIC_SNOWBALL_BATCH_12.md.
+11. Read docs/reports/AGENTIC_SNOWBALL_BATCH_13.md.
+12. Read docs/reports/codex-notes.md.
+13. Read THIS plan from the repository. Do not reconstruct it from the starter prompt.
+
+Do not assume ~/dev/zig-reference exists.
+Do not assume /workspace/zig-reference is the only valid path.
+Do not require a Git remote to begin.
+Do not stop merely because the supplied branch is not named main.
+
+If a usable origin exists and safe synchronization is appropriate, synchronize without destroying task-local work.
+
+Use Zig 0.14.0 only.
+Record the actual base commit.
+Do not force historical module/test/count values if current repository truth differs.
+
+If this plan is missing and cannot be obtained through the legitimate task repository mechanism, stop and report that exact artifact blocker.
+
+
+PHASE 0 — RECONFIRM ALL SETTLED MACHINE PROOFS
+
+Before implementing repeated ticks, reconfirm current truth.
+
+At minimum run the focused self-tests:
+
+python3 tools/python-environment.py --check
+python3 tools/query-reference.py agent doctor
+python3 tools/verify-riscv64-morphic-runtime.py --self-test
+python3 tools/verify-freestanding-riscv64-morphic-runtime.py --self-test
+python3 tools/verify-freestanding-riscv64-supervisor-trap.py --self-test
+python3 tools/verify-freestanding-riscv64-supervisor-timer.py --self-test
+
+When the required external tools are available, run the real execution labs:
+
+python3 tools/verify-riscv64-morphic-runtime.py
+python3 tools/verify-freestanding-riscv64-morphic-runtime.py
+python3 tools/verify-freestanding-riscv64-supervisor-trap.py
+python3 tools/verify-freestanding-riscv64-supervisor-timer.py
+
+Do not begin Batch 14 on top of a broken Batch 10/11/12/13 machine boundary.
+
+Record current canonical Morphic byte counts from execution. Never hard-code historical 765 as the definition of correctness.
+
+
+PHASE 1 — QUERY BEFORE BROWSE; BUILD THE TASK PROJECTION
+
+Use current supported Agent Fast Path / Z-Ref command grammar rather than inventing syntax.
+
+Run current equivalents of:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+python3 tools/query-reference.py agent decide "extend the proven one-shot riscv64 supervisor timer interrupt into a finite bounded monotonic sequence of real timer ticks, re-arm each event, return with sret, terminate explicitly, and preserve canonical Morphic bytes"
+python3 tools/query-reference.py agent preflight run-hosted-morphic-runtime
+python3 tools/query-reference.py agent preflight bounded-system-resource-plan
+python3 tools/query-reference.py agent preflight bounded-deterministic-event-trace
+python3 tools/query-reference.py agent preflight bounded-deterministic-scheduler
+
+Inspect existing timer, clock, deadline, trap, event-trace, scheduler, and bounded-counter capabilities through the query surface before broad source browsing.
+
+Create/update:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_14.md
+
+before implementation and record the initial Task Projection:
+
+- existing reusable capability;
+- existing recipe/composition;
+- existing machine-boundary glue;
+- missing reusable capability, if any;
+- project-specific orchestration;
+- external execution dependency;
+- explicit unknowns;
+- rejected alternatives;
+- Minimum Trustworthy Read Set;
+- validation/evidence plan;
+- explicitly out of scope.
+
+Do not choose a module quota.
+
+The fact that repeated ticks exist does not automatically justify a generic timer module. Let executable pressure decide.
+
+
+PHASE 2 — ESTABLISH THE MONOTONIC TIME FACTS
+
+Determine from specification-backed and directly observed evidence what monotonic time source the current S-mode environment may use truthfully.
+
+A likely source is the RISC-V time CSR / counter exposed under the current OpenSBI/QEMU environment, but verify the actual path rather than relying on memory.
+
+Record provenance separately for:
+
+- architectural/specification fact;
+- firmware/tool documentation fact;
+- directly observed machine behavior.
+
+The implementation must have an explicit representation for at least:
+
+- current observed time;
+- programmed deadline;
+- tick count;
+- expected final tick count;
+- whether the repeated-tick phase is active;
+- whether final neutralization completed.
+
+All state must remain bounded.
+
+Do not claim wall-clock time, nanoseconds, POSIX time, scheduling fairness, or precision that has not been established.
+
+This batch needs monotonic ordering and repeated event delivery, not a general-purpose clock API.
+
+
+PHASE 3 — DEFINE A FINITE RE-ARM POLICY
+
+Choose the smallest conventional policy that can produce more than one real timer interrupt and terminate exactly.
+
+Use a small compiled expected tick count. Prefer enough events to prove repetition rather than a second isolated one-shot, while keeping execution quick and bounded. A value such as 4 is a reasonable hypothesis, but derive the final constant from reliable execution rather than treating this suggestion as sacred.
+
+Each expected timer delivery must:
+
+1. arrive through the existing supervisor trap vector;
+2. classify as interrupt bit 1 / supervisor timer cause 5;
+3. preserve interrupt sepc semantics;
+4. capture monotonic time evidence;
+5. increment a bounded tick count exactly once;
+6. either program the next future deadline or, for the final tick, perform explicit final neutralization;
+7. restore context;
+8. return with sret.
+
+The re-arm policy must be explicit.
+
+Acceptable shapes include programming each next deadline from a newly observed monotonic time plus a bounded interval, or another conventional relationship justified by evidence.
+
+Do not make unproven claims about long-term periodic drift, phase lock, frequency accuracy, or scheduler quantum precision.
+
+If the handler can observe a late deadline, define the bounded policy explicitly rather than allowing an immediate unbounded interrupt loop.
+
+The final tick must end in an explicit neutral state, for example masking STIE and moving the programmed deadline out of the active execution window, if that remains the conventional evidenced mechanism.
+
+No interrupt storm.
+No infinite tick loop.
+No periodic background activity after the proof phase.
+
+
+PHASE 4 — PRESERVE SYNCHRONOUS AND ONE-SHOT SEMANTICS
+
+Batch 14 must not erase the distinctions proven by Batches 12 and 13.
+
+SYNCHRONOUS BREAKPOINT
+
+- scause interrupt bit = 0;
+- cause = breakpoint;
+- known 32-bit EBREAK;
+- resume policy advances sepc only by the mechanically proven instruction width.
+
+BATCH 13 ONE-SHOT TIMER
+
+- scause interrupt bit = 1;
+- cause = supervisor timer;
+- sepc is not breakpoint-advanced;
+- one expected delivery;
+- explicit one-shot neutralization;
+- sret return.
+
+BATCH 14 REPEATED TICKS
+
+- scause interrupt bit = 1;
+- cause = supervisor timer for every recorded tick;
+- no breakpoint-style sepc advancement;
+- each delivery belongs to the active repeated-tick phase;
+- each non-final tick has an evidenced re-arm relationship;
+- final tick performs evidenced neutralization;
+- exact expected count, no extra delivery.
+
+Prefer preserving the Batch 13 one-shot proof as its own evidence phase if practical rather than weakening its verifier into accepting arbitrary later timer behavior.
+
+If additional phase/state is required to distinguish one-shot and repeated-tick behavior, keep it explicit and bounded.
+
+Do not modify the old verifier merely to hide a regression. If a verifier must evolve because the execution stream legitimately gains a new independent frame, preserve all old proof obligations and explain the change.
+
+
+PHASE 5 — MAKE REPEATED-TICK EVIDENCE MECHANICAL
+
+Add a focused Batch 14 evidence frame distinct from the Batch 12 trap frame, Batch 13 one-shot timer frame, and Morphic output frame.
+
+Names such as:
+
+ZIGREF_TICKS_BEGIN
+...
+ZIGREF_TICKS_END
+ZIGREF_TICKS_RETURNED
+
+are acceptable if consistent with repository conventions, but markers are transport, not proof.
+
+The verifier must derive as much as practical from runtime state and ELF relationships rather than trusting payload prose.
+
+For every observed repeated tick, the focused verifier should establish at minimum:
+
+- sequence index;
+- interrupt bit = 1;
+- cause = supervisor timer;
+- observed interrupted sepc;
+- observed time value;
+- programmed deadline relationship where available;
+- handler/re-arm policy completion;
+- successful return evidence.
+
+Across the complete sequence it must establish:
+
+- exactly the compiled expected number of ticks;
+- no duplicate sequence index;
+- no skipped sequence index;
+- observed time values are strictly monotonic;
+- programmed deadlines are relationally sensible and monotonic under the chosen policy;
+- each non-final event was explicitly re-armed;
+- final event was explicitly neutralized;
+- no additional timer delivery after final neutralization;
+- every asynchronous sepc remains in a mechanically plausible compiled execution/wait region when such ELF anchoring is practical;
+- Batch 12 synchronous breakpoint proof remains intact;
+- Batch 13 one-shot timer proof remains intact;
+- canonical Morphic output remains exact.
+
+Absolute time values, exact interrupted instruction addresses, and host scheduling timing may vary between QEMU runs. Validate relations rather than demanding byte-identical timer telemetry.
+
+Do not permit the payload to print a claimed tick_count that is never reconciled against the actual number of parsed timer records.
+
+
+PHASE 6 — FOCUSED VERIFIER
+
+Add one focused canonical verifier, preferably:
+
+python3 tools/verify-freestanding-riscv64-supervisor-ticks.py
+
+The exact file name may change only if existing repository naming conventions strongly require another spelling.
+
+Requirements:
+
+- --self-test mode;
+- finite execution timeout;
+- fail closed;
+- real qemu-system-riscv64 execution required for full PASS;
+- build and inspect the correct freestanding ELF;
+- preserve ELF symbol evidence needed by prior proofs;
+- execute at least two real machine runs;
+- parse the repeated-tick frame independently;
+- prove exact expected tick count;
+- prove monotonic time relationships;
+- prove re-arm relationships;
+- prove final neutralization;
+- reject missing, duplicate, malformed, out-of-order, non-monotonic, wrong-cause, wrong-interrupt-class, missing-return, missing-rearm, missing-final-neutralization, extra-delivery, timeout, and Morphic-mismatch cases;
+- preserve Batch 12 breakpoint anchoring;
+- preserve Batch 13 one-shot timer proof;
+- compare current canonical Morphic bytes against native hosted/fake paths;
+- output ordinary useful diagnostics followed by exactly one LOCATIONS section and one MINIMUS section according to repository convention;
+- exit status must remain truthful.
+
+Self-tests should exercise parser and failure paths without requiring QEMU.
+
+The full verifier must not claim PASS without real asynchronous machine delivery.
+
+
+PHASE 7 — PRESERVATION MATRIX
+
+Run and preserve all established focused verifiers:
+
+python3 tools/verify-riscv64-morphic-runtime.py --self-test
+python3 tools/verify-freestanding-riscv64-morphic-runtime.py --self-test
+python3 tools/verify-freestanding-riscv64-supervisor-trap.py --self-test
+python3 tools/verify-freestanding-riscv64-supervisor-timer.py --self-test
+python3 tools/verify-freestanding-riscv64-supervisor-ticks.py --self-test
+
+When external dependencies are available, run all real execution labs:
+
+python3 tools/verify-riscv64-morphic-runtime.py
+python3 tools/verify-freestanding-riscv64-morphic-runtime.py
+python3 tools/verify-freestanding-riscv64-supervisor-trap.py
+python3 tools/verify-freestanding-riscv64-supervisor-timer.py
+python3 tools/verify-freestanding-riscv64-supervisor-ticks.py
+
+A Batch 14 PASS requires the new real repeated-tick proof and preservation of the settled earlier machine proofs.
+
+
+PHASE 8 — COMMANDS, CONTRACT TRUTH, AND CONSTRUCTIVE MEMORY
+
+Update COMMANDS.md cumulatively.
+
+Do not delete prior supported commands.
+
+Document the new focused Batch 14 verifier and self-test with exact prerequisites and scope.
+
+Update the canonical recipe / machine-readable contract only with facts actually proven.
+
+Record positive claims narrowly, for example:
+
+- finite bounded repeated supervisor timer sequence;
+- exact expected count under the proof configuration;
+- monotonic observed time across delivered ticks;
+- explicit re-arm policy;
+- final neutralization;
+- sret return after each expected event;
+- unchanged canonical Morphic semantics.
+
+Record explicit non-claims, including:
+
+- indefinite periodic ticking;
+- production timekeeping accuracy;
+- preemption;
+- scheduling fairness;
+- sleep queues;
+- timeouts API;
+- U-mode timer delivery;
+- multi-hart timer coordination;
+- wall-clock / calendar time;
+- POSIX clocks;
+- Linux clock ABI;
+- real-hardware equivalence.
+
+Update docs/reports/AGENTIC_SNOWBALL_BATCH_14.md with:
+
+- baseline and ancestry;
+- Task Projection;
+- external dependency versions/paths;
+- implementation summary;
+- exact machine evidence;
+- preservation evidence;
+- Snowball Yield;
+- new preventables;
+- remaining unknowns;
+- explicit non-claims;
+- next smallest evidence-backed pressure.
+
+Snowball Yield should be factual bookkeeping, not benchmark theater.
+
+Record at least:
+
+- existing modules reused;
+- existing recipes/compositions reused;
+- existing machine-boundary code reused;
+- new reusable modules / recipes, if any;
+- target-specific glue;
+- focused validators added;
+- failure paths eliminated;
+- new facts that compound;
+- anything still requiring broad archaeology;
+- observed instruction-compression / Less-Lines effect only where it can be stated factually.
+
+
+PHASE 9 — AGGREGATE VALIDATION
+
+Run the current canonical repository validation surface from COMMANDS.md.
+
+At minimum preserve the equivalent of:
+
+zig build test
+zig build smoke
+zig build recipes
+zig build conformance
+zig build property
+zig build fuzz-smoke
+zig build differential
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/build-repository-index.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/build-dependency-graphs.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/build-agent-index.py --check
+python3 tools/format-module-contracts.py --check
+python3 tools/developer-command.py validate-repository
+
+Run the repository-supported Zig formatting check with actual tracked Zig source paths or the canonical wrapper. Do not use a bare `zig fmt --check` invocation that supplies no files.
+
+If current COMMANDS.md has stronger or newer canonical validation commands, use those instead of freezing this list.
+
+No false PASS when aggregate validation fails.
+
+
+PACKAGE PROVISIONING
+
+Follow repository policy:
+
+- never use sudo;
+- never request interactive privilege escalation;
+- never curl-pipe installers;
+- never download opaque binaries;
+- never add untrusted third-party repositories;
+- never globally install Python packages outside repository policy;
+- direct conventional distro package-manager installation is permitted only when the supplied task environment already allows it without sudo or interaction;
+- install only the smallest conventional packages actually required;
+- record exact commands, versions, executable paths, and reason.
+
+Likely external tools remain:
+
+qemu-system-riscv64
+qemu-riscv64
+readelf or repository-supported equivalent
+OpenSBI firmware through the conventional QEMU execution path
+
+If required real-machine tooling cannot be obtained under these rules, produce the maximum useful tested partial PR, mark machine proof PARTIAL/blocked, and do not claim Batch 14 PASS.
+
+
+PUBLICATION REQUIREMENT
+
+This is an implementation batch, not an analysis-only exercise.
+
+Aim for a mergeable pull request.
+
+Do not stop after describing what should be changed.
+
+Complete the implementation, focused tests, real machine proof, preservation matrix, report, cumulative COMMANDS.md update, machine-readable contract truth, aggregate validation, commits, publication, and pull request when repository credentials/remotes permit it.
+
+If remote publication is unavailable, still produce the maximum tested local branch/commits and clearly report the publication blocker.
+
+Do not manufacture a PR URL.
+
+
+DEVELOPER MINIMUS
+
+Serious verification surfaces must preserve the repository's Developer Minimus convention.
+
+Ordinary useful output first.
+Then exactly one LOCATIONS section.
+Then exactly one MINIMUS section.
+
+Do not emit nested or repeated final handoffs from a single canonical outer verifier.
+
+Keep the Minimus handoff bounded and truthful.
+
+
+BATCH 14 SUCCESS DEFINITION
+
+Full PASS requires evidence that all of the following are true in the current revision:
+
+1. Batch 10 Linux-user Morphic execution proof remains valid.
+2. Batch 11 freestanding RISC-V machine execution proof remains valid.
+3. Batch 12 synchronous EBREAK / TrapFrame / ELF resume / sret proof remains valid.
+4. Batch 13 real one-shot asynchronous supervisor timer proof remains valid.
+5. A finite sequence of more than one real asynchronous supervisor timer interrupt is delivered through our existing S-mode trap vector.
+6. Every recorded repeated tick has interrupt bit 1 and supervisor timer cause 5.
+7. Interrupt sepc is never subjected to breakpoint-style advancement.
+8. Observed timer time values are strictly monotonic across the sequence.
+9. Every non-final tick has an explicit evidenced re-arm policy.
+10. The final tick has an explicit evidenced neutralization policy.
+11. Exactly the expected bounded number of ticks occurs.
+12. No extra undeclared timer delivery occurs after final neutralization.
+13. The handler restores required context and returns through sret after each expected event.
+14. The repeated-tick verifier is fail-closed and has focused self-tests.
+15. The Morphic core remains unchanged unless executable evidence demonstrates a truly necessary change.
+16. Native hosted/fake and machine execution still agree on current canonical Morphic bytes.
+17. COMMANDS.md is cumulative and accurate.
+18. Machine-readable contract claims do not exceed evidence.
+19. docs/reports/AGENTIC_SNOWBALL_BATCH_14.md records evidence, Snowball Yield, non-claims, and next pressure.
+20. Aggregate repository validation passes.
+21. The work is committed and a mergeable PR is produced when publication access exists.
+
+Anything less must be reported as PARTIAL with the exact missing evidence.
+
+
+EXPLICIT NON-GOALS
+
+Do not implement in Batch 14:
+
+- preemptive context switching;
+- scheduler quantum enforcement;
+- sleep queues;
+- generic timeout APIs;
+- wall-clock time;
+- RTC support;
+- U-mode;
+- Linux system calls;
+- Linux clock_gettime / timerfd / POSIX timer semantics;
+- ELF userspace execution;
+- musl / BusyBox / Alpine boot;
+- OpenRC / apk;
+- signals;
+- paging activation merely because page-table components exist;
+- VirtIO;
+- persistent storage;
+- networking;
+- multi-hart coordination;
+- nested-interrupt architecture;
+- FP/vector context expansion unless existing execution unexpectedly requires it;
+- a generic timer HAL without executable pressure.
+
+
+NEXT-PRESSURE DISCIPLINE
+
+Do not decide Batch 15 from aspiration alone.
+
+At the end of Batch 14, identify the smallest next pressure supported by actual execution evidence.
+
+Possible later candidates may include:
+
+- consolidating the now-multi-class trap/interrupt dispatch boundary if real duplication justifies it;
+- using the monotonic repeated-tick foundation for a bounded scheduler-facing time source without preemption;
+- advancing physical memory / Sv39 activation toward U-mode;
+
+but do not pre-commit to any of them in this batch.
+
+Let the executed system tell us where the next irreducible pressure lives.
+
+
+FINAL HANDOFF
+
+Report:
+
+- actual starting and ending commit;
+- branch and remote state;
+- Batch 13 baseline evidence;
+- exact repeated tick count used;
+- actual QEMU/OpenSBI/tool versions;
+- monotonic time evidence strategy;
+- re-arm policy;
+- final neutralization policy;
+- synchronous breakpoint preservation;
+- one-shot timer preservation;
+- repeated-tick machine evidence;
+- canonical Morphic equality;
+- focused self-test results;
+- real execution-lab results;
+- aggregate validation results;
+- files changed;
+- Snowball Yield;
+- explicit non-claims;
+- commits produced;
+- PR URL if real;
+- smallest next evidence-backed pressure.
+
+Do not claim Batch 14 PASS unless the real repeated asynchronous timer sequence was delivered through our S-mode trap vector and mechanically validated.
