@@ -410,3 +410,50 @@ Other projects may reproduce each output.
 Morphic’s intended advantage is that it reaches those outputs through fewer independent semantic implementations and fewer places where architectural truth can drift.
 
 That is the unique benefit worth proving.
+
+---
+
+## Current implementation direction: Alpz as the hardest Morphic body
+
+The document above remains correct. The project now has a more concrete way to prove it.
+
+**Morphic remains the flagship system-scale composition. Alpz is the current flagship real-machine/kernel embodiment used to force Morphic's shared contracts against increasingly serious machine reality.**
+
+That distinction matters:
+
+```text
+Morphic
+= shared system meaning, reusable policy, cross-form identity
+
+Alpz
+= one concrete machine/kernel body that must satisfy those meanings
+
+Z-Ref
+= the accumulated contracts, evidence, dependencies, and solved engineering
+  that let agents and engineers construct both
+```
+
+The current Alpz line is valuable to Morphic precisely because it keeps introducing machine pressure that a hosted simulator can avoid: real trap entry, asynchronous timer delivery, monotonic machine time, physical ownership, virtual memory, privilege transitions, syscalls, process state, filesystems, drivers, networking, and eventually Linux-userspace compatibility.
+
+The intended rule is not that every Alpz mechanism becomes part of Morphic. It is the opposite: every new machine-specific pressure should help us discover the narrowest environmental adapter and the strongest reusable semantic contract above it.
+
+Recent work already uses exact semantic preservation across hosted, deterministic fake, and real RISC-V execution as an acceptance condition. As Alpz becomes more capable, that pattern should broaden into stronger machine-substitution evidence: different bodies, one governed system.
+
+The long-term embodiment set is therefore larger than the original hypervisor emphasis:
+
+- hosted deterministic execution;
+- replay and fault-injection bodies;
+- Alpz on RISC-V;
+- later Alpz or Morphic bodies on AArch64/x86_64 or other targets;
+- a Morphic microvisor/hypervisor as a parallel embodiment;
+- embedded and firmware forms;
+- safety-monitor forms;
+- potentially adapters that let unrelated kernels reuse the same externally tested semantic obligations.
+
+The current primary Alpz operating-system goal is direct Linux-userspace compatibility, beginning with real unmodified distributions and package ecosystems. The microvisor/hypervisor path remains important, but it no longer defines the only upward path for Morphic.
+
+The unique benefit we now intend to prove at larger scale is therefore:
+
+> **One repository accumulates solved mechanisms and machine-readable engineering knowledge; one Morphic semantic architecture composes them; multiple machines realize that architecture without each becoming a fresh semantic rewrite.**
+
+If that remains true while Alpz grows from a small freestanding RISC-V nucleus into a serious kernel, Morphic's central claim will have survived a much harder test than a demonstration built only for simulation.
