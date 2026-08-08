@@ -110,10 +110,10 @@ const recipe_specs = [_]RecipeSpec{
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
-    const check_command = b.addSystemCommand(&.{ "python3", "tools/module-contract-consistency-checker.py" });
+    const check_command = b.addSystemCommand(&.{ "python3", "tools/python-environment.py", "tools/module-contract-consistency-checker.py" });
     const check_step = b.step("check-module-contracts", "Validate schema, formatting, paths, public surfaces, dependencies, catalog, and build registrations");
     check_step.dependOn(&check_command.step);
-    const agent_check_command = b.addSystemCommand(&.{ "python3", "tools/validate-agent-contracts.py" });
+    const agent_check_command = b.addSystemCommand(&.{ "python3", "tools/python-environment.py", "tools/validate-agent-contracts.py" });
     const agent_check_step = b.step("validate-agent-contracts", "Validate agent-readable modules and deterministic projections");
     agent_check_step.dependOn(&agent_check_command.step);
     const port_check_command = b.addSystemCommand(&.{ "node", "tools/check-port-contracts.js" });
@@ -150,7 +150,7 @@ pub fn build(b: *std.Build) void {
     const status_command = b.addSystemCommand(&.{ "python3", "tools/status.py" });
     const status_step = b.step("status", "Print evidence-backed repository health");
     status_step.dependOn(&status_command.step);
-    const evidence_check_command = b.addSystemCommand(&.{ "python3", "tools/record-validation.py", "--check" });
+    const evidence_check_command = b.addSystemCommand(&.{ "python3", "tools/python-environment.py", "tools/record-validation.py", "--check" });
     const evidence_check_step = b.step("check-validation-evidence", "Reject invalid, stale, or wrong-version module evidence");
     evidence_check_step.dependOn(&evidence_check_command.step);
     policy_step.dependOn(evidence_check_step);
@@ -230,6 +230,11 @@ pub fn build(b: *std.Build) void {
             const executable = b.addExecutable(.{ .name = "run-hosted-morphic-runtime", .root_module = recipe_module });
             const run_hosted = b.addRunArtifact(executable);
             b.step("run-hosted-morphic-runtime", "Run deterministic hosted Morphic composition").dependOn(&run_hosted.step);
+            const fake_module = b.createModule(.{ .root_source_file = b.path("recipes/run-hosted-morphic-runtime/src/fake.zig"), .target = target, .optimize = optimize });
+            fake_module.addImport("morphic-core", recipe_module);
+            const fake_executable = b.addExecutable(.{ .name = "run-fake-morphic-runtime", .root_module = fake_module });
+            const run_fake = b.addRunArtifact(fake_executable);
+            b.step("run-fake-morphic-runtime", "Run deterministic fake-machine Morphic composition").dependOn(&run_fake.step);
             const verify_hosted = b.step("verify-hosted-morphic-runtime", "Verify hosted Morphic composition and dependencies");
             verify_hosted.dependOn(&run_recipe.step);
             verify_hosted.dependOn(agent_check_step);

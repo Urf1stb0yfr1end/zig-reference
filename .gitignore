@@ -28,3 +28,5 @@ generated/**/*.db
 
 __pycache__/
 *.py[cod]
+
+.venv/

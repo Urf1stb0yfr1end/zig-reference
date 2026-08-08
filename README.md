@@ -501,21 +501,18 @@ Open [`docs/catalog/MODULES.md`](docs/catalog/MODULES.md). It links every implem
 
 ## Validation
 
-For a fresh environment, create and activate a repository-local virtual environment and install the validation dependencies before running any repository checks:
+For a fresh environment, create a repository-local virtual environment and install the validation dependencies before running repository checks:
 
 ```sh
 cd ~/dev/zig-reference
 python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r tools/requirements.txt
+.venv/bin/python -m pip install -r tools/requirements.txt
 ```
 
-Keep the virtual environment active while running the repository commands below. This prevents missing-dependency failures such as `No module named 'jsonschema'` on a fresh clone.
-
-Activate the repository Python environment on later sessions:
+Dependency-backed canonical and build commands select `.venv` through `tools/python-environment.py`; shell activation is optional. Check it directly with:
 
 ```sh
-source .venv/bin/activate
+python3 tools/python-environment.py --check
 ```
 
 Run the primary checks:
