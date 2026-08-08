@@ -2,17 +2,15 @@ CODEX AGENTIC SNOWBALL BATCH 10 — RISC-V EXECUTION PROBE
 
 MISSION
 
-Apply the first real cross-architecture execution pressure to the Morphic runtime.
+Apply the first real cross-architecture execution pressure to the existing Morphic runtime.
 
-Batch 09 proved one shared target-neutral Morphic core can execute through hosted and deterministic fake machine implementations on the development host while preserving byte-identical canonical observables.
+Batch 09 proved one shared target-neutral Morphic core can execute through hosted and deterministic fake machine implementations while preserving byte-identical canonical observables.
 
-Batch 10 must now answer a narrower and more important question:
+Batch 10 must answer:
 
 DO THE SAME SETTLED SEMANTICS SURVIVE ACTUAL RISC-V EXECUTION WITHOUT BEING REWRITTEN?
 
-The preferred first pressure target is a riscv64 Linux userspace executable run under QEMU user-mode, because it exercises real RISC-V machine code while avoiding premature privileged-mode, firmware, trap, device, and boot semantics.
-
-The governing idea is:
+Preferred pressure target: a riscv64 Linux userspace executable run under QEMU user-mode. This executes real RISC-V machine code while deliberately avoiding premature supervisor-mode, firmware, trap, device, boot, and hypervisor semantics.
 
 ONE CORE.
 SAME SCENARIO.
@@ -21,83 +19,90 @@ NO SECOND SEMANTIC IMPLEMENTATION.
 
 This is an evidence-gathering batch, not a race toward Alpine.
 
-Do not begin Linux boot handoff.
-Do not begin supervisor-mode or machine-mode runtime code.
-Do not begin SBI, CSRs, traps, interrupts, MMIO, UART, FDT, PLIC, CLINT, VirtIO, page-table activation, a hypervisor, or a universal HAL.
-Do not add a RISC-V-specific copy of the Morphic runtime.
-Do not create speculative architecture modules merely because a future freestanding backend might need them.
-Do not add a private cross-target DSL or custom interface language.
+Do not begin Linux boot handoff, supervisor/machine mode, SBI, CSRs, traps, interrupts, MMIO, UART, FDT, PLIC, CLINT, VirtIO, page-table activation, a hypervisor, or a universal HAL.
+Do not create a RISC-V copy of Morphic semantics.
+Do not invent architecture modules because they may be useful later.
+Do not add a private cross-target DSL.
 
-If the existing hosted/core code can cross-compile and execute correctly with little or no new reusable capability, that is a successful Snowball result. Do not manufacture novelty to make the batch look larger.
+If the existing core cross-compiles and executes with zero new reusable modules, treat that as a strong Snowball result.
 
-STARTING STATE
+WORKSPACE BOOTSTRAP — IMPORTANT
 
-Work in ~/dev/zig-reference.
+Do not assume the Codex execution checkout lives at ~/dev/zig-reference.
+Do not require a Git remote in order to begin.
+
+Resolve the actual supplied repository first:
+
+1. If ~/dev/zig-reference exists and is a git worktree, use it.
+2. Otherwise use the current/supplied git worktree, commonly /workspace/zig-reference.
+3. Run git rev-parse --show-toplevel and cd to that root.
+4. Record the actual repository root, branch, HEAD, git status, and git remote -v.
+
+Synchronization rule:
+
+- If a usable origin remote exists, run git pull --ff-only origin main before editing when the current checkout is intended to track main.
+- If no remote exists, DO NOT STOP merely because origin is absent. Treat the supplied checkout as the task's authoritative snapshot, record that synchronization was unavailable, and continue.
+- Never invent or add a remote merely to satisfy this request.
+- Never claim the checkout is synchronized when it cannot be verified.
+- If the Batch 10 plan itself is present in the supplied checkout, lack of origin is not a blocker.
+
+The previous Batch 10 attempt incorrectly stopped because /workspace/zig-reference had no origin. That behavior is explicitly superseded by this rule.
 
 Read AGENTS.md first.
 Read COMMANDS.md before inventing or guessing commands.
 Read docs/agentic-vocabulary.md.
 Read docs/standards/SNOWBALL_YIELD.md if present.
 Read docs/reports/AGENTIC_SNOWBALL_BATCH_09.md.
-Read the current run-hosted-morphic-runtime recipe contract and source through the Agent Fast Path before broad source reading.
-Read the current contracts for bounded-system-resource-plan, bounded-deterministic-event-trace, and bounded-deterministic-scheduler through preflight before opening implementation source.
+Read the current run-hosted-morphic-runtime contract through the Agent Fast Path before broad source reading.
+Read preflight for bounded-system-resource-plan, bounded-deterministic-event-trace, and bounded-deterministic-scheduler before opening their implementation source.
 
-Sync current main when origin exists.
 Record the actual base commit.
 Use Zig 0.14.0 only.
 
-Expected observed starting state after Batch 09 merge:
+EXPECTED STARTING EVIDENCE
+
+Expected after Batch 09 merge commit 50468558931156bfddbce94e1efd5a20369ebc98:
 
 - 53 contracted modules;
 - 53 full Agent Fast Path modules;
 - 0 partial modules;
 - repository Python environment regression green;
-- full repository validation green;
-- hosted Morphic output deterministic;
-- fake Morphic output deterministic;
-- hosted and fake canonical outputs byte-identical for the tested scenario;
-- canonical output size remains 765 bytes for that scenario unless a real correctness defect is established;
-- benchmark-pre-morphic-52 remains frozen and must not be modified, moved, deleted, recreated, or retagged.
+- native hosted Morphic deterministic;
+- native fake Morphic deterministic;
+- hosted/fake canonical artifacts byte-identical;
+- canonical scenario historically 765 bytes;
+- full repository validation historically 322/322 steps, 206/206 tests;
+- benchmark-pre-morphic-52 frozen and untouched.
 
-The user independently observed after merge commit 50468558931156bfddbce94e1efd5a20369ebc98:
-
-- python3 tools/developer-command.py validate-repository => 322/322 steps succeeded, 206/206 tests passed;
-- PYTHONDONTWRITEBYTECODE=1 python3 tools/test-python-environment.py => PASS;
-- zig build run-hosted-morphic-runtime and zig build run-fake-morphic-runtime emitted the same visible canonical scenario;
-- zig build test-recipe-run-hosted-morphic-runtime returned successfully.
-
-Treat these as expected starting evidence, not as permission to skip revalidation.
+These are expected baseline facts, not permission to skip revalidation. If the supplied checkout differs, measure and report the actual state before editing. Do not force counts.
 
 PHASE 0 — ENVIRONMENT AND EXECUTION-LAB GATE
 
-Before editing code, determine whether this environment can actually execute riscv64 Linux user-mode programs.
-
-At minimum inspect:
+Before editing, inspect at minimum:
 
 zig version
 python3 tools/python-environment.py --check
 python3 tools/query-reference.py agent doctor
 command -v qemu-riscv64 || true
-qemu-riscv64 --version if present
+qemu-riscv64 --version  # only if present
 
 Do not use sudo.
 Do not globally install Python packages.
 Do not silently download opaque binaries.
-Do not hide a missing external execution tool.
+Do not hide missing tools.
 
-If qemu-riscv64 is absent, inspect whether the repository or execution environment already provides an approved conventional way to provision QEMU user-mode. Do not invent one.
+If qemu-riscv64 is absent, inspect whether the supplied environment provides a conventional, permitted package/install mechanism or another already-installed conventional riscv64 userspace emulator. Use only an allowed, ordinary mechanism. Record exactly what was provisioned and how.
 
-If QEMU user-mode cannot be made available within the allowed environment, stop before cross-target implementation and report the exact external-tool gap. Do not claim Batch 10 passed without executing RISC-V machine code.
+If real riscv64 machine code cannot be executed in the task environment without prohibited privilege or opaque downloads, stop and report that external execution blocker. Cross-compilation alone is not Batch 10 PASS.
 
-Do not replace the required execution evidence with cross-compilation alone.
-
-If another already-installed, conventional riscv64 userspace emulator exists and gives equivalent evidence, it may be used only if the Batch 10 report records the substitution and why it is semantically sufficient.
+Absence of a Git remote is NOT an execution blocker.
+Absence of ~/dev/zig-reference is NOT an execution blocker when a valid supplied checkout exists.
 
 PHASE 1 — FREEZE THE REQUIREMENT MAP BEFORE IMPLEMENTATION
 
-Practice the Snowball first.
+Practice the Snowball before designing.
 
-Run the smallest useful current agent-facing discovery surfaces, including at minimum:
+Run the smallest useful current discovery surfaces, including:
 
 python3 tools/query-reference.py agent bootstrap
 python3 tools/query-reference.py agent doctor
@@ -107,10 +112,9 @@ python3 tools/query-reference.py agent preflight bounded-system-resource-plan
 python3 tools/query-reference.py agent preflight bounded-deterministic-event-trace
 python3 tools/query-reference.py agent preflight bounded-deterministic-scheduler
 
-Use agent compose/capability surfaces where current vocabulary supports them.
-Do not guess capability IDs.
+Use compose/capability queries where current repository grammar supports them. Do not guess capability IDs.
 
-Before implementation, create docs/reports/AGENTIC_SNOWBALL_BATCH_10.md and freeze a requirement map classifying each requirement as:
+Before implementation changes, create docs/reports/AGENTIC_SNOWBALL_BATCH_10.md and freeze requirements as:
 
 - existing module;
 - existing recipe/composition;
@@ -120,345 +124,221 @@ Before implementation, create docs/reports/AGENTIC_SNOWBALL_BATCH_10.md and free
 - external execution dependency;
 - out of scope.
 
-The requirement map must be written before implementation changes.
-
 Do not choose a module quota.
 Do not decide in advance that a new module must exist.
 Do not recreate existing mechanisms under RISC-V-specific names.
 
 PHASE 2 — BASELINE NATIVE SEMANTICS
 
-Before changing Morphic or build behavior:
+Before changing Morphic/build behavior:
 
-1. Run the native hosted scenario twice.
-2. Run the fake scenario twice.
-3. Capture exact bytes to files without terminal decoration.
-4. Prove hosted repeatability byte-for-byte.
-5. Prove fake repeatability byte-for-byte.
-6. Prove hosted versus fake canonical equality byte-for-byte.
+1. Run native hosted twice.
+2. Run native fake twice.
+3. Capture exact program bytes to files without terminal decoration.
+4. Compare hosted run 1 == hosted run 2 byte-for-byte.
+5. Compare fake run 1 == fake run 2 byte-for-byte.
+6. Compare hosted == fake byte-for-byte.
 7. Record exact byte counts.
 
-Use current documented commands from COMMANDS.md.
+Use actual current commands from COMMANDS.md.
+Do not assume 765 bytes; measure it.
 
-Do not assume 765 bytes merely because Batch 09 reported it. Measure it again.
+If baseline equality fails, investigate before Batch 10 implementation.
 
-If the baseline differs from canonical current truth, investigate before making Batch 10 changes.
+PHASE 3 — CROSS-COMPILE EXISTING SEMANTICS FIRST
 
-PHASE 3 — CROSS-COMPILE THE EXISTING SEMANTICS FIRST
+Before designing a RISC-V machine adapter, attempt the cheapest correct path:
 
-Before designing a new RISC-V machine adapter, attempt the cheapest correct path:
+Can the SAME Morphic core and userspace scenario compile as a riscv64 Linux executable and execute under QEMU user-mode without semantic source duplication?
 
-Can the existing Morphic core and existing hosted-style userspace entrypoint be compiled as a riscv64 Linux executable and run under QEMU user-mode without changing semantic code?
+Prefer a statically linked target if that avoids a guest dynamic loader. Discover Zig 0.14.0's actual target syntax rather than blindly copying target strings from this request.
 
-Prefer a statically linked target when that avoids dependence on a guest dynamic loader. Use Zig 0.14.0 target facilities and ordinary Zig build practices.
+The RISC-V executable must execute the same canonical scenario.
 
-Do not hardcode a target spelling from this request if Zig 0.14.0 reports a different canonical target syntax. Discover the actual supported target form.
-
-The cross-target executable must execute the same canonical scenario.
-
-Do not create:
+Forbidden:
 
 - riscv_core.zig containing copied scheduler/resource/trace logic;
 - separate RISC-V task ordering;
 - separate RISC-V formatting semantics;
-- a second trace implementation;
-- a second resource plan;
-- a second scheduler policy.
+- second trace implementation;
+- second resource plan;
+- second scheduler policy.
 
-If a target-specific entrypoint wrapper is required solely to launch the same core, keep it as small and conventional as possible.
-
-If no RISC-V-specific adapter is needed for Linux userspace, do not create one.
-
-That outcome is desirable evidence that the target-neutral work is actually target-neutral.
+A tiny target-specific entrypoint/build wrapper is acceptable only if necessary to launch the same semantic core.
+If no RISC-V-specific adapter is necessary, do not create one.
 
 PHASE 4 — EXECUTE REAL RISC-V MACHINE CODE
 
-Run the cross-compiled artifact with qemu-riscv64.
+Run the cross-compiled artifact under qemu-riscv64 or the justified equivalent.
 
-Capture only the program's stdout/stderr artifacts needed for comparison.
 Record:
 
 - exact Zig target;
 - exact build command;
-- exact QEMU command;
-- QEMU version;
-- executable format/architecture evidence using an existing conventional local tool if available;
-- process exit status;
-- output byte count;
-- whether two RISC-V executions are byte-identical.
+- exact emulator command;
+- emulator version/path;
+- executable architecture evidence using a conventional local tool if available;
+- exit status;
+- exact output byte count;
+- two-run RISC-V repeatability.
 
-At minimum, prove mechanically:
+Mechanically prove:
 
-native hosted output == native fake output
-native hosted output == RISC-V output
-RISC-V run 1 == RISC-V run 2
+native hosted == native fake
+native hosted == riscv64
+riscv64 run 1 == riscv64 run 2
 
-Compare raw bytes, not normalized prose, unless unavoidable external framing exists. If framing exists, explain it and extract only a mechanically delimited program payload. Do not silently strip differences.
+Compare raw bytes, not visual similarity. If unavoidable emulator framing exists, mechanically delimit the program payload and document the framing; do not silently normalize differences.
 
-The ideal result is exactly the same canonical 765-byte artifact across native hosted, native fake, and riscv64 execution, but exact equality must be measured rather than assumed.
+If output differs, classify before fixing:
 
-If output differs, do not immediately patch around it. Determine whether the difference is:
-
-- a real semantic bug;
+- semantic bug;
 - architecture-width assumption;
 - endianness assumption;
-- target-specific stdlib behavior;
-- text/newline behavior;
+- stdlib target behavior;
+- newline/text behavior;
 - build configuration;
 - emulator artifact;
-- or an unsupported/unknown cause.
+- unknown.
 
-Use current diagnostics and Failure State Capsule machinery where it genuinely applies. Unknown remains UNKNOWN.
+Use Invariant-Guided Diagnosis / Failure State Capsule only when current canonical truth genuinely applies. Unknown remains UNKNOWN.
 
-PHASE 5 — LET PRESSURE DECIDE WHETHER THE BATCH NEEDS NEW REUSABLE CODE
+PHASE 5 — LET PRESSURE DECIDE WHAT TO ADD
 
-Only after the RISC-V attempt exposes actual pressure should new reusable capability be considered.
-
-Examples of legitimate evidence-backed outcomes include:
+Permitted outcomes:
 
 A. ZERO NEW REUSABLE CAPABILITY
-
-The existing core cross-compiles and runs unchanged; only build/test orchestration is new.
-
-This is a strong Snowball result. Record it plainly.
+Existing core compiles/runs unchanged; only build/test orchestration is new. This is an excellent result.
 
 B. SMALL TARGET-NEUTRAL REPAIR
+A hidden architecture assumption exists in shared code. Repair it generically and add focused regression evidence.
 
-A previously hidden architecture assumption is found in shared code. Repair it generically, add focused regression coverage, and explain why the fix is not RISC-V-specific policy.
+C. REUSABLE CROSS-TARGET EXECUTION MECHANISM
+Only if multiple current surfaces genuinely need one; use ordinary Zig/build conventions.
 
-C. GENUINELY REUSABLE CROSS-TARGET EXECUTION CAPABILITY
+D. REUSABLE RISC-V SEMANTIC PRIMITIVE
+Only if userspace execution itself proves one is necessary.
 
-A small reusable build/test mechanism is missing and multiple current surfaces need it. Add only the minimum conventional capability.
-
-D. GENUINELY REUSABLE RISC-V SEMANTIC CAPABILITY
-
-Only if the userspace execution itself proves a generally reusable RISC-V semantic primitive is needed should a new module be added.
-
-Do not add SBI, CSR, trap, MMIO, UART, or privileged modules in this batch because Linux user-mode execution does not provide evidence for them.
-
+Do not add SBI, CSR, trap, MMIO, UART, FDT, page-table activation, or privileged modules in this batch. Linux user-mode does not justify them.
 Do not turn an emulator command into a library module.
 
-PHASE 6 — TEST THE CLAIM "TARGET-NEUTRAL"
+PHASE 6 — PROVE TARGET-NEUTRALITY STRUCTURALLY
 
-The repository must make it hard to accidentally fork semantics by architecture.
+Add the smallest mechanical test/build structure needed to prove native and riscv64 compile the same canonical Morphic semantic implementation.
 
-Add the smallest mechanical test or build structure needed to prove the same canonical Morphic implementation is used for native and riscv64 execution.
+Prefer one source/composition compiled for multiple targets.
 
-Prefer one source/composition compiled for multiple targets over two near-identical source files.
+A reviewer must be able to establish cheaply:
 
-A cold reviewer should be able to answer mechanically:
-
-- Is there still one runCore/shared semantic implementation?
-- Does riscv64 execution compile that same implementation?
-- Is any target-specific wrapper thin and non-semantic?
-- Are output and trace bytes exactly compared?
-- Could a future change accidentally update native semantics while leaving a stale RISC-V copy? There should be no such copy to go stale.
-
-Do not accept prose as proof when source/build structure can prove it.
+- one runCore/shared semantic implementation remains;
+- riscv64 compiles that implementation;
+- any target wrapper is thin and non-semantic;
+- output/trace bytes are mechanically compared;
+- there is no stale RISC-V semantic copy that could diverge later.
 
 PHASE 7 — AGENT-NATIVE DISCOVERY
 
-A cold agent should be able to discover how to validate the cross-target claim without reading broad source.
+Keep the normal repository grammar:
 
-Use existing repository grammar:
+requirement -> decide/query -> preflight -> build/execute -> compare -> validate
 
-requirement
-→ decide/query
-→ preflight
-→ build/execute
-→ compare
-→ validate
-
-If a new public command is introduced, document it in COMMANDS.md and make its purpose explicit.
-
+Document new public commands in COMMANDS.md.
 Do not create a second command catalog.
-Do not add a new agent vocabulary term for ordinary cross-compilation or emulation.
-Do not expose raw source through agent projections merely to advertise the new target.
+Do not invent formal vocabulary for ordinary cross-compilation/emulation.
 
-If a serious reusable verification command is added, it must use Developer Minimus:
+If a serious developer-facing aggregate verification command is justified, it must preserve Developer Minimus:
 
-ordinary output first
+ordinary output
 LOCATIONS
 MINIMUS
 
-Exactly one top-level authoritative handoff, preserving the underlying exit code.
+exactly once, preserving exit status.
 
-A reasonable canonical surface may be something conceptually like:
-
-python3 tools/developer-command.py verify-riscv-morphic-runtime
-
-but do not create that exact command merely because this request names it. Create it only if it is the cleanest repository-consistent serious verification surface.
-
-Raw focused build/run steps may remain raw when appropriate.
+Raw focused build/run commands need not emit Minimus unless current policy requires it.
 
 PHASE 8 — EXTERNAL DEPENDENCY TRUTH
 
-QEMU is an external execution dependency, not part of Zig semantics.
+QEMU/emulation is external execution infrastructure, not Zig semantic truth.
 
-Do not make ordinary repository validation unexpectedly depend on QEMU unless the dependency is deliberately provisioned and documented.
+Do not silently make ordinary repository validation depend on QEMU.
+If adding CI coverage, provision QEMU conventionally and explicitly and keep normal validation usable for users who do not need the machine profile.
 
-If Batch 10 adds CI coverage for the RISC-V execution probe:
+The report must distinguish:
 
-- provision QEMU conventionally and explicitly;
-- keep the version/source visible where practical;
-- do not rely on an accidental runner preinstall;
-- do not break users who only need the normal non-machine validation path;
-- keep normal Python dependency rules unchanged;
-- do not use a custom package manager merely for this batch.
+- what normal validate-repository proves;
+- what the RISC-V execution verification additionally proves.
 
-If cross-target verification remains a dedicated optional machine-profile command, the report must state exactly what the normal repository validation does and does not prove.
+Do not claim RISC-V execution is covered by a gate that never invokes it.
 
-Do not falsely claim full repository validation proves RISC-V execution if the QEMU path is not part of it.
+PHASE 9 — IDENTIFY THE NEXT FREESTANDING DIFFERENCE, DO NOT IMPLEMENT IT
 
-PHASE 9 — PREPARE THE NEXT FREESTANDING STEP WITHOUT IMPLEMENTING IT
+After real riscv64 Linux execution succeeds, identify what Linux userspace is still providing that a future freestanding RISC-V execution will lose.
 
-Once real riscv64 Linux execution is proven, use the evidence to identify the next smallest difference between:
+Possible categories to investigate, not pre-decided modules:
 
-riscv64 Linux userspace
-and
-future freestanding RISC-V execution.
-
-The report should identify, without implementing, which assumptions disappear when Linux is removed.
-
-Likely categories may include:
-
+- program entry/exit;
 - output transport;
-- process entry/exit;
-- firmware boundary;
 - stack/bootstrap;
 - panic behavior;
+- firmware boundary;
 - privileged state.
 
-These are categories, not required modules.
-
-Do not decide the next module names in advance.
-Do not start SBI in this batch.
-Do not add a speculative freestanding adapter.
-
-The desired Batch 10 result is a sharply smaller, evidence-backed question for Batch 11.
-
-CORRECTNESS AND CODE QUALITY
-
-For all changed code:
-
-- prefer ordinary Zig and ordinary build-system conventions;
-- preserve the existing semantic implementation;
-- make target differences explicit;
-- avoid hidden allocation where current contracts forbid it;
-- preserve deterministic ordering;
-- keep native errors authoritative;
-- test exact output rather than visual similarity;
-- keep target-specific code narrow;
-- do not introduce clever metaprogramming solely to prove genericity;
-- do not optimize for line count at the expense of truth;
-- do optimize Cost of Correct Use.
-
-Where established programming practice and Zig already provide a good answer, require evidence before inventing a project-specific alternative.
+Use observed evidence to state the next smallest Batch 11 pressure.
+Do not start SBI or privileged code in Batch 10.
 
 COMMANDS.md — MANDATORY CUMULATIVE RULE
 
-Every Codex run that changes the repository must leave COMMANDS.md current.
+Every repository-changing Codex run must leave COMMANDS.md current.
 
-- Add every genuinely new runnable command introduced by this run.
-- Update changed command syntax or purpose.
-- Backfill real supported commands from prior batches that are currently omitted.
-- Remove or accurately mark obsolete commands.
-- Never document a command that does not exist.
-- Never mark a command validated unless it actually ran successfully in the reported environment.
+- Add real new commands.
+- Update changed syntax/purpose.
+- Backfill real supported commands omitted from previous batches.
+- Remove or mark obsolete/nonexistent commands accurately.
+- Never document nonexistent commands.
+- Never mark an unexecuted command validated.
 - Preserve raw versus canonical Developer Minimus distinctions.
 
 Run:
 
 PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
 
-VOCABULARY DISCIPLINE
+VOCABULARY / AGENTS DISCIPLINE
 
-Use existing formal project vocabulary where it fits:
+Use existing formal terms where they fit: Cost of Correct Use, Minimum Read Set, Context Efficiency, Correct-Use Preflight, Invariant-Guided Diagnosis, Failure State Capsule, Repair Locality, Snowball Yield, Agentic Snowball.
 
-- Cost of Correct Use;
-- Minimum Read Set;
-- Context Efficiency;
-- Correct-Use Preflight;
-- Invariant-Guided Diagnosis;
-- Failure State Capsule;
-- Repair Locality;
-- Snowball Yield;
-- Agentic Snowball.
+Use ordinary programming terms for cross-compilation, target, architecture, emulator, userspace, executable, static linking, stdout, exit status, byte equality.
 
-Use ordinary terms for:
+Do not add Batch 10 history to AGENTS.md. Modify AGENTS.md only for a durable rule every future cold agent must know.
 
-- cross-compilation;
-- target;
-- architecture;
-- emulator;
-- userspace;
-- executable;
-- static linking;
-- stdout;
-- exit status;
-- byte equality.
+SNOWBALL YIELD — FACTUAL BOOKKEEPING
 
-Do not add a new formal vocabulary term unless actual implementation pressure proves a recurring concept not covered by existing language.
+Create/update docs/reports/AGENTIC_SNOWBALL_BATCH_10.md with at minimum:
 
-AGENTS.md DISCIPLINE
-
-Do not add Batch 10 history to AGENTS.md.
-
-Modify AGENTS.md only if this batch discovers a durable rule that every future cold agent must know and that is not already represented elsewhere.
-
-SNOWBALL YIELD — REQUIRED FACTUAL BOOKKEEPING
-
-Create/update:
-
-docs/reports/AGENTIC_SNOWBALL_BATCH_10.md
-
-Record at minimum:
-
-- actual base commit;
+- actual repository root;
+- whether origin/synchronization was available;
+- actual base commit and branch;
 - Zig version;
-- QEMU version and executable path;
+- emulator version/path;
 - frozen requirements;
-- existing modules reused;
-- existing recipe/composition reused;
-- existing toolchain capabilities reused;
-- missing reusable capabilities discovered before implementation;
-- missing reusable capabilities discovered during implementation;
+- existing modules/recipes/toolchain capabilities reused;
+- missing reusable capabilities before and during implementation;
 - project-specific orchestration;
 - external execution dependencies;
-- new reusable modules;
-- new reusable recipes;
-- target-specific source files added;
-- source reads required before selection;
-- source reads required after preflight;
-- known diagnostic lookups;
-- unknown diagnostic lookups;
-- focused validations;
-- aggregate validations;
-- exact native hosted output bytes;
-- exact native fake output bytes;
-- exact riscv64 output bytes;
-- repeatability comparisons;
-- cross-architecture equality result;
+- new modules/recipes;
+- target-specific source files;
+- source reads before selection and after preflight;
+- known/unknown diagnostic lookups;
+- focused/aggregate validation;
+- exact native hosted/fake/riscv64 output bytes;
+- repeatability and equality results;
 - unmeasured fields;
-- limits and non-claims.
+- limits/non-claims.
 
-Do not invent:
-
-- token savings;
-- percentage speedups;
-- hidden compute savings;
-- comparative Rust/C/Zig productivity claims;
-- future agent preference rates;
-- hardware equivalence;
-- privileged RISC-V correctness.
-
-If a field was not measured, say unmeasured.
+No invented token savings, speedups, hidden compute estimates, language productivity claims, hardware equivalence, or privileged RISC-V correctness.
 
 VALIDATION — FOCUSED FIRST
 
-Before completion, run all focused checks affected by the batch, plus the current canonical repository gates.
-
-At minimum, where applicable:
+At minimum where applicable:
 
 PYTHONDONTWRITEBYTECODE=1 python3 tools/test-python-environment.py
 PYTHONDONTWRITEBYTECODE=1 python3 tools/test-agent-fast-path.py
@@ -469,71 +349,67 @@ PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
 PYTHONDONTWRITEBYTECODE=1 python3 tools/test-developer-minimus.py
 python3 tools/query-reference.py agent doctor
 
-Run the hosted/fake Morphic recipe tests.
-Run native hosted/fake repeatability comparisons.
-Run the real riscv64 QEMU execution at least twice.
-Run exact native-versus-riscv byte comparison.
-Run any new focused target/build tests.
-Run the canonical full repository validation last.
-Run git diff --check.
+Also:
+
+- hosted/fake Morphic recipe tests;
+- native hosted/fake repeatability comparisons;
+- real riscv64 execution twice;
+- exact native-versus-riscv comparison;
+- any new focused target/build tests;
+- canonical full repository validation last;
+- git diff --check;
+- final intended-diff review.
 
 Do not mark skipped gates passed.
 
-INDEPENDENT REVIEW FRIENDLINESS
+INDEPENDENT REVIEW ACCEPTANCE
 
-A separate cold reviewer should be able to verify cheaply:
+A cold reviewer should be able to verify mechanically:
 
-1. Did actual riscv64 machine code execute?
-2. Was the exact executable target recorded?
-3. Was QEMU actually invoked successfully?
-4. Is there still one Morphic semantic core?
-5. Are native hosted and fake outputs still byte-identical?
-6. Is riscv64 output byte-identical to the same canonical artifact?
-7. Are two riscv64 runs byte-identical?
-8. Were any architecture assumptions discovered and repaired generically?
-9. Were new modules added only when real pressure justified them?
-10. Does ordinary repository validation remain truthful about what it covers?
-11. Is COMMANDS.md current?
-12. Does full repository validation still pass?
-13. Is the final worktree limited to intended task changes?
+1. Actual riscv64 machine code executed.
+2. Exact executable target and emulator are recorded.
+3. One Morphic semantic core remains.
+4. Native hosted == native fake.
+5. riscv64 == native canonical bytes.
+6. Two riscv64 runs are byte-identical.
+7. Any architecture repair is generic and tested.
+8. New modules exist only if real pressure justified them.
+9. Normal repository validation remains truthful about QEMU coverage.
+10. COMMANDS.md is current.
+11. Full repository validation passes.
+12. Final worktree contains only intended Batch 10 changes.
 
 STOP CONDITIONS
 
-Stop and explain rather than forcing the batch if:
+Stop and report honestly if:
 
-- real riscv64 execution cannot be performed in the environment;
-- only cross-compilation, not execution, is available;
-- the only way forward would require unapproved opaque downloads or privileged package installation;
-- current Morphic semantics cannot cross-compile without a material redesign whose scope cannot be justified;
-- a failing comparison cannot be causally established;
-- existing canonical contract truth conflicts with executable behavior and cannot be repaired safely in scope;
-- a pre-existing validation failure cannot be distinguished from Batch 10 changes.
+- real riscv64 execution cannot be performed with allowed tools;
+- only cross-compilation is possible;
+- proceeding requires prohibited privileged installation or opaque downloads;
+- Morphic cannot cross-compile without a material redesign outside justified scope;
+- a semantic mismatch cannot be causally established;
+- canonical contract truth conflicts with executable behavior and cannot safely be repaired;
+- a pre-existing validation failure cannot be distinguished from Batch 10 work.
 
-Do not hide the limitation.
-Do not print the success sentinel when a required RISC-V execution proof did not occur.
+DO NOT stop merely because:
+
+- ~/dev/zig-reference is absent;
+- the supplied checkout is /workspace/zig-reference;
+- origin is absent;
+- the supplied worktree uses a branch such as work instead of main.
+
+Those are environment facts to record, not blockers, provided a valid Batch 10 checkout is supplied.
 
 COMPLETION STANDARD
 
-Batch 10 is complete only when real riscv64 machine code has executed the existing Morphic scenario under a conventional userspace emulator and the repository has mechanically compared its canonical artifact against native hosted/fake execution.
+Batch 10 passes only when real riscv64 machine code executes the existing Morphic scenario under a conventional userspace emulator and its canonical artifact is mechanically compared against native hosted/fake execution.
 
-The strongest successful outcome is not necessarily a new module.
-
-A result such as:
-
-requirements: N
-existing reusable capabilities: almost all
-new reusable capabilities: 0
-project-specific cross-target orchestration: small
-native hosted == native fake == riscv64: true
-
-would be a major Snowball success.
-
-The batch should leave Batch 11 with an evidence-backed freestanding difference rather than a speculative list of hardware abstractions.
+The strongest result may be zero new reusable modules.
 
 Do not commit.
 Do not push.
 Do not open a PR.
 
-Finish only after all required validation succeeds and the final task summary ends exactly:
+Finish only after required validation succeeds and the final task summary ends exactly:
 
 AGENTIC SNOWBALL BATCH 10 PASSED
