@@ -1269,6 +1269,21 @@
       "const module = @import(\"bounded-system-resource-plan\");",
       "var value = const P = Planner(capacities); const result = try P.plan(description);"
     ],
-    "integration_notes": []
+    "integration_notes": [],
+    "canonical_invariants": [
+      {
+        "id": "resource-plan-memory-bound",
+        "operation": "plan",
+        "description": "Required page-aligned storage must not exceed declared total memory.",
+        "observed_relation": {
+          "left": "required_bytes",
+          "relation": "greater_than",
+          "right": "total_memory"
+        },
+        "diagnostic_id": "ZIGREF-RESOURCE-PLAN-MEMORY-EXCEEDED",
+        "repair": "Increase total_memory or reduce the bounded resource categories.",
+        "focused_validation": "zig build test-bounded-system-resource-plan"
+      }
+    ]
   }
 }

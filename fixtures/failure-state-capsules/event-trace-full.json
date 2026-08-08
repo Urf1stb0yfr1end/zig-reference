@@ -1,0 +1,1 @@
+{"schema_version":"1.0.0","component":"bounded-deterministic-event-trace","operation":"append","native_error":"TraceFull","observed":{"capacity":1,"count":1}}

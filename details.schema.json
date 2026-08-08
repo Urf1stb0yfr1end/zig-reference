@@ -4610,6 +4610,75 @@
           "items": {
             "type": "string"
           }
+        },
+        "canonical_invariants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "operation",
+              "description",
+              "observed_relation",
+              "diagnostic_id",
+              "repair",
+              "focused_validation"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "operation": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "observed_relation": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "left",
+                  "relation",
+                  "right"
+                ],
+                "properties": {
+                  "left": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]*$"
+                  },
+                  "relation": {
+                    "enum": [
+                      "less_than",
+                      "greater_than",
+                      "greater_than_or_equal"
+                    ]
+                  },
+                  "right": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]*$"
+                  }
+                }
+              },
+              "diagnostic_id": {
+                "type": "string",
+                "pattern": "^ZIGREF-[A-Z0-9-]+$"
+              },
+              "repair": {
+                "type": "string",
+                "minLength": 1
+              },
+              "focused_validation": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "uniqueItems": true
         }
       }
     }

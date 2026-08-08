@@ -1327,6 +1327,21 @@
       "const module = @import(\"bounded-deterministic-event-trace\");",
       "var value = BoundedDeterministicEventTrace(64).init();"
     ],
-    "integration_notes": []
+    "integration_notes": [],
+    "canonical_invariants": [
+      {
+        "id": "event-trace-capacity",
+        "operation": "append",
+        "description": "The trace cannot append when its logical count has reached capacity.",
+        "observed_relation": {
+          "left": "count",
+          "relation": "greater_than_or_equal",
+          "right": "capacity"
+        },
+        "diagnostic_id": "ZIGREF-EVENT-TRACE-FULL",
+        "repair": "Drain or reset the trace, or increase its compile-time capacity.",
+        "focused_validation": "zig build test-bounded-deterministic-event-trace"
+      }
+    ]
   }
 }
