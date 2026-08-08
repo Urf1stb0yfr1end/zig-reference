@@ -231,6 +231,15 @@ pub fn build(b: *std.Build) void {
             const install_riscv64 = b.addInstallArtifact(executable, .{});
             b.step("install-riscv64-morphic-runtime", "Cross-compile and install the Morphic executable selected by -Dtarget")
                 .dependOn(&install_riscv64.step);
+            const freestanding_target = b.resolveTargetQuery(.{ .cpu_arch = .riscv64, .os_tag = .freestanding, .abi = .none });
+            const freestanding_module = b.createModule(.{ .root_source_file = b.path("recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig"), .target = freestanding_target, .optimize = .ReleaseSmall, .code_model = .medium });
+            freestanding_module.addImport("morphic-core", recipe_module);
+            const freestanding = b.addExecutable(.{ .name = "morphic-freestanding-riscv64", .root_module = freestanding_module });
+            freestanding.entry = .disabled;
+            freestanding.setLinkerScript(b.path("recipes/run-hosted-morphic-runtime/freestanding-riscv64.ld"));
+            const install_freestanding = b.addInstallArtifact(freestanding, .{});
+            b.step("install-freestanding-riscv64-morphic-runtime", "Build and install the freestanding RISC-V Morphic payload")
+                .dependOn(&install_freestanding.step);
             const run_hosted = b.addRunArtifact(executable);
             b.step("run-hosted-morphic-runtime", "Run deterministic hosted Morphic composition").dependOn(&run_hosted.step);
             const fake_module = b.createModule(.{ .root_source_file = b.path("recipes/run-hosted-morphic-runtime/src/fake.zig"), .target = target, .optimize = optimize });
