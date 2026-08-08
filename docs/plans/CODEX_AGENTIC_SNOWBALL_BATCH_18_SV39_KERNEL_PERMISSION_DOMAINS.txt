@@ -1,0 +1,751 @@
+CODEX AGENTIC SNOWBALL BATCH 18 — SV39 KERNEL PERMISSION DOMAINS
+
+MISSION
+
+Advance Alpz by exactly one memory-protection rung:
+
+TAKE THE REAL ACTIVE SV39 ADDRESS SPACE PROVEN IN BATCH 17 AND REPLACE ITS TEMPORARY WHOLE-CONTINUATION RWX POLICY WITH PAGE-ALIGNED, ELF-DERIVED, SUPERVISOR-ONLY KERNEL PERMISSION DOMAINS, THEN MECHANICALLY PROVE THAT TEXT IS EXECUTABLE BUT NOT WRITABLE, RODATA IS READ-ONLY AND NON-EXECUTABLE, WRITABLE KERNEL STATE/STACK/OWNED POOL IS WRITABLE BUT NON-EXECUTABLE, THE TRANSLATED ALIAS REMAINS RW/NX, NO INSTALLED KERNEL LEAF IS BOTH WRITABLE AND EXECUTABLE, AND THE CANONICAL MORPHIC WORKLOAD CONTINUES UNDER THE HARDENED ACTIVE SV39 ADDRESS SPACE.
+
+Batch 17 established:
+
+Batch 16 owned physical page pool
+→ real page-table pages allocated from that owned pool
+→ existing Sv39 builder/walker/entry/invalidation machinery
+→ real satp MODE=Sv39 with owned root PPN
+→ global SFENCE.VMA boundary
+→ continued stack/global execution
+→ one real non-identity virtual alias to an owned physical frame
+→ canonical Morphic bytes unchanged while paging remained active
+
+Batch 17 deliberately used one simple supervisor RWX identity permission policy over the bounded continuation span so the first active-paging proof would not mix address-space activation with permission hardening.
+
+Batch 18 removes that temporary weakness without jumping to U-mode.
+
+The intended bridge is:
+
+Batch 17 active Sv39 continuation
+→ page-aligned ELF/linker permission domains
+→ existing Sv39 mapping/protection semantics
+→ text RX
+→ rodata R
+→ data/BSS/stack/owned pool RW
+→ translated alias RW
+→ all leaves supervisor-only
+→ zero W+X leaves
+→ translation invalidation after permission mutation
+→ positive post-hardening code/read/write/alias probes
+→ canonical Morphic execution while hardened permissions remain active
+→ Batch 12–17 proofs remain intact
+
+This is NOT a U-mode batch.
+This is NOT a user-address-space batch.
+This is NOT a page-fault-policy batch.
+This is NOT a syscall batch.
+This is NOT a Linux ABI batch.
+This is NOT mmap/brk.
+This is NOT a general VMM.
+This is NOT a higher-half redesign.
+This is NOT demand paging.
+This is NOT copy-on-write.
+This is NOT ASID allocation.
+This is NOT SMP TLB shootdown.
+
+The goal is deliberately narrow:
+
+MAKE THE FIRST REAL ALPZ SV39 ADDRESS SPACE STOP BEING GENERALLY RWX, PROVE THE ACTUAL INSTALLED LEAF PERMISSIONS, AND KEEP RUNNING.
+
+
+CURRENT FLAGSHIP DOCTRINE
+
+Morphic remains the flagship system-scale composition of zig-reference.
+Alpz is the current flagship real-machine/kernel embodiment used to pressure Morphic and Z-Ref against increasingly serious machine reality.
+
+Batch 18 must strengthen, not blur, that relationship.
+
+The Morphic computation must remain semantically unchanged.
+The new work belongs at the machine/address-space boundary.
+Do not teach Morphic about Sv39 permissions.
+Do not move Alpz-specific linker policy into target-neutral modules.
+
+A successful Batch 18 should strengthen the conservation relation:
+
+hosted Morphic
+=
+deterministic fake Morphic
+=
+real RISC-V Morphic under active Sv39 with page-granular kernel W^X permission domains
+
+for the canonical observable payload.
+
+
+CANONICAL BATCH 17 MERGED BASELINE
+
+The merged Batch 17 main revision is:
+
+4f469dc1e5cc0587a2ebf94694d24f4cf7a38900
+
+The Batch 17 PR head was:
+
+ede082b94594314b58a6de71b3171a5726f34b95
+
+At plan-authoring time, GitHub validation for the Batch 17 PR head completed successfully and the PR reported successful two-run real-QEMU Batch 16/17 evidence.
+
+Do not invent an independent maintainer reproduction unless such evidence is actually present in the supplied checkout or explicitly provided by the maintainer.
+
+If the maintainer has created immutable Batch 16 or Batch 17 tags by the time this task runs, preserve them exactly.
+Do not move, delete, recreate, retarget, or repurpose historical evidence tags.
+Do not create a new milestone tag unless explicitly requested by the maintainer.
+
+
+FIRST EXECUTABLE GATE
+
+Before implementing Batch 18, prove the supplied checkout's current machine truth.
+
+Resolve repository root and current HEAD.
+Read AGENTS.md and COMMANDS.md first.
+Use the repository's canonical Python environment/bootstrap if required.
+
+Run at minimum:
+
+python3 tools/verify-freestanding-riscv64-active-sv39.py --self-test
+python3 tools/verify-freestanding-riscv64-active-sv39.py
+
+The real Batch 17 QEMU proof is mandatory.
+
+Batch 18 begins only if the current checkout genuinely proves:
+
+- the Batch 16 linker-owned eight-page pool;
+- Batch 16 Bare direct-access phase;
+- real owned frame allocation/release/accounting;
+- real page-table frames from that owned pool;
+- actual satp MODE=Sv39 with the owned root PPN;
+- the Batch 17 non-identity translated alias;
+- continued code/stack/global execution after activation;
+- Batch 12–16 preservation;
+- exact canonical Morphic equality.
+
+Do not weaken, skip, replace, or reinterpret this gate.
+If QEMU/readelf/another required executable is unavailable, report that truth and do not claim the real-machine gate passed.
+
+
+WHY PERMISSION DOMAINS ARE NEXT
+
+The Batch 17 report explicitly identified the next pressure as an reviewed code/rodata/data permission split or a bounded kernel/user mapping policy before U-mode.
+
+Choose the smaller and cleaner rung first: harden the existing supervisor address space before introducing privilege-separated user execution.
+
+The long-horizon ladder is approximately:
+
+owned physical frames                         [Batch 16]
+→ active Sv39 kernel continuation             [Batch 17]
+→ page-granular kernel permission domains     [Batch 18]
+→ first bounded U-mode entry/return
+→ syscall trap/return
+→ checked user memory copy/validation
+→ ELF userspace loading
+→ process/file-descriptor/VFS work
+→ Linux userspace contracts
+→ real Alpine userspace
+
+Do not skip directly to U-mode or Linux compatibility in this batch.
+
+
+Z-REF EXECUTION DOCTRINE
+
+Treat the repository as accumulated executable knowledge.
+
+Before broad source reading, use Agent Fast Path / preflight / module contracts / details.json / recipe surfaces to discover:
+
+- exact Batch 17 active-Sv39 implementation;
+- exact current linker section layout;
+- existing linker-visible image/stack/pool symbols;
+- exact Entry.Permissions bit semantics;
+- builder map/protect/unmap behavior;
+- whether Builder.protect is architecturally suitable for a live active page table;
+- walker/provider capabilities for reading actual leaf entries;
+- SFENCE.VMA invalidation planning/execution semantics;
+- current RealPageOwner boundary;
+- exact post-Batch-17 execution path before Morphic;
+- current generated/recipe metadata truth;
+- all focused validation commands.
+
+Construct a compact Task Projection before implementation and record it in:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_18.md
+
+At minimum record:
+
+requested capability
+canonical Batch 17 gate
+reused modules
+linker permission domains
+page-alignment policy
+live page-table mutation policy
+text permissions
+rodata permissions
+writable-state permissions
+alias permissions
+U-bit policy
+A/D-bit policy
+W^X invariant
+satp preservation
+SFENCE.VMA policy
+positive post-hardening probes
+raw leaf evidence strategy
+failure behavior
+unknowns
+non-claims
+minimum trustworthy read set
+focused validators
+preservation validators
+success evidence
+Snowball Yield
+One-Sentence Preventables
+
+Do not create a new reusable module merely because this is a new batch.
+If a genuine reusable correctness gap is found in the existing Sv39 builder/protection surface, repair the smallest canonical layer and add focused regression evidence rather than routing around it with duplicate page-table logic.
+
+
+LINKER PAGE-DOMAIN RULE
+
+Strict per-page permissions require strict per-page ownership of section meaning.
+
+The current Batch 17 image begins at 0x80200000 and maps the page-rounded continuation span, but the linker script does not yet establish page-separated text/rodata/writable domains.
+
+Do not pretend a page is both read-only and writable merely because two ELF sections happen to share it.
+Do not label a mixed text/data page RX or RW and call the split complete.
+
+Preferred design:
+
+- extend the existing freestanding linker script with explicit page-aligned permission-domain boundaries;
+- preserve __image_begin and __image_end truth;
+- expose repository-consistent symbols for the text, rodata, and writable domains;
+- align transitions between permission classes to 4096 bytes;
+- avoid gratuitous holes beyond the page padding required to make permissions truthful;
+- keep the existing 64 KiB stack and linker-owned physical page pool inside the writable/non-executable supervisor domain;
+- let ELF symbols remain the canonical source of ranges;
+- do not duplicate hard-coded section addresses in Zig or Python.
+
+A strong shape is conceptually:
+
+[image begin]
+[text domain: entry + trap + all executable text]      RX, U=0
+[page boundary]
+[rodata domain]                                        R,  U=0
+[page boundary]
+[data + BSS + active stack + owned page pool]          RW, U=0
+[image end]
+
+Exact symbol names should follow repository conventions and must be mechanically inspected from the ELF by the verifier.
+
+If a section is empty, preserve truthful page-domain arithmetic rather than inventing fake content.
+
+ONE-SENTENCE PREVENTABLE:
+
+A permission split is not real if ELF sections with incompatible permissions still share the same hardware page.
+
+
+PERMISSION POLICY
+
+Use the existing Sv39 Entry.Permissions semantics.
+
+For the final Batch 18 active address space, require at minimum:
+
+TEXT DOMAIN
+- valid leaf
+- supervisor-only: U=0
+- R=1
+- W=0
+- X=1
+- A=1
+- D=0 unless a mechanically justified existing policy requires otherwise
+
+RODATA DOMAIN
+- valid leaf
+- supervisor-only: U=0
+- R=1
+- W=0
+- X=0
+- A=1
+- D=0
+
+WRITABLE KERNEL DOMAIN
+(data, BSS, stack, owned pool, page-table pages through their identity mappings)
+- valid leaf
+- supervisor-only: U=0
+- R=1
+- W=1
+- X=0
+- A=1
+- D=1
+
+NON-IDENTITY ALIAS
+- supervisor-only: U=0
+- R=1
+- W=1
+- X=0
+- A=1
+- D=1
+
+Do not add executable writable pages merely to make the proof easier.
+Do not set U=1 anywhere in the kernel continuation address space.
+Do not claim W^X from labels; prove it from the actual leaf PTE bits represented by real page-table memory.
+
+Global-bit policy should remain whatever the current bounded design truth requires; do not invent an ASID/global mapping architecture in this batch.
+
+
+PRESERVE BATCH 17 AS A HISTORICAL PHASE
+
+Batch 17's evidence has already earned a specific meaning: first active Sv39 continuation using the temporary bounded RWX policy and translated alias.
+
+Do not silently rewrite Batch 17 evidence to mean the Batch 18 hardened policy.
+
+Preferred implementation sequence:
+
+Batch 12–16 proofs
+→ Batch 17 constructs/activates its address space and emits its existing evidence
+→ ZIGREF_SV39_ACTIVE_RETURNED
+→ Batch 18 tightens the already-active mappings in place
+→ required SFENCE.VMA boundary
+→ Batch 18 positive continuation probes
+→ Batch 18 evidence frame
+→ Morphic executes under hardened permissions
+
+The existing Batch 17 verifier should remain capable of passing the Batch 18 machine output because its historical frame and translated-alias semantics still occur before Morphic.
+
+Do not edit the Batch 17 verifier merely to hide a regression.
+If a legitimate linker alignment change shifts addresses or counts, the existing verifier must continue deriving those values from ELF/runtime truth rather than relying on historical numeric addresses.
+
+
+LIVE PAGE-TABLE MUTATION SAFETY
+
+This is a critical design review point.
+
+Do not casually unmap the currently executing code page and assume stale TLB state will save execution.
+
+Inspect the existing Builder.protect implementation and its documented mutation/invalidation semantics.
+
+If it updates a live leaf in a way that creates an architecturally unsafe transient invalid mapping, do NOT rely on that behavior for active kernel permission hardening merely because QEMU happens to survive it.
+
+Preferred outcomes, in order:
+
+1. If the existing canonical operation already performs a safe direct leaf-permission replacement and returns the correct invalidation plan, reuse it unchanged.
+
+2. If the current operation is not suitable for live active mappings, make the smallest reusable canonical repair or extension so an existing valid leaf can have permissions replaced without changing its physical target and without a transient unmap. Add focused tests that prove:
+   - physical address preserved;
+   - level preserved;
+   - only legal permission bits changed;
+   - malformed/missing mapping rejected;
+   - failure atomicity;
+   - returned invalidation plan is correct.
+
+Do not add an Alpz-only hand-encoded PTE mutation if the generic builder is the correct reusable layer.
+Do not weaken builder rollback/error semantics.
+
+After all intended leaf mutations are complete, execute an architecturally appropriate SFENCE.VMA boundary using the existing invalidation module.
+For this bounded single-address-space/single-hart proof, a single global fence after the complete mutation set is acceptable if current RISC-V contract truth supports it.
+
+Record exactly what was done.
+
+
+ACTUAL LEAF EVIDENCE
+
+Batch 18 must prove actual installed permissions, not merely print labels such as text=RX.
+
+Add a bounded way to inspect the real page-table leaf entries after the permission transition.
+
+Prefer reusing the real provider/walker/entry machinery already present.
+
+For every installed 4 KiB leaf in the bounded Batch 18 address space, emit or otherwise expose enough raw evidence for the verifier to independently determine:
+
+- virtual page address;
+- resolved physical page address;
+- raw leaf PTE value or equivalently complete raw permission bits tied to the actual provider entry;
+- leaf level;
+- domain classification only as auxiliary evidence, never as the source of truth.
+
+The verifier must independently decode the raw bits.
+
+The bounded image is small, so emitting one compact row per installed leaf is acceptable.
+No unbounded page-table dump.
+No general-purpose debugger is required.
+
+The verifier must prove from those raw rows:
+
+- exact identity coverage of every ELF-derived text/rodata/writable page;
+- exact alias leaf;
+- no unexpected extra leaf in the declared bounded address-space proof;
+- all identity physical targets equal their virtual page addresses;
+- alias physical target is the owned alias data frame and differs from alias VA;
+- no duplicate virtual leaf;
+- no overlapping or missing page in declared ranges;
+- every leaf is 4 KiB level;
+- all U bits are zero;
+- text leaves are RX and not W;
+- rodata leaves are R only and not W/X;
+- writable leaves are RW and not X;
+- alias is RW and not X;
+- no W+X leaf exists anywhere;
+- PPN/address encoding is correct;
+- A/D policy matches the declared domain policy.
+
+Do not trust a machine-emitted wx_leaf_count=0 without independently recomputing it.
+
+
+POSITIVE POST-HARDENING MACHINE PROBES
+
+Batch 18 does not need to introduce page-fault recovery merely to prove permissions.
+
+Do not deliberately write rodata or execute writable data unless a safe bounded page-fault observation path already exists and using it does not broaden the batch.
+
+Instead, after hardening and after the SFENCE.VMA boundary, perform positive operations that require each intended allowed permission class to remain usable:
+
+- execute ordinary code from the hardened text domain;
+- read a deterministic constant known to reside in the rodata domain;
+- mutate/read a writable global or BSS datum;
+- mutate/read a stack-local value;
+- write/read the existing translated alias;
+- read the alias target through its writable identity mapping;
+- read satp and prove it remains MODE=Sv39 with the same owned root;
+- continue evidence output;
+- run the canonical Morphic workload;
+- terminate normally.
+
+These probes prove the hardened mapping remains operational.
+The raw real PTE evidence proves the denied permission bits are absent.
+
+Do not claim page-fault handling, fault recovery, or adversarial memory isolation in this batch.
+
+
+BATCH 18 EVIDENCE FRAME
+
+Add a distinct bounded frame; do not mutate the meaning of Batch 17 framing.
+
+Suggested framing:
+
+ZIGREF_SV39_PERMISSIONS_BEGIN
+...
+ZIGREF_SV39_PERMISSIONS_END
+ZIGREF_SV39_PERMISSIONS_RETURNED
+
+Exact field names may follow repository conventions.
+
+Expose enough raw evidence for independent recomputation, including at minimum:
+
+- page size;
+- raw satp before and after permission tightening;
+- root physical address/root PPN;
+- ELF-derived text begin/end;
+- ELF-derived rodata begin/end;
+- ELF-derived writable begin/end;
+- alias VA and physical target;
+- total leaf count;
+- one compact row for every installed leaf with VA, PA, raw PTE, and level;
+- declared mutation count;
+- SFENCE.VMA execution marker;
+- post-hardening code-executed marker;
+- rodata read value;
+- stack probe result;
+- writable-global probe result;
+- alias/identity sentinel result;
+- post-hardening satp raw value;
+- post-hardening Morphic-order marker;
+- completion/return marker.
+
+Optional summary fields such as wx_leaf_count or user_leaf_count are useful only if the verifier independently recomputes them from raw rows.
+
+Keep telemetry deterministic and fixed-capacity.
+No heap allocation.
+
+
+FOCUSED BATCH 18 VERIFIER
+
+Add one canonical verifier consistent with the existing sequence, preferably:
+
+tools/verify-freestanding-riscv64-sv39-permissions.py
+
+It must support:
+
+--self-test
+
+and real execution mode.
+
+The self-test must be rejection-oriented.
+
+At minimum reject malformed or contradictory evidence for:
+
+- missing/duplicate Batch 18 frame;
+- missing/duplicate return marker;
+- wrong proof ordering relative to Batch 17 and Morphic;
+- malformed fixed-width values;
+- satp not Sv39;
+- root mismatch from Batch 17;
+- text/rodata/writable linker ranges not page aligned;
+- incompatible domains sharing a page;
+- gaps or overlaps in declared domain coverage;
+- missing leaf;
+- duplicate leaf;
+- unexpected extra leaf;
+- non-4-KiB leaf;
+- wrong identity target;
+- alias becoming identity;
+- alias target outside owned pool or colliding with page-table ownership;
+- invalid PTE encoding;
+- W without R;
+- U bit set on any kernel leaf;
+- text W bit set;
+- text X bit missing;
+- rodata W or X bit set;
+- writable-domain X bit set;
+- alias X bit set;
+- any W+X leaf;
+- A/D policy contradiction;
+- mutation/fence evidence missing;
+- post-hardening code/rodata/stack/global/alias probe contradiction;
+- satp root or mode changing unexpectedly;
+- Batch 12–17 preservation loss;
+- Morphic payload drift.
+
+Real mode must:
+
+1. Build the current freestanding RISC-V artifact.
+2. Inspect ELF identity and all permission-domain linker symbols.
+3. Prove the section-domain boundaries are page aligned and mutually coherent.
+4. Derive the exact expected page set for text, rodata, and writable kernel state from ELF symbols.
+5. Run at least two bounded real qemu-system-riscv64 machines with finite timeout.
+6. Parse Batch 18 raw leaf rows.
+7. Independently decode raw Sv39 PTE bits rather than trusting textual permission labels.
+8. Recompute every VA→PA and domain permission relation.
+9. Prove all U bits are zero and W+X count is mechanically zero.
+10. Prove satp remains active Sv39 with the same owned root across hardening.
+11. Prove SFENCE.VMA occurs after permission mutation and before post-hardening probes.
+12. Prove positive code/rodata/stack/global/alias probes occurred after hardening.
+13. Reuse Batch 12–17 parsers/verifiers where practical rather than duplicating old semantics.
+14. Preserve exact hosted/fake/two-machine Morphic equality.
+15. Fail nonzero on timeout, malformed, duplicate, missing, stale, contradictory, wrong-permission, or out-of-order evidence.
+16. End through Developer Minimus.
+
+The verifier should derive current addresses from the ELF and machine evidence, not historical Batch 17 numeric addresses.
+
+
+PRESERVE PREVIOUS MACHINE PROOFS
+
+Batch 18 must mechanically preserve established machine milestones.
+
+At minimum preserve:
+
+Batch 12
+real synchronous breakpoint trap and sret return
+
+Batch 13
+real one-shot supervisor timer interrupt and explicit neutralization
+
+Batch 14
+four real monotonic supervisor timer ticks, three re-arms, final neutralization, four returns, no extra delivery
+
+Batch 15
+real rdtime observations consumed by the existing deterministic scheduler after sret
+
+Batch 16
+real linker-owned physical memory, allocator behavior, Bare direct-access phase
+
+Batch 17
+real owned page tables, satp MODE=Sv39, owned root, SFENCE.VMA, non-identity alias, post-switch continuation
+
+Batch 18
+page-aligned supervisor-only permission domains with mechanically zero W+X leaves and continued execution
+
+Morphic
+exact canonical hosted/fake/two-real-machine equality, currently 765 bytes unless repository truth has deliberately changed before execution; if it changed legitimately, establish the new baseline mechanically rather than weakening equality.
+
+The final Morphic execution must occur after the Batch 18 hardened-permission return marker while Sv39 remains active.
+
+
+FOCUSED VALIDATION
+
+Run all focused tests for any reusable modules touched or consumed by the implementation.
+
+At minimum include current canonical test/smoke surfaces for:
+
+riscv-sv39-page-table-entry
+riscv-sv39-virtual-address-indexing
+riscv-page-table-page-owner
+riscv-sv39-page-table-walker
+riscv-sfence-vma-invalidation
+riscv-sv39-page-table-builder
+physical-memory-region-set
+physical-page-frame-allocator
+construct-and-verify-sv39-address-space recipe
+run-hosted-morphic-runtime recipe where applicable
+
+If Builder.protect or a related canonical operation is repaired/extended for safe live permission replacement, its focused tests must include explicit regression coverage for that new truth.
+
+Then run the Batch 17 self-test/real lab and the Batch 18 self-test/real lab on the final implementation.
+
+
+DOCUMENTATION / REPOSITORY TRUTH
+
+Update COMMANDS.md with:
+
+python3 tools/verify-freestanding-riscv64-sv39-permissions.py --self-test
+python3 tools/verify-freestanding-riscv64-sv39-permissions.py
+
+Add:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_18.md
+
+Record:
+
+- exact starting commit;
+- first executable gate result;
+- Task Projection;
+- linker domain symbols and alignment policy;
+- final permission policy;
+- whether a reusable builder/protection repair was required;
+- exact raw PTE evidence strategy;
+- satp/fence behavior;
+- two-run real-QEMU evidence;
+- preservation matrix;
+- Snowball Yield;
+- One-Sentence Preventables;
+- explicit non-claims;
+- next smallest pressure.
+
+Correct generated/recipe metadata through canonical repository tooling.
+
+Also clean any now-stale Batch 17 forward-looking metadata that still describes active Sv39 as merely future work, but do not rewrite historical reports or milestone evidence to pretend Batch 17 had Batch 18 semantics.
+
+Where recipe metadata mentions riscv-page-table-page-owner, make the distinction truthful between reusable hosted/semantic owner precedent and the actual freestanding RealPageOwner machine provider. Do not falsely claim the generic hosted owner directly owns real Batch 18 page-table frames.
+
+Do not hand-edit generated artifacts when the repository provides a canonical generator.
+
+
+ONE-SENTENCE PREVENTABLES TO RECORD
+
+At minimum consider these if the implementation confirms them:
+
+1. A permission split is not real if incompatible ELF sections still share one hardware page.
+
+2. W^X is a property of installed leaf PTE bits, not of section names or documentation labels.
+
+3. Do not transiently unmap the page currently executing merely because stale TLB state might let QEMU survive.
+
+4. Changing live PTE permissions is incomplete until the required translation invalidation boundary has executed.
+
+5. A supervisor-only kernel map must prove U=0 on every installed kernel leaf, not merely omit user-mode tests.
+
+
+SNOWBALL YIELD
+
+Measure factual reuse rather than making grand benchmark claims.
+
+Record at minimum:
+
+- reusable modules directly reused;
+- existing recipe knowledge reused;
+- reusable module changes, if any;
+- target-specific lines added for linker/permission integration;
+- verifier lines added;
+- generated/documentation-only changes;
+- how much of the final behavior came from existing Entry/Builder/Walker/SFENCE/allocator contracts;
+- whether any old verifier required semantic modification;
+- number of real QEMU executions;
+- Morphic semantic changes, expected zero;
+- any quantities genuinely unavailable.
+
+A strong Batch 18 Snowball result would be:
+
+"The machine acquired materially stronger memory-protection semantics primarily by recomposing existing Sv39 machinery and refining linker truth, rather than by inventing another page-table subsystem."
+
+
+DO NOT BUILD THESE YET
+
+Do not implement:
+
+U-mode entry
+user page tables
+user-accessible PTEs
+per-process address spaces
+ASID allocator
+page-fault recovery policy
+demand paging
+copy-on-write
+user copy helpers
+syscalls
+ELF userspace loading
+fork/clone/execve
+Linux mmap/brk
+POSIX memory APIs
+general VMM policy
+higher-half kernel relocation
+DTB RAM discovery
+buddy/slab allocation
+SMP TLB shootdown
+VirtIO
+filesystems
+networking
+musl
+BusyBox
+Alpine /init
+
+Those are later pressures.
+
+
+PUBLICATION / COMPLETION CONTRACT
+
+Complete implementation, validation, documentation, generated truth, and evidence in the supplied checkout.
+
+Create normal commits with descriptive messages.
+Leave the branch clean except for intentionally ignored/local test artifacts.
+
+If an origin remote and publication capability are available:
+
+- publish the implementation branch;
+- create or update a mergeable PR against main;
+- report the exact PR head SHA;
+- ensure required CI is green or truthfully report any pending/failing check.
+
+If publication capability is genuinely unavailable:
+
+- do not claim publication;
+- document the exact limitation;
+- leave complete committed PR-ready work and exact handoff instructions.
+
+Never claim PASS from prose alone.
+
+Batch 18 is complete only when the repository mechanically proves:
+
+Batch 17 active Sv39 truth
++
+page-aligned ELF permission domains
++
+actual installed raw leaf PTEs
++
+TEXT = supervisor RX
++
+RODATA = supervisor R/NX
++
+WRITABLE KERNEL = supervisor RW/NX
++
+ALIAS = supervisor RW/NX
++
+U=0 on every kernel leaf
++
+W+X=0 on every installed leaf
++
+translation invalidation executed
++
+post-hardening code/rodata/stack/global/alias continuation
++
+Sv39 remained active with the same owned root
++
+Morphic executed afterward unchanged
++
+Batch 12–17 remained mechanically preserved
++
+aggregate repository validation passed.
+
+Do not stop at analysis.
+Do not stop after writing a report.
+Do not claim green without running the required executable proof surfaces.
+Do not create or move milestone tags unless explicitly requested by the maintainer.
