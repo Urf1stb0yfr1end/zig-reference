@@ -298,3 +298,10 @@ Free-text `python3 tools/query-reference.py agent diagnose TERM` remains bounded
 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/test-invariant-diagnosis.py` | Validate capsule fixtures, known/unknown/invalid behavior, and byte-repeatability. |
 
 The canonical capsule schema is `schemas/failure-state-capsule.schema.json`. Batch 08 pressure-tested temporal progression, declared resource bounds, and bounded trace capacity without adding a module or recipe; Agent Fast Path remains 53 contracted / 53 full / 0 partial.
+
+## Bounded monotonic supervisor tick commands (Batch 14)
+
+- `python3 tools/verify-freestanding-riscv64-supervisor-ticks.py --self-test` checks repeated-tick framing, exact count/return reconciliation, cause classification, strict monotonic time, deadline chaining, non-final re-arm, final neutralization, ELF-bound, and failure-path parsing without QEMU.
+- `python3 tools/verify-freestanding-riscv64-supervisor-ticks.py` is the canonical Batch 14 execution lab. It builds and inspects the current freestanding RISC-V ELF, preserves the Batch 12 breakpoint and Batch 13 one-shot proofs, runs two bounded real `qemu-system-riscv64` machines, requires exactly four cause-5 supervisor timer deliveries and four post-`sret` returns per run, verifies fresh-observed-time-plus-100000 re-arming and final STIE-mask/maximum-deadline neutralization with no extra tick, compares the unchanged Morphic bytes with native hosted/fake paths, and appends one Developer Minimus handoff. It requires `qemu-system-riscv64` and `readelf` and remains outside ordinary repository validation.
+
+Batch 14 executed the complete Batch 10–14 lab matrix with QEMU 8.2.2/OpenSBI 1.3. The repeated-tick lab delivered four strictly monotonic asynchronous supervisor timer ticks in each of two real machines, explicitly re-armed all three non-final deliveries, neutralized the fourth, returned through `sret` four times, observed no fifth delivery, and preserved the 765-byte canonical Morphic artifact. Ordinary repository validation remains independent of QEMU.
