@@ -306,6 +306,49 @@ Examples include rediscovering:
 
 The long-term objective is to make the Rediscovery Tax approach zero for settled facts.
 
+## One-Sentence Preventable
+
+An expensive agent mistake, search, repair loop, or rediscovery episode that could have been prevented by surfacing one small, already-known fact before the decisive action was taken.
+
+The name is deliberately literal: the preventing fact should usually be compact enough to state in one sentence, even when failing to surface it can waste large amounts of tokens, tool calls, compilation, source archaeology, or wall-clock time.
+
+Examples include:
+
+```text
+This borrow becomes invalid after grow().
+This command must use the repository-managed Python environment.
+This operation mutates state before returning the error.
+This component is hosted-only.
+This handle is invalid after remove().
+```
+
+A One-Sentence Preventable is not merely an agent error. If the repository possessed the decisive fact and could have exposed it cheaply at the decision point, the wasted work is also an interface defect.
+
+The desired response is therefore not only to repair the immediate task, but to preserve and surface the preventing fact through the canonical contract, Agent Brief, preflight, diagnostic, or other smallest appropriate decision surface.
+
+One-Sentence Preventables are a concrete source of Rediscovery Tax and poor Context Efficiency. The project should drive their recurrence toward zero for settled facts.
+
+Plural: **One-Sentence Preventables**.
+
+## Silent-Failure Cascade
+
+Compounding agent work caused when an important operation fails, degrades, falls back, or does not perform the requested effect while presenting a state that is easy to interpret as success.
+
+A Silent-Failure Cascade is especially expensive for agents because later reasoning may be internally consistent while resting on a false earlier assumption.
+
+Typical shape:
+
+```text
+important operation does not achieve requested effect
+→ failure or fallback is not made decisive
+→ agent assumes success
+→ later changes build on false state
+→ symptoms appear far from the original cause
+→ debugging cost multiplies
+```
+
+The preferred design is to fail early and specifically, preserve causal state, and expose the smallest useful diagnostic or repair path. When compatibility requires a conventional outward error surface, richer internal causality may still be retained for diagnostics and validation.
+
 ## Reimplementation Tax
 
 The work lost when an agent recreates a mechanism that already exists because the repository failed to make the existing mechanism discoverable or obviously reusable.
