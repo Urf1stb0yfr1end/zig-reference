@@ -32,6 +32,21 @@ var timer_sstatus: usize = 0;
 export var timer_trap_count: usize = 0;
 var timer_policy_complete: bool = false;
 
+const expected_tick_count: usize = 4;
+const tick_interval: usize = 100_000;
+var ticks_active: bool = false;
+var ticks_final_neutralized: bool = false;
+var tick_sepc: [expected_tick_count]usize = [_]usize{0} ** expected_tick_count;
+var tick_scause: [expected_tick_count]usize = [_]usize{0} ** expected_tick_count;
+var tick_sstatus: [expected_tick_count]usize = [_]usize{0} ** expected_tick_count;
+var tick_observed_time: [expected_tick_count]usize = [_]usize{0} ** expected_tick_count;
+var tick_deadline: [expected_tick_count]usize = [_]usize{0} ** expected_tick_count;
+var tick_next_deadline: [expected_tick_count]usize = [_]usize{0} ** expected_tick_count;
+var tick_rearmed: [expected_tick_count]bool = [_]bool{false} ** expected_tick_count;
+var active_tick_deadline: usize = 0;
+export var tick_trap_count: usize = 0;
+export var tick_return_count: usize = 0;
+
 export fn supervisorTrapEntry() linksection(".text.trap") callconv(.naked) void {
     asm volatile (
         \\addi sp, sp, -288
@@ -120,6 +135,47 @@ export fn recordTrap(frame: *TrapFrame) callconv(.c) void {
     const interrupt = frame.scause >> 63;
     const cause = frame.scause & 0x7fff_ffff_ffff_ffff;
     if (interrupt == 1 and cause == 5) {
+        if (ticks_final_neutralized) {
+            // Preserve an undeclared post-final delivery as failing evidence.
+            tick_trap_count += 1;
+            asm volatile ("li t0, 32; csrc sie, t0" ::: "t0", "memory");
+            _ = sbiCall(0, 0, std.math.maxInt(usize), 0);
+            return;
+        }
+        if (ticks_active) {
+            const index = tick_trap_count;
+            if (index >= expected_tick_count) {
+                ticks_active = false;
+                asm volatile ("li t0, 32; csrc sie, t0" ::: "t0", "memory");
+                _ = sbiCall(0, 0, std.math.maxInt(usize), 0);
+                return;
+            }
+            const now = asm volatile ("rdtime %[value]"
+                : [value] "=r" (-> usize),
+            );
+            tick_sepc[index] = frame.sepc;
+            tick_scause[index] = frame.scause;
+            tick_sstatus[index] = frame.sstatus;
+            tick_observed_time[index] = now;
+            tick_deadline[index] = active_tick_deadline;
+            tick_trap_count = index + 1;
+            if (tick_trap_count < expected_tick_count) {
+                // Re-arm relative to a newly observed counter value. This
+                // avoids an already-late deadline becoming an interrupt loop.
+                const next = now +% tick_interval;
+                active_tick_deadline = next;
+                tick_next_deadline[index] = next;
+                _ = sbiCall(0, 0, next, 0);
+                tick_rearmed[index] = true;
+            } else {
+                ticks_active = false;
+                asm volatile ("li t0, 32; csrc sie, t0" ::: "t0", "memory");
+                _ = sbiCall(0, 0, std.math.maxInt(usize), 0);
+                tick_next_deadline[index] = std.math.maxInt(usize);
+                ticks_final_neutralized = true;
+            }
+            return;
+        }
         timer_sepc = frame.sepc;
         timer_scause = frame.scause;
         timer_sstatus = frame.sstatus;
@@ -212,6 +268,49 @@ comptime {
 }
 
 extern fn timerProbe() callconv(.c) usize;
+
+comptime {
+    asm (
+        \\.global ticksProbe
+        \\.global ticksWaitBegin
+        \\.global ticksWaitEnd
+        \\.type ticksProbe,@function
+        \\ticksProbe:
+        \\mv t3, sp
+        \\li t0, 0x789ab
+        \\li t1, 0x89abc
+        \\li a0, 0x9abcd
+        \\li t2, 32
+        \\csrs sie, t2
+        \\csrsi sstatus, 2
+        \\ticksWaitBegin:
+        \\wfi
+        \\la t4, tick_trap_count
+        \\ld t4, 0(t4)
+        \\la t5, tick_return_count
+        \\ld t6, 0(t5)
+        \\bgeu t6, t4, ticksWaitBegin
+        \\addi t6, t6, 1
+        \\sd t6, 0(t5)
+        \\li t2, 4
+        \\bltu t6, t2, ticksWaitBegin
+        \\ticksWaitEnd:
+        \\csrci sstatus, 2
+        \\li t2, 0x789ab
+        \\bne t0, t2, 1f
+        \\li t2, 0x89abc
+        \\bne t1, t2, 1f
+        \\li t2, 0x9abcd
+        \\bne a0, t2, 1f
+        \\bne sp, t3, 1f
+        \\li a0, 1
+        \\ret
+        \\1: li a0, 0
+        \\ret
+    );
+}
+
+extern fn ticksProbe() callconv(.c) usize;
 
 export fn _start() linksection(".text.entry") callconv(.naked) noreturn {
     asm volatile (
@@ -315,6 +414,57 @@ export fn freestandingMain() callconv(.c) noreturn {
         shutdown();
     }
     write("ZIGREF_TIMER_RETURNED\n");
+    const ticks_now = asm volatile ("rdtime %[value]"
+        : [value] "=r" (-> usize),
+    );
+    active_tick_deadline = ticks_now +% tick_interval;
+    ticks_active = true;
+    _ = sbiCall(0, 0, active_tick_deadline, 0);
+    const ticks_registers_preserved = ticksProbe() == 1;
+    // Global SIE is now masked by ticksProbe. Any undeclared extra delivery
+    // before this frame would still have incremented tick_trap_count.
+    write("ZIGREF_TICKS_BEGIN\nexpected=");
+    write(if (expected_tick_count == 4) "4" else "INVALID");
+    write("\ncount=");
+    write(if (tick_trap_count == expected_tick_count) "4" else "INVALID");
+    write("\nreturns=");
+    write(if (tick_return_count == expected_tick_count) "4" else "INVALID");
+    write("\npolicy=observed-time-plus-bounded-interval\ninterval=");
+    writeUsizeHex(tick_interval);
+    write("\nregisters=");
+    write(if (ticks_registers_preserved) "PASS" else "FAIL");
+    write("\nstack=");
+    write(if (ticks_registers_preserved) "PASS" else "FAIL");
+    write("\nfinal_neutralized=");
+    write(if (ticks_final_neutralized) "PASS" else "FAIL");
+    for (0..expected_tick_count) |index| {
+        write("\ntick=");
+        writeUsizeHex(index);
+        write(",cause=");
+        writeUsizeHex(tick_scause[index] & 0x7fff_ffff_ffff_ffff);
+        write(",interrupt=");
+        write(if (tick_scause[index] >> 63 == 1) "1" else "0");
+        write(",sepc=");
+        writeUsizeHex(tick_sepc[index]);
+        write(",time=");
+        writeUsizeHex(tick_observed_time[index]);
+        write(",deadline=");
+        writeUsizeHex(tick_deadline[index]);
+        write(",next_deadline=");
+        writeUsizeHex(tick_next_deadline[index]);
+        write(",rearmed=");
+        write(if (tick_rearmed[index]) "1" else "0");
+        write(",sstatus=");
+        writeUsizeHex(tick_sstatus[index]);
+    }
+    write("\nZIGREF_TICKS_END\n");
+    if (tick_trap_count != expected_tick_count or tick_return_count != expected_tick_count or
+        !ticks_final_neutralized or !ticks_registers_preserved)
+    {
+        write("ZIGREF_TICKS_FAILURE\n");
+        shutdown();
+    }
+    write("ZIGREF_TICKS_RETURNED\n");
     var output: [128]u8 = undefined;
     var trace: [2048]u8 = undefined;
     const result = morphic.runFake(&output, &trace) catch {
