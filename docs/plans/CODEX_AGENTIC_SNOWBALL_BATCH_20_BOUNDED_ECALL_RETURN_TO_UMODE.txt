@@ -1,0 +1,1221 @@
+CODEX AGENTIC SNOWBALL — BATCH 20
+BOUNDED ECALL SERVICE RETURN TO U-MODE
+
+Repository:
+thanks-cohn/zig-reference
+
+Plan path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_20_BOUNDED_ECALL_RETURN_TO_UMODE.txt
+
+
+MISSION
+
+Advance the sealed Batch 19 RISC-V machine boundary by exactly one architectural pressure:
+
+prove one bounded U-mode ECALL that enters S-mode on the trusted supervisor trap stack, performs one fixed register-only supervisor service, deliberately returns to U-mode through SRET at an independently derived continuation PC, proves that user execution really resumed and observed the supervisor-produced return value, then executes one second terminal U-mode ECALL that returns deliberately to the known supervisor continuation.
+
+This batch is the first proof of:
+
+U-mode
+→ ECALL
+→ trusted S-mode trap handling
+→ supervisor changes a user return register
+→ SRET back to U-mode
+→ user instructions execute after the return
+→ second bounded U-mode ECALL
+→ known S-mode continuation
+
+Do not turn this into Linux syscall work.
+
+Do not build a syscall table.
+
+Do not add Linux syscall numbers.
+
+Do not add user pointers or copy helpers.
+
+Do not add processes, ELF userspace loading, VFS, file descriptors, mmap, brk, signals, futexes, or Alpine work.
+
+The Batch 20 service exists only to prove the trap/return machinery.
+
+
+SEALED BASELINE
+
+The immutable Batch 19 milestone is:
+
+morphic-riscv-first-bounded-umode-round-trip
+
+which peels to:
+
+25d41ceb967844b527ba1c59a0425ce5765e95af
+
+That revision was independently reproduced locally before tagging with:
+
+- Zig 0.14.0;
+- qemu-system-riscv64 11.0.3;
+- Python 3.14.6;
+- Git 2.55.0;
+- Batch 18 permission preservation PASS;
+- Batch 19 rejection self-test PASS;
+- two real Batch 19 QEMU machines PASS;
+- exact final leaf set with 35 leaves;
+- exactly two U=1 leaves;
+- W+X=0;
+- owned Sv39 root 0x80218000 in that reproduced image;
+- ELF-derived copied ECALL sepc;
+- observed stvec and sscratch restoration;
+- exact 765-byte Morphic equality;
+- 53 contracted / 53 full / 0 partial agent-readable modules;
+- canonical repository validation 322/322 build steps and 207/207 tests.
+
+Treat the milestone tag and its peeled revision as historical evidence.
+
+Do not move, recreate, or rewrite that tag.
+
+The planning commit containing this file is allowed to be newer than the sealed Batch 19 revision. The implementation must preserve the Batch 19 behavior and verifier on the final Batch 20 machine output.
+
+
+BOOTSTRAP BEFORE SOURCE ARCHAEOLOGY
+
+Read AGENTS.md and COMMANDS.md first.
+
+Then run the canonical zero-context bootstrap:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+
+Use the repository fast path before broad source reading.
+
+At minimum query/preflight the existing capabilities around:
+
+- physical-memory-region-set;
+- physical-page-frame-allocator;
+- riscv-sv39-page-table-entry;
+- riscv-sv39-virtual-address-indexing;
+- riscv-page-table-page-owner;
+- riscv-sv39-page-table-walker;
+- riscv-sfence-vma-invalidation;
+- riscv-sv39-page-table-builder;
+- bounded deterministic evidence/trace machinery where relevant;
+- run-hosted-morphic-runtime recipe.
+
+Use agent impact before changing a shared foundation.
+
+Use agent diagnostic before inventing a repair for a recognized repository failure.
+
+Do not create a new reusable module merely because Batch 20 needs a few machine-specific lines. Add a canonical module only if the repository queries demonstrate a genuinely reusable missing capability with a stable contract beyond this recipe.
+
+
+EXECUTABLE BASELINE GATES
+
+Before implementing Batch 20, prove the current Batch 19 baseline still works.
+
+Run at minimum:
+
+python3 tools/verify-freestanding-riscv64-sv39-permissions.py --self-test
+python3 tools/verify-freestanding-riscv64-sv39-permissions.py
+
+python3 tools/verify-freestanding-riscv64-umode-round-trip.py --self-test
+python3 tools/verify-freestanding-riscv64-umode-round-trip.py
+
+Do not continue by assuming the old milestone is healthy if these executable gates fail in the current checkout.
+
+Record the exact pre-implementation HEAD and gate results in the Batch 20 report.
+
+
+BATCH 20 NON-NEGOTIABLE RESULT
+
+The final machine must prove all of the following in two independent real QEMU executions:
+
+1. Batch 12–19 evidence still parses and passes.
+2. The existing Batch 19 one-shot U-mode probe remains a distinct historical/current-machine proof.
+3. Batch 20 reuses the existing two user leaves rather than allocating a new user address space.
+4. Batch 20 allocates zero new physical frames.
+5. Batch 20 allocates zero new page-table frames.
+6. Final page-table root remains unchanged.
+7. Final leaf set remains the Batch 19 set: all supervisor leaves plus exactly one U RX code page and exactly one U RW/NX stack page.
+8. Exactly two leaves have U=1.
+9. No leaf is W+X.
+10. A distinct Batch 20 copied user probe executes from the existing U RX code page.
+11. The first Batch 20 ECALL traps synchronously with scause=8, interrupt=0, trapped SPP=0, and an ELF-derived exact sepc.
+12. The first Batch 20 U→S entry swaps from user sp to trusted supervisor-only trap-stack memory before its first memory access.
+13. The first trap records a complete enough user integer context to resume safely.
+14. The supervisor consumes only fixed register arguments; it does not dereference an arbitrary user pointer.
+15. The supervisor produces one deterministic return value in a0.
+16. The saved return PC is changed to the independently ELF-derived post-service user continuation.
+17. The saved privilege state is prepared for U-mode return with SPP=0.
+18. The trap path restores the intended user context, rearms the trusted trap-stack convention, and executes SRET back to U-mode.
+19. User code demonstrably executes after that SRET.
+20. User code validates/observes the supervisor-produced a0 result and records post-return evidence in its own user stack.
+21. A second distinct terminal ECALL executes from U-mode at an independently ELF-derived PC.
+22. The second trap again lands on trusted supervisor-only trap-stack memory before any trap-frame store.
+23. The second trap has scause=8, interrupt=0, trapped SPP=0.
+24. The second trap proves the first service-return happened exactly once and the user post-return checks completed.
+25. The second trap deliberately transfers to the known S-mode continuation rather than returning to U-mode again.
+26. Canonical supervisor stvec is restored afterward.
+27. sscratch is neutralized afterward according to the ordinary supervisor convention.
+28. Actual post-restoration CSR readbacks prove stvec and sscratch state.
+29. satp/root remains unchanged.
+30. The canonical Morphic artifact remains exactly 765 bytes and equal across hosted, fake, and two real QEMU machines.
+31. Aggregate repository validation passes.
+32. Documentation and recipe truth match the implementation.
+33. No Linux ABI or general syscall architecture is falsely claimed.
+
+
+PRESERVE BATCH 19 AS A DISTINCT PROOF
+
+Do not mutate Batch 19 into Batch 20 and then rewrite history.
+
+The final machine should still execute the Batch 19 bounded one-shot proof first and emit:
+
+ZIGREF_UMODE_BEGIN
+...
+ZIGREF_UMODE_END
+ZIGREF_UMODE_RETURNED
+
+with the existing Batch 19 verifier continuing to accept the final machine output.
+
+Prefer leaving the existing Batch 19 verifier unchanged.
+
+Prefer leaving the existing Batch 19 userProbeTemplateBegin / userProbeTemplateEcall / userTrapEntry / enterUser path semantically unchanged.
+
+If a mechanical refactor is truly necessary, it must preserve all observable Batch 19 behavior and the old verifier must remain strict. Do not weaken Batch 19 checks to accommodate Batch 20.
+
+Batch 20 evidence must begin only after Batch 19 has completed.
+
+Batch 20 must complete before the Morphic frame begins.
+
+Suggested ordering:
+
+Batch 12–18 historical/current-machine frames
+→ Batch 19 one-shot U-mode frame + RETURNED
+→ Batch 20 service-return frame + RETURNED
+→ Morphic frame
+
+
+REUSE THE BATCH 19 USER PAGES
+
+Batch 19 already consumes:
+
+- four page-table frames;
+- one translated-alias data frame;
+- one user-code data frame;
+- one user-stack data frame;
+
+from the eight-page bounded physical pool in the current design.
+
+One pool frame remains unconsumed.
+
+Batch 20 must not consume it.
+
+Reuse:
+
+user code VA:
+0x80401000
+
+user stack VA:
+0x80402000
+
+user stack top:
+0x80403000
+
+Reuse the same allocator-owned physical frames created by Batch 19.
+
+Reuse the same PTEs.
+
+Reuse the same four-page page-table hierarchy.
+
+Do not create another user code page.
+
+Do not create another user stack page.
+
+Do not allocate another trap-stack page.
+
+The dedicated supervisor-only trap stack carved in Batch 19 remains the trusted trap stack.
+
+Batch 20 is deliberately a Snowball test: the new privilege behavior should cost machine-boundary code, not another memory subsystem.
+
+
+BATCH 20 PROBE REPOPULATION
+
+After Batch 19 has fully returned to S-mode and emitted ZIGREF_UMODE_RETURNED, repopulate the existing user-code physical frame with a distinct Batch 20 probe template.
+
+Do not change the user-code PTE.
+
+Do not change the user-stack PTE.
+
+Do not change satp.
+
+Do not allocate page tables.
+
+A strong sequence is:
+
+Batch 19 completes
+→ supervisor has ordinary control
+→ clear or deterministically overwrite the existing user-code physical frame through the supervisor-owned identity mapping
+→ copy the Batch 20 template bytes
+→ verify the copied size is bounded below one page
+→ execute local-hart FENCE.I
+→ enter the Batch 20 probe using the already-existing U RX mapping
+
+Because the translations are unchanged, do not emit a new SFENCE.VMA claim merely for ceremony.
+
+If no translation was mutated, Batch 20 should explicitly record:
+
+translation_change=none
+sfence_vma=not-required-no-pte-change
+fence_i=local-hart-executed
+
+If implementation work unexpectedly changes a PTE, then execute and prove the required SFENCE.VMA boundary. Do not claim it was unnecessary if a translation actually changed.
+
+The point is architectural truth, not repeating Batch 19 steps mechanically.
+
+
+DISTINCT BATCH 20 USER TEMPLATE
+
+Create a second ELF-visible copied user template rather than overloading the historical Batch 19 labels.
+
+Suggested symbols:
+
+userServiceProbeTemplateBegin
+userServiceProbeServiceEcall
+userServiceProbeAfterService
+userServiceProbeTerminalEcall
+userServiceProbeFail
+userServiceProbeTemplateEnd
+
+Exact names may follow repository style, but the begin, first ECALL, post-service resume, second ECALL, and end boundaries must be independently derivable from the built ELF.
+
+The copied probe must be position-independent after relocation to 0x80401000.
+
+It must contain no kernel-symbol address references.
+
+It must make no SBI calls.
+
+It must use no libc.
+
+It must use no heap.
+
+It must use no arbitrary user pointer argument.
+
+It must execute no privileged instruction.
+
+It must use no Linux syscall number.
+
+It must not depend on a general syscall selector.
+
+The service semantics are identified by this one fixed probe and the exact first ECALL site, not by a scalable syscall table.
+
+
+FIXED REGISTER-ONLY SERVICE CONTRACT
+
+Use one deliberately tiny register-only service so the batch proves argument capture and a kernel-produced return value without introducing user-memory copying.
+
+Recommended contract:
+
+input a0 = 0x20
+input a1 = 0x19
+
+supervisor result:
+a0 = 0x39
+
+This may simply be bounded addition of the two fixed arguments.
+
+The exact arithmetic is not the milestone. The milestone is that the result is produced in S-mode and is observed by resumed U-mode code.
+
+Do not publish this as a stable syscall ABI.
+
+Do not assign it a Linux syscall number.
+
+Do not create an a7 dispatch table.
+
+Do not call it POSIX.
+
+Do not create a generic registration mechanism.
+
+The handler should recognize the first service operation from the independently known first ECALL PC plus the expected bounded register state.
+
+The second ECALL is a terminal proof signal, not a second service.
+
+
+USER-SIDE PROOF SHAPE
+
+A strong copied template does approximately this:
+
+- establish a bounded user stack reservation, for example 32 bytes;
+- write a pre-service sentinel into its own user stack;
+- establish service inputs a0=0x20 and a1=0x19;
+- establish selected non-result register sentinels;
+- execute the first ECALL at userServiceProbeServiceEcall;
+- resume exactly at userServiceProbeAfterService;
+- require a0 == 0x39;
+- require selected preserved register sentinels still match;
+- write the returned 0x39 into its user stack;
+- write a distinct post-return sentinel into its user stack;
+- establish a terminal register marker;
+- execute the second ECALL at userServiceProbeTerminalEcall;
+- contain a fail-stop path after the terminal ECALL so an accidental second return to U-mode cannot look successful.
+
+Use only relocation-safe local branches/labels.
+
+The verifier must independently derive the copied offsets from the ELF symbols.
+
+Do not trust machine-emitted expected PCs without checking them against ELF truth.
+
+Suggested user stack evidence can occupy fixed slots inside the one already-mapped stack page, for example:
+
+slot 0: pre-service sentinel
+slot 1: supervisor return value copied by user code
+slot 2: post-return sentinel
+
+Exact offsets/values may differ if the implementation has a better bounded layout. Record them explicitly and verify them independently.
+
+
+FIRST ECALL — TRUSTED U→S ENTRY
+
+The Batch 20 service trap path must preserve the core Batch 19 safety rule:
+
+RISC-V does not automatically replace sp on U→S trap.
+
+Therefore the first instruction of the Batch 20 user-origin trap entry must be a register-only trusted-stack exchange equivalent to:
+
+csrrw sp, sscratch, sp
+
+No load.
+No store.
+No stack allocation.
+No C call.
+No global access.
+
+may precede that swap.
+
+Only after the swap may the trap path allocate/write a supervisor TrapFrame.
+
+Keep interrupts disabled across this bounded probe.
+
+Nested traps remain out of scope.
+
+
+COMPLETE ENOUGH USER CONTEXT FOR RETURN
+
+Batch 19 did not need a general return-to-user context because its one ECALL terminated the U-mode probe and transferred to S-mode.
+
+Batch 20 does.
+
+The Batch 20 trap path must save enough integer state to resume the interrupted U-mode execution correctly.
+
+Prefer using the existing 288-byte TrapFrame layout and actually populating the complete integer register state needed by the return path rather than inventing a second incompatible frame shape.
+
+At minimum, mechanically preserve all user integer registers whose values may be live across the trap, with x2/original user sp captured through sscratch after the original scratch register used to read it has itself been safely saved.
+
+A strong implementation saves x1–x31, with x2 reconstructed from sscratch, plus:
+
+- sepc;
+- sstatus;
+- scause;
+- stval.
+
+x0 is architecturally zero.
+
+If some registers are intentionally not stored, justify exactly why they cannot be live and add evidence. Do not rely on C calling conventions to preserve user state across a trap.
+
+This is a privilege-return boundary, not an ordinary function call.
+
+
+FIRST TRAP HANDLER POLICY
+
+For the first Batch 20 ECALL, require mechanically:
+
+- interrupt bit = 0;
+- scause = 8;
+- trapped SPP = 0;
+- trapped sepc equals the ELF-derived copied service ECALL VA;
+- trapped user sp lies inside the existing user stack page;
+- expected fixed service inputs are present;
+- selected register sentinels are present;
+- TrapFrame lies wholly inside the dedicated supervisor-only trap stack;
+- the trap-stack leaf is U=0 RW/NX.
+
+Then perform only the fixed register service:
+
+result = 0x20 + 0x19 = 0x39
+
+Write the service result into the saved user a0 slot in the trusted TrapFrame.
+
+Do not write through a user pointer.
+
+Do not set SUM.
+
+Do not access user virtual memory from S-mode as part of the service.
+
+
+ELF-DERIVED RETURN PC
+
+Do not return to U-mode by blindly doing sepc += 4 and assuming that is sufficient evidence.
+
+ECALL is architecturally fixed-width, but this repository can prove more.
+
+Independently derive from the built ELF:
+
+userServiceProbeTemplateBegin
+userServiceProbeServiceEcall
+userServiceProbeAfterService
+
+Compute:
+
+service_ecall_va = user_code_va + (service_ecall_symbol - template_begin_symbol)
+
+service_resume_va = user_code_va + (after_service_symbol - template_begin_symbol)
+
+Require the trapped first sepc to equal service_ecall_va.
+
+Set the trusted saved return sepc to service_resume_va.
+
+Require service_resume_va to be strictly after the first ECALL and before the terminal ECALL.
+
+The runtime may emit these values as evidence, but the verifier must recompute them from ELF symbols and reject disagreement.
+
+
+SSTATUS POLICY FOR RETURN TO U
+
+Before the first trap executes SRET back to U-mode, mechanically prepare the saved sstatus so:
+
+- SPP = 0;
+- SIE remains disabled for this bounded proof;
+- SPIE policy is explicit and must not accidentally enable user-time asynchronous interrupts;
+- SUM = 0;
+- unrelated preserved bits are not casually destroyed.
+
+Do not hardcode an entire replacement sstatus word if a masked update preserves more truthful state.
+
+Record the trapped value and the return-prepared value separately.
+
+The verifier must decode the relevant bits independently.
+
+
+REARM THE TRUSTED TRAP STACK BEFORE USER RETURN
+
+The critical Batch 20 novelty is not merely changing sepc. The machine must be safe for the second U-origin trap too.
+
+On first-trap return to U-mode:
+
+- restore the intended saved user registers, with a0 containing the supervisor result;
+- restore the prepared user sepc/sstatus;
+- unwind the supervisor TrapFrame so supervisor sp is back at the trusted trap-stack top;
+- perform the register-only swap that restores user sp and places the trusted trap-stack top back into sscratch;
+- execute SRET.
+
+A canonical shape is the inverse of the entry swap:
+
+trap entry:
+    csrrw sp, sscratch, sp
+
+return after frame unwind:
+    csrrw sp, sscratch, sp
+    sret
+
+provided the register and frame ordering is proven correct.
+
+After that return:
+
+sp must be the original bounded user sp;
+sscratch must again contain the trusted supervisor trap-stack top.
+
+There is no supervisor instruction window in U-mode to read sscratch directly, so the strongest behavioral proof is that the second U-mode ECALL again lands at the expected trap-frame address inside the trusted trap stack.
+
+If the same fixed trap-stack top and same frame size are reused, require the two recorded Batch 20 trap-frame addresses to be identical unless there is a documented reason otherwise.
+
+This is powerful evidence that the trusted-stack convention was correctly rearmed.
+
+
+PROVE USER EXECUTION AFTER THE FIRST SRET
+
+Do not call Batch 20 successful merely because the supervisor prepared a return frame.
+
+The user probe must prove it actually resumed.
+
+After userServiceProbeAfterService executes, user code must:
+
+- observe a0 == 0x39;
+- verify selected non-result register sentinels;
+- write the service result into its own stack;
+- write a distinct post-return sentinel;
+- reach the independently derived terminal ECALL site.
+
+If the result or preserved state is wrong, the user probe must fail-stop rather than execute the terminal success ECALL.
+
+Thus reaching the second expected U-mode ECALL is itself evidence that real user instructions executed after the first supervisor SRET.
+
+
+SECOND TERMINAL ECALL
+
+The second Batch 20 ECALL is a bounded completion signal.
+
+It is not another service.
+
+The second trap must prove:
+
+- it is the second and only second Batch 20 U-origin trap;
+- interrupt bit = 0;
+- scause = 8;
+- trapped SPP = 0;
+- trapped sepc equals the independently ELF-derived terminal ECALL VA;
+- user sp remains inside the one existing user stack page;
+- the expected terminal register marker is present;
+- selected preserved state shows the first return completed;
+- the trap frame again lies wholly inside the supervisor-only trap stack;
+- no third Batch 20 U-origin trap occurs.
+
+The terminal ECALL must not return to U-mode.
+
+Instead deliberately transfer to the known S-mode continuation, using the saved ordinary supervisor stack/callee state established before initial Batch 20 entry.
+
+Set SPP deliberately for that supervisor continuation and record the exact policy.
+
+Any unexpected cause, PC, trap count, or privilege state must fail closed.
+
+
+DISTINCT SERVICE TRAP PATH
+
+Prefer a distinct Batch 20 service-return trap entry and entry trampoline instead of mutating the historical Batch 19 one-shot path into a state machine.
+
+Suggested conceptual surfaces:
+
+userServiceTrapEntry
+recordUserServiceTrap
+enterUserServiceProbe
+userServiceSupervisorResume
+
+Exact names may differ.
+
+Meaningful separation is allowed here:
+
+- Batch 19 path proves one-shot U→S termination;
+- Batch 20 path proves S→U service return and then terminal U→S.
+
+Do not merge them merely to reduce line count if doing so makes either proof harder to reason about or weakens historical preservation.
+
+Morphic should eliminate accidental separations, not meaningful ones.
+
+
+TRAP ACTION STATE
+
+Use bounded explicit state for the two Batch 20 traps.
+
+A small fixed state is sufficient, for example:
+
+trap_count = 0/1/2
+first_trap_record
+second_trap_record
+return_to_user_count
+terminal_to_supervisor_count
+
+If assembly needs to choose between return-to-user and terminal-to-supervisor behavior after a Zig handler returns, use an explicit bounded action state with only the required variants.
+
+Do not interpret arbitrary user-controlled values as an unchecked branch target/action.
+
+Do not introduce a general dispatcher.
+
+Unexpected state must fail closed.
+
+
+NO USER POINTERS IN BATCH 20
+
+This is important for the roadmap.
+
+Batch 20 is the syscall/trap-return boundary.
+
+Batch 21 can pressure safe user↔kernel copy separately.
+
+Therefore Batch 20 service inputs and output must remain register-only.
+
+The supervisor may inspect the already-owned physical user stack frame after the terminal return for test evidence through its supervisor identity mapping, as Batch 19 already used owned physical evidence.
+
+That does NOT constitute a general user-copy facility.
+
+Do not expose:
+
+copy_from_user
+copy_to_user
+validate_user_range
+user slice APIs
+SUM-enabled dereference
+arbitrary user virtual addresses
+
+in Batch 20.
+
+
+NO NEW TRANSLATION WORK
+
+The Batch 19 mapping is already sufficient.
+
+The final Batch 20 address space should remain mechanically identical in shape to the final Batch 19 address space:
+
+- same satp;
+- same root;
+- same page-table frame set;
+- same supervisor identity leaves;
+- same translated alias;
+- same U code VA/PA;
+- same U stack VA/PA;
+- exactly two U leaves;
+- zero W+X leaves.
+
+Re-run the existing Batch 19 raw-leaf verifier on the final machine output.
+
+The Batch 20 verifier should also independently prove there was no mapping drift.
+
+If a new page-table allocation occurs, treat it as a design failure unless there is an extraordinary mechanically documented reason. The intended result is zero new page-table frames.
+
+If a new physical allocation occurs, treat it as a design failure. The intended result is zero new physical frames.
+
+
+BATCH 20 EVIDENCE FRAME
+
+Add a distinct bounded evidence frame after ZIGREF_UMODE_RETURNED and before Morphic.
+
+Suggested framing:
+
+ZIGREF_ECALL_RETURN_BEGIN
+...
+ZIGREF_ECALL_RETURN_END
+ZIGREF_ECALL_RETURN_RETURNED
+
+Exact names may follow current repository conventions, but use a distinct stable prefix and do not redefine Batch 19 framing.
+
+Expose enough raw evidence for independent reconstruction.
+
+At minimum include:
+
+- page_size;
+- satp_before;
+- satp_after;
+- root_physical;
+- page_table_count_before;
+- page_table_count_after;
+- free/used physical-frame accounting if mechanically available;
+- user_code_va;
+- user_code_pa;
+- user_stack_va;
+- user_stack_pa;
+- user_stack_top;
+- Batch 20 template begin runtime address;
+- service ECALL runtime symbol;
+- after-service runtime symbol;
+- terminal ECALL runtime symbol;
+- template end runtime address;
+- independently checkable copied template size;
+- translation_change policy;
+- SFENCE.VMA policy for this batch;
+- FENCE.I marker;
+- canonical supervisor stvec before Batch 20;
+- Batch 20 trap-vector address;
+- trusted trap-stack begin/end/top;
+- first trap-frame address;
+- second trap-frame address;
+- first scause;
+- first interrupt bit;
+- first sepc;
+- first trapped sstatus;
+- first trapped SPP;
+- first user sp;
+- first service input a0;
+- first service input a1;
+- selected first-trap register sentinels;
+- supervisor service result;
+- prepared return sepc;
+- prepared return sstatus;
+- prepared return SPP;
+- return_to_user_count;
+- second scause;
+- second interrupt bit;
+- second sepc;
+- second trapped sstatus;
+- second trapped SPP;
+- second user sp;
+- selected terminal register marker;
+- user-observed return value from the user stack;
+- user post-return sentinel from the user stack;
+- terminal_to_supervisor_count;
+- supervisor resume marker;
+- observed stvec_after;
+- observed sscratch_after;
+- final exact U-leaf count;
+- final W+X count;
+- final leaf count or an explicit statement that Batch 19 exact leaf evidence was re-used and independently re-parsed;
+- complete=PASS.
+
+Do not make the verifier trust PASS labels when raw values can be recomputed.
+
+
+ELF TRUTH
+
+The Batch 20 full verifier must independently inspect the built ELF.
+
+Use the repository's existing readelf/symbol helpers where possible.
+
+Derive at minimum:
+
+- text/rodata/writable domains needed for preservation checks;
+- physical pool begin/end;
+- supervisorTrapEntry;
+- trusted trap-stack symbols;
+- userServiceProbeTemplateBegin;
+- userServiceProbeServiceEcall;
+- userServiceProbeAfterService;
+- userServiceProbeTerminalEcall;
+- userServiceProbeTemplateEnd;
+- Batch 20 dedicated trap entry if useful for stvec truth;
+- supervisor resume symbol if exported for evidence.
+
+Compute all copied user VAs from ELF symbol offsets plus user_code_va.
+
+Require runtime-emitted symbol addresses to agree with ELF truth where they are emitted.
+
+Do not hardcode a guessed ECALL offset such as +14 in the new Batch 20 verifier.
+
+Do not infer success merely from a runtime field named expected_*.
+
+
+REJECTION-ORIENTED VERIFIER
+
+Create:
+
+tools/verify-freestanding-riscv64-ecall-return.py
+
+Support:
+
+python3 tools/verify-freestanding-riscv64-ecall-return.py --self-test
+python3 tools/verify-freestanding-riscv64-ecall-return.py
+
+Prefer keeping the rejection self-test independent of two full machines if a clean deterministic synthetic fixture can be constructed without weakening coverage.
+
+If the current repository pattern makes a one-machine fixture the smallest truthful path, keep it bounded and document that requirement. Do not fabricate a PASS result when QEMU is absent.
+
+The parser must first require prior Batch 19 completion and parse the prior proof using the existing Batch 19 verifier.
+
+The Batch 20 parser must reject malformed or contradictory evidence including at minimum:
+
+- missing/duplicate Batch 20 frame markers;
+- Batch 20 frame before Batch 19 RETURNED;
+- Morphic before Batch 20 RETURNED;
+- wrong first trap count;
+- wrong second trap count;
+- a third Batch 20 trap;
+- first interrupt bit set;
+- first scause not 8;
+- first trapped SPP=1;
+- first sepc not equal ELF-derived service ECALL VA;
+- first user sp outside user stack;
+- first trap frame outside trusted supervisor trap stack;
+- second trap frame outside trusted supervisor trap stack;
+- trap-stack leaf U=1;
+- trap-stack leaf executable or non-writable;
+- first and second trap frames inconsistent with the claimed rearmed fixed trap stack;
+- wrong fixed service inputs;
+- wrong supervisor result;
+- runtime template symbols disagreeing with ELF;
+- prepared return sepc not equal ELF-derived after-service VA;
+- prepared return SPP=1;
+- unsafe prepared SIE/SPIE/SUM policy;
+- return_to_user_count != 1;
+- second interrupt bit set;
+- second scause not 8;
+- second trapped SPP=1;
+- second sepc not equal ELF-derived terminal ECALL VA;
+- missing user-observed result;
+- wrong user-observed result;
+- missing post-return sentinel;
+- wrong terminal register marker;
+- terminal_to_supervisor_count != 1;
+- supervisor resume missing;
+- stvec not actually restored;
+- sscratch not actually neutralized;
+- satp/root drift;
+- page-table count growth;
+- physical-frame allocation growth;
+- user code/stack PA drift from preserved Batch 19 evidence;
+- missing FENCE.I after code repopulation;
+- false SFENCE.VMA policy;
+- any new U leaf;
+- any W+X leaf;
+- any disappearance/change of the Batch 19 user leaves;
+- canonical Morphic byte drift.
+
+Add mutation tests that exercise these rejection classes.
+
+Do not merely list intended rejection cases in prose; implement them.
+
+
+REAL TWO-QEMU LAB
+
+The full command must:
+
+1. build the current freestanding ELF;
+2. inspect independent ELF symbols;
+3. run native hosted Morphic twice;
+4. run deterministic fake Morphic twice;
+5. execute two bounded qemu-system-riscv64 machines;
+6. run the existing Batch 12–19 parsers against each final machine output;
+7. parse/decode the Batch 20 frame independently;
+8. prove the first U→S service trap;
+9. prove the deliberate S→U return;
+10. prove post-return user execution;
+11. prove the second U→S terminal trap;
+12. prove exact trap counts 2 for Batch 20;
+13. prove both trap frames use trusted supervisor-only memory;
+14. prove the user mapping/page-table/physical allocation state did not grow;
+15. prove actual stvec/sscratch restoration;
+16. prove exact canonical Morphic equality across hosted/fake/two real machines;
+17. emit one truthful Developer Minimus handoff.
+
+Real QEMU is mandatory for the full command.
+
+Do not claim real-machine proof from a parser self-test.
+
+
+PRESERVATION MATRIX
+
+On each final Batch 20 machine output, explicitly preserve/re-run the historical/current parsers for:
+
+Batch 12 supervisor synchronous trap;
+Batch 13 supervisor timer;
+Batch 14 bounded ticks;
+Batch 15 scheduler-facing time;
+Batch 16 physical-memory ownership;
+Batch 17 active Sv39;
+Batch 18 permission domains;
+Batch 19 bounded U-mode round trip;
+Batch 20 bounded ECALL service return.
+
+Do not remove an old parser from the chain because the new output became inconvenient.
+
+
+CSR RESTORATION
+
+After the second terminal ECALL has deliberately returned to the known S-mode continuation:
+
+- restore stvec to canonical supervisorTrapEntry;
+- neutralize sscratch to zero if that remains the ordinary supervisor convention;
+- read stvec back with csrr;
+- read sscratch back with csrr;
+- read satp back with csrr;
+- prove the ordinary supervisor stack/callee state is restored;
+- keep interrupts in the historical expected state;
+- emit Batch 20 evidence;
+- then run Morphic.
+
+Do not print expected constants in place of CSR observations.
+
+
+FENCE TRUTH
+
+Batch 20 overwrites executable bytes in an already-mapped physical page and later fetches them through the existing executable U mapping.
+
+Therefore FENCE.I is mandatory before entering the new probe.
+
+Translation synchronization is separate.
+
+If no PTE changes occurred, SFENCE.VMA is not required merely because instruction bytes changed.
+
+The evidence and report should explicitly teach this distinction:
+
+PTE unchanged
+→ no translation invalidation required
+
+instruction bytes changed
+→ FENCE.I required before instruction fetch
+
+Do not rely on QEMU cache friendliness.
+
+
+COMMANDS / RECIPE / REPORT TRUTH
+
+Update COMMANDS.md with a new Batch 20 section containing the exact verifier commands and truthful scope/nonclaims.
+
+Update:
+
+recipes/run-hosted-morphic-runtime/recipe.json
+
+so current recipe truth includes the Batch 20 bounded ECALL return surface without rewriting historical Batch 19 meaning.
+
+Create:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_20.md
+
+The report must include:
+
+- Task Projection;
+- sealed Batch 19 baseline revision/tag;
+- exact pre-implementation gate results;
+- exact final implementation commit when known;
+- existing page/frame reuse arithmetic;
+- proof that zero new physical frames were consumed;
+- proof that zero new page-table frames were consumed;
+- distinct Batch 19 vs Batch 20 paths;
+- full trap-stack entry/rearm design;
+- why the first memory access occurs only after trusted stack exchange;
+- full-enough user register context policy;
+- fixed register-only service contract;
+- exact ELF-derived service ECALL / resume / terminal ECALL relations;
+- sstatus/SPP/SIE/SPIE/SUM policy for return to U;
+- proof of actual post-service U-mode execution;
+- second terminal ECALL semantics;
+- actual CSR restoration observations;
+- FENCE.I vs SFENCE.VMA reasoning;
+- two-real-QEMU evidence if actually executed;
+- Batch 12–19 preservation;
+- exact Morphic equality;
+- Snowball Yield;
+- One-Sentence Preventables;
+- explicit non-claims;
+- next smallest pressure.
+
+Do not record a QEMU version, address, count, or PASS that was not actually observed in that run.
+
+Historical Batch reports remain descriptions of their own revisions.
+
+
+SNOWBALL YIELD
+
+Record factual Batch 20 reuse.
+
+At minimum distinguish:
+
+- reusable modules reused unchanged;
+- Batch 19 user PTEs reused unchanged;
+- Batch 19 user physical frames reused unchanged;
+- Batch 19 trap-stack reservation reused unchanged;
+- existing page-table hierarchy reused unchanged;
+- new physical frames consumed, expected 0;
+- new page-table frames consumed, expected 0;
+- new project-specific machine-boundary code;
+- any canonical reusable repair;
+- old verifiers preserved unchanged or exact reason for any unavoidable change;
+- Morphic semantic changes, expected 0.
+
+Do not turn Snowball Yield into a grand benchmark claim.
+
+A particularly useful factual result would be:
+
+Batch 19 paid for U-mode pages, page-table geometry, and trusted trap-stack ownership once; Batch 20 reused all of them and added only the missing service-return context machinery.
+
+Only write that if the implementation actually earns it.
+
+
+ONE-SENTENCE PREVENTABLES
+
+Include concise preventable statements where useful.
+
+Strong candidates:
+
+A trap handler that can enter S-mode is not yet a syscall-return boundary; returning safely to the interrupted U-mode context requires preserving user state, preparing sepc/sstatus, rearming the trusted trap stack, and proving post-SRET user execution.
+
+And:
+
+Changing executable bytes without changing a PTE requires instruction synchronization, not gratuitous translation invalidation.
+
+Use wording that matches the final implementation.
+
+
+FOCUSED VALIDATION
+
+Run the strongest applicable focused tests discovered from current contracts.
+
+At minimum preserve/re-run the closure around:
+
+- physical-memory region set;
+- physical-page-frame allocator;
+- Sv39 entry;
+- Sv39 indexing;
+- page-table owner;
+- Sv39 walker;
+- Sv39 builder;
+- SFENCE.VMA invalidation;
+- run-hosted-morphic-runtime recipe;
+- Batch 17 active-Sv39 self-test/full lab where required by the canonical chain;
+- Batch 18 permission self-test/full lab;
+- Batch 19 U-mode self-test/full lab;
+- new Batch 20 self-test/full lab.
+
+Also run:
+
+zig fmt --check build.zig projects recipes conformance
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+
+python3 tools/query-reference.py agent doctor
+
+python3 tools/developer-command.py validate-repository
+
+and all canonical generation/drift checks required by any changed contracts/recipes.
+
+Do not mark a command PASS without executing it.
+
+
+BATCH 20 SUCCESS CRITERIA
+
+Do not call Batch 20 complete unless all of the following are mechanically true:
+
+1. Batch 18 full permission gate passed before implementation.
+2. Batch 19 self-test and full two-QEMU gate passed before implementation.
+3. Final machine output still passes historical/current Batch 12–19 parsers.
+4. Batch 20 uses the same user code VA/PA as Batch 19.
+5. Batch 20 uses the same user stack VA/PA as Batch 19.
+6. No new physical frame is allocated for Batch 20.
+7. No new page-table frame is allocated for Batch 20.
+8. satp/root remains unchanged.
+9. Final exact leaf set remains unchanged from the Batch 19 final mapping shape.
+10. Exactly two U=1 leaves remain.
+11. W+X remains zero.
+12. Batch 20 user template is ELF-visible, bounded, copied, and relocation-safe.
+13. FENCE.I is executed after Batch 20 code bytes are written and before user fetch.
+14. SFENCE.VMA evidence truthfully reflects whether any PTE changed; intended result is no Batch 20 PTE change and therefore no new SFENCE requirement.
+15. Batch 20 enters U-mode architecturally through SRET.
+16. First Batch 20 trap has csrrw sp,sscratch,sp as the first instruction before any memory access.
+17. First trap frame lies wholly in supervisor-only U=0 RW/NX memory.
+18. First trap is synchronous scause=8, interrupt=0, trapped SPP=0.
+19. First sepc equals independently ELF-derived service ECALL VA.
+20. First user sp lies inside the bounded user stack.
+21. Service inputs equal the fixed register contract.
+22. Supervisor computes the fixed result 0x39 in S-mode.
+23. Saved user a0 is changed to the supervisor result.
+24. Saved return sepc equals independently ELF-derived after-service VA.
+25. Prepared return sstatus has SPP=0 and the declared safe SIE/SPIE/SUM policy.
+26. User register context is sufficiently saved/restored for the actual probe and verified sentinels survive.
+27. Trusted trap-stack convention is rearmed before the first SRET back to U.
+28. SRET returns to real U-mode execution.
+29. User code observes a0=0x39 after return.
+30. User code records the returned value and a post-return sentinel in its own stack.
+31. User code reaches exactly one second terminal ECALL.
+32. Second terminal sepc equals independently ELF-derived terminal ECALL VA.
+33. Second trap is synchronous scause=8, interrupt=0, trapped SPP=0.
+34. Second trap frame again lies wholly inside trusted supervisor memory.
+35. The two Batch 20 trap-frame addresses prove the fixed trap stack was correctly reusable/rearmed, preferably identical under the chosen layout.
+36. return_to_user_count is exactly 1.
+37. terminal_to_supervisor_count is exactly 1.
+38. Batch 20 U-origin trap count is exactly 2.
+39. No third Batch 20 U-origin trap occurs.
+40. Second trap deliberately returns to the known S-mode continuation.
+41. Ordinary supervisor stack/callee state is restored.
+42. stvec is restored and actual CSR readback agrees with supervisorTrapEntry ELF truth.
+43. sscratch is neutralized and actual CSR readback agrees.
+44. satp readback still identifies the same Sv39 root.
+45. Two independent real QEMU runs pass.
+46. Hosted native, deterministic fake, and both real-machine Morphic payloads remain exactly equal at 765 bytes.
+47. Aggregate repository validation passes.
+48. COMMANDS.md, recipe metadata, and Batch 20 report match actual behavior.
+49. No arbitrary user pointer is consumed by the supervisor service.
+50. No syscall table, Linux syscall numbering, process model, ELF userspace loader, or Linux compatibility is falsely claimed.
+
+
+EXPLICIT NON-CLAIMS
+
+Batch 20 does NOT prove:
+
+- a Linux syscall ABI;
+- Linux syscall numbering;
+- a syscall table;
+- scalable syscall dispatch;
+- POSIX semantics;
+- stable userspace ABI compatibility;
+- arbitrary user arguments beyond the fixed bounded register contract;
+- safe arbitrary user pointers;
+- copy_from_user;
+- copy_to_user;
+- user-range validation;
+- SUM-enabled user-memory access;
+- multiple user programs;
+- processes;
+- scheduling persistent user tasks;
+- fork;
+- clone;
+- exec;
+- a userspace ELF loader;
+- file descriptors;
+- console file semantics;
+- VFS;
+- filesystems;
+- mmap;
+- brk;
+- page-fault recovery;
+- demand paging;
+- copy-on-write;
+- signals;
+- futexes;
+- threads;
+- sockets;
+- poll/epoll;
+- procfs;
+- sysfs;
+- device ioctls;
+- musl compatibility;
+- BusyBox compatibility;
+- Alpine compatibility;
+- Debian/Ubuntu compatibility;
+- SMP;
+- ASIDs;
+- TLB shootdown;
+- adversarial userspace security;
+- real-hardware portability;
+- performance claims.
+
+
+NEXT SMALLEST PRESSURE
+
+If Batch 20 succeeds, the next smallest pressure should normally be safe user↔kernel memory transfer rather than jumping directly to a broad syscall surface.
+
+A likely Batch 21 target is one bounded user-memory copy contract with explicit range validation, permission checks, fault/failure behavior, and no Linux-specific syscall semantics yet.
+
+Do not implement Batch 21 in this run.
+
+
+PUBLICATION / PR
+
+After implementation and executable proof:
+
+- update the Batch 20 report with only actually observed evidence;
+- update COMMANDS.md and recipe truth;
+- run focused validation;
+- run aggregate repository validation;
+- run the real two-QEMU Batch 20 lab;
+- commit the implementation;
+- publish the branch;
+- open or update one mergeable PR against main;
+- summarize exact validation and nonclaims in the PR body.
+
+Do not create or move a milestone tag.
+
+Do not merge the PR yourself unless explicitly instructed by the maintainer.
+
+The maintainer will independently audit/merge, reproduce the exact merged revision locally, and only then create the immutable Batch 20 milestone tag.
+
+
+FINAL CODEX REPORT EXPECTATION
+
+When the run is complete, report compactly:
+
+- branch name;
+- final implementation commit SHA;
+- PR number/URL;
+- files changed;
+- whether Batch 19 remained independently passing;
+- whether zero new physical frames were consumed;
+- whether zero new page-table frames were consumed;
+- first ECALL service sepc and ELF-derived relation;
+- prepared user resume sepc and ELF-derived relation;
+- second terminal ECALL sepc and ELF-derived relation;
+- first and second trap-frame addresses;
+- exact trap counts;
+- service input/result evidence;
+- post-return user evidence;
+- actual stvec/sscratch restoration evidence;
+- final U-leaf/W+X counts;
+- QEMU version and two-real-machine result if actually executed;
+- exact Morphic byte equality result;
+- aggregate repository validation counts;
+- explicit nonclaims;
+- any residual concern that should block merge.
+
+Do not hide a failed gate behind a large success summary.
+
+Do not create a tag.
