@@ -2,7 +2,7 @@ const std = @import("std");
 const pte = @import("riscv-sv39-page-table-entry");
 const va = @import("riscv-sv39-virtual-address-indexing");
 pub const Error = error{ NonCanonical, InvalidEntry, MalformedEntry, MisalignedSuperpage, ProviderReadFailure };
-pub const Result = struct { physical_address: u64, level: pte.Level, page_size: u64, permissions: pte.Permissions };
+pub const Result = struct { physical_address: u64, level: pte.Level, page_size: u64, permissions: pte.Permissions, raw_entry: u64 };
 pub fn walk(provider: anytype, root: u64, address: u64) Error!Result {
     const parts = va.decompose(address) catch return error.NonCanonical;
     const indices = [_]u16{ parts.vpn2, parts.vpn1, parts.vpn0 };
@@ -20,7 +20,7 @@ pub fn walk(provider: anytype, root: u64, address: u64) Error!Result {
                 const level: pte.Level = @enumFromInt(2 - depth);
                 e.validateAtLevel(level) catch return error.MisalignedSuperpage;
                 const size = va.pageSize(@enumFromInt(2 - depth));
-                return .{ .physical_address = e.address() + (address & (size - 1)), .level = level, .page_size = size, .permissions = e.permissions() };
+                return .{ .physical_address = e.address() + (address & (size - 1)), .level = level, .page_size = size, .permissions = e.permissions(), .raw_entry = raw };
             },
         }
     }
@@ -35,6 +35,7 @@ test "walks leaf and reports provider failure" {
     try o.write(child, 0, (try pte.Entry.leaf(0x200000, .{ .read = true }, .page_2m)).raw);
     const r = try walk(&o, root, 0x1234);
     try std.testing.expectEqual(@as(u64, 0x201234), r.physical_address);
+    try std.testing.expectEqual(try o.read(child, 0), r.raw_entry);
     o.fail_reads = true;
     try std.testing.expectError(error.ProviderReadFailure, walk(&o, root, 0));
 }

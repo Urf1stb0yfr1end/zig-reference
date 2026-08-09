@@ -24,6 +24,8 @@ No hidden global state. Sv39 supports 4 KiB, 2 MiB, and 1 GiB leaves. Malformed 
 ## Failure behavior
 Structured errors report failures. Builder construction rolls back newly allocated intermediate pages; no silent replacement, split, or merge occurs.
 
+`protect` validates an existing leaf and its requested level, encodes the new legal permissions with the existing physical base, and performs one provider write. It never transiently unmaps the leaf. A failed read, validation, encoding, or write leaves the old leaf unchanged; success returns an address-scoped invalidation plan that the caller must execute before relying on the replacement in an active address space.
+
 ## Ownership and cleanup
 Allocation is explicit and bounded. The caller owns synchronization, cleanup, and execution of invalidation plans. Copying a live owner is prohibited by contract; transfer invalidates its old binding.
 

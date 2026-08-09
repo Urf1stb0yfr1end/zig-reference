@@ -32,7 +32,9 @@
   },
   "purpose": {
     "primary": "Allocation-free read-only Sv39 translation through an injected provider.",
-    "secondary": [],
+    "secondary": [
+      "Expose the exact provider leaf in Result.raw_entry for independent PTE verification."
+    ],
     "non_goals": [
       "Sv39x4, hgatp, full hypervisor, guest-stage translation"
     ],
@@ -162,7 +164,9 @@
     "initial_state": ""
   },
   "invariants": {
-    "representation": [],
+    "representation": [
+      "Result.raw_entry is the exact decoded leaf value read from provider memory."
+    ],
     "ownership": [],
     "ordering": [],
     "bounds": [],
@@ -688,7 +692,8 @@
     ],
     "integration_notes": [
       "Preserve the Zig 0.14.0 baseline and canonical dependency closure.",
-      "Run the focused validation commands."
+      "Run the focused validation commands.",
+      "Use Result.raw_entry when proof requires independent PPN or permission-bit decoding."
     ]
   }
 }

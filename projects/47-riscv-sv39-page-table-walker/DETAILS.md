@@ -18,6 +18,8 @@ Scalars are copied. Provider and owner pointers are borrowed per call. Addresses
 ## Outputs
 Copied results own no hidden allocation and require no cleanup.
 
+`Result.raw_entry` is the exact leaf value read from the injected provider. It lets bounded verifiers independently decode PPN and permission bits rather than trusting a summarized permission label.
+
 ## State and invariants
 No hidden global state. Sv39 supports 4 KiB, 2 MiB, and 1 GiB leaves. Malformed encodings and noncanonical addresses are rejected.
 
