@@ -1,0 +1,1095 @@
+CODEX AGENTIC SNOWBALL — BATCH 21
+BOUNDED USER-MEMORY TRANSFER CONTRACT
+
+Repository:
+thanks-cohn/zig-reference
+
+Plan path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_21_BOUNDED_USER_MEMORY_TRANSFER.txt
+
+
+MISSION
+
+Advance the merged Batch 20 RISC-V machine boundary by exactly one architectural pressure on the shortest credible path toward Alpine:
+
+prove a small, reusable, bounded user-memory transfer contract that can safely copy bytes from U-mode memory into trusted supervisor memory and safely copy trusted supervisor bytes back into U-mode memory, with explicit range validation, permission validation, failure behavior, and no unchecked supervisor dereference of a user virtual pointer.
+
+Batch 20 proved:
+
+U-mode
+→ ECALL
+→ trusted S-mode trap stack
+→ fixed register-only supervisor service
+→ SRET back to U-mode
+→ resumed user execution
+→ terminal U-mode ECALL
+→ known S-mode continuation
+
+Batch 21 must add:
+
+U-mode owns bytes
+→ user passes bounded pointer + length
+→ supervisor validates the entire range
+→ supervisor copies bytes IN safely
+→ supervisor produces/records deterministic result
+→ SRET back to U-mode
+→ supervisor later copies bytes OUT safely
+→ user observes the written bytes
+→ invalid write range is rejected before mutation
+→ terminal U-mode ECALL
+→ known S-mode continuation
+
+This is the first intentional user-pointer pressure.
+
+It is still NOT a Linux syscall ABI.
+
+Do not build a syscall table.
+Do not assign Linux syscall numbers.
+Do not add processes.
+Do not add a userspace ELF loader in this batch.
+Do not add VFS, file descriptors, mmap, brk, signals, futexes, threads, procfs, sockets, or Alpine rootfs work in this batch.
+
+The point is to earn the safe user-memory primitive that the ELF loader, syscall layer, strings, argv/envp, file I/O, and later Linux ABI work will need repeatedly.
+
+
+WHY THIS IS THE NEXT ALPINE STEP
+
+Read:
+
+docs/roadmaps/SELF_HOSTED_RECURSIVE_ABI_LAB.md
+
+The repository is now deliberately optimizing for the shortest credible route to:
+
+M0 native execution foundation
+→ M1 BusyBox baseline
+→ M2 musl/dynamic ELF
+→ M3 useful Alpine
+→ M4 QEMU/TCG self-hosting
+→ recursive differential ABI testing
+
+Do not optimize Batch 21 for feature breadth.
+
+Optimize it for a primitive that removes future repeated work.
+
+A Linux-compatible kernel cannot safely implement common syscalls, argv/envp loading, path strings, read/write buffers, ioctl payloads, socket addresses, or dynamic-loader interactions if user pointers are merely trusted or dereferenced casually.
+
+Therefore this batch should make user-memory transfer a mechanically testable foundation now, before syscall breadth begins.
+
+
+CURRENT BASELINE
+
+Batch 20 merged as:
+
+d4d8a10c9b28ff92507e5d065d0c90dddf6cee15
+
+The current main also contains the recursive ABI laboratory roadmap commits after that merge.
+
+At plan creation time, current main is expected to include:
+
+28ee9895d9deb412098c3916e2a251f7f2fdb9b4
+
+docs: clarify long-term recursive hypervisor goal
+
+Treat the actual checked-out HEAD as truth and record it before implementation.
+
+Batch 20 is merged but this plan does not create or move a Batch 20 milestone tag.
+
+Do not rewrite prior milestone tags.
+
+Do not weaken historical verifiers.
+
+
+BOOTSTRAP BEFORE SOURCE ARCHAEOLOGY
+
+Read AGENTS.md and COMMANDS.md first.
+
+Then run:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+
+Use repository queries before broad source reading.
+
+At minimum query/preflight capabilities around:
+
+- checked half-open ranges;
+- bounded byte reader/writer;
+- distinct memory address types;
+- physical page frame conversion;
+- physical memory region set;
+- physical page frame allocator;
+- RISC-V Sv39 PTE decoding;
+- RISC-V Sv39 virtual indexing;
+- page-table walker;
+- page-table builder/query;
+- existing trap frame and U-mode machinery;
+- run-hosted-morphic-runtime recipe.
+
+Search specifically for any existing user-memory range, copy, transfer, access-plan, user-pointer, or address-translation primitive.
+
+Do not invent a duplicate module if one already exists.
+
+If no reusable user-memory planning capability exists, prefer adding exactly ONE small reusable module for validation/planning rather than embedding all semantic rules permanently in the machine adapter.
+
+A suitable concept is:
+
+bounded user-memory transfer plan
+
+or equivalent repository-native naming.
+
+Do not use names such as copy_from_user/copy_to_user unless the implementation actually intends to satisfy the established Linux contract associated with those names.
+
+A familiar name is a compatibility claim.
+
+Prefer a descriptive native surface such as:
+
+planUserRead
+planUserWrite
+copyUserBytesIn
+copyUserBytesOut
+
+or equivalent names justified by the repository naming discipline.
+
+The reusable module should validate/plan.
+The freestanding machine adapter may perform the actual physical byte copy.
+
+
+EXECUTABLE BASELINE GATES
+
+Before changing source, run and record at minimum:
+
+python3 tools/verify-freestanding-riscv64-sv39-permissions.py --self-test
+python3 tools/verify-freestanding-riscv64-sv39-permissions.py
+
+python3 tools/verify-freestanding-riscv64-umode-round-trip.py --self-test
+python3 tools/verify-freestanding-riscv64-umode-round-trip.py
+
+python3 tools/verify-freestanding-riscv64-ecall-return.py --self-test
+python3 tools/verify-freestanding-riscv64-ecall-return.py
+
+Do not continue by assuming Batch 20 remains healthy if these gates fail.
+
+Record exact pre-implementation HEAD, Zig version, QEMU version, and gate results in the Batch 21 report.
+
+
+BATCH 21 NON-NEGOTIABLE RESULT
+
+The final implementation must prove all of the following in two independent real qemu-system-riscv64 executions:
+
+1. Batch 12–20 evidence still parses and passes unchanged.
+2. Batch 21 executes only after the Batch 20 returned marker.
+3. Batch 21 finishes before the canonical Morphic frame begins.
+4. Batch 21 reuses the existing Batch 19/20 U RX code page and U RW/NX stack page.
+5. Batch 21 allocates zero new physical frames for the machine proof.
+6. Batch 21 allocates zero new page-table frames.
+7. satp/root remains unchanged.
+8. The exact final raw leaf set remains unchanged from Batch 20/B19 truth.
+9. Exactly two leaves remain U=1.
+10. W+X remains zero.
+11. SUM remains zero during the bounded proof unless the implementation can mechanically justify and strictly bracket a different policy. Prefer no SUM usage.
+12. User code writes a deterministic input payload into its own writable user stack.
+13. User code passes a bounded user virtual address and length through registers to a known Batch 21 ECALL site.
+14. The supervisor does NOT directly trust/dereference that user virtual pointer.
+15. The supervisor validates pointer arithmetic without overflow.
+16. The supervisor validates every page touched by the complete range before copying.
+17. Copy-IN requires U=1 and readable permission for every touched page.
+18. Copy-OUT requires U=1 and writable permission for every touched page.
+19. The successful copy-IN transfers exactly the requested bytes to trusted supervisor-owned storage.
+20. The successful copy-IN result is mechanically checked byte-for-byte or by an independently reproducible digest plus length.
+21. The supervisor produces a deterministic output payload in trusted memory.
+22. The successful copy-OUT transfers exactly that payload into an allowed U RW range.
+23. U-mode resumes and independently verifies the bytes written by the supervisor.
+24. At least one permission-invalid copy-OUT attempt is rejected before any target byte is changed.
+25. At least one unmapped/out-of-range/overflow rejection path is mechanically exercised without turning into an uncontrolled page fault.
+26. Range rejection behavior is explicit and deterministic.
+27. No partial write occurs on a prevalidation failure.
+28. Trap entry continues to use the trusted supervisor-only trap stack before any trap-frame memory access.
+29. Repeated returns to U-mode correctly rearm the trusted sscratch/trap-stack convention.
+30. A final terminal U-mode ECALL returns deliberately to the known S-mode continuation.
+31. stvec is restored and read back.
+32. sscratch is neutralized and read back.
+33. canonical 765-byte Morphic equality remains exact across hosted, fake, and both real machines.
+34. aggregate repository validation passes.
+35. documentation and recipe metadata describe only what is mechanically proved.
+36. no Linux ABI or general syscall-copy semantics are falsely claimed.
+
+
+PRESERVE PRIOR PROOFS AS DISTINCT HISTORY
+
+Do not mutate Batch 19 or Batch 20 into Batch 21.
+
+The final machine output should preserve the existing sequence:
+
+historical/current Batch 12–18 evidence
+→ Batch 19 U-mode one-shot proof + RETURNED
+→ Batch 20 ECALL return proof + RETURNED
+→ Batch 21 user-memory transfer proof + RETURNED
+→ Morphic frame
+
+Leave existing Batch 19 and Batch 20 verifiers strict.
+
+Prefer leaving their code unchanged.
+
+The new Batch 21 verifier must call/reuse the prior verifier chain rather than copy-pasting weakened versions of old checks.
+
+
+REUSE THE EXISTING USER ADDRESS SPACE
+
+Do not allocate another user address space.
+
+Reuse:
+
+user code VA:
+0x80401000
+
+user stack VA:
+0x80402000
+
+user stack top:
+0x80403000
+
+Reuse the same physical frames already owned by Batch 19/20.
+
+Reuse the same PTEs.
+
+Reuse the same page-table hierarchy.
+
+Repopulate the existing user-code physical frame with a distinct Batch 21 probe only after Batch 20 has fully completed.
+
+Because executable bytes change while translations do not:
+
+- execute local-hart FENCE.I after repopulating the code frame;
+- do not claim a new SFENCE.VMA is needed if no PTE changed;
+- record the truth explicitly.
+
+Expected policy if no translation changes:
+
+translation_change=none
+sfence_vma=not-required-no-pte-change
+fence_i=local-hart-executed
+
+
+SAFE ACCESS STRATEGY
+
+Prefer keeping SUM=0 throughout Batch 21.
+
+The strongest current design is to treat the user virtual pointer as data, not as a supervisor pointer:
+
+user VA range
+    ↓
+checked arithmetic
+    ↓
+walk/query each page in active Sv39
+    ↓
+require U and required R/W permission
+    ↓
+resolve physical backing
+    ↓
+copy through supervisor-owned/identity-mapped physical access
+
+This is preferable to simply setting SUM and dereferencing arbitrary user virtual addresses in S-mode because it makes the validation boundary explicit and keeps invalid user pointers from becoming uncontrolled supervisor faults.
+
+Do not assume physical contiguity across user virtual pages.
+
+A transfer plan must be able to split one logical user range into bounded physical segments.
+
+Even if the real machine success path fits inside the existing one-page user stack, the reusable planner should have unit tests for:
+
+- same-page ranges;
+- page-boundary crossing;
+- distinct noncontiguous physical pages;
+- overflow;
+- unmapped page;
+- U=0 page;
+- read permission rejection;
+- write permission rejection;
+- zero-length policy;
+- maximum bounded segment count.
+
+If the machine proof can cheaply exercise a real cross-page read without weakening the user-code execution mapping, do so. A good optional proof is a read-only range that crosses from the end of the U RX code page into the beginning of the U RW stack page, because both pages are readable while their physical frames need not be contiguous.
+
+Do not force that optional geometry if it materially complicates the batch. The required machine milestone is safe real user-pointer transfer plus failure atomicity; cross-page correctness may be proved in the reusable module if the final QEMU case remains one-page.
+
+
+REUSABLE PLANNER SHAPE
+
+If repository discovery confirms this capability is missing, add one small bounded planning module.
+
+It should NOT know about ECALL numbers, Linux, Alpine, processes, or the freestanding recipe.
+
+It should accept:
+
+- user virtual start address;
+- byte length;
+- requested access kind: read-from-user or write-to-user;
+- a bounded resolver/query provider that can report mapping and permissions for each page.
+
+It should return either:
+
+- a bounded sequence of physical transfer segments;
+
+or a deterministic error.
+
+Each segment should contain enough information to perform a copy without trusting the original user pointer, for example:
+
+- user page/range fragment;
+- physical address;
+- byte count;
+- optional raw permission evidence if useful.
+
+Required planner properties:
+
+- checked start + length arithmetic;
+- no wraparound;
+- every touched byte represented exactly once;
+- ordered segments;
+- no overlap inside the plan;
+- no omitted gap;
+- page offset preserved;
+- U=1 required;
+- read permission required for copy-IN;
+- write permission required for copy-OUT;
+- deterministic segment bound;
+- no heap requirement if repository style supports fixed capacity;
+- failure before any caller-side write occurs.
+
+The planner should be allocation-free or fixed-capacity if reasonably consistent with existing repository foundations.
+
+Do not bake the current 0x8040xxxx addresses into the reusable module.
+
+The freestanding adapter supplies current page-table truth.
+
+
+TRANSFER SEMANTICS
+
+Use deliberately native, narrow semantics.
+
+Suggested bounded maximum transfer size for the QEMU probe:
+
+32 or 64 bytes.
+
+Choose one fixed maximum and make it explicit.
+
+Suggested deterministic error model:
+
+- invalid/overflowing range;
+- unmapped;
+- not user-accessible;
+- not readable;
+- not writable;
+- too many segments / exceeds bounded transfer limit.
+
+Exact error names should follow repository style.
+
+Zero-length policy must be explicit and tested.
+
+A simple policy is:
+
+zero length succeeds without resolving/dereferencing memory
+
+but use repository conventions if an existing range primitive strongly suggests another contract.
+
+Do not silently truncate.
+
+Do not partially copy beyond the requested length.
+
+
+BATCH 21 USER PROBE
+
+Create a distinct ELF-visible Batch 21 copied user template.
+
+Suggested symbols:
+
+userMemoryProbeTemplateBegin
+userMemoryProbeCopyInEcall
+userMemoryProbeAfterCopyIn
+userMemoryProbeCopyOutEcall
+userMemoryProbeAfterCopyOut
+userMemoryProbeRejectEcall
+userMemoryProbeAfterReject
+userMemoryProbeTerminalEcall
+userMemoryProbeFail
+userMemoryProbeTemplateEnd
+
+Exact names may follow repository style, but every service ECALL and every return continuation used as proof must be independently derivable from the built ELF.
+
+The template must be relocation-safe after copying to 0x80401000.
+
+It must use no libc.
+No heap.
+No SBI.
+No Linux syscall number.
+No privileged instruction.
+No kernel-symbol absolute address embedded in copied code.
+
+Use only bounded stack-local user data and register arguments.
+
+
+SUGGESTED USER-SIDE SEQUENCE
+
+Reserve a fixed small stack block, for example 96–160 bytes inside the existing U RW page.
+
+Define deterministic slots, for example:
+
+slot A: input payload
+slot B: output destination
+slot C: guard bytes surrounding output destination
+slot D: guard bytes for rejected-write proof
+slot E: status/result sentinels
+
+Use a memorable deterministic input payload such as 16 bytes:
+
+"zig-user-memory!"
+
+or any exact fixed byte sequence of the chosen length.
+
+Do not rely on a C string terminator unless it is part of the tested length.
+
+First service:
+
+- user writes input payload into slot A;
+- a0 = pointer to slot A;
+- a1 = input length;
+- optionally a2 = fixed operation marker only if needed by the bounded state machine;
+- execute userMemoryProbeCopyInEcall.
+
+Supervisor:
+
+- independently recognizes the expected first Batch 21 ECALL PC;
+- validates pointer + length;
+- builds a read plan;
+- copies exact bytes into trusted supervisor scratch storage;
+- verifies/records exact bytes or deterministic digest;
+- returns bounded status/result in register(s);
+- SRET back to ELF-derived userMemoryProbeAfterCopyIn.
+
+User:
+
+- verifies returned success marker;
+- establishes output destination guards;
+- passes pointer + length for slot B;
+- executes userMemoryProbeCopyOutEcall.
+
+Supervisor:
+
+- validates complete write range first;
+- builds write plan;
+- writes deterministic reply payload from supervisor storage through resolved physical segments;
+- returns success;
+- SRET to ELF-derived userMemoryProbeAfterCopyOut.
+
+User:
+
+- verifies every reply byte;
+- verifies surrounding guards were not changed;
+- prepares an intentionally invalid write request;
+- executes userMemoryProbeRejectEcall.
+
+Suggested real-machine rejection:
+
+attempt a write whose first byte lies in the existing U RX code page, or a range that begins in/enters a non-writable page.
+
+The handler must reject it before mutation.
+
+Do not actually overwrite user code.
+
+User then verifies a nearby writable guard remains unchanged if the rejected range would otherwise have crossed into it.
+
+Finally:
+
+- set a terminal marker;
+- execute userMemoryProbeTerminalEcall;
+- fail-stop after the terminal ECALL if execution unexpectedly returns again.
+
+
+DO NOT TURN THIS INTO A GENERAL SYSCALL DISPATCHER
+
+Batch 21 may need multiple controlled ECALL sites.
+
+Recognize the bounded phase primarily through:
+
+- trap count/state;
+- independently ELF-derived expected sepc;
+- expected fixed register shape.
+
+Do not introduce a scalable a7 syscall table yet.
+
+Do not publish stable Linux syscall numbers.
+
+The machine probe is a state machine for proof, not the production syscall ABI.
+
+A general syscall dispatch layer belongs in a later separately reviewed batch.
+
+
+TRUSTED TRAP STACK
+
+Every Batch 21 U-origin trap must retain the Batch 19/20 safety invariant:
+
+first instruction of the dedicated user-origin trap path:
+
+csrrw sp, sscratch, sp
+
+No load/store/global access/C call may precede that swap.
+
+Repeated returns to U-mode must rearm sscratch with the trusted trap-stack top before SRET.
+
+The verifier should require that repeated Batch 21 trap frames land at the same expected supervisor-only frame address when using the same fixed stack geometry.
+
+Unexpected nesting remains out of scope; interrupts stay disabled during the bounded proof.
+
+
+FULL USER CONTEXT
+
+Reuse the Batch 20 full-enough TrapFrame discipline.
+
+Do not regress to saving only calling-convention registers.
+
+Trap-return correctness is architectural, not a normal function-call contract.
+
+The supervisor may update only the intended return registers and sepc/sstatus fields before returning to U-mode.
+
+Selected non-result user registers should be sentinel-checked across at least one transfer return.
+
+
+FAILURE ATOMICITY
+
+This batch must distinguish validation from mutation.
+
+For copy-OUT:
+
+1. validate the complete logical range;
+2. obtain the complete bounded transfer plan;
+3. only after the entire plan succeeds, perform writes.
+
+A later segment permission failure must not leave earlier user bytes modified.
+
+Mechanically prove at least one failure-atomic rejection in unit tests.
+
+Prefer a QEMU proof too using the RX-code-page rejection geometry if practical.
+
+For copy-IN, failure should similarly avoid exposing a partial trusted result as a successful completed transfer.
+
+Use scratch-buffer commit semantics if needed:
+
+- copy into temporary trusted buffer;
+- mark/consume result only after full transfer succeeds.
+
+
+NO SUM SHORTCUT
+
+Do not implement Batch 21 by doing:
+
+set SUM
+memcpy(user_ptr,...)
+clear SUM
+
+without an independently validated range/permission contract.
+
+That would move the crash boundary rather than solve the user-pointer problem.
+
+Preferred Batch 21 invariant:
+
+SUM remains 0.
+
+If Codex discovers that the current mapping architecture makes physical-segment copying impossible without a material redesign, stop and document the exact blocker rather than silently weakening the safety model.
+
+
+MAPPING PRESERVATION
+
+Batch 21 must not alter the page-table shape merely to make the test easier.
+
+Require:
+
+- same satp;
+- same root;
+- same page-table frame set;
+- same user code VA/PA;
+- same user stack VA/PA;
+- same alias;
+- same supervisor leaves and permissions;
+- exactly two U leaves;
+- zero W+X leaves.
+
+The Batch 21 verifier should compare the final raw leaf map exactly against prior Batch 20/B19 truth.
+
+Do not trust only counts.
+
+
+BATCH 21 EVIDENCE FRAME
+
+Add a new frame after Batch 20 RETURNED and before Morphic.
+
+Suggested framing:
+
+ZIGREF_USER_MEMORY_BEGIN
+...
+ZIGREF_USER_MEMORY_END
+ZIGREF_USER_MEMORY_RETURNED
+
+Use repository conventions if a better stable prefix exists.
+
+At minimum expose mechanically reconstructable evidence for:
+
+- page_size;
+- satp_before/after;
+- root_physical;
+- page-table count before/after;
+- physical allocated count before/after;
+- user code VA/PA;
+- user stack VA/PA/top;
+- template begin/end;
+- each Batch 21 ECALL symbol runtime address;
+- each user continuation symbol runtime address;
+- copied template size;
+- translation-change policy;
+- SFENCE.VMA policy;
+- FENCE.I marker;
+- trap vector before/current/after;
+- trap-stack begin/end;
+- each trap-frame address;
+- each scause;
+- each interrupt bit;
+- each trapped SPP;
+- each trapped sepc;
+- each trapped user sp;
+- pointer and length passed for each transfer;
+- planner segment count for each successful transfer;
+- per-segment user fragment and resolved PA where useful;
+- exact copy-in byte count;
+- exact copied input bytes or stable deterministic digest plus independent expected bytes;
+- copy-in status;
+- copy-out byte count;
+- output destination;
+- exact expected output bytes/digest;
+- user-observed output verification marker;
+- rejected request pointer/length;
+- rejection reason;
+- rejected request byte count written = 0;
+- guard-before/guard-after values proving no mutation;
+- SUM observed/policy evidence if practical;
+- terminal marker captured from the real TrapFrame;
+- return-to-user count;
+- terminal-to-supervisor count;
+- total Batch 21 trap count;
+- supervisor-resume marker;
+- actual stvec_after readback;
+- actual sscratch_after readback;
+- final raw leaf rows;
+- final U count;
+- final W+X count;
+- complete=PASS.
+
+Do not print constant PASS claims where raw values can be observed.
+
+
+ELF TRUTH
+
+The full Batch 21 verifier must inspect the built ELF independently.
+
+Derive at minimum:
+
+- existing ELF text/rodata/writable domains through prior helpers;
+- physical pool symbols;
+- supervisorTrapEntry;
+- trusted trap-stack symbols;
+- Batch 21 template begin/end;
+- every Batch 21 ECALL label;
+- every Batch 21 return continuation label;
+- dedicated Batch 21 trap entry if distinct;
+- final supervisor resume label.
+
+Compute copied user PCs as:
+
+user_code_va + (symbol - template_begin)
+
+Require runtime-emitted values to match ELF truth.
+
+Do not hardcode offsets discovered from one build.
+
+
+BATCH 21 VERIFIER
+
+Create:
+
+tools/verify-freestanding-riscv64-user-memory-transfer.py
+
+Support:
+
+python3 tools/verify-freestanding-riscv64-user-memory-transfer.py --self-test
+python3 tools/verify-freestanding-riscv64-user-memory-transfer.py
+
+The full command must:
+
+1. build the current freestanding ELF;
+2. inspect independent ELF symbols;
+3. run hosted Morphic twice;
+4. run fake Morphic twice;
+5. execute two bounded qemu-system-riscv64 machines;
+6. run the complete prior Batch 12–20 parser chain on each output;
+7. parse Batch 21 evidence independently;
+8. prove copy-IN range/permissions/bytes;
+9. prove copy-OUT range/permissions/bytes;
+10. prove user resumed and observed supervisor-written data;
+11. prove invalid write rejection before mutation;
+12. prove pointer arithmetic and bounded lengths;
+13. prove trusted trap-stack reuse;
+14. prove no translation/allocation growth;
+15. prove exact raw leaf equality with prior truth;
+16. prove stvec/sscratch restoration;
+17. prove exact 765-byte Morphic equality across hosted/fake/two machines;
+18. emit one truthful Developer Minimus handoff.
+
+Real QEMU is mandatory for the full command.
+
+Do not claim real-machine proof from --self-test.
+
+
+REJECTION-ORIENTED SELF TEST
+
+The self-test must exercise the planner/module unit tests and mutate/reject contradictory machine evidence.
+
+At minimum reject mutations for:
+
+- missing/duplicate Batch 21 frame markers;
+- ordering before Batch 20 RETURNED;
+- Morphic before Batch 21 RETURNED;
+- wrong trap count;
+- extra trap;
+- interrupt bit set;
+- scause not 8;
+- trapped SPP=1;
+- wrong ELF-derived ECALL PC;
+- wrong ELF-derived resume PC where emitted;
+- user sp outside stack;
+- trap frame outside trusted stack;
+- trap-stack leaf U=1;
+- trap-stack leaf not RW/NX;
+- pointer + length overflow;
+- length above bounded maximum;
+- pointer outside user mappings;
+- U=0 mapping accepted;
+- copy-IN from non-readable mapping accepted;
+- copy-OUT to non-writable mapping accepted;
+- plan omits bytes;
+- plan overlaps bytes;
+- plan physical offset mismatch;
+- wrong segment count;
+- wrong input bytes/digest;
+- wrong copy-in byte count;
+- wrong output bytes/digest;
+- user did not observe output;
+- rejected write reports nonzero bytes written;
+- rejected write changed guard bytes;
+- wrong rejection reason;
+- return count drift;
+- terminal marker drift;
+- terminal count drift;
+- stvec restoration drift;
+- sscratch restoration drift;
+- satp/root drift;
+- physical allocation growth;
+- page-table allocation growth;
+- user code/stack PA drift;
+- FENCE.I missing;
+- false SFENCE.VMA claim;
+- missing prior leaf;
+- extra leaf;
+- changed PA;
+- changed PTE permissions;
+- third U leaf;
+- any W+X leaf;
+- Morphic byte drift.
+
+Do not merely list these in docs. Implement meaningful mutation/unit cases.
+
+
+REAL-MACHINE COPY-IN PROOF
+
+Use a deterministic user payload whose exact bytes are known independently to the verifier.
+
+A good proof includes:
+
+input_ptr = exact bounded stack VA
+input_len = exact small constant
+resolved segments = mechanically recomputed from final raw PTE truth
+trusted destination = supervisor .bss scratch buffer
+copied bytes = exact expected bytes
+
+The verifier should derive expected bytes from a stable test constant or ELF-visible data, not merely trust a machine-emitted digest.
+
+If a digest is used, compute the digest independently in the verifier and compare it to emitted raw bytes or independently known source bytes.
+
+For a small payload, emitting exact hexadecimal bytes is simpler and stronger.
+
+
+REAL-MACHINE COPY-OUT PROOF
+
+Use a second bounded user stack slot that begins with guard/sentinel bytes.
+
+Supervisor validates the complete target range and writes a deterministic reply such as:
+
+"ALPZ-USER-OK"
+
+or another fixed byte sequence.
+
+The user probe must verify every byte after SRET.
+
+The supervisor may later inspect the same physical stack frame only for evidence after the user probe has completed.
+
+The verifier must independently compare the output bytes and guards.
+
+
+REAL-MACHINE REJECTION PROOF
+
+Prefer a permission failure that cannot accidentally succeed.
+
+Strong candidate:
+
+request copy-OUT into the U RX code page.
+
+The planner must see U=1 but W=0 and return a deterministic not-writable rejection.
+
+No code byte may be modified.
+
+If demonstrating cross-page failure atomicity is practical, use a range whose later page is non-writable and prove bytes in any earlier writable fragment remain untouched because all validation completed before mutation.
+
+Do not destabilize the active executing template merely to make a more theatrical rejection case.
+
+Safety and clarity beat novelty.
+
+
+UNIT-LEVEL CROSS-PAGE PROOF
+
+Even if the QEMU success cases remain stack-local, the reusable planner must prove page splitting independently.
+
+Construct deterministic fake mappings where:
+
+virtual page A → physical frame X
+virtual page B → physical frame Y
+
+with X and Y noncontiguous.
+
+Plan a range beginning near the end of A and ending inside B.
+
+Require exactly two ordered segments with correct offsets and lengths.
+
+Then mutate permissions on B and prove the whole plan fails before any copy-out mutation.
+
+This is the reusable guarantee future user buffers will rely on once address spaces grow beyond two pages.
+
+
+SNOWBALL YIELD
+
+The Batch 21 report must explicitly account for reuse.
+
+Expected reused foundations include:
+
+- checked range arithmetic;
+- typed addresses;
+- Sv39 PTE permission decoding;
+- active page-table query/walk;
+- physical ownership;
+- fixed-capacity structures;
+- Batch 19 trusted trap stack;
+- Batch 20 repeated U↔S return machinery;
+- existing user code/stack pages;
+- existing ELF-symbol verifier patterns;
+- existing exact leaf reconstruction;
+- existing Morphic conservation proof.
+
+Record:
+
+- new physical frames: expected 0;
+- new page-table frames: expected 0;
+- new U leaves: expected 0;
+- canonical reusable modules added: preferably 0 or exactly 1 if repository discovery proves the gap;
+- Morphic semantic bytes changed: expected 0;
+- historical verifiers weakened: 0.
+
+The purpose is to show that Batch 19 and Batch 20 paid for the privilege machinery once and Batch 21 can spend that foundation on a real ABI prerequisite.
+
+
+DOCUMENTATION
+
+Add:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_21.md
+
+Update COMMANDS.md with exact Batch 21 self-test/full commands and truthful nonclaims.
+
+Update the relevant recipe metadata and generated indexes only as required by repository policy.
+
+Reference:
+
+docs/roadmaps/SELF_HOSTED_RECURSIVE_ABI_LAB.md
+
+in the report as roadmap context, but do not claim Alpine execution from this batch.
+
+The report must say clearly:
+
+Batch 21 earns a safe bounded user-memory transfer primitive on the path to Linux userspace. It does not yet load a general ELF user process or implement Linux read/write/path syscalls.
+
+
+AGGREGATE VALIDATION
+
+After implementation run at minimum:
+
+python3 tools/verify-freestanding-riscv64-sv39-permissions.py --self-test
+python3 tools/verify-freestanding-riscv64-sv39-permissions.py
+
+python3 tools/verify-freestanding-riscv64-umode-round-trip.py --self-test
+python3 tools/verify-freestanding-riscv64-umode-round-trip.py
+
+python3 tools/verify-freestanding-riscv64-ecall-return.py --self-test
+python3 tools/verify-freestanding-riscv64-ecall-return.py
+
+python3 tools/verify-freestanding-riscv64-user-memory-transfer.py --self-test
+python3 tools/verify-freestanding-riscv64-user-memory-transfer.py
+
+zig fmt --check build.zig projects recipes conformance
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+
+python3 tools/query-reference.py agent doctor
+
+python3 tools/developer-command.py validate-repository
+
+Run focused tests/smokes for every reused or newly added foundation changed by this batch.
+
+If a new reusable module is added, integrate it completely with the repository contract/index/build/test system rather than leaving it as an orphan helper.
+
+
+PR REQUIREMENTS
+
+Work on one branch.
+
+Commit the complete Batch 21 implementation.
+
+Publish/update exactly one PR.
+
+The PR body must include:
+
+- mission;
+- exact pre-implementation HEAD;
+- baseline gate results;
+- reusable-module decision and Z-Ref query evidence;
+- copy-IN contract;
+- copy-OUT contract;
+- rejection/failure-atomic contract;
+- trap/return design;
+- page/allocation reuse arithmetic;
+- exact final leaf/U/WX truth;
+- FENCE.I/SFENCE.VMA policy;
+- two-QEMU result;
+- Morphic 765-byte conservation;
+- aggregate validation result;
+- Snowball Yield;
+- explicit nonclaims.
+
+Do not merge the PR.
+
+Do not create or move milestone tags.
+
+
+FAIL-CLOSED RULE
+
+Any unexpected:
+
+- trap cause;
+- interrupt;
+- privilege state;
+- ECALL PC;
+- user pointer;
+- length;
+- arithmetic overflow;
+- mapping absence;
+- U/R/W permission;
+- segment geometry;
+- copy byte count;
+- user result;
+- guard mutation;
+- trap count;
+- page allocation;
+- page-table allocation;
+- satp/root;
+- leaf set;
+- CSR restoration;
+- Morphic output
+
+must fail the proof.
+
+Do not print PASS and continue after a contradiction.
+
+
+SCOPE DISCIPLINE
+
+DO NOT add in Batch 21:
+
+- Linux syscall table;
+- Linux syscall numbers;
+- stable POSIX ABI;
+- process table;
+- PID model;
+- fork/clone;
+- exec;
+- generic ELF userspace loader;
+- argv/envp loader;
+- VFS;
+- file descriptors;
+- console write syscall;
+- path lookup;
+- mmap/brk;
+- page faults/demand paging;
+- signals;
+- futexes;
+- threads;
+- procfs/sysfs;
+- sockets;
+- Alpine rootfs;
+- BusyBox integration;
+- dynamic linker;
+- package manager;
+- KVM;
+- hypervisor work.
+
+Those come later.
+
+This batch is intentionally narrow because a mechanically trustworthy user-memory primitive makes several of those later batches smaller.
+
+
+NEXT PRESSURE AFTER BATCH 21
+
+If Batch 21 is clean, the preferred next batch is the smallest executable userspace-loader step toward M0:
+
+- parse/load one tiny static ELF user image into a bounded user address space;
+- establish entry PC and user stack;
+- run it in U-mode;
+- use the earned user-memory and ECALL-return machinery for observable completion.
+
+Do not jump directly to BusyBox before this loader boundary exists.
+
+After that, the short-path sequence should remain approximately:
+
+Batch 22: bounded userspace ELF loader / first tiny real user image
+Batch 23: minimal syscall dispatch + console write/exit semantics
+Batch 24: fd table + console descriptors
+Batch 25: VFS/initramfs
+Batch 26: exec/process lifecycle
+Batch 27: brk/mmap and loader growth
+Batch 28: musl-enabling gaps / TLS / signals / threads as discovered
+Batch 29+: BusyBox and Alpine-driven gap closure
+
+Treat these numbers as directional, not sacred. If executable evidence shows a smaller prerequisite, take the smaller prerequisite.
+
+The governing rule from SELF_HOSTED_RECURSIVE_ABI_LAB.md is:
+
+optimize for the smallest environment that can discover the next missing behavior, then distill every discovery into a permanent narrow test.
+
+
+MILESTONE STATEMENT
+
+Batch 21 is successful only when we can truthfully say:
+
+The RISC-V Alpz/Morphic machine path can receive a bounded user virtual pointer from real U-mode code, validate the complete range against active Sv39 mappings and permissions without trusting the pointer as a supervisor address, transfer exact bytes from user memory into trusted supervisor storage, transfer exact bytes from trusted supervisor storage back into writable user memory, reject an invalid write before mutation, return repeatedly to real U-mode through the trusted trap-stack discipline, preserve the exact page-table shape and prior proofs, and retain exact 765-byte Morphic equality across hosted, fake, and two real QEMU machines.
+
+Nothing broader is implied.
