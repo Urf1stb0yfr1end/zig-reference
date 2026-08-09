@@ -17,9 +17,17 @@ extern var __physical_page_pool_begin: u8;
 extern var __physical_page_pool_end: u8;
 extern var __image_begin: u8;
 extern var __image_end: u8;
+extern var __text_domain_begin: u8;
+extern var __text_domain_end: u8;
+extern var __rodata_domain_begin: u8;
+extern var __rodata_domain_end: u8;
+extern var __writable_domain_begin: u8;
+extern var __writable_domain_end: u8;
 
 const sv39_alias: usize = 0x8040_0000;
 var sv39_continuation_marker: usize = 0;
+var sv39_permission_global: usize = 0;
+const sv39_permission_rodata: usize = 0x18_39_2026;
 
 fn RealPageOwner(comptime Allocator: type) type {
     return struct {
@@ -789,6 +797,147 @@ export fn freestandingMain() callconv(.c) noreturn {
         shutdown();
     }
     write("ZIGREF_SV39_ACTIVE_RETURNED\n");
+
+    // Batch 18 replaces each live leaf directly: Builder.protect preserves its
+    // target and level and never installs a transient invalid entry.  One global
+    // fence follows the complete bounded mutation set before any hardened probe.
+    const text_begin = @intFromPtr(&__text_domain_begin);
+    const text_end = @intFromPtr(&__text_domain_end);
+    const rodata_begin = @intFromPtr(&__rodata_domain_begin);
+    const rodata_end = @intFromPtr(&__rodata_domain_end);
+    const writable_begin = @intFromPtr(&__writable_domain_begin);
+    const writable_end = @intFromPtr(&__writable_domain_end);
+    const text_permissions = sv39_entries.Permissions{ .read = true, .execute = true, .accessed = true };
+    const rodata_permissions = sv39_entries.Permissions{ .read = true, .accessed = true };
+    const writable_permissions = sv39_entries.Permissions{ .read = true, .write = true, .accessed = true, .dirty = true };
+    var mutation_count: usize = 0;
+    address = text_begin;
+    while (address < text_end) : (address += frames.PageSize) {
+        _ = builder.protect(address, .page_4k, text_permissions) catch {
+            write("ZIGREF_SV39_PERMISSIONS_FAILURE\n");
+            shutdown();
+        };
+        mutation_count += 1;
+    }
+    address = rodata_begin;
+    while (address < rodata_end) : (address += frames.PageSize) {
+        _ = builder.protect(address, .page_4k, rodata_permissions) catch {
+            write("ZIGREF_SV39_PERMISSIONS_FAILURE\n");
+            shutdown();
+        };
+        mutation_count += 1;
+    }
+    address = writable_begin;
+    while (address < writable_end) : (address += frames.PageSize) {
+        _ = builder.protect(address, .page_4k, writable_permissions) catch {
+            write("ZIGREF_SV39_PERMISSIONS_FAILURE\n");
+            shutdown();
+        };
+        mutation_count += 1;
+    }
+    _ = builder.protect(sv39_alias, .page_4k, writable_permissions) catch {
+        write("ZIGREF_SV39_PERMISSIONS_FAILURE\n");
+        shutdown();
+    };
+    mutation_count += 1;
+    const satp_permissions_before = asm volatile ("csrr %[value], satp"
+        : [value] "=r" (-> usize),
+    );
+    sfence_vma.executeUnsafe(sfence_vma.global());
+
+    // Positive probes exercise allowed accesses only; the raw leaf rows below
+    // independently prove that the denied permission bits are absent.
+    var permission_stack: usize = 0x18_5100;
+    permission_stack +%= 0x39;
+    sv39_permission_global = permission_stack;
+    const rodata_read = sv39_permission_rodata;
+    const permission_alias_sentinel: usize = 0x18a1_1a55_c0de_0039;
+    alias_pointer.* = permission_alias_sentinel;
+    const permission_alias_read = alias_pointer.*;
+    const permission_identity_read = identity_pointer.*;
+    const satp_permissions_after = asm volatile ("csrr %[value], satp"
+        : [value] "=r" (-> usize),
+    );
+
+    write("ZIGREF_SV39_PERMISSIONS_BEGIN\npage_size=");
+    writeUsizeHex(frames.PageSize);
+    write("\nsatp_before=");
+    writeUsizeHex(satp_permissions_before);
+    write("\nsatp_after=");
+    writeUsizeHex(satp_permissions_after);
+    write("\nroot_physical=");
+    writeUsizeHex(root_physical);
+    write("\nroot_ppn=");
+    writeUsizeHex(root_physical >> 12);
+    write("\ntext_begin=");
+    writeUsizeHex(text_begin);
+    write("\ntext_end=");
+    writeUsizeHex(text_end);
+    write("\nrodata_begin=");
+    writeUsizeHex(rodata_begin);
+    write("\nrodata_end=");
+    writeUsizeHex(rodata_end);
+    write("\nwritable_begin=");
+    writeUsizeHex(writable_begin);
+    write("\nwritable_end=");
+    writeUsizeHex(writable_end);
+    write("\nalias=");
+    writeUsizeHex(sv39_alias);
+    write("\nalias_physical=");
+    writeUsizeHex(alias_physical);
+    write("\nleaf_count=");
+    writeUsizeHex((writable_end - text_begin) / frames.PageSize + 1);
+    address = text_begin;
+    while (address < writable_end) : (address += frames.PageSize) {
+        const leaf = builder.query(address) catch {
+            write("ZIGREF_SV39_PERMISSIONS_FAILURE\n");
+            shutdown();
+        };
+        write("\nleaf_va=");
+        writeUsizeHex(address);
+        write(",pa=");
+        writeUsizeHex(leaf.physical_address);
+        write(",pte=");
+        writeUsizeHex(leaf.raw_entry);
+        write(",level=");
+        writeUsizeHex(@intFromEnum(leaf.level));
+    }
+    const alias_leaf = builder.query(sv39_alias) catch {
+        write("ZIGREF_SV39_PERMISSIONS_FAILURE\n");
+        shutdown();
+    };
+    write("\nleaf_va=");
+    writeUsizeHex(sv39_alias);
+    write(",pa=");
+    writeUsizeHex(alias_leaf.physical_address);
+    write(",pte=");
+    writeUsizeHex(alias_leaf.raw_entry);
+    write(",level=");
+    writeUsizeHex(@intFromEnum(alias_leaf.level));
+    write("\nmutation_count=");
+    writeUsizeHex(mutation_count);
+    write("\nsfence_vma=global-executed\ncode_probe=PASS\nrodata_read=");
+    writeUsizeHex(rodata_read);
+    write("\nstack_probe=");
+    writeUsizeHex(permission_stack);
+    write("\nglobal_probe=");
+    writeUsizeHex(sv39_permission_global);
+    write("\nalias_wrote=");
+    writeUsizeHex(permission_alias_sentinel);
+    write("\nalias_read=");
+    writeUsizeHex(permission_alias_read);
+    write("\nidentity_read=");
+    writeUsizeHex(permission_identity_read);
+    write("\npost_hardening_morphic=next\ncomplete=PASS\nZIGREF_SV39_PERMISSIONS_END\n");
+    if (satp_permissions_before != satp_after_expected or satp_permissions_after != satp_after_expected or
+        permission_stack != 0x18_5139 or sv39_permission_global != permission_stack or
+        rodata_read != sv39_permission_rodata or permission_alias_read != permission_alias_sentinel or
+        permission_identity_read != permission_alias_sentinel)
+    {
+        write("ZIGREF_SV39_PERMISSIONS_FAILURE\n");
+        shutdown();
+    }
+    write("ZIGREF_SV39_PERMISSIONS_RETURNED\n");
     var output: [128]u8 = undefined;
     var trace: [2048]u8 = undefined;
     const result = morphic.runFake(&output, &trace) catch {

@@ -85,6 +85,7 @@
     "Entry.leaf",
     "Builder.init",
     "Builder.mapPage",
+    "Builder.protect",
     "Builder.query",
     "global",
     "executeUnsafe"
@@ -99,11 +100,11 @@
     "The synchronous breakpoint alone advances sepc by its ELF-proven 32-bit instruction width. Timer interrupts leave sepc unchanged. The one-shot masks STIE and sets the deadline to maximum; each non-final repeated tick re-arms from newly observed time plus 100000 counter units, and the fourth tick masks STIE and sets the deadline to maximum before sret.",
     "Scheduler-facing machine time uses the raw RV64 rdtime value as u64 through an identity mapping, so the bridge performs no narrowing or arithmetic; advanceTo retains the scheduler time-reversal rejection and ordering semantics.",
     "The freestanding adapter reserves one eight-page, 4096-byte-aligned NOLOAD pool in its ELF, reads the linker bounds and actual satp CSR, registers exactly that interval as usable, and exercises the existing allocator. Direct access is valid only for the mechanically observed Bare mode; this is neither platform RAM discovery nor a production PMM, and Sv39 remains inactive during that preserved phase; Batch 17 activates it only afterward.",
-    "After the preserved Bare physical-memory phase, four zeroed page-table pages from the same owned pool map the exact page-aligned ELF continuation span with 4 KiB leaves and one bounded non-identity alias; satp installs Sv39 with ASID 0 and the owned root PPN, then the canonical global SFENCE.VMA execution boundary runs before continued Zig and Morphic execution."
+    "After the preserved Batch 17 broad-RWX activation frame, Builder.protect directly replaces every live 4 KiB leaf without a transient unmap while preserving physical targets and levels. ELF-derived page-aligned domains then provide supervisor text RX/A, rodata R/A/NX, writable image/stack/pool and translated alias RW/A/D/NX; one global SFENCE.VMA precedes positive probes and the unchanged Morphic workload. The freestanding RealPageOwner supplies actual machine page-table frames; riscv-page-table-page-owner remains the reusable hosted semantic precedent and is not the machine provider."
   ],
   "gaps_discovered": [
     "The hosted path still relies on Linux userspace. The freestanding riscv64 path proves one fixed-frame resumable synchronous breakpoint trap, one one-shot supervisor timer interrupt, one finite four-delivery monotonic repeated-tick phase, and non-preemptive scheduler decisions driven by those observations after sret; indefinite periodic ticking, timekeeping accuracy, preemption, sleeping tasks, clock accuracy, nested traps/interrupts, multiple harts, floating-point/vector context, hardware discovery, and Linux/POSIX/Alpine compatibility remain out of scope or unimplemented.",
-    "Physical-memory ownership is limited to the linker-reserved eight-page pool. No DTB/RAM discovery, reclamation, general allocator policy, a general VMM, or virtual mapping policy beyond the bounded active-Sv39 proof is claimed."
+    "Physical-memory ownership remains limited to the linker-reserved eight-page pool, and the hardened map remains one bounded supervisor address space. No DTB/RAM discovery, U-mode, page-fault recovery, per-process mappings, ASIDs, demand paging, SMP shootdown, general allocator policy, or general VMM is claimed."
   ],
   "future_systems_enabled": [
     "hosted runtime experiments",
@@ -111,7 +112,7 @@
     "later bounded scheduler-facing time-source and machine-boundary work without preemption",
     "later non-preemptive timeout orchestration using an explicitly declared counter-unit policy",
     "later active-Sv39 work using explicitly owned frames rather than guessed platform RAM",
-    "active Sv39 experiments over the linker-owned pool"
+    "later bounded U-mode entry work built on a supervisor-only W^X kernel baseline"
   ],
   "intended_build_commands": [
     "zig build run-hosted-morphic-runtime",
@@ -127,7 +128,9 @@
     "python3 tools/verify-freestanding-riscv64-supervisor-ticks.py",
     "python3 tools/verify-freestanding-riscv64-scheduler-time.py",
     "python3 tools/verify-freestanding-riscv64-physical-memory.py",
-    "python3 tools/verify-freestanding-riscv64-active-sv39.py"
+    "python3 tools/verify-freestanding-riscv64-active-sv39.py",
+    "python3 tools/verify-freestanding-riscv64-sv39-permissions.py --self-test",
+    "python3 tools/verify-freestanding-riscv64-sv39-permissions.py"
   ],
   "intended_smoke_commands": [],
   "validation_evidence_references": []

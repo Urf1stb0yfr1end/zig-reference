@@ -99,13 +99,55 @@ pub fn Builder(comptime Owner: type) type {
             return error.MissingMapping;
         }
         pub fn protect(self: *Self, v: u64, level: pte.Level, p: pte.Permissions) Error!Mutation {
-            const old = self.query(v) catch return error.MissingMapping;
-            if (old.level != level) return error.Conflict;
-            _ = try self.unmapPage(v, level);
-            self.mapPage(v, old.physical_address, level, p) catch return error.ProviderWriteFailure;
-            return .{ .invalidation = inv.forAddress(v) };
+            try va.requireAligned(v, @enumFromInt(@intFromEnum(level)));
+            const parts = va.decompose(v) catch return error.NonCanonical;
+            const indices = [_]u16{ parts.vpn2, parts.vpn1, parts.vpn0 };
+            const target = 2 - @intFromEnum(level);
+            var frame = self.root;
+            for (indices, 0..) |idx, depth| {
+                const raw = self.owner.read(frame, idx) catch return error.ProviderReadFailure;
+                if (raw == 0) return error.MissingMapping;
+                const old = pte.Entry.decode(raw) catch return error.MalformedMapping;
+                if (depth == target) {
+                    if (old.kind() != .leaf) return error.MalformedMapping;
+                    old.validateAtLevel(level) catch return error.MalformedMapping;
+                    const replacement = pte.Entry.leaf(old.address(), p, level) catch return error.MalformedMapping;
+                    // Replace one valid leaf with another in one provider write.  The
+                    // physical target and level stay fixed, and live callers never
+                    // observe a transient invalid entry.  They must execute the
+                    // returned translation-invalidation plan before relying on it.
+                    self.owner.write(frame, idx, replacement.raw) catch return error.ProviderWriteFailure;
+                    return .{ .invalidation = inv.forAddress(v) };
+                }
+                if (old.kind() != .branch) return error.Conflict;
+                frame = old.address();
+            }
+            return error.MissingMapping;
         }
     };
+}
+
+test "protect atomically replaces only a valid leaf permission set" {
+    const O = @import("riscv-page-table-page-owner").PageOwner(3);
+    var o = O{};
+    var b = try Builder(O).init(&o);
+    _ = try b.mapPage(0x4000, 0x9000, .page_4k, .{ .read = true, .write = true, .execute = true, .accessed = true, .dirty = true });
+    const mutation = try b.protect(0x4000, .page_4k, .{ .read = true, .execute = true, .accessed = true });
+    try std.testing.expect(mutation.invalidation != null);
+    const after = try b.query(0x4000);
+    try std.testing.expectEqual(@as(u64, 0x9000), after.physical_address);
+    try std.testing.expectEqual(pte.Level.page_4k, after.level);
+    try std.testing.expect(after.permissions.read and after.permissions.execute and after.permissions.accessed);
+    try std.testing.expect(!after.permissions.write and !after.permissions.user and !after.permissions.dirty);
+    try std.testing.expectError(error.MissingMapping, b.protect(0x8000, .page_4k, .{ .read = true }));
+    try std.testing.expectError(error.MalformedMapping, b.protect(0, .page_2m, .{ .read = true }));
+
+    o.fail_writes = true;
+    try std.testing.expectError(error.ProviderWriteFailure, b.protect(0x4000, .page_4k, .{ .read = true }));
+    o.fail_writes = false;
+    const unchanged = try b.query(0x4000);
+    try std.testing.expectEqual(@as(u64, 0x9000), unchanged.physical_address);
+    try std.testing.expect(unchanged.permissions.execute and !unchanged.permissions.write);
 }
 test "map query conflict unmap and atomic allocation failure" {
     const O = @import("riscv-page-table-page-owner").PageOwner(3);

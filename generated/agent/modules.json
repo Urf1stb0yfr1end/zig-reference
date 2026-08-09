@@ -6957,7 +6957,8 @@
       "id": "47",
       "integration_notes": [
         "Preserve the Zig 0.14.0 baseline and canonical dependency closure.",
-        "Run the focused validation commands."
+        "Run the focused validation commands.",
+        "Use Result.raw_entry when proof requires independent PPN or permission-bit decoding."
       ],
       "invalidation": {},
       "known_gaps": [
@@ -7230,7 +7231,9 @@
         "target_maturity_level": 2,
         "unit_validated": true
       },
-      "failure_guarantees": [],
+      "failure_guarantees": [
+        "protect preserves the existing mapping on validation, encoding, read, and write failure."
+      ],
       "focused_validation_commands": [
         "zig build test-riscv-sv39-page-table-builder",
         "zig build smoke-riscv-sv39-page-table-builder"
@@ -7240,7 +7243,11 @@
         "Preserve the Zig 0.14.0 baseline and canonical dependency closure.",
         "Run the focused validation commands."
       ],
-      "invalidation": {},
+      "invalidation": {
+        "protect": [
+          "Execute the returned address-scoped plan after successful live leaf replacement."
+        ]
+      },
       "known_gaps": [
         "Sv39x4, hgatp, full hypervisor, guest-stage translation"
       ],
