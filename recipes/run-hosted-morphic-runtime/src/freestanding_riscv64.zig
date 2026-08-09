@@ -155,6 +155,7 @@ var copy_segment_count: usize = 0;
 var copy_coverage: usize = 0;
 var copy_scratch: [32]u8 = [_]u8{0xa5} ** 32;
 var copy_prepared_sstatus: usize = 0;
+var copy_prepared_sepc: usize = 0;
 var copy_result: usize = 0;
 var copy_terminal_marker: usize = 0;
 var copy_return_count: usize = 0;
@@ -411,6 +412,7 @@ fn recordUserCopyTrap(frame: *TrapFrame) void {
         copy_result = 0x21b;
         frame.x[10] = copy_result;
         frame.sepc = user_code_va + @intFromPtr(&userCopyInProbeAfterService) - begin;
+        copy_prepared_sepc = frame.sepc;
         frame.sstatus &= ~@as(usize, 0x40122);
         copy_prepared_sstatus = frame.sstatus;
         copy_return_count += 1;
@@ -1926,6 +1928,8 @@ export fn freestandingMain() callconv(.c) noreturn {
     writeUsizeHex(copy_status[1]);
     write("\nprepared_sstatus=");
     writeUsizeHex(copy_prepared_sstatus);
+    write("\nprepared_sepc=");
+    writeUsizeHex(copy_prepared_sepc);
     write("\nservice_result=");
     writeUsizeHex(copy_result);
     write("\npost_return_marker=");
@@ -1940,9 +1944,49 @@ export fn freestandingMain() callconv(.c) noreturn {
     writeUsizeHex(copy_stvec_after);
     write("\nsscratch_after=");
     writeUsizeHex(copy_sscratch_after);
+    var copy_final_leaf_count: usize = 0;
+    var copy_final_u_leaves: usize = 0;
+    var copy_final_wx_leaves: usize = 0;
+    address = text_begin;
+    while (address < writable_end) : (address += frames.PageSize) {
+        const leaf = builder.query(address) catch shutdown();
+        copy_final_leaf_count += 1;
+        copy_final_u_leaves += @intFromBool(leaf.raw_entry & 0x10 != 0);
+        copy_final_wx_leaves += @intFromBool(leaf.raw_entry & 0xc == 0xc);
+        write("\nleaf_va=");
+        writeUsizeHex(address);
+        write(",pa=");
+        writeUsizeHex(leaf.physical_address);
+        write(",pte=");
+        writeUsizeHex(leaf.raw_entry);
+        write(",level=");
+        writeUsizeHex(@intFromEnum(leaf.level));
+    }
+    for ([_]usize{ sv39_alias, user_code_va, user_stack_va }) |va| {
+        const leaf = builder.query(va) catch shutdown();
+        copy_final_leaf_count += 1;
+        copy_final_u_leaves += @intFromBool(leaf.raw_entry & 0x10 != 0);
+        copy_final_wx_leaves += @intFromBool(leaf.raw_entry & 0xc == 0xc);
+        write("\nleaf_va=");
+        writeUsizeHex(va);
+        write(",pa=");
+        writeUsizeHex(leaf.physical_address);
+        write(",pte=");
+        writeUsizeHex(leaf.raw_entry);
+        write(",level=");
+        writeUsizeHex(@intFromEnum(leaf.level));
+    }
+    write("\nfinal_u_leaves=");
+    writeUsizeHex(copy_final_u_leaves);
+    write("\nfinal_wx_leaves=");
+    writeUsizeHex(copy_final_wx_leaves);
+    write("\nfinal_leaf_count=");
+    writeUsizeHex(copy_final_leaf_count);
     write("\ntranslation_change=none\nsfence_vma=not-required-no-pte-change\nfence_i=local-hart-executed\nsum=observed-zero\ncomplete=PASS\nZIGREF_USER_COPY_IN_END\nZIGREF_USER_COPY_IN_RETURNED\n");
     if (copy_allocated_before != allocator.allocatedCount() or copy_tables_before != page_owner.page_count or copy_satp_before != copy_satp_after or
-        copy_stvec_after != historical_stvec or copy_sscratch_after != 0 or post_marker.* != 0x21c0 or copy_trap_count != 2) shutdown();
+        copy_stvec_after != historical_stvec or copy_sscratch_after != 0 or post_marker.* != 0x21c0 or copy_trap_count != 2 or
+        copy_prepared_sepc != user_code_va + @intFromPtr(&userCopyInProbeAfterService) - copy_begin or
+        copy_final_leaf_count != final_leaf_count or copy_final_u_leaves != 2 or copy_final_wx_leaves != 0) shutdown();
     var output: [128]u8 = undefined;
     var trace: [2048]u8 = undefined;
     const result = morphic.runFake(&output, &trace) catch {
