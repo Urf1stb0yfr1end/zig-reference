@@ -55,6 +55,7 @@ const specs = [_]ModuleSpec{
     .{ .name = "bounded-system-resource-plan", .source = "projects/50-bounded-system-resource-plan/src/bounded_system_resource_plan.zig", .dependencies = &.{ "bounded-integer", "checked-integer-cast", "aligned-address-and-size-helpers", "fixed-bump-allocator", "fixed-capacity-topological-sort" } },
     .{ .name = "bounded-deterministic-event-trace", .source = "projects/51-bounded-deterministic-event-trace/src/bounded_deterministic_event_trace.zig", .dependencies = &.{} },
     .{ .name = "bounded-deterministic-scheduler", .source = "projects/52-bounded-deterministic-scheduler/src/bounded_deterministic_scheduler.zig", .dependencies = &.{"fixed-capacity-priority-queue"} },
+    .{ .name = "bounded-user-memory-transfer-plan", .source = "projects/53-bounded-user-memory-transfer-plan/src/bounded_user_memory_transfer_plan.zig", .dependencies = &.{ "fixed-capacity-vector", "checked-half-open-range", "distinct-memory-address-types" } },
 };
 
 const RecipeSpec = struct { name: []const u8, dependencies: []const []const u8 };

@@ -674,6 +674,21 @@
       "baselineValidated": false,
       "testedTargetVersions": [],
       "knownMigrationBlockers": []
+    },
+    {
+      "id": "53",
+      "canonicalName": "bounded-user-memory-transfer-plan",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/53-bounded-user-memory-transfer-plan/port.js",
+      "implementationPath": "projects/53-bounded-user-memory-transfer-plan/src/bounded_user_memory_transfer_plan.zig",
+      "dependenciesMustPortFirst": [
+        "fixed-capacity-vector",
+        "checked-half-open-range",
+        "distinct-memory-address-types"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
     }
   ]
 }

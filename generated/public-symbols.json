@@ -5,6 +5,10 @@
   "repository_index_version": "1.0.0",
   "symbols": [
     {
+      "module": "bounded-user-memory-transfer-plan",
+      "symbol": "Access"
+    },
+    {
       "module": "bounded-binary-sub-reader",
       "symbol": "AdvancementPolicy"
     },
@@ -101,6 +105,10 @@
       "symbol": "Entry"
     },
     {
+      "module": "bounded-user-memory-transfer-plan",
+      "symbol": "Error"
+    },
+    {
       "module": "riscv-page-table-page-owner",
       "symbol": "Error"
     },
@@ -147,6 +155,10 @@
     {
       "module": "distinct-memory-address-types",
       "symbol": "GuestPhysicalAddress"
+    },
+    {
+      "module": "bounded-user-memory-transfer-plan",
+      "symbol": "GuestVirtualAddress"
     },
     {
       "module": "distinct-memory-address-types",
@@ -213,6 +225,14 @@
       "symbol": "PageOwner"
     },
     {
+      "module": "bounded-user-memory-transfer-plan",
+      "symbol": "PageQuery"
+    },
+    {
+      "module": "bounded-user-memory-transfer-plan",
+      "symbol": "PageResolution"
+    },
+    {
       "module": "physical-page-frame-number-and-address-conversion",
       "symbol": "PageSize"
     },
@@ -239,6 +259,10 @@
     {
       "module": "riscv-sv39-page-table-entry",
       "symbol": "Permissions"
+    },
+    {
+      "module": "bounded-user-memory-transfer-plan",
+      "symbol": "PhysicalAddress"
     },
     {
       "module": "distinct-memory-address-types",
@@ -293,6 +317,10 @@
       "symbol": "SaturatingCounter"
     },
     {
+      "module": "bounded-user-memory-transfer-plan",
+      "symbol": "Segment"
+    },
+    {
       "module": "elf64-program-header-parser",
       "symbol": "Segment"
     },
@@ -335,6 +363,10 @@
     {
       "module": "bounded-system-resource-plan",
       "symbol": "TraceEventStorage"
+    },
+    {
+      "module": "bounded-user-memory-transfer-plan",
+      "symbol": "TransferPlan"
     },
     {
       "module": "optional-typed-handle",
@@ -423,6 +455,10 @@
     {
       "module": "riscv-sv39-virtual-address-indexing",
       "symbol": "pageSize"
+    },
+    {
+      "module": "bounded-user-memory-transfer-plan",
+      "symbol": "page_size"
     },
     {
       "module": "elf64-file-header-parser",

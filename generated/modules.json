@@ -956,6 +956,24 @@
       "status": "experimental-unverified",
       "summary": "Schedule a bounded set of copied tasks with caller-controlled time and stable deterministic ordering.",
       "target_maturity_level": 2
+    },
+    {
+      "aliases": [],
+      "declared_maturity": "experimental",
+      "deprecated_names": [],
+      "details": "projects/53-bounded-user-memory-transfer-plan/details.json",
+      "directory": "projects/53-bounded-user-memory-transfer-plan",
+      "display_name": "Bounded User Memory Transfer Plan",
+      "id": "53",
+      "implementation_version": "1.0.0",
+      "lifecycle": "experimental",
+      "name": "bounded-user-memory-transfer-plan",
+      "public_contract_version": "1.0.0",
+      "replacement_module": "",
+      "source": "projects/53-bounded-user-memory-transfer-plan/src/bounded_user_memory_transfer_plan.zig",
+      "status": "experimental-unverified",
+      "summary": "Plan bounded user virtual ranges as validated physical fragments.",
+      "target_maturity_level": 2
     }
   ],
   "repository_index_version": "1.0.0"

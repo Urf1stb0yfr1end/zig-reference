@@ -163,6 +163,7 @@ The following section is derived from `generated/modules.json` and canonical mod
 | `bounded-system-resource-plan` | `zig build test-bounded-system-resource-plan` | `zig build smoke-bounded-system-resource-plan` | `projects/50-bounded-system-resource-plan/details.json` |
 | `bounded-deterministic-event-trace` | `zig build test-bounded-deterministic-event-trace` | `zig build smoke-bounded-deterministic-event-trace` | `projects/51-bounded-deterministic-event-trace/details.json` |
 | `bounded-deterministic-scheduler` | `zig build test-bounded-deterministic-scheduler` | `zig build smoke-bounded-deterministic-scheduler` | `projects/52-bounded-deterministic-scheduler/details.json` |
+| `bounded-user-memory-transfer-plan` | `zig build test-bounded-user-memory-transfer-plan` | `zig build smoke-bounded-user-memory-transfer-plan` | `projects/53-bounded-user-memory-transfer-plan/details.json` |
 <!-- END GENERATED MODULE COMMANDS -->
 
 ## Recipes and conformance
@@ -208,7 +209,7 @@ Each module has `zig build test-<module>` and `zig build smoke-<module>` targets
 ## Agent-readable pilot commands
 
 <!-- CURRENT AGENT CORPUS -->
-Agent Fast Path v2 currently projects 53 contracted modules as 53 full cards with 0 partial cards.
+Agent Fast Path v2 currently projects 54 contracted modules as 54 full cards with 0 partial cards.
 The Batch 07 repair revalidated bootstrap/doctor discovery, deterministic preflight, command-reference drift, ports, Developer Minimus, hosted Morphic verification, and the complete repository pipeline under Zig 0.14.0; exact results are recorded in `docs/reports/AGENTIC_SNOWBALL_BATCH_07_REPAIR.md`.
 The root-document policy is checked by `node tools/check-port-contracts.js`; it accepts
 only the explicit flagship/root allowlist and rejects any other root Markdown file.
@@ -347,3 +348,5 @@ Batch 19 executed the self-test and full lab with Zig 0.14.0 and QEMU 8.2.2. Bot
 - `python3 tools/verify-freestanding-riscv64-ecall-return.py` builds and independently inspects the ELF, runs native and fake Morphic twice, executes two real system-QEMU machines, preserves the strict Batch 12–19 parser chain, and proves the fixed `0x20 + 0x19 -> 0x39` supervisor service, one SRET back to resumed U-mode, one terminal SRET to the ELF-derived S-mode continuation, actual zero-growth allocator/page-table snapshots, exact equality with the Batch 19 final leaf set and user PAs, exactly two U leaves, zero W+X leaves, CSR restoration, and exact 765-byte equality.
 
 Batch 20 executed both repaired commands with Zig 0.14.0 and QEMU 8.2.2. Actual evidence showed allocator count `7 -> 7`, page-table count `4 -> 4`, identical Batch 19 and Batch 20 U-page PAs, one unchanged 36-leaf set, U=2, W+X=0, and the same trusted trap-frame address for both traps. It reuses the Batch 19 U RX code frame, U RW/NX stack frame, four-page hierarchy, and trusted supervisor stack. This is not a syscall table, Linux ABI, user-copy facility, process model, userspace ELF loader, or arbitrary-user-pointer proof.
+
+Batch 21A compiler-executed `test-bounded-user-memory-transfer-plan`, `smoke-bounded-user-memory-transfer-plan`, agent doctor, and `python3 tools/developer-command.py validate-repository` successfully under Zig 0.14.0 after recording current unit and smoke evidence for all 54 modules; the run intentionally did not execute the Batch 18/19/20 real-QEMU labs.

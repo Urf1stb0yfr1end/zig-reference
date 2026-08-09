@@ -1,0 +1,1037 @@
+{
+  "schema_version": "3.0.0",
+  "contract_version": "0.1.0",
+  "generated_at": "2026-08-09",
+  "last_reviewed_at": "2026-08-09",
+  "module": {
+    "id": "53",
+    "canonical_name": "bounded-user-memory-transfer-plan",
+    "display_name": "Bounded User Memory Transfer Plan",
+    "directory": "projects/53-bounded-user-memory-transfer-plan",
+    "summary": "Plan bounded user virtual ranges as validated physical fragments.",
+    "long_description": "Allocation-free failure-atomic planning across page boundaries.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "lifecycle": "experimental",
+    "target_maturity_level": 2,
+    "implementation_version": "1.0.0",
+    "public_contract_version": "1.0.0",
+    "introduced_version": "1.0.0",
+    "deprecated_version": "",
+    "superseded_version": "",
+    "removed_version": "",
+    "replacement_module": "",
+    "migration_guide": "",
+    "support_policy": "Experimental; semantic contract versioning applies.",
+    "deprecation_reason": "",
+    "category": "foundation",
+    "subcategory": "memory",
+    "tags": [
+      "bounded",
+      "freestanding",
+      "allocation-free",
+      "virtual-memory"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Plan bounded user virtual ranges as validated physical fragments.",
+    "secondary": [
+      "Separate validation from later copying."
+    ],
+    "non_goals": [
+      "copy bytes",
+      "implement syscalls",
+      "walk a specific page-table format"
+    ],
+    "problems_solved": [
+      "partial and unchecked user-memory transfer planning"
+    ],
+    "future_role": "Reusable policy between address translation and copy orchestration."
+  },
+  "c_pain": {
+    "summary": "Direct page loops leave overflow, permissions, offsets, capacity, and partial output as conventions.",
+    "common_failure_modes": [
+      "wrapped ranges",
+      "wrong-direction permission checks",
+      "partial plans"
+    ],
+    "maintenance_burdens": [
+      "duplicated transfer validation"
+    ],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "A direct translation loop is compact and allocation-free.",
+    "where_c_degrades": "Cross-page invariants and failure atomicity remain informal."
+  },
+  "zig_response": {
+    "summary": "Distinct addresses, checked ranges, error unions, and fixed capacity expose the contract.",
+    "language_features": [
+      "error unions",
+      "comptime",
+      "tagged unions and enums"
+    ],
+    "guarantees_made_visible": [
+      "checked range",
+      "fixed capacity",
+      "failure atomicity"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "keep mappings stable while consuming the plan",
+      "provide truthful bounded queries"
+    ],
+    "tradeoffs": [
+      "one segment per page",
+      "fixed 4 KiB page size"
+    ]
+  },
+  "locations": {
+    "module_root": "projects/53-bounded-user-memory-transfer-plan",
+    "implementation": [
+      "projects/53-bounded-user-memory-transfer-plan/src/bounded_user_memory_transfer_plan.zig"
+    ],
+    "public_entrypoint": "projects/53-bounded-user-memory-transfer-plan/src/bounded_user_memory_transfer_plan.zig",
+    "readme": "projects/53-bounded-user-memory-transfer-plan/README.md",
+    "mastery": "projects/53-bounded-user-memory-transfer-plan/MASTERY.md",
+    "details_markdown": "projects/53-bounded-user-memory-transfer-plan/DETAILS.md",
+    "details_json": "projects/53-bounded-user-memory-transfer-plan/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": [],
+    "unit_tests": [
+      "projects/53-bounded-user-memory-transfer-plan/src/bounded_user_memory_transfer_plan.zig"
+    ],
+    "smoke_tests": [
+      "projects/53-bounded-user-memory-transfer-plan/tests/smoke_test.zig"
+    ],
+    "generated_files": [],
+    "dependency_contracts": [
+      "projects/00-fixed-capacity-vector/details.json",
+      "projects/17-checked-half-open-range/details.json",
+      "projects/18-distinct-memory-address-types/details.json"
+    ]
+  },
+  "public_surface": {
+    "root_symbols": [
+      "Access",
+      "Error",
+      "GuestVirtualAddress",
+      "PageQuery",
+      "PageResolution",
+      "PhysicalAddress",
+      "Segment",
+      "TransferPlan",
+      "page_size"
+    ],
+    "types": [
+      {
+        "name": "Access",
+        "kind": "public declaration"
+      },
+      {
+        "name": "Error",
+        "kind": "public declaration"
+      },
+      {
+        "name": "GuestVirtualAddress",
+        "kind": "public declaration"
+      },
+      {
+        "name": "PageQuery",
+        "kind": "public declaration"
+      },
+      {
+        "name": "PageResolution",
+        "kind": "public declaration"
+      },
+      {
+        "name": "PhysicalAddress",
+        "kind": "public declaration"
+      },
+      {
+        "name": "Segment",
+        "kind": "public declaration"
+      },
+      {
+        "name": "TransferPlan",
+        "kind": "public declaration"
+      },
+      {
+        "name": "page_size",
+        "kind": "public declaration"
+      }
+    ],
+    "functions": [
+      {
+        "name": "TransferPlan",
+        "signature": "TransferPlan(comptime capacity: usize) type"
+      }
+    ],
+    "methods": [],
+    "constants": [
+      {
+        "name": "page_size",
+        "type": "usize",
+        "value": "4096",
+        "summary": "Transfer page size."
+      }
+    ],
+    "errors": [
+      "AddressOverflow",
+      "CapacityExceeded",
+      "Unmapped",
+      "SupervisorOnly",
+      "NotReadable",
+      "NotWritable",
+      "UnalignedPhysicalPage"
+    ],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": [],
+    "endpoints": [
+      {
+        "name": "TransferPlan",
+        "kind": "function",
+        "signature": "TransferPlan(comptime capacity: usize) type",
+        "visibility": "public",
+        "summary": "Construct the fixed-capacity plan type.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "capacity",
+            "type": "usize",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of FixedPriorityQueue.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "items",
+        "kind": "function",
+        "signature": "items(self: *const Self) []const Segment",
+        "visibility": "public",
+        "summary": "Borrow ordered initialized segments.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "self",
+            "type": "*const Self",
+            "role": "operation input",
+            "ownership": "borrowed",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of FixedPriorityQueue.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "plan",
+        "kind": "function",
+        "signature": "plan(start: GuestVirtualAddress, length: usize, access: Access, resolver: PageQuery) Error!Self",
+        "visibility": "public",
+        "summary": "Validate all pages and return an owned plan.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "start",
+            "type": "GuestVirtualAddress",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          },
+          {
+            "name": "length",
+            "type": "usize",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          },
+          {
+            "name": "access",
+            "type": "Access",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          },
+          {
+            "name": "resolver",
+            "type": "PageQuery",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of FixedPriorityQueue.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "query",
+        "kind": "function",
+        "signature": "query(self: PageQuery, page_start: GuestVirtualAddress) ?PageResolution",
+        "visibility": "public",
+        "summary": "Invoke the bounded page provider.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "self",
+            "type": "PageQuery",
+            "role": "operation input",
+            "ownership": "borrowed",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          },
+          {
+            "name": "page_start",
+            "type": "GuestVirtualAddress",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Result of FixedPriorityQueue.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "Failures preserve documented cursor or collection state.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      }
+    ]
+  },
+  "inputs": [],
+  "outputs": [],
+  "state": {
+    "fields": [],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [],
+    "borrows": [],
+    "copies": [],
+    "transfers": [],
+    "shared": [],
+    "allocator": "",
+    "allocator_lifetime": "",
+    "element_cleanup": "",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [],
+    "optional_empty_results": [],
+    "failure_atomicity": "",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [
+      {
+        "module": "fixed-capacity-vector",
+        "path": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig",
+        "symbol": "FixedVector",
+        "guarantee": "Stores bounded inline segments.",
+        "reason": "Stores bounded inline segments."
+      },
+      {
+        "module": "checked-half-open-range",
+        "path": "projects/17-checked-half-open-range/src/checked_half_open_range.zig",
+        "symbol": "CheckedRange",
+        "guarantee": "Checks start plus length.",
+        "reason": "Checks start plus length."
+      },
+      {
+        "module": "distinct-memory-address-types",
+        "path": "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig",
+        "symbol": "GuestVirtualAddress, PhysicalAddress",
+        "guarantee": "Separates address domains.",
+        "reason": "Separates address domains."
+      }
+    ],
+    "standard_library": [
+      "std.math.add",
+      "std.math.sub",
+      "std.testing"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": []
+  },
+  "dependency_contracts": [],
+  "expected_dependents": [],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "bounded-user-memory-transfer-plan",
+    "import_path": "projects/53-bounded-user-memory-transfer-plan/src/bounded_user_memory_transfer_plan.zig",
+    "import_configuration": "",
+    "minimal_example": "",
+    "integration_patterns": [],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "",
+    "maximum_tested_zig_version": "",
+    "hosted": "yes",
+    "freestanding": "yes",
+    "thread_safe": "no",
+    "reentrant": "",
+    "interrupt_safe": "",
+    "async_safe": "",
+    "signal_safe": "",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "No allocator.",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "",
+    "no_std_equivalent": ""
+  },
+  "concurrency": {
+    "internal_synchronization": "",
+    "caller_synchronization_required": "",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-bounded-user-memory-transfer-plan",
+    "commands": [],
+    "unit_tests": [],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": [],
+    "smoke_test_commands": [
+      "zig build smoke-bounded-user-memory-transfer-plan"
+    ],
+    "smoke_test_behaviors": [],
+    "smoke_test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "",
+    "continuous_integration": "",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [],
+    "status_dimensions": {
+      "implementation_present": false,
+      "contract_complete": false,
+      "contract_formatted": true,
+      "unit_tests_present": false,
+      "smoke_test_present": false,
+      "contract_checker_passed": false,
+      "compiler_validated": false,
+      "unit_tests_passed": false,
+      "smoke_tests_passed": false
+    }
+  },
+  "documentation": {
+    "read_order": [],
+    "examples_covered": [],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [],
+    "related_modules": [],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "",
+    "breaking_change_policy": "",
+    "deprecation_policy": "",
+    "known_gaps": [],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [],
+    "synchronization_requirements": [],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [],
+    "problems": [],
+    "inputs": [],
+    "outputs": [],
+    "environments": [],
+    "keywords": [],
+    "grep_terms": [],
+    "natural_language_queries": [],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "",
+    "snowball_score": ""
+  },
+  "agent_guidance": {
+    "use_when": [],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [],
+    "verification_steps": [],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [],
+    "files_to_read_first": [],
+    "files_not_required_for_basic_use": [],
+    "smoke_test_before_integration": ""
+  },
+  "source_map": {
+    "symbols_to_files": [],
+    "tests_to_behaviors": [],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": [],
+    "smoke_tests_to_public_symbols": [],
+    "smoke_tests_to_dependencies": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": []
+  },
+  "smoke_test": {
+    "required": true,
+    "implemented": false,
+    "status": "not-implemented",
+    "source_path": "projects/53-bounded-user-memory-transfer-plan/tests/smoke_test.zig",
+    "build_step": "smoke-bounded-user-memory-transfer-plan",
+    "commands": [
+      "zig build smoke-bounded-user-memory-transfer-plan"
+    ],
+    "public_import_used": "bounded-user-memory-transfer-plan",
+    "public_symbols_exercised": [],
+    "successful_operations": [],
+    "failure_or_boundary_operations": [],
+    "cleanup_exercised": [],
+    "repository_dependencies_exercised": [],
+    "hosted_environment_required": "",
+    "freestanding_environment_required": "",
+    "fixtures": [],
+    "expected_exit_status": "",
+    "expected_output": [],
+    "forbidden_private_access": true,
+    "last_run": "",
+    "last_result": "unverified",
+    "last_validated_commit": "",
+    "compiler_version": "",
+    "known_failures": [],
+    "notes": []
+  },
+  "portability": {
+    "baseline_zig_version": "0.14.0",
+    "port_contract": "projects/53-bounded-user-memory-transfer-plan/port.js",
+    "port_contract_schema": "port.schema.json",
+    "tested_zig_versions": [],
+    "untested_zig_versions": [],
+    "dependencies_must_port_first": [
+      "fixed-capacity-vector",
+      "checked-half-open-range",
+      "distinct-memory-address-types"
+    ],
+    "version_sensitive_symbols": [],
+    "version_sensitive_files": [],
+    "semantic_guarantees_to_preserve": [],
+    "validation_commands": [
+      "zig build test-bounded-user-memory-transfer-plan",
+      "zig build smoke-bounded-user-memory-transfer-plan"
+    ],
+    "known_porting_blockers": [],
+    "automatic_port_guaranteed": false,
+    "notes": []
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Plan bounded user virtual ranges as validated physical fragments.",
+    "search_aliases": [
+      "user memory transfer planner",
+      "physical transfer segments",
+      "bounded user range"
+    ],
+    "capability_ids": [
+      "bounded-user-memory-transfer-planning",
+      "user-page-permission-validation",
+      "physical-transfer-segmentation"
+    ],
+    "use_when": [
+      "Need to validate a complete user virtual range before a later physical-memory copy."
+    ],
+    "do_not_use_when": [
+      "Need to copy bytes, walk page tables, or implement an ABI."
+    ],
+    "entrypoint": "projects/53-bounded-user-memory-transfer-plan/src/bounded_user_memory_transfer_plan.zig",
+    "public_symbols": [
+      "Access",
+      "Error",
+      "GuestVirtualAddress",
+      "PageQuery",
+      "PageResolution",
+      "PhysicalAddress",
+      "Segment",
+      "TransferPlan",
+      "page_size"
+    ],
+    "dependency_ids": [
+      "fixed-capacity-vector",
+      "checked-half-open-range",
+      "distinct-memory-address-types"
+    ],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "resolver": [
+        "Borrowed synchronously during plan."
+      ],
+      "items": [
+        "Borrows returned plan storage."
+      ]
+    },
+    "invalidation": {
+      "plan move or destruction": [
+        "items slice is invalidated."
+      ]
+    },
+    "failure_guarantees": [
+      "Every failure returns no plan value; caller state is unchanged."
+    ],
+    "effects": [
+      "borrows_caller_memory",
+      "returns_borrow",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "test-bounded-user-memory-transfer-plan",
+      "smoke-bounded-user-memory-transfer-plan"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": [
+        "capacity"
+      ]
+    },
+    "construction": {
+      "named_import": "bounded-user-memory-transfer-plan",
+      "primary_symbol": "TransferPlan",
+      "initialization": "const plan = try TransferPlan(4).plan(start, length, .read_from_user, query);"
+    },
+    "operation_map": {
+      "build plan": "plan",
+      "segments": "items",
+      "resolve page": "query"
+    },
+    "error_map": [
+      {
+        "error": "AddressOverflow",
+        "operation": "plan",
+        "meaning": "AddressOverflow condition described by the canonical contract.",
+        "handling": "Correct the range, capacity, mapping, or permissions before retrying."
+      },
+      {
+        "error": "CapacityExceeded",
+        "operation": "plan",
+        "meaning": "CapacityExceeded condition described by the canonical contract.",
+        "handling": "Correct the range, capacity, mapping, or permissions before retrying."
+      },
+      {
+        "error": "Unmapped",
+        "operation": "plan",
+        "meaning": "Unmapped condition described by the canonical contract.",
+        "handling": "Correct the range, capacity, mapping, or permissions before retrying."
+      },
+      {
+        "error": "SupervisorOnly",
+        "operation": "plan",
+        "meaning": "SupervisorOnly condition described by the canonical contract.",
+        "handling": "Correct the range, capacity, mapping, or permissions before retrying."
+      },
+      {
+        "error": "NotReadable",
+        "operation": "plan",
+        "meaning": "NotReadable condition described by the canonical contract.",
+        "handling": "Correct the range, capacity, mapping, or permissions before retrying."
+      },
+      {
+        "error": "NotWritable",
+        "operation": "plan",
+        "meaning": "NotWritable condition described by the canonical contract.",
+        "handling": "Correct the range, capacity, mapping, or permissions before retrying."
+      },
+      {
+        "error": "UnalignedPhysicalPage",
+        "operation": "plan",
+        "meaning": "UnalignedPhysicalPage condition described by the canonical contract.",
+        "handling": "Correct the range, capacity, mapping, or permissions before retrying."
+      }
+    ],
+    "composition": {
+      "commonly_with": [
+        "riscv-sv39-page-table-walker"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Ascending virtual address, one fragment per touched page.",
+      "external_nondeterminism": [
+        "Provider results are caller-controlled."
+      ]
+    },
+    "known_gaps": [
+      "Does not copy bytes.",
+      "Does not freeze mappings."
+    ],
+    "minimal_usage": [
+      "const transfer = @import(\"bounded-user-memory-transfer-plan\");",
+      "const plan = try transfer.TransferPlan(4).plan(start, length, .read_from_user, query);"
+    ],
+    "integration_notes": [
+      "Adapt the page walker or mapping database to PageQuery."
+    ],
+    "canonical_invariants": []
+  }
+}

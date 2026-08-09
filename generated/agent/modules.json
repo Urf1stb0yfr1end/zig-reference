@@ -28,6 +28,7 @@
         "dependents": [
           "bounded-deterministic-scheduler",
           "bounded-system-resource-plan",
+          "bounded-user-memory-transfer-plan",
           "elf64-program-header-parser",
           "fixed-capacity-priority-queue",
           "fixed-capacity-topological-sort",
@@ -58,6 +59,7 @@
       "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
+        "bounded-user-memory-transfer-plan",
         "elf64-program-header-parser",
         "fixed-capacity-priority-queue",
         "fixed-capacity-topological-sort",
@@ -163,6 +165,7 @@
       "transitive_dependents": [
         "bounded-deterministic-scheduler",
         "bounded-system-resource-plan",
+        "bounded-user-memory-transfer-plan",
         "elf64-program-header-parser",
         "fixed-capacity-priority-queue",
         "fixed-capacity-topological-sort",
@@ -2500,6 +2503,7 @@
       ],
       "change_impact": {
         "dependents": [
+          "bounded-user-memory-transfer-plan",
           "elf64-file-header-parser",
           "elf64-program-header-parser",
           "physical-memory-region-set",
@@ -2533,6 +2537,7 @@
       "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
+        "bounded-user-memory-transfer-plan",
         "elf64-file-header-parser",
         "elf64-program-header-parser",
         "physical-memory-region-set",
@@ -2629,6 +2634,7 @@
       "thread_safety": "immutable_reads_only",
       "transitive_dependencies": [],
       "transitive_dependents": [
+        "bounded-user-memory-transfer-plan",
         "elf64-file-header-parser",
         "elf64-program-header-parser",
         "physical-memory-region-set",
@@ -2657,6 +2663,7 @@
       ],
       "change_impact": {
         "dependents": [
+          "bounded-user-memory-transfer-plan",
           "elf64-program-header-parser",
           "physical-memory-region-set",
           "physical-page-frame-allocator",
@@ -2691,6 +2698,7 @@
       "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
+        "bounded-user-memory-transfer-plan",
         "elf64-program-header-parser",
         "physical-memory-region-set",
         "physical-page-frame-allocator",
@@ -2789,6 +2797,7 @@
       "thread_safety": "immutable_reads_only",
       "transitive_dependencies": [],
       "transitive_dependents": [
+        "bounded-user-memory-transfer-plan",
         "elf64-program-header-parser",
         "physical-memory-region-set",
         "physical-page-frame-allocator",
@@ -7855,6 +7864,202 @@
       "transitive_dependents": [],
       "use_when": [
         "Need allocation-free scheduling whose time is supplied explicitly."
+      ]
+    },
+    {
+      "aliases": [
+        "user memory transfer planner",
+        "physical transfer segments",
+        "bounded user range"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "items": [
+          "Borrows returned plan storage."
+        ],
+        "resolver": [
+          "Borrowed synchronously during plan."
+        ]
+      },
+      "canonical_invariants": [],
+      "capabilities": [
+        "bounded-user-memory-transfer-planning",
+        "user-page-permission-validation",
+        "physical-transfer-segmentation"
+      ],
+      "change_impact": {
+        "dependents": [],
+        "recipes": []
+      },
+      "composition": {
+        "commonly_with": [
+          "riscv-sv39-page-table-walker"
+        ],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "const plan = try TransferPlan(4).plan(start, length, .read_from_user, query);",
+        "named_import": "bounded-user-memory-transfer-plan",
+        "primary_symbol": "TransferPlan"
+      },
+      "dependency_build_order": [
+        "checked-half-open-range",
+        "distinct-memory-address-types",
+        "fixed-capacity-vector",
+        "bounded-user-memory-transfer-plan"
+      ],
+      "details": "projects/53-bounded-user-memory-transfer-plan/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [
+          "Provider results are caller-controlled."
+        ],
+        "ordering": "Ascending virtual address, one fragment per touched page."
+      },
+      "diagnostic_ids": [],
+      "direct_dependencies": [
+        "checked-half-open-range",
+        "distinct-memory-address-types",
+        "fixed-capacity-vector"
+      ],
+      "direct_dependents": [],
+      "do_not_use_when": [
+        "Need to copy bytes, walk page tables, or implement an ABI."
+      ],
+      "environment_constraints": {
+        "architectures": [],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "AddressOverflow",
+          "handling": "Correct the range, capacity, mapping, or permissions before retrying.",
+          "meaning": "AddressOverflow condition described by the canonical contract.",
+          "operation": "plan"
+        },
+        {
+          "error": "CapacityExceeded",
+          "handling": "Correct the range, capacity, mapping, or permissions before retrying.",
+          "meaning": "CapacityExceeded condition described by the canonical contract.",
+          "operation": "plan"
+        },
+        {
+          "error": "Unmapped",
+          "handling": "Correct the range, capacity, mapping, or permissions before retrying.",
+          "meaning": "Unmapped condition described by the canonical contract.",
+          "operation": "plan"
+        },
+        {
+          "error": "SupervisorOnly",
+          "handling": "Correct the range, capacity, mapping, or permissions before retrying.",
+          "meaning": "SupervisorOnly condition described by the canonical contract.",
+          "operation": "plan"
+        },
+        {
+          "error": "NotReadable",
+          "handling": "Correct the range, capacity, mapping, or permissions before retrying.",
+          "meaning": "NotReadable condition described by the canonical contract.",
+          "operation": "plan"
+        },
+        {
+          "error": "NotWritable",
+          "handling": "Correct the range, capacity, mapping, or permissions before retrying.",
+          "meaning": "NotWritable condition described by the canonical contract.",
+          "operation": "plan"
+        },
+        {
+          "error": "UnalignedPhysicalPage",
+          "handling": "Correct the range, capacity, mapping, or permissions before retrying.",
+          "meaning": "UnalignedPhysicalPage condition described by the canonical contract.",
+          "operation": "plan"
+        }
+      ],
+      "evidence_summary": {
+        "conformance_validated": false,
+        "evidence_records": 1,
+        "lifecycle": "experimental",
+        "maturity_level": 4,
+        "module": "bounded-user-memory-transfer-plan",
+        "smoke_validated": true,
+        "target_maturity_level": 2,
+        "unit_validated": true
+      },
+      "failure_guarantees": [
+        "Every failure returns no plan value; caller state is unchanged."
+      ],
+      "focused_validation_commands": [
+        "zig build test-bounded-user-memory-transfer-plan",
+        "zig build smoke-bounded-user-memory-transfer-plan"
+      ],
+      "id": "53",
+      "integration_notes": [
+        "Adapt the page walker or mapping database to PageQuery."
+      ],
+      "invalidation": {
+        "plan move or destruction": [
+          "items slice is invalidated."
+        ]
+      },
+      "known_gaps": [
+        "Does not copy bytes.",
+        "Does not freeze mappings."
+      ],
+      "matching_recipes": [],
+      "minimal_usage": [
+        "const transfer = @import(\"bounded-user-memory-transfer-plan\");",
+        "const plan = try transfer.TransferPlan(4).plan(start, length, .read_from_user, query);"
+      ],
+      "module": "bounded-user-memory-transfer-plan",
+      "operation_map": {
+        "build plan": "plan",
+        "resolve page": "query",
+        "segments": "items"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "public_symbols": [
+        "Access",
+        "Error",
+        "GuestVirtualAddress",
+        "PageQuery",
+        "PageResolution",
+        "PhysicalAddress",
+        "Segment",
+        "TransferPlan",
+        "page_size"
+      ],
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [
+          "capacity"
+        ],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
+      "source": "projects/53-bounded-user-memory-transfer-plan/src/bounded_user_memory_transfer_plan.zig",
+      "status": "full",
+      "summary": "Plan bounded user virtual ranges as validated physical fragments.",
+      "thread_safety": "not_synchronized",
+      "transitive_dependencies": [
+        "checked-half-open-range",
+        "distinct-memory-address-types",
+        "fixed-capacity-vector"
+      ],
+      "transitive_dependents": [],
+      "use_when": [
+        "Need to validate a complete user virtual range before a later physical-memory copy."
       ]
     }
   ]

@@ -43,6 +43,18 @@
       "module": "bounded-system-resource-plan"
     },
     {
+      "dependency": "checked-half-open-range",
+      "module": "bounded-user-memory-transfer-plan"
+    },
+    {
+      "dependency": "distinct-memory-address-types",
+      "module": "bounded-user-memory-transfer-plan"
+    },
+    {
+      "dependency": "fixed-capacity-vector",
+      "module": "bounded-user-memory-transfer-plan"
+    },
+    {
       "dependency": "dynamic-array",
       "module": "byte-writer"
     },

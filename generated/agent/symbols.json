@@ -4,6 +4,9 @@
   "agent_index_version": "2.0.0",
   "generator": "tools/build-agent-index.py",
   "symbols": {
+    "Access": [
+      "bounded-user-memory-transfer-plan"
+    ],
     "AdvancementPolicy": [
       "bounded-binary-sub-reader"
     ],
@@ -77,6 +80,7 @@
       "riscv-sv39-page-table-entry"
     ],
     "Error": [
+      "bounded-user-memory-transfer-plan",
       "riscv-page-table-page-owner",
       "riscv-sv39-page-table-builder",
       "riscv-sv39-page-table-walker",
@@ -107,6 +111,7 @@
       "distinct-memory-address-types"
     ],
     "GuestVirtualAddress": [
+      "bounded-user-memory-transfer-plan",
       "distinct-memory-address-types"
     ],
     "HandleTable": [
@@ -149,6 +154,12 @@
     "PageOwner": [
       "riscv-page-table-page-owner"
     ],
+    "PageQuery": [
+      "bounded-user-memory-transfer-plan"
+    ],
+    "PageResolution": [
+      "bounded-user-memory-transfer-plan"
+    ],
     "PageSize": [
       "physical-page-frame-number-and-address-conversion"
     ],
@@ -167,6 +178,7 @@
       "riscv-sv39-page-table-entry"
     ],
     "PhysicalAddress": [
+      "bounded-user-memory-transfer-plan",
       "distinct-memory-address-types"
     ],
     "PhysicalMemoryRegion": [
@@ -206,6 +218,7 @@
       "saturating-counter"
     ],
     "Segment": [
+      "bounded-user-memory-transfer-plan",
       "elf64-program-header-parser"
     ],
     "SegmentType": [
@@ -231,6 +244,9 @@
     ],
     "TlvDecoder": [
       "type-length-value-decoder"
+    ],
+    "TransferPlan": [
+      "bounded-user-memory-transfer-plan"
     ],
     "TypedHandle": [
       "optional-typed-handle"
@@ -297,6 +313,9 @@
     ],
     "pageSize": [
       "riscv-sv39-virtual-address-indexing"
+    ],
+    "page_size": [
+      "bounded-user-memory-transfer-plan"
     ],
     "parse": [
       "elf64-file-header-parser"

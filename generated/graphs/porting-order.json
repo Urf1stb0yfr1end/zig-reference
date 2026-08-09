@@ -37,6 +37,7 @@
     "wrapping-sequence-number",
     "binary-cursor-checkpoint",
     "bitmap-allocator",
+    "bounded-user-memory-transfer-plan",
     "byte-writer",
     "fixed-bump-allocator",
     "fixed-capacity-priority-queue",

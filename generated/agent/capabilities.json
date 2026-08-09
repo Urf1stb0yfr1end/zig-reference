@@ -73,6 +73,9 @@
     "bounded-topological-sort": [
       "fixed-capacity-topological-sort"
     ],
+    "bounded-user-memory-transfer-planning": [
+      "bounded-user-memory-transfer-plan"
+    ],
     "caller-controlled-time": [
       "bounded-deterministic-scheduler"
     ],
@@ -211,6 +214,9 @@
     "physical-page-frame-allocator": [
       "physical-page-frame-allocator"
     ],
+    "physical-transfer-segmentation": [
+      "bounded-user-memory-transfer-plan"
+    ],
     "range-intersection": [
       "checked-half-open-range"
     ],
@@ -289,6 +295,9 @@
     ],
     "unit-safe-quantity": [
       "unit-safe-quantity"
+    ],
+    "user-page-permission-validation": [
+      "bounded-user-memory-transfer-plan"
     ],
     "validated-ascii-byte": [
       "validated-ascii-byte"

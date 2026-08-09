@@ -43,10 +43,12 @@
       "bounded-system-resource-plan"
     ],
     "bounded-system-resource-plan": [],
+    "bounded-user-memory-transfer-plan": [],
     "byte-writer": [
       "owned-byte-buffer"
     ],
     "checked-half-open-range": [
+      "bounded-user-memory-transfer-plan",
       "elf64-file-header-parser",
       "elf64-program-header-parser",
       "physical-memory-region-set",
@@ -60,6 +62,7 @@
       "type-length-value-decoder"
     ],
     "distinct-memory-address-types": [
+      "bounded-user-memory-transfer-plan",
       "elf64-program-header-parser",
       "physical-memory-region-set",
       "physical-page-frame-allocator",
@@ -92,6 +95,7 @@
       "bounded-system-resource-plan"
     ],
     "fixed-capacity-vector": [
+      "bounded-user-memory-transfer-plan",
       "elf64-program-header-parser",
       "fixed-capacity-priority-queue",
       "fixed-capacity-topological-sort",

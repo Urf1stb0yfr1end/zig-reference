@@ -93,7 +93,8 @@
     {
       "capability": "allocation-free",
       "modules": [
-        "bounded-deterministic-event-trace"
+        "bounded-deterministic-event-trace",
+        "bounded-user-memory-transfer-plan"
       ]
     },
     {
@@ -214,6 +215,7 @@
         "bounded-deterministic-event-trace",
         "bounded-deterministic-scheduler",
         "bounded-system-resource-plan",
+        "bounded-user-memory-transfer-plan",
         "fixed-bump-allocator",
         "fixed-capacity-priority-queue",
         "fixed-capacity-topological-sort",
@@ -698,6 +700,7 @@
         "bounded-deterministic-scheduler",
         "bounded-integer",
         "bounded-system-resource-plan",
+        "bounded-user-memory-transfer-plan",
         "checked-half-open-range",
         "checked-integer-cast",
         "distinct-memory-address-types",
@@ -1211,6 +1214,12 @@
       "capability": "parser stack",
       "modules": [
         "stack"
+      ]
+    },
+    {
+      "capability": "partial and unchecked user-memory transfer planning",
+      "modules": [
+        "bounded-user-memory-transfer-plan"
       ]
     },
     {
@@ -1892,6 +1901,7 @@
     {
       "capability": "virtual-memory",
       "modules": [
+        "bounded-user-memory-transfer-plan",
         "distinct-memory-address-types"
       ]
     },

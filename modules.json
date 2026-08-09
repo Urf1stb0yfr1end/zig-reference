@@ -476,6 +476,15 @@
       "details": "projects/52-bounded-deterministic-scheduler/details.json",
       "unit_test_step": "test-bounded-deterministic-scheduler",
       "smoke_test_step": "smoke-bounded-deterministic-scheduler"
+    },
+    {
+      "id": "53",
+      "canonical_name": "bounded-user-memory-transfer-plan",
+      "directory": "projects/53-bounded-user-memory-transfer-plan",
+      "public_entrypoint": "projects/53-bounded-user-memory-transfer-plan/src/bounded_user_memory_transfer_plan.zig",
+      "details": "projects/53-bounded-user-memory-transfer-plan/details.json",
+      "unit_test_step": "test-bounded-user-memory-transfer-plan",
+      "smoke_test_step": "smoke-bounded-user-memory-transfer-plan"
     }
   ]
 }

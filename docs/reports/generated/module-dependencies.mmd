@@ -10,6 +10,9 @@ graph TD
   bounded_system_resource_plan --> checked_integer_cast
   bounded_system_resource_plan --> fixed_bump_allocator
   bounded_system_resource_plan --> fixed_capacity_topological_sort
+  bounded_user_memory_transfer_plan --> checked_half_open_range
+  bounded_user_memory_transfer_plan --> distinct_memory_address_types
+  bounded_user_memory_transfer_plan --> fixed_capacity_vector
   byte_writer --> dynamic_array
   elf64_file_header_parser --> binary_cursor_checkpoint
   elf64_file_header_parser --> bounded_byte_reader
