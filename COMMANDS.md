@@ -350,3 +350,12 @@ Batch 19 executed the self-test and full lab with Zig 0.14.0 and QEMU 8.2.2. Bot
 Batch 20 executed both repaired commands with Zig 0.14.0 and QEMU 8.2.2. Actual evidence showed allocator count `7 -> 7`, page-table count `4 -> 4`, identical Batch 19 and Batch 20 U-page PAs, one unchanged 36-leaf set, U=2, W+X=0, and the same trusted trap-frame address for both traps. It reuses the Batch 19 U RX code frame, U RW/NX stack frame, four-page hierarchy, and trusted supervisor stack. This is not a syscall table, Linux ABI, user-copy facility, process model, userspace ELF loader, or arbitrary-user-pointer proof.
 
 Batch 21A compiler-executed `test-bounded-user-memory-transfer-plan`, `smoke-bounded-user-memory-transfer-plan`, agent doctor, and `python3 tools/developer-command.py validate-repository` successfully under Zig 0.14.0 after recording current unit and smoke evidence for all 54 modules; the run intentionally did not execute the Batch 18/19/20 real-QEMU labs.
+
+### Batch 21B real user copy-IN
+
+```text
+python3 tools/verify-freestanding-riscv64-user-copy-in.py --self-test
+python3 tools/verify-freestanding-riscv64-user-copy-in.py
+```
+
+The self-test mutation-checks the strict Batch 21B evidence parser. The full command builds the freestanding ELF, derives copied user-probe locations from its symbols, runs two independent `qemu-system-riscv64` machines, preserves the Batch 20 proof chain, and checks exact 765-byte Morphic equality.

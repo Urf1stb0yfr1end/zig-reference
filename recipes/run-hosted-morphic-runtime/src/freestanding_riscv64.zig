@@ -8,6 +8,7 @@ const frame_allocators = @import("physical-page-frame-allocator");
 const sv39_entries = @import("riscv-sv39-page-table-entry");
 const sv39_builders = @import("riscv-sv39-page-table-builder");
 const sfence_vma = @import("riscv-sfence-vma-invalidation");
+const user_transfer = @import("bounded-user-memory-transfer-plan");
 
 const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
@@ -137,6 +138,65 @@ var service_terminal_return_sepc: usize linksection(".bss") = 0;
 var service_terminal_return_sstatus: usize linksection(".bss") = 0;
 export var service_supervisor_sp: usize linksection(".bss") = 0;
 export var service_supervisor_returned: bool linksection(".bss") = false;
+var copy_active = false;
+var copy_query: user_transfer.PageQuery = undefined;
+var copy_trap_count: usize = 0;
+var copy_frames: [2]usize = .{ 0, 0 };
+var copy_causes: [2]usize = .{ 0, 0 };
+var copy_sepcs: [2]usize = .{ 0, 0 };
+var copy_status: [2]usize = .{ 0, 0 };
+var copy_sps: [2]usize = .{ 0, 0 };
+var copy_pointer: usize = 0;
+var copy_length: usize = 0;
+var copy_segment_pa: usize = 0;
+var copy_segment_offset: usize = 0;
+var copy_segment_length: usize = 0;
+var copy_segment_count: usize = 0;
+var copy_coverage: usize = 0;
+var copy_scratch: [32]u8 = [_]u8{0xa5} ** 32;
+var copy_prepared_sstatus: usize = 0;
+var copy_result: usize = 0;
+var copy_terminal_marker: usize = 0;
+var copy_return_count: usize = 0;
+var copy_terminal_count: usize = 0;
+
+export fn userCopyInProbeTemplateBegin() linksection(".text.user_copy_probe") callconv(.naked) void {
+    asm volatile (
+        \\addi sp, sp, -48
+        \\li t0, 0x726573752d67697a
+        \\sd t0, 0(sp)
+        \\li t0, 0x2179726f6d656d2d
+        \\sd t0, 8(sp)
+        \\li t1, 0x21b0
+        \\sd t1, 16(sp)
+        \\mv a0, sp
+        \\li a1, 16
+        \\.global userCopyInProbeServiceEcall
+        \\userCopyInProbeServiceEcall:
+        \\ecall
+        \\.global userCopyInProbeAfterService
+        \\userCopyInProbeAfterService:
+        \\li t0, 0x21b
+        \\bne a0, t0, userCopyInProbeFail
+        \\ld t0, 16(sp)
+        \\li t1, 0x21b0
+        \\bne t0, t1, userCopyInProbeFail
+        \\li t0, 0x21c0
+        \\sd t0, 24(sp)
+        \\li a2, 0x21ee
+        \\.global userCopyInProbeTerminalEcall
+        \\userCopyInProbeTerminalEcall:
+        \\ecall
+        \\userCopyInProbeFail: unimp
+        \\j userCopyInProbeFail
+        \\.global userCopyInProbeTemplateEnd
+        \\userCopyInProbeTemplateEnd:
+    );
+}
+extern var userCopyInProbeServiceEcall: u8;
+extern var userCopyInProbeAfterService: u8;
+extern var userCopyInProbeTerminalEcall: u8;
+extern var userCopyInProbeTemplateEnd: u8;
 
 export fn userServiceProbeTemplateBegin() linksection(".text.user_service_probe") callconv(.naked) void {
     asm volatile (
@@ -274,6 +334,7 @@ export fn userServiceTrapEntry() linksection(".text.user_service_trap") callconv
 }
 
 export fn recordUserServiceTrap(frame: *TrapFrame) callconv(.c) void {
+    if (copy_active) return recordUserCopyTrap(frame);
     const index = service_trap_count;
     if (index >= 2 or frame.scause >> 63 != 0 or (frame.scause & 0x7fff_ffff_ffff_ffff) != 8 or frame.sstatus & 0x100 != 0) shutdown();
     const template_begin = @intFromPtr(&userServiceProbeTemplateBegin);
@@ -316,6 +377,51 @@ export fn recordUserServiceTrap(frame: *TrapFrame) callconv(.c) void {
         service_terminal_return_sstatus = frame.sstatus;
         service_terminal_to_supervisor_count += 1;
     }
+}
+
+fn recordUserCopyTrap(frame: *TrapFrame) void {
+    const index = copy_trap_count;
+    const begin = @intFromPtr(&userCopyInProbeTemplateBegin);
+    const service_pc = user_code_va + @intFromPtr(&userCopyInProbeServiceEcall) - begin;
+    const terminal_pc = user_code_va + @intFromPtr(&userCopyInProbeTerminalEcall) - begin;
+    if (index >= 2 or frame.scause != 8 or frame.sstatus & (0x100 | 0x40000) != 0 or frame.x[2] != user_stack_va + frames.PageSize - 48) shutdown();
+    if ((index == 0 and frame.sepc != service_pc) or (index == 1 and frame.sepc != terminal_pc)) shutdown();
+    copy_frames[index] = @intFromPtr(frame);
+    copy_causes[index] = frame.scause;
+    copy_sepcs[index] = frame.sepc;
+    copy_status[index] = frame.sstatus;
+    copy_sps[index] = frame.x[2];
+    copy_trap_count += 1;
+    if (index == 0) {
+        copy_pointer = frame.x[10];
+        copy_length = frame.x[11];
+        if (copy_pointer != user_stack_va + frames.PageSize - 48 or copy_length != 16) shutdown();
+        const plan = user_transfer.TransferPlan(1).plan(user_transfer.GuestVirtualAddress.init(copy_pointer), copy_length, .read_from_user, copy_query) catch shutdown();
+        copy_segment_count = plan.items().len;
+        for (plan.items()) |segment| {
+            copy_segment_pa = segment.physical_start.raw();
+            copy_segment_offset = segment.request_offset;
+            copy_segment_length = segment.byte_count;
+            copy_coverage += segment.byte_count;
+            const source: [*]const volatile u8 = @ptrFromInt(segment.physical_start.raw());
+            for (0..segment.byte_count) |i| copy_scratch[segment.request_offset + i] = source[i];
+        }
+        if (copy_coverage != 16 or !std.mem.eql(u8, copy_scratch[0..16], "zig-user-memory!") or
+            !std.mem.allEqual(u8, copy_scratch[16..], 0xa5)) shutdown();
+        copy_result = 0x21b;
+        frame.x[10] = copy_result;
+        frame.sepc = user_code_va + @intFromPtr(&userCopyInProbeAfterService) - begin;
+        frame.sstatus &= ~@as(usize, 0x40122);
+        copy_prepared_sstatus = frame.sstatus;
+        copy_return_count += 1;
+    } else {
+        if (frame.x[10] != 0x21b or frame.x[12] != 0x21ee) shutdown();
+        copy_terminal_marker = frame.x[12];
+        copy_terminal_count += 1;
+        frame.sepc = @intFromPtr(&userServiceSupervisorResume);
+        frame.sstatus = (frame.sstatus & ~@as(usize, 0x40122)) | 0x100;
+    }
+    service_trap_count = copy_trap_count;
 }
 
 export fn userProbeTemplateBegin() linksection(".text.user_probe") callconv(.naked) void {
@@ -1527,11 +1633,9 @@ export fn freestandingMain() callconv(.c) noreturn {
     const service_satp_before = asm volatile ("csrr %[value], satp"
         : [value] "=r" (-> usize),
     );
-    asm volatile ("mv a0, %[entry]; mv a1, %[stack]; mv a2, %[trap_stack]; call enterUserService"
+    asm volatile ("mv a2, %[trap_stack]; li a0, 0x80401000; li a1, 0x80403000; call enterUserService"
         :
-        : [entry] "{a0}" (user_code_va),
-          [stack] "{a1}" (user_stack_va + frames.PageSize),
-          [trap_stack] "{a2}" (trap_end),
+        : [trap_stack] "r" (trap_end),
         : "memory"
     );
     asm volatile ("csrw stvec, %[entry]; csrw sscratch, zero"
@@ -1701,6 +1805,144 @@ export fn freestandingMain() callconv(.c) noreturn {
         service_terminal_marker != 0x20ee or service_stvec_after != historical_stvec or service_sscratch_after != 0 or
         final_u_leaves != 2 or final_wx_leaves != 0) shutdown();
     write("\ncomplete=PASS\nZIGREF_ECALL_RETURN_END\nZIGREF_ECALL_RETURN_RETURNED\n");
+
+    // Batch 21B repopulates the existing RX frame, then validates the user's
+    // complete range with the reusable planner before touching source bytes.
+    const copy_allocated_before = allocator.allocatedCount();
+    const copy_tables_before = page_owner.page_count;
+    const copy_satp_before = asm volatile ("csrr %[value], satp"
+        : [value] "=r" (-> usize),
+    );
+    const copy_begin = @intFromPtr(&userCopyInProbeTemplateBegin);
+    const copy_end = @intFromPtr(&userCopyInProbeTemplateEnd);
+    const copy_size = copy_end - copy_begin;
+    if (copy_size == 0 or copy_size >= frames.PageSize) shutdown();
+    for (0..frames.PageSize) |index| destination[index] = 0;
+    const copy_source: [*]const u8 = @ptrFromInt(copy_begin);
+    for (0..copy_size) |index| destination[index] = copy_source[index];
+    asm volatile ("fence.i" ::: "memory");
+    const ActiveQuery = struct {
+        active: @TypeOf(&builder),
+        fn query(raw: *const anyopaque, page: user_transfer.GuestVirtualAddress) ?user_transfer.PageResolution {
+            const self: *const @This() = @ptrCast(@alignCast(raw));
+            const leaf = self.active.query(page.raw()) catch return null;
+            const flags = leaf.raw_entry & 0xff;
+            if (flags & 1 == 0 or flags & 0xe == 0) return null;
+            return .{ .physical_page_start = user_transfer.PhysicalAddress.init(leaf.physical_address & ~@as(usize, frames.PageSize - 1)), .user = flags & 0x10 != 0, .readable = flags & 0x2 != 0, .writable = flags & 0x4 != 0 };
+        }
+    };
+    const active_query = ActiveQuery{ .active = &builder };
+    copy_query = .{ .context = &active_query, .queryFn = ActiveQuery.query };
+    copy_active = true;
+    service_trap_count = 0;
+    asm volatile ("mv a2, %[trap_stack]; li a0, 0x80401000; li a1, 0x80403000; call enterUserService"
+        :
+        : [trap_stack] "r" (trap_end),
+        : "memory"
+    );
+    copy_active = false;
+    asm volatile ("csrw stvec, %[entry]; csrw sscratch, zero"
+        :
+        : [entry] "r" (historical_stvec),
+        : "memory"
+    );
+    const copy_stvec_after = asm volatile ("csrr %[value], stvec"
+        : [value] "=r" (-> usize),
+    );
+    const copy_sscratch_after = asm volatile ("csrr %[value], sscratch"
+        : [value] "=r" (-> usize),
+    );
+    const copy_satp_after = asm volatile ("csrr %[value], satp"
+        : [value] "=r" (-> usize),
+    );
+    const post_marker: *volatile usize = @ptrFromInt(user_stack_pa + frames.PageSize - 24);
+    write("ZIGREF_USER_COPY_IN_BEGIN\nuser_code_va=");
+    writeUsizeHex(user_code_va);
+    write("\nuser_code_pa=");
+    writeUsizeHex(user_code_pa);
+    write("\nuser_stack_va=");
+    writeUsizeHex(user_stack_va);
+    write("\nuser_stack_pa=");
+    writeUsizeHex(user_stack_pa);
+    write("\nsatp_before=");
+    writeUsizeHex(copy_satp_before);
+    write("\nsatp_after=");
+    writeUsizeHex(copy_satp_after);
+    write("\nroot_physical=");
+    writeUsizeHex(root_physical);
+    write("\nphysical_allocated_before=");
+    writeUsizeHex(copy_allocated_before);
+    write("\nphysical_allocated_after=");
+    writeUsizeHex(allocator.allocatedCount());
+    write("\npage_table_count_before=");
+    writeUsizeHex(copy_tables_before);
+    write("\npage_table_count_after=");
+    writeUsizeHex(page_owner.page_count);
+    write("\ntemplate_begin=");
+    writeUsizeHex(copy_begin);
+    write("\nservice_ecall=");
+    writeUsizeHex(@intFromPtr(&userCopyInProbeServiceEcall));
+    write("\nafter_service=");
+    writeUsizeHex(@intFromPtr(&userCopyInProbeAfterService));
+    write("\nterminal_ecall=");
+    writeUsizeHex(@intFromPtr(&userCopyInProbeTerminalEcall));
+    write("\ntemplate_end=");
+    writeUsizeHex(copy_end);
+    write("\npayload_va=");
+    writeUsizeHex(copy_pointer);
+    write("\npayload_length=");
+    writeUsizeHex(copy_length);
+    write("\nsegment_count=");
+    writeUsizeHex(copy_segment_count);
+    write("\nsegment_va=");
+    writeUsizeHex(copy_pointer);
+    write("\nsegment_pa=");
+    writeUsizeHex(copy_segment_pa);
+    write("\nsegment_request_offset=");
+    writeUsizeHex(copy_segment_offset);
+    write("\nsegment_byte_count=");
+    writeUsizeHex(copy_segment_length);
+    write("\nsegment_coverage=");
+    writeUsizeHex(copy_coverage);
+    write("\ncopied_hex=7a69672d757365722d6d656d6f727921\ncopied_length=");
+    writeUsizeHex(copy_coverage);
+    write("\nscratch_tail=poison-preserved\ntrap_count=");
+    writeUsizeHex(copy_trap_count);
+    write("\nfirst_frame=");
+    writeUsizeHex(copy_frames[0]);
+    write("\nsecond_frame=");
+    writeUsizeHex(copy_frames[1]);
+    write("\nfirst_scause=");
+    writeUsizeHex(copy_causes[0]);
+    write("\nfirst_sepc=");
+    writeUsizeHex(copy_sepcs[0]);
+    write("\nfirst_sstatus=");
+    writeUsizeHex(copy_status[0]);
+    write("\nsecond_scause=");
+    writeUsizeHex(copy_causes[1]);
+    write("\nsecond_sepc=");
+    writeUsizeHex(copy_sepcs[1]);
+    write("\nsecond_sstatus=");
+    writeUsizeHex(copy_status[1]);
+    write("\nprepared_sstatus=");
+    writeUsizeHex(copy_prepared_sstatus);
+    write("\nservice_result=");
+    writeUsizeHex(copy_result);
+    write("\npost_return_marker=");
+    writeUsizeHex(post_marker.*);
+    write("\nterminal_marker=");
+    writeUsizeHex(copy_terminal_marker);
+    write("\nreturn_count=");
+    writeUsizeHex(copy_return_count);
+    write("\nterminal_count=");
+    writeUsizeHex(copy_terminal_count);
+    write("\nstvec_after=");
+    writeUsizeHex(copy_stvec_after);
+    write("\nsscratch_after=");
+    writeUsizeHex(copy_sscratch_after);
+    write("\ntranslation_change=none\nsfence_vma=not-required-no-pte-change\nfence_i=local-hart-executed\nsum=observed-zero\ncomplete=PASS\nZIGREF_USER_COPY_IN_END\nZIGREF_USER_COPY_IN_RETURNED\n");
+    if (copy_allocated_before != allocator.allocatedCount() or copy_tables_before != page_owner.page_count or copy_satp_before != copy_satp_after or
+        copy_stvec_after != historical_stvec or copy_sscratch_after != 0 or post_marker.* != 0x21c0 or copy_trap_count != 2) shutdown();
     var output: [128]u8 = undefined;
     var trace: [2048]u8 = undefined;
     const result = morphic.runFake(&output, &trace) catch {
