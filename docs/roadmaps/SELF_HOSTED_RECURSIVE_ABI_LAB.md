@@ -237,7 +237,39 @@ Only after the corresponding Linux facilities are mature should the kernel attem
 
 ### M8 — hardware virtualization acceleration
 
-Later, replace or supplement TCG with native VMX/SVM support or a KVM-compatible interface. This is a performance upgrade to an already functioning recursive laboratory, not a dependency for creating it.
+Later, replace or supplement TCG with native VMX/SVM support or a KVM-compatible interface. This is initially a performance upgrade to an already functioning recursive laboratory, not a dependency for creating it.
+
+The longer-term intention goes further than acceleration. The kernel should eventually grow into a full hypervisor-capable experimental platform: agents should be able to create isolated guest machines recursively, boot known-good implementations of systems or subsystems relevant to the capability they are currently building, issue the same queries or workloads against both the reference implementation and our implementation, compare observable behavior, and use any discrepancy as the next concrete engineering task.
+
+In that model, virtualization is not merely a way to run another operating system. It becomes a general mechanism for executable inquiry. When an agent needs to know how a capability is supposed to behave, it should increasingly be able to ask a real implementation by running it in a controlled guest, capture the answer, test our implementation against it, and preserve the discovered behavior as a permanent regression.
+
+Conceptually:
+
+```text
+agent seeks capability
+        ↓
+select known-good implementation
+        ↓
+instantiate reference guest
+        ↓
+issue controlled query / workload
+        ↓
+capture observable behavior
+        ↓
+run same query against our system
+        ↓
+compare
+        ↓
+match ───────────────► preserve test
+  │
+  └─ mismatch
+        ↓
+   agent fixes implementation
+        ↓
+        ↺
+```
+
+The ultimate goal is therefore not simply self-hosting and not simply nested virtualization. It is a recursively testable system in which agents can construct temporary reference worlds as needed, interrogate actual implementations, and progressively convert those observations into compact executable knowledge inside the repository.
 
 ## Design rule
 
