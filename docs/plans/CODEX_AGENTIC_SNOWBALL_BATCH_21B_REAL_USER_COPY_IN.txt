@@ -1,0 +1,617 @@
+CODEX AGENTIC SNOWBALL — BATCH 21B
+REAL USER COPY-IN THROUGH ACTIVE SV39
+
+Repository:
+thanks-cohn/zig-reference
+
+Plan path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_21B_REAL_USER_COPY_IN.txt
+
+MISSION
+
+Advance the merged Batch 21A planner into the real freestanding RISC-V machine path by proving exactly one new architectural pressure:
+
+real U-mode bytes
+→ user pointer + length in registers
+→ U-mode ECALL
+→ trusted S-mode trap stack
+→ adapt active Sv39 translation into bounded-user-memory-transfer-plan
+→ validate the complete user range
+→ copy exact bytes through resolved physical segments into trusted supervisor storage
+→ mechanically prove the copied bytes
+→ SRET back to U-mode
+→ prove user execution resumed
+→ terminal U-mode ECALL
+→ known supervisor continuation
+→ unchanged Morphic frame
+
+This batch is COPY-IN only.
+
+Do not implement copy-out in this run.
+Do not build a syscall table.
+Do not assign Linux syscall numbers.
+Do not add a userspace ELF loader.
+Do not add VFS, file descriptors, processes, mmap, brk, signals, futexes, threads, procfs, sockets, BusyBox, APK, or Alpine rootfs work.
+
+The purpose is to turn the new reusable transfer planner into a real machine-proven safe user-read primitive without broadening the ABI surface.
+
+WHY THIS IS THE NEXT ALPINE STEP
+
+Read:
+
+docs/roadmaps/SELF_HOSTED_RECURSIVE_ABI_LAB.md
+
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_21_BOUNDED_USER_MEMORY_TRANSFER.txt
+
+Batch 21A intentionally split the original Batch 21 scope because the monolithic request exceeded a practical Codex run.
+
+Batch 21A has now merged the reusable allocation-free module:
+
+projects/53-bounded-user-memory-transfer-plan
+
+Current merged Batch 21A commit:
+
+9ae67288718cc8f47c3f1c357dd53d71aae42e1a
+
+The new module already proves, in isolation:
+
+- checked user virtual start + length arithmetic;
+- bounded page-count/capacity checking;
+- one page-confined segment per touched virtual page;
+- non-contiguous physical backing support;
+- U=1 requirement;
+- read/write permission direction;
+- page-offset preservation;
+- deterministic errors;
+- zero-length policy;
+- failure-atomic planning;
+- no heap allocation.
+
+Batch 21B must NOT duplicate that logic in the machine adapter.
+It must compose the module.
+
+The shortest credible Alpine path now needs the kernel to safely consume actual user buffers. This is the first real integration of that capability.
+
+BASELINE AND TASK-BUDGET RULE
+
+Treat the actual checked-out HEAD as truth and record it before implementation.
+
+At plan creation time main is:
+
+9ae67288718cc8f47c3f1c357dd53d71aae42e1a
+
+Do not spend the beginning of this run replaying every old QEMU lab.
+
+Previous work has already established the merged Batch 18–20 chain and Batch 21A repository closure.
+
+Before source changes, run only lightweight/focused gates:
+
+1. git rev-parse HEAD
+2. git status --short --branch
+3. zig version
+4. python3 tools/query-reference.py agent doctor
+5. zig build test-bounded-user-memory-transfer-plan
+6. zig build smoke-bounded-user-memory-transfer-plan
+7. python3 tools/verify-freestanding-riscv64-ecall-return.py --self-test
+
+If those pass, IMPLEMENT.
+
+Do not run the full Batch 18/19/20 two-QEMU labs before implementation.
+The new Batch 21B verifier must preserve and reuse the historical parser/proof chain, and the expensive machine execution should happen after implementation.
+
+REPOSITORY DISCOVERY
+
+Read AGENTS.md and COMMANDS.md first.
+
+Use Z-Ref discovery narrowly. Do not repeat the already-settled question of whether a user-memory planner exists; it exists and must be reused.
+
+Inspect/preflight at minimum:
+
+- bounded-user-memory-transfer-plan;
+- riscv-sv39-page-table-walker;
+- riscv-sv39-page-table-entry;
+- distinct-memory-address-types;
+- existing Batch 19/20 trap frame and U-mode machinery;
+- run-hosted-morphic-runtime recipe;
+- current freestanding RISC-V machine source and verifier conventions.
+
+Find the actual Batch 20 implementation symbols and preserve their architecture unless a mechanical reason requires a small extension.
+
+Do not create another general-purpose user-copy module in this batch.
+
+NON-NEGOTIABLE MACHINE RESULT
+
+Two independent real qemu-system-riscv64 executions must prove all of the following:
+
+1. Batch 12–20 evidence still parses/preserves its existing strict invariants.
+2. Batch 21B executes only after Batch 20 has completed.
+3. Batch 21B finishes before the canonical Morphic frame begins.
+4. The existing U RX code page at 0x80401000 is reused.
+5. The existing U RW/NX stack page at 0x80402000 is reused.
+6. No new physical frame is allocated for Batch 21B.
+7. No new page-table frame is allocated.
+8. satp/root is unchanged.
+9. The final raw leaf set is unchanged from Batch 20 truth.
+10. Exactly two leaves remain U=1.
+11. W+X remains zero.
+12. SUM remains zero for the complete Batch 21B proof.
+13. User code constructs a deterministic byte payload in its own U RW stack page.
+14. User code passes the payload virtual address and exact byte length in registers to a distinct ELF-derived Batch 21B ECALL site.
+15. Supervisor code does not dereference the supplied user virtual pointer directly.
+16. Supervisor adapts the active Sv39 page-table truth into the merged bounded-user-memory-transfer-plan module.
+17. The planner validates the complete range before any byte is copied.
+18. The successful plan requires U=1 and readable permission for each touched page.
+19. The machine adapter copies only through the planner-produced physical segments.
+20. Exact requested bytes are copied into fixed supervisor-owned scratch storage.
+21. No byte before or after the requested destination range is modified.
+22. The copied payload is mechanically proven against an independent expected value.
+23. Supervisor returns a deterministic success/result marker to U-mode.
+24. SRET returns to an ELF-derived post-copy user continuation.
+25. User code proves it resumed after the copy service.
+26. A final distinct terminal U-mode ECALL deliberately returns to a known S-mode continuation.
+27. Trusted trap-stack entry remains register-only before the first trap-frame memory store, preserving the existing first-instruction csrrw sp,sscratch,sp rule.
+28. sscratch/trap-stack state is correctly rearmed for the terminal trap.
+29. stvec is restored and mechanically read back.
+30. sscratch is neutralized/restored and mechanically read back.
+31. allocator count before/after is unchanged.
+32. page-table-owner count before/after is unchanged.
+33. FENCE.I is executed after repopulating the existing user code frame.
+34. No SFENCE.VMA is claimed for Batch 21B if no PTE changes occur.
+35. Exact 765-byte Morphic equality remains preserved across hosted, fake, and both real machines.
+36. Full repository validation passes.
+37. No Linux syscall/user-copy compatibility claim is made.
+
+REUSE BATCH 20 GEOMETRY
+
+Keep the established addresses unless the actual merged implementation proves otherwise:
+
+user code VA:
+0x80401000
+
+user stack VA:
+0x80402000
+
+user stack top:
+0x80403000
+
+Reuse the exact existing physical frames and PTEs.
+
+Repopulate the user code physical frame with a distinct Batch 21B copied probe only after Batch 20 has completed.
+
+Translations do not change, so expected synchronization policy is:
+
+translation_change=none
+sfence_vma=not-required-no-pte-change
+fence_i=local-hart-executed
+
+Do not emit these as decorative strings only. Mechanically anchor FENCE.I in the machine path/verifier using the same evidence discipline as prior batches.
+
+USER PAYLOAD
+
+Use one fixed payload small enough to remain within the existing user stack page.
+
+Recommended exact payload:
+
+"zig-user-memory!"
+
+That is 16 bytes and does not require a terminating NUL for the proof.
+
+A different fixed 16-byte payload is acceptable if the implementation has a good mechanical reason, but keep it exact and document it.
+
+Reserve bounded stack-local slots for:
+
+- input payload;
+- user sentinel(s);
+- post-return marker;
+- terminal marker.
+
+Keep all touched memory inside the existing U RW/NX stack page for the required real-machine success path.
+
+The reusable planner already has page-crossing/non-contiguous unit coverage. Do not turn 21B into a cross-page machine test unless it is genuinely cheap.
+
+BATCH 21B USER PROBE
+
+Create a distinct relocation-safe ELF-visible copied user template.
+
+Suggested symbols:
+
+userCopyInProbeTemplateBegin
+userCopyInProbeServiceEcall
+userCopyInProbeAfterService
+userCopyInProbeTerminalEcall
+userCopyInProbeFail
+userCopyInProbeTemplateEnd
+
+Exact names may follow current repository style.
+
+The verifier must derive service ECALL, post-service continuation, terminal ECALL, and template bounds from the built ELF rather than trusting emitted expected constants.
+
+User sequence:
+
+1. reserve a bounded stack-local area;
+2. write the exact 16-byte payload into that U RW/NX memory;
+3. set one or more guard/sentinel values elsewhere in the stack frame;
+4. place payload VA in a0;
+5. place payload length in a1;
+6. optionally place a private Batch 21B operation marker in a2/a7 if the existing bounded state machine benefits from one;
+7. execute the service ECALL;
+8. after SRET, require the expected success/result marker;
+9. verify user-side sentinels remain intact;
+10. write a post-return marker proving resumed U-mode execution;
+11. set a distinct terminal marker;
+12. execute the terminal ECALL;
+13. fail-stop if execution ever falls through unexpectedly.
+
+No libc.
+No heap.
+No SBI from U-mode.
+No Linux syscall numbers.
+No privileged instruction in the copied user template.
+No absolute kernel symbol embedded into relocated U code.
+
+SUPERVISOR SERVICE
+
+Keep a deliberately private Batch 21B state machine.
+
+On the service trap, fail closed unless at minimum:
+
+- interrupt bit is zero;
+- scause is U-mode ECALL (8);
+- trapped SPP=0;
+- sepc equals the ELF-derived service ECALL VA;
+- phase is exactly the expected Batch 21B service phase;
+- a1 equals the exact bounded payload length;
+- user pointer is accepted only through the planner path;
+- trusted trap-stack/frame invariants hold.
+
+Do not read payload bytes before the complete plan succeeds.
+
+ADAPT ACTIVE SV39 TO THE PLANNER
+
+Use the existing active page-table walker/query truth.
+
+Provide a small adapter from active Sv39 results to:
+
+bounded-user-memory-transfer-plan.PageQuery
+
+For each aligned virtual page queried, derive PageResolution from the real leaf PTE/walker result:
+
+- physical_page_start from resolved physical backing;
+- user from raw U bit;
+- readable from R bit/valid leaf semantics;
+- writable from W bit/valid leaf semantics.
+
+The adapter must reject invalid/non-leaf/unmapped translation rather than fabricate permissions.
+
+Do not copy Sv39 permission rules into the generic planner.
+The generic planner remains architecture-independent.
+
+COPY THROUGH PHYSICAL SEGMENTS
+
+After the complete read plan succeeds:
+
+for each planner segment:
+
+- use segment.physical_start;
+- use segment.byte_count;
+- use segment.request_offset;
+- access the already supervisor-accessible physical/identity-mapped backing, not the original user VA;
+- copy into one fixed supervisor-owned scratch array.
+
+Suggested scratch bound:
+
+32 bytes
+
+Required actual copied length:
+
+16 bytes
+
+Initialize the entire scratch array with a poison byte before the copy, for example 0xA5.
+
+After copy, mechanically prove:
+
+- bytes [0..16) equal the exact payload;
+- bytes [16..scratch.len) retain the poison value;
+- observed copied length is exactly 16;
+- segment coverage sums to exactly 16;
+- no source user VA was directly dereferenced by the S-mode copy path.
+
+A deterministic digest may be recorded in addition to exact bytes, but do not use only a digest when exact 16-byte equality is cheap.
+
+SUM POLICY
+
+Keep sstatus.SUM=0 throughout Batch 21B.
+
+The point is to prove that user virtual pointers are treated as untrusted address descriptions, not as supervisor-dereferenceable pointers.
+
+The verifier must inspect actual saved/prepared/trapped status evidence sufficient to prove SUM remained zero across the relevant supervisor path.
+
+Do not merely print sum=0 as a hard-coded claim.
+
+RETURN TO U-MODE
+
+After successful copy and proof:
+
+- set deterministic success marker in saved a0 or another documented return register;
+- advance/prepare sepc to the ELF-derived userCopyInProbeAfterService continuation;
+- prepare sstatus for U-mode return with SPP=0 and safe expected interrupt/SUM policy;
+- restore user integer context;
+- rearm sscratch so the next U→S trap again swaps onto the trusted supervisor trap stack;
+- execute SRET.
+
+User code must then mutate a post-return marker before the terminal ECALL so the second trap proves the first SRET actually resumed U-mode instructions.
+
+TERMINAL TRAP
+
+The second Batch 21B U-mode ECALL is terminal for this sub-batch.
+
+Fail closed unless:
+
+- cause=8;
+- interrupt=0;
+- SPP=0;
+- sepc equals the independently ELF-derived terminal ECALL VA;
+- post-return user marker is present in real saved user state;
+- terminal marker is present in real saved user state;
+- exact expected trap count/phase is observed;
+- trusted trap-stack invariant is again satisfied.
+
+Then deliberately establish the known S-mode continuation using the actual CSR/SRET path consistent with Batch 20's proven architecture.
+
+Do not leave cosmetic frame.sepc/frame.sstatus edits that are not applied.
+
+EVIDENCE FRAME
+
+Emit a distinct Batch 21B frame after Batch 20's returned marker and before Morphic.
+
+Prefer a framing name consistent with existing machine output, for example:
+
+ZIGREF_USER_COPY_IN_BEGIN
+...
+ZIGREF_USER_COPY_IN_END
+ZIGREF_USER_COPY_IN_RETURNED
+
+The exact names may follow current convention.
+
+Evidence should include actual observed values sufficient for an independent verifier to establish:
+
+- run identity;
+- trap count/order;
+- ELF-derived service/resume/terminal PCs;
+- user payload VA and length;
+- planner segment count;
+- each actual segment VA/PA/offset/length;
+- copied exact bytes or canonical byte rendering;
+- scratch poison preservation;
+- actual user return/result marker;
+- actual post-return marker;
+- actual terminal marker;
+- actual scause/SPP/status values for both traps;
+- trusted trap-frame/trap-stack address;
+- stvec/sscratch before/after restoration;
+- satp/root;
+- allocator count before/after;
+- page-table count before/after;
+- user code/stack physical frame identities;
+- FENCE.I evidence;
+- no PTE-change/SFENCE policy evidence;
+- exact final leaf evidence or a mechanically linked prior leaf-set frame sufficient for the new verifier to compare strict equality.
+
+Do not emit values that the verifier cannot distinguish from hard-coded expected claims when the machine can observe the real value.
+
+NEW VERIFIER
+
+Add one strict Batch 21B verifier, following repository naming convention, likely:
+
+tools/verify-freestanding-riscv64-user-copy-in.py
+
+or the nearest consistent name.
+
+It must have:
+
+--self-test
+
+and default full execution mode.
+
+The verifier must reuse/call the strict Batch 20 parser/proof chain rather than reimplementing weaker historical checks.
+
+It must independently inspect the built ELF and derive the copied-template symbols and ECALL/continuation addresses.
+
+It must independently validate the final page-table/mapping facts using existing machine evidence and/or the strict Batch 20 verifier interfaces.
+
+Do not trust a machine-emitted field such as user_pages=2 or wx=0 without checking the underlying leaf evidence.
+
+SELF-TEST REJECTION MATRIX
+
+Keep this smaller than the original monolithic Batch 21 request but strong enough to prevent decorative proof.
+
+At minimum mutation-reject:
+
+1. wrong Batch 21B framing/order;
+2. wrong trap count;
+3. service interrupt bit set;
+4. service cause != 8;
+5. service SPP != 0;
+6. service sepc != ELF-derived service ECALL;
+7. wrong payload VA;
+8. wrong payload length;
+9. missing planner segment;
+10. extra planner segment;
+11. wrong segment request_offset;
+12. wrong segment byte_count;
+13. wrong segment physical target;
+14. supervisor-only or non-readable source leaf;
+15. copied byte mismatch;
+16. wrong copied length;
+17. poisoned scratch tail modified;
+18. SUM observed/prepared as 1;
+19. wrong U-mode success/result marker;
+20. missing post-return marker;
+21. terminal cause/SPP/PC mismatch;
+22. missing/wrong terminal marker;
+23. stvec restoration mismatch;
+24. sscratch restoration mismatch;
+25. satp/root drift;
+26. physical allocation growth;
+27. page-table allocation growth;
+28. user code/stack PA drift;
+29. FENCE.I evidence missing;
+30. false SFENCE/PTE-change policy;
+31. changed/added/missing final leaf;
+32. third U leaf;
+33. W+X leaf;
+34. Morphic payload inequality.
+
+The self-test need not emulate every hardware instruction. It must prove the verifier rejects plausible forged evidence for the semantic claims above.
+
+REAL QEMU EXECUTION
+
+The full Batch 21B verifier must execute two independent bounded qemu-system-riscv64 machines using the repository's existing convention.
+
+Both must independently satisfy the same strict evidence checks.
+
+Do not substitute hosted/fake execution for the required real machines.
+
+Preserve the Morphic conservation invariant:
+
+hosted payload = 765 bytes
+fake payload   = 765 bytes
+machine A      = same exact 765 bytes
+machine B      = same exact 765 bytes
+
+DOCUMENTATION
+
+Update only the documentation/truth needed by this actual integration:
+
+- COMMANDS.md with Batch 21B self/full commands;
+- the relevant run-hosted-morphic-runtime recipe metadata if the recipe's proven surface genuinely changes;
+- a Batch 21B report under docs/reports/;
+- generated indexes/truth required by repository policy.
+
+Do not call the generic planner itself system-proven merely because this one machine adapter composes it unless repository evidence policy explicitly supports that conclusion.
+
+The report must clearly separate:
+
+21A:
+reusable planning semantics
+
+21B:
+real U-mode → validated Sv39 plan → physical copy-IN → U-mode resume
+
+NONCLAIMS
+
+Batch 21B does NOT prove:
+
+- Linux copy_from_user semantics;
+- Linux syscall ABI;
+- generic syscall dispatch;
+- copy-out;
+- arbitrary process address spaces;
+- page-fault recovery;
+- TOCTOU-safe concurrent remapping;
+- pinning user pages;
+- demand paging;
+- ELF userspace loading;
+- argv/envp;
+- file descriptors;
+- VFS;
+- mmap/brk;
+- signals;
+- futexes/threads;
+- BusyBox;
+- Alpine.
+
+The planner itself explicitly does not freeze mappings. Preserve that truth. Batch 21B is a bounded single-machine-phase proof under the current controlled mapping lifetime.
+
+VALIDATION ORDER
+
+After implementation, run in this order:
+
+1. zig build test-bounded-user-memory-transfer-plan
+2. zig build smoke-bounded-user-memory-transfer-plan
+3. python3 tools/verify-freestanding-riscv64-ecall-return.py --self-test
+4. new Batch 21B verifier --self-test
+5. new Batch 21B full verifier (two real QEMU machines)
+6. zig fmt --check build.zig projects recipes conformance
+7. python3 tools/check-command-reference.py --check
+8. python3 tools/query-reference.py agent doctor
+9. python3 tools/developer-command.py validate-repository
+
+Do not separately replay Batch 18, 19, and 20 full two-QEMU labs unless the new verifier cannot mechanically preserve their proof chain or a regression appears.
+
+If a prior invariant fails, fix the regression rather than weakening the old verifier.
+
+ACCEPTANCE CHECKLIST
+
+Before opening the PR, confirm all are true:
+
+[ ] merged Batch 21A planner is actually imported/composed
+[ ] no duplicate user-range validation implementation was created
+[ ] actual active Sv39 results feed PageQuery/PageResolution
+[ ] complete plan succeeds before any copy
+[ ] U=1/read permission required
+[ ] SUM=0 throughout relevant supervisor path
+[ ] no direct S-mode dereference of original user VA
+[ ] exact 16-byte user payload copied through physical segments
+[ ] trusted scratch poison proves no over-copy
+[ ] U-mode receives success marker
+[ ] SRET resumes actual U-mode continuation
+[ ] post-return marker proves resumed U execution
+[ ] terminal ECALL returns deliberately to S continuation
+[ ] trusted trap stack reused for both traps
+[ ] zero new physical frames
+[ ] zero new page-table frames
+[ ] unchanged satp/root
+[ ] unchanged exact final leaf set
+[ ] exactly U=2
+[ ] W+X=0
+[ ] FENCE.I mechanically evidenced
+[ ] no false SFENCE/PTE-change claim
+[ ] two real QEMU runs pass
+[ ] exact 765-byte Morphic equality preserved
+[ ] self-test rejection matrix passes
+[ ] repository validation passes
+[ ] docs state nonclaims explicitly
+
+COMMIT / PR SCOPE
+
+Keep this PR focused on Batch 21B real copy-IN integration.
+
+Expected changed areas:
+
+- freestanding RISC-V machine implementation;
+- Batch 21B verifier;
+- focused report/docs;
+- recipe/command/generated truth required by policy.
+
+Avoid unrelated cleanup and broad refactors.
+
+Commit the completed implementation.
+Push one branch.
+Open or update one PR.
+
+Do not merge.
+Do not create or move milestone tags.
+
+STOP CONDITIONS
+
+Do not stop after reading/discovery merely because the work is nontrivial.
+The deliverable for this run is actual Batch 21B code + verifier + evidence + PR.
+
+Stop without a partial semantic claim only if there is a concrete technical blocker such as:
+
+- the active Sv39 walker cannot expose required leaf/physical information without a foundational change;
+- the existing supervisor mapping cannot safely access resolved physical backing under current geometry;
+- a proven prior invariant makes the requested composition impossible.
+
+If blocked, report the exact failing symbol/contract/invariant and the smallest prerequisite needed.
+
+Do not convert a time-budget concern into a vague technical refusal.
+
+NEXT PRESSURE AFTER 21B
+
+Do not implement it here, but the expected next sub-batch is Batch 21C:
+
+validated copy-OUT + real rejected-write failure atomicity + resumed U-mode byte observation.
+
+After 21C closes the original Batch 21 contract, then evaluate the first bounded real userspace ELF loader/tiny user image as the next Alpine-oriented batch.
