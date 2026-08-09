@@ -1,0 +1,828 @@
+CODEX AGENTIC SNOWBALL BATCH 19 — FIRST BOUNDED U-MODE ROUND TRIP
+
+MISSION
+
+Advance Alpz by exactly one privilege-separation rung:
+
+TAKE THE HARDENED ACTIVE SV39 SUPERVISOR ADDRESS SPACE PROVEN IN BATCH 18, ADD EXACTLY ONE BOUNDED USER EXECUTION PROBE WITH A USER RX CODE PAGE AND USER RW/NX STACK PAGE, ENTER RISC-V U-MODE THROUGH SRET, TAKE ONE INTENTIONAL U-MODE ECALL BACK INTO S-MODE THROUGH A TRUSTED SUPERVISOR-ONLY TRAP STACK, RETURN TO A KNOWN SUPERVISOR CONTINUATION, THEN PROVE FROM REAL QEMU EXECUTION AND RAW INSTALLED PTE BITS THAT THE USER/KERNEL PRIVILEGE BOUNDARY WAS REAL WHILE BATCH 12–18 AND THE CANONICAL MORPHIC PAYLOAD REMAIN UNCHANGED.
+
+The intended bridge is:
+
+Batch 18 hardened active Sv39
+→ preserve the historical Batch 18 permission frame
+→ allocate two owned physical frames for one user code page and one user stack page
+→ reuse the already-existing Sv39 page-table hierarchy
+→ map user code U=1 RX
+→ map user stack U=1 RW/NX
+→ keep every kernel/supervisor mapping U=0
+→ synchronize translation state
+→ synchronize freshly written instruction bytes with FENCE.I
+→ prepare a dedicated supervisor-only trap stack through sscratch
+→ set sepc to the bounded user entry
+→ clear SPP so SRET enters U-mode
+→ execute position-independent user instructions
+→ touch the user stack successfully
+→ execute exactly one ECALL from U-mode
+→ trap to S-mode with scause=8 and trapped SPP=0
+→ switch stacks before the first trap-frame memory write
+→ record the user trap on supervisor-only memory
+→ deliberately return to a known S-mode continuation
+→ restore the ordinary supervisor trap vector/state
+→ prove the final installed leaves and privilege bits
+→ execute canonical Morphic unchanged
+
+This is the first bounded S→U→S round trip.
+
+This is NOT a syscall ABI batch.
+This is NOT a general syscall-dispatch batch.
+This is NOT a return-to-user-after-syscall batch.
+This is NOT a process batch.
+This is NOT a scheduler/preemption batch.
+This is NOT a general user-address-space manager.
+This is NOT an ELF userspace loader.
+This is NOT copy_from_user/copy_to_user.
+This is NOT page-fault recovery.
+This is NOT demand paging.
+This is NOT fork/clone/exec.
+This is NOT mmap/brk.
+This is NOT signals.
+This is NOT futexes.
+This is NOT Linux ABI compatibility.
+This is NOT Alpine boot work.
+
+The single U-mode ECALL exists only as a deterministic one-shot return signal for this proof. Do not assign Linux syscall numbers, do not create a syscall table, and do not claim Linux ECALL semantics.
+
+
+CURRENT FLAGSHIP DOCTRINE
+
+Morphic remains the flagship system-scale composition of zig-reference.
+Alpz is the current flagship real-machine/kernel embodiment used to pressure Morphic and Z-Ref against increasingly serious machine reality.
+
+Batch 19 strengthens the machine boundary without teaching Morphic about privilege levels.
+
+Morphic semantics must remain target-neutral and byte-identical.
+The U-mode transition belongs at the freestanding RISC-V machine boundary.
+
+The conservation relation after success is:
+
+hosted Morphic
+=
+deterministic fake Morphic
+=
+real RISC-V Morphic after hardened Sv39 and one completed U-mode round trip
+
+for the canonical observable payload.
+
+
+CANONICAL BATCH 18 BASELINE
+
+The merged Batch 18 revision is:
+
+23dcafad7dee3518b568663f5a3eca72760c4583
+
+Its immutable independently reproduced milestone tag is:
+
+morphic-riscv-first-supervisor-only-sv39-permission-domains
+
+The peeled tag target is exactly:
+
+23dcafad7dee3518b568663f5a3eca72760c4583
+
+At this baseline, independent local verification proved with Zig 0.14.0 and two real qemu-system-riscv64 machines:
+
+- active Sv39 remains enabled;
+- owned root/page-table frames remain real;
+- text is supervisor RX;
+- rodata is supervisor R/NX;
+- writable kernel state, stack, pool, and translated alias are supervisor RW/NX;
+- U=0 on every Batch 18 installed leaf;
+- W+X=0 on every Batch 18 installed leaf;
+- the existing non-identity alias remains real;
+- Batch 12–17 remain preserved;
+- canonical Morphic remains exactly 765 bytes;
+- aggregate repository validation completed 322/322 build steps and 207/207 tests.
+
+Treat that tag as immutable historical evidence.
+Do not move, delete, recreate, retarget, or repurpose it.
+Do not create a Batch 19 milestone tag unless the maintainer explicitly requests one after independent reproduction.
+
+
+FIRST EXECUTABLE GATE
+
+Before implementing Batch 19:
+
+1. Read AGENTS.md and COMMANDS.md first.
+2. Resolve repository root and exact current HEAD.
+3. Run Agent Fast Path discovery before broad source archaeology.
+4. Prove the current Batch 18 machine truth.
+
+At minimum run:
+
+python3 tools/verify-freestanding-riscv64-sv39-permissions.py --self-test
+python3 tools/verify-freestanding-riscv64-sv39-permissions.py
+
+The full real two-QEMU Batch 18 lab is mandatory.
+
+Batch 19 begins only if the supplied checkout genuinely proves:
+
+- Batch 12–17 preservation;
+- active Sv39 with the owned root;
+- Batch 18 ELF-derived text/rodata/writable domains;
+- actual raw leaf PTE decoding;
+- U=0 for the existing supervisor map;
+- zero W+X leaves;
+- positive post-hardening execution;
+- exact canonical Morphic equality.
+
+If QEMU, readelf, Zig 0.14.0, Python dependencies, or another required executable is unavailable, report that truth. Do not reinterpret a self-test as real-machine evidence.
+
+
+WHY U-MODE IS NEXT
+
+Batch 18 removed the temporary broad RWX kernel mapping and established a truthful supervisor-only page-permission baseline.
+
+The smallest next pressure is not Linux yet. It is proving that the machine can cross the architectural privilege boundary safely.
+
+The long-horizon ladder is approximately:
+
+owned physical frames                         [Batch 16]
+→ active Sv39 kernel continuation             [Batch 17]
+→ hardened supervisor permission domains      [Batch 18]
+→ first bounded U-mode round trip              [Batch 19]
+→ syscall trap and return-to-user boundary
+→ checked user-memory access
+→ ELF userspace loading
+→ process/file-descriptor/VFS work
+→ Linux userspace contracts
+→ musl / BusyBox / Alpine
+
+Do not skip the privilege boundary and jump directly to Linux ABI behavior.
+
+
+Z-REF EXECUTION DOCTRINE
+
+Treat the repository as accumulated executable knowledge.
+
+Use at minimum:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+
+Then use agent decide/card/compose/preflight/impact surfaces to discover:
+
+- current freestanding RISC-V trap entry and TrapFrame layout;
+- existing S-mode synchronous and timer trap preservation behavior;
+- sstatus/sepc/stvec handling already present;
+- current use, if any, of sscratch;
+- current linker stack symbols and total reserved supervisor stack;
+- current Batch 18 Sv39 builder/walker/entry/SFENCE surfaces;
+- exact eight-page pool ownership after Batch 18;
+- exact page-table frames and translated alias physical frame;
+- free-frame count at the Batch 19 transition point;
+- exact existing 0x80400000 translated alias leaf/table geometry;
+- whether the intended user VAs can reuse that already-allocated L0 page table;
+- any existing instruction-cache/FENCE.I primitive;
+- all focused validators and dependency impact.
+
+Construct and record a compact Task Projection in:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_19.md
+
+At minimum record:
+
+requested capability
+Batch 18 executable gate
+selected/reused modules
+current physical-frame arithmetic
+chosen user code VA
+chosen user stack VA/range/top
+chosen physical frames
+page-table reuse/allocation count
+user code PTE policy
+user stack PTE policy
+kernel U-bit invariant
+W^X invariant
+user probe construction method
+instruction synchronization policy
+translation invalidation policy
+stvec policy
+sscratch policy
+trusted trap-stack range
+S→U transition sstatus policy
+U→S trap cause/origin policy
+supervisor continuation policy
+unknown-trap failure behavior
+raw leaf evidence strategy
+positive user execution evidence
+preservation evidence
+unknowns
+non-claims
+minimum trustworthy read set
+focused validation commands
+Snowball Yield
+One-Sentence Preventables
+
+Do not create a reusable module merely because this is a new batch. If discovery shows a genuine reusable correctness gap, repair the smallest canonical layer and prove it rather than adding an Alpz-only duplicate.
+
+
+PRESERVE BATCH 18 AS A HISTORICAL PHASE
+
+Batch 18 has already earned a precise meaning: active Sv39 with a fully supervisor-only bounded address space and zero U leaves.
+
+Do not rewrite that evidence to pretend user pages existed during Batch 18.
+
+Preferred runtime ordering:
+
+Batch 12–17 proofs
+→ Batch 18 hardening
+→ Batch 18 raw-PTE evidence
+→ ZIGREF_SV39_PERMISSIONS_RETURNED
+→ Batch 19 allocate/populate/map user pages
+→ translation + instruction synchronization
+→ Batch 19 S→U→S round trip
+→ Batch 19 raw-PTE/privilege evidence
+→ canonical Morphic
+
+The existing Batch 18 verifier must continue to pass on the final Batch 19 tree without semantic weakening.
+
+Do not edit old verifiers merely to hide a regression.
+
+
+BOUNDED USER ADDRESS-SPACE SHAPE
+
+Batch 19 needs only two user leaves:
+
+1. one 4 KiB user code page;
+2. one 4 KiB user stack page.
+
+No heap.
+No user data segment beyond stack scratch.
+No guard-page/fault policy unless already free and proven without broadening scope.
+No second process.
+No address-space allocator.
+
+Prefer placing the two new user virtual pages immediately after the existing bounded translated alias inside the same already-present 2 MiB Sv39 leaf-table subtree, provided discovery mechanically confirms those virtual pages are currently unmapped.
+
+The existing alias is currently at 0x80400000. A strong shape is conceptually:
+
+0x80400000  existing supervisor-only translated alias
+0x80401000  bounded user RX code page
+0x80402000  bounded user RW/NX stack page
+0x80403000  user stack top
+
+Exact constants may remain project-level constants, but they must be fixed, canonical, documented, independently verified, page-aligned, canonical Sv39 addresses, and non-overlapping with all prior mappings.
+
+The key snowball requirement is:
+
+DO NOT ALLOCATE A NEW PAGE-TABLE PAGE IF THE CURRENT ALIAS L0 TABLE CAN REPRESENT BOTH USER LEAVES.
+
+Mechanically prove whether it can.
+If it can, reuse it.
+If it cannot due to actual current tree geometry, record why before allocating anything new.
+
+The Batch 18 eight-page pool currently has four page-table pages plus the distinct alias data frame in use. Prefer consuming only two additional owned frames for user code and user stack, leaving the page-table hierarchy unchanged and at least one pool frame unconsumed.
+
+Do not enlarge the eight-page pool merely for convenience.
+Do not hard-code free-frame claims without checking allocator/owner truth.
+
+
+USER PAGE PERMISSIONS
+
+Use the existing Sv39 Entry/Builder semantics and prove actual raw installed PTE bits.
+
+USER CODE LEAF
+- valid
+- 4 KiB leaf
+- U=1
+- R=1
+- W=0
+- X=1
+- A=1
+- D=0
+- physical target is one owned, allocated pool frame
+
+USER STACK LEAF
+- valid
+- 4 KiB leaf
+- U=1
+- R=1
+- W=1
+- X=0
+- A=1
+- D=1
+- physical target is a second owned, allocated pool frame
+- physical target differs from user code, alias target, root, and every page-table frame
+
+SUPERVISOR LEAVES
+- remain U=0
+- preserve Batch 18 text/rodata/writable/alias semantics
+- remain W^X at the leaf level
+
+After user mappings are installed, the bounded proof should have exactly two U=1 leaves and no unexpected user leaf.
+
+Do not claim page-fault isolation by intentionally touching U=0 kernel pages from user mode. Raw PTE evidence is sufficient for the denied-access bit policy in this batch.
+
+
+USER PROBE CONSTRUCTION
+
+There is no userspace ELF loader yet. Do not invent one in Batch 19.
+
+Build one tiny deterministic, relocation-safe user probe and copy its instruction bytes into the allocated user-code physical frame through the supervisor identity mapping before entering U-mode.
+
+Preferred probe properties:
+
+- bounded size far below one page;
+- position-independent after copying;
+- no kernel-symbol address references;
+- no SBI calls;
+- no libc;
+- no heap;
+- no PC-relative reference to kernel data;
+- no privileged instructions;
+- no syscall-number convention;
+- uses only fixed register sentinels and the supplied user stack;
+- stores one sentinel to the user stack and reads it back;
+- places known values in a few general registers;
+- executes exactly one ECALL as the intentional return signal;
+- contains a fail-stop instruction/loop after ECALL so accidental return to U-mode after the one-shot trap cannot silently look successful.
+
+A strong implementation is a small assembler-defined template with ELF-visible begin/end/ECALL labels whose bytes are copied into the user-code frame.
+
+The verifier should derive the expected ECALL offset from those canonical template symbols and require the trapped sepc to equal:
+
+user_code_va + (template_ecall - template_begin)
+
+Do not trust a machine-emitted expected_ecall field without independently checking the template relationship.
+
+If pseudo-instructions are used, prove the emitted template still contains no relocation-dependent reference that becomes wrong after copying.
+
+
+INSTRUCTION AND TRANSLATION SYNCHRONIZATION
+
+This is mandatory correctness work.
+
+The supervisor writes new instruction bytes into memory and then causes U-mode to fetch them through a new executable virtual mapping.
+
+Therefore do not rely on QEMU cache friendliness.
+
+Required sequence:
+
+populate/verify user code physical frame
+→ install user code + user stack PTEs
+→ execute the architecturally appropriate SFENCE.VMA boundary for the new translations
+→ execute FENCE.I before U-mode instruction fetch
+→ enter U-mode
+
+Reuse the existing SFENCE.VMA machinery.
+Search for an existing FENCE.I primitive before adding code. If none exists, one explicit RISC-V adapter-level FENCE.I is acceptable for this bounded single-hart proof; record that it is a local-hart instruction synchronization boundary, not a multi-hart I-cache protocol.
+
+Evidence must distinguish translation synchronization from instruction synchronization.
+
+ONE-SENTENCE PREVENTABLE:
+
+Fresh executable bytes are not proven executable correctly merely because QEMU happened to fetch the bytes you just wrote; synchronize instruction fetch explicitly.
+
+
+TRUSTED SUPERVISOR TRAP STACK
+
+This is the most important safety requirement in Batch 19.
+
+RISC-V does not automatically replace sp when a U-mode trap enters S-mode.
+
+The current supervisor trap entry was designed for traps whose interrupted sp is already a supervisor stack pointer. Do NOT enter U-mode and let the first trap frame be written on the user-controlled stack.
+
+The U-mode trap path must switch to trusted supervisor-only memory before its first trap-frame load/store.
+
+Use sscratch or an equivalently standard, mechanically justified RISC-V mechanism.
+
+A strong bounded design is:
+
+- keep the existing total 64 KiB linker-reserved supervisor stack extent;
+- carve a small fixed trap-stack region from that existing reservation rather than allocating another physical frame;
+- preserve the historical __stack_bottom/__stack_top total-range meaning;
+- introduce explicit linker symbols for the normal supervisor stack ceiling and dedicated U-trap stack begin/end/top;
+- start ordinary supervisor execution below the reserved trap-stack region;
+- set sscratch to the dedicated trap-stack top immediately before entering U-mode;
+- on trap from U-mode, use a register-only stack swap such as the canonical csrrw sp,sscratch,sp pattern before any memory store;
+- record the original user sp from sscratch only after the temporary register used for that read has itself been safely saved;
+- place the complete TrapFrame only on the supervisor-only trap stack.
+
+Do not simply point sscratch at __stack_top while freestandingMain may already occupy the same stack area.
+Do not rely on undocumented spare bytes above or below the current stack pointer.
+Do not allocate a user-accessible trap stack.
+
+The verifier must prove:
+
+- trap-frame address lies inside the declared trusted trap-stack range;
+- the leaf containing that trap frame has U=0 and RW/NX supervisor permissions;
+- trapped user sp lies inside the declared user stack page;
+- no trap-frame memory write is required before the stack swap.
+
+Nested traps/interrupts remain out of scope. Keep interrupts disabled across this bounded U-mode probe so the dedicated one-shot trap stack cannot be confused with a general nested-trap design.
+
+
+S→U TRANSITION
+
+Enter U-mode architecturally, not by labeling S-mode code as user code.
+
+Immediately before the transition, prove/establish at minimum:
+
+- active satp remains Sv39 with the Batch 18 owned root;
+- stvec points to the dedicated bounded user-trap entry;
+- sscratch contains the trusted supervisor trap-stack top;
+- supervisor interrupts are disabled for the bounded probe;
+- sstatus.SPP is cleared so SRET returns to U-mode;
+- SPIE/SIE policy is explicit and does not accidentally enable asynchronous user-time interrupts;
+- SUM remains disabled unless a specific documented operation truly requires it;
+- sepc contains the user-code entry VA;
+- user sp contains the aligned top of the user stack page;
+- the transition executes SRET.
+
+Preserve enough supervisor call state to return safely to the exact continuation after the U-mode trap. Do not assume user general registers will preserve supervisor caller/callee state.
+
+A small assembly trampoline may save the normal supervisor continuation state, enter U-mode, and later restore it after the dedicated trap path returns to S-mode.
+
+Keep this bounded and explicit.
+
+
+U→S RETURN SIGNAL
+
+The user probe executes exactly one ECALL.
+
+The dedicated user-trap path must prove:
+
+- interrupt bit = 0;
+- scause = 8 (environment call from U-mode);
+- trapped sstatus.SPP = 0, mechanically proving the interrupted privilege was U;
+- trapped sepc equals the independently derived copied-template ECALL VA;
+- trapped user sp is in the user stack range;
+- selected user register sentinels match the probe contract;
+- the user stack sentinel was actually written/read as expected;
+- the trap frame itself resides on the supervisor-only trap stack.
+
+This is not a syscall dispatcher.
+
+Do not decode a7 as a syscall number.
+Do not expose a syscall table.
+Do not copy arbitrary user pointers.
+Do not return a syscall result to U-mode.
+
+After recording the one-shot expected trap, deliberately transfer to a known supervisor continuation. A clean approach is to set the saved return state for S-mode and execute SRET into a supervisor resume label while restoring the saved supervisor stack/callee state.
+
+Record exactly how SPP/SPIE/SIE are prepared for that supervisor continuation.
+
+Any unexpected user-origin exception/interrupt/cause/sepc must fail closed and must not inherit the ECALL success policy.
+
+
+RESTORE SUPERVISOR TRAP STATE
+
+After the bounded S→U→S round trip completes:
+
+- restore stvec to the canonical historical supervisorTrapEntry;
+- neutralize/clear sscratch if it is no longer part of the ordinary supervisor convention;
+- prove satp/root unchanged;
+- prove supervisor execution resumed at the intended label;
+- prove the ordinary supervisor stack is restored;
+- keep interrupts in the historical expected state;
+- emit Batch 19 evidence;
+- then run Morphic.
+
+Do not leave the dedicated one-shot U-mode trap vector silently installed for later Morphic execution.
+
+
+RAW FINAL LEAF EVIDENCE
+
+Batch 19 must independently prove the resulting mixed-privilege address space.
+
+Emit one bounded post-round-trip leaf frame or equivalent raw evidence sufficient for the Python verifier to independently decode every installed 4 KiB leaf in the bounded address space.
+
+Reuse the Batch 18 walker/raw-entry capability.
+
+The verifier must mechanically prove:
+
+- all prior Batch 18 identity leaves remain present;
+- existing translated alias remains present and U=0;
+- exactly one user code VA exists and is U=1 RX;
+- exactly one user stack VA exists and is U=1 RW/NX;
+- exactly two leaves total have U=1;
+- every kernel/supervisor leaf has U=0;
+- no leaf has W+X;
+- user code/stack PPNs encode the reported owned physical frames;
+- user code and user stack physical frames are distinct;
+- neither collides with page-table frames or the existing alias target;
+- no duplicate VA;
+- no unexpected leaf;
+- every leaf is level-0 / 4 KiB;
+- satp root remains the same owned root;
+- if current alias-subtree reuse is viable, page-table frame count remains unchanged from Batch 18.
+
+Allow expected physical aliases explicitly: the user code and stack frames also remain visible through their supervisor-only pool identity mappings. Do not mistake expected same-PA/different-VA aliases for duplicate virtual mappings.
+
+Do not claim a global physical-frame W^X policy. The batch proves per-leaf W^X plus privilege isolation bits; the supervisor's direct-map ownership of user physical memory remains an explicit kernel capability.
+
+
+BATCH 19 EVIDENCE FRAME
+
+Add a distinct bounded frame. Do not redefine Batch 18 framing.
+
+Suggested framing:
+
+ZIGREF_UMODE_BEGIN
+...
+ZIGREF_UMODE_END
+ZIGREF_UMODE_RETURNED
+
+Exact field names may follow current repository conventions.
+
+Expose enough evidence for independent recomputation, including at minimum:
+
+- page size;
+- satp before/after;
+- root physical/root PPN;
+- stvec before user transition;
+- dedicated user stvec value;
+- stvec after restoration;
+- sscratch/trap-stack-top policy;
+- trusted trap-stack begin/end;
+- actual trap-frame address;
+- user code VA/PA;
+- user stack VA/PA/begin/end/top;
+- user probe template begin/end/ECALL relationship;
+- translation fence marker;
+- FENCE.I marker;
+- prepared SPP/SPIE/SIE/SUM policy;
+- trapped scause;
+- trapped interrupt bit;
+- trapped sepc;
+- trapped sstatus / trapped SPP;
+- trapped user sp;
+- selected user register sentinels;
+- stack-sentinel evidence;
+- supervisor resume marker;
+- ordinary supervisor stack restoration marker;
+- exact final leaf count;
+- one VA/PA/raw-PTE/level row for every installed leaf;
+- page-table-frame count or equivalent reuse evidence;
+- complete PASS marker.
+
+The Python verifier must decode raw evidence itself. Machine-emitted labels are auxiliary evidence only.
+
+
+REJECTION-ORIENTED VERIFIER
+
+Create:
+
+tools/verify-freestanding-riscv64-umode-round-trip.py
+
+Support:
+
+python3 tools/verify-freestanding-riscv64-umode-round-trip.py --self-test
+python3 tools/verify-freestanding-riscv64-umode-round-trip.py
+
+The self-test must reject malformed/contradictory evidence including at minimum:
+
+- missing/duplicate frame markers;
+- Batch 19 frame before Batch 18 completion;
+- Morphic before U-mode completion;
+- wrong user ECALL cause;
+- interrupt bit set;
+- trapped SPP=1;
+- wrong trapped sepc;
+- user sp outside user stack;
+- trap frame outside trusted supervisor trap stack;
+- trap-stack leaf with U=1;
+- user code leaf missing U or X;
+- user code leaf writable;
+- user stack leaf missing U or W;
+- executable user stack;
+- unexpected third U leaf;
+- any kernel U leaf;
+- any W+X leaf;
+- PPN/PA contradiction;
+- user frame collision with root/page-table/alias frame;
+- unexpected page-table growth when the chosen geometry claims table reuse;
+- missing SFENCE.VMA evidence;
+- missing FENCE.I evidence;
+- satp/root drift;
+- stvec not restored;
+- sscratch not restored/neutralized according to declared policy;
+- user register/stack sentinel contradiction;
+- supervisor resume missing;
+- canonical Morphic byte drift.
+
+The real lab must:
+
+1. build and inspect the current ELF;
+2. derive all relevant linker symbols;
+3. run native hosted Morphic twice;
+4. run deterministic fake Morphic twice;
+5. execute two bounded qemu-system-riscv64 machines;
+6. run the existing Batch 12–18 parsers against each machine output;
+7. independently parse/decode Batch 19 U-mode evidence;
+8. prove the S→U→S round trip in each machine;
+9. prove exact final leaf permissions and privilege bits;
+10. prove exact canonical Morphic equality across native/fake/two real machines;
+11. emit one truthful Developer Minimus handoff.
+
+Real QEMU is mandatory for the full command.
+
+
+LINKER / ELF TRUTH
+
+If carving a dedicated U-trap stack from the existing supervisor stack reservation, expose explicit symbols and derive them from the ELF.
+
+Preserve the historical total stack extent if possible.
+
+Do not hard-code linker addresses into the Python verifier when an ELF symbol can be the source of truth.
+
+If assembler template labels are added for the user probe, make them ELF-visible enough for the verifier to derive the copied entry/ECALL offset relationship.
+
+Do not modify historical Batch 18 report numbers to make the new tree look identical to the old tagged revision. Historical reports describe their own revisions.
+
+
+COMMANDS / RECIPE / REPORT TRUTH
+
+Update COMMANDS.md with the new Batch 19 surfaces.
+
+Update recipes/run-hosted-morphic-runtime/recipe.json so current machine truth includes the bounded U-mode round trip without rewriting historical Batch meanings.
+
+Create:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_19.md
+
+The report must include:
+
+- Task Projection;
+- exact baseline and gate results;
+- chosen user VA layout;
+- frame/page-table reuse arithmetic;
+- stack-switch design and why no trap frame touches user memory;
+- exact sstatus/SPP transition policy;
+- ECALL one-shot return semantics and explicit non-syscall status;
+- raw PTE proof strategy;
+- FENCE.I and SFENCE.VMA boundaries;
+- two-real-QEMU evidence if actually executed;
+- Batch 12–18 preservation;
+- exact Morphic equality;
+- Snowball Yield;
+- One-Sentence Preventables;
+- explicit non-claims;
+- next smallest pressure.
+
+Snowball Yield should distinguish:
+
+- reusable modules reused unchanged;
+- existing page-table hierarchy reused unchanged;
+- new project-specific machine-boundary code;
+- any canonical reusable repair required;
+- new physical frames consumed;
+- new page-table frames consumed;
+- old verifiers preserved unchanged;
+- Morphic semantic changes, expected to be zero.
+
+Do not turn Snowball Yield into a grand benchmark claim.
+
+
+FOCUSED VALIDATION
+
+Run the strongest applicable focused tests discovered from current contracts.
+
+At minimum preserve/re-run the relevant closure around:
+
+- Sv39 Entry;
+- Sv39 indexing;
+- page-table owner;
+- Sv39 walker;
+- Sv39 builder;
+- SFENCE.VMA invalidation;
+- physical-memory region set;
+- physical-page-frame allocator;
+- run-hosted-morphic-runtime recipe;
+- Batch 17 active-Sv39 self-test/full lab;
+- Batch 18 permission self-test/full lab;
+- new Batch 19 self-test/full lab.
+
+Also run:
+
+python3 tools/query-reference.py agent doctor
+python3 tools/check-command-reference.py --check
+python3 tools/developer-command.py validate-repository
+
+and any canonical generation/drift checks required by changed contracts/recipes.
+
+Do not record generated evidence as PASS without actually running its defining command.
+
+
+BATCH 19 SUCCESS CRITERIA
+
+Do not call Batch 19 complete unless all of the following are mechanically true:
+
+1. Batch 18 full real-QEMU gate passed before implementation.
+2. Historical Batch 12–18 proofs still parse/pass on the final machine output.
+3. Exactly one bounded user code page exists with U=1 RX and not W.
+4. Exactly one bounded user stack page exists with U=1 RW/NX.
+5. Exactly two installed leaves have U=1.
+6. Every supervisor/kernel leaf remains U=0.
+7. No installed leaf is W+X.
+8. User frames are allocator-owned and distinct from page-table/alias frames.
+9. Existing page-table hierarchy is reused without new page-table allocation if the baseline alias L0 geometry supports it.
+10. The user trap path switches from user sp to trusted supervisor-only trap memory before its first trap-frame memory store.
+11. The recorded trap frame resides inside the declared supervisor trap-stack range.
+12. The machine enters U-mode through SRET with prepared SPP=0.
+13. The user probe demonstrably executes from the user RX page.
+14. The user probe demonstrably writes/reads its user stack.
+15. The intentional ECALL traps with scause=8, interrupt=0, and trapped SPP=0.
+16. The trapped sepc equals the independently derived copied-template ECALL VA.
+17. The machine returns to the exact intended S-mode continuation.
+18. stvec is restored to the canonical supervisor trap entry afterward.
+19. satp/root remains unchanged.
+20. SFENCE.VMA and FENCE.I boundaries are explicit and executed.
+21. Two independent real system-QEMU runs pass.
+22. Native hosted, deterministic fake, and both real-machine Morphic payloads remain exactly equal at 765 bytes.
+23. Aggregate repository validation passes.
+24. Documentation/recipe/command truth matches implementation.
+25. No syscall ABI, process, ELF userspace, page-fault recovery, or Linux compatibility is falsely claimed.
+
+
+EXPLICIT NON-CLAIMS
+
+Batch 19 does NOT prove:
+
+- general processes;
+- multiple user programs;
+- persistent user task scheduling;
+- syscall dispatch semantics;
+- return from a syscall to user mode;
+- Linux syscall numbering;
+- user pointers or safe copy helpers;
+- ELF user-program loading;
+- page-fault recovery;
+- user/kernel fault isolation under adversarial accesses;
+- signals;
+- threads;
+- fork/clone/exec;
+- mmap/brk;
+- futexes;
+- file descriptors;
+- VFS;
+- POSIX;
+- musl compatibility;
+- BusyBox compatibility;
+- Alpine boot;
+- ASID lifecycle;
+- TLB shootdown;
+- SMP/multi-hart correctness;
+- general interrupt delivery while in U-mode;
+- floating-point/vector user context;
+- production security certification;
+- arbitrary hardware behavior beyond the tested QEMU configuration.
+
+
+NEXT PRESSURE IF BATCH 19 PASSES
+
+The next smallest rung should be reviewed separately.
+
+Likely Batch 20:
+
+FIRST BOUNDED U-MODE ECALL TRAP THAT RETURNS TO U-MODE THROUGH A DEFINED NON-LINUX SYSCALL-BOUNDARY PROOF, WITH ARGUMENT/RESULT REGISTER PRESERVATION AND NO GENERAL ABI CLAIM YET.
+
+That is where syscall trap/return semantics begin.
+
+Do not implement Batch 20 inside Batch 19.
+
+
+PUBLICATION
+
+Work on a dedicated branch.
+Keep commits coherent.
+Run focused tests before broad validation.
+Regenerate canonical derived views only through repository tooling.
+Update COMMANDS.md.
+Create the Batch 19 report.
+Record truthful Snowball Yield.
+Publish the branch.
+Open a mergeable pull request with exact testing evidence and explicit non-claims.
+
+Do not merge the PR yourself unless the task environment explicitly instructs you to do so.
+Do not create or move milestone tags.
+
+
+FINAL STANDARD
+
+The important result is not a printed line saying "user mode".
+
+The important result is a mechanically evidenced privilege round trip:
+
+S-mode hardened kernel
+→ SRET with SPP=0
+→ real U-mode instruction execution from U=1 RX memory
+→ real U-mode stack access in U=1 RW/NX memory
+→ ECALL
+→ hardware trap with scause=8 and trapped SPP=0
+→ register-only stack switch to trusted U=0 supervisor memory before trap-frame stores
+→ bounded supervisor trap recording
+→ deliberate S-mode continuation
+→ final raw PTE proof that exactly two leaves are user-accessible
+→ Morphic unchanged
+
+If any part of that chain is merely inferred from labels rather than executable evidence, Batch 19 is not finished.
