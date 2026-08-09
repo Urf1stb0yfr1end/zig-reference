@@ -58,6 +58,14 @@
       ],
       "status": "full"
     },
+    "bounded-user-memory-transfer-plan": {
+      "dependencies": [
+        "checked-half-open-range",
+        "distinct-memory-address-types",
+        "fixed-capacity-vector"
+      ],
+      "status": "full"
+    },
     "byte-writer": {
       "dependencies": [
         "dynamic-array"

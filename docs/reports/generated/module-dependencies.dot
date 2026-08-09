@@ -10,6 +10,9 @@ digraph modules {
   "bounded-system-resource-plan" -> "checked-integer-cast";
   "bounded-system-resource-plan" -> "fixed-bump-allocator";
   "bounded-system-resource-plan" -> "fixed-capacity-topological-sort";
+  "bounded-user-memory-transfer-plan" -> "checked-half-open-range";
+  "bounded-user-memory-transfer-plan" -> "distinct-memory-address-types";
+  "bounded-user-memory-transfer-plan" -> "fixed-capacity-vector";
   "byte-writer" -> "dynamic-array";
   "elf64-file-header-parser" -> "binary-cursor-checkpoint";
   "elf64-file-header-parser" -> "bounded-byte-reader";

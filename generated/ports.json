@@ -334,6 +334,44 @@
         ],
         "zigVersion": "0.14.0"
       },
+      "module": "bounded-user-memory-transfer-plan",
+      "path": "projects/53-bounded-user-memory-transfer-plan/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "Access",
+            "Error",
+            "GuestVirtualAddress",
+            "PageQuery",
+            "PageResolution",
+            "PhysicalAddress",
+            "Segment",
+            "TransferPlan",
+            "page_size"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-bounded-user-memory-transfer-plan",
+            "zig build smoke-bounded-user-memory-transfer-plan"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented bounded-user-memory-transfer-plan public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
       "module": "byte-writer",
       "path": "projects/06-byte-writer/port.js",
       "risks": [

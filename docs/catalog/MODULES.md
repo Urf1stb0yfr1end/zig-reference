@@ -59,6 +59,7 @@ Use this file for fast discovery. Open a module's `DETAILS.md` or `details.json`
 | `51-bounded-deterministic-event-trace` | Bounded normalized deterministic event recording and canonical rendering | none | schedulers, runtimes, replay observation, host-target comparison | [`DETAILS.md`](../../projects/51-bounded-deterministic-event-trace/DETAILS.md) | [`details.json`](../../projects/51-bounded-deterministic-event-trace/details.json) |
 
 | `52-bounded-deterministic-scheduler` | Allocation-free caller-timed scheduling with stable `(ready_at, priority, insertion)` order | `42-fixed-capacity-priority-queue` | deterministic runtimes, simulations | [`DETAILS.md`](../../projects/52-bounded-deterministic-scheduler/DETAILS.md) | [`details.json`](../../projects/52-bounded-deterministic-scheduler/details.json) |
+| `53-bounded-user-memory-transfer-plan` | Failure-atomic bounded user-range planning into physical page fragments | `00`, `17`, `18` | kernels, hypervisors, emulators | [`DETAILS.md`](../../projects/53-bounded-user-memory-transfer-plan/DETAILS.md) | [`details.json`](../../projects/53-bounded-user-memory-transfer-plan/details.json) |
 
 ## Selection workflow
 

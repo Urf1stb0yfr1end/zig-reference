@@ -262,6 +262,12 @@
     },
     {
       "kind": "function",
+      "module": "bounded-user-memory-transfer-plan",
+      "name": "TransferPlan",
+      "signature": "TransferPlan(comptime capacity: usize) type"
+    },
+    {
+      "kind": "function",
       "module": "optional-typed-handle",
       "name": "TypedHandle",
       "signature": "TypedHandle(comptime Tag: type, comptime Integer: type) type"
@@ -1353,6 +1359,12 @@
       "signature": "isValidEnumValue(comptime E: type, raw: std.meta.Tag(E)) bool"
     },
     {
+      "kind": "function",
+      "module": "bounded-user-memory-transfer-plan",
+      "name": "items",
+      "signature": "items(self: *const Self) []const Segment"
+    },
+    {
       "kind": "method",
       "module": "dynamic-array",
       "name": "items",
@@ -1581,6 +1593,12 @@
       "signature": "plan()"
     },
     {
+      "kind": "function",
+      "module": "bounded-user-memory-transfer-plan",
+      "name": "plan",
+      "signature": "plan(start: GuestVirtualAddress, length: usize, access: Access, resolver: PageQuery) Error!Self"
+    },
+    {
       "kind": "method",
       "module": "dynamic-array",
       "name": "pop",
@@ -1669,6 +1687,12 @@
       "module": "intrusive-doubly-linked-list",
       "name": "pushFront",
       "signature": "pushFront()"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-user-memory-transfer-plan",
+      "name": "query",
+      "signature": "query(self: PageQuery, page_start: GuestVirtualAddress) ?PageResolution"
     },
     {
       "kind": "function",

@@ -27,6 +27,11 @@
       "fixed-bump-allocator",
       "fixed-capacity-topological-sort"
     ],
+    "bounded-user-memory-transfer-plan": [
+      "checked-half-open-range",
+      "distinct-memory-address-types",
+      "fixed-capacity-vector"
+    ],
     "byte-writer": [
       "dynamic-array"
     ],

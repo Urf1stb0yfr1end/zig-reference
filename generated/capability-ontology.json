@@ -210,7 +210,8 @@
       ],
       "description": "Repository capability represented by: allocation-free.",
       "implementing_modules": [
-        "bounded-deterministic-event-trace"
+        "bounded-deterministic-event-trace",
+        "bounded-user-memory-transfer-plan"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -540,6 +541,7 @@
         "bounded-deterministic-event-trace",
         "bounded-deterministic-scheduler",
         "bounded-system-resource-plan",
+        "bounded-user-memory-transfer-plan",
         "fixed-bump-allocator",
         "fixed-capacity-priority-queue",
         "fixed-capacity-topological-sort",
@@ -1860,6 +1862,7 @@
         "bounded-deterministic-scheduler",
         "bounded-integer",
         "bounded-system-resource-plan",
+        "bounded-user-memory-transfer-plan",
         "checked-half-open-range",
         "checked-integer-cast",
         "distinct-memory-address-types",
@@ -3143,6 +3146,23 @@
       "description": "Repository capability represented by: parser stack.",
       "implementing_modules": [
         "stack"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "partial and unchecked user-memory transfer planning",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "partial and unchecked user-memory transfer planning"
+      ],
+      "description": "Repository capability represented by: partial and unchecked user-memory transfer planning.",
+      "implementing_modules": [
+        "bounded-user-memory-transfer-plan"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -4946,6 +4966,7 @@
       ],
       "description": "Repository capability represented by: virtual-memory.",
       "implementing_modules": [
+        "bounded-user-memory-transfer-plan",
         "distinct-memory-address-types"
       ],
       "narrower_capabilities": [],
