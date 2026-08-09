@@ -655,3 +655,304 @@ We built it for you too.
 ---
 
 > **Why redo the rework? Help an agent out. Don’t make the same thing twice.**
+
+## Accomplishments so far
+
+This repository is no longer only a proposal for cumulative systems engineering. A substantial part of the intended snowball has already been exercised in code, tooling, composition, and real-machine experiments.
+
+This section is deliberately an evidence ledger rather than a marketing list. It records what has actually been built or mechanically demonstrated, and keeps future goals separate from completed work.
+
+### A reusable Zig systems foundation exists
+
+The repository now contains a broad lower-level foundation of contracted Zig modules rather than a handful of isolated examples.
+
+Implemented foundations include, among others:
+
+- checked casts, bounded integers, nonzero integers, saturating counters, semantic versions, FourCC values, validated ASCII bytes, wrapping sequence numbers, tagged results, optional typed handles, source spans, endian codecs, and unit-safe quantities;
+- checked half-open ranges, alignment helpers, validated bit flags, validated enum decoding, and distinct virtual/physical memory address types;
+- fixed-capacity vectors, queues/ring buffers, bit sets, priority queues, free lists, bump allocators, object pools, generational handle tables, owned byte buffers, allocator-backed stacks, byte writers, and bitmap allocators;
+- bounded byte readers, binary cursor checkpoints, bounded sub-readers, length-prefixed fields, TLV decoding, and ELF64 file/program-header parsing;
+- explicit lifecycle/state-machine machinery and bounded topological ordering;
+- physical page-number/address conversion, physical-memory region sets, and deterministic physical page-frame allocation;
+- a complete reusable RISC-V Sv39 foundation split across PTE encoding/validation, virtual-address indexing, page-table-page ownership, walking, SFENCE.VMA invalidation planning, and failure-aware page-table construction.
+
+The important accomplishment is not only that these components exist. They are structured to be found and reused by later work instead of rediscovered inside a larger subsystem.
+
+### The repository has an agent-facing engineering layer
+
+The repository now carries a deterministic discovery and validation layer around the source tree.
+
+That layer includes:
+
+- machine-readable `details.json` contracts;
+- human `README.md`, `MASTERY.md`, and `DETAILS.md` contracts;
+- per-module Zig migration knowledge through `port.js`;
+- deterministic catalogs and repository indexes;
+- public-symbol and endpoint indexes;
+- dependency graphs and composition information;
+- command-reference checking;
+- validation-evidence recording;
+- repository policy checking;
+- contract/schema consistency checking;
+- recipe registration and executable composition tests;
+- conformance, property, fuzz-smoke, differential, smoke, and ordinary unit-test paths;
+- agent bootstrap, doctor, discovery, decision, composition, impact, and diagnostic workflows through the repository query tooling.
+
+This means an agent can increasingly begin with a capability question instead of a blind source-tree crawl.
+
+### The Snowball Principle has been exercised, not merely described
+
+Several later machine milestones directly reuse earlier modules without reopening their solved semantics.
+
+Physical memory ownership reuses the repository's typed addresses, region sets, page-number conversion, and frame allocator.
+
+Active Sv39 reuses the physical allocator plus the complete page-table module stack.
+
+Permission hardening reuses the same page-table hierarchy rather than replacing it.
+
+U-mode execution reuses the same owned frames and page tables.
+
+The later ECALL return milestone reuses the exact same user pages, four-page page-table hierarchy, and trusted supervisor trap-stack reservation while allocating **zero new physical frames and zero new page-table frames** for the new behavior.
+
+That is the repository's central thesis appearing in the machine itself: earlier work is being paid for once and composed later.
+
+### Morphic exists across multiple machine bodies
+
+Morphic has progressed beyond a hosted-only idea.
+
+The same canonical Morphic computation has been exercised through:
+
+- hosted native execution;
+- deterministic fake execution;
+- freestanding RISC-V execution under real system QEMU runs.
+
+Across the real-machine milestones, the canonical Morphic artifact has remained exactly **765 bytes**, and the verification chain compares those bytes across hosted, fake, and real-machine embodiments.
+
+The important result is semantic conservation: substantial changes to the machine body, paging, privilege level, traps, timers, and userspace transitions have not required changing the canonical Morphic payload.
+
+### Alpz has crossed from bare supervisor code into real protected U-mode execution
+
+The RISC-V kernel path has advanced through a sequence of separately evidenced milestones.
+
+#### Batch 12 — synchronous supervisor trap boundary
+
+The freestanding kernel established a real supervisor trap entry and return path around a synchronous `EBREAK`, including a fixed 288-byte integer TrapFrame, CSR capture, and `SRET`.
+
+#### Batch 13 — first asynchronous supervisor timer interrupt
+
+The kernel demonstrated a real asynchronous supervisor timer interrupt rather than only synchronous exception handling.
+
+#### Batch 14 — bounded monotonic timer ticks
+
+The timer path was extended to exactly four bounded monotonic ticks with fresh time observations, explicit rearming, and final interrupt neutralization.
+
+#### Batch 15 — scheduler-facing real time
+
+Real supervisor monotonic time was composed into the existing bounded deterministic scheduler while keeping the scheduling boundary deliberately non-preemptive.
+
+#### Batch 16 — real bounded physical-memory ownership
+
+The freestanding image gained a linker-owned, page-aligned eight-page physical pool and exercised the existing physical-memory region and page-frame allocator contracts against actual machine memory.
+
+The proof covered bounded allocation, exhaustion, release, invalid release rejection, deterministic reacquisition, accounting, and real sentinel reads/writes.
+
+#### Batch 17 — active owned Sv39
+
+The kernel stopped treating page tables as a hosted abstraction and activated a real Sv39 hierarchy built from allocator-owned page-table frames.
+
+It switched `satp` into Sv39 mode, executed the required translation fence, continued kernel execution under translation, and installed a real non-identity translated alias.
+
+#### Batch 18 — supervisor-only permission domains
+
+The active address space was hardened into explicit permission domains derived from ELF/linker truth:
+
+- text: supervisor RX;
+- rodata: supervisor R/NX;
+- writable kernel memory: supervisor RW/NX;
+- translated alias: supervisor RW/NX;
+- `U=0` throughout the supervisor address space;
+- `W+X=0` throughout the final leaf set.
+
+The verifier independently decodes raw PTE evidence rather than trusting permission labels emitted by the kernel.
+
+#### Batch 19 — first bounded S→U→S round trip
+
+The kernel crossed the RISC-V privilege boundary for the first time.
+
+It reused the existing Sv39 hierarchy, added exactly one U-mode RX code page and one U-mode RW/NX stack page, copied a position-independent probe into owned memory, synchronized translation/instruction state, and entered U-mode through `SRET`.
+
+The U-mode probe executed real instructions, used its writable user stack, and issued one `ECALL` back to S-mode.
+
+Because RISC-V does not automatically replace `sp` on a U→S trap, the trusted entry path begins with the register-only exchange:
+
+```asm
+csrrw sp, sscratch, sp
+```
+
+before any trap-frame memory access.
+
+The resulting trap was mechanically checked for synchronous cause 8, `SPP=0`, the independently ELF-derived copied ECALL PC, user-stack bounds, register sentinels, trusted supervisor trap-frame placement, exactly two U leaves, and zero W+X leaves.
+
+Two real QEMU machines completed the same proof, while hosted, fake, and both machines retained exact 765-byte Morphic equality.
+
+The immutable milestone is recorded by:
+
+```text
+morphic-riscv-first-bounded-umode-round-trip
+```
+
+#### Batch 20 — supervisor service and deliberate return to U-mode
+
+The next milestone proved that entering the kernel from U-mode was not a one-way terminal trick.
+
+A distinct U-mode probe now performs:
+
+```text
+U-mode
+→ ECALL
+→ trusted S-mode trap handling
+→ fixed register-only supervisor service
+→ SRET back to U-mode
+→ resumed user instructions observe the result
+→ second terminal ECALL
+→ deliberate S-mode continuation
+```
+
+The fixed service consumes register inputs `0x20` and `0x19` and returns `0x39` in `a0`. The resumed user code independently checks the returned value and preserved state before issuing the terminal ECALL.
+
+The repaired proof records real allocator and page-table snapshots, real prepared privilege state, actual terminal register state, actual CSR restoration, and exact post-Batch-20 raw-leaf truth rather than replacing those observations with expected constants.
+
+Batch 20 reuses the Batch 19 code page, stack page, physical frames, four-page page-table hierarchy, and trusted trap stack. The measured allocator count remains `7 -> 7` and page-table count remains `4 -> 4` across the new behavior.
+
+The final machine proof retains exactly two U leaves, zero W+X leaves, unchanged translation shape, and exact 765-byte Morphic equality across hosted, fake, and two real QEMU executions.
+
+### The evidence standard has become progressively stricter
+
+The machine batches do not rely only on a successful boot message.
+
+The accumulated proof style now includes:
+
+- independent ELF-symbol inspection;
+- raw `satp` decoding;
+- raw PTE decoding and exact leaf-set reconstruction;
+- physical-frame ownership reconciliation;
+- actual CSR readbacks;
+- exact trap cause and privilege-state checks;
+- explicit fence-policy checks;
+- trusted-stack bounds and permissions;
+- allocator/page-table before-and-after accounting;
+- deterministic hosted/fake/real Morphic byte comparison;
+- rejection-oriented mutation tests designed to prove that contradictory evidence is actually rejected;
+- preservation of earlier strict verifiers instead of weakening old tests when a later batch changes the image layout;
+- repeated two-machine QEMU execution for the real freestanding milestones.
+
+Historical tagged revisions remain evidence for the binaries they actually described. Later batches prove preservation of semantics without pretending that code growth leaves every old address or leaf count numerically unchanged.
+
+### The project now has explicit architectural vocabulary
+
+The repository has separated three ideas that are easy to collapse accidentally:
+
+- **Z-Ref** is the accumulated semantic, evidence, navigation, and reusable-engineering layer;
+- **Morphic** is the machine-independent composition/semantic architecture whose computation can inhabit different machine bodies;
+- **Alpz** is the current kernel/real-machine embodiment that is pressure-testing those ideas, presently most deeply on RISC-V.
+
+The project also records the compatibility-boundary naming rule: a familiar name is treated as a compatibility claim, while the `z` prefix is reserved as a semantic hazard marker where familiar terminology would cause humans or agents to import a contract the implementation does not yet satisfy.
+
+The repository has also documented Less-Lines Convergence, Instruction Compression, 0-to-Done Speed, Snowball Yield, and related agentic vocabulary for measuring whether accumulated engineering knowledge is actually reducing future work.
+
+### The Linux-ABI direction is now concrete
+
+The Linux-userspace goal has been narrowed into an explicit compatibility strategy rather than a vague desire to "boot Linux."
+
+The intended path is one Linux ABI/semantic contract, with Alpine as the first compact proof environment rather than a separate Alpine-specific ABI.
+
+The roadmap recognizes the actual dependency chain:
+
+```text
+native userspace execution
+→ BusyBox baseline
+→ musl / dynamic ELF requirements
+→ useful Alpine
+→ APK / networking / pseudo-filesystems
+→ QEMU/TCG self-hosting
+→ recursive differential ABI testing
+```
+
+The repository explicitly recognizes that mature Linux compatibility is broader than syscall numbers: ELF behavior, errno semantics, descriptors, memory mapping, signals/processes, futex/thread behavior, `/proc`, `/sys`, `/dev`, ioctls, sockets, polling, filesystems, and related observable contracts all matter.
+
+### The recursive ABI laboratory has been designed
+
+[`docs/roadmaps/SELF_HOSTED_RECURSIVE_ABI_LAB.md`](docs/roadmaps/SELF_HOSTED_RECURSIVE_ABI_LAB.md) now defines the long-term self-hosted testing architecture.
+
+The key intended inflection point is not a custom hypervisor. It is reaching a useful enough Alpine environment on Alpz that `qemu-system-*` can run under QEMU TCG.
+
+That enables the recursive experiment:
+
+```text
+L0 real machine / host Linux
+        ↓
+L1 Alpz + Alpine
+        ↓
+QEMU/TCG
+        ↓
+┌───────────────────┬───────────────────┐
+│ L2 golden Linux   │ L2 newest Alpz    │
+└───────────────────┴───────────────────┘
+        ↓                    ↓
+      same controlled workload
+                 ↓
+               DIFF
+                 ↓
+        smallest reproducer
+                 ↓
+               repair
+                 ↓
+       permanent regression
+```
+
+The design deliberately keeps an external Linux oracle during early and middle development so a bug in Alpz cannot silently become the only source of expected behavior.
+
+Large userspace workloads are treated as discovery tools. Once they expose an incompatibility, the intended workflow is to distill the disagreement into a tiny permanent executable probe.
+
+This is the Snowball Principle applied to operating-system compatibility itself.
+
+### The long-term hypervisor goal has also been clarified
+
+Native virtualization is no longer treated as a prerequisite for reaching the recursive laboratory. TCG can get there first.
+
+The longer-term intention is broader: eventually the system should become a full hypervisor-capable experimental platform in which agents can instantiate known-good reference guests, issue controlled queries or workloads, run the same experiment against our implementation, compare observable behavior, repair discrepancies, and preserve each learned contract as executable repository knowledge.
+
+In that model, virtualization becomes a mechanism for executable inquiry rather than merely a way to run another operating system.
+
+### What is not yet claimed
+
+The project has deliberately **not** claimed completion of the Linux boundary merely because protected U-mode now runs.
+
+As of the completed Batch 20 milestone, the repository does not yet claim:
+
+- a Linux syscall ABI;
+- general syscall numbering or dispatch;
+- safe arbitrary user-pointer transfer;
+- a userspace ELF loader;
+- processes, `fork`, `clone`, or `exec`;
+- file descriptors or a VFS;
+- `mmap`, `brk`, page-fault recovery, or copy-on-write;
+- signals or futex/thread completeness;
+- `/proc`, `/sys`, `/dev`, sockets, or full polling semantics;
+- BusyBox compatibility;
+- musl compatibility;
+- an Alpine shell;
+- APK operation;
+- QEMU/TCG self-hosting;
+- SMP or production-grade security;
+- real-hardware portability beyond the environments actually tested.
+
+Those are the frontier, not accomplishments that have already been earned.
+
+The immediate engineering pressure is the first bounded, permission-checked user-memory transfer primitive. From there the repository can continue toward real ELF userspace, Linux ABI behavior, BusyBox, musl, Alpine, and ultimately the recursive ABI laboratory.
+
+The important fact is that the path is no longer hypothetical from the bottom up.
+
+The repository has already moved from reusable primitive modules, through owned physical memory and live Sv39, through hardened supervisor permissions, across the U-mode privilege boundary, and back again through a real supervisor service while preserving the same Morphic computation.
+
+The snowball is rolling.
