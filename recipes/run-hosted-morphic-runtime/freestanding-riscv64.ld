@@ -8,6 +8,10 @@ SECTIONS {
   .text : {
     *(.text.entry)
     . = ALIGN(4);
+    *(.text.usertrap)
+    . = ALIGN(4);
+    *(.text.enteruser)
+    . = ALIGN(4);
     *(.text.trap)
     *(.text .text.*)
   }
@@ -23,7 +27,12 @@ SECTIONS {
     *(.bss .bss.* COMMON)
     . = ALIGN(16);
     __stack_bottom = .;
-    . += 64K;
+    . += 60K;
+    __supervisor_stack_top = .;
+    __user_trap_stack_begin = .;
+    . += 4K;
+    __user_trap_stack_end = .;
+    __user_trap_stack_top = .;
     __stack_top = .;
   }
   .physical_page_pool (NOLOAD) : ALIGN(4096) {

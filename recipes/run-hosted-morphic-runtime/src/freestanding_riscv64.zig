@@ -23,8 +23,13 @@ extern var __rodata_domain_begin: u8;
 extern var __rodata_domain_end: u8;
 extern var __writable_domain_begin: u8;
 extern var __writable_domain_end: u8;
+extern var __supervisor_stack_top: u8;
+extern var __user_trap_stack_begin: u8;
+extern var __user_trap_stack_end: u8;
 
 const sv39_alias: usize = 0x8040_0000;
+const user_code_va: usize = 0x8040_1000;
+const user_stack_va: usize = 0x8040_2000;
 var sv39_continuation_marker: usize = 0;
 var sv39_permission_global: usize = 0;
 const sv39_permission_rodata: usize = 0x18_39_2026;
@@ -104,6 +109,137 @@ var timer_scause: usize = 0;
 var timer_sstatus: usize = 0;
 export var timer_trap_count: usize = 0;
 var timer_policy_complete: bool = false;
+
+export var user_supervisor_sp: usize linksection(".bss") = 0;
+var user_trap_frame_address: usize linksection(".bss") = 0;
+var user_scause: usize linksection(".bss") = 0;
+var user_sepc: usize linksection(".bss") = 0;
+var user_sstatus: usize linksection(".bss") = 0;
+var user_sp: usize linksection(".bss") = 0;
+var user_a0: usize linksection(".bss") = 0;
+var user_t0: usize linksection(".bss") = 0;
+var user_t1: usize linksection(".bss") = 0;
+export var user_returned: bool linksection(".bss") = false;
+
+export fn userProbeTemplateBegin() linksection(".text.user_probe") callconv(.naked) void {
+    asm volatile (
+        \\li t0, 0x139
+        \\addi sp, sp, -16
+        \\sd t0, 0(sp)
+        \\ld t1, 0(sp)
+        \\li a0, 0x519
+        \\.global userProbeTemplateEcall
+        \\userProbeTemplateEcall:
+        \\ecall
+        \\1: unimp
+        \\j 1b
+        \\.global userProbeTemplateEnd
+        \\userProbeTemplateEnd:
+    );
+}
+extern var userProbeTemplateEcall: u8;
+extern var userProbeTemplateEnd: u8;
+
+export fn userTrapEntry() linksection(".text.usertrap") callconv(.naked) void {
+    asm volatile (
+    // The architectural trap does not change sp.  This register-only swap
+    // is therefore deliberately the first instruction and precedes stores.
+        \\csrrw sp, sscratch, sp
+        \\addi sp, sp, -288
+        \\sd t0, 40(sp)
+        \\sd t1, 48(sp)
+        \\sd a0, 80(sp)
+        \\csrr t0, sscratch
+        \\sd t0, 16(sp)
+        \\csrr t0, sepc
+        \\sd t0, 256(sp)
+        \\csrr t0, sstatus
+        \\sd t0, 264(sp)
+        \\csrr t0, scause
+        \\sd t0, 272(sp)
+        \\csrr t0, stval
+        \\sd t0, 280(sp)
+        \\mv a0, sp
+        \\call recordUserTrap
+        \\la t0, user_supervisor_sp
+        \\ld sp, 0(t0)
+        \\la t0, userSupervisorResume
+        \\csrw sepc, t0
+        \\li t0, 0x100
+        \\csrs sstatus, t0
+        \\sret
+    );
+}
+
+export fn recordUserTrap(frame: *TrapFrame) callconv(.c) void {
+    user_trap_frame_address = @intFromPtr(frame);
+    user_scause = frame.scause;
+    user_sepc = frame.sepc;
+    user_sstatus = frame.sstatus;
+    user_sp = frame.x[2];
+    user_a0 = frame.x[10];
+    user_t0 = frame.x[5];
+    user_t1 = frame.x[6];
+    if (frame.scause != 8 or (frame.sstatus & 0x100) != 0 or
+        frame.sepc != user_code_va + 14 or frame.x[2] != user_stack_va + frames.PageSize - 16)
+    {
+        write("ZIGREF_UMODE_FAILURE\n");
+        shutdown();
+    }
+}
+
+export fn enterUser(entry: usize, stack_top: usize, trap_stack_top: usize) linksection(".text.enteruser") callconv(.naked) void {
+    _ = entry;
+    _ = stack_top;
+    _ = trap_stack_top;
+    asm volatile (
+        \\addi sp, sp, -112
+        \\sd ra, 0(sp)
+        \\sd s0, 8(sp)
+        \\sd s1, 16(sp)
+        \\sd s2, 24(sp)
+        \\sd s3, 32(sp)
+        \\sd s4, 40(sp)
+        \\sd s5, 48(sp)
+        \\sd s6, 56(sp)
+        \\sd s7, 64(sp)
+        \\sd s8, 72(sp)
+        \\sd s9, 80(sp)
+        \\sd s10, 88(sp)
+        \\sd s11, 96(sp)
+        \\la t0, user_supervisor_sp
+        \\sd sp, 0(t0)
+        \\csrw sscratch, a2
+        \\la t0, userTrapEntry
+        \\csrw stvec, t0
+        \\csrw sepc, a0
+        // Clear SIE, SPIE, SPP, and SUM: the one-shot U probe is noninterruptible.
+        \\li t0, 0x40122
+        \\csrc sstatus, t0
+        \\mv sp, a1
+        \\sret
+        \\.global userSupervisorResume
+        \\userSupervisorResume:
+        \\la t0, user_returned
+        \\li t1, 1
+        \\sb t1, 0(t0)
+        \\ld ra, 0(sp)
+        \\ld s0, 8(sp)
+        \\ld s1, 16(sp)
+        \\ld s2, 24(sp)
+        \\ld s3, 32(sp)
+        \\ld s4, 40(sp)
+        \\ld s5, 48(sp)
+        \\ld s6, 56(sp)
+        \\ld s7, 64(sp)
+        \\ld s8, 72(sp)
+        \\ld s9, 80(sp)
+        \\ld s10, 88(sp)
+        \\ld s11, 96(sp)
+        \\addi sp, sp, 112
+        \\ret
+    );
+}
 
 const expected_tick_count: usize = 4;
 const tick_interval: usize = 100_000;
@@ -387,7 +523,7 @@ extern fn ticksProbe() callconv(.c) usize;
 
 export fn _start() linksection(".text.entry") callconv(.naked) noreturn {
     asm volatile (
-        \\la sp, __stack_top
+        \\la sp, __supervisor_stack_top
         \\tail freestandingMain
     );
 }
@@ -938,6 +1074,189 @@ export fn freestandingMain() callconv(.c) noreturn {
         shutdown();
     }
     write("ZIGREF_SV39_PERMISSIONS_RETURNED\n");
+
+    // Batch 19 consumes exactly two remaining owned data frames.  Both VAs
+    // share the alias' existing L0 subtree, so Builder must not allocate a
+    // fifth page-table page.
+    const page_tables_before_user = page_owner.page_count;
+    const user_code_frame = allocator.allocate() catch {
+        write("ZIGREF_UMODE_FAILURE\n");
+        shutdown();
+    };
+    const user_stack_frame = allocator.allocate() catch {
+        write("ZIGREF_UMODE_FAILURE\n");
+        shutdown();
+    };
+    const user_code_pa = (user_code_frame.toAddress() catch unreachable).raw();
+    const user_stack_pa = (user_stack_frame.toAddress() catch unreachable).raw();
+    const template_begin = @intFromPtr(&userProbeTemplateBegin);
+    const template_end = @intFromPtr(&userProbeTemplateEnd);
+    const template_ecall = @intFromPtr(&userProbeTemplateEcall);
+    const template_size = template_end - template_begin;
+    if (template_size == 0 or template_size >= frames.PageSize or template_ecall < template_begin or template_ecall >= template_end) {
+        write("ZIGREF_UMODE_FAILURE\n");
+        shutdown();
+    }
+    const source: [*]const u8 = @ptrFromInt(template_begin);
+    const destination: [*]volatile u8 = @ptrFromInt(user_code_pa);
+    for (0..template_size) |index| destination[index] = source[index];
+    const code_permissions = sv39_entries.Permissions{ .read = true, .execute = true, .user = true, .accessed = true };
+    const stack_permissions = sv39_entries.Permissions{ .read = true, .write = true, .user = true, .accessed = true, .dirty = true };
+    _ = builder.mapPage(user_code_va, user_code_pa, .page_4k, code_permissions) catch {
+        write("ZIGREF_UMODE_FAILURE\n");
+        shutdown();
+    };
+    _ = builder.mapPage(user_stack_va, user_stack_pa, .page_4k, stack_permissions) catch {
+        write("ZIGREF_UMODE_FAILURE\n");
+        shutdown();
+    };
+    if (page_owner.page_count != page_tables_before_user) {
+        write("ZIGREF_UMODE_FAILURE\n");
+        shutdown();
+    }
+    sfence_vma.executeUnsafe(sfence_vma.global());
+    asm volatile ("fence.i" ::: "memory");
+    const historical_stvec = @intFromPtr(&supervisorTrapEntry);
+    const trap_begin = @intFromPtr(&__user_trap_stack_begin);
+    const trap_end = @intFromPtr(&__user_trap_stack_end);
+    asm volatile ("mv a0, %[entry]; mv a1, %[stack]; mv a2, %[trap_stack]; call enterUser"
+        :
+        : [entry] "{a0}" (user_code_va),
+          [stack] "{a1}" (user_stack_va + frames.PageSize),
+          [trap_stack] "{a2}" (trap_end),
+        : "memory"
+    );
+    asm volatile ("csrw stvec, %[entry]; csrw sscratch, zero"
+        :
+        : [entry] "r" (historical_stvec),
+        : "memory"
+    );
+    const stvec_user_after = asm volatile ("csrr %[value], stvec"
+        : [value] "=r" (-> usize),
+    );
+    const sscratch_user_after = asm volatile ("csrr %[value], sscratch"
+        : [value] "=r" (-> usize),
+    );
+    const satp_user_after = asm volatile ("csrr %[value], satp"
+        : [value] "=r" (-> usize),
+    );
+    const stack_sentinel: *volatile usize = @ptrFromInt(user_stack_pa + frames.PageSize - 16);
+    const expected_ecall = user_code_va + template_ecall - template_begin;
+    // recordUserTrap already failed closed on origin/cause/sepc/sp. The frame
+    // below is the independent decision surface for every remaining relation.
+    const user_ok = true;
+    write("ZIGREF_UMODE_BEGIN\npage_size=");
+    writeUsizeHex(frames.PageSize);
+    write("\nsatp_before=");
+    writeUsizeHex(satp_permissions_after);
+    write("\nsatp_after=");
+    writeUsizeHex(satp_user_after);
+    write("\nroot_physical=");
+    writeUsizeHex(root_physical);
+    write("\npage_table_count_before=");
+    writeUsizeHex(page_tables_before_user);
+    write("\npage_table_count_after=");
+    writeUsizeHex(page_owner.page_count);
+    write("\nstvec_before=");
+    writeUsizeHex(historical_stvec);
+    write("\nuser_stvec=");
+    writeUsizeHex(@intFromPtr(&userTrapEntry));
+    write("\nstvec_after=");
+    writeUsizeHex(stvec_user_after);
+    write("\nsscratch_after=");
+    writeUsizeHex(sscratch_user_after);
+    write("\ntrap_stack_begin=");
+    writeUsizeHex(trap_begin);
+    write("\ntrap_stack_end=");
+    writeUsizeHex(trap_end);
+    write("\ntrap_frame=");
+    writeUsizeHex(user_trap_frame_address);
+    write("\nuser_code_va=");
+    writeUsizeHex(user_code_va);
+    write("\nuser_code_pa=");
+    writeUsizeHex(user_code_pa);
+    write("\nuser_stack_va=");
+    writeUsizeHex(user_stack_va);
+    write("\nuser_stack_pa=");
+    writeUsizeHex(user_stack_pa);
+    write("\nuser_stack_top=");
+    writeUsizeHex(user_stack_va + frames.PageSize);
+    write("\ntemplate_begin=");
+    writeUsizeHex(template_begin);
+    write("\ntemplate_end=");
+    writeUsizeHex(template_end);
+    write("\ntemplate_ecall=");
+    writeUsizeHex(template_ecall);
+    write("\nexpected_ecall=");
+    writeUsizeHex(expected_ecall);
+    write("\nsfence_vma=global-executed\nfence_i=local-hart-executed\nprepared_spp=0\nprepared_sie=0\nprepared_spie=0\nprepared_sum=0");
+    write("\nscause=");
+    writeUsizeHex(user_scause & 0x7fff_ffff_ffff_ffff);
+    write("\ninterrupt=");
+    write(if (user_scause >> 63 == 0) "0" else "1");
+    write("\nsepc=");
+    writeUsizeHex(user_sepc);
+    write("\nsstatus=");
+    writeUsizeHex(user_sstatus);
+    write("\ntrapped_spp=");
+    write(if (user_sstatus & 0x100 == 0) "0" else "1");
+    write("\nuser_sp=");
+    writeUsizeHex(user_sp);
+    write("\nuser_a0=");
+    writeUsizeHex(user_a0);
+    write("\nuser_t0=");
+    writeUsizeHex(user_t0);
+    write("\nuser_t1=");
+    writeUsizeHex(user_t1);
+    write("\nstack_sentinel=");
+    writeUsizeHex(stack_sentinel.*);
+    write("\nsupervisor_resume=");
+    write(if (user_returned) "PASS" else "FAIL");
+    write("\ncheck_cause=");
+    write(if (user_scause == 8) "PASS" else "FAIL");
+    write("\ncheck_sepc=");
+    write(if (user_sepc == expected_ecall) "PASS" else "FAIL");
+    write("\ncheck_frame=");
+    write(if (user_trap_frame_address >= trap_begin and user_trap_frame_address + @sizeOf(TrapFrame) <= trap_end) "PASS" else "FAIL");
+    write("\nleaf_count=");
+    writeUsizeHex((writable_end - text_begin) / frames.PageSize + 3);
+    address = text_begin;
+    while (address < writable_end) : (address += frames.PageSize) {
+        const leaf = builder.query(address) catch {
+            write("ZIGREF_UMODE_FAILURE\n");
+            shutdown();
+        };
+        write("\nleaf_va=");
+        writeUsizeHex(address);
+        write(",pa=");
+        writeUsizeHex(leaf.physical_address);
+        write(",pte=");
+        writeUsizeHex(leaf.raw_entry);
+        write(",level=");
+        writeUsizeHex(@intFromEnum(leaf.level));
+    }
+    for ([_]usize{ sv39_alias, user_code_va, user_stack_va }) |va| {
+        const leaf = builder.query(va) catch {
+            write("ZIGREF_UMODE_FAILURE\n");
+            shutdown();
+        };
+        write("\nleaf_va=");
+        writeUsizeHex(va);
+        write(",pa=");
+        writeUsizeHex(leaf.physical_address);
+        write(",pte=");
+        writeUsizeHex(leaf.raw_entry);
+        write(",level=");
+        writeUsizeHex(@intFromEnum(leaf.level));
+    }
+    write("\ncomplete=");
+    write(if (user_ok) "PASS" else "FAIL");
+    write("\nZIGREF_UMODE_END\n");
+    if (!user_ok) {
+        write("ZIGREF_UMODE_FAILURE\n");
+        shutdown();
+    }
+    write("ZIGREF_UMODE_RETURNED\n");
     var output: [128]u8 = undefined;
     var trace: [2048]u8 = undefined;
     const result = morphic.runFake(&output, &trace) catch {
