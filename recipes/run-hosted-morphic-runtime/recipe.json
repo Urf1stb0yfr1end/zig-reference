@@ -134,9 +134,12 @@
   ],
   "intended_smoke_commands": [
     "python3 tools/verify-freestanding-riscv64-umode-round-trip.py --self-test",
-    "python3 tools/verify-freestanding-riscv64-umode-round-trip.py"
+    "python3 tools/verify-freestanding-riscv64-umode-round-trip.py",
+    "python3 tools/verify-freestanding-riscv64-ecall-return.py --self-test",
+    "python3 tools/verify-freestanding-riscv64-ecall-return.py"
   ],
   "validation_evidence_references": [
-    "docs/reports/AGENTIC_SNOWBALL_BATCH_19.md"
+    "docs/reports/AGENTIC_SNOWBALL_BATCH_19.md",
+    "docs/reports/AGENTIC_SNOWBALL_BATCH_20.md"
   ]
 }
