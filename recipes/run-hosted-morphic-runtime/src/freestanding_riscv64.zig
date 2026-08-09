@@ -121,6 +121,203 @@ var user_t0: usize linksection(".bss") = 0;
 var user_t1: usize linksection(".bss") = 0;
 export var user_returned: bool linksection(".bss") = false;
 
+export var service_trap_count: usize linksection(".bss") = 0;
+var service_frames: [2]usize linksection(".bss") = .{ 0, 0 };
+var service_causes: [2]usize linksection(".bss") = .{ 0, 0 };
+var service_sepcs: [2]usize linksection(".bss") = .{ 0, 0 };
+var service_status: [2]usize linksection(".bss") = .{ 0, 0 };
+var service_sps: [2]usize linksection(".bss") = .{ 0, 0 };
+var service_inputs: [2]usize linksection(".bss") = .{ 0, 0 };
+var service_result: usize linksection(".bss") = 0;
+var service_prepared_sstatus: usize linksection(".bss") = 0;
+var service_terminal_marker: usize linksection(".bss") = 0;
+var service_return_to_user_count: usize linksection(".bss") = 0;
+var service_terminal_to_supervisor_count: usize linksection(".bss") = 0;
+var service_terminal_return_sepc: usize linksection(".bss") = 0;
+var service_terminal_return_sstatus: usize linksection(".bss") = 0;
+export var service_supervisor_sp: usize linksection(".bss") = 0;
+export var service_supervisor_returned: bool linksection(".bss") = false;
+
+export fn userServiceProbeTemplateBegin() linksection(".text.user_service_probe") callconv(.naked) void {
+    asm volatile (
+        \\addi sp, sp, -32
+        \\li t0, 0x2019
+        \\sd t0, 0(sp)
+        \\li t1, 0x20aa
+        \\li a0, 0x20
+        \\li a1, 0x19
+        \\.global userServiceProbeServiceEcall
+        \\userServiceProbeServiceEcall:
+        \\ecall
+        \\.global userServiceProbeAfterService
+        \\userServiceProbeAfterService:
+        \\li t0, 0x39
+        \\bne a0, t0, userServiceProbeFail
+        \\li t0, 0x20aa
+        \\bne t1, t0, userServiceProbeFail
+        \\sd a0, 8(sp)
+        \\li t0, 0x2020
+        \\sd t0, 16(sp)
+        \\li a2, 0x20ee
+        \\.global userServiceProbeTerminalEcall
+        \\userServiceProbeTerminalEcall:
+        \\ecall
+        \\userServiceProbeFail:
+        \\unimp
+        \\j userServiceProbeFail
+        \\.global userServiceProbeTemplateEnd
+        \\userServiceProbeTemplateEnd:
+    );
+}
+extern var userServiceProbeServiceEcall: u8;
+extern var userServiceProbeAfterService: u8;
+extern var userServiceProbeTerminalEcall: u8;
+extern var userServiceProbeTemplateEnd: u8;
+
+export fn userServiceTrapEntry() linksection(".text.user_service_trap") callconv(.naked) void {
+    asm volatile (
+        \\csrrw sp, sscratch, sp
+        \\addi sp, sp, -288
+        \\sd ra, 8(sp)
+        \\sd gp, 24(sp)
+        \\sd tp, 32(sp)
+        \\sd t0, 40(sp)
+        \\sd t1, 48(sp)
+        \\sd t2, 56(sp)
+        \\sd s0, 64(sp)
+        \\sd s1, 72(sp)
+        \\sd a0, 80(sp)
+        \\sd a1, 88(sp)
+        \\sd a2, 96(sp)
+        \\sd a3, 104(sp)
+        \\sd a4, 112(sp)
+        \\sd a5, 120(sp)
+        \\sd a6, 128(sp)
+        \\sd a7, 136(sp)
+        \\sd s2, 144(sp)
+        \\sd s3, 152(sp)
+        \\sd s4, 160(sp)
+        \\sd s5, 168(sp)
+        \\sd s6, 176(sp)
+        \\sd s7, 184(sp)
+        \\sd s8, 192(sp)
+        \\sd s9, 200(sp)
+        \\sd s10, 208(sp)
+        \\sd s11, 216(sp)
+        \\sd t3, 224(sp)
+        \\sd t4, 232(sp)
+        \\sd t5, 240(sp)
+        \\sd t6, 248(sp)
+        \\csrr t0, sscratch
+        \\sd t0, 16(sp)
+        \\csrr t0, sepc
+        \\sd t0, 256(sp)
+        \\csrr t0, sstatus
+        \\sd t0, 264(sp)
+        \\csrr t0, scause
+        \\sd t0, 272(sp)
+        \\csrr t0, stval
+        \\sd t0, 280(sp)
+        \\mv a0, sp
+        \\call recordUserServiceTrap
+        \\la t0, service_trap_count
+        \\ld t0, 0(t0)
+        \\li t1, 2
+        \\beq t0, t1, 2f
+        \\ld t0, 264(sp)
+        \\csrw sstatus, t0
+        \\ld ra, 8(sp)
+        \\ld gp, 24(sp)
+        \\ld tp, 32(sp)
+        \\ld t1, 48(sp)
+        \\ld t2, 56(sp)
+        \\ld s0, 64(sp)
+        \\ld s1, 72(sp)
+        \\ld a0, 80(sp)
+        \\ld a1, 88(sp)
+        \\ld a2, 96(sp)
+        \\ld a3, 104(sp)
+        \\ld a4, 112(sp)
+        \\ld a5, 120(sp)
+        \\ld a6, 128(sp)
+        \\ld a7, 136(sp)
+        \\ld s2, 144(sp)
+        \\ld s3, 152(sp)
+        \\ld s4, 160(sp)
+        \\ld s5, 168(sp)
+        \\ld s6, 176(sp)
+        \\ld s7, 184(sp)
+        \\ld s8, 192(sp)
+        \\ld s9, 200(sp)
+        \\ld s10, 208(sp)
+        \\ld s11, 216(sp)
+        \\ld t3, 224(sp)
+        \\ld t4, 232(sp)
+        \\ld t5, 240(sp)
+        \\ld t6, 248(sp)
+        \\ld t0, 16(sp)
+        \\csrw sscratch, t0
+        \\ld t0, 40(sp)
+        \\addi sp, sp, 288
+        \\csrrw sp, sscratch, sp
+        \\sret
+        \\2:
+        \\ld t1, 256(sp)
+        \\csrw sepc, t1
+        \\ld t1, 264(sp)
+        \\csrw sstatus, t1
+        \\la t0, service_supervisor_sp
+        \\ld sp, 0(t0)
+        \\csrw sscratch, zero
+        \\sret
+    );
+}
+
+export fn recordUserServiceTrap(frame: *TrapFrame) callconv(.c) void {
+    const index = service_trap_count;
+    if (index >= 2 or frame.scause >> 63 != 0 or (frame.scause & 0x7fff_ffff_ffff_ffff) != 8 or frame.sstatus & 0x100 != 0) shutdown();
+    const template_begin = @intFromPtr(&userServiceProbeTemplateBegin);
+    const expected_service = user_code_va + @intFromPtr(&userServiceProbeServiceEcall) - template_begin;
+    const expected_terminal = user_code_va + @intFromPtr(&userServiceProbeTerminalEcall) - template_begin;
+    const expected_sp = user_stack_va + frames.PageSize - 32;
+    if (frame.x[2] != expected_sp) shutdown();
+    if (index == 0) {
+        if (frame.sepc != expected_service or frame.x[10] != 0x20 or frame.x[11] != 0x19 or
+            frame.x[5] != 0x2019 or frame.x[6] != 0x20aa) shutdown();
+    } else {
+        if (frame.sepc != expected_terminal or frame.x[12] != 0x20ee or frame.x[10] != 0x39 or
+            frame.x[6] != 0x20aa or service_result != 0x39 or service_trap_count != 1) shutdown();
+    }
+    service_frames[index] = @intFromPtr(frame);
+    service_causes[index] = frame.scause;
+    service_sepcs[index] = frame.sepc;
+    service_status[index] = frame.sstatus;
+    service_sps[index] = frame.x[2];
+    service_trap_count += 1;
+    if (index == 0) {
+        service_inputs = .{ frame.x[10], frame.x[11] };
+        service_result = frame.x[10] + frame.x[11];
+        frame.x[10] = service_result;
+        frame.sepc = user_code_va + @intFromPtr(&userServiceProbeAfterService) - @intFromPtr(&userServiceProbeTemplateBegin);
+        asm volatile ("csrw sepc, %[value]"
+            :
+            : [value] "r" (frame.sepc),
+        );
+        frame.sstatus &= ~@as(usize, 0x40122);
+        service_prepared_sstatus = frame.sstatus;
+        service_return_to_user_count += 1;
+    } else {
+        service_terminal_marker = frame.x[12];
+        frame.sepc = @intFromPtr(&userServiceSupervisorResume);
+        // The second SRET deliberately enters the known S-mode continuation
+        // with SPP=1 while keeping SIE, SPIE, and SUM clear.
+        frame.sstatus = (frame.sstatus & ~@as(usize, 0x40122)) | 0x100;
+        service_terminal_return_sepc = frame.sepc;
+        service_terminal_return_sstatus = frame.sstatus;
+        service_terminal_to_supervisor_count += 1;
+    }
+}
+
 export fn userProbeTemplateBegin() linksection(".text.user_probe") callconv(.naked) void {
     asm volatile (
         \\li t0, 0x139
@@ -240,6 +437,61 @@ export fn enterUser(entry: usize, stack_top: usize, trap_stack_top: usize) links
         \\ret
     );
 }
+
+export fn enterUserService(entry: usize, stack_top: usize, trap_stack_top: usize) linksection(".text.enteruserservice") callconv(.naked) void {
+    _ = entry;
+    _ = stack_top;
+    _ = trap_stack_top;
+    asm volatile (
+        \\addi sp, sp, -112
+        \\sd ra, 0(sp)
+        \\sd s0, 8(sp)
+        \\sd s1, 16(sp)
+        \\sd s2, 24(sp)
+        \\sd s3, 32(sp)
+        \\sd s4, 40(sp)
+        \\sd s5, 48(sp)
+        \\sd s6, 56(sp)
+        \\sd s7, 64(sp)
+        \\sd s8, 72(sp)
+        \\sd s9, 80(sp)
+        \\sd s10, 88(sp)
+        \\sd s11, 96(sp)
+        \\la t0, service_supervisor_sp
+        \\sd sp, 0(t0)
+        \\csrw sscratch, a2
+        \\la t0, userServiceTrapEntry
+        \\csrw stvec, t0
+        \\csrw sepc, a0
+        \\li t0, 0x40122
+        \\csrc sstatus, t0
+        \\mv sp, a1
+        \\sret
+        \\.global userServiceSupervisorResume
+        \\userServiceSupervisorResume:
+        \\la t0, service_supervisor_returned
+        \\li t1, 1
+        \\sb t1, 0(t0)
+        \\la t0, service_supervisor_sp
+        \\ld sp, 0(t0)
+        \\ld ra, 0(sp)
+        \\ld s0, 8(sp)
+        \\ld s1, 16(sp)
+        \\ld s2, 24(sp)
+        \\ld s3, 32(sp)
+        \\ld s4, 40(sp)
+        \\ld s5, 48(sp)
+        \\ld s6, 56(sp)
+        \\ld s7, 64(sp)
+        \\ld s8, 72(sp)
+        \\ld s9, 80(sp)
+        \\ld s10, 88(sp)
+        \\ld s11, 96(sp)
+        \\addi sp, sp, 112
+        \\ret
+    );
+}
+extern var userServiceSupervisorResume: u8;
 
 const expected_tick_count: usize = 4;
 const tick_interval: usize = 100_000;
@@ -1257,6 +1509,198 @@ export fn freestandingMain() callconv(.c) noreturn {
         shutdown();
     }
     write("ZIGREF_UMODE_RETURNED\n");
+
+    // Batch 20 deliberately reuses both Batch 19 user frames and every PTE.
+    const service_allocated_before = allocator.allocatedCount();
+    const service_page_tables_before = page_owner.page_count;
+    const service_begin = @intFromPtr(&userServiceProbeTemplateBegin);
+    const service_end = @intFromPtr(&userServiceProbeTemplateEnd);
+    const service_ecall = @intFromPtr(&userServiceProbeServiceEcall);
+    const service_after = @intFromPtr(&userServiceProbeAfterService);
+    const terminal_ecall = @intFromPtr(&userServiceProbeTerminalEcall);
+    const service_size = service_end - service_begin;
+    if (service_size == 0 or service_size >= frames.PageSize or !(service_begin < service_ecall and service_ecall < service_after and service_after < terminal_ecall and terminal_ecall < service_end)) shutdown();
+    for (0..frames.PageSize) |index| destination[index] = 0;
+    const service_source: [*]const u8 = @ptrFromInt(service_begin);
+    for (0..service_size) |index| destination[index] = service_source[index];
+    asm volatile ("fence.i" ::: "memory");
+    const service_satp_before = asm volatile ("csrr %[value], satp"
+        : [value] "=r" (-> usize),
+    );
+    asm volatile ("mv a0, %[entry]; mv a1, %[stack]; mv a2, %[trap_stack]; call enterUserService"
+        :
+        : [entry] "{a0}" (user_code_va),
+          [stack] "{a1}" (user_stack_va + frames.PageSize),
+          [trap_stack] "{a2}" (trap_end),
+        : "memory"
+    );
+    asm volatile ("csrw stvec, %[entry]; csrw sscratch, zero"
+        :
+        : [entry] "r" (historical_stvec),
+        : "memory"
+    );
+    const service_stvec_after = asm volatile ("csrr %[value], stvec"
+        : [value] "=r" (-> usize),
+    );
+    const service_sscratch_after = asm volatile ("csrr %[value], sscratch"
+        : [value] "=r" (-> usize),
+    );
+    const service_satp_after = asm volatile ("csrr %[value], satp"
+        : [value] "=r" (-> usize),
+    );
+    const service_allocated_after = allocator.allocatedCount();
+    const service_page_tables_after = page_owner.page_count;
+    const observed_result: *volatile usize = @ptrFromInt(user_stack_pa + frames.PageSize - 24);
+    const observed_post: *volatile usize = @ptrFromInt(user_stack_pa + frames.PageSize - 16);
+    write("ZIGREF_ECALL_RETURN_BEGIN\npage_size=");
+    writeUsizeHex(frames.PageSize);
+    write("\nsatp_before=");
+    writeUsizeHex(service_satp_before);
+    write("\nsatp_after=");
+    writeUsizeHex(service_satp_after);
+    write("\nroot_physical=");
+    writeUsizeHex(root_physical);
+    write("\npage_table_count_before=");
+    writeUsizeHex(service_page_tables_before);
+    write("\npage_table_count_after=");
+    writeUsizeHex(service_page_tables_after);
+    write("\nphysical_allocated_before=");
+    writeUsizeHex(service_allocated_before);
+    write("\nphysical_allocated_after=");
+    writeUsizeHex(service_allocated_after);
+    write("\nuser_code_va=");
+    writeUsizeHex(user_code_va);
+    write("\nuser_code_pa=");
+    writeUsizeHex(user_code_pa);
+    write("\nuser_stack_va=");
+    writeUsizeHex(user_stack_va);
+    write("\nuser_stack_pa=");
+    writeUsizeHex(user_stack_pa);
+    write("\nuser_stack_top=");
+    writeUsizeHex(user_stack_va + frames.PageSize);
+    write("\ntemplate_begin=");
+    writeUsizeHex(service_begin);
+    write("\nservice_ecall=");
+    writeUsizeHex(service_ecall);
+    write("\nafter_service=");
+    writeUsizeHex(service_after);
+    write("\nterminal_ecall=");
+    writeUsizeHex(terminal_ecall);
+    write("\ntemplate_end=");
+    writeUsizeHex(service_end);
+    write("\ntemplate_size=");
+    writeUsizeHex(service_size);
+    write("\ntranslation_change=none\nsfence_vma=not-required-no-pte-change\nfence_i=local-hart-executed");
+    write("\nstvec_before=");
+    writeUsizeHex(historical_stvec);
+    write("\ntrap_stvec=");
+    writeUsizeHex(@intFromPtr(&userServiceTrapEntry));
+    write("\ntrap_stack_begin=");
+    writeUsizeHex(trap_begin);
+    write("\ntrap_stack_end=");
+    writeUsizeHex(trap_end);
+    write("\nfirst_trap_frame=");
+    writeUsizeHex(service_frames[0]);
+    write("\nsecond_trap_frame=");
+    writeUsizeHex(service_frames[1]);
+    write("\nfirst_scause=");
+    writeUsizeHex(service_causes[0]);
+    write("\nfirst_interrupt=");
+    write(if (service_causes[0] >> 63 == 0) "0" else "1");
+    write("\nfirst_sepc=");
+    writeUsizeHex(service_sepcs[0]);
+    write("\nfirst_sstatus=");
+    writeUsizeHex(service_status[0]);
+    write("\nfirst_user_sp=");
+    writeUsizeHex(service_sps[0]);
+    write("\nfirst_a0=");
+    writeUsizeHex(service_inputs[0]);
+    write("\nfirst_a1=");
+    writeUsizeHex(service_inputs[1]);
+    write("\nservice_result=");
+    writeUsizeHex(service_result);
+    write("\nprepared_sepc=");
+    writeUsizeHex(user_code_va + service_after - service_begin);
+    write("\nprepared_sstatus=");
+    writeUsizeHex(service_prepared_sstatus);
+    write("\nreturn_to_user_count=");
+    writeUsizeHex(service_return_to_user_count);
+    write("\nsecond_scause=");
+    writeUsizeHex(service_causes[1]);
+    write("\nsecond_interrupt=");
+    write(if (service_causes[1] >> 63 == 0) "0" else "1");
+    write("\nsecond_sepc=");
+    writeUsizeHex(service_sepcs[1]);
+    write("\nsecond_sstatus=");
+    writeUsizeHex(service_status[1]);
+    write("\nsecond_user_sp=");
+    writeUsizeHex(service_sps[1]);
+    write("\nuser_observed_result=");
+    writeUsizeHex(observed_result.*);
+    write("\npost_return_sentinel=");
+    writeUsizeHex(observed_post.*);
+    write("\nterminal_marker=");
+    writeUsizeHex(service_terminal_marker);
+    write("\nterminal_to_supervisor_count=");
+    writeUsizeHex(service_terminal_to_supervisor_count);
+    write("\nterminal_return_sepc=");
+    writeUsizeHex(service_terminal_return_sepc);
+    write("\nterminal_return_sstatus=");
+    writeUsizeHex(service_terminal_return_sstatus);
+    write("\ntrap_count=");
+    writeUsizeHex(service_trap_count);
+    write("\nsupervisor_resume=");
+    write(if (service_supervisor_returned) "PASS" else "FAIL");
+    write("\nstvec_after=");
+    writeUsizeHex(service_stvec_after);
+    write("\nsscratch_after=");
+    writeUsizeHex(service_sscratch_after);
+    var final_leaf_count: usize = 0;
+    var final_u_leaves: usize = 0;
+    var final_wx_leaves: usize = 0;
+    address = text_begin;
+    while (address < writable_end) : (address += frames.PageSize) {
+        const leaf = builder.query(address) catch shutdown();
+        final_leaf_count += 1;
+        final_u_leaves += @intFromBool(leaf.raw_entry & 0x10 != 0);
+        final_wx_leaves += @intFromBool(leaf.raw_entry & 0xc == 0xc);
+        write("\nleaf_va=");
+        writeUsizeHex(address);
+        write(",pa=");
+        writeUsizeHex(leaf.physical_address);
+        write(",pte=");
+        writeUsizeHex(leaf.raw_entry);
+        write(",level=");
+        writeUsizeHex(@intFromEnum(leaf.level));
+    }
+    for ([_]usize{ sv39_alias, user_code_va, user_stack_va }) |va| {
+        const leaf = builder.query(va) catch shutdown();
+        final_leaf_count += 1;
+        final_u_leaves += @intFromBool(leaf.raw_entry & 0x10 != 0);
+        final_wx_leaves += @intFromBool(leaf.raw_entry & 0xc == 0xc);
+        write("\nleaf_va=");
+        writeUsizeHex(va);
+        write(",pa=");
+        writeUsizeHex(leaf.physical_address);
+        write(",pte=");
+        writeUsizeHex(leaf.raw_entry);
+        write(",level=");
+        writeUsizeHex(@intFromEnum(leaf.level));
+    }
+    write("\nfinal_u_leaves=");
+    writeUsizeHex(final_u_leaves);
+    write("\nfinal_wx_leaves=");
+    writeUsizeHex(final_wx_leaves);
+    write("\nfinal_leaf_count=");
+    writeUsizeHex(final_leaf_count);
+    if (service_allocated_before != service_allocated_after or
+        service_page_tables_before != service_page_tables_after or
+        service_satp_before != service_satp_after or service_satp_after != satp_permissions_after or
+        service_trap_count != 2 or service_return_to_user_count != 1 or service_terminal_to_supervisor_count != 1 or
+        !service_supervisor_returned or service_result != 0x39 or observed_result.* != 0x39 or observed_post.* != 0x2020 or
+        service_terminal_marker != 0x20ee or service_stvec_after != historical_stvec or service_sscratch_after != 0 or
+        final_u_leaves != 2 or final_wx_leaves != 0) shutdown();
+    write("\ncomplete=PASS\nZIGREF_ECALL_RETURN_END\nZIGREF_ECALL_RETURN_RETURNED\n");
     var output: [128]u8 = undefined;
     var trace: [2048]u8 = undefined;
     const result = morphic.runFake(&output, &trace) catch {
