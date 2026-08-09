@@ -132,6 +132,11 @@
     "python3 tools/verify-freestanding-riscv64-sv39-permissions.py --self-test",
     "python3 tools/verify-freestanding-riscv64-sv39-permissions.py"
   ],
-  "intended_smoke_commands": [],
-  "validation_evidence_references": []
+  "intended_smoke_commands": [
+    "python3 tools/verify-freestanding-riscv64-umode-round-trip.py --self-test",
+    "python3 tools/verify-freestanding-riscv64-umode-round-trip.py"
+  ],
+  "validation_evidence_references": [
+    "docs/reports/AGENTIC_SNOWBALL_BATCH_19.md"
+  ]
 }
