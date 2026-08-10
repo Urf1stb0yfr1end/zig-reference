@@ -18,6 +18,9 @@ The same four-trap probe obtains the real `NotWritable` result for `0x80401000`,
 - Local `FENCE.I` followed repopulation of the existing code frame; no SFENCE.VMA was claimed because no translation changed.
 - Hosted, fake, QEMU-A, and QEMU-B Morphic artifacts were byte-identical at exactly 765 bytes.
 - The strict mutation/rejection self-test and complete repository validation passed.
+- All four recorded `scause` values were non-interrupt cause 8, and all four trap-frame addresses equaled the trusted Batch 21B supervisor trap frame.
+- Each of the three actual prepared `sstatus` values had SPP, SUM, SIE, and SPIE clear; the restored `stvec`, active SATP, and root matched Batch 21B truth.
+- Planner evidence was captured from the returned segment: request offset 0, byte count 16, and accumulated coverage 16.
 
 Batch 21 is mechanically complete only for this narrow native boundary: bounded real copy-IN, bounded real copy-OUT, permission rejection, later-page atomic rejection, SUM=0, physical-segment-only supervisor access, unchanged mappings/resources, and strict two-QEMU evidence.
 

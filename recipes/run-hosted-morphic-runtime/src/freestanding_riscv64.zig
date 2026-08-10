@@ -208,11 +208,16 @@ var copy_out_traps: usize = 0;
 var copy_out_frames: [4]usize = .{0} ** 4;
 var copy_out_sepcs: [4]usize = .{0} ** 4;
 var copy_out_status: [4]usize = .{0} ** 4;
+var copy_out_causes: [4]usize = .{0} ** 4;
 var copy_out_prepared: [3]usize = .{0} ** 3;
+var copy_out_prepared_status: [3]usize = .{0} ** 3;
 var copy_out_destination: usize = 0;
 var copy_out_stack_pa: usize = 0;
 var copy_out_code_pa: usize = 0;
 var copy_out_segment_pa: usize = 0;
+var copy_out_segment_offset: usize = 0;
+var copy_out_segment_bytes: usize = 0;
+var copy_out_segment_coverage: usize = 0;
 var copy_out_guard_before: usize = 0;
 var copy_out_guard_after: usize = 0;
 var copy_out_code_before: usize = 0;
@@ -488,6 +493,7 @@ fn recordUserCopyOutTrap(frame: *TrapFrame) void {
     copy_out_frames[index] = @intFromPtr(frame);
     copy_out_sepcs[index] = frame.sepc;
     copy_out_status[index] = frame.sstatus;
+    copy_out_causes[index] = frame.scause;
     copy_out_traps += 1;
     if (index == 0) {
         copy_out_destination = frame.x[10];
@@ -499,9 +505,13 @@ fn recordUserCopyOutTrap(frame: *TrapFrame) void {
         if (plan.items().len != 1) shutdown();
         for (plan.items()) |segment| {
             copy_out_segment_pa = segment.physical_start.raw();
+            copy_out_segment_offset = segment.request_offset;
+            copy_out_segment_bytes = segment.byte_count;
+            copy_out_segment_coverage += segment.byte_count;
             const target: [*]volatile u8 = @ptrFromInt(segment.physical_start.raw());
             for (0..segment.byte_count) |i| target[i] = copy_out_payload[segment.request_offset + i];
         }
+        if (copy_out_segment_coverage != copy_out_payload.len) shutdown();
         frame.x[10] = 0x21c1;
         frame.sepc = user_code_va + @intFromPtr(&userCopyOutProbeAfterService) - begin;
     } else if (index == 1) {
@@ -546,6 +556,7 @@ fn recordUserCopyOutTrap(frame: *TrapFrame) void {
 fn prepareCopyOutReturn(frame: *TrapFrame, index: usize) void {
     frame.sstatus &= ~@as(usize, 0x40122);
     copy_out_prepared[index] = frame.sepc;
+    copy_out_prepared_status[index] = frame.sstatus;
     copy_out_return_count += 1;
     asm volatile ("csrw sepc, %[value]"
         :
@@ -2257,7 +2268,13 @@ export fn freestandingMain() callconv(.c) noreturn {
     writeUsizeHex(copy_out_destination);
     write("\nlength=0000000000000010\nsegment_count=0000000000000001\nsegment_pa=");
     writeUsizeHex(copy_out_segment_pa);
-    write("\nsegment_offset=0000000000000000\nsegment_bytes=0000000000000010\nsegment_coverage=0000000000000010\ntrusted_hex=6b65726e656c2d746f2d757365722121\nobserved_hex=6b65726e656c2d746f2d757365722121");
+    write("\nsegment_offset=");
+    writeUsizeHex(copy_out_segment_offset);
+    write("\nsegment_bytes=");
+    writeUsizeHex(copy_out_segment_bytes);
+    write("\nsegment_coverage=");
+    writeUsizeHex(copy_out_segment_coverage);
+    write("\ntrusted_hex=6b65726e656c2d746f2d757365722121\nobserved_hex=6b65726e656c2d746f2d757365722121");
     write("\nguard_before=");
     writeUsizeHex(copy_out_guard_before);
     write("\nguard_before_after=");
@@ -2285,10 +2302,14 @@ export fn freestandingMain() callconv(.c) noreturn {
         writeUsizeHex(copy_out_sepcs[i]);
         write("\ntrap" ++ ([_]u8{'0' + i}) ++ "_sstatus=");
         writeUsizeHex(copy_out_status[i]);
+        write("\ntrap" ++ ([_]u8{'0' + i}) ++ "_scause=");
+        writeUsizeHex(copy_out_causes[i]);
     }
     inline for (0..3) |i| {
         write("\nprepared" ++ ([_]u8{'0' + i}) ++ "_sepc=");
         writeUsizeHex(copy_out_prepared[i]);
+        write("\nprepared" ++ ([_]u8{'0' + i}) ++ "_sstatus=");
+        writeUsizeHex(copy_out_prepared_status[i]);
     }
     write("\nstvec_after=");
     writeUsizeHex(out_stvec_after);

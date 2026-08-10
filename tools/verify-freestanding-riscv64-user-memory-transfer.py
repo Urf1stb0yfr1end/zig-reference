@@ -29,14 +29,17 @@ def parse(raw,truth):
  if any(raw.count(x)!=1 for x in (BEGIN,END,RETURNED)):raise RuntimeError('wrong framing')
  if not(prior.RETURNED in raw and raw.find(prior.RETURNED)<raw.find(BEGIN)<raw.find(END)<raw.find(RETURNED)<raw.find(b'ZIGREF_MORPHIC_BEGIN')):raise RuntimeError('wrong order')
  prior.parse(raw,truth)
- d,rows=prior.prior.parse_fields(raw,BEGIN,END);_,oldrows=prior.prior.parse_fields(raw,prior.BEGIN,prior.END)
- nums='user_code_va user_code_pa user_stack_va user_stack_pa satp_before satp_after root_physical physical_allocated_before physical_allocated_after page_table_count_before page_table_count_after template_begin service_ecall after_service permission_ecall after_permission atomic_ecall after_atomic terminal_ecall template_end destination_va length segment_count segment_pa segment_offset segment_bytes segment_coverage guard_before guard_before_after guard_after guard_after_after permission_va permission_length code_guard_before code_guard_after atomic_va atomic_length valid_prefix_length prefix_before prefix_after trap_count return_count stvec_after sscratch_after final_u_leaves final_wx_leaves final_leaf_count trap0_frame trap0_sepc trap0_sstatus trap1_frame trap1_sepc trap1_sstatus trap2_frame trap2_sepc trap2_sstatus trap3_frame trap3_sepc trap3_sstatus prepared0_sepc prepared1_sepc prepared2_sepc'.split();n={k:hx(d,k) for k in nums}
+ d,rows=prior.prior.parse_fields(raw,BEGIN,END);old_d,oldrows=prior.prior.parse_fields(raw,prior.BEGIN,prior.END)
+ nums='user_code_va user_code_pa user_stack_va user_stack_pa satp_before satp_after root_physical physical_allocated_before physical_allocated_after page_table_count_before page_table_count_after template_begin service_ecall after_service permission_ecall after_permission atomic_ecall after_atomic terminal_ecall template_end destination_va length segment_count segment_pa segment_offset segment_bytes segment_coverage guard_before guard_before_after guard_after guard_after_after permission_va permission_length code_guard_before code_guard_after atomic_va atomic_length valid_prefix_length prefix_before prefix_after trap_count return_count stvec_after sscratch_after final_u_leaves final_wx_leaves final_leaf_count trap0_frame trap0_sepc trap0_sstatus trap1_frame trap1_sepc trap1_sstatus trap2_frame trap2_sepc trap2_sstatus trap3_frame trap3_sepc trap3_sstatus prepared0_sepc prepared1_sepc prepared2_sepc trap0_scause trap1_scause trap2_scause trap3_scause prepared0_sstatus prepared1_sstatus prepared2_sstatus'.split();n={k:hx(d,k) for k in nums}
  syms=[truth[k] for k in ('userCopyOutProbeTemplateBegin','userCopyOutProbeServiceEcall','userCopyOutProbeAfterService','userCopyOutProbePermissionRejectEcall','userCopyOutProbeAfterPermissionReject','userCopyOutProbeAtomicRejectEcall','userCopyOutProbeAfterAtomicReject','userCopyOutProbeTerminalEcall','userCopyOutProbeTemplateEnd')]
  if [n[k] for k in ('template_begin','service_ecall','after_service','permission_ecall','after_permission','atomic_ecall','after_atomic','terminal_ecall','template_end')]!=syms:raise RuntimeError('ELF symbol contradiction')
  pcs=[0x80401000+x-syms[0] for x in syms[1:-1]]
- traps=[n[f'trap{i}_sepc'] for i in range(4)];statuses=[n[f'trap{i}_sstatus'] for i in range(4)];prepared=[n[f'prepared{i}_sepc'] for i in range(3)]
- if traps!=[pcs[0],pcs[2],pcs[4],pcs[6]] or prepared!=[pcs[1],pcs[3],pcs[5]] or len(statuses)!=4 or any(x&(0x100|0x40000) for x in statuses):raise RuntimeError('trap/return/SUM contradiction')
- if (n['satp_before']!=n['satp_after'] or n['physical_allocated_before']!=n['physical_allocated_after'] or n['page_table_count_before']!=n['page_table_count_after'] or n['trap_count']!=4 or n['return_count']!=3 or n['sscratch_after']!=0):raise RuntimeError('conservation contradiction')
+ traps=[n[f'trap{i}_sepc'] for i in range(4)];statuses=[n[f'trap{i}_sstatus'] for i in range(4)];causes=[n[f'trap{i}_scause'] for i in range(4)];prepared=[n[f'prepared{i}_sepc'] for i in range(3)];prepared_status=[n[f'prepared{i}_sstatus'] for i in range(3)];frames=[n[f'trap{i}_frame'] for i in range(4)]
+ if traps!=[pcs[0],pcs[2],pcs[4],pcs[6]] or causes!=[8]*4 or prepared!=[pcs[1],pcs[3],pcs[5]] or any(x&(0x100|0x40000) for x in statuses):raise RuntimeError('trap origin/cause/SUM contradiction')
+ if any(x & 0x40122 for x in prepared_status):raise RuntimeError('prepared SPP/SUM/SIE/SPIE contradiction')
+ trusted_frame=hx(old_d,'first_frame')
+ if frames != [trusted_frame]*4 or hx(old_d,'second_frame')!=trusted_frame:raise RuntimeError('trusted trap-frame contradiction')
+ if (n['satp_before']!=n['satp_after'] or n['satp_before']!=hx(old_d,'satp_after') or n['root_physical']!=hx(old_d,'root_physical') or n['stvec_after']!=hx(old_d,'stvec_after') or n['physical_allocated_before']!=n['physical_allocated_after'] or n['page_table_count_before']!=n['page_table_count_after'] or n['trap_count']!=4 or n['return_count']!=3 or n['sscratch_after']!=0):raise RuntimeError('conservation contradiction')
  if (n['destination_va'],n['length'],n['segment_count'],n['segment_pa'],n['segment_offset'],n['segment_bytes'],n['segment_coverage'])!=(0x80402fc8,16,1,n['user_stack_pa']+0xfc8,0,16,16):raise RuntimeError('successful plan contradiction')
  if d.get('trusted_hex')!='6b65726e656c2d746f2d757365722121' or d.get('observed_hex')!=d['trusted_hex'] or n['guard_before']!=n['guard_before_after'] or n['guard_after']!=n['guard_after_after']:raise RuntimeError('payload/guard contradiction')
  old=leafmap(oldrows);new=leafmap([r for r in rows if 'leaf_va' in r])
@@ -58,6 +61,13 @@ def fixture():
 def self_test():
  p,art,t,raw=fixture();d=parse(raw,t)
  muts=[(BEGIN,b'BAD'),(RETURNED,b'BAD'),(b'trap_count=0000000000000004',b'trap_count=0000000000000005'),(b'length=0000000000000010',b'length=000000000000000f'),(b'observed_hex=6b65726e656c2d746f2d757365722121',b'observed_hex=0065726e656c2d746f2d757365722121'),(b'permission_result=NotWritable',b'permission_result=Unmapped'),(b'atomic_result=Unmapped',b'atomic_result=NotWritable'),(b'prefix_after=8877665544332211',b'prefix_after=8877665544332210'),(b'final_u_leaves=0000000000000002',b'final_u_leaves=0000000000000003'),(b'sfence_vma=not-required-no-pte-change',b'sfence_vma=global')]
+ _,rows=prior.prior.parse_fields(raw,BEGIN,END)
+ for key in ('trap0_scause','trap1_scause','trap2_scause','trap3_scause'):
+  value=f'{key}=0000000000000008'.encode();muts.append((value,value[:-1]+b'9'))
+ for key in ('prepared0_sstatus','prepared1_sstatus','prepared2_sstatus'):
+  value=f'{key}={d[key]}'.encode();muts.append((value,f'{key}={int(d[key],16)|0x20:016x}'.encode()))
+ for key in ('trap0_frame','trap1_frame','trap2_frame','trap3_frame','stvec_after','satp_before','root_physical','segment_offset','segment_bytes','segment_coverage'):
+  value=f'{key}={d[key]}'.encode();muts.append((value,f'{key}={int(d[key],16)+1:016x}'.encode()))
  for a,b in muts:reject(raw,t,a,b)
  p.cleanup();print('PASS: Batch 21C strict rejection matrix')
 def main():
