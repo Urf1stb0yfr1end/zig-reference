@@ -1,0 +1,850 @@
+CODEX AGENTIC SNOWBALL — BATCH 21C
+REAL USER COPY-OUT + ATOMIC REJECTION
+
+Repository:
+thanks-cohn/zig-reference
+
+Plan path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_21C_REAL_USER_COPY_OUT_AND_ATOMIC_REJECTION.txt
+
+MISSION
+
+Close the split Batch 21 user-memory boundary by adding exactly the pieces intentionally deferred from Batch 21B:
+
+trusted supervisor bytes
+→ bounded user destination pointer + length
+→ active Sv39 translation/permission query
+→ canonical bounded-user-memory-transfer-plan in write_to_user mode
+→ complete-range validation before mutation
+→ copy exact bytes only through planner-produced physical segments
+→ SRET back to U-mode
+→ user independently observes exact written bytes
+→ permission-invalid write rejection
+→ later-page failure with a valid writable prefix
+→ prove zero partial write on failure
+→ terminal U-mode ECALL
+→ known supervisor continuation
+→ unchanged Morphic frame
+
+This is Batch 21C only.
+
+Do NOT expand into Linux syscall dispatch, Linux copy_to_user semantics, errno/EFAULT, processes, userspace ELF loading, VFS, file descriptors, mmap/brk, signals, futexes, threads, procfs, networking, BusyBox, APK, Alpine rootfs, QEMU hosting, or KVM.
+
+The purpose is to finish the reusable bidirectional user-memory boundary needed by later ELF/syscall/userspace work while preserving the narrow, mechanically proven architecture already established by 21A and 21B.
+
+CURRENT BASELINE
+
+Current merged main at plan creation:
+
+fec3f79e0b2954dc5bf92d3dbcd47d48524acb43
+
+Merge pull request #42 — Batch 21B real U→S copy-IN.
+
+Batch 21B is independently locally reproduced at that exact merge with:
+
+- Zig 0.14.0
+- QEMU 11.0.3
+- Python 3.14.6
+- Batch 21B strict rejection self-test PASS
+- Batch 21B real two-QEMU proof PASS
+- traps=2 per machine
+- U=2
+- W+X=0
+- Morphic=765 exact bytes
+- 54/54 full agent-readable modules
+- 326/326 repository build steps
+- 216/216 tests
+- validate-repository PASS
+
+Treat the actual checked-out HEAD as truth. Record it before modifying source.
+
+Read before implementation:
+
+AGENTS.md
+COMMANDS.md
+docs/roadmaps/SELF_HOSTED_RECURSIVE_ABI_LAB.md
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_21_BOUNDED_USER_MEMORY_TRANSFER.txt
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_21B_REAL_USER_COPY_IN.txt
+docs/reports/AGENTIC_SNOWBALL_BATCH_21B.md
+
+BATCH 21A/21B ARE FOUNDATIONS, NOT THINGS TO REIMPLEMENT
+
+Batch 21A already provides the canonical architecture-independent planner:
+
+projects/53-bounded-user-memory-transfer-plan
+
+It already proves:
+
+- checked start+length arithmetic;
+- bounded page count;
+- page-confined ordered physical segments;
+- page-offset preservation;
+- non-contiguous physical backing;
+- U=1 requirement;
+- read_from_user and write_to_user permission direction;
+- deterministic errors;
+- zero-length policy;
+- allocation-free planning;
+- later-page failure returns no usable partial plan.
+
+Batch 21B already proves the real machine integration for read_from_user:
+
+- active Sv39 query adapter;
+- real U-mode pointer/length;
+- trusted U→S ECALL entry;
+- first trap instruction csrrw sp,sscratch,sp;
+- SUM=0;
+- planner-produced physical segments only;
+- exact U→S copy into supervisor scratch;
+- poison-tail no-overcopy proof;
+- ELF-derived return SEPC;
+- SRET to resumed U-mode;
+- terminal U ECALL;
+- unchanged satp/root/allocator/page-table counts;
+- exact final leaf equality;
+- U=2 and W+X=0;
+- two QEMU machines;
+- exact 765-byte Morphic equality.
+
+Do not create another planner.
+Do not create another page-query abstraction unless a tiny adapter extension is mechanically necessary.
+Do not duplicate Sv39 permission logic in a new generic module.
+Do not weaken or replace the Batch 21B verifier.
+
+TASK-BUDGET RULE
+
+This request exists because the original monolithic Batch 21 was too large for one Codex execution.
+
+Do not spend the beginning of the run replaying every old full QEMU lab.
+
+Before source changes, run only focused gates:
+
+1. git rev-parse HEAD
+2. git status --short --branch
+3. zig version
+4. python3 tools/query-reference.py agent doctor
+5. zig build test-bounded-user-memory-transfer-plan
+6. zig build smoke-bounded-user-memory-transfer-plan
+7. python3 tools/verify-freestanding-riscv64-user-copy-in.py --self-test
+
+If these pass, implement.
+
+The final Batch 21C verifier must compose/preserve the Batch 21B strict parser chain and perform the expensive real-machine execution after implementation.
+
+Do not separately rerun Batch 18/19/20 full two-QEMU labs unless a concrete failure requires diagnosis.
+
+REPOSITORY DISCOVERY
+
+Use Z-Ref narrowly.
+
+Inspect/preflight at minimum:
+
+- bounded-user-memory-transfer-plan;
+- distinct-memory-address-types;
+- riscv-sv39-page-table-entry;
+- riscv-sv39-page-table-walker;
+- riscv-sv39-page-table-builder;
+- current ActiveQuery/PageQuery adapter from Batch 21B;
+- current Batch 21B trap state machine;
+- current user-code/stack geometry;
+- run-hosted-morphic-runtime recipe;
+- current Batch 21B verifier/parser conventions.
+
+Do not rediscover whether write_to_user exists. It exists in the planner and must be composed.
+
+NON-NEGOTIABLE MACHINE RESULT
+
+Two independent real qemu-system-riscv64 executions must mechanically prove all of the following:
+
+1. The complete historical verifier chain through Batch 21B remains strict and passes.
+2. Batch 21C executes only after Batch 21B has completed and returned.
+3. Batch 21C finishes before the canonical Morphic frame begins.
+4. Existing U RX code VA 0x80401000 is reused.
+5. Existing U RW/NX stack VA 0x80402000 is reused.
+6. Existing user physical frames are reused.
+7. No new physical frame is allocated for the Batch 21C proof.
+8. No new page-table frame is allocated.
+9. satp/root is unchanged.
+10. No PTE is changed by Batch 21C.
+11. Final raw leaf truth is exactly equal to Batch 21B truth.
+12. Exactly two leaves remain U=1.
+13. W+X remains zero.
+14. SUM remains zero for the supervisor copy paths.
+15. A distinct Batch 21C user probe executes in real U-mode.
+16. A successful copy-OUT request passes destination user VA + exact length through registers.
+17. Supervisor validates the complete destination range with bounded-user-memory-transfer-plan in write_to_user mode before writing any byte.
+18. Every successful destination page requires U=1 and W=1.
+19. Supervisor never directly dereferences the original user virtual pointer.
+20. Actual writes occur only through planner-produced physical segments.
+21. Supervisor copies one exact deterministic 16-byte payload into user memory.
+22. User mode resumes and independently verifies all 16 bytes.
+23. Guard/sentinel bytes around the successful destination prove no under-copy/over-copy.
+24. A permission-invalid copy-OUT attempt is deterministically rejected before mutation.
+25. A later-page failure is exercised where the request has a valid writable prefix but then reaches an unmapped page.
+26. The writable prefix is proven byte-for-byte unchanged after that later-page rejection.
+27. No partial destination mutation occurs on the later-page failure.
+28. Rejection does not become an uncontrolled supervisor page fault.
+29. Rejection results are explicit and deterministic.
+30. Repeated U→S traps continue to enter through the trusted supervisor trap stack.
+31. The first trap-entry instruction remains csrrw sp,sscratch,sp before trap-frame stores.
+32. sscratch is correctly rearmed for every return to U-mode.
+33. Every return continuation used as proof is derived independently from ELF symbols.
+34. Actual prepared return SEPC values are emitted and compared with ELF-derived continuations.
+35. A distinct terminal U-mode ECALL deliberately returns to a known S-mode continuation.
+36. stvec is restored and read back.
+37. sscratch is neutralized/restored and read back.
+38. FENCE.I executes after repopulating the existing user code frame.
+39. No SFENCE.VMA is claimed if translations are unchanged.
+40. Hosted, fake, QEMU-A, and QEMU-B Morphic payloads remain exactly equal at 765 bytes.
+41. Strict mutation/rejection self-test for the new evidence parser passes.
+42. Full repository validation passes.
+43. Documentation claims only the bounded native contract actually proved.
+
+REUSE THE EXISTING ADDRESS SPACE
+
+Keep the established geometry:
+
+user code VA:
+0x80401000
+
+user stack VA:
+0x80402000
+
+user stack top:
+0x80403000
+
+Reuse the same physical frames, page-table hierarchy, PTEs, and trusted supervisor trap stack already proved by Batch 19/20/21B.
+
+After Batch 21B completes, repopulate the existing user code physical frame with a distinct Batch 21C probe.
+
+Then execute:
+
+fence.i
+
+Expected translation policy remains:
+
+translation_change=none
+sfence_vma=not-required-no-pte-change
+fence_i=local-hart-executed
+
+Do not print these as decorative assertions only. Keep the same evidence discipline used by Batch 21B.
+
+SUCCESSFUL COPY-OUT PAYLOAD
+
+Use one fixed 16-byte supervisor-owned payload.
+
+Recommended exact bytes / ASCII:
+
+"kernel-to-user!!"
+
+Length:
+16
+
+A different fixed 16-byte payload is acceptable only if documented consistently in runtime, verifier, and report.
+
+Keep the source payload in trusted supervisor-owned storage.
+
+Do not construct the source payload from user memory.
+
+SUCCESSFUL USER DESTINATION
+
+Reserve a bounded stack-local region in the existing U RW/NX page.
+
+Prefer a layout with explicit guards, for example conceptually:
+
+[ guard-before ][ 16-byte destination ][ guard-after ][ phase markers ]
+
+Initialize the destination and guards in U-mode before the copy service.
+
+The exact layout may follow instruction-size/register-pressure constraints, but mechanically prove:
+
+- destination begins in the mapped U RW/NX stack page;
+- requested length is exactly 16;
+- guard-before remains unchanged;
+- guard-after remains unchanged;
+- the 16 destination bytes become exactly the trusted supervisor payload;
+- no other user-stack sentinel used by the probe changes unexpectedly.
+
+SUCCESSFUL COPY-OUT SERVICE
+
+On the first Batch 21C service ECALL:
+
+- require interrupt=0;
+- require scause=8;
+- require SPP=0;
+- require SUM=0;
+- require expected Batch 21C phase;
+- require sepc equals independently ELF-derived successful-copy ECALL VA;
+- capture destination VA and length from saved user registers;
+- require exact bounded length;
+- do not touch destination bytes yet;
+- call the canonical planner with write_to_user;
+- require a complete successful plan;
+- copy only through returned physical segments;
+- preserve segment request offsets exactly;
+- copy exactly 16 bytes from trusted supervisor source;
+- prove exact segment coverage;
+- set a deterministic success marker in saved user state;
+- set actual frame.sepc to ELF-derived post-copy continuation;
+- record actual prepared SEPC and prepared sstatus;
+- preserve SUM=0 and SPP=0 for U return;
+- correctly rearm sscratch;
+- SRET to U-mode.
+
+User code must then verify the exact copied bytes itself before proceeding.
+
+PERMISSION-INVALID REJECTION
+
+Exercise one real write_to_user planning request against the existing U RX code page.
+
+Recommended destination:
+
+0x80401000
+
+Recommended length:
+16
+
+The exact address may be a safe fixed range inside the existing U RX code page, but it must be U=1, readable/executable, and W=0 according to the real active leaf truth.
+
+Expected planner result:
+
+NotWritable
+
+or the exact existing repository error variant for that condition.
+
+Requirements:
+
+- planner is invoked in write_to_user mode;
+- rejection is caused by real active Sv39 permission truth;
+- no write loop is entered;
+- no PTE is changed;
+- no SUM elevation occurs;
+- code-page guard bytes are proven unchanged across the rejection.
+
+For the code-page no-mutation proof, prefer one mechanically simple approach:
+
+- snapshot an exact bounded byte sequence from the known code physical frame before the rejected operation;
+- snapshot the same bytes after rejection;
+- require exact equality at runtime;
+- emit enough actual evidence for the verifier to compare/mutation-test.
+
+Do not rely solely on the fact that execution happened to continue.
+
+LATER-PAGE FAILURE / ATOMICITY PROOF
+
+This is the most important new Batch 21C pressure.
+
+Use a destination range whose prefix lies in the valid writable stack page but whose suffix reaches the immediately following unmapped page.
+
+Recommended geometry:
+
+start:
+0x80403000 - 8
+
+length:
+16
+
+Therefore:
+
+first 8 bytes:
+inside U RW/NX stack page
+
+next 8 bytes:
+starting at 0x80403000, outside the currently mapped user pages
+
+Before issuing this rejected request, U-mode must write a deterministic 8-byte sentinel into the valid writable prefix.
+
+The supervisor must:
+
+1. call bounded-user-memory-transfer-plan in write_to_user mode;
+2. allow the planner to validate the first writable page;
+3. encounter the second page as unmapped;
+4. receive the deterministic planner error;
+5. perform ZERO destination writes because no complete plan was returned.
+
+After returning to U-mode, user code must independently read the valid 8-byte prefix and prove the sentinel is unchanged.
+
+The supervisor/verifier should also record enough evidence to establish:
+
+- requested VA and length;
+- first page was the real mapped U RW page;
+- second page was unmapped;
+- expected rejection variant;
+- no copy segment sequence was consumed for writing;
+- valid-prefix bytes before == after;
+- no trap/page fault escaped the bounded service;
+- U-mode successfully resumed after the rejected request.
+
+This is the required all-or-nothing proof.
+
+Do NOT implement a design that copies the first page and only then discovers the second-page error.
+
+The whole point of the planner is validation before mutation.
+
+BATCH 21C USER PROBE
+
+Create one distinct relocation-safe copied user template.
+
+Suggested ELF-visible symbols:
+
+userCopyOutProbeTemplateBegin
+userCopyOutProbeServiceEcall
+userCopyOutProbeAfterService
+userCopyOutProbePermissionRejectEcall
+userCopyOutProbeAfterPermissionReject
+userCopyOutProbeAtomicRejectEcall
+userCopyOutProbeAfterAtomicReject
+userCopyOutProbeTerminalEcall
+userCopyOutProbeFail
+userCopyOutProbeTemplateEnd
+
+Exact names may follow repository style.
+
+Every ECALL site and return continuation used as proof must be independently derived from the built ELF.
+
+The template must remain relocation-safe after copying to 0x80401000.
+
+No libc.
+No heap.
+No SBI from U-mode.
+No Linux syscall numbers.
+No privileged instructions in the copied template.
+No absolute kernel address embedded into relocated user code.
+
+Suggested bounded sequence:
+
+PHASE 1 — SUCCESS
+
+- reserve stack frame;
+- seed destination poison/guards;
+- pass writable destination VA + length 16;
+- ECALL;
+- require deterministic success marker;
+- verify exact 16 output bytes;
+- verify guards;
+- write success/post-return marker.
+
+PHASE 2 — PERMISSION REJECTION
+
+- pass U RX code destination + length 16;
+- ECALL;
+- require deterministic NotWritable-style result marker;
+- write post-rejection marker proving U resumed.
+
+PHASE 3 — LATER-PAGE ATOMIC REJECTION
+
+- seed exact 8-byte sentinel at stack_top-8;
+- pass stack_top-8 + length 16;
+- ECALL;
+- require deterministic Unmapped-style result marker;
+- verify exact 8-byte sentinel unchanged;
+- write post-rejection marker proving U resumed.
+
+PHASE 4 — TERMINAL
+
+- set distinct terminal marker;
+- terminal ECALL;
+- fail-stop if execution falls through unexpectedly.
+
+TRAP STATE MACHINE
+
+Keep the Batch 21C machine state deliberately bounded and explicit.
+
+Expected number of U ECALL traps:
+
+4
+
+1. successful copy-OUT
+2. permission-invalid rejection
+3. later-page/unmapped atomic rejection
+4. terminal return
+
+If a different bounded trap count is mechanically cleaner, document and prove it, but do not add unrelated services.
+
+For every trap:
+
+- interrupt bit zero;
+- scause=8;
+- SPP=0 on U-origin traps;
+- exact phase/order;
+- exact ELF-derived trapped sepc;
+- trusted trap-frame address in supervisor-only memory;
+- expected saved user SP bounds;
+- expected service/result markers;
+- SUM clear.
+
+Every SRET back to U-mode must rearm trusted sscratch correctly so the next trap again enters on the supervisor stack.
+
+Do not leave cosmetic frame.sepc/frame.sstatus changes that are not actually loaded into CSRs before SRET.
+
+ACTIVE SV39 ADAPTER
+
+Reuse the current Batch 21B ActiveQuery/PageQuery composition.
+
+For write_to_user, the generic planner must receive real leaf truth:
+
+- physical_page_start;
+- user bit;
+- readable bit;
+- writable bit.
+
+Successful output requires user=true and writable=true.
+
+Do not special-case the current stack address inside the generic planner.
+
+Do not infer writability from address ranges when the active PTE already supplies the truth.
+
+Do not directly dereference user VAs in S-mode.
+
+PHYSICAL COPY PATH
+
+For the successful plan only:
+
+for each planner-produced segment:
+
+- use physical_start;
+- use byte_count;
+- use request_offset;
+- copy from trusted supervisor source into the supervisor-accessible physical/identity backing;
+- never use the original user VA as a supervisor pointer.
+
+The copy loop must be unreachable on planner failure.
+
+Prefer code structure that makes this visually and mechanically obvious:
+
+plan = TransferPlan(...).plan(..., .write_to_user, query) catch rejection;
+
+ONLY AFTER plan success:
+
+for plan.items(): perform writes
+
+Do not interleave planning and mutation.
+
+SUM POLICY
+
+Keep sstatus.SUM=0 throughout Batch 21C.
+
+Record real saved/prepared sstatus evidence for the relevant traps/returns and have the verifier decode/check the bit.
+
+Do not satisfy this requirement with only a hard-coded textual sum=observed-zero line.
+
+EVIDENCE FRAME
+
+Emit one distinct Batch 21C evidence frame after Batch 21B RETURNED and before Morphic.
+
+Suggested framing:
+
+ZIGREF_USER_COPY_OUT_BEGIN
+...
+ZIGREF_USER_COPY_OUT_END
+ZIGREF_USER_COPY_OUT_RETURNED
+
+Exact names may follow current conventions.
+
+Keep scalar headers distinct from repeated structured leaf rows so the parser cannot repeat the Batch 21B duplicate-key mistake.
+
+Evidence should contain actual observed values sufficient to prove at minimum:
+
+GLOBAL CONSERVATION
+
+- user code VA/PA;
+- user stack VA/PA;
+- satp before/after;
+- root physical;
+- allocator count before/after;
+- page-table count before/after;
+- stvec after restore;
+- sscratch after restore;
+- final leaf count;
+- every final leaf VA/PA/raw PTE/level;
+- final U count;
+- final W+X count;
+- fence policy;
+- translation policy.
+
+SUCCESSFUL COPY-OUT
+
+- service ECALL PC;
+- actual prepared return SEPC;
+- trapped/prepared sstatus;
+- destination VA;
+- requested length;
+- planner segment count;
+- every successful planner segment VA/PA/request_offset/byte_count;
+- total segment coverage;
+- exact trusted source payload rendering;
+- exact user-observed destination rendering;
+- guard-before value;
+- guard-after value;
+- service result marker;
+- post-return U-mode marker.
+
+PERMISSION REJECTION
+
+- rejected destination VA/length;
+- actual active leaf raw PTE or independently derivable leaf row;
+- deterministic rejection kind;
+- code guard before/after;
+- return marker proving U resumed;
+- no writes performed marker backed by actual guard equality, not merely a claim.
+
+ATOMIC REJECTION
+
+- rejected start VA;
+- length 16;
+- valid-prefix length 8;
+- first-page real PTE/PA truth;
+- second-page unmapped result;
+- deterministic rejection kind;
+- valid-prefix sentinel before;
+- valid-prefix sentinel after;
+- exact equality;
+- return marker proving U resumed.
+
+TRAP SEQUENCE
+
+- trap count;
+- each trap-frame address;
+- each scause;
+- each trapped sepc;
+- each relevant sstatus;
+- each actual prepared return sepc;
+- return count;
+- rejection count;
+- terminal marker;
+- completion marker.
+
+STRICT VERIFIER
+
+Add a final Batch 21 verifier, preferably:
+
+tools/verify-freestanding-riscv64-user-memory-transfer.py
+
+This verifier should represent the completed Batch 21 boundary, while reusing the strict Batch 21B verifier/parser rather than replacing or weakening it.
+
+The new verifier must:
+
+1. import/reuse the strict Batch 21B parser chain;
+2. require exact framing/order:
+   Batch 21B RETURNED
+   → Batch 21C frame
+   → Batch 21C RETURNED
+   → Morphic;
+3. independently inspect the built ELF for every Batch 21C template/ECALL/continuation symbol;
+4. compare actual trapped and prepared PCs against independently derived U-mode relocated addresses;
+5. parse repeated leaf rows structurally, separate from scalar headers;
+6. compare the exact post-21C leaf map against Batch 21B leaf truth;
+7. derive U count and W+X from raw PTEs itself;
+8. verify allocator/page-table/satp/root conservation;
+9. verify successful write_to_user geometry and physical translation;
+10. prove destination segment coverage equals exactly 16;
+11. verify exact trusted payload and exact user-observed output;
+12. verify success guards unchanged;
+13. verify permission rejection is against a real U=1 W=0 leaf;
+14. verify permission guard before==after;
+15. verify atomic rejection begins with a real writable mapped prefix and then hits an unmapped next page;
+16. verify valid-prefix sentinel before==after;
+17. require no uncontrolled exception/trap beyond the expected ECALL sequence;
+18. prove SUM=0 from actual status evidence;
+19. verify stvec and sscratch restoration;
+20. require local FENCE.I and no new SFENCE.VMA claim if no PTE changed;
+21. execute two independent real qemu-system-riscv64 machines;
+22. run hosted Morphic and fake Morphic;
+23. require hosted == fake == QEMU-A == QEMU-B;
+24. require exact length 765;
+25. fail closed on any missing, duplicate, malformed, extra, reordered, or contradictory required evidence.
+
+REJECTION / MUTATION SELF-TEST
+
+The verifier --self-test must run at least one real bounded fixture and mutation-reject a broad matrix including:
+
+- frame markers/order;
+- trap count;
+- service/rejection/terminal PCs;
+- prepared return SEPCs;
+- SPP/SUM bits;
+- destination VA/length;
+- source payload bytes;
+- user-observed output bytes;
+- successful planner segment count;
+- segment VA/PA/offset/count;
+- segment coverage;
+- success guard mutation;
+- permission-rejection result;
+- permission leaf W-bit mutation;
+- permission guard mutation;
+- atomic-rejection start/length;
+- first-page writable truth mutation;
+- second-page mapped/unmapped contradiction;
+- valid-prefix sentinel mutation;
+- allocator drift;
+- page-table-count drift;
+- satp/root drift;
+- stvec/sscratch drift;
+- missing/extra/duplicate leaf;
+- changed leaf PA/PTE/level;
+- third U leaf;
+- W+X leaf;
+- fence-policy contradiction;
+- Morphic equality/length drift where practical.
+
+Do not build a self-test that merely mutates decorative strings while leaving the load-bearing machine facts unchecked.
+
+HISTORICAL VERIFIERS
+
+Do not weaken or silently modify historical Batch 18/19/20/21B verifiers to make Batch 21C pass.
+
+If a shared parser helper genuinely needs a correctness fix, preserve strictness and document the reason.
+
+The default expectation is that prior verifiers remain unchanged.
+
+FINAL COMMANDS
+
+At minimum the completed implementation must make these pass:
+
+zig build test-bounded-user-memory-transfer-plan
+zig build smoke-bounded-user-memory-transfer-plan
+python3 tools/verify-freestanding-riscv64-user-copy-in.py --self-test
+python3 tools/verify-freestanding-riscv64-user-memory-transfer.py --self-test
+python3 tools/verify-freestanding-riscv64-user-memory-transfer.py
+python3 tools/query-reference.py agent doctor
+python3 tools/developer-command.py validate-repository
+
+The full new verifier must itself execute two real QEMU machines.
+
+Do not substitute a mocked or hosted-only machine proof.
+
+If validation evidence becomes stale because tracked recipe/build inputs changed, regenerate it canonically using repository tooling and re-run the drift checks.
+
+DOCUMENTATION
+
+Update at minimum:
+
+COMMANDS.md
+recipes/run-hosted-morphic-runtime/recipe.json
+docs/reports/AGENTIC_SNOWBALL_BATCH_21C.md
+
+The report should state actual observed machine evidence after successful execution, not planned values presented as facts.
+
+Explicitly state that Batch 21 is now mechanically complete only in this narrow native sense:
+
+- bounded read-from-user planning + real copy-IN;
+- bounded write-to-user planning + real copy-OUT;
+- permission rejection;
+- later-page atomic rejection;
+- no direct supervisor dereference of original user VA;
+- SUM=0;
+- unchanged mappings/resources;
+- strict two-QEMU proof.
+
+NONCLAIMS
+
+Do not claim any of the following:
+
+- Linux copy_from_user;
+- Linux copy_to_user;
+- Linux fault-fixup tables;
+- EFAULT semantics;
+- arbitrary process address spaces;
+- concurrent-remapping safety;
+- page pinning;
+- demand paging;
+- syscall table;
+- Linux syscall ABI;
+- errno behavior;
+- ELF userspace loader;
+- execve;
+- VFS;
+- file descriptors;
+- mmap/brk;
+- signals;
+- futexes;
+- threads;
+- procfs/sysfs/devfs completeness;
+- sockets/networking;
+- BusyBox;
+- musl compatibility;
+- APK;
+- Alpine boot;
+- QEMU/TCG hosting;
+- KVM.
+
+EXPECTED NEXT STEP AFTER 21C
+
+Do not implement this in the current PR.
+
+If Batch 21C succeeds, the next evidence-driven batch should move to the first real userspace ELF loading/execution boundary, unless the implementation reveals a smaller prerequisite that is mechanically necessary.
+
+The likely progression is:
+
+completed bounded user-memory boundary
+→ real userspace ELF image loading
+→ tiny loaded Linux-style user program
+→ minimal syscall dispatch
+→ BusyBox/musl pressure
+→ Alpine.
+
+PR / DELIVERY RULES
+
+Implement the complete Batch 21C request in one branch/PR.
+
+Commit the implementation.
+Push the branch.
+Open or update exactly one PR against main.
+
+In the PR body report:
+
+- exact starting HEAD;
+- exact final head SHA;
+- files changed;
+- focused gates run;
+- Batch 21C self-test result;
+- full two-QEMU verifier result;
+- QEMU version;
+- Zig version;
+- observed trap count;
+- observed U/W+X counts;
+- allocator/page-table before/after;
+- exact successful copy payload/result;
+- exact permission rejection result;
+- exact atomic rejection result;
+- valid-prefix sentinel preservation;
+- exact Morphic byte length/equality;
+- full repository validation result;
+- explicit nonclaims.
+
+Do not merge.
+Do not tag.
+
+If the task cannot be completed in the available run, do not stop with a vague statement such as "too much work" or "time limit."
+
+Either:
+
+- complete and open/update the PR;
+
+or
+
+- identify the concrete technical blocker, the exact command/error, and the smallest remaining repair.
+
+Do not spend the run repeating already-settled discovery.
+
+ACCEPTANCE SUMMARY
+
+Batch 21C is complete only when real machine evidence proves:
+
+U-mode requests bounded output
+→ active Sv39 validates the whole writable range
+→ canonical planner returns physical segments
+→ S-mode writes through those segments with SUM=0
+→ U-mode observes exact trusted bytes
+→ guards prove exact bounds
+→ U RX write is rejected
+→ writable-prefix + unmapped-suffix write is rejected before any mutation
+→ U-mode proves the valid prefix stayed unchanged
+→ repeated trap-stack discipline survives every return
+→ final leaves/resources remain unchanged
+→ two independent QEMU machines agree
+→ Morphic remains exactly 765 bytes
+→ repository validation passes.
+
+Then Batch 21 is closed and the project may move on to real userspace ELF loading.
