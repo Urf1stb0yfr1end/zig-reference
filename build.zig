@@ -242,6 +242,14 @@ pub fn build(b: *std.Build) void {
             const install_userspace_elf = b.addInstallArtifact(userspace_elf, .{});
             b.step("install-userspace-rv64-elf", "Build and install the bounded RV64 userspace ELF fixture")
                 .dependOn(&install_userspace_elf.step);
+            const userspace_data_module = b.createModule(.{ .root_source_file = b.path("recipes/run-hosted-morphic-runtime/fixtures/userspace-elf-rv64-data-bss.zig"), .target = freestanding_target, .optimize = .ReleaseSmall, .code_model = .medium });
+            const userspace_data_elf = b.addExecutable(.{ .name = "userspace-elf-rv64-data-bss", .root_module = userspace_data_module });
+            userspace_data_elf.entry = .disabled;
+            userspace_data_elf.root_module.strip = true;
+            userspace_data_elf.setLinkerScript(b.path("recipes/run-hosted-morphic-runtime/userspace-elf-rv64-data-bss.ld"));
+            const install_userspace_data_elf = b.addInstallArtifact(userspace_data_elf, .{});
+            b.step("install-userspace-rv64-data-bss-elf", "Build and install the bounded writable RV64 userspace ELF fixture")
+                .dependOn(&install_userspace_data_elf.step);
             const freestanding_module = b.createModule(.{ .root_source_file = b.path("recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig"), .target = freestanding_target, .optimize = .ReleaseSmall, .code_model = .medium });
             freestanding_module.addImport("morphic-core", recipe_module);
             freestanding_module.addImport("bounded-deterministic-scheduler", findModule("bounded-deterministic-scheduler", &modules));
@@ -255,6 +263,7 @@ pub fn build(b: *std.Build) void {
             freestanding_module.addImport("bounded-user-memory-transfer-plan", findModule("bounded-user-memory-transfer-plan", &modules));
             freestanding_module.addImport("bounded-elf64-load-plan", findModule("bounded-elf64-load-plan", &modules));
             freestanding_module.addAnonymousImport("userspace-elf-rv64", .{ .root_source_file = userspace_elf.getEmittedBin() });
+            freestanding_module.addAnonymousImport("userspace-elf-rv64-data-bss", .{ .root_source_file = userspace_data_elf.getEmittedBin() });
             const freestanding = b.addExecutable(.{ .name = "morphic-freestanding-riscv64", .root_module = freestanding_module });
             freestanding.entry = .disabled;
             freestanding.root_module.strip = false;
