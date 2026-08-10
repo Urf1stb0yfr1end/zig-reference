@@ -1,0 +1,606 @@
+CODEX AGENTIC SNOWBALL — BATCH 24A
+BOUNDED RV64 LINUX INITIAL PROCESS STACK PLAN
+
+Repository:
+thanks-cohn/zig-reference
+
+Plan path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_24A_BOUNDED_RV64_LINUX_INITIAL_STACK_PLAN.txt
+
+MISSION
+
+Batch 23 proved a real separately built RV64 ET_EXEC userspace ELF with one R-X PT_LOAD plus one RW- PT_LOAD containing initialized data and non-empty BSS can be loaded, mapped, executed in real U-mode, mutated, and returned through the trusted supervisor boundary under strict QEMU evidence.
+
+Batch 24 begins the initial Linux-process-startup boundary.
+
+This boundary is deliberately split because it contains two distinct truths:
+
+24A — define and mechanically validate the reusable bounded RV64 Linux initial-stack image/layout contract without QEMU or kernel mutation.
+
+24B — later consume that settled planner in Alpz, materialize the planned bytes into real mapped user-stack memory, enter the ELF with the planned SP, and prove real U-mode observation of argc/argv/envp/auxv under strict QEMU evidence.
+
+Batch 24A must prove exactly one new reusable fact:
+
+A bounded, allocation-free, failure-atomic planner can construct the complete byte image and exact address relationships for a deliberately narrow RV64 Linux-style initial userspace stack containing argc, argv, envp, a bounded auxiliary vector, NUL-terminated strings, required sentinels, and a 16-byte-aligned initial stack pointer, without writing guest memory and without depending on page tables, QEMU, ELF execution, or kernel orchestration.
+
+The decisive new fact is:
+
+Linux-style process startup stack semantics become a reusable machine-readable planning primitive before Alpz performs any machine-side stack construction.
+
+Do not begin Batch 24B machine execution in this run.
+Do not begin Batch 25 Linux syscall work.
+
+CURRENT BASELINE
+
+Canonical merged Batch 23 revision:
+
+45849edc53981bd2fb5ccc01a9ee7742e9ebf1dd
+
+Treat checked-out HEAD as truth.
+
+Before changing source:
+
+1. record git rev-parse HEAD;
+2. record git status --short --branch;
+3. inspect any delta from the canonical Batch 23 merge to HEAD;
+4. preserve compatible newer work;
+5. never reset/discard newer work merely to reproduce the historical baseline.
+
+Batch 23 settled these relevant truths:
+
+- real RV64 ET_EXEC execution exists;
+- one R-X code PT_LOAD and one RW- initialized-data/BSS PT_LOAD are proved;
+- one existing U RW/NX stack page already exists in the machine composition;
+- trusted U-mode entry and U→S ECALL return already exist;
+- bounded user-memory transfer planning/copy boundaries already exist;
+- bounded ELF interpretation/load planning already exists.
+
+Batch 24A MUST NOT modify or weaken those machine proofs.
+
+READ / QUERY BEFORE IMPLEMENTATION
+
+Follow AGENTS.md.
+
+At minimum inspect the current equivalents of:
+
+- AGENTS.md
+- COMMANDS.md
+- docs/standards/SNOWBALL_YIELD.md
+- docs/roadmaps/ALPZ_TO_ALPINE_QEMU_KVM_AND_BEYOND.md
+- docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_23_FIRST_WRITABLE_RV64_USERSPACE_ELF_DATA_BSS.txt
+- docs/reports/AGENTIC_SNOWBALL_BATCH_23.md
+- projects/00-fixed-capacity-vector/details.json
+- projects/06-byte-writer/details.json
+- projects/10-checked-integer-cast/details.json
+- projects/15-aligned-address-and-size-helpers/details.json
+- projects/17-checked-half-open-range/details.json
+- projects/18-distinct-memory-address-types/details.json
+- projects/53-bounded-user-memory-transfer-plan/details.json
+- projects/54-bounded-elf64-load-plan/details.json
+
+Use the current repository indexes and Agent Fast Path rather than assuming these are the only relevant foundations.
+
+AUTHORITATIVE ABI SHAPE
+
+The implementation must model the deliberately bounded Linux/RV64 startup shape, not invent a private Alpz startup convention.
+
+Use primary ABI/source truth when resolving ambiguity. The relevant shape is the Linux ELF process startup contract and the RISC-V psABI requirement that the stack pointer be 128-bit / 16-byte aligned at procedure entry.
+
+For this batch, the planned initial stack at final SP must have the conventional downward-growing RV64 word layout:
+
+lowest address / initial SP
+
+    argc                         one 64-bit word
+    argv[0]                      64-bit pointer
+    argv[1]
+    ...
+    argv[argc-1]
+    NULL                         64-bit zero sentinel
+    envp[0]                      64-bit pointer
+    envp[1]
+    ...
+    NULL                         64-bit zero sentinel
+    auxv[0].type                 64-bit word
+    auxv[0].value                64-bit word
+    auxv[1].type
+    auxv[1].value
+    ...
+    AT_NULL                      64-bit zero
+    0                            64-bit zero
+    zero padding as needed
+    NUL-terminated argv/env strings in deterministic planned locations
+
+higher address / bounded stack top
+
+The exact deterministic string packing direction/order may be selected by the module, but it must be documented, stable, non-overlapping, and mechanically tested.
+
+The final initial SP must be 16-byte aligned.
+
+All argv/envp pointers emitted into the image must point to the exact corresponding NUL-terminated bytes inside the same planned stack image.
+
+The planner must append required argv/envp NULL sentinels and the terminating AT_NULL pair itself. Callers must not be able to accidentally omit them.
+
+This is a deliberately narrow Linux-compatible startup image contract, not a claim to reproduce every current Linux create_elf_tables feature.
+
+STRICT SCOPE
+
+Batch 24A SHOULD create one canonical reusable module if no equivalent capability exists at checked-out HEAD.
+
+Expected conceptual module:
+
+bounded-rv64-linux-initial-stack-plan
+
+Expected location if the next project ID remains available:
+
+projects/55-bounded-rv64-linux-initial-stack-plan
+
+Do not blindly claim project ID 55. Confirm checked-out HEAD and use the next canonical project number if newer work has already occupied it.
+
+The module should be:
+
+- allocation-free;
+- deterministic;
+- bounded by compile-time capacity;
+- hosted/freestanding compatible;
+- little-endian RV64 specific where 64-bit word encoding is part of the contract;
+- independent of QEMU;
+- independent of page tables;
+- independent of physical memory;
+- independent of the Alpz kernel recipe;
+- independent of ELF parsing;
+- failure-atomic;
+- suitable for later consumption by Batch 24B and eventually execve/process creation.
+
+Do not put this policy directly into freestanding_riscv64.zig.
+
+REQUIREMENT / CAPABILITY FREEZE
+
+Before implementation, freeze the Snowball Yield requirement map.
+
+At minimum classify:
+
+1. fixed-capacity owned byte/output storage;
+2. checked address/range arithmetic;
+3. alignment helpers;
+4. endian-safe RV64 word encoding;
+5. distinct guest virtual address representation;
+6. argv/envp string validation and deterministic packing;
+7. startup table layout and sentinel policy;
+8. auxv bounded serialization;
+9. failure atomicity;
+10. external smoke/import contract.
+
+Use existing modules when they truthfully solve a requirement.
+
+Do not create replacement byte writers, vectors, checked-range helpers, address wrappers, or alignment helpers merely for Batch 24A.
+
+If one genuinely reusable lower-level capability is missing, classify it first using the Agent Fast Path. If it is small, general, and required for 24A, add it canonically and continue. If it creates real scope explosion, preserve reviewable work and report the blocker rather than silently inventing project-specific semantics.
+
+PROPOSED PUBLIC CONTRACT
+
+The exact Zig spelling may follow current repository conventions, but the public surface should conceptually expose something close to:
+
+- constants describing RV64 word size and required stack alignment;
+- an AuxEntry type;
+- an AuxValue form if symbolic resolution is needed for pointers to planned argv/env strings;
+- a bounded StackPlan / StackImage type owning the emitted bytes and metadata;
+- a planning operation that accepts a bounded guest stack range/top plus argv/envp/auxv inputs;
+- immutable access to the planned byte image;
+- exact initial_sp;
+- exact used virtual range;
+- exact offsets/addresses for argv table, envp table, auxv table, and strings when useful to later composition.
+
+Prefer the smallest public surface that lets Batch 24B consume the plan without re-deriving layout semantics.
+
+A strong shape would be a returned plan that owns one contiguous image corresponding exactly to:
+
+    [initial_sp, stack_top)
+
+with every byte deterministic, including alignment padding.
+
+Then Batch 24B can copy that byte image into the already-proven writable user-stack mapping without rebuilding Linux startup layout in kernel code.
+
+Do not require this exact type spelling if current repository patterns support a cleaner equivalent.
+
+ARGV REQUIREMENTS
+
+The planner must support a deliberately bounded nonzero argv vector.
+
+For each argument:
+
+- input is a byte string without an interior NUL;
+- planner appends exactly one NUL terminator;
+- planner assigns one exact in-image guest virtual address;
+- argv table contains that address exactly once in order;
+- argv[argc] is a zero pointer;
+- argc equals the exact argv count;
+- no pointer may refer outside the returned used stack image;
+- no string regions may overlap table words or one another.
+
+For the first contract, requiring argc >= 1 is acceptable and arguably preferable because Linux process argv normally includes argv[0]. If zero-argc support is intentionally admitted, document and test it explicitly rather than allowing it accidentally.
+
+ENVIRONMENT REQUIREMENTS
+
+The planner must support a bounded envp vector.
+
+For each environment string:
+
+- no interior NUL;
+- exactly one appended NUL;
+- deterministic placement;
+- exact pointer in the envp table;
+- one final zero pointer after the last envp entry.
+
+An empty environment must be a valid, explicitly tested case if the implementation can represent it cleanly.
+
+Do not parse NAME=VALUE semantics in this batch. The planner lays out environment strings; it does not define shell/environment policy.
+
+AUXILIARY VECTOR REQUIREMENTS
+
+Batch 24A must establish the structural auxv contract without prematurely implementing the entire Linux auxiliary-vector universe.
+
+The planner must support a bounded ordered list of 64-bit type/value entries and append the terminal:
+
+    AT_NULL = 0
+    value   = 0
+
+itself.
+
+Reject caller-supplied AT_NULL if allowing it would make termination ambiguous.
+
+Prefer rejecting duplicate auxv types for this first bounded contract unless primary Linux behavior or a strong future requirement makes duplicates necessary. If duplicates are admitted, document exact ordering/lookup semantics and test them.
+
+The planner must be able to represent at least the kinds of immediate values needed by the later Batch 24B fixture, conceptually including a minimal subset such as:
+
+- AT_PAGESZ;
+- AT_ENTRY;
+- AT_UID;
+- AT_EUID;
+- AT_GID;
+- AT_EGID;
+- AT_SECURE.
+
+If a tiny symbolic value form can cleanly and generally resolve an aux entry to the planned argv[0] string, support it so a future Batch 24B may truthfully emit AT_EXECFN without a second layout pass.
+
+Do NOT add AT_PHDR merely by hardcoding a value if the relevant program-header bytes are not actually mapped in the future process image.
+
+Do NOT add AT_RANDOM unless the planner has a truthful bounded representation for the referenced 16-byte payload.
+
+Do NOT fabricate HWCAP, HWCAP2, VDSO/SYSINFO_EHDR, platform strings, interpreter base, clock tick, rseq, or other auxiliary values merely to make the vector look realistic.
+
+This module plans structure; caller policy chooses truthful aux entries.
+
+STACK RANGE / ALIGNMENT REQUIREMENTS
+
+The caller supplies a checked bounded guest stack virtual range or equivalent top/bottom truth.
+
+The planner must:
+
+- reject non-representable address arithmetic;
+- reject an invalid or empty stack range when it cannot hold the required image;
+- place the entire used image within the caller-provided stack range;
+- keep final initial_sp aligned to 16 bytes;
+- ensure every table word is naturally 8-byte aligned;
+- ensure all generated pointer values are exact guest virtual addresses;
+- ensure strings and table regions do not overlap;
+- deterministically zero alignment/padding bytes in the returned image;
+- never wrap addresses while subtracting/adding sizes.
+
+Do not silently truncate addresses, lengths, counts, or pointer values.
+
+BYTE IMAGE TRUTH
+
+The strongest preferred 24A result is a planner that returns the exact contiguous bytes later intended to appear in user memory.
+
+That means focused tests can independently decode the returned byte image and prove:
+
+- initial SP location;
+- argc word;
+- each argv pointer;
+- argv NULL;
+- each envp pointer;
+- envp NULL;
+- every auxv type/value pair;
+- AT_NULL terminator pair;
+- every NUL-terminated string;
+- every pointer-to-string relationship;
+- zero padding;
+- final stack alignment;
+- no overlap;
+- exact used byte count.
+
+Do not make Batch 24B reconstruct the byte image from a collection of loosely related offsets if 24A can return a canonical image safely and cheaply.
+
+FAILURE ATOMICITY
+
+No partial successful plan/image may escape on error.
+
+At minimum include explicit error behavior for:
+
+- output capacity exhausted;
+- stack range too small;
+- address arithmetic overflow/underflow;
+- too many argv entries for the selected bound;
+- too many envp entries for the selected bound;
+- too many auxv entries for the selected bound;
+- interior NUL in argv/envp strings;
+- caller-supplied AT_NULL if forbidden;
+- duplicate auxv key if forbidden;
+- invalid symbolic aux target/index if symbolic values are supported;
+- impossible alignment/layout;
+- any checked integer conversion failure.
+
+The implementation must construct into local owned state and only return success after the complete image and every relationship validate.
+
+FOCUSED TEST MATRIX
+
+At minimum add deterministic tests for:
+
+POSITIVE
+
+1. one argv, empty env, minimal auxv;
+2. multiple argv entries preserving order;
+3. multiple env entries preserving order;
+4. multiple auxv entries preserving order;
+5. exact 16-byte SP alignment with padding required;
+6. no-padding boundary;
+7. strings of different lengths;
+8. maximum accepted bounded capacities;
+9. pointer decoding back to exact string bytes;
+10. terminal argv/envp/auxv sentinels.
+
+NEGATIVE / BOUNDARY
+
+11. stack one byte/word too small;
+12. byte capacity one byte too small;
+13. address subtraction underflow or equivalent impossible range;
+14. argv count capacity exceeded;
+15. env count capacity exceeded;
+16. aux count capacity exceeded;
+17. embedded NUL in argv;
+18. embedded NUL in env;
+19. forbidden AT_NULL supplied by caller;
+20. duplicate aux key if duplicates are forbidden;
+21. invalid symbolic pointer target if supported;
+22. near-usize address overflow boundary;
+23. late failure leaves no returned partial plan;
+24. external named-import smoke test.
+
+Prefer table-driven tests where that improves clarity without obscuring the semantic relationships.
+
+INDEPENDENT TEST DECODING
+
+Do not test the planner only by comparing its metadata to itself.
+
+Focused tests should independently decode the returned bytes using simple checked reads and require agreement with the intended startup structure.
+
+Where useful, use existing byte-reader/endian primitives rather than the planner's own private helper functions so that a bug in one encoding path is less likely to validate itself.
+
+Do not call a hash an exact-byte proof.
+
+REPOSITORY INTEGRATION
+
+A new reusable module must receive the normal repository treatment:
+
+- canonical numbered project directory;
+- README.md;
+- MASTERY.md;
+- DETAILS.md;
+- details.json;
+- src implementation/unit tests;
+- smoke test;
+- port.js if required by current module convention;
+- root build integration;
+- module catalog/discovery integration through canonical generators;
+- dependency metadata;
+- focused validation commands;
+- generated indexes/evidence regenerated through repository tooling.
+
+Do not manually edit generated graph/index facts that canonical tooling derives.
+
+EXPECTED COMMAND SHAPE
+
+If the canonical module name is bounded-rv64-linux-initial-stack-plan, expect focused commands conceptually like:
+
+zig build test-bounded-rv64-linux-initial-stack-plan
+zig build smoke-bounded-rv64-linux-initial-stack-plan
+
+Use the exact canonical names selected at implementation time and update COMMANDS.md only where repository convention requires it.
+
+NO MACHINE EXECUTION IN 24A
+
+Batch 24A must stop at the reusable planner/evidence boundary.
+
+Do not:
+
+- modify the freestanding Alpz loader to construct the stack;
+- change enterUser to consume a new SP;
+- add a new QEMU process-startup verifier;
+- make the Batch 23 guest parse argc/argv/envp/auxv;
+- introduce Linux syscalls;
+- introduce execve;
+- introduce a process object;
+- add dynamic ELF or PT_INTERP;
+- add musl;
+- add BusyBox;
+- add Alpine.
+
+Those machine facts belong to Batch 24B and later pressures.
+
+BATCH 23 HARDENING DEBT
+
+Do not opportunistically broaden 24A into a Batch 23 proof-hardening campaign.
+
+Known Batch 23 hardening opportunities include independently enumerating aggregate user/W+X leaf counts, full sanitization of newly exposed user pages, and stronger external reconstruction of PTE-to-physical-frame relationships.
+
+Preserve those as explicit debt unless one directly blocks truthful 24A implementation. Batch 24A contains no new user mapping and should not need to touch them.
+
+VALIDATION
+
+At minimum run and record:
+
+- git status --short --branch
+- zig version
+- python3 tools/query-reference.py agent bootstrap
+- python3 tools/query-reference.py agent doctor
+- appropriate agent decide/card/compose/preflight/impact commands
+- all focused unit tests for the new module
+- the new module external smoke test
+- zig build test-bounded-elf64-load-plan
+- zig build smoke-bounded-elf64-load-plan
+- zig build test-bounded-user-memory-transfer-plan
+- zig build smoke-bounded-user-memory-transfer-plan
+- zig build check
+- PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+- python3 tools/developer-command.py validate-repository
+
+Batch 24A does not require real system QEMU because no new machine behavior is claimed.
+
+If the complete repository validation naturally runs existing machine-independent/historical configured steps, let it do so; do not add QEMU ceremony merely for this planning milestone.
+
+Repair in-scope failures rather than merely reporting them.
+
+Regenerate every affected validation-evidence record, index, dependency view, catalog, and command reference required by current repository policy.
+
+REPORT
+
+Create:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_24A.md
+
+The report must state exactly:
+
+- starting revision;
+- requirement/capability map frozen before implementation;
+- existing modules actually reused;
+- any genuinely missing reusable lower capability;
+- canonical new module identity and path;
+- exact public contract;
+- exact RV64 word/alignment assumptions;
+- exact stack image ordering;
+- exact argv/envp policy;
+- exact auxv policy;
+- exact capacity/bounds;
+- exact failure semantics;
+- independent byte-image decoding evidence;
+- focused validation results;
+- complete repository validation result;
+- Snowball Yield;
+- explicit nonclaims;
+- smallest actionable Batch 24B pressure.
+
+EXPLICIT NONCLAIMS
+
+Batch 24A must not claim:
+
+- any new bytes were written to real Alpz user memory;
+- a real initial process stack executed under QEMU;
+- the current guest ELF receives argc/argv/envp/auxv;
+- full Linux create_elf_tables compatibility;
+- ASLR / randomized stack placement;
+- AT_RANDOM unless explicitly implemented and proved;
+- AT_PHDR unless backed by truthful mapped program-header memory;
+- HWCAP/HWCAP2 correctness;
+- VDSO/SYSINFO_EHDR;
+- platform/base-platform strings;
+- PT_INTERP;
+- dynamic linking;
+- TLS;
+- libc or musl startup compatibility;
+- Linux syscall ABI;
+- execve;
+- processes/fork/clone;
+- VFS or file descriptors;
+- mmap/brk;
+- signals/futexes/threads;
+- BusyBox;
+- Alpine;
+- QEMU hosted inside Alpz;
+- KVM;
+- hardware virtualization.
+
+COMPLETION STANDARD
+
+A successful Batch 24A is complete only when the repository can truthfully demonstrate:
+
+bounded argv/envp/aux inputs
+    → canonical reusable RV64 Linux startup-stack planner
+    → checked deterministic layout
+    → exact NUL-terminated string packing
+    → exact argv pointers + NULL
+    → exact envp pointers + NULL
+    → exact bounded auxv pairs + AT_NULL/0
+    → exact little-endian RV64 word image
+    → exact 16-byte-aligned initial SP
+    → every generated pointer resolves to intended in-image bytes
+    → all bytes fit the supplied guest stack range
+    → failure-atomic rejection matrix
+    → independent byte-image decoding tests
+    → external named-import smoke PASS
+    → repository contracts/indexes/evidence valid
+    → full validate-repository PASS
+
+SOURCE CONTROL / PR REQUIREMENT
+
+The run is not finished merely because implementation or tests are done.
+
+For successful Batch 24A:
+
+1. leave the working tree reviewable and free of accidental generated/binary junk;
+2. commit all intended Batch 24A changes on the working branch;
+3. push that branch to origin;
+4. create a pull request targeting main, or update the existing Batch 24A PR if one already exists;
+5. ensure the PR body describes actual evidence only;
+6. include exact branch name, final commit SHA, PR number, and PR URL in the final handoff.
+
+If authentication, permissions, GitHub availability, or tooling prevents PR creation after commit/push, do not silently stop. State the exact reason and give the exact branch/commit handoff required to create the PR manually.
+
+If a genuine technical blocker prevents successful Batch 24A completion, preserve coherent reviewable work. Commit/push only when doing so truthfully represents the partial state. A clearly marked draft/blocker PR is appropriate when useful and tooling permits it.
+
+MANDATORY FINAL OUTPUT — NEVER SILENTLY STOP
+
+This applies whether the run PASSES, FAILS validation, is BLOCKED, or cannot create the PR.
+
+Do not end immediately after code generation.
+Do not end immediately after a compiler/test/validation failure.
+Do not end after a long-running validation command.
+Do not end after commit or push without reporting the result.
+Do not disappear after spending the execution budget.
+
+Before stopping ALWAYS produce the normal repository completion/handoff output containing:
+
+- final status: PASS, PARTIAL, or BLOCKED;
+- concise implementation summary;
+- exact new proof statements actually established;
+- exact validations run and PASS/FAIL/BLOCKED result;
+- failures/blockers and narrowest known cause;
+- explicit nonclaims;
+- Snowball Yield;
+- LOCATIONS;
+- MINIMUS handoff;
+- starting revision;
+- final commit SHA if one exists;
+- branch name;
+- push status;
+- PR number and URL if created/updated;
+- if no PR exists, exact reason and next PR action;
+- exact remaining work;
+- one actionable next pressure.
+
+Even if a command fails near the end, produce this handoff using evidence already obtained.
+
+A long run with no final output is NOT an acceptable completion state.
+
+Only stop after producing the normal final output/handoff.
+
+NEXT PRESSURE AFTER 24A
+
+Do not implement it in this run.
+
+Expected Batch 24B pressure:
+
+Consume the settled initial-stack planner in the freestanding Alpz machine composition; construct one deterministic argv/envp/minimal truthful auxv stack image inside real allocator-owned U RW/NX stack memory; enter the real Batch 23-style ELF at planner-derived e_entry with SP exactly equal to the stack planner's initial_sp; have real U-mode guest code independently parse and validate argc, argv strings/pointers, envp strings/pointers, auxv values, NULL sentinels, and 16-byte SP alignment; then ECALL through the trusted supervisor boundary and verify the stack image remained within its declared writable user range under strict mutation-tested two-QEMU evidence.
+
+Batch 24B should consume 24A as policy authority rather than re-deriving stack layout in freestanding_riscv64.zig.
+
+Do not begin Batch 24B here.
