@@ -361,3 +361,14 @@ python3 tools/verify-freestanding-riscv64-user-copy-in.py
 The self-test mutation-checks the strict Batch 21B evidence parser. The full command builds the freestanding ELF, derives copied user-probe locations from its symbols, runs two independent `qemu-system-riscv64` machines, preserves the Batch 20 proof chain, and checks exact 765-byte Morphic equality.
 
 Batch 21B repair validation executed both the rejection self-test and full two-machine QEMU verifier successfully under Zig 0.14.0, proving two traps per machine, U=2, W+X=0, and exact 765-byte Morphic equality; the complete repository validation also passed 326/326 build steps and 216/216 tests.
+
+### Batch 21C bounded real user-memory transfer
+
+- `python3 tools/verify-freestanding-riscv64-user-memory-transfer.py --self-test` builds and executes one real bounded system-QEMU fixture, validates the completed Batch 21 evidence chain, and mutation-rejects the copy-OUT, permission-rejection, atomic-rejection, conservation, permission, and policy evidence.
+- `python3 tools/verify-freestanding-riscv64-user-memory-transfer.py` is the canonical Batch 21C execution lab. It executes two independent `qemu-system-riscv64` machines, preserves the strict Batch 21B parser chain, proves the exact 16-byte `kernel-to-user!!` write through planner-produced physical segments with SUM clear, rejects the real U RX page as `NotWritable`, rejects the writable-prefix/unmapped-suffix range as `Unmapped` without prefix mutation, derives U=2 and W+X=0 from unchanged leaves, and requires exact 765-byte hosted/fake/machine Morphic equality.
+
+Batch 21C executed both commands under Zig 0.14.0 and QEMU 8.2.2. Each machine observed four expected U-mode ECALL traps, allocator and page-table counts remained 7 and 4 respectively, and the active `satp`, root, PTEs, user physical frames, and two-leaf user permission truth remained unchanged. This is a bounded native user-memory boundary proof, not Linux `copy_to_user`, EFAULT/fault fixup, concurrent-remapping safety, a syscall ABI, process model, ELF loader, VFS, or Linux compatibility.
+
+PR #43 review repair re-executed the Batch 21C self-test, two-machine verifier, and complete 326/326-step, 216/216-test repository validation under Zig 0.14.0 and QEMU 8.2.2. The verifier now consumes actual cause, trusted trap-frame, prepared-status, and planner-segment evidence and cross-checks Batch 21C trap-vector, SATP, and root truth against Batch 21B.
+
+PR #43 final review repair made both Batch 21C verifier modes append one bounded `LOCATIONS` then `MINIMUS` handoff after their ordinary output. Controlled invocation failure was also executed to confirm `FAIL`, actionable next-command output, and preservation of exit status 2.

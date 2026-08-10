@@ -138,11 +138,14 @@
     "python3 tools/verify-freestanding-riscv64-ecall-return.py --self-test",
     "python3 tools/verify-freestanding-riscv64-ecall-return.py",
     "python3 tools/verify-freestanding-riscv64-user-copy-in.py --self-test",
-    "python3 tools/verify-freestanding-riscv64-user-copy-in.py"
+    "python3 tools/verify-freestanding-riscv64-user-copy-in.py",
+    "python3 tools/verify-freestanding-riscv64-user-memory-transfer.py --self-test",
+    "python3 tools/verify-freestanding-riscv64-user-memory-transfer.py"
   ],
   "validation_evidence_references": [
     "docs/reports/AGENTIC_SNOWBALL_BATCH_19.md",
     "docs/reports/AGENTIC_SNOWBALL_BATCH_20.md",
-    "docs/reports/AGENTIC_SNOWBALL_BATCH_21B.md"
+    "docs/reports/AGENTIC_SNOWBALL_BATCH_21B.md",
+    "docs/reports/AGENTIC_SNOWBALL_BATCH_21C.md"
   ]
 }
