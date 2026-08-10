@@ -110,6 +110,7 @@
     "generated_files": [],
     "dependency_contracts": [
       "projects/04-bounded-byte-reader/details.json",
+      "projects/10-checked-integer-cast/details.json",
       "projects/00-fixed-capacity-vector/details.json",
       "projects/17-checked-half-open-range/details.json",
       "projects/18-distinct-memory-address-types/details.json",
@@ -177,6 +178,8 @@
       "UnsupportedFeature",
       "NoLoadableSegment",
       "SegmentFileOutOfBounds",
+      "EntryOutOfRange",
+      "WriteWithoutRead",
       "UnsupportedPermissions",
       "UnsupportedAlignment",
       "OverlappingLoadSegments",
@@ -483,6 +486,13 @@
         "reason": "reuses existing mechanism"
       },
       {
+        "module": "checked-integer-cast",
+        "path": "projects/10-checked-integer-cast/src/checked_integer_cast.zig",
+        "symbol": "checkedIntegerCast",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
         "module": "fixed-capacity-vector",
         "path": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig",
         "symbol": "FixedVector",
@@ -542,6 +552,24 @@
       "usage_phase": "compile_time_and_runtime",
       "smoke_test_exercises_dependency": true,
       "contract_path": "projects/04-bounded-byte-reader/details.json"
+    },
+    {
+      "module": "checked-integer-cast",
+      "directory": "projects/10-checked-integer-cast",
+      "import_name": "checked-integer-cast",
+      "import_path": "projects/10-checked-integer-cast/src/checked_integer_cast.zig",
+      "symbols_used": [
+        "checkedIntegerCast"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked integer conversion"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/10-checked-integer-cast/details.json"
     },
     {
       "module": "fixed-capacity-vector",
@@ -738,7 +766,9 @@
     "boundary_tests": [
       "exclusive entry end",
       "touching ranges",
-      "capacity"
+      "capacity",
+      "write-without-read rejection",
+      "checked entry conversion boundary"
     ],
     "regression_tests": [],
     "test_dependencies": [],
@@ -912,6 +942,7 @@
     ],
     "dependencies_must_port_first": [
       "elf64-file-header-parser",
+      "checked-integer-cast",
       "elf64-program-header-parser",
       "fixed-capacity-vector",
       "checked-half-open-range",
@@ -959,6 +990,7 @@
     ],
     "dependency_ids": [
       "bounded-byte-reader",
+      "checked-integer-cast",
       "fixed-capacity-vector",
       "checked-half-open-range",
       "distinct-memory-address-types",
@@ -1100,6 +1132,18 @@
         "error": "PlanCapacityExceeded",
         "operation": "plan",
         "meaning": "PlanCapacityExceeded acceptance or planning failure.",
+        "handling": "Reject the ELF or correct the bounded fixture before retrying."
+      },
+      {
+        "error": "EntryOutOfRange",
+        "operation": "plan",
+        "meaning": "EntryOutOfRange acceptance or planning failure.",
+        "handling": "Reject the ELF or correct the bounded fixture before retrying."
+      },
+      {
+        "error": "WriteWithoutRead",
+        "operation": "plan",
+        "meaning": "WriteWithoutRead acceptance or planning failure.",
         "handling": "Reject the ELF or correct the bounded fixture before retrying."
       }
     ],

@@ -1,5 +1,6 @@
 const std = @import("std");
 const bounded = @import("bounded-byte-reader");
+const casts = @import("checked-integer-cast");
 const vectors = @import("fixed-capacity-vector");
 const ranges = @import("checked-half-open-range");
 const addresses = @import("distinct-memory-address-types");
@@ -28,12 +29,18 @@ pub const Error = file_header.ParseError || program_header.ParseError || error{
     UnsupportedFeature,
     NoLoadableSegment,
     SegmentFileOutOfBounds,
+    EntryOutOfRange,
+    WriteWithoutRead,
     UnsupportedPermissions,
     UnsupportedAlignment,
     OverlappingLoadSegments,
     EntryNotExecutable,
     PlanCapacityExceeded,
 };
+
+fn checkedEntry(comptime Backing: type, value: u64) error{EntryOutOfRange}!Backing {
+    return casts.checkedIntegerCast(Backing, value) catch return error.EntryOutOfRange;
+}
 
 pub fn LoadPlan(comptime capacity: usize) type {
     return struct {
@@ -60,7 +67,7 @@ pub fn plan(comptime capacity: usize, bytes: []const u8) Error!LoadPlan(capacity
 
     const rows = try program_header.parseTable(max_program_headers, &reader, header);
     var result = LoadPlan(capacity){
-        .entry = addresses.GuestVirtualAddress.init(@intCast(header.entry)),
+        .entry = addresses.GuestVirtualAddress.init(try checkedEntry(usize, header.entry)),
         .segments = vectors.FixedVector(SegmentPlan, capacity).init(),
     };
 
@@ -78,8 +85,10 @@ pub fn plan(comptime capacity: usize, bytes: []const u8) Error!LoadPlan(capacity
         }
 
         if (row.file_range.end > bytes.len) return error.SegmentFileOutOfBounds;
+        const read = row.permissions.contains(.read);
         const write = row.permissions.contains(.write);
         const execute = row.permissions.contains(.execute);
+        if (write and !read) return error.WriteWithoutRead;
         if (write and execute) return error.UnsupportedPermissions;
         if (row.alignment > 1 and row.file_range.start % @as(usize, @intCast(row.alignment)) != row.virtual_range.start % @as(usize, @intCast(row.alignment))) return error.UnsupportedAlignment;
 
@@ -93,7 +102,7 @@ pub fn plan(comptime capacity: usize, bytes: []const u8) Error!LoadPlan(capacity
             .file_byte_count = row.file_range.length(),
             .memory_byte_count = row.virtual_range.length(),
             .zero_fill_byte_count = row.virtual_range.length() - row.file_range.length(),
-            .permissions = .{ .read = row.permissions.contains(.read), .write = write, .execute = execute },
+            .permissions = .{ .read = read, .write = write, .execute = execute },
             .alignment = row.alignment,
         }) catch return error.PlanCapacityExceeded;
     }
@@ -175,6 +184,17 @@ test "rejects policy, bounds, entry, and capacity failures" {
     writeSegment(&two, 0, 5, 0x100, 0x1000, 1, 2, 1);
     writeSegment(&two, 1, 4, 0x110, 0x2000, 1, 2, 1);
     try std.testing.expectError(error.PlanCapacityExceeded, plan(1, &two));
+}
+
+test "rejects write permission without read permission" {
+    var bytes = fixture(1);
+    writeSegment(&bytes, 0, 2, 0x100, 0x1000, 1, 2, 1);
+    try std.testing.expectError(error.WriteWithoutRead, plan(1, &bytes));
+}
+
+test "entry conversion accepts the backing boundary and rejects the next value" {
+    try std.testing.expectEqual(std.math.maxInt(u32), try checkedEntry(u32, std.math.maxInt(u32)));
+    try std.testing.expectError(error.EntryOutOfRange, checkedEntry(u32, @as(u64, std.math.maxInt(u32)) + 1));
 }
 
 test "canonical parser failures and RV64 acceptance failures propagate" {

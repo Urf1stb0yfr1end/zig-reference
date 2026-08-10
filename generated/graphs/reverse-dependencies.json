@@ -58,6 +58,7 @@
       "physical-page-frame-allocator"
     ],
     "checked-integer-cast": [
+      "bounded-elf64-load-plan",
       "bounded-system-resource-plan",
       "elf64-file-header-parser",
       "elf64-program-header-parser",

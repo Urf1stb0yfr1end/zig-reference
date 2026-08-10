@@ -111,6 +111,8 @@ module.exports = {
       "UnsupportedFeature",
       "NoLoadableSegment",
       "SegmentFileOutOfBounds",
+      "EntryOutOfRange",
+      "WriteWithoutRead",
       "UnsupportedPermissions",
       "UnsupportedAlignment",
       "OverlappingLoadSegments",
@@ -135,6 +137,15 @@ module.exports = {
         "canonicalName": "bounded-byte-reader",
         "portContract": "projects/04-bounded-byte-reader/port.js",
         "importName": "bounded-byte-reader",
+        "symbolsUsed": [],
+        "mustPortFirst": true,
+        "reason": "The module imports this direct repository dependency in build.zig.",
+        "guaranteesInherited": []
+      },
+      {
+        "canonicalName": "checked-integer-cast",
+        "portContract": "projects/10-checked-integer-cast/port.js",
+        "importName": "checked-integer-cast",
         "symbolsUsed": [],
         "mustPortFirst": true,
         "reason": "The module imports this direct repository dependency in build.zig.",
@@ -187,6 +198,7 @@ module.exports = {
       }
     ],
     "standardLibrary": [
+      "std.math.maxInt",
       "std.mem.writeInt",
       "std.testing.expect",
       "std.testing.expectEqual",
@@ -281,6 +293,19 @@ module.exports = {
   "standardLibraryUsage": {
     "imports": [
       {
+        "path": "std.math.maxInt",
+        "symbols": [
+          "std.math.maxInt"
+        ],
+        "files": [
+          "projects/54-bounded-elf64-load-plan/src/bounded_elf64_load_plan.zig"
+        ],
+        "purpose": "implementation support",
+        "versionSensitivity": "medium",
+        "knownChanges": [],
+        "migrationNotes": []
+      },
+      {
         "path": "std.mem.writeInt",
         "symbols": [
           "std.mem.writeInt"
@@ -359,7 +384,9 @@ module.exports = {
     "endianApis": [
       "std.mem.writeInt"
     ],
-    "mathApis": [],
+    "mathApis": [
+      "std.math.maxInt"
+    ],
     "metadataApis": []
   },
   "buildSystemUsage": {
@@ -369,6 +396,7 @@ module.exports = {
     "sourcePath": "projects/54-bounded-elf64-load-plan/src/bounded_elf64_load_plan.zig",
     "directModuleDependencies": [
       "bounded-byte-reader",
+      "checked-integer-cast",
       "fixed-capacity-vector",
       "checked-half-open-range",
       "distinct-memory-address-types",
@@ -441,6 +469,8 @@ module.exports = {
       "UnsupportedFeature",
       "NoLoadableSegment",
       "SegmentFileOutOfBounds",
+      "EntryOutOfRange",
+      "WriteWithoutRead",
       "UnsupportedPermissions",
       "UnsupportedAlignment",
       "OverlappingLoadSegments",
@@ -516,6 +546,7 @@ module.exports = {
   "migrationOrder": {
     "portAfter": [
       "bounded-byte-reader",
+      "checked-integer-cast",
       "fixed-capacity-vector",
       "checked-half-open-range",
       "distinct-memory-address-types",
@@ -526,6 +557,7 @@ module.exports = {
     "independentOf": [],
     "recommendedSequence": [
       "bounded-byte-reader",
+      "checked-integer-cast",
       "fixed-capacity-vector",
       "checked-half-open-range",
       "distinct-memory-address-types",
@@ -576,6 +608,7 @@ module.exports = {
       "projects/54-bounded-elf64-load-plan/details.json",
       "projects/54-bounded-elf64-load-plan/DETAILS.md",
       "projects/04-bounded-byte-reader/port.js",
+      "projects/10-checked-integer-cast/port.js",
       "projects/00-fixed-capacity-vector/port.js",
       "projects/17-checked-half-open-range/port.js",
       "projects/18-distinct-memory-address-types/port.js",
@@ -589,6 +622,7 @@ module.exports = {
     ],
     "recommendedPortOrder": [
       "bounded-byte-reader",
+      "checked-integer-cast",
       "fixed-capacity-vector",
       "checked-half-open-range",
       "distinct-memory-address-types",
@@ -601,6 +635,7 @@ module.exports = {
       "@as",
       "@intCast",
       "@sizeOf",
+      "std.math.maxInt",
       "std.mem.writeInt",
       "std.testing.expect",
       "std.testing.expectEqual",
@@ -612,6 +647,7 @@ module.exports = {
       "@as",
       "@intCast",
       "@sizeOf",
+      "std.math.maxInt",
       "std.mem.writeInt",
       "std.testing.expect",
       "std.testing.expectEqual",
@@ -662,6 +698,12 @@ module.exports = {
       }
     ],
     "standardLibraryToFiles": [
+      {
+        "api": "std.math.maxInt",
+        "files": [
+          "projects/54-bounded-elf64-load-plan/src/bounded_elf64_load_plan.zig"
+        ]
+      },
       {
         "api": "std.mem.writeInt",
         "files": [

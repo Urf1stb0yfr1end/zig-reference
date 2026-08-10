@@ -1593,6 +1593,7 @@
       "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
+        "bounded-elf64-load-plan",
         "bounded-system-resource-plan",
         "elf64-file-header-parser",
         "elf64-program-header-parser",
@@ -8160,6 +8161,7 @@
       "direct_dependencies": [
         "bounded-byte-reader",
         "checked-half-open-range",
+        "checked-integer-cast",
         "distinct-memory-address-types",
         "elf64-file-header-parser",
         "elf64-program-header-parser",
@@ -8246,6 +8248,18 @@
           "error": "PlanCapacityExceeded",
           "handling": "Reject the ELF or correct the bounded fixture before retrying.",
           "meaning": "PlanCapacityExceeded acceptance or planning failure.",
+          "operation": "plan"
+        },
+        {
+          "error": "EntryOutOfRange",
+          "handling": "Reject the ELF or correct the bounded fixture before retrying.",
+          "meaning": "EntryOutOfRange acceptance or planning failure.",
+          "operation": "plan"
+        },
+        {
+          "error": "WriteWithoutRead",
+          "handling": "Reject the ELF or correct the bounded fixture before retrying.",
+          "meaning": "WriteWithoutRead acceptance or planning failure.",
           "operation": "plan"
         }
       ],

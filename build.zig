@@ -56,7 +56,7 @@ const specs = [_]ModuleSpec{
     .{ .name = "bounded-deterministic-event-trace", .source = "projects/51-bounded-deterministic-event-trace/src/bounded_deterministic_event_trace.zig", .dependencies = &.{} },
     .{ .name = "bounded-deterministic-scheduler", .source = "projects/52-bounded-deterministic-scheduler/src/bounded_deterministic_scheduler.zig", .dependencies = &.{"fixed-capacity-priority-queue"} },
     .{ .name = "bounded-user-memory-transfer-plan", .source = "projects/53-bounded-user-memory-transfer-plan/src/bounded_user_memory_transfer_plan.zig", .dependencies = &.{ "fixed-capacity-vector", "checked-half-open-range", "distinct-memory-address-types" } },
-    .{ .name = "bounded-elf64-load-plan", .source = "projects/54-bounded-elf64-load-plan/src/bounded_elf64_load_plan.zig", .dependencies = &.{ "bounded-byte-reader", "fixed-capacity-vector", "checked-half-open-range", "distinct-memory-address-types", "elf64-file-header-parser", "elf64-program-header-parser" } },
+    .{ .name = "bounded-elf64-load-plan", .source = "projects/54-bounded-elf64-load-plan/src/bounded_elf64_load_plan.zig", .dependencies = &.{ "bounded-byte-reader", "checked-integer-cast", "fixed-capacity-vector", "checked-half-open-range", "distinct-memory-address-types", "elf64-file-header-parser", "elf64-program-header-parser" } },
 };
 
 const RecipeSpec = struct { name: []const u8, dependencies: []const []const u8 };

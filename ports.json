@@ -698,6 +698,7 @@
       "implementationPath": "projects/54-bounded-elf64-load-plan/src/bounded_elf64_load_plan.zig",
       "dependenciesMustPortFirst": [
         "bounded-byte-reader",
+        "checked-integer-cast",
         "fixed-capacity-vector",
         "checked-half-open-range",
         "distinct-memory-address-types",

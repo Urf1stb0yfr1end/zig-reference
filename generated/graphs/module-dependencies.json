@@ -31,6 +31,10 @@
       "module": "bounded-elf64-load-plan"
     },
     {
+      "dependency": "checked-integer-cast",
+      "module": "bounded-elf64-load-plan"
+    },
+    {
       "dependency": "distinct-memory-address-types",
       "module": "bounded-elf64-load-plan"
     },

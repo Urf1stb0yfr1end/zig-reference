@@ -7,6 +7,7 @@ digraph modules {
   "bounded-deterministic-scheduler" -> "fixed-capacity-priority-queue";
   "bounded-elf64-load-plan" -> "bounded-byte-reader";
   "bounded-elf64-load-plan" -> "checked-half-open-range";
+  "bounded-elf64-load-plan" -> "checked-integer-cast";
   "bounded-elf64-load-plan" -> "distinct-memory-address-types";
   "bounded-elf64-load-plan" -> "elf64-file-header-parser";
   "bounded-elf64-load-plan" -> "elf64-program-header-parser";

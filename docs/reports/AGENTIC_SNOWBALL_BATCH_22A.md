@@ -15,7 +15,7 @@ The generated fast path did not identify an equivalent load planner. Module 54 t
 
 ## Supported subset and plan contract
 
-`bounded-elf64-load-plan` accepts ELF64 version 1, little endian, `ET_EXEC`, RISC-V machine 243, at most 64 program headers, and one or more `PT_LOAD` rows. It rejects dynamic/interpreter/TLS/shared-library/unknown features, W+X, incoherent alignment congruence, out-of-file source ranges, overlapping virtual ranges, excess capacity, and entries outside executable load memory. Null, note, and program-header metadata rows are ignored.
+`bounded-elf64-load-plan` accepts ELF64 version 1, little endian, `ET_EXEC`, RISC-V machine 243, at most 64 program headers, and one or more `PT_LOAD` rows. It rejects dynamic/interpreter/TLS/shared-library/unknown features, W+X, W without R, incoherent alignment congruence, out-of-file source ranges, overlapping virtual ranges, excess capacity, entries that do not fit the guest-address backing type, and entries outside executable load memory. Null, note, and program-header metadata rows are ignored.
 
 The owned allocation-free result retains `e_entry` and program-header ordering. Each segment records the exact source and virtual-memory half-open ranges, typed guest virtual start, file/memory/zero-fill byte counts, exact R/W/X booleans, and alignment. Boundary-touching ranges are admitted; actual overlaps are rejected. BSS is represented as `p_memsz - p_filesz`, but no memory is zeroed in this batch.
 
@@ -23,7 +23,7 @@ Planning is failure-atomic because all construction occurs in a local fixed vect
 
 ## Executed evidence
 
-Focused unit fixtures cover exact source/memory/permission facts, program-header ordering, equal file/memory sizes, BSS, touching and overlapping ranges, W+X, file bounds, non-executable and exclusive-end entries, capacity, canonical magic/class/table failures, endian/machine/type policy, no load row, and later-row failure atomicity. The smoke test proves an external named import can consume the bounded public type and constants.
+Focused unit fixtures cover exact source/memory/permission facts, program-header ordering, equal file/memory sizes, BSS, touching and overlapping ranges, W+X, W without R, checked entry-conversion boundaries, file bounds, non-executable and exclusive-end entries, capacity, canonical magic/class/table failures, endian/machine/type policy, no load row, and later-row failure atomicity. The smoke test proves an external named import can consume the bounded public type and constants.
 
 The run chose deterministic in-memory ELF fixtures rather than committing a compiler-produced binary. No ELF was executed.
 
