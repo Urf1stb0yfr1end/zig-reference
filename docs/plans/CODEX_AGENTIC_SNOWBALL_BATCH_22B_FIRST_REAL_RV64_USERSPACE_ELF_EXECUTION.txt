@@ -1,0 +1,695 @@
+CODEX AGENTIC SNOWBALL — BATCH 22B
+FIRST REAL RV64 USERSPACE ELF EXECUTION
+
+Repository:
+thanks-cohn/zig-reference
+
+Plan path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_22B_FIRST_REAL_RV64_USERSPACE_ELF_EXECUTION.txt
+
+MISSION
+
+Batch 22A settled ELF interpretation and load planning.
+
+Batch 22B must consume that settled primitive and prove exactly one new machine fact:
+
+an actual independently built RV64 ELF artifact
+→ exact bytes consumed by bounded-elf64-load-plan
+→ one admitted executable PT_LOAD
+→ exact planned bytes copied into the already-proven Alpz user code frame
+→ exact existing U RX mapping preserved
+→ required instruction-cache synchronization
+→ entry taken from the returned LoadPlan.e_entry
+→ real RISC-V U-mode execution of those ELF-loaded bytes
+→ deliberate ECALL
+→ return through the already-proven trusted U→S trap boundary
+→ previously-earned safety/resource invariants remain true
+
+The decisive new fact is:
+
+Alpz executes instructions from a real separately built RV64 ELF userspace artifact beginning at that ELF's parsed e_entry.
+
+This is a machine-execution batch, not another ELF-policy batch.
+
+Do not begin Batch 23.
+
+CURRENT BASELINE
+
+The canonical starting point is the merged Batch 22A revision:
+
+49ec4f4d608ce9ae5200d520e4f7d8208bc48d1b
+
+Batch 22A added:
+
+projects/54-bounded-elf64-load-plan
+
+and established a failure-atomic first RV64 ELF policy including checked ranges, exact PT_LOAD source/memory truth, BSS truth, permission truth, overlap rejection, W+X rejection, W-without-R rejection, checked e_entry conversion, and entry containment in an executable admitted segment.
+
+Do not duplicate, widen, or re-derive that policy in Batch 22B.
+
+Treat checked-out HEAD as truth. Record HEAD before source modification. If HEAD is newer than the baseline, inspect the delta and preserve any compatible later work.
+
+READ BEFORE IMPLEMENTATION
+
+AGENTS.md
+COMMANDS.md
+docs/standards/SNOWBALL_YIELD.md
+docs/roadmaps/ALPZ_TO_ALPINE_QEMU_KVM_AND_BEYOND.md
+docs/roadmaps/SELF_HOSTED_RECURSIVE_ABI_LAB.md
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_22A_BOUNDED_RV64_USERSPACE_ELF_LOAD_PLAN.txt
+docs/reports/AGENTIC_SNOWBALL_BATCH_22A.md
+projects/54-bounded-elf64-load-plan/DETAILS.md
+projects/54-bounded-elf64-load-plan/details.json
+projects/53-bounded-user-memory-transfer-plan/DETAILS.md
+projects/44-riscv-sv39-page-table-entry/DETAILS.md
+projects/47-riscv-sv39-page-table-walker/DETAILS.md
+projects/48-riscv-sfence-vma-invalidation/DETAILS.md
+projects/49-riscv-sv39-page-table-builder/DETAILS.md
+recipes/run-hosted-morphic-runtime/README.md
+recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig
+tools/verify-freestanding-riscv64-user-memory-transfer.py
+
+Also inspect the Batch 19/20/21B/21C reports and verifier chain only as needed to preserve the proven S→U→S boundary and evidence conventions. Do not rewrite those milestones.
+
+ZERO-CONTEXT AGENT WORKFLOW
+
+Before broad archaeology run:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+python3 tools/query-reference.py agent preflight bounded-elf64-load-plan
+
+Then use agent decide/card/compose/impact to inspect the minimum reusable foundations for:
+
+- bounded ELF load planning;
+- existing user code frame and user stack geometry;
+- current Sv39 mapping truth;
+- existing S→U and U→S transition path;
+- physical-frame ownership;
+- instruction-cache synchronization if already represented;
+- strict Batch 21C machine verification.
+
+Freeze a requirement/capability map before implementation as required by SNOWBALL_YIELD.
+
+Classify every requirement as:
+
+1. already solved reusable capability;
+2. small orchestration/composition;
+3. genuinely missing reusable capability;
+4. deliberately deferred to Batch 23 or later.
+
+Do not create a new generic module merely to make the batch look larger. This milestone is expected to be mostly machine orchestration plus strict evidence.
+
+FOCUSED PRE-CHANGE GATES
+
+Before modifying source run at minimum:
+
+1. git rev-parse HEAD
+2. git status --short --branch
+3. zig version
+4. python3 tools/query-reference.py agent doctor
+5. zig build test-bounded-elf64-load-plan
+6. zig build smoke-bounded-elf64-load-plan
+7. python3 tools/verify-freestanding-riscv64-user-memory-transfer.py --self-test
+
+If a focused baseline fails, diagnose before implementation.
+
+DO NOT RUN THE COMPLETE HISTORICAL MACHINE LAB MERELY AS CEREMONY BEFORE CHANGES.
+
+Batch 22B's own final verifier must compose the existing proof chain and execute real QEMU because real machine execution is the point of this batch.
+
+STRICT SCOPE
+
+Batch 22B MAY implement only what is required for the first actual ELF execution milestone:
+
+- one deterministic separately built RV64 ELF userspace artifact;
+- one executable PT_LOAD sufficient for the proof;
+- p_filesz == p_memsz is preferred for this first machine fixture;
+- no writable ELF data segment is required;
+- reuse the already-proven U RW/NX stack;
+- reuse the already-proven U RX code virtual page/frame if truthful;
+- load exact PT_LOAD bytes from the real ELF artifact;
+- preserve exact planner permissions;
+- perform FENCE.I or the repository's canonical equivalent after instruction bytes are modified;
+- enter U-mode at LoadPlan.e_entry;
+- execute a deterministic ELF-resident marker/probe;
+- issue one deliberate U-mode ECALL;
+- return through the existing trusted supervisor trap path;
+- emit strict bounded evidence tying artifact → plan → copied bytes → entry → executed U-mode behavior.
+
+EXPLICIT NON-GOALS
+
+Do NOT add or claim:
+
+- argc/argv/envp;
+- auxv;
+- Linux initial stack layout;
+- PT_INTERP;
+- relocations;
+- dynamic linking;
+- PIE/ET_DYN support;
+- libc;
+- musl;
+- Linux syscall numbers;
+- errno/EFAULT behavior;
+- file descriptors;
+- VFS;
+- mmap/brk;
+- process objects;
+- execve;
+- fork/clone;
+- signals;
+- futexes;
+- threads;
+- proc/sys/dev;
+- networking;
+- BusyBox;
+- APK;
+- Alpine;
+- QEMU hosted inside Alpz;
+- KVM;
+- general-purpose userspace loading.
+
+Do not add a writable PT_LOAD merely to make the ELF look more realistic. That belongs in a later pressure if needed.
+
+REAL GUEST ELF ARTIFACT
+
+The guest must be an actual separately built ELF artifact, distinct from the Alpz kernel ELF.
+
+It must NOT be:
+
+- a hand-authored instruction byte array inside freestanding_riscv64.zig;
+- the existing hardcoded user probe wrapped in decorative metadata;
+- a copied slice of the kernel .text presented as a guest;
+- a runtime constant claiming to be an ELF without an independently inspectable file artifact.
+
+Prefer a tiny deterministic freestanding RV64 source/build target under an appropriate repository test/fixture location.
+
+The artifact should be produced by the repository build or verifier workflow rather than committed as an opaque binary unless current repository policy explicitly prefers otherwise.
+
+Preferred first fixture:
+
+- ELF64 little endian;
+- ET_EXEC;
+- RISC-V machine 243;
+- no PT_INTERP;
+- no dynamic relocation requirement;
+- one executable non-writable PT_LOAD;
+- p_filesz == p_memsz;
+- virtual address arranged to fit the already-proven user code page if practical;
+- e_entry inside that PT_LOAD;
+- tiny deterministic RV64 instructions;
+- one unmistakable register marker or similarly bounded runtime fact;
+- one ECALL;
+- fail-stop behavior if control unexpectedly continues.
+
+If the existing user geometry remains current, strongly prefer arranging the fixture's executable segment around the already-proven code VA near 0x80401000 and retaining the existing stack near 0x80402000–0x80403000. Confirm actual HEAD before relying on these addresses.
+
+The guest source and guest ELF must have an independently identifiable path in the completion report.
+
+USE BATCH 22A AS THE ONLY ELF POLICY AUTHORITY
+
+The kernel-side machine path must feed the exact guest ELF bytes to:
+
+@import("bounded-elf64-load-plan").plan(...)
+
+or the repository-equivalent named import.
+
+Do not manually decode e_entry, p_offset, p_vaddr, p_filesz, p_memsz, p_flags, or alignment again in the machine orchestration.
+
+Do not hardcode the intended e_entry and then merely assert that the planner happened to return the same value.
+
+The machine path must use the returned LoadPlan as the authority for:
+
+- entry;
+- admitted segment count;
+- source range;
+- destination virtual range;
+- file byte count;
+- memory byte count;
+- zero-fill truth;
+- R/W/X truth;
+- relevant alignment truth.
+
+For this first fixture, requiring exactly one admitted executable segment is acceptable at the orchestration boundary if documented as a Batch 22B fixture restriction. Do not weaken module 54 itself merely to enforce that fixture shape.
+
+EMBEDDING / BUILD PIPELINE
+
+The exact separately built guest ELF bytes used by the external verifier must be the bytes consumed by the kernel-side planner.
+
+Use a deterministic build dependency or generated-file embedding mechanism consistent with Zig 0.14.0 and repository conventions.
+
+Avoid hand-copying the guest ELF into source.
+
+The build graph must make it mechanically difficult for the verifier to inspect one guest artifact while the kernel consumes another.
+
+Prefer one canonical guest artifact path/reference flowing to both:
+
+- kernel build/input;
+- external strict verifier.
+
+If a content digest is useful, compute it from the actual artifact and use it only as supporting evidence, never as a substitute for structural ELF inspection.
+
+PHYSICAL DESTINATION AND MAPPING POLICY
+
+Reuse the existing proven user code frame and stack if possible.
+
+Preferred smallest path:
+
+existing allocator-owned code physical frame
+→ exact PT_LOAD bytes copied into that physical frame through an already-trusted supervisor/physical access path
+→ existing U RX PTE remains U RX
+→ no transient U W+X mapping
+→ no new user mapping
+→ no new page-table frame
+→ no SFENCE.VMA if no translation changed
+→ FENCE.I after executable bytes change
+
+Do not make the U executable page writable merely to simplify loading.
+
+Do not silently widen ELF permissions.
+
+If direct preparation of the physical frame under existing supervisor mappings is already how the historical U-mode probe was installed, reuse and tighten that mechanism rather than inventing a new loader mapping mode.
+
+If actual HEAD proves a mapping change is unavoidable, use the canonical page-table builder/invalidation foundations, preserve W^X, prove the exact transition mechanically, and explain why reuse was insufficient. This is a fallback, not the preferred path.
+
+BYTE-COPY TRUTH
+
+Copy exactly the planner-described source bytes for the admitted executable segment.
+
+For the preferred p_filesz == p_memsz fixture:
+
+- copied byte count must equal plan.file_byte_count;
+- zero_fill_byte_count must equal zero;
+- do not invent BSS work.
+
+If the final fixture unexpectedly has a nonzero zero-fill tail, either:
+
+1. implement exact zeroing through a bounded trusted physical path and prove it; or
+2. simplify the fixture back to p_filesz == p_memsz.
+
+Prefer option 2 for Batch 22B.
+
+The proof must tie the bytes at the execution destination to the exact ELF PT_LOAD source range before U-mode entry.
+
+A bounded checksum/digest or exact-byte comparison is acceptable as supporting evidence if independently reconstructed by the verifier.
+
+Do not prove only that "some bytes were copied."
+
+INSTRUCTION-CACHE SYNCHRONIZATION
+
+Because executable memory contents change, execute the required RISC-V instruction-cache synchronization before entering the newly loaded code.
+
+Prefer the smallest architecturally correct FENCE.I path.
+
+Evidence must distinguish instruction-cache synchronization from address-translation invalidation.
+
+If PTEs are unchanged, report that SFENCE.VMA was not required rather than emitting one ceremonially.
+
+ENTRY TRUTH
+
+The U-mode entry PC must come from LoadPlan.entry.
+
+The actual SRET preparation path must consume that value.
+
+The external verifier must independently inspect the real guest ELF and reconstruct e_entry.
+
+It must then require agreement among at least:
+
+- guest ELF e_entry;
+- Batch 22A planner evidence;
+- supervisor prepared user entry;
+- observed U-mode execution/trap evidence.
+
+A hardcoded address plus equality printout is not sufficient proof.
+
+GUEST EXECUTION PROBE
+
+Keep the guest tiny.
+
+At its real ELF entry it should perform a deterministic sequence that is distinguishable from the historical hand-copied probe.
+
+Recommended shape:
+
+_start:
+    establish one or more unmistakable register marker values
+    optionally perform a bounded stack touch using the existing proven U RW/NX stack
+    ecall
+    fail-stop if execution unexpectedly resumes
+
+Do not use Linux syscall conventions. The ECALL is a proof signal, not a Linux syscall.
+
+The marker should be chosen so the supervisor/verifier can distinguish the new ELF guest from Batch 19/20/21 historical probes.
+
+TRAP / RETURN PROOF
+
+The existing trusted U→S path is already proven and should be reused.
+
+Batch 22B must prove the trap was caused by the ELF-loaded U-mode program, including at minimum:
+
+- expected U-mode ECALL cause;
+- expected user PC relationship to the real guest e_entry/code;
+- expected marker register state from the ELF guest;
+- trusted supervisor trap-frame/stack path remains in use;
+- supervisor control reaches a known bounded continuation after the trap.
+
+Do not redesign the trap frame unless a concrete defect requires it.
+
+RESOURCE AND PTE CONSERVATION
+
+The preferred Batch 22B result should preserve the existing Batch 21C resource geometry.
+
+Where applicable, require mechanical evidence that:
+
+- allocator-owned frame count is unchanged across ELF execution preparation;
+- page-table frame count is unchanged;
+- active SATP/root identity is preserved;
+- existing user code page maps the expected physical frame;
+- existing user stack maps the expected physical frame;
+- executable page remains U RX and not writable;
+- stack remains U RW/NX;
+- W+X leaf count remains zero;
+- no unexpected additional U leaf appears.
+
+If the implementation legitimately changes one of these facts, the verifier must reconstruct and justify the new truth. Do not silently relax conservation assertions.
+
+STRICT EXTERNAL VERIFIER
+
+Add or extend a canonical verifier, preferably conceptually:
+
+tools/verify-freestanding-riscv64-userspace-elf.py
+
+Use actual repository naming conventions at HEAD.
+
+It should provide:
+
+--self-test
+full execution mode
+
+The verifier must compose the existing Batch 21C evidence chain rather than replacing it with weaker text matching.
+
+The full mode must:
+
+1. build the distinct guest RV64 ELF artifact;
+2. independently inspect the guest ELF structure;
+3. build the Alpz freestanding kernel with that exact guest artifact as input;
+4. independently inspect the kernel/guest artifact identities as needed;
+5. run the same two real qemu-system-riscv64 machine configurations used by the current strict proof chain unless HEAD intentionally changed the canonical pair;
+6. parse bounded machine evidence;
+7. reconstruct the guest PT_LOAD/e_entry facts independently of kernel self-report;
+8. require artifact→plan→destination→entry→trap agreement;
+9. preserve the strict Batch 21C safety/resource evidence that remains applicable;
+10. require exact Morphic equality if the current canonical machine verifier still establishes that invariant;
+11. fail closed on missing, duplicate, malformed, contradictory, or out-of-range evidence.
+
+Do not trust kernel log claims such as "ELF loaded" without independent artifact reconstruction.
+
+INDEPENDENT ELF INSPECTION
+
+The external verifier must not call module 54 as its only source of truth.
+
+Use an independent mechanism appropriate for the environment, for example:
+
+- Python struct-based bounded ELF64 parsing in the verifier;
+- readelf/llvm-readelf output parsed strictly;
+- another already-independent host mechanism.
+
+At minimum independently derive:
+
+- ELF identity/class/endian/type/machine;
+- e_entry;
+- PT_LOAD count relevant to the fixture;
+- executable PT_LOAD p_offset;
+- p_vaddr;
+- p_filesz;
+- p_memsz;
+- p_flags;
+- exact source bytes or a strong deterministic digest over that source range.
+
+The verifier must ensure the inspected file is the exact artifact fed to the kernel build.
+
+MUTATION / NEGATIVE SELF-TESTS
+
+The verifier self-test must prove it rejects forged or inconsistent evidence.
+
+At minimum mutate/reject representative cases for:
+
+- wrong guest artifact identity/digest;
+- wrong e_entry;
+- wrong PT_LOAD source offset or size;
+- wrong destination VA;
+- wrong permission truth;
+- claimed loaded-byte digest not matching the guest source bytes;
+- claimed prepared entry not matching guest e_entry;
+- missing FENCE.I evidence where required;
+- unexpected SFENCE.VMA/mapping mutation if the final implementation claims none;
+- wrong U-mode trap cause;
+- wrong marker register;
+- trap PC inconsistent with the guest program;
+- changed allocator/page-table conservation fact;
+- changed SATP/root truth;
+- W+X appearing;
+- duplicate/missing bounded evidence fields.
+
+Do not make the self-test merely exercise parser syntax. Mutations must target the proof relationships that make Batch 22B meaningful.
+
+EVIDENCE FORMAT
+
+Follow the existing bounded evidence and LOCATIONS/MINIMUS conventions.
+
+Prefer machine-readable bounded key/value records that the verifier consumes strictly.
+
+Evidence should make it possible to reconstruct at least:
+
+GUEST ARTIFACT
+- artifact identity/path label suitable for verifier correlation
+- artifact digest if used
+
+PLAN
+- entry
+- segment count
+- source start/end or offset/length
+- memory start/end
+- file bytes
+- memory bytes
+- zero fill
+- R/W/X
+- alignment if relevant
+
+LOAD
+- destination physical frame/address
+- destination virtual address
+- copied byte count
+- destination/source digest or exact bounded comparison result
+- fence.i occurrence/count
+- sfence.vma occurrence/count if relevant
+
+ENTRY/TRAP
+- prepared U entry
+- U stack pointer geometry if relevant
+- trap cause
+- trap PC/sepc
+- marker registers
+- trusted trap-frame/stack fact
+- known supervisor continuation marker
+
+CONSERVATION
+- frame counts
+- page-table frame counts
+- SATP/root
+- user leaf count
+- U RX code PTE truth
+- U RW/NX stack PTE truth
+- W+X count
+
+Do not emit unverifiable prose as the only evidence for any decisive claim.
+
+MORPHIC PRESERVATION
+
+Batch 22B is an Alpz machine-pressure milestone. It must not alter canonical hosted/fake Morphic semantics merely to accommodate the new guest ELF.
+
+If the existing strict chain currently proves exact 765-byte Morphic equality, preserve that equality unless actual HEAD establishes a newer canonical value/contract. Derive the expected current invariant from repository truth; do not hardcode historical numbers blindly.
+
+The ELF execution proof and Morphic equality are distinct facts. Preserve both without conflating them.
+
+FAILURE BEHAVIOR
+
+The machine path must fail stop on impossible or unsupported loader/orchestration states.
+
+Do not continue into U-mode after:
+
+- planner rejection;
+- wrong segment count for the bounded fixture contract;
+- destination-range mismatch;
+- physical destination inability;
+- copy mismatch;
+- unsupported zero-fill shape if fixture contract requires zero;
+- permission mismatch;
+- entry mismatch;
+- required fence preparation failure.
+
+The verifier must propagate nonzero failure status and still provide the repository's normal actionable handoff where that convention applies.
+
+EXPECTED IMPLEMENTATION SHAPE
+
+A successful Batch 22B should remain conceptually small:
+
+separately built guest ELF
+        ↓
+bounded-elf64-load-plan
+        ↓
+one immutable LoadPlan
+        ↓
+existing user code physical frame
+        ↓
+exact PT_LOAD byte copy
+        ↓
+existing U RX mapping
+        ↓
+FENCE.I
+        ↓
+LoadPlan.e_entry
+        ↓
+SRET to U
+        ↓
+ELF-loaded RV64 instructions
+        ↓
+marker + ECALL
+        ↓
+trusted supervisor trap path
+        ↓
+known continuation
+
+If implementation begins growing process tables, VFS state, Linux ABI scaffolding, general ELF relocation machinery, or dynamic loader concepts, stop and reduce scope.
+
+REQUIRED FOCUSED VALIDATION
+
+After implementation, run at minimum the actual applicable equivalents of:
+
+zig build test-bounded-elf64-load-plan
+zig build smoke-bounded-elf64-load-plan
+python3 tools/verify-freestanding-riscv64-user-memory-transfer.py --self-test
+python3 tools/verify-freestanding-riscv64-userspace-elf.py --self-test
+python3 tools/verify-freestanding-riscv64-userspace-elf.py
+
+If the canonical verifier name differs, document the exact command.
+
+The full Batch 22B verifier must run real QEMU and must not be replaced by a hosted-only test.
+
+FINAL REPOSITORY VALIDATION
+
+After focused proof succeeds:
+
+- run formatting/contract checks required by current repository policy;
+- regenerate validation/index/graph artifacts only where source changes require it;
+- run python3 tools/developer-command.py validate-repository;
+- require the final repository pipeline to pass;
+- leave generated evidence consistent with HEAD;
+- keep unrelated user files/untracked local artifacts out of commits.
+
+COMPLETION REPORT
+
+Create the normal Batch 22B report under docs/reports/ following repository naming conventions.
+
+The report must clearly separate:
+
+WHAT WAS PROVED
+
+from:
+
+WHAT IS STILL NOT CLAIMED
+
+It must identify:
+
+- starting revision;
+- final revision/branch;
+- exact guest source location;
+- exact guest ELF build artifact mechanism/location;
+- exact machine orchestration changes;
+- whether existing code frame/stack were reused;
+- whether any PTE changed;
+- FENCE.I truth;
+- SFENCE.VMA truth;
+- actual guest e_entry;
+- exact PT_LOAD shape;
+- marker/trap result;
+- two-QEMU result;
+- resource/PTE conservation result;
+- Morphic equality result if applicable;
+- focused validation commands/results;
+- full repository validation result.
+
+EXPLICIT COMPLETION NONCLAIMS
+
+Even on full success, the report must say this is NOT yet:
+
+- Linux userspace ABI compatibility;
+- argc/argv/envp/auxv startup;
+- multiple-segment general loader completeness;
+- writable ELF data/BSS machine proof unless actually required and proved;
+- dynamic linking;
+- PT_INTERP;
+- relocation support;
+- process creation;
+- execve;
+- VFS;
+- mmap/brk;
+- signals/futexes/threads;
+- BusyBox;
+- musl;
+- Alpine;
+- nested QEMU;
+- KVM.
+
+BATCH 22B SUCCESS CRITERIA
+
+Batch 22B is complete only if all of the following are mechanically supported:
+
+1. A distinct actual RV64 ELF file is built as a separate guest artifact.
+2. The exact guest bytes consumed by the machine path are fed through canonical bounded-elf64-load-plan.
+3. The accepted plan is not re-derived by bespoke ELF parsing in the kernel orchestration.
+4. Exact planned executable PT_LOAD bytes are copied into the execution destination.
+5. Destination bytes are mechanically tied to the independently inspected guest PT_LOAD bytes.
+6. Executable mapping preserves the planner's permission truth and W^X.
+7. Required instruction-cache synchronization occurs.
+8. U-mode entry is taken from LoadPlan.e_entry.
+9. Real QEMU executes the ELF-loaded U-mode instructions.
+10. The ELF guest produces its distinctive marker and deliberate ECALL.
+11. The trusted U→S trap path captures the expected cause/PC/register truth.
+12. Previously-earned resource/PTE safety invariants remain mechanically supported or any deliberate change is explicitly reconstructed.
+13. The strict verifier independently reconstructs the guest ELF facts and mutation-tests the decisive proof relationships.
+14. The canonical two-machine execution succeeds.
+15. Full repository validation succeeds.
+16. Normal completion output ends with LOCATIONS then MINIMUS and an actionable next pressure.
+
+If any one of these is missing, do not call Batch 22B complete.
+
+NEXT PRESSURE AFTER SUCCESS
+
+Do not implement it during this run.
+
+The likely next pressure is Batch 23: make the ELF process image richer while preserving the first real execution proof, probably by introducing a deliberately bounded writable PT_LOAD/BSS or other minimal process-image truth required before Linux-style startup stack work.
+
+Batch 23 should be chosen from actual Batch 22B evidence, not preemptively implemented here.
+
+END-OF-RUN OUTPUT REQUIREMENT
+
+Complete Batch 22B fully before stopping.
+
+At the end, produce the repository's usual completion output:
+
+- concise summary of changes;
+- exact new machine fact proved;
+- exact guest ELF identity and load shape;
+- focused validation results;
+- two-QEMU strict verifier result;
+- full repository validation result;
+- resource/PTE/fence truth;
+- explicit remaining nonclaims;
+- standard LOCATIONS section;
+- standard MINIMUS handoff;
+- actionable next command/pressure for planning Batch 23.
+
+Only after producing that normal completion output and handoff should the run stop.
+
+Do not begin Batch 23.
