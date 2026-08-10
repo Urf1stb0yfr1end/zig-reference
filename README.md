@@ -431,7 +431,6 @@ For the current frontier:
 - [`docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_24A_BOUNDED_RV64_LINUX_INITIAL_STACK_PLAN.txt`](docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_24A_BOUNDED_RV64_LINUX_INITIAL_STACK_PLAN.txt)
 - [`COMMANDS.md`](COMMANDS.md)
 
-Do not weaken a gate merely to make new work pass. Fix the work.
 
 ## Start here
 
@@ -442,8 +441,7 @@ If you are new to the repository:
 3. Read the latest completed batch report and the next plan.
 4. Query existing capabilities before adding another primitive.
 5. Preserve explicit nonclaims.
-6. Keep evidence reproducible by someone who was not present when the code was written.
+6. Keep evidence reproducible
 
-The project does not require anyone to believe the vision in advance.
 
 The repository is meant to make the next result testable.
