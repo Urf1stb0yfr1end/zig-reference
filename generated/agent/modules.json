@@ -8121,7 +8121,9 @@
       ],
       "change_impact": {
         "dependents": [],
-        "recipes": []
+        "recipes": [
+          "run-hosted-morphic-runtime"
+        ]
       },
       "composition": {
         "commonly_with": [
@@ -8292,7 +8294,9 @@
       "known_gaps": [
         "Does not copy, map, zero, fence, or execute ELF segments."
       ],
-      "matching_recipes": [],
+      "matching_recipes": [
+        "run-hosted-morphic-runtime"
+      ],
       "minimal_usage": [
         "const elf_plan = @import(\"bounded-elf64-load-plan\");",
         "const load = try elf_plan.plan(4, elf_bytes);"

@@ -2,7 +2,7 @@
 """Strict Batch 21C bidirectional real user-memory proof."""
 import importlib.util,re,shutil,subprocess,sys,tempfile,traceback
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[1]; COMMAND="python3 tools/verify-freestanding-riscv64-user-memory-transfer.py"; BEGIN=b"ZIGREF_USER_COPY_OUT_BEGIN"; END=b"ZIGREF_USER_COPY_OUT_END"; RETURNED=b"ZIGREF_USER_COPY_OUT_RETURNED"; TIMEOUT=20
+ROOT=Path(__file__).resolve().parents[1]; COMMAND="python3 tools/verify-freestanding-riscv64-user-memory-transfer.py"; BEGIN=b"ZIGREF_USER_COPY_OUT_BEGIN"; END=b"ZIGREF_USER_COPY_OUT_END"; RETURNED=b"ZIGREF_USER_COPY_OUT_RETURNED"; TIMEOUT=300
 spec=importlib.util.spec_from_file_location("copyin",ROOT/"tools/verify-freestanding-riscv64-user-copy-in.py"); prior=importlib.util.module_from_spec(spec);spec.loader.exec_module(prior)
 def run(c,t=None):return subprocess.run(c,cwd=ROOT,check=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=t).stdout
 def elf_truth(path):

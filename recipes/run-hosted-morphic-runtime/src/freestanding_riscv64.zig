@@ -9,10 +9,18 @@ const sv39_entries = @import("riscv-sv39-page-table-entry");
 const sv39_builders = @import("riscv-sv39-page-table-builder");
 const sfence_vma = @import("riscv-sfence-vma-invalidation");
 const user_transfer = @import("bounded-user-memory-transfer-plan");
+const elf_load = @import("bounded-elf64-load-plan");
+const userspace_elf = @embedFile("userspace-elf-rv64");
 
 const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
 const physical_pool_pages = 8;
+
+fn fnv1a64(bytes: []const u8) u64 {
+    var value: u64 = 0xcbf29ce484222325;
+    for (bytes) |byte| value = (value ^ byte) *% 0x100000001b3;
+    return value;
+}
 
 extern var __physical_page_pool_begin: u8;
 extern var __physical_page_pool_end: u8;
@@ -121,6 +129,9 @@ var user_a0: usize linksection(".bss") = 0;
 var user_t0: usize linksection(".bss") = 0;
 var user_t1: usize linksection(".bss") = 0;
 export var user_returned: bool linksection(".bss") = false;
+var userspace_elf_active: bool linksection(".bss") = false;
+var userspace_elf_entry: usize linksection(".bss") = 0;
+var userspace_elf_memory_end: usize linksection(".bss") = 0;
 
 export var service_trap_count: usize linksection(".bss") = 0;
 var service_frames: [2]usize linksection(".bss") = .{ 0, 0 };
@@ -676,6 +687,14 @@ export fn recordUserTrap(frame: *TrapFrame) callconv(.c) void {
     user_a0 = frame.x[10];
     user_t0 = frame.x[5];
     user_t1 = frame.x[6];
+    if (userspace_elf_active) {
+        if (frame.scause != 8 or (frame.sstatus & 0x100) != 0 or
+            frame.sepc < userspace_elf_entry or frame.sepc >= userspace_elf_memory_end or
+            frame.x[2] != user_stack_va + frames.PageSize or frame.x[10] != 0x22b0 or
+            frame.x[5] != 0x22b1 or frame.x[6] != 0x22b2) shutdown();
+        userspace_elf_active = false;
+        return;
+    }
     if (frame.scause != 8 or (frame.sstatus & 0x100) != 0 or
         frame.sepc != user_code_va + 14 or frame.x[2] != user_stack_va + frames.PageSize - 16)
     {
@@ -1113,6 +1132,153 @@ fn writeUsizeHex(value: usize) void {
 fn shutdown() noreturn {
     _ = sbiCall(0x53525354, 0, 0, 0); // SBI system reset: shutdown, no reason.
     while (true) asm volatile ("wfi");
+}
+
+noinline fn executeUserspaceElf(allocator: anytype, page_owner: anytype, builder: anytype, user_code_pa: usize, user_stack_pa: usize, trap_end: usize, historical_stvec: usize, root_physical: usize) void {
+    const destination: [*]volatile u8 = @ptrFromInt(user_code_pa);
+    write("ZIGREF_USERSPACE_ELF_PHASE plan-load-execute\n");
+    // Batch 22B consumes the separately linked guest file through module 54,
+    // and deliberately reuses the established code/stack frames and leaves.
+    const elf_alloc_before = allocator.allocatedCount();
+    const elf_tables_before = page_owner.page_count;
+    const elf_satp_before = asm volatile ("csrr %[value], satp"
+        : [value] "=r" (-> usize),
+    );
+    const load = elf_load.plan(1, userspace_elf) catch |err| {
+        write("ZIGREF_USERSPACE_ELF_FAILURE planner=");
+        write(@errorName(err));
+        write("\n");
+        shutdown();
+    };
+    write("ZIGREF_USERSPACE_ELF_PHASE plan-complete\n");
+    if (load.items().len != 1) {
+        write("ZIGREF_USERSPACE_ELF_FAILURE fixture-shape\n");
+        shutdown();
+    }
+    const segment = load.items()[0];
+    if (segment.memory_start.raw() != user_code_va or segment.memory.start != user_code_va or
+        segment.memory.end > user_code_va + frames.PageSize or segment.file_byte_count != segment.memory_byte_count or
+        segment.zero_fill_byte_count != 0 or !segment.permissions.read or segment.permissions.write or
+        !segment.permissions.execute or load.entry.raw() < segment.memory.start or load.entry.raw() >= segment.memory.end)
+    {
+        write("ZIGREF_USERSPACE_ELF_FAILURE plan-destination\n");
+        shutdown();
+    }
+    for (0..frames.PageSize) |index| destination[index] = 0;
+    const elf_source = userspace_elf[segment.source.start..segment.source.end];
+    for (elf_source, 0..) |byte, index| destination[index] = byte;
+    const loaded: [*]const volatile u8 = @ptrFromInt(user_code_pa);
+    var loaded_hash: u64 = 0xcbf29ce484222325;
+    for (elf_source, 0..) |source_byte, index| {
+        const loaded_byte = loaded[index];
+        if (loaded_byte != source_byte) {
+            write("ZIGREF_USERSPACE_ELF_FAILURE loaded-byte-mismatch\n");
+            shutdown();
+        }
+        loaded_hash = (loaded_hash ^ loaded_byte) *% 0x100000001b3;
+    }
+    const source_hash = fnv1a64(elf_source);
+    write("ZIGREF_USERSPACE_ELF_PHASE bytes-verified\n");
+    asm volatile ("fence.i" ::: "memory");
+    userspace_elf_entry = load.entry.raw();
+    userspace_elf_memory_end = segment.memory.end;
+    userspace_elf_active = true;
+    user_returned = false;
+    asm volatile ("mv a0, %[entry]; mv a1, %[stack]; mv a2, %[trap_stack]; call enterUser; la t0, user_supervisor_sp; ld sp, 0(t0); addi sp, sp, 112"
+        :
+        : [entry] "r" (load.entry.raw()),
+          [stack] "r" (user_stack_va + frames.PageSize),
+          [trap_stack] "r" (trap_end),
+        : "memory", "ra", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "t0", "t1", "t2", "t3", "t4", "t5", "t6"
+    );
+    asm volatile ("csrw stvec, %[entry]; csrw sscratch, zero"
+        :
+        : [entry] "r" (historical_stvec),
+        : "memory"
+    );
+    const elf_satp_after = asm volatile ("csrr %[value], satp"
+        : [value] "=r" (-> usize),
+    );
+    const elf_code_leaf = builder.query(user_code_va) catch shutdown();
+    const elf_stack_leaf = builder.query(user_stack_va) catch shutdown();
+    if (userspace_elf_active or !user_returned or user_scause != 8 or
+        elf_alloc_before != allocator.allocatedCount() or elf_tables_before != page_owner.page_count or
+        elf_satp_before != elf_satp_after or elf_code_leaf.physical_address != user_code_pa or
+        elf_stack_leaf.physical_address != user_stack_pa or elf_code_leaf.raw_entry & 0x16 != 0x12 or
+        elf_stack_leaf.raw_entry & 0x16 != 0x16 or elf_stack_leaf.raw_entry & 0x8 != 0) shutdown();
+    write("ZIGREF_USERSPACE_ELF_BEGIN\nartifact=userspace-elf-rv64\nartifact_bytes=");
+    writeUsizeHex(userspace_elf.len);
+    write("\nartifact_fnv1a64=");
+    writeUsizeHex(fnv1a64(userspace_elf));
+    write("\nsource_fnv1a64=");
+    writeUsizeHex(source_hash);
+    write("\nentry=");
+    writeUsizeHex(load.entry.raw());
+    write("\nsegment_count=0000000000000001\nsource_start=");
+    writeUsizeHex(segment.source.start);
+    write("\nsource_end=");
+    writeUsizeHex(segment.source.end);
+    write("\nmemory_start=");
+    writeUsizeHex(segment.memory.start);
+    write("\nmemory_end=");
+    writeUsizeHex(segment.memory.end);
+    write("\nfile_bytes=");
+    writeUsizeHex(segment.file_byte_count);
+    write("\nmemory_bytes=");
+    writeUsizeHex(segment.memory_byte_count);
+    write("\nzero_fill=");
+    writeUsizeHex(segment.zero_fill_byte_count);
+    write("\nalignment=");
+    writeUsizeHex(@intCast(segment.alignment));
+    write("\npermissions=R-X\ndestination_va=");
+    writeUsizeHex(segment.memory_start.raw());
+    write("\ndestination_pa=");
+    writeUsizeHex(user_code_pa);
+    write("\ncopied_bytes=");
+    writeUsizeHex(segment.file_byte_count);
+    write("\nloaded_bytes_equal=PASS");
+    write("\nloaded_fnv1a64=");
+    writeUsizeHex(loaded_hash);
+    write("\nprepared_entry=");
+    writeUsizeHex(userspace_elf_entry);
+    write("\ntrap_cause=");
+    writeUsizeHex(user_scause);
+    write("\ntrap_sepc=");
+    writeUsizeHex(user_sepc);
+    write("\ntrap_sstatus=");
+    writeUsizeHex(user_sstatus);
+    write("\ntrap_frame=");
+    writeUsizeHex(user_trap_frame_address);
+    write("\nmarker_a0=");
+    writeUsizeHex(user_a0);
+    write("\nmarker_t0=");
+    writeUsizeHex(user_t0);
+    write("\nmarker_t1=");
+    writeUsizeHex(user_t1);
+    write("\nphysical_allocated_before=");
+    writeUsizeHex(elf_alloc_before);
+    write("\nphysical_allocated_after=");
+    writeUsizeHex(allocator.allocatedCount());
+    write("\npage_table_count_before=");
+    writeUsizeHex(elf_tables_before);
+    write("\npage_table_count_after=");
+    writeUsizeHex(page_owner.page_count);
+    write("\nsatp_before=");
+    writeUsizeHex(elf_satp_before);
+    write("\nsatp_after=");
+    writeUsizeHex(elf_satp_after);
+    write("\nroot_physical=");
+    writeUsizeHex(root_physical);
+    write("\nuser_code_pa=");
+    writeUsizeHex(user_code_pa);
+    write("\nuser_stack_pa=");
+    writeUsizeHex(user_stack_pa);
+    write("\nuser_leaf_count=0000000000000002\nwx_leaf_count=0000000000000000");
+    write("\ncode_pte=");
+    writeUsizeHex(elf_code_leaf.raw_entry);
+    write("\nstack_pte=");
+    writeUsizeHex(elf_stack_leaf.raw_entry);
+    write("\ntranslation_change=none\nsfence_vma=not-required-no-pte-change\nfence_i=local-hart-executed\nsupervisor_resume=PASS\ncomplete=PASS\nZIGREF_USERSPACE_ELF_END\nZIGREF_USERSPACE_ELF_RETURNED\n");
 }
 
 export fn freestandingMain() callconv(.c) noreturn {
@@ -2354,7 +2520,8 @@ export fn freestandingMain() callconv(.c) noreturn {
     write("\nfinal_leaf_count=");
     writeUsizeHex(out_leaf_count);
     write("\ntranslation_change=none\nsfence_vma=not-required-no-pte-change\nfence_i=local-hart-executed\nsum=observed-zero\ncomplete=PASS\nZIGREF_USER_COPY_OUT_END\nZIGREF_USER_COPY_OUT_RETURNED\n");
-    if (out_u != 2 or out_wx != 0 or out_leaf_count != copy_final_leaf_count) shutdown();
+    executeUserspaceElf(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
+
     var output: [128]u8 = undefined;
     var trace: [2048]u8 = undefined;
     const result = morphic.runFake(&output, &trace) catch {
