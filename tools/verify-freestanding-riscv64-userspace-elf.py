@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import hashlib,importlib.util,os,re,shutil,struct,subprocess,sys,tempfile,traceback
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[1]; COMMAND='python3 tools/verify-freestanding-riscv64-userspace-elf.py'; BEGIN=b'ZIGREF_USERSPACE_ELF_BEGIN\n'; END=b'ZIGREF_USERSPACE_ELF_END\n'; RETURNED=b'ZIGREF_USERSPACE_ELF_RETURNED\n'; TIMEOUT=300
+ROOT=Path(__file__).resolve().parents[1]; COMMAND='python3 tools/verify-freestanding-riscv64-userspace-elf.py'; BEGIN=b'ZIGREF_USERSPACE_ELF_BEGIN'; END=b'ZIGREF_USERSPACE_ELF_END'; RETURNED=b'ZIGREF_USERSPACE_ELF_RETURNED'; TIMEOUT=300
 s=importlib.util.spec_from_file_location('prior',ROOT/'tools/verify-freestanding-riscv64-user-memory-transfer.py');prior=importlib.util.module_from_spec(s);s.loader.exec_module(prior)
 def run(c,t=None):return subprocess.run(c,cwd=ROOT,check=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=t).stdout
 def fnv(b):
@@ -23,6 +23,7 @@ def fields(raw):
  if raw.count(BEGIN)!=1 or raw.count(END)!=1 or raw.count(RETURNED)!=1 or not(raw.find(BEGIN)<raw.find(END)<raw.find(RETURNED)<raw.find(b'ZIGREF_MORPHIC_BEGIN')):raise RuntimeError('Batch 22B framing')
  body=raw[raw.find(BEGIN)+len(BEGIN):raw.find(END)];d={}
  for line in body.splitlines():
+  if not line:continue
   if b'=' not in line:raise RuntimeError('malformed evidence')
   k,v=line.decode().split('=',1)
   if k in d:raise RuntimeError('duplicate evidence')
@@ -33,7 +34,7 @@ def num(d,k):
  return int(d[k],16)
 def parse(raw,t,ktruth):
  prior.parse(raw,ktruth);d=fields(raw)
- expected={'artifact':'userspace-elf-rv64','permissions':'R-X','translation_change':'none','sfence_vma':'not-required-no-pte-change','fence_i':'local-hart-executed','supervisor_resume':'PASS','complete':'PASS'}
+ expected={'artifact':'userspace-elf-rv64','permissions':'R-X','translation_change':'none','sfence_vma':'not-required-no-pte-change','fence_i':'local-hart-executed','loaded_bytes_equal':'PASS','supervisor_resume':'PASS','complete':'PASS'}
  if any(d.get(k)!=v for k,v in expected.items()):raise RuntimeError('policy evidence')
  pairs={'artifact_bytes':t['bytes'],'artifact_fnv1a64':t['full'],'source_start':t['off'],'source_end':t['off']+t['fs'],'entry':t['entry'],'prepared_entry':t['entry'],'memory_start':t['va'],'destination_va':t['va'],'memory_end':t['va']+t['ms'],'file_bytes':t['fs'],'memory_bytes':t['ms'],'copied_bytes':t['fs'],'zero_fill':0,'alignment':t['align'],'source_fnv1a64':t['source'],'loaded_fnv1a64':t['source'],'segment_count':1,'trap_cause':8,'trap_sepc':t['ecall'],'marker_a0':0x22b0,'marker_t0':0x22b1,'marker_t1':0x22b2,'user_leaf_count':2,'wx_leaf_count':0}
  if any(num(d,k)!=v for k,v in pairs.items()):raise RuntimeError('artifact-plan-load-entry-trap contradiction')
@@ -53,7 +54,7 @@ def fixture():
  return p,g,k,elf(g),prior.elf_truth(k),run([q,'-machine','virt','-nographic','-bios','default','-kernel',str(k)],TIMEOUT)
 def selftest():
  p,g,k,t,kt,raw=fixture();d=parse(raw,t,kt)
- muts=[(BEGIN,b'BAD\n'),(b'artifact_fnv1a64='+d['artifact_fnv1a64'].encode(),b'artifact_fnv1a64=0000000000000000'),(b'entry='+d['entry'].encode(),b'entry=0000000080401002'),(b'source_start='+d['source_start'].encode(),b'source_start=0000000000000000'),(b'destination_va='+d['destination_va'].encode(),b'destination_va=0000000080402000'),(b'permissions=R-X',b'permissions=RWX'),(b'loaded_fnv1a64='+d['loaded_fnv1a64'].encode(),b'loaded_fnv1a64=0000000000000000'),(b'prepared_entry='+d['prepared_entry'].encode(),b'prepared_entry=0000000080401002'),(b'fence_i=local-hart-executed',b'fence_i=missing'),(b'sfence_vma=not-required-no-pte-change',b'sfence_vma=global'),(b'trap_cause=0000000000000008',b'trap_cause=0000000000000009'),(b'marker_a0=00000000000022b0',b'marker_a0=00000000000022b1'),(b'physical_allocated_after='+d['physical_allocated_after'].encode(),b'physical_allocated_after=0000000000000008'),(b'wx_leaf_count=0000000000000000',b'wx_leaf_count=0000000000000001')]
+ muts=[(BEGIN,b'BAD\n'),(b'artifact_fnv1a64='+d['artifact_fnv1a64'].encode(),b'artifact_fnv1a64=0000000000000000'),(b'entry='+d['entry'].encode(),b'entry=0000000080401002'),(b'source_start='+d['source_start'].encode(),b'source_start=0000000000000000'),(b'destination_va='+d['destination_va'].encode(),b'destination_va=0000000080402000'),(b'permissions=R-X',b'permissions=RWX'),(b'loaded_bytes_equal=PASS',b'loaded_bytes_equal=FAIL'),(b'loaded_fnv1a64='+d['loaded_fnv1a64'].encode(),b'loaded_fnv1a64=0000000000000000'),(b'prepared_entry='+d['prepared_entry'].encode(),b'prepared_entry=0000000080401002'),(b'fence_i=local-hart-executed',b'fence_i=missing'),(b'sfence_vma=not-required-no-pte-change',b'sfence_vma=global'),(b'trap_cause=0000000000000008',b'trap_cause=0000000000000009'),(b'marker_a0=00000000000022b0',b'marker_a0=00000000000022b1'),(b'physical_allocated_after='+d['physical_allocated_after'].encode(),b'physical_allocated_after=0000000000000008'),(b'wx_leaf_count=0000000000000000',b'wx_leaf_count=0000000000000001')]
  for a,b in muts:reject(raw,t,kt,a,b)
  p.cleanup();print('PASS: Batch 22B strict relationship mutations rejected')
 def handoff(status,summary,failure=None,next=None):
@@ -66,7 +67,7 @@ def main():
  try:
   if sys.argv[1:]:selftest();summary='fixture=1 decisive relationship mutations=rejected'
   else:
-   p,g,k,t,kt,a=fixture();q=shutil.which('qemu-system-riscv64');b=run([q,'-machine','virt','-nographic','-bios','default','-kernel',str(k)],TIMEOUT);parse(a,t,kt);parse(b,t,kt);native=run(['zig','build','run-hosted-morphic-runtime']);fake=run(['zig','build','run-fake-morphic-runtime']);payload=[prior.prior.prior.perm.morphic.extract(x) for x in (a,b)]
+   p,g,k,t,kt,a=fixture();q=shutil.which('qemu-system-riscv64');b=run([q,'-machine','virt','-nographic','-bios','default','-kernel',str(k)],TIMEOUT);parse(a,t,kt);parse(b,t,kt);native=run(['zig','build','run-hosted-morphic-runtime']);fake=run(['zig','build','run-fake-morphic-runtime']);payload=[prior.prior.prior.prior.perm.morphic.extract(x) for x in (a,b)]
    if not(native==fake==payload[0]==payload[1]):raise RuntimeError('Morphic equality drift')
    print(f"PASS: Batch 22B runs=2 entry=0x{t['entry']:x} PT_LOAD={t['fs']} marker=22b0/22b1/22b2 U-ECALL=8 U=2 W+X=0 Morphic={len(native)}");summary=f"runs=2 entry=0x{t['entry']:x} PT_LOAD={t['fs']} U=2 W+X=0 Morphic={len(native)}";p.cleanup()
  except Exception as e:traceback.print_exc();handoff('FAIL','Batch 22B verification failed',str(e));return getattr(e,'returncode',1)

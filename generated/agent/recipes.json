@@ -43,6 +43,7 @@
     "run-hosted-morphic-runtime": [
       "bounded-deterministic-event-trace",
       "bounded-deterministic-scheduler",
+      "bounded-elf64-load-plan",
       "bounded-system-resource-plan",
       "distinct-memory-address-types",
       "physical-memory-region-set",

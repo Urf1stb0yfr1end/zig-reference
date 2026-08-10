@@ -20,7 +20,7 @@ No missing generally reusable capability was discovered and no new module was cr
 
 The source `recipes/run-hosted-morphic-runtime/fixtures/userspace-elf-rv64.zig` is separately compiled and linked by `userspace-elf-rv64.ld`; the single emitted artifact is both installed for independent inspection and embedded in the kernel build. Its ELF64 little-endian RV64 ET_EXEC plan has one R-X PT_LOAD at `0x80401000`, `p_filesz == p_memsz == 26`, alignment 4096, zero BSS, and `e_entry == 0x80401000`.
 
-The kernel passes the exact embedded file to `bounded-elf64-load-plan.plan(1, ...)`, copies only the returned source range to the existing allocator-owned user code frame, exact-compares it through matching FNV-1a digests, retains the U RX leaf and U RW/NX stack leaf, changes no PTE, executes one local `FENCE.I` and no new `SFENCE.VMA`, and supplies `LoadPlan.entry` to the established SRET path.
+The kernel passes the exact embedded file to `bounded-elf64-load-plan.plan(1, ...)`, copies only the returned source range to the existing allocator-owned user code frame, and directly compares every planner-selected source byte with the volatile loaded destination byte. A matching FNV-1a digest remains supporting evidence only. The kernel retains the U RX leaf and U RW/NX stack leaf, changes no PTE, executes one local `FENCE.I` and no new `SFENCE.VMA`, and supplies `LoadPlan.entry` to the established SRET path.
 
 The guest establishes `a0=0x22b0`, `t0=0x22b1`, and `t1=0x22b2`, then issues its unique ECALL. Two real QEMU machines trapped cause 8 at the independently reconstructed guest ECALL PC on the existing trusted supervisor trap frame and reached the known supervisor continuation. Allocated-frame count, page-table-frame count, SATP/root, code/stack physical frames, two U leaves, and zero W+X leaves were conserved. Hosted, fake, and both machine Morphic artifacts remained exactly 765 bytes and equal.
 
@@ -31,8 +31,9 @@ The guest establishes `a0=0x22b0`, `t0=0x22b1`, and `t1=0x22b2`, then issues its
 - `python3 tools/verify-freestanding-riscv64-user-memory-transfer.py --self-test` — PASS after installing QEMU 8.2.2 in the execution environment.
 - `python3 tools/verify-freestanding-riscv64-userspace-elf.py --self-test` — PASS; one real fixture and decisive relationship mutations rejected.
 - `python3 tools/verify-freestanding-riscv64-userspace-elf.py` — PASS; two real QEMU machines.
+- `zig build check` — PASS; 55 current validation-evidence records, seven deterministic agent indexes (55 full and zero partial contracts), 14 textual indexes, and 11 acyclic graph views were clean.
 - `PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check` — PASS.
-- `python3 tools/developer-command.py validate-repository` — PASS (final counts are recorded in the command output and completion handoff).
+- `python3 tools/developer-command.py validate-repository` — PASS; 330/330 build steps and 225/225 tests passed.
 
 ## What is still not claimed
 
