@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Strict Batch 21C bidirectional real user-memory proof."""
-import importlib.util,re,shutil,subprocess,sys,tempfile
+import importlib.util,re,shutil,subprocess,sys,tempfile,traceback
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[1]; BEGIN=b"ZIGREF_USER_COPY_OUT_BEGIN"; END=b"ZIGREF_USER_COPY_OUT_END"; RETURNED=b"ZIGREF_USER_COPY_OUT_RETURNED"; TIMEOUT=20
+ROOT=Path(__file__).resolve().parents[1]; COMMAND="python3 tools/verify-freestanding-riscv64-user-memory-transfer.py"; BEGIN=b"ZIGREF_USER_COPY_OUT_BEGIN"; END=b"ZIGREF_USER_COPY_OUT_END"; RETURNED=b"ZIGREF_USER_COPY_OUT_RETURNED"; TIMEOUT=20
 spec=importlib.util.spec_from_file_location("copyin",ROOT/"tools/verify-freestanding-riscv64-user-copy-in.py"); prior=importlib.util.module_from_spec(spec);spec.loader.exec_module(prior)
 def run(c,t=None):return subprocess.run(c,cwd=ROOT,check=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=t).stdout
 def elf_truth(path):
@@ -69,11 +69,32 @@ def self_test():
  for key in ('trap0_frame','trap1_frame','trap2_frame','trap3_frame','stvec_after','satp_before','root_physical','segment_offset','segment_bytes','segment_coverage'):
   value=f'{key}={d[key]}'.encode();muts.append((value,f'{key}={int(d[key],16)+1:016x}'.encode()))
  for a,b in muts:reject(raw,t,a,b)
- p.cleanup();print('PASS: Batch 21C strict rejection matrix')
+ p.cleanup();print('PASS: Batch 21C strict rejection matrix',flush=True)
+def handoff(status, command, summary, failure=None, next_command=None):
+ args=[sys.executable,'tools/developer-minimus.py','--command',command,'--status',status,'--summary',summary,
+       '--location','source=recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig',
+       '--location','verifier=tools/verify-freestanding-riscv64-user-memory-transfer.py',
+       '--location','report=docs/reports/AGENTIC_SNOWBALL_BATCH_21C.md']
+ if failure:args += ['--failure',failure]
+ if next_command or failure:args += ['--next',next_command or command]
+ sys.stdout.flush();sys.stderr.flush();subprocess.call(args,cwd=ROOT)
 def main():
- if sys.argv[1:]==['--self-test']:self_test();return 0
- if sys.argv[1:]:return 2
- p,art,t,a=fixture();q=shutil.which('qemu-system-riscv64');b=run([q,'-machine','virt','-nographic','-bios','default','-kernel',str(art)],TIMEOUT);parse(a,t);parse(b,t);native=run(['zig','build','run-hosted-morphic-runtime']);fake=run(['zig','build','run-fake-morphic-runtime']);payload=[prior.prior.prior.perm.morphic.extract(x) for x in (a,b)]
- if not(native==fake==payload[0]==payload[1]) or len(native)!=765:raise RuntimeError('Morphic equality drift')
- p.cleanup();print('PASS: Batch 21C runs=2 traps=4 U=2 W+X=0 payload=kernel-to-user!! permission=NotWritable atomic=Unmapped prefix=unchanged Morphic=765');return 0
+ self_mode=sys.argv[1:]==['--self-test'];command=COMMAND+(' --self-test' if self_mode else '')
+ if sys.argv[1:] and not self_mode:
+  print(f'usage: {COMMAND} [--self-test]',file=sys.stderr)
+  handoff('FAIL',command,'Batch 21C verifier invocation was rejected','unsupported arguments')
+  return 2
+ try:
+  if self_mode:
+   self_test();summary='fixture=1 traps=4 causes=8 trusted-frame=PASS prepared-status=PASS segment-evidence=PASS mutations=rejected'
+  else:
+   p,art,t,a=fixture();q=shutil.which('qemu-system-riscv64');b=run([q,'-machine','virt','-nographic','-bios','default','-kernel',str(art)],TIMEOUT);parse(a,t);parse(b,t);native=run(['zig','build','run-hosted-morphic-runtime']);fake=run(['zig','build','run-fake-morphic-runtime']);payload=[prior.prior.prior.perm.morphic.extract(x) for x in (a,b)]
+   if not(native==fake==payload[0]==payload[1]) or len(native)!=765:raise RuntimeError('Morphic equality drift')
+   p.cleanup();print('PASS: Batch 21C runs=2 traps=4 U=2 W+X=0 payload=kernel-to-user!! permission=NotWritable atomic=Unmapped prefix=unchanged Morphic=765',flush=True)
+   summary='runs=2 traps=4 U=2 W+X=0 copy=16 NotWritable=PASS atomic-Unmapped=PASS prefix=unchanged Morphic=765'
+ except (AssertionError,OSError,UnicodeError,subprocess.CalledProcessError,subprocess.TimeoutExpired,RuntimeError,ValueError) as error:
+  traceback.print_exc();handoff('FAIL',command,'Batch 21C bounded user-memory verification failed',str(error))
+  return error.returncode if isinstance(error,subprocess.CalledProcessError) else 1
+ handoff('PASS',command,summary, next_command=COMMAND if self_mode else 'python3 tools/developer-command.py validate-repository')
+ return 0
 if __name__=='__main__':raise SystemExit(main())
