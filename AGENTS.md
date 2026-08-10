@@ -6,6 +6,16 @@
 
 The long-term goal is that large Zig systems can be assembled by discovering modules, reading their contracts, following dependencies, reusing validated implementations, and writing only project-specific orchestration.
 
+## Alpz long-term roadmap
+
+Agents doing Alpz kernel, Linux-ABI, userspace, virtualization, Morphic, or recursive-validation work must read:
+
+`docs/roadmaps/ALPZ_TO_ALPINE_QEMU_KVM_AND_BEYOND.md`
+
+That document is the long-horizon execution/compatibility roadmap from the current bounded user-memory boundary through real ELF execution, Linux ABI work, BusyBox, musl, Alpine, QEMU/TCG, the self-hosted recursive ABI lab, Debian/glibc, RISC-V hardware virtualization, `/dev/kvm`, QEMU/KVM, accelerated recursive worlds, and later container/large-workload pressure.
+
+Treat its later batch numbers as planning bands rather than completed work or fixed promises. Preserve the intended dependency order and do not prematurely implement a later-stage facility when a smaller prerequisite is the current target. The roadmap explains the destination; checked-in batch plans and current repository evidence define the immediate task and what is actually proved.
+
 ## Zero-context agent entry
 
 Assume every coding agent may arrive with no prior knowledge of this repository.
