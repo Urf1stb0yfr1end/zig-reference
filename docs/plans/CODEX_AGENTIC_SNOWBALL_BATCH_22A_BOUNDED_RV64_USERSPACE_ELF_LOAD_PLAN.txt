@@ -1,0 +1,557 @@
+CODEX AGENTIC SNOWBALL — BATCH 22A
+BOUNDED RV64 USERSPACE ELF LOAD PLAN
+
+Repository:
+thanks-cohn/zig-reference
+
+Plan path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_22A_BOUNDED_RV64_USERSPACE_ELF_LOAD_PLAN.txt
+
+MISSION
+
+Split the original Batch 22 real-ELF milestone into two snowballs.
+
+Batch 22A must solve only the architecture-independent ELF acceptance and load-planning problem:
+
+ELF bytes
+→ existing Z-Ref ELF64 file-header parser
+→ existing Z-Ref ELF64 program-header parser
+→ bounded RV64 userspace acceptance policy
+→ failure-atomic PT_LOAD planning
+→ deterministic entry-point truth
+→ deterministic segment/file/virtual-memory plan
+→ focused tests + rejection matrix
+→ repository-valid reusable knowledge
+
+Batch 22A must NOT execute the ELF in U-mode.
+
+The decisive new fact for Batch 22A is:
+
+Given bounded ELF bytes, Z-Ref can deterministically decide whether the file belongs to the deliberately supported first RV64 userspace subset and, on success, return a complete load plan describing exactly what later Alpz machine orchestration must copy, zero, map, and enter.
+
+The next batch, Batch 22B, will consume this settled primitive to prove the first actual RV64 ELF executes in real U-mode.
+
+Do not begin Batch 22B during this run.
+
+This split is intentional. Do not collapse it back into the original monolithic Batch 22 request.
+
+CURRENT BASELINE
+
+Batch 21C is complete for the narrow native user-memory boundary. Current repository main also contains the long-term Alpz roadmap and the superseded monolithic Batch 22 planning document at the time this replacement request is created.
+
+Treat the actual checked-out HEAD as truth. Record it before modifying source.
+
+Read before implementation:
+
+AGENTS.md
+COMMANDS.md
+docs/standards/SNOWBALL_YIELD.md
+docs/roadmaps/ALPZ_TO_ALPINE_QEMU_KVM_AND_BEYOND.md
+docs/roadmaps/SELF_HOSTED_RECURSIVE_ABI_LAB.md
+docs/reports/AGENTIC_SNOWBALL_BATCH_21C.md
+projects/37-elf64-file-header-parser/DETAILS.md
+projects/37-elf64-file-header-parser/details.json
+projects/38-elf64-program-header-parser/DETAILS.md
+projects/38-elf64-program-header-parser/details.json
+
+If the old file still exists in the checkout, also read it only for historical scope context:
+
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_22_FIRST_REAL_RV64_USERSPACE_ELF_EXECUTION.txt
+
+Do not execute that old monolithic plan. This 22A file supersedes it.
+
+FOUNDATIONS TO REUSE
+
+The repository already has the foundations this batch should compose rather than duplicate:
+
+- bounded-byte-reader;
+- binary cursor/checkpoint/sub-reader foundations;
+- checked integer casts;
+- checked half-open ranges;
+- alignment helpers;
+- validated enums and bit flags;
+- endian integer codecs;
+- distinct memory-address types;
+- fixed-capacity vectors;
+- elf64-file-header-parser;
+- elf64-program-header-parser.
+
+The module catalog currently identifies the ELF parsers as intended foundations for ELF tables, load plans, executable mappers, and kernel loaders.
+
+Do not create:
+
+- another ELF file-header parser;
+- another ELF program-header parser;
+- another generic byte reader;
+- page-table code;
+- physical-frame allocation code;
+- U-mode entry code;
+- syscall code;
+- a process abstraction;
+- an execve implementation.
+
+ZERO-CONTEXT BOOTSTRAP
+
+Before broad source archaeology:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+
+Then use the fast path to inspect/preflight at minimum:
+
+- elf64-file-header-parser;
+- elf64-program-header-parser;
+- bounded-byte-reader;
+- checked-half-open-range;
+- aligned-address-and-size-helpers;
+- distinct-memory-address-types;
+- validated-bit-flags;
+- fixed-capacity-vector.
+
+Freeze a requirement/capability map before implementation as required by SNOWBALL_YIELD.
+
+Classify every requirement as:
+
+1. already solved reusable capability;
+2. small composition/orchestration;
+3. genuinely missing reusable capability;
+4. deliberately deferred to 22B or later.
+
+LIKELY REUSABLE GAP
+
+Repository evidence strongly suggests the genuinely missing reusable layer is not parsing individual ELF structures but composing them into a bounded load plan.
+
+If discovery confirms that gap, prefer one small canonical module at the next available project slot, likely conceptually:
+
+projects/54-bounded-elf64-load-plan
+
+The exact final module name and slot must follow actual repository conventions and current HEAD. Do not create it blindly if an equivalent canonical module already exists.
+
+The module must remain target-neutral in mechanism even though Batch 22A applies an RV64 userspace acceptance policy.
+
+It must not perform privileged machine operations.
+
+TASK-BUDGET RULE
+
+This run exists specifically to reduce Codex risk.
+
+Do not spend it running historical machine labs.
+
+Before source changes, use focused gates only:
+
+1. git rev-parse HEAD
+2. git status --short --branch
+3. zig version
+4. python3 tools/query-reference.py agent doctor
+5. zig build test-elf64-file-header-parser
+6. zig build smoke-elf64-file-header-parser
+7. zig build test-elf64-program-header-parser
+8. zig build smoke-elf64-program-header-parser
+
+If these pass, implement.
+
+Batch 22A does NOT require qemu-system-riscv64.
+
+Do not run the Batch 21C two-machine verifier merely as ceremony. If a concrete unexpected regression points at machine code, diagnose it narrowly; otherwise keep this run at the parser/planner layer.
+
+SUPPORTED FIRST ELF SUBSET
+
+The plan must encode an explicit narrow first userspace subset suitable for Batch 22B.
+
+At minimum, the composition must be able to require and validate:
+
+- ELF magic;
+- ELF64 class;
+- little-endian data encoding;
+- supported ELF identification/version;
+- RISC-V machine identity;
+- a deliberately supported executable type for the first fixture;
+- bounded program-header table/count/entry size through canonical parsers;
+- at least one PT_LOAD;
+- bounded PT_LOAD file range;
+- p_filesz <= p_memsz;
+- checked virtual-memory range arithmetic;
+- coherent supported alignment relationship;
+- deterministic permission translation from ELF PF_R/PF_W/PF_X truth;
+- no accepted W+X load segment for this first policy;
+- e_entry contained in an executable admitted PT_LOAD memory range;
+- unsupported overlapping PT_LOAD layouts rejected unless a simple, explicitly correct non-overlap policy already exists;
+- unsupported features rejected explicitly rather than silently ignored.
+
+Do not claim a complete System V or Linux ELF loader.
+
+Do not add support merely because ELF permits something if Batch 22B does not need it yet.
+
+LOAD-PLAN CONTRACT
+
+The output must be a complete immutable/failure-atomic plan. Callers must never receive a usable partial plan after a later validation failure.
+
+The exact public API should follow repository style, but the semantic result must expose enough typed truth for later Alpz orchestration to operate without reparsing or re-deriving loader policy.
+
+Conceptually, the successful plan needs facts equivalent to:
+
+LoadPlan
+- entry virtual address
+- admitted PT_LOAD count
+- ordered segment plans
+- exact source ELF byte range per segment
+- exact destination virtual-memory range per segment
+- file byte count
+- memory byte count
+- zero-fill byte count or range
+- read/write/execute permission truth
+- alignment information required by the supported contract
+
+Each segment plan should make these relationships explicit:
+
+source_start = p_offset
+source_length = p_filesz
+memory_start = p_vaddr for the supported first contract
+memory_length = p_memsz
+zero_fill_length = p_memsz - p_filesz
+permissions = truthfully derived from p_flags
+
+Do not store raw unvalidated arithmetic merely because it came from a parsed header.
+
+All additions, ends, conversions, range construction, counts, and capacity boundaries must be checked.
+
+FAILURE ATOMICITY
+
+A later bad PT_LOAD must invalidate the entire plan.
+
+Required behavioral shape:
+
+parse header
+→ parse program-header table
+→ inspect/validate all relevant load rows
+→ validate entry relation
+→ only then return a usable complete plan
+
+If segment N is valid and segment N+1 is invalid, the caller must receive an error, not a one-segment usable plan.
+
+Use fixed bounded storage and repository conventions. No hidden heap allocation merely for planning if existing fixed-capacity foundations can express the supported bound cleanly.
+
+ORDERING
+
+Define deterministic output ordering.
+
+Prefer a simple canonical rule such as program-header order if that preserves the loader contract, or ascending virtual address if the reusable module requires canonicalization. Choose one rule, document it, and test it.
+
+Do not accidentally make output depend on hash-map iteration or allocator behavior.
+
+PERMISSION POLICY
+
+The planner must preserve ELF permission truth rather than widen it for convenience.
+
+For the first Batch 22A/22B policy:
+
+- RX is acceptable for executable program bytes;
+- RW/NX is acceptable for writable data if such a segment is admitted;
+- read-only NX is acceptable if needed;
+- W+X must be rejected for the first supported policy;
+- executable entry must resolve into an admitted executable segment.
+
+Keep generic ELF flag parsing distinct from policy rejection. If the canonical parser already models flags precisely, reuse that truth.
+
+ZERO-FILL / BSS TRUTH
+
+Even if Batch 22B chooses a tiny fixture where p_filesz == p_memsz, the plan should not lie about p_memsz.
+
+If the reusable abstraction can cheaply and correctly represent p_memsz > p_filesz, represent the zero-fill tail as explicit plan truth and unit-test it.
+
+If supporting that case requires disproportionate new semantics, reject it explicitly for 22A and document the deferral. Do not half-support BSS.
+
+Prefer representation over machine execution: Batch 22A does not need to actually zero physical memory.
+
+OVERLAP POLICY
+
+Do not defer overlap ambiguity into machine integration.
+
+For the first policy, a simple deterministic rejection of overlapping admitted PT_LOAD memory ranges is acceptable and preferred unless the existing canonical contracts already provide a clearly correct stronger policy.
+
+Test boundary-touching half-open ranges separately from actual overlap.
+
+ENTRY POLICY
+
+The plan's entry value must come from the parsed ELF header.
+
+Success requires the entry to lie within an admitted executable PT_LOAD memory range.
+
+Reject at least:
+
+- entry outside every admitted load segment;
+- entry in a writable/non-executable data segment;
+- entry exactly at the exclusive end of an executable segment;
+- overflowed/malformed ranges that make containment unknowable.
+
+REAL RV64 FIXTURE WITHOUT MACHINE EXECUTION
+
+If inexpensive and consistent with repository build conventions, add a tiny deterministic freestanding RV64 ELF fixture or build target to exercise the complete parser→planner path against an actual compiler-produced ELF file.
+
+This fixture is allowed in 22A because it is parser/planner evidence, not U-mode execution.
+
+Keep it tiny:
+
+- no libc;
+- no PT_INTERP;
+- no runtime relocation requirement;
+- one simple executable PT_LOAD is sufficient;
+- deterministic e_entry and flags;
+- no need to boot or run it under QEMU.
+
+Do not commit opaque generated binaries if repository policy prefers deterministic build artifacts.
+
+If adding this fixture would consume disproportionate effort, prioritize the reusable planner and strong in-memory fixtures. Batch 22B can create the real guest artifact. Record which path was chosen.
+
+REQUIRED UNIT / NEGATIVE TEST MATRIX
+
+The new or composed planner must test successful and rejecting cases. At minimum cover the behaviors relevant to its supported subset:
+
+SUCCESS
+
+- one valid executable PT_LOAD with entry inside;
+- exact source range derived from p_offset/p_filesz;
+- exact memory range derived from p_vaddr/p_memsz;
+- permission truth preserved;
+- deterministic output ordering;
+- p_filesz == p_memsz;
+- p_memsz > p_filesz representation if supported;
+- boundary-touching non-overlapping segments if multiple segments are supported.
+
+REJECTION
+
+- bad ELF magic through canonical parser behavior;
+- wrong class;
+- wrong endianness;
+- wrong machine;
+- unsupported ELF type;
+- malformed/truncated program-header table;
+- zero PT_LOAD if policy requires at least one;
+- p_offset + p_filesz overflow/out of input bounds;
+- p_filesz > p_memsz;
+- p_vaddr + p_memsz overflow;
+- unsupported alignment relationship;
+- W+X PT_LOAD;
+- overlapping admitted PT_LOAD virtual ranges;
+- entry outside executable load range;
+- entry in non-executable load range;
+- entry at exclusive segment end;
+- capacity exceeded;
+- valid first segment followed by invalid later segment returns no usable partial plan.
+
+Do not duplicate negative tests already exhaustively proven inside the individual canonical parsers unless the composition needs to prove correct error propagation or policy behavior.
+
+ERROR SURFACE
+
+Use explicit deterministic errors following repository conventions.
+
+Do not collapse materially different policy failures into one generic InvalidElf if a stable, small error vocabulary improves later diagnostics.
+
+The exact names should be chosen after reading current parser contracts. Candidate semantic categories include:
+
+- unsupported machine/type/encoding;
+- no loadable segment;
+- segment file range out of bounds;
+- filesz greater than memsz;
+- virtual range overflow;
+- unsupported permissions;
+- unsupported alignment;
+- overlapping load ranges;
+- entry not executable;
+- plan capacity exceeded.
+
+Do not invent diagnostics that falsely imply the compiler or hardware detected the condition.
+
+NO MACHINE SIDE EFFECTS
+
+Batch 22A must not:
+
+- allocate physical frames;
+- mutate page tables;
+- write satp;
+- execute SFENCE.VMA;
+- execute FENCE.I;
+- enter U-mode;
+- install trap handlers;
+- perform user-memory copies;
+- run the guest ELF;
+- add a syscall ABI.
+
+Those are 22B/later concerns.
+
+This separation is the point of the split.
+
+MODULE CONTRACT / AGENT READABILITY
+
+If a new canonical module is required, give it the repository's normal complete reusable surface:
+
+- source;
+- README.md;
+- MASTERY.md;
+- DETAILS.md;
+- details.json;
+- port.js;
+- focused unit tests;
+- smoke test;
+- build.zig integration;
+- catalog/index integration;
+- exact validation commands;
+- ownership/borrowing/failure/compatibility truth.
+
+Do not add decorative metadata that can be derived from canonical truth.
+
+The module should be easy for the next zero-context Codex agent to select and integrate without reading its whole implementation.
+
+SNOWBALL YIELD
+
+The expected successful Batch 22A story is:
+
+Already solved:
+ELF byte reading + ELF header parsing + program-header parsing + checked arithmetic primitives + bounded collections
+
+New reusable composition:
+complete bounded ELF load plan
+
+Deferred machine orchestration:
+physical destination selection + page mapping/reuse + byte copy/zero + FENCE.I + e_entry U-mode entry + ECALL proof
+
+That deferred machine orchestration becomes Batch 22B and should be materially smaller because 22A makes ELF interpretation a settled primitive.
+
+DOCUMENTATION / REPORT
+
+Add the conventional implementation report:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_22A.md
+
+The report must state:
+
+- exact starting revision;
+- requirements/capability map;
+- what existing modules were reused;
+- whether a new canonical module was required and why;
+- exact supported ELF subset;
+- exact plan contract;
+- exact failure-atomicity story;
+- negative cases actually executed;
+- focused validation results;
+- repository validation result;
+- explicit nonclaims;
+- Snowball Yield;
+- next pressure: Batch 22B real RV64 userspace ELF execution.
+
+Update COMMANDS.md with the new module/unit/smoke or focused planner verification commands as appropriate.
+
+Regenerate deterministic catalogs/indexes/evidence required by repository policy.
+
+VALIDATION
+
+Run the smallest truthful validation stack first, then repository closure.
+
+At minimum after implementation:
+
+- zig fmt --check;
+- focused new planner unit tests;
+- focused new planner smoke test;
+- existing ELF file-header parser test/smoke;
+- existing ELF program-header parser test/smoke;
+- relevant contract/port checks;
+- repository index/check commands required by AGENTS.md/current conventions;
+- python3 tools/query-reference.py agent doctor;
+- python3 tools/developer-command.py validate-repository.
+
+If the repository validation reveals a real regression caused by 22A, repair it within 22A scope and rerun the failing/final gates.
+
+Do not add system-QEMU execution merely to make the validation list look more impressive.
+
+COMPLETION STANDARD
+
+Batch 22A is complete only when all of the following are true:
+
+1. The existing canonical ELF parsers are reused rather than duplicated.
+2. The first RV64 userspace ELF acceptance policy is explicit and bounded.
+3. A complete load plan is produced only after whole-input/whole-plan validation succeeds.
+4. No usable partial plan escapes after later failure.
+5. PT_LOAD source file ranges are checked and bounded.
+6. PT_LOAD virtual memory ranges are checked and bounded.
+7. p_filesz <= p_memsz is enforced.
+8. Permission truth is explicit.
+9. W+X is rejected by the first policy.
+10. Overlap policy is deterministic and tested.
+11. e_entry is preserved from parsed ELF truth and must lie in an admitted executable segment.
+12. Output ordering is deterministic.
+13. Fixed plan capacity behavior is explicit and tested.
+14. Focused positive and negative tests pass.
+15. Agent-readable module/contract surfaces are complete if a module was added.
+16. COMMANDS/catalog/index/evidence surfaces are updated as required.
+17. AGENTIC_SNOWBALL_BATCH_22A.md records what was actually proved and explicit nonclaims.
+18. Full repository validation passes.
+19. No machine/U-mode execution claim is made.
+20. The finished primitive is sufficient for Batch 22B to concentrate on real-machine integration instead of rediscovering ELF load semantics.
+
+EXPLICIT NONCLAIMS
+
+Batch 22A does not prove:
+
+- any ELF executes;
+- any U-mode instruction executes;
+- physical memory allocation for an ELF;
+- page-table creation or mutation for an ELF;
+- byte copying into user physical pages;
+- BSS zeroing in actual memory;
+- FENCE.I/SFENCE.VMA behavior;
+- ELF e_entry privilege entry;
+- user ECALL return;
+- Linux syscall ABI;
+- Linux copy_to_user/copy_from_user semantics;
+- argc/argv/envp/auxv;
+- PT_INTERP;
+- relocations;
+- dynamic linking;
+- musl;
+- processes;
+- execve;
+- VFS;
+- mmap/brk;
+- signals/futexes/threads;
+- BusyBox;
+- Alpine;
+- QEMU hosting;
+- KVM.
+
+END-OF-RUN OUTPUT / HANDOFF
+
+Do not simply stop after code compiles.
+
+Complete Batch 22A fully, including repairs required to satisfy its own tests and repository validation.
+
+Commit the completed Batch 22A work using the repository's normal intentional commit practice.
+
+At the end of the run produce the usual bounded completion output containing:
+
+- concise summary of what changed;
+- exact reusable capability added or composed;
+- exact tests/validation actually run and their results;
+- explicit nonclaims/remaining work;
+- the normal repository LOCATIONS section;
+- then the normal MINIMUS handoff;
+- an actionable next command or next planning pressure.
+
+The next pressure should be identified as Batch 22B: first real RV64 userspace ELF execution using the completed load-plan primitive.
+
+Only after producing the normal completion summary, LOCATIONS, and MINIMUS handoff should this Codex run stop.
+
+Do not implement Batch 22B in this run.
+
+FINAL PRINCIPLE
+
+Batch 21 proved that validating a complete user-memory transfer before mutation was worth extracting into a reusable primitive.
+
+Batch 22A applies the same lesson to ELF loading:
+
+Do not let the first real ELF execution run simultaneously invent ELF semantics and debug privilege/mapping machinery.
+
+Settle the ELF load contract first.
+
+Then Batch 22B gets to be about one thing:
+
+an actual RV64 ELF executes.
