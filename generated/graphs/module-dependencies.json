@@ -23,6 +23,34 @@
       "module": "bounded-deterministic-scheduler"
     },
     {
+      "dependency": "bounded-byte-reader",
+      "module": "bounded-elf64-load-plan"
+    },
+    {
+      "dependency": "checked-half-open-range",
+      "module": "bounded-elf64-load-plan"
+    },
+    {
+      "dependency": "checked-integer-cast",
+      "module": "bounded-elf64-load-plan"
+    },
+    {
+      "dependency": "distinct-memory-address-types",
+      "module": "bounded-elf64-load-plan"
+    },
+    {
+      "dependency": "elf64-file-header-parser",
+      "module": "bounded-elf64-load-plan"
+    },
+    {
+      "dependency": "elf64-program-header-parser",
+      "module": "bounded-elf64-load-plan"
+    },
+    {
+      "dependency": "fixed-capacity-vector",
+      "module": "bounded-elf64-load-plan"
+    },
+    {
       "dependency": "aligned-address-and-size-helpers",
       "module": "bounded-system-resource-plan"
     },

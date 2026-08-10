@@ -164,6 +164,7 @@ The following section is derived from `generated/modules.json` and canonical mod
 | `bounded-deterministic-event-trace` | `zig build test-bounded-deterministic-event-trace` | `zig build smoke-bounded-deterministic-event-trace` | `projects/51-bounded-deterministic-event-trace/details.json` |
 | `bounded-deterministic-scheduler` | `zig build test-bounded-deterministic-scheduler` | `zig build smoke-bounded-deterministic-scheduler` | `projects/52-bounded-deterministic-scheduler/details.json` |
 | `bounded-user-memory-transfer-plan` | `zig build test-bounded-user-memory-transfer-plan` | `zig build smoke-bounded-user-memory-transfer-plan` | `projects/53-bounded-user-memory-transfer-plan/details.json` |
+| `bounded-elf64-load-plan` | `zig build test-bounded-elf64-load-plan` | `zig build smoke-bounded-elf64-load-plan` | `projects/54-bounded-elf64-load-plan/details.json` |
 <!-- END GENERATED MODULE COMMANDS -->
 
 ## Recipes and conformance
@@ -209,7 +210,7 @@ Each module has `zig build test-<module>` and `zig build smoke-<module>` targets
 ## Agent-readable pilot commands
 
 <!-- CURRENT AGENT CORPUS -->
-Agent Fast Path v2 currently projects 54 contracted modules as 54 full cards with 0 partial cards.
+Agent Fast Path v2 currently projects 55 contracted modules as 55 full cards with 0 partial cards.
 The Batch 07 repair revalidated bootstrap/doctor discovery, deterministic preflight, command-reference drift, ports, Developer Minimus, hosted Morphic verification, and the complete repository pipeline under Zig 0.14.0; exact results are recorded in `docs/reports/AGENTIC_SNOWBALL_BATCH_07_REPAIR.md`.
 The root-document policy is checked by `node tools/check-port-contracts.js`; it accepts
 only the explicit flagship/root allowlist and rejects any other root Markdown file.
@@ -372,3 +373,9 @@ Batch 21C executed both commands under Zig 0.14.0 and QEMU 8.2.2. Each machine o
 PR #43 review repair re-executed the Batch 21C self-test, two-machine verifier, and complete 326/326-step, 216/216-test repository validation under Zig 0.14.0 and QEMU 8.2.2. The verifier now consumes actual cause, trusted trap-frame, prepared-status, and planner-segment evidence and cross-checks Batch 21C trap-vector, SATP, and root truth against Batch 21B.
 
 PR #43 final review repair made both Batch 21C verifier modes append one bounded `LOCATIONS` then `MINIMUS` handoff after their ordinary output. Controlled invocation failure was also executed to confirm `FAIL`, actionable next-command output, and preservation of exit status 2.
+
+## Batch 22A bounded ELF64 load planning
+
+`zig build test-bounded-elf64-load-plan` runs the deterministic positive and rejection matrix for static RV64 ELF acceptance and failure-atomic PT_LOAD planning. `zig build smoke-bounded-elf64-load-plan` verifies the external named import. Batch 22A ran both successfully under Zig 0.14.0; it did not execute an ELF or require system QEMU. The complete validation record is `docs/reports/AGENTIC_SNOWBALL_BATCH_22A.md`.
+
+PR #44 final Batch 22A merge-gate repair added deterministic planner rejection for ELF write-without-read permissions and checked `e_entry` conversion boundaries; the focused planner/parser stack and complete repository validation were rerun under Zig 0.14.0. This remains load planning only and does not execute an ELF.

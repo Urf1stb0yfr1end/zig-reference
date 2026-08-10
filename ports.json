@@ -689,6 +689,25 @@
       "baselineValidated": false,
       "testedTargetVersions": [],
       "knownMigrationBlockers": []
+    },
+    {
+      "id": "54",
+      "canonicalName": "bounded-elf64-load-plan",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/54-bounded-elf64-load-plan/port.js",
+      "implementationPath": "projects/54-bounded-elf64-load-plan/src/bounded_elf64_load_plan.zig",
+      "dependenciesMustPortFirst": [
+        "bounded-byte-reader",
+        "checked-integer-cast",
+        "fixed-capacity-vector",
+        "checked-half-open-range",
+        "distinct-memory-address-types",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
     }
   ]
 }

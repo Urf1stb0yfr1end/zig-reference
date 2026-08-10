@@ -105,6 +105,10 @@
       "symbol": "Entry"
     },
     {
+      "module": "bounded-elf64-load-plan",
+      "symbol": "Error"
+    },
+    {
       "module": "bounded-user-memory-transfer-plan",
       "symbol": "Error"
     },
@@ -197,6 +201,10 @@
       "symbol": "Level"
     },
     {
+      "module": "bounded-elf64-load-plan",
+      "symbol": "LoadPlan"
+    },
+    {
       "module": "riscv-sv39-page-table-builder",
       "symbol": "Mutation"
     },
@@ -251,6 +259,10 @@
     {
       "module": "elf64-program-header-parser",
       "symbol": "Permission"
+    },
+    {
+      "module": "bounded-elf64-load-plan",
+      "symbol": "Permissions"
     },
     {
       "module": "elf64-program-header-parser",
@@ -323,6 +335,10 @@
     {
       "module": "elf64-program-header-parser",
       "symbol": "Segment"
+    },
+    {
+      "module": "bounded-elf64-load-plan",
+      "symbol": "SegmentPlan"
     },
     {
       "module": "elf64-program-header-parser",
@@ -449,6 +465,10 @@
       "symbol": "isValidEnumValue"
     },
     {
+      "module": "bounded-elf64-load-plan",
+      "symbol": "max_program_headers"
+    },
+    {
       "module": "aligned-address-and-size-helpers",
       "symbol": "paddingNeeded"
     },
@@ -473,12 +493,20 @@
       "symbol": "parseTable"
     },
     {
+      "module": "bounded-elf64-load-plan",
+      "symbol": "plan"
+    },
+    {
       "module": "riscv-sv39-virtual-address-indexing",
       "symbol": "requireAligned"
     },
     {
       "module": "binary-cursor-checkpoint",
       "symbol": "restore"
+    },
+    {
+      "module": "bounded-elf64-load-plan",
+      "symbol": "riscv_machine"
     },
     {
       "module": "riscv-sv39-virtual-address-indexing",

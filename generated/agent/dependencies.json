@@ -44,6 +44,18 @@
       ],
       "status": "full"
     },
+    "bounded-elf64-load-plan": {
+      "dependencies": [
+        "bounded-byte-reader",
+        "checked-half-open-range",
+        "checked-integer-cast",
+        "distinct-memory-address-types",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "fixed-capacity-vector"
+      ],
+      "status": "full"
+    },
     "bounded-integer": {
       "dependencies": [],
       "status": "full"

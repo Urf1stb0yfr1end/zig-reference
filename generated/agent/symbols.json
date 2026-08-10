@@ -80,6 +80,7 @@
       "riscv-sv39-page-table-entry"
     ],
     "Error": [
+      "bounded-elf64-load-plan",
       "bounded-user-memory-transfer-plan",
       "riscv-page-table-page-owner",
       "riscv-sv39-page-table-builder",
@@ -133,6 +134,9 @@
       "riscv-sv39-page-table-entry",
       "riscv-sv39-virtual-address-indexing"
     ],
+    "LoadPlan": [
+      "bounded-elf64-load-plan"
+    ],
     "Mutation": [
       "riscv-sv39-page-table-builder"
     ],
@@ -174,6 +178,7 @@
       "elf64-program-header-parser"
     ],
     "Permissions": [
+      "bounded-elf64-load-plan",
       "elf64-program-header-parser",
       "riscv-sv39-page-table-entry"
     ],
@@ -220,6 +225,9 @@
     "Segment": [
       "bounded-user-memory-transfer-plan",
       "elf64-program-header-parser"
+    ],
+    "SegmentPlan": [
+      "bounded-elf64-load-plan"
     ],
     "SegmentType": [
       "elf64-program-header-parser"
@@ -308,6 +316,9 @@
     "isValidEnumValue": [
       "validated-enum-decoder"
     ],
+    "max_program_headers": [
+      "bounded-elf64-load-plan"
+    ],
     "paddingNeeded": [
       "aligned-address-and-size-helpers"
     ],
@@ -326,11 +337,17 @@
     "parseTable": [
       "elf64-program-header-parser"
     ],
+    "plan": [
+      "bounded-elf64-load-plan"
+    ],
     "requireAligned": [
       "riscv-sv39-virtual-address-indexing"
     ],
     "restore": [
       "binary-cursor-checkpoint"
+    ],
+    "riscv_machine": [
+      "bounded-elf64-load-plan"
     ],
     "validateRange": [
       "riscv-sv39-virtual-address-indexing"

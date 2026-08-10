@@ -485,6 +485,15 @@
       "details": "projects/53-bounded-user-memory-transfer-plan/details.json",
       "unit_test_step": "test-bounded-user-memory-transfer-plan",
       "smoke_test_step": "smoke-bounded-user-memory-transfer-plan"
+    },
+    {
+      "id": "54",
+      "canonical_name": "bounded-elf64-load-plan",
+      "directory": "projects/54-bounded-elf64-load-plan",
+      "public_entrypoint": "projects/54-bounded-elf64-load-plan/src/bounded_elf64_load_plan.zig",
+      "details": "projects/54-bounded-elf64-load-plan/details.json",
+      "unit_test_step": "test-bounded-elf64-load-plan",
+      "smoke_test_step": "smoke-bounded-elf64-load-plan"
     }
   ]
 }

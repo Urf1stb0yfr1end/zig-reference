@@ -94,6 +94,7 @@
       "capability": "allocation-free",
       "modules": [
         "bounded-deterministic-event-trace",
+        "bounded-elf64-load-plan",
         "bounded-user-memory-transfer-plan"
       ]
     },
@@ -214,6 +215,7 @@
       "modules": [
         "bounded-deterministic-event-trace",
         "bounded-deterministic-scheduler",
+        "bounded-elf64-load-plan",
         "bounded-system-resource-plan",
         "bounded-user-memory-transfer-plan",
         "fixed-bump-allocator",
@@ -278,10 +280,22 @@
       ]
     },
     {
+      "capability": "bounded-elf64-load-planning",
+      "modules": [
+        "bounded-elf64-load-plan"
+      ]
+    },
+    {
       "capability": "bounds",
       "modules": [
         "bounded-byte-reader",
         "checked-half-open-range"
+      ]
+    },
+    {
+      "capability": "bss",
+      "modules": [
+        "bounded-elf64-load-plan"
       ]
     },
     {
@@ -523,6 +537,12 @@
       ]
     },
     {
+      "capability": "elf64",
+      "modules": [
+        "bounded-elf64-load-plan"
+      ]
+    },
+    {
       "capability": "endian integer decode",
       "modules": [
         "endian-integer-codec"
@@ -545,6 +565,12 @@
       "modules": [
         "bounded-byte-reader",
         "endian-integer-codec"
+      ]
+    },
+    {
+      "capability": "entry",
+      "modules": [
+        "bounded-elf64-load-plan"
       ]
     },
     {
@@ -581,6 +607,12 @@
       "capability": "failure-atomic transition",
       "modules": [
         "state-machine"
+      ]
+    },
+    {
+      "capability": "failure-atomic-load-planning",
+      "modules": [
+        "bounded-elf64-load-plan"
       ]
     },
     {
@@ -1223,6 +1255,12 @@
       ]
     },
     {
+      "capability": "partial or policy-ambiguous elf load planning",
+      "modules": [
+        "bounded-elf64-load-plan"
+      ]
+    },
+    {
       "capability": "permission bits",
       "modules": [
         "bit-set"
@@ -1335,6 +1373,12 @@
       "capability": "protocols",
       "modules": [
         "validated-bit-flags"
+      ]
+    },
+    {
+      "capability": "pt_load",
+      "modules": [
+        "bounded-elf64-load-plan"
       ]
     },
     {
@@ -1505,6 +1549,18 @@
       "capability": "rollover",
       "modules": [
         "wrapping-sequence-number"
+      ]
+    },
+    {
+      "capability": "rv64",
+      "modules": [
+        "bounded-elf64-load-plan"
+      ]
+    },
+    {
+      "capability": "rv64-elf-acceptance",
+      "modules": [
+        "bounded-elf64-load-plan"
       ]
     },
     {
