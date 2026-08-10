@@ -243,6 +243,7 @@ pub fn build(b: *std.Build) void {
             freestanding_module.addImport("riscv-sv39-page-table-entry", findModule("riscv-sv39-page-table-entry", &modules));
             freestanding_module.addImport("riscv-sv39-page-table-builder", findModule("riscv-sv39-page-table-builder", &modules));
             freestanding_module.addImport("riscv-sfence-vma-invalidation", findModule("riscv-sfence-vma-invalidation", &modules));
+            freestanding_module.addImport("bounded-user-memory-transfer-plan", findModule("bounded-user-memory-transfer-plan", &modules));
             const freestanding = b.addExecutable(.{ .name = "morphic-freestanding-riscv64", .root_module = freestanding_module });
             freestanding.entry = .disabled;
             freestanding.root_module.strip = false;
