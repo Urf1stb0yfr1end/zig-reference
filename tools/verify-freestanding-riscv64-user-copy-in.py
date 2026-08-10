@@ -13,21 +13,13 @@ def elf_truth(path):
   if len(p)>=2 and p[-1] in names: found[p[-1]]=int(p[1],16)
  if set(found)!=set(names): raise RuntimeError("Batch 21B ELF symbols missing")
  return found
-def fields(raw):
- body=raw.split(BEGIN,1)[1].split(END,1)[0].strip(); d={}
- for line in body.splitlines():
-  if b"=" not in line: continue
-  k,v=line.split(b"=",1); k=k.decode(); v=v.decode()
-  if k in d: raise RuntimeError("duplicate evidence field")
-  d[k]=v
- return d
 def hx(d,k):
  if k not in d or not re.fullmatch(r"[0-9a-f]{16}",d[k]): raise RuntimeError("malformed "+k)
  return int(d[k],16)
 def parse(raw,truth):
  if raw.count(BEGIN)!=1 or raw.count(END)!=1 or raw.count(RETURNED)!=1: raise RuntimeError("wrong Batch 21B framing")
  if not(raw.find(prior.RETURNED)<raw.find(BEGIN)<raw.find(END)<raw.find(RETURNED)<raw.find(b"ZIGREF_MORPHIC_BEGIN")): raise RuntimeError("wrong Batch 21B order")
- old=prior.parse(raw, None); d=fields(raw); _, rows=prior.parse_fields(raw, BEGIN, END); _, old_rows=prior.parse_fields(raw, prior.BEGIN, prior.END)
+ old=prior.parse(raw, None); d, rows=prior.parse_fields(raw, BEGIN, END); _, old_rows=prior.parse_fields(raw, prior.BEGIN, prior.END)
  numeric=("user_code_va user_code_pa user_stack_va user_stack_pa satp_before satp_after root_physical physical_allocated_before physical_allocated_after page_table_count_before page_table_count_after template_begin service_ecall after_service terminal_ecall template_end payload_va payload_length segment_count segment_va segment_pa segment_request_offset segment_byte_count segment_coverage copied_length trap_count first_frame second_frame first_scause first_sepc first_sstatus second_scause second_sepc second_sstatus prepared_sstatus service_result post_return_marker terminal_marker return_count terminal_count stvec_after sscratch_after prepared_sepc final_u_leaves final_wx_leaves final_leaf_count").split()
  n={k:hx(d,k) for k in numeric}
  if (n['user_code_va'],n['user_stack_va'])!=(0x80401000,0x80402000) or (n['user_code_pa'],n['user_stack_pa'])!=(int(old['headers']['user_code_pa'],16),int(old['headers']['user_stack_pa'],16)): raise RuntimeError("user frame drift")
@@ -86,7 +78,7 @@ def main():
  q=shutil.which('qemu-system-riscv64')
  if not q: raise RuntimeError('qemu-system-riscv64 required')
  with tempfile.TemporaryDirectory() as p:
-  subprocess.run(['zig','build','install-freestanding-riscv64-morphic-runtime','--prefix',p],cwd=ROOT,check=True); art=Path(p)/'bin/morphic-freestanding-riscv64'; truth=elf_truth(art); cmd=[q,'-machine','virt','-nographic','-bios','default','-kernel',str(art)]; raws=[run(cmd,TIMEOUT) for _ in range(2)]; [parse(x,truth) for x in raws]; native=run(['zig','build','run-hosted-morphic-runtime']); fake=run(['zig','build','run-fake-morphic-runtime']); payload=[prior.perm.morphic.extract(x) for x in raws]
+  subprocess.run(['zig','build','install-freestanding-riscv64-morphic-runtime','--prefix',p],cwd=ROOT,check=True); art=Path(p)/'bin/morphic-freestanding-riscv64'; truth=elf_truth(art); cmd=[q,'-machine','virt','-nographic','-bios','default','-kernel',str(art)]; raws=[run(cmd,TIMEOUT) for _ in range(2)]; [parse(x,truth) for x in raws]; native=run(['zig','build','run-hosted-morphic-runtime']); fake=run(['zig','build','run-fake-morphic-runtime']); payload=[prior.prior.perm.morphic.extract(x) for x in raws]
   if not(native==fake==payload[0]==payload[1]) or len(native)!=765: raise RuntimeError('Morphic equality drift')
  print('PASS: Batch 21B runs=2 traps=2 U=2 W+X=0 Morphic=765')
  return 0

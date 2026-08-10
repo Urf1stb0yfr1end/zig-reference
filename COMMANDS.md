@@ -359,3 +359,5 @@ python3 tools/verify-freestanding-riscv64-user-copy-in.py
 ```
 
 The self-test mutation-checks the strict Batch 21B evidence parser. The full command builds the freestanding ELF, derives copied user-probe locations from its symbols, runs two independent `qemu-system-riscv64` machines, preserves the Batch 20 proof chain, and checks exact 765-byte Morphic equality.
+
+Batch 21B repair validation executed both the rejection self-test and full two-machine QEMU verifier successfully under Zig 0.14.0, proving two traps per machine, U=2, W+X=0, and exact 765-byte Morphic equality; the complete repository validation also passed 326/326 build steps and 216/216 tests.

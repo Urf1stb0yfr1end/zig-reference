@@ -161,8 +161,10 @@ var copy_terminal_marker: usize = 0;
 var copy_return_count: usize = 0;
 var copy_terminal_count: usize = 0;
 
-export fn userCopyInProbeTemplateBegin() linksection(".text.user_copy_probe") callconv(.naked) void {
+export fn userCopyInProbeContainer() linksection(".text.user_copy_probe") callconv(.naked) void {
     asm volatile (
+        \\.global userCopyInProbeTemplateBegin
+        \\userCopyInProbeTemplateBegin:
         \\addi sp, sp, -48
         \\li t0, 0x726573752d67697a
         \\sd t0, 0(sp)
@@ -194,6 +196,7 @@ export fn userCopyInProbeTemplateBegin() linksection(".text.user_copy_probe") ca
         \\userCopyInProbeTemplateEnd:
     );
 }
+extern var userCopyInProbeTemplateBegin: u8;
 extern var userCopyInProbeServiceEcall: u8;
 extern var userCopyInProbeAfterService: u8;
 extern var userCopyInProbeTerminalEcall: u8;
@@ -413,6 +416,13 @@ fn recordUserCopyTrap(frame: *TrapFrame) void {
         frame.x[10] = copy_result;
         frame.sepc = user_code_va + @intFromPtr(&userCopyInProbeAfterService) - begin;
         copy_prepared_sepc = frame.sepc;
+        // The first-trap assembly restores registers directly and intentionally
+        // does not reload TrapFrame.sepc, so apply the prepared continuation to
+        // the live CSR before returning through SRET.
+        asm volatile ("csrw sepc, %[value]"
+            :
+            : [value] "r" (copy_prepared_sepc),
+        );
         frame.sstatus &= ~@as(usize, 0x40122);
         copy_prepared_sstatus = frame.sstatus;
         copy_return_count += 1;
@@ -1638,7 +1648,7 @@ export fn freestandingMain() callconv(.c) noreturn {
     asm volatile ("mv a2, %[trap_stack]; li a0, 0x80401000; li a1, 0x80403000; call enterUserService"
         :
         : [trap_stack] "r" (trap_end),
-        : "memory"
+        : "memory", "ra", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "t0", "t1", "t2", "t3", "t4", "t5", "t6"
     );
     asm volatile ("csrw stvec, %[entry]; csrw sscratch, zero"
         :
@@ -1840,7 +1850,7 @@ export fn freestandingMain() callconv(.c) noreturn {
     asm volatile ("mv a2, %[trap_stack]; li a0, 0x80401000; li a1, 0x80403000; call enterUserService"
         :
         : [trap_stack] "r" (trap_end),
-        : "memory"
+        : "memory", "ra", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "t0", "t1", "t2", "t3", "t4", "t5", "t6"
     );
     copy_active = false;
     asm volatile ("csrw stvec, %[entry]; csrw sscratch, zero"
