@@ -1143,3 +1143,262 @@ missing external truth     → explicit UNKNOWN / BLOCKED
 ```
 
 A mature Foundation should reduce its Reconstruction Escape Rate by deliberately incorporating legally and technically appropriate external truth, but it must never fabricate that truth merely to make a reconstruction appear complete.
+
+---
+
+# Recursive Development and Re-Embodiment Vocabulary
+
+The following terms describe the project's long-horizon model for transferring validated engineering knowledge across compiler generations, programming languages, machine architectures, and recursively tested system generations. They are design terms and future targets unless a specific report records corresponding mechanical evidence.
+
+See `docs/concepts/RECURSIVE_SUCCESSOR_QUALIFICATION_AND_KNOWLEDGE_TRANSFER.md` for the fuller design argument.
+
+## Conceptual Parallelization
+
+Dividing a large engineering transformation into workstreams according to semantic responsibility and dependency boundaries rather than arbitrary file ownership.
+
+Typical workstreams might include primitives, tooling, kernel code, architecture-specific mechanisms, compatibility surfaces, or validation infrastructure.
+
+The purpose is to let multiple agents discover and repair independently where independence is real while preserving a common final evidence standard.
+
+Example:
+
+```text
+         Zig 1.0 migration
+                │
+    ┌───────────┼───────────┐
+    ↓           ↓           ↓
+ primitives   tooling     kernel code
+    │           │           │
+    └───────────┼───────────┘
+                ↓
+          integration
+                ↓
+          QEMU proofs
+                ↓
+      validate-repository
+```
+
+Conceptual Parallelization is not permission to merge independent plausible outputs without integration evidence.
+
+## Serialized Truth
+
+The principle that discovery, implementation, and repair may proceed in parallel, but the final system claim must converge through one explicit validation and evidence closure.
+
+Project shorthand:
+
+> **Parallelize discovery and repair. Serialize truth.**
+
+Serialized Truth prevents multi-agent throughput from weakening claim discipline. Parallel branches may disagree, fail, or explore alternatives; the promoted result must still pass the declared common proof boundary.
+
+## Re-Embodiment
+
+Reconstructing an already-understood capability or system in a different implementation substrate while preserving its required semantic contracts and re-establishing the appropriate evidence.
+
+Possible changes of embodiment include:
+
+- Zig 0.14 → a later Zig generation;
+- Zig → Rust or another language;
+- RV64 → AArch64 or another architecture;
+- one runtime or kernel substrate → another compatible substrate.
+
+Re-Embodiment differs from textual translation. The preserved object is the engineering meaning, not the original syntax.
+
+Conceptually:
+
+```text
+canonical semantics
+      │
+  ┌───┴───┐
+  ↓       ↓
+old       new
+embodiment embodiment
+  │       │
+  └───┬───┘
+      ↓
+shared or equivalent evidence
+```
+
+A Re-Embodiment claim requires explicit identification of which contracts transfer unchanged, which mechanisms are replaced, and which evidence must be re-earned.
+
+## Semantic Transfer
+
+The preservation and reuse of engineering meaning across an implementation boundary such as a language migration, architecture port, compiler transition, or subsystem replacement.
+
+Semantic Transfer is successful when a future implementation can be constructed from canonical capability knowledge and validated against the required behavior without depending primarily on line-for-line imitation of the old source.
+
+The strongest form is:
+
+> **Preserve what solved means so thoroughly that the solution can be re-embodied somewhere else.**
+
+Semantic Transfer is one mechanism by which the Foundation can outlive its first implementation language.
+
+## Recursive Successor Qualification
+
+A development process in which a trusted system generation constructs or receives a candidate successor, executes that successor in a controlled environment, interrogates its behavior, compares it against declared references or invariants, and decides whether the candidate satisfies the qualification boundary required for promotion.
+
+The defining statement is:
+
+> **A trusted generation of the system can construct, execute, interrogate, compare, and qualify its successor before handing control to it.**
+
+Conceptually:
+
+```text
+trusted N
+   ↓
+build or receive N+1
+   ↓
+execute N+1 recursively
+   ↓
+challenge invariants and workloads
+   ↓
+compare required observations
+   ↓
+qualification closure
+   ↓
+promote or reject
+```
+
+Recursive Successor Qualification is stronger than ordinary self-hosting. Building the successor is not sufficient; the predecessor participates in establishing whether the successor is fit to become the next trusted baseline.
+
+## Qualification Boundary
+
+The explicit set of evidence that separates a merely existing candidate from a candidate eligible for promotion.
+
+The central distinction is:
+
+```text
+candidate exists
+≠
+candidate is trusted
+```
+
+A Qualification Boundary may include focused module validation, machine invariants, compatibility tests, resource-conservation checks, real workloads, differential tests, direct-boot evidence, or other milestone-specific proof.
+
+The boundary must be declared rather than inferred from a successful build.
+
+## Successor Trust Ratchet
+
+The monotonic development pattern created when each trusted generation qualifies the next generation before promotion.
+
+Conceptually:
+
+```text
+N trusted
+→ N+1 tested under N
+→ N+1 qualified
+→ N+1 promoted
+→ N+1 tests N+2
+```
+
+The ratchet does not claim that later generations are bug-free or universally more correct. It means the project preserves a declared minimum qualification boundary across promotion and retains a known predecessor while the candidate is being evaluated.
+
+A broken candidate therefore does not automatically become the new baseline merely because it is newer.
+
+## Recursive Differential Laboratory
+
+A self-hosted or recursively hosted test environment in which a candidate implementation and an independent reference implementation execute the same controlled workload and their observable behavior is compared.
+
+For a Linux-compatibility direction, a mature form could be:
+
+```text
+                  Alpz host
+                     │
+             ┌───────┴───────┐
+             ↓               ↓
+         golden Linux    Alpz candidate
+             │               │
+             └───────┬───────┘
+                     ↓
+              same test/workload
+                     ↓
+              compare behavior
+                     ↓
+                minimize delta
+                     ↓
+              permanent test
+```
+
+The purpose is to turn compatibility disagreement into reusable engineering knowledge rather than treating the reference implementation as an oracle for unrelated internal design choices.
+
+## Self-Hosted Development Closure
+
+The condition in which a declared build-and-validation loop for a system can be completed inside that system's own usable environment without an undocumented dependence on the former development host.
+
+For Alpz, a possible future form is:
+
+```text
+Alpz
+ ↓
+Alpine userspace
+ ↓
+Zig toolchain
+ ↓
+build candidate Alpz
+ ↓
+QEMU or VMM
+ ↓
+execute candidate
+ ↓
+qualification checks
+```
+
+Self-Hosted Development Closure is always relative to explicit bootstrap assumptions and a declared validation scope. It does not mean that external recovery, independent reproduction, hardware testing, or reference systems cease to be useful.
+
+## Promotion Proof
+
+The final evidence required to move a recursively tested candidate from candidate status to trusted-baseline status.
+
+A Promotion Proof should be stronger than "the candidate passed inside the predecessor" when the target is direct deployment. It may require both recursive qualification and a final direct-boot or target-environment validation closure.
+
+Conceptually:
+
+```text
+recursive candidate PASS
+        ↓
+direct target boot
+        ↓
+required promotion checks
+        ↓
+trusted baseline
+```
+
+The exact Promotion Proof is milestone-specific and must be recorded rather than assumed.
+
+## Recursive Knowledge Return
+
+The act of returning discoveries made while constructing or qualifying a successor to the canonical Foundation as reusable contracts, tests, diagnostics, recipes, proof relations, or other Agent Footholds.
+
+The desired loop is:
+
+```text
+candidate pressure
+→ discover missing rule
+→ repair
+→ canonicalize rule
+→ validate
+→ Foundation becomes stronger
+→ next successor begins with that knowledge
+```
+
+Recursive Knowledge Return is what prevents recursive development from becoming repeated trial-and-error. The successor inherits not only the predecessor's code but the knowledge gained while proving the successor.
+
+## Regenerative Engineering Substrate
+
+A repository and execution environment whose accumulated contracts, proofs, diagnostics, reusable capabilities, and recursive test machinery make it progressively cheaper to construct and qualify later implementations.
+
+A Regenerative Engineering Substrate does not imply autonomous model self-improvement. The improvement occurs in the external engineering environment available to future agents.
+
+Its characteristic cycle is:
+
+```text
+preserve knowledge
+→ construct successor
+→ challenge successor
+→ learn from failures
+→ canonicalize learning
+→ qualify successor
+→ promote successor
+→ repeat from a stronger base
+```
+
+The long-horizon benefit is that successful engineering can survive the agent that discovered it, the language that first expressed it, and eventually the system generation that first proved it.
