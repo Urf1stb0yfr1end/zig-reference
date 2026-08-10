@@ -1,191 +1,345 @@
-AGENTIC SNOWBALL BATCH 23
+CODEX AGENTIC SNOWBALL — BATCH 23
 FIRST WRITABLE RV64 USERSPACE ELF DATA + BSS MACHINE PROOF
 
-BASELINE
+Repository:
+thanks-cohn/zig-reference
 
-Start from current main after the merged Batch 22B milestone:
+Plan path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_23_FIRST_WRITABLE_RV64_USERSPACE_ELF_DATA_BSS.txt
+
+MISSION
+
+Batch 22A settled bounded RV64 ELF interpretation/load planning.
+Batch 22B proved the first actual separately built RV64 userspace ELF executes from LoadPlan.e_entry in real U-mode under strict two-QEMU evidence.
+
+Batch 23 must preserve those facts and prove exactly one new process-image capability:
+
+real two-PT_LOAD RV64 ET_EXEC ELF
+→ existing bounded-elf64-load-plan
+→ exact R-X code load
+→ exact initialized RW data load
+→ exact planner-declared BSS zero-fill
+→ exact U R-X and U RW/NX mappings
+→ planner-derived e_entry
+→ real U-mode observation of initialized data
+→ real U-mode observation of zero BSS
+→ bounded mutation of writable ELF storage
+→ deliberate U-mode ECALL
+→ trusted supervisor trap/return
+→ supervisor observation of the mutation in the actual mapped physical storage
+→ strict two-QEMU agreement
+→ complete repository validation
+
+The decisive new fact is:
+
+Alpz can load and execute a real RV64 userspace ELF whose process image contains executable code plus genuinely writable initialized data and non-empty BSS, while preserving exact permissions and proving the copied, zeroed, and mutated bytes mechanically.
+
+This is a bounded process-image milestone. It is not Linux userspace ABI work.
+
+Do not begin Batch 24.
+
+CURRENT BASELINE
+
+The canonical merged Batch 22B milestone is:
 
 5221e9cac8316462d459ef426ec1da3a84519c6c
 
-Batch 22B is settled truth. It proved one separately built real RV64 ET_EXEC userspace ELF with one R-X PT_LOAD can be consumed by bounded-elf64-load-plan, copied exactly into the existing allocator-owned U RX frame, FENCE.I'd, entered from LoadPlan.e_entry in real U-mode, and returned through the trusted supervisor ECALL boundary under two independent real QEMU runs while preserving resource, SATP, PTE, U=2, W+X=0, and Morphic invariants.
+Batch 22B settled the following truths:
 
-Do not reopen Batch 22A ELF interpretation policy.
+- one separately built real RV64 ET_EXEC ELF;
+- one R-X PT_LOAD;
+- exact planner-selected byte loading;
+- direct loaded-byte comparison, with digest only as supporting evidence;
+- FENCE.I before execution of changed instruction bytes;
+- U-mode entry from LoadPlan.e_entry;
+- deliberate U-mode ECALL and trusted supervisor return;
+- two independent real qemu-system-riscv64 runs;
+- U=2 and W+X=0 at that milestone;
+- Morphic equality remained 765 bytes;
+- complete repository validation passed.
+
+Treat checked-out HEAD as truth.
+
+The repository may contain documentation or plan commits newer than the historical Batch 22B merge. Before changing source:
+
+1. record git rev-parse HEAD;
+2. record git status --short --branch;
+3. inspect the delta from 5221e9cac8316462d459ef426ec1da3a84519c6c to HEAD;
+4. preserve compatible newer work;
+5. never reset or discard newer repository work merely to recreate the historical baseline.
+
+Do not reopen Batch 22A ELF policy merely because Batch 23 needs a richer fixture.
 Do not weaken Batch 22B proof relationships.
-Do not begin Linux ABI work, argc/argv/envp/auxv, dynamic linking, process creation, VFS, mmap/brk, BusyBox, Alpine, QEMU hosting, KVM, or Batch 24.
 
-GOAL
+READ / QUERY BEFORE IMPLEMENTATION
 
-Prove the next smallest process-image fact:
+At minimum inspect the current equivalents of:
 
-A separately built real RV64 ET_EXEC userspace ELF containing a deliberately bounded writable PT_LOAD with initialized data and a non-empty BSS tail can be planned by the existing bounded-elf64-load-plan, loaded into allocator-owned user memory, initialized exactly from ELF file bytes, zero-filled exactly according to the planner, mapped with the exact planned non-executable writable permissions, observed and mutated by real U-mode code, and returned through the already-proven trusted supervisor boundary under strict real-QEMU evidence.
+- AGENTS.md
+- COMMANDS.md
+- docs/standards/SNOWBALL_YIELD.md
+- docs/roadmaps/ALPZ_TO_ALPINE_QEMU_KVM_AND_BEYOND.md
+- docs/roadmaps/SELF_HOSTED_RECURSIVE_ABI_LAB.md
+- docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_22A_BOUNDED_RV64_USERSPACE_ELF_LOAD_PLAN.txt
+- docs/reports/AGENTIC_SNOWBALL_BATCH_22A.md
+- docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_22B_FIRST_REAL_RV64_USERSPACE_ELF_EXECUTION.txt
+- docs/reports/AGENTIC_SNOWBALL_BATCH_22B.md
+- projects/54-bounded-elf64-load-plan/DETAILS.md
+- projects/54-bounded-elf64-load-plan/details.json
+- projects/53-bounded-user-memory-transfer-plan/DETAILS.md
+- projects/44-riscv-sv39-page-table-entry/DETAILS.md
+- projects/47-riscv-sv39-page-table-walker/DETAILS.md
+- projects/48-riscv-sfence-vma-invalidation/DETAILS.md
+- projects/49-riscv-sv39-page-table-builder/DETAILS.md
+- recipes/run-hosted-morphic-runtime/README.md
+- recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig
+- tools/verify-freestanding-riscv64-userspace-elf.py
 
-The central new truth for Batch 23 must be:
+Inspect older Batch 19–21 reports/verifiers only as needed to preserve inherited machine-boundary and resource proofs. Do not rewrite historical milestones.
 
-- planner-selected initialized writable bytes are copied exactly;
-- planner-declared BSS bytes are zero before U-mode observes them;
-- the writable segment is represented by an exact U RW/NX mapping rather than permission widening;
-- real U-mode code reads the initialized data, observes zeroed BSS, writes a bounded value into that writable segment, then ECALLs back;
-- supervisor evidence proves the expected post-U-mode mutation occurred in the same mapped physical storage;
-- the existing executable ELF proof remains intact.
+ZERO-CONTEXT AGENT WORKFLOW
 
-SCOPE BOUNDARY
+Before broad source archaeology run:
 
-Prefer the smallest architecture that proves the fact.
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+python3 tools/query-reference.py agent preflight bounded-elf64-load-plan
 
-A suitable target is one tiny separately built RV64 fixture with exactly:
+Then use agent decide/card/compose/impact as appropriate to inspect the smallest reusable closure for:
 
-- one R-X PT_LOAD containing code;
-- one RW- PT_LOAD containing initialized data plus a non-zero p_memsz - p_filesz BSS tail;
-- one entry point inside the executable segment;
+- ELF load planning;
+- physical-frame ownership;
+- current user virtual-memory geometry;
+- Sv39 mapping/build/walk truth;
+- exact permission encoding;
+- trusted U-mode entry and U→S trap path;
+- user-memory transfer primitives;
+- Batch 22B strict machine verification.
+
+Freeze a requirement/capability map before implementation as required by Snowball Yield.
+
+Classify each requirement as:
+
+1. already solved reusable capability;
+2. small project-specific orchestration;
+3. genuinely missing reusable capability;
+4. deliberately deferred work.
+
+If a genuinely reusable lower-level capability is missing, classify it before implementing the dependent orchestration. Do not terminate the entire run merely because classification is required. If the capability is small, general, necessary, and genuinely within Batch 23, implement it canonically with its normal contract/tests/evidence and continue. If satisfying it would cause a real scope explosion, preserve all reviewable work, report the exact blocker, and still perform the mandatory final handoff below.
+
+FOCUSED PRE-CHANGE GATES
+
+Before modifying source run at minimum:
+
+- git rev-parse HEAD
+- git status --short --branch
+- zig version
+- qemu-system-riscv64 --version when available
+- python3 tools/query-reference.py agent doctor
+- zig build test-bounded-elf64-load-plan
+- zig build smoke-bounded-elf64-load-plan
+- python3 tools/verify-freestanding-riscv64-userspace-elf.py --self-test
+
+If a focused baseline fails, diagnose before relying on it.
+
+Do not run expensive historical machine labs as ceremony. Run them when they protect an inherited proof relationship or when the Batch 23 verifier composes them directly.
+
+STRICT SCOPE
+
+Prefer the smallest architecture that proves writable ELF data and BSS truth.
+
+The target fixture should be one tiny separately built RV64 ELF64 little-endian ET_EXEC containing exactly the required process-image shape:
+
+- one R-X PT_LOAD containing executable guest code;
+- one RW- PT_LOAD containing initialized data;
+- writable p_memsz greater than writable p_filesz;
+- therefore a non-zero BSS tail;
+- one e_entry inside the executable PT_LOAD;
 - no PT_INTERP;
 - no dynamic linking;
-- no relocations;
+- no runtime relocations;
 - no TLS;
 - no shared-library semantics;
-- no stack-construction ABI;
+- no initial Linux process-stack ABI;
 - no libc;
-- no syscalls beyond the already-proven deliberate ECALL boundary.
+- no Linux syscall ABI.
 
-If the existing Batch 22A planner currently admits this shape without semantic change, consume it unchanged.
+The deliberate ECALL remains a proof signal into the already-proven trusted supervisor path, not a Linux syscall.
 
-If a genuinely reusable lower-level capability is missing, stop and classify it using the Agent Fast Path before adding project-specific code. Add a new reusable module only if the missing capability is truly general and not simply Batch 23 orchestration.
+Do not add general process objects, execve, VFS, mmap/brk, argv/envp/auxv, signals, futexes, threads, BusyBox, Alpine, QEMU hosting, KVM, or hardware virtualization.
 
-REUSE REQUIREMENT
+USE THE EXISTING ELF PLAN AS AUTHORITY
 
-Use the existing repository primitives and Batch 22B machine composition as authoritative inputs. In particular:
+The kernel-side path must feed the exact emitted guest ELF bytes to bounded-elf64-load-plan.
 
-- bounded-elf64-load-plan is the sole ELF acceptance/planning authority;
-- existing allocator-owned physical memory machinery remains authoritative;
-- existing Sv39 page-table entry/builder/walker machinery remains authoritative;
-- existing typed memory address primitives remain authoritative;
-- existing trusted S-to-U-to-S trap/ECALL path remains authoritative;
-- existing user-memory transfer primitives should be reused where their contract truthfully fits;
-- Batch 22B executable-segment proof must remain preserved rather than rewritten.
+Do not manually reparse or independently derive a second policy for:
 
-Do not duplicate ELF parsing or silently derive a second loader policy in recipe code.
+- e_entry;
+- PT_LOAD admission;
+- p_offset;
+- p_vaddr;
+- p_filesz;
+- p_memsz;
+- segment permissions;
+- alignment;
+- zero-fill count.
 
-MACHINE IMAGE REQUIREMENT
+Use the returned LoadPlan as the machine-orchestration authority for those facts.
 
-The new fixture must make the writable-segment facts independently inspectable.
+If module 54 already admits the intended two-PT_LOAD image, consume it unchanged.
 
-The verifier must independently parse or inspect the emitted ELF strongly enough to establish at least:
+If the intended fixture exposes a genuine bug or missing general semantic rule in module 54, repair that canonical module only when the repair is generally correct, add focused tests, regenerate its evidence, and then continue Batch 23. Do not fork ELF policy inside recipe code.
 
-- exact artifact identity used by the kernel build;
+REAL GUEST ELF ARTIFACT
+
+The guest must remain a separately built real ELF artifact, distinct from the Alpz kernel ELF.
+
+It must not be:
+
+- a hand-authored instruction/data byte array inside the kernel;
+- the historical probe with decorative ELF metadata;
+- a copied slice of kernel text/data;
+- an opaque runtime structure merely labeled as ELF.
+
+Prefer source plus deterministic linker/build rules under existing fixture/build conventions.
+
+The exact artifact inspected by the external verifier must be the artifact embedded or otherwise consumed by the kernel build. Make artifact divergence mechanically difficult.
+
+The verifier must independently establish from the emitted artifact at least:
+
+- ELF identity/class/endian/machine/type;
 - PT_LOAD count and ordering;
-- executable segment source/memory ranges and R-X permissions;
-- writable segment source/memory ranges and RW- permissions;
-- writable p_filesz;
-- writable p_memsz;
-- exact non-zero BSS length = p_memsz - p_filesz;
-- e_entry and its relationship to the executable segment.
+- R-X segment source range, virtual range, sizes, permissions, alignment;
+- RW- segment source range, virtual range, p_filesz, p_memsz, permissions, alignment;
+- exact BSS length = writable p_memsz - writable p_filesz;
+- BSS length > 0;
+- e_entry and its containment in the executable segment.
 
-Do not trust only kernel-emitted claims for ELF structure.
+Do not trust only kernel-emitted text for ELF structure.
 
-LOAD REQUIREMENT
+MACHINE MEMORY / MAPPING REQUIREMENT
 
-The kernel-side orchestration must consume the LoadPlan and perform only the machine operations implied by that plan.
+Preserve the Batch 22B executable proof wherever truthful.
 
-For the executable segment, preserve the exact Batch 22B source-byte-to-loaded-byte proof and FENCE.I behavior.
+For the R-X segment:
 
-For the writable segment:
+- preserve exact planner-selected source-byte loading;
+- preserve direct source-to-loaded byte comparison;
+- preserve U R-X and not-writable mapping truth;
+- execute FENCE.I after changing executable bytes and before entering them;
+- do not emit SFENCE.VMA unless translation state actually changed.
 
-1. allocate or reuse bounded allocator-owned physical storage that is explicitly accounted for;
-2. establish an exact U RW/NX mapping for the planned virtual range;
-3. copy exactly the planner-selected initialized file bytes into the intended destination;
-4. directly compare every copied initialized source byte against the volatile loaded destination byte;
+For the RW- segment:
+
+1. allocate or reuse bounded allocator-owned physical storage with explicit ownership/accounting;
+2. establish an exact U RW/NX mapping covering the planned writable memory range;
+3. copy exactly the planner-selected initialized file bytes;
+4. directly compare every initialized source byte with its volatile loaded destination byte;
 5. zero exactly the planner-declared BSS tail;
-6. directly verify every BSS destination byte is zero before U-mode entry;
-7. do not execute FENCE.I merely for writable non-executable data unless an existing contract requires it for a truthful reason;
-8. perform SFENCE.VMA only if page-table translation state actually changed and report that truth precisely.
+6. directly establish that the bounded BSS region under proof is zero before U-mode entry;
+7. do not execute FENCE.I merely because non-executable data changed;
+8. execute SFENCE.VMA only when required by a real translation change and report that fact precisely.
 
-Do not collapse p_memsz to p_filesz.
-Do not treat a digest as an exact-copy proof.
-Do not widen writable data to executable.
-Do not widen permissions to make the fixture convenient.
+Never collapse p_memsz to p_filesz.
+Never use a checksum as a substitute for exact byte comparison.
+Never widen RW data to executable.
+Never make an executable user mapping writable for loader convenience.
+Never claim unchanged resource counts if a new data frame or page-table page was actually introduced.
 
-U-MODE BEHAVIOR REQUIREMENT
+Choose the smallest non-overlapping user virtual layout compatible with current HEAD. Reuse existing page-table levels when truthful, but do not contort the proof merely to preserve an old count.
 
-The guest program must make the new proof observable through real execution.
+U-MODE BEHAVIOR
 
-It should, using deliberately simple fixed operations:
+The guest must make the new process-image facts observable through real execution.
 
-- load a known initialized value from the writable PT_LOAD;
-- confirm the expected initialized value;
-- load one or more bytes/words from the BSS tail and confirm they are zero;
-- write a distinctive bounded marker into the writable segment or BSS;
-- place unique Batch 23 register markers into a small fixed set of registers;
+Use a deliberately tiny deterministic sequence. At minimum the guest must:
+
+- load a known initialized value from the RW PT_LOAD;
+- establish that it equals the expected fixture constant;
+- read a bounded location in the BSS tail and establish it is zero;
+- write a distinctive Batch 23 value into writable mapped storage, preferably into the BSS location just proved zero;
+- establish a small fixed set of unique Batch 23 register markers;
 - issue the deliberate ECALL;
-- rely on the existing trusted supervisor trap path.
+- fail-stop if execution unexpectedly resumes in a path that should not occur.
 
-Avoid introducing a general userspace runtime or ABI. The fixture exists only to prove process-image writable-data/BSS behavior.
+Do not introduce a general userspace runtime merely for the fixture.
 
 SUPERVISOR RETURN PROOF
 
-After the ECALL returns to supervisor code, prove at least:
+After the guest ECALL mechanically prove at least:
 
-- cause is the expected U-mode ECALL;
-- trap PC belongs to the independently reconstructed executable segment;
-- expected register markers survived in the trusted trap frame;
-- initialized data had the expected value before guest mutation;
-- BSS was zero before guest mutation;
-- the guest's expected bounded write is visible in the mapped writable physical storage afterward;
+- trap cause is U-mode ECALL;
+- trap status proves expected prior privilege;
+- trap PC belongs to the independently reconstructed executable segment and has the expected relation to e_entry/guest instructions;
+- expected Batch 23 register markers are present in the trusted trap frame;
+- the initialized value used by the guest came from the ELF-loaded RW storage;
+- the selected BSS location was zero before guest execution;
+- the guest's distinctive write is visible after return in the same allocator-owned physical storage backing the RW user mapping;
 - executable segment bytes remain unchanged;
-- writable PTE is U RW/NX;
 - executable PTE is U R-X and not writable;
+- writable PTE is U RW/NX;
 - W+X leaf count remains zero;
 - SATP/root truth remains coherent;
-- allocator/page-table accounting matches the deliberately introduced resources;
-- no unrelated translation or permission drift occurred;
+- allocator and page-table accounting matches deliberately introduced resources;
+- no unrelated translation/permission drift occurred;
 - supervisor continuation is reached.
 
 RESOURCE ACCOUNTING
 
-Batch 23 may require one additional user physical frame and possibly page-table resources depending on the selected virtual layout.
+Batch 23 may legitimately require one additional user physical frame and possibly page-table resources depending on the chosen virtual layout.
 
-Do not hide this behind conservation claims copied from Batch 22B.
+Do not copy Batch 22B conservation numbers blindly.
 
-Instead establish exact before/after accounting and explain why every new frame/table exists. If the layout can reuse existing page-table levels without weakening the proof, do so. If an additional table page is required, account for it explicitly.
+Record exact before/after counts and explain every new frame/table. If current page-table levels can be reused, prove that. If a new table page is required, account for it explicitly.
 
-The verifier must reject fabricated evidence that claims unchanged counts when the real architecture necessarily changed them.
+The verifier must reject fabricated unchanged-count evidence when the machine architecture actually changed resource counts.
 
-STRICT VERIFIER
+STRICT BATCH 23 VERIFIER
 
-Add or evolve one canonical Batch 23 verifier. Prefer a new clearly named verifier if extending the Batch 22B verifier would blur milestone boundaries.
+Add a clearly named canonical Batch 23 verifier unless extending the Batch 22B verifier can preserve milestone clarity without weakening either interface.
 
-The verifier must support:
+It must provide:
 
 1. --self-test
-   - execute at least one real QEMU fixture if that remains repository convention;
-   - mutation-reject decisive Batch 23 relationships;
+   - execute at least one real QEMU fixture when repository convention/environment permits;
+   - mutation-reject decisive Batch 23 proof relationships;
    - reject false initialized-byte equality;
-   - reject false BSS-zero claims;
-   - reject wrong writable-segment permissions;
-   - reject wrong guest mutation value/address;
+   - reject false BSS-zero truth;
+   - reject wrong RW/NX permissions;
+   - reject wrong guest mutation address/value;
    - reject wrong entry/trap relationships;
-   - reject resource-accounting lies.
+   - reject resource-accounting lies;
+   - reject artifact/plan divergence.
 
 2. full invocation
+   - independently inspect the exact guest ELF;
    - run two independent real qemu-system-riscv64 machines;
-   - independently inspect the guest ELF;
-   - preserve the established Batch 22B proof chain;
-   - require exact agreement for the new writable-data/BSS relationships on both runs;
-   - preserve the existing Morphic equality proof unless Batch 23 truthfully and intentionally changes that artifact.
+   - preserve or strictly compose the established Batch 22B proof chain;
+   - require exact agreement for all new writable-data/BSS relationships on both runs;
+   - preserve Morphic equality unless Batch 23 truthfully and intentionally changes that artifact.
 
-Avoid timing-sensitive evidence ordering. Evidence framing must be deterministic and bounded.
+Evidence framing must be deterministic and bounded. Avoid timing-sensitive ordering.
 
 PROOF QUALITY
 
 Do not call digest equality exact byte equality.
-
 Where exact bytes matter, compare bytes directly.
-
-Where zero-fill matters, inspect the destination bytes directly before guest execution.
-
-Where post-execution mutation matters, inspect the actual mapped destination storage after return.
-
-Where permissions matter, derive them from actual page-table leaves rather than a textual claim.
-
+Where zero-fill matters, inspect destination memory before guest execution.
+Where post-execution mutation matters, inspect actual mapped destination storage after return.
+Where permissions matter, derive them from actual page-table leaves.
 Where ELF structure matters, derive it independently from the exact emitted artifact.
+Where resource counts matter, reconstruct them from actual allocator/page-table state.
+
+REGRESSION REQUIREMENT
+
+Batch 23 must not gain writable ELF support by silently breaking the Batch 22B milestone.
+
+At final validation, require either:
+
+- the existing Batch 22B strict self-test and full two-QEMU verifier still pass independently; or
+- the Batch 23 verifier demonstrably and strictly composes all decisive Batch 22B relationships, while the historical Batch 22B verifier itself remains runnable and unweakened.
+
+Prefer preserving the historical verifier unchanged unless a concrete repository-wide repair is necessary.
 
 VALIDATION
 
@@ -193,20 +347,22 @@ At minimum run and record:
 
 - python3 tools/query-reference.py agent bootstrap
 - python3 tools/query-reference.py agent doctor
-- the appropriate Agent Fast Path preflight for the composition if available
+- appropriate Agent Fast Path preflight/compose checks
 - zig build test-bounded-elf64-load-plan
 - zig build smoke-bounded-elf64-load-plan
-- Batch 22B strict verifier --self-test
-- Batch 22B strict full two-QEMU verifier, unless the new Batch 23 verifier strictly composes and proves that chain in a stronger way
+- python3 tools/verify-freestanding-riscv64-userspace-elf.py --self-test
+- python3 tools/verify-freestanding-riscv64-userspace-elf.py
 - Batch 23 verifier --self-test
 - Batch 23 full two-QEMU verifier
 - zig build check
 - PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
 - python3 tools/developer-command.py validate-repository
 
+If a newer canonical command at checked-out HEAD supersedes one listed above, use the current canonical equivalent and state the substitution.
+
 Repair in-scope failures rather than merely reporting them.
 
-All generated indexes, validation evidence, command references, reports, and recipe metadata affected by the change must be regenerated and checked before completion.
+Regenerate and check every affected generated index, dependency view, validation-evidence record, command reference, recipe metadata file, and report before completion.
 
 REPORT
 
@@ -218,29 +374,33 @@ The report must state exactly:
 
 - starting revision;
 - requirement/capability map;
-- what existing modules/compositions were reused;
-- whether any reusable capability was genuinely missing;
-- exact ELF fixture shape;
-- exact writable initialized-byte and BSS relationships;
+- existing modules/compositions actually reused;
+- any genuinely missing reusable capability and how it was handled;
+- exact guest ELF fixture shape;
+- exact executable and writable PT_LOAD relationships;
+- exact initialized-byte relationship;
+- exact non-zero BSS relationship;
 - exact mapping/resource changes;
 - exact U-mode behavior proved;
-- strict one-QEMU/self-test result;
-- strict two-QEMU result;
+- exact post-return mutation proof;
+- Batch 22B regression result;
+- Batch 23 self-test result;
+- Batch 23 strict two-QEMU result;
 - complete repository validation result;
 - Snowball Yield accounting;
 - explicit nonclaims;
-- smallest next pressure.
+- smallest actionable next pressure.
 
 NONCLAIMS
 
-Batch 23 must not claim any of the following unless independently introduced and proved, which is not requested here:
+Batch 23 must not claim:
 
 - Linux userspace ABI compatibility;
 - argc/argv/envp/auxv;
-- initial process stack ABI;
+- initial process-stack ABI;
 - arbitrary many-segment ELF loading;
 - relocations;
-- PIE;
+- PIE/ET_DYN process loading;
 - PT_INTERP;
 - dynamic linking;
 - libc or musl;
@@ -261,31 +421,79 @@ Batch 23 must not claim any of the following unless independently introduced and
 
 COMPLETION STANDARD
 
-Batch 23 is complete only when the repository can truthfully demonstrate this chain:
+A successful Batch 23 is complete only when the repository truthfully demonstrates:
 
 separately built real RV64 ET_EXEC ELF
-    -> independently inspected two-PT_LOAD image
-    -> existing bounded-elf64-load-plan
-    -> exact R-X code load
-    -> exact initialized RW data load
-    -> exact planner-declared BSS zero-fill
-    -> exact U R-X + U RW/NX mappings
-    -> FENCE.I for executable bytes
-    -> planner-derived e_entry
-    -> real U-mode execution
-    -> initialized-data observation
-    -> BSS-zero observation
-    -> bounded U-mode writable-data mutation
-    -> deliberate U-mode ECALL
-    -> trusted supervisor trap frame
-    -> supervisor observes expected mutation in actual mapped storage
-    -> strict two-QEMU agreement
-    -> full repository validation PASS
+    → independently inspected two-PT_LOAD image
+    → existing bounded-elf64-load-plan
+    → exact R-X code load
+    → exact initialized RW data load
+    → exact planner-declared non-empty BSS zero-fill
+    → exact U R-X + U RW/NX mappings
+    → FENCE.I for changed executable bytes
+    → planner-derived e_entry
+    → real U-mode execution
+    → initialized-data observation
+    → BSS-zero observation
+    → bounded U-mode writable-data mutation
+    → deliberate U-mode ECALL
+    → trusted supervisor trap frame
+    → supervisor observes expected mutation in actual mapped storage
+    → inherited Batch 22B proof remains valid
+    → strict two-QEMU agreement
+    → full repository validation PASS
 
-The run must leave the repository in a clean, reviewable, committed state on its working branch.
+SOURCE CONTROL / PR REQUIREMENT
 
-At the end, produce the repository's normal completion output: concise implementation summary, exact proof statements, explicit nonclaims, complete validation results, Snowball Yield, LOCATIONS, and MINIMUS handoff with an actionable next pressure.
+The run is not finished merely because implementation or tests are done.
 
-Do not stop after merely producing code.
-Do not stop before the usual final completion output.
+For a successful Batch 23:
+
+1. leave the working tree reviewable and free of accidental generated/binary junk;
+2. commit all intended Batch 23 changes on the working branch;
+3. push that branch to origin;
+4. create a pull request targeting main, or update the existing Batch 23 pull request if one already exists;
+5. give the exact branch name, final commit SHA, PR number, and PR URL in the final output;
+6. ensure the PR body describes actual evidence and does not claim validations that did not pass.
+
+If authentication, repository permissions, GitHub availability, or tooling prevents PR creation after the branch is successfully committed/pushed, do NOT silently stop. State the exact reason, give the branch and commit SHA, and provide the exact PR handoff needed for a human to finish it. PR creation is the expected outcome whenever the environment permits it.
+
+If a genuine technical blocker prevents successful Batch 23 completion, preserve all useful reviewable work. Commit/push only if doing so accurately represents a coherent partial state and does not masquerade as a completed milestone. If a draft/blocker PR is appropriate and tooling permits it, create one clearly marked as incomplete. In every case, produce the mandatory final handoff below.
+
+MANDATORY FINAL OUTPUT — NEVER SILENTLY STOP
+
+This requirement applies whether the batch PASSES, FAILS validation, is BLOCKED by the environment, or cannot create the PR.
+
+Do not end immediately after code generation.
+Do not end immediately after a compiler/test/QEMU failure.
+Do not end immediately after a long-running validation command.
+Do not end after commit or push without reporting the result.
+Do not disappear after spending the execution budget.
+
+Before stopping, ALWAYS emit a normal final completion/handoff message containing:
+
+- final status: PASS, PARTIAL, or BLOCKED;
+- concise implementation summary;
+- exact new proof statements actually established;
+- exact validations run and their PASS/FAIL/BLOCKED results;
+- any failures and the narrowest known cause;
+- explicit nonclaims;
+- Snowball Yield;
+- LOCATIONS;
+- MINIMUS handoff;
+- starting revision;
+- final commit SHA if a commit exists;
+- branch name;
+- push status;
+- PR number and URL if created/updated;
+- if no PR exists, the exact reason and next PR action;
+- exact remaining work, if any;
+- one actionable next pressure.
+
+Even if a tool command fails near the end, produce this handoff using the evidence already obtained.
+
+A long run with no final output is NOT an acceptable completion state.
+
+Only stop after producing this normal final output/handoff.
+
 Do not begin Batch 24.
