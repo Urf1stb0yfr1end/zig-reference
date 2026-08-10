@@ -1,0 +1,514 @@
+CODEX AGENTIC SNOWBALL — BATCH 22
+FIRST BOUNDED REAL RV64 USERSPACE ELF EXECUTION
+
+Repository:
+thanks-cohn/zig-reference
+
+Plan path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_22_FIRST_REAL_RV64_USERSPACE_ELF_EXECUTION.txt
+
+MISSION
+
+Cross the next smallest Alpz userspace boundary after Batch 21C:
+
+actual RV64 ELF file
+→ existing Z-Ref ELF64 file/program-header parsing
+→ bounded PT_LOAD validation
+→ truthful user mapping/copy preparation
+→ actual ELF e_entry
+→ real RISC-V U-mode instructions
+→ deliberate ECALL through the already-proven trusted U→S boundary
+→ known supervisor continuation
+→ unchanged previously-earned safety invariants
+→ unchanged canonical Morphic semantics
+
+The decisive new fact for Batch 22 is:
+
+Alpz executes an actual independently built RV64 ELF userspace artifact from its ELF entry point.
+
+Batch 22 must end the era in which the only userspace execution proof is a handcrafted instruction template copied directly out of the kernel image.
+
+This is Batch 22 only.
+
+Do NOT expand into a Linux syscall table, Linux errno/EFAULT semantics, argc/argv/envp/auxv completeness, PT_INTERP, dynamic linking, musl, processes, fork/clone/execve, VFS, file descriptors, mmap/brk, signals, futexes, threads, procfs/sysfs/devfs, networking, BusyBox, APK, Alpine boot, QEMU hosting, KVM, or general-purpose process management.
+
+The governing repository rule is the roadmap rule:
+
+take the smallest step that exposes the next missing behavior, then compress the discovery into permanent executable knowledge.
+
+CURRENT BASELINE
+
+Current merged main at plan creation:
+
+4d9e1eb445860030e84a32391d0ca0690530e7c5
+
+Merge pull request #43 — Batch 21C planner-backed user copy-OUT, permission rejection, later-page atomic rejection, and strict verifier.
+
+Batch 21 is now mechanically complete for its narrow native user-memory boundary.
+
+Treat actual checked-out HEAD as truth. Record it before modifying source.
+
+Read before implementation:
+
+AGENTS.md
+COMMANDS.md
+docs/roadmaps/ALPZ_TO_ALPINE_QEMU_KVM_AND_BEYOND.md
+docs/roadmaps/SELF_HOSTED_RECURSIVE_ABI_LAB.md
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_21_BOUNDED_USER_MEMORY_TRANSFER.txt
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_21B_REAL_USER_COPY_IN.txt
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_21C_REAL_USER_COPY_OUT_AND_ATOMIC_REJECTION.txt
+docs/reports/AGENTIC_SNOWBALL_BATCH_21C.md
+projects/37-elf64-file-header-parser/DETAILS.md
+projects/37-elf64-file-header-parser/details.json
+projects/38-elf64-program-header-parser/DETAILS.md
+projects/38-elf64-program-header-parser/details.json
+
+BASELINE CAPABILITIES ARE FOUNDATIONS, NOT THINGS TO REIMPLEMENT
+
+Already solved and to be reused:
+
+- bounded-byte-reader and checked binary parsing foundations;
+- elf64-file-header-parser;
+- elf64-program-header-parser;
+- checked integer/range/alignment primitives;
+- typed virtual/physical addresses;
+- real physical-frame ownership;
+- active allocator-owned Sv39;
+- truthful page permissions and W^X enforcement;
+- trusted S→U entry;
+- trusted U→S trap entry beginning with csrrw sp,sscratch,sp before trap-frame stores;
+- deliberate SRET return handling;
+- bounded bidirectional user-memory transfer planning/copying with SUM clear;
+- strict rejection-oriented machine verifiers;
+- canonical Morphic equality checks.
+
+Do not create a second ELF parser.
+Do not create a second page-table implementation.
+Do not create another user-pointer planner.
+Do not create a separate privilege-transition path merely for ELF execution.
+Do not weaken the Batch 21C verifier to make Batch 22 fit.
+
+ZERO-CONTEXT BOOTSTRAP / DISCOVERY
+
+Before broad source reading, run:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+
+Then use the repository fast path to inspect/preflight at minimum:
+
+- elf64-file-header-parser;
+- elf64-program-header-parser;
+- bounded-byte-reader;
+- checked-half-open-range;
+- aligned-address-and-size-helpers;
+- distinct-memory-address-types;
+- physical-page-frame-allocator;
+- riscv-sv39-page-table-entry;
+- riscv-sv39-page-table-walker;
+- riscv-sv39-page-table-builder;
+- bounded-user-memory-transfer-plan;
+- run-hosted-morphic-runtime recipe;
+- current Batch 21C verifier chain.
+
+Freeze a requirement/capability map before implementation as required by docs/standards/SNOWBALL_YIELD.md.
+
+Classify each Batch 22 need as:
+
+1. already solved reusable capability;
+2. tiny target-specific orchestration;
+3. genuinely missing reusable capability;
+4. deliberately deferred work.
+
+If a genuinely reusable ELF load-planning gap is discovered, add only the smallest canonical reusable abstraction necessary for this batch. Do not create a broad process/VM subsystem merely because later work will need one.
+
+TASK-BUDGET RULE
+
+Do not spend the opening of the run replaying every historical two-QEMU lab.
+
+Before source changes, run focused gates only:
+
+1. git rev-parse HEAD
+2. git status --short --branch
+3. zig version
+4. python3 tools/query-reference.py agent doctor
+5. zig build test-elf64-file-header-parser
+6. zig build smoke-elf64-file-header-parser
+7. zig build test-elf64-program-header-parser
+8. zig build smoke-elf64-program-header-parser
+9. python3 tools/verify-freestanding-riscv64-user-memory-transfer.py --self-test
+
+If these pass, implement.
+
+The final Batch 22 verifier must compose/preserve the Batch 21C proof chain and perform the expensive real-machine execution after implementation.
+
+Do not separately rerun every Batch 18–21 full two-QEMU lab unless a concrete failure requires diagnosis.
+
+BATCH 22 SCOPE DECISION
+
+Keep the first ELF artifact intentionally tiny.
+
+Preferred Batch 22 proof shape:
+
+- one independently built RV64 ELF executable artifact;
+- static/freestanding, no PT_INTERP;
+- no libc;
+- no relocations required at runtime;
+- one minimal executable PT_LOAD segment is sufficient for this batch;
+- e_entry lies inside that executable PT_LOAD segment;
+- use the already-proven user stack mapping rather than inventing Linux process-startup stack semantics;
+- the loaded program executes a deterministic marker/check and one deliberate ECALL;
+- the ECALL returns through the existing trusted supervisor boundary to a known S-mode continuation.
+
+A second writable PT_LOAD segment is NOT required merely to make Batch 22 look more complete. If the smallest truthful fixture can prove real ELF execution with one RX PT_LOAD plus the already-existing user stack, prefer that bounded proof. Multi-segment/writable-data/startup-stack pressure can become Batch 23 unless implementation reality proves it is inseparable.
+
+REAL ELF ARTIFACT REQUIREMENT
+
+The program executed in Batch 22 must be a real ELF file produced as a distinct build artifact.
+
+It must not be represented only as:
+
+- a byte array hand-authored inside freestanding_riscv64.zig;
+- a copied kernel .text template masquerading as an ELF load;
+- machine-emitted expected constants with no independently inspectable ELF truth.
+
+Do not commit generated ELF binary artifacts to the repository unless existing repository policy explicitly permits it. Prefer deterministic build-time production of the tiny RV64 fixture and deterministic inclusion/availability to the Alpz execution lab.
+
+The external verifier must be able to inspect the actual guest ELF with readelf or equivalent repository-approved tooling independently of Alpz runtime claims.
+
+ELF ACCEPTANCE BOUNDARY
+
+Use the canonical Z-Ref ELF parsers.
+
+Batch 22 must mechanically validate at least the subset required for the chosen tiny fixture, including:
+
+- ELF magic;
+- ELF64 class;
+- little-endian encoding if that is the supported RV64 machine contract;
+- supported ELF version;
+- RISC-V machine identity;
+- supported executable type for this fixture;
+- program-header table bounds/count/entry size through existing parser contracts;
+- bounded PT_LOAD discovery;
+- p_offset + p_filesz bounds within the ELF artifact;
+- p_filesz <= p_memsz;
+- checked virtual-range arithmetic;
+- required alignment relationship for the chosen load contract;
+- e_entry contained in an executable loaded range;
+- no unsupported overlapping load layout for this bounded proof;
+- permission flags translated truthfully rather than widened for convenience.
+
+Do not silently accept unsupported ELF features. Reject them deterministically and document the narrow supported subset.
+
+If the existing parser exposes a different exact vocabulary or stronger checks, use its canonical contract rather than duplicating parallel validation.
+
+LOAD / MAPPING POLICY
+
+Prefer reuse of the already-proven user address-space geometry where it keeps the proof smaller and truthful.
+
+Established addresses include:
+
+user code VA:
+0x80401000
+
+user stack VA:
+0x80402000
+
+user stack top:
+0x80403000
+
+For the preferred minimal Batch 22 fixture, arrange the actual guest ELF so its executable PT_LOAD is loadable at the existing U RX code region and its e_entry is inside that segment.
+
+Reuse the existing allocator-owned user code frame and existing U RW/NX stack frame if doing so preserves truthful ELF semantics and keeps Batch 21 invariants intact.
+
+Do not allocate or remap additional pages merely to demonstrate allocation growth.
+
+If translation/PTE mutation is genuinely unnecessary because the ELF is loaded into already-correct U RX geometry, preserve that fact and report it accurately.
+
+If the real ELF contract requires a mapping change, use the existing Sv39 builder/invalidation machinery and mechanically prove the exact change. Never emit decorative SFENCE.VMA claims.
+
+Executable bytes copied into an already-mapped physical code frame require the appropriate local FENCE.I before user instruction fetch.
+
+PERMISSIONS
+
+Batch 22 must never create W+X.
+
+For every ELF PT_LOAD range actually used:
+
+- derive permissions from the real ELF program-header flags;
+- reject or safely handle flag combinations outside the deliberately supported Batch 22 subset;
+- require U=1 for userspace mappings;
+- executable program bytes must not become writable merely because copying them was convenient;
+- writable data, if any is admitted by the chosen minimal fixture, must be NX.
+
+The verifier must reconstruct permission truth from actual raw PTE evidence rather than trusting labels printed by the kernel.
+
+COPY / ZERO-FILL SEMANTICS
+
+For each supported PT_LOAD segment:
+
+- copy exactly p_filesz bytes from the ELF artifact;
+- if p_memsz > p_filesz is supported in Batch 22, zero exactly the tail and prove it;
+- never read outside the ELF artifact;
+- never write outside the planned segment memory range;
+- keep arithmetic checked;
+- preserve failure atomicity as far as the bounded design permits.
+
+If BSS-style p_memsz > p_filesz is not needed for the smallest Batch 22 fixture, it may be rejected/deferred explicitly rather than half-implemented.
+
+Do not turn Batch 22 into a full Linux exec loader.
+
+ENTRY / USER EXECUTION
+
+The user entry PC must come from the parsed ELF e_entry.
+
+Do not enter a hard-coded probe address and merely print that it equals e_entry.
+
+The external verifier must independently inspect the guest ELF entry and load segment(s), then compare those facts against runtime evidence.
+
+Enter U-mode through the already-proven privilege transition path.
+
+Preserve:
+
+- SPP=0 for U entry/return;
+- SUM=0;
+- trusted supervisor trap stack;
+- csrrw sp,sscratch,sp as the first user-origin trap-entry instruction before trap-frame memory stores;
+- bounded interrupt policy used by the existing proof;
+- correct sscratch rearming where U-mode return requires it;
+- deliberate stvec/sscratch restoration when the proof returns to supervisor continuation.
+
+TINY GUEST PROGRAM
+
+Keep the first guest program deliberately simple and independently inspectable.
+
+It should:
+
+1. begin at its ELF e_entry;
+2. execute real RV64 U-mode instructions loaded from the ELF PT_LOAD segment;
+3. use the already-proven user stack in a bounded way if useful;
+4. place one deterministic terminal marker in a register and/or stack location;
+5. execute one deliberate ECALL;
+6. have a fail-stop path so accidental continuation cannot masquerade as success.
+
+This ECALL is a bounded proof signal, not a Linux syscall ABI.
+
+Do not assign it a Linux syscall number merely to make the demo look Unix-like.
+
+STRICT BATCH 22 VERIFIER
+
+Add one focused rejection-oriented verifier following current repository style, with a name such as:
+
+tools/verify-freestanding-riscv64-userspace-elf.py
+
+Exact naming may follow the current command conventions.
+
+It must provide:
+
+--self-test
+
+and a full real-machine mode.
+
+The full mode must run two independent qemu-system-riscv64 machines unless a later repository convention explicitly supersedes that proof standard.
+
+The Batch 22 verifier must preserve/compose the strict Batch 21C parser chain rather than replacing it.
+
+It must independently inspect BOTH:
+
+1. the Alpz freestanding kernel ELF; and
+2. the distinct tiny RV64 userspace guest ELF.
+
+Do not treat runtime-emitted expected ELF values as independent evidence.
+
+NON-NEGOTIABLE MACHINE RESULT
+
+Two independent real QEMU executions must mechanically prove, at minimum:
+
+1. Historical strict evidence through Batch 21C still passes.
+2. Batch 22 evidence occurs after the completed Batch 21 boundary and before the canonical Morphic frame.
+3. The guest input is a distinct real ELF artifact.
+4. External ELF inspection proves its RV64 identity and exact e_entry.
+5. External ELF inspection proves the exact PT_LOAD rows used by the loader.
+6. Alpz parses the guest through canonical Z-Ref ELF parser foundations.
+7. Every admitted file/range calculation is bounded and checked.
+8. The loaded executable bytes equal the guest ELF file bytes for the supported PT_LOAD file range.
+9. The user executable mapping is U=1 and executable but not writable.
+10. No final leaf is W+X.
+11. Existing supervisor leaves remain U=0.
+12. The actual entry prepared for U-mode equals the parsed and independently verified guest ELF e_entry.
+13. Real instructions execute in U-mode from the loaded ELF segment.
+14. The guest reaches its deliberate ECALL.
+15. scause is the expected U-mode ECALL cause and not an interrupt.
+16. trapped SPP=0.
+17. SUM remains clear.
+18. the trap frame resides in the already-trusted supervisor-only trap stack.
+19. the first user-origin trap entry still uses the register-only sscratch stack exchange before stores.
+20. the guest terminal marker/sentinel is observed exactly.
+21. control deliberately reaches the known supervisor continuation.
+22. stvec/sscratch restoration truth is observed rather than merely asserted.
+23. allocation/page-table/mapping deltas are exactly explained and reconciled.
+24. FENCE.I/SFENCE.VMA evidence matches actual code/mapping mutation policy.
+25. hosted, fake, QEMU-A, and QEMU-B canonical Morphic artifacts remain byte-identical at exactly 765 bytes.
+26. the new verifier mutation/rejection matrix rejects contradictory guest ELF, entry, PT_LOAD, permission, trap, resource, and fence evidence.
+27. full repository validation passes.
+
+REJECTION / NEGATIVE EVIDENCE
+
+The new self-test must not merely test malformed framing.
+
+Mutation/rejection coverage should include the evidence categories that would falsify the Batch 22 claim, such as:
+
+- wrong guest ELF machine;
+- wrong guest e_entry;
+- e_entry outside executable PT_LOAD;
+- PT_LOAD offset/filesz contradiction;
+- p_filesz > p_memsz contradiction;
+- executable mapping made writable;
+- missing U permission;
+- unexpected extra user leaf;
+- unexpected W+X leaf;
+- wrong trapped sepc;
+- wrong scause or interrupt classification;
+- wrong trusted trap-frame address;
+- SUM/SPP contradiction;
+- wrong loaded-byte digest or exact-byte evidence;
+- wrong allocation/page-table delta;
+- false FENCE.I/SFENCE.VMA policy;
+- Morphic byte drift;
+- missing/duplicated/out-of-order evidence frame.
+
+Where practical, also add focused unit tests for loader/planner logic that reject malformed or unsupported ELF layouts without requiring QEMU.
+
+RESOURCE CONSERVATION / SNOWBALL YIELD
+
+Record exact resource effects.
+
+If Batch 22 reuses the existing user code frame and user stack frame, say so and prove it.
+
+If a new frame or page-table page is genuinely required, emit exact before/after counts and explain why the new capability requires it.
+
+Do not celebrate allocation growth as progress.
+
+The preferred Snowball result is that most of Batch 22 is composition of already-earned parser, allocator, Sv39, U-mode, trap, and user-memory foundations.
+
+REPORT / COMMAND SURFACES
+
+Add the conventional report:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_22.md
+
+Update COMMANDS.md with the focused Batch 22 self-test and full execution lab.
+
+Update the relevant recipe metadata and deterministic indexes/evidence required by repository policy.
+
+If a new reusable module is added, give it the full canonical module contract surface and focused unit/smoke commands. If no new reusable module is necessary, do not invent one just to increment the module count.
+
+The report must distinguish:
+
+- actual guest ELF facts;
+- actual runtime facts;
+- externally recomputed verifier facts;
+- preserved historical evidence;
+- explicit nonclaims.
+
+MINIMUS / HANDOFF CONTRACT
+
+Follow the current Developer Minimus convention.
+
+The Batch 22 verifier should leave a bounded PASS/FAIL handoff with useful LOCATIONS and an actionable next command, preserving child exit status on failure.
+
+On PASS, locations should identify at least:
+
+- guest ELF fixture source/build definition;
+- loader/orchestration source;
+- strict verifier;
+- Batch 22 report;
+- any genuinely new reusable module.
+
+Do not make the handoff a second report. Keep it small.
+
+FINAL VALIDATION
+
+At minimum, after implementation run:
+
+- focused ELF parser unit/smoke tests;
+- focused tests for any new reusable loader/planner abstraction;
+- python3 tools/verify-freestanding-riscv64-user-memory-transfer.py --self-test;
+- Batch 22 verifier --self-test;
+- Batch 22 full two-QEMU verifier;
+- python3 tools/query-reference.py agent doctor;
+- python3 tools/developer-command.py validate-repository.
+
+Run formatting/command-reference/index/evidence checks required by the repository's current canonical validation flow.
+
+Do not weaken gates to make the batch pass.
+
+NONCLAIMS
+
+Batch 22 does NOT claim:
+
+- a Linux syscall ABI;
+- Linux syscall numbering;
+- errno/EFAULT;
+- Linux copy_from_user/copy_to_user semantics beyond the already-proven narrow native Batch 21 boundary;
+- argc/argv/envp/auxv process-startup completeness;
+- PT_INTERP;
+- a dynamic linker;
+- shared libraries;
+- relocations beyond whatever the deliberately chosen tiny static fixture requires;
+- a general execve implementation;
+- multiple processes;
+- fork/clone;
+- process scheduling;
+- demand paging;
+- mmap/brk;
+- copy-on-write;
+- signals;
+- futexes;
+- threads;
+- VFS/file descriptors;
+- procfs/sysfs/devfs;
+- sockets/networking;
+- BusyBox;
+- musl;
+- APK;
+- Alpine boot;
+- QEMU/TCG self-hosting;
+- hypervisor execution;
+- KVM compatibility;
+- SMP or production security;
+- arbitrary real-hardware portability.
+
+BATCH 22 STOP CONDITION
+
+Stop when the following sentence is mechanically true and independently reproduced:
+
+"Alpz parsed a distinct real RV64 ELF executable with the canonical Z-Ref ELF foundations, loaded its bounded executable segment with truthful U-mode permissions, entered the ELF's independently verified e_entry, executed real loaded instructions in U-mode, trapped deliberately through the existing trusted supervisor boundary, returned to known S-mode continuation, preserved the Batch 21 safety boundary, and preserved exact canonical Morphic output across two real QEMU machines."
+
+Do not continue into Batch 23 merely because there is context budget left.
+
+LIKELY NEXT PRESSURE — NOT PART OF THIS REQUEST
+
+Batch 23 should be chosen only after Batch 22 evidence is closed.
+
+The likely next pressure is richer real ELF/process-image construction, probably some combination of:
+
+- multiple PT_LOAD segments including truthful writable data/BSS;
+- a purpose-built process-style user stack;
+- argc/argv/envp;
+- then minimal auxv.
+
+Do not implement those merely to preempt the next batch.
+
+FINAL INSTRUCTION
+
+Implement the smallest truthful Batch 22 that proves first real RV64 userspace ELF execution.
+
+Reuse before inventing.
+Validate before claiming.
+Preserve old strict evidence.
+Leave the next batch smaller than this one.
+
+Solved once.
+Documented completely.
+Reusable from here.
