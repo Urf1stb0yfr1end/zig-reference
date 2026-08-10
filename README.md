@@ -2,597 +2,161 @@
 
 > **Solved once. Documented completely. Reused forever.**
 
-## What if a systems project could remember enough that the 1,000th agent starts far above the first?
+`zig-reference` is a cumulative systems-engineering project for Zig 0.14.0.
 
-`zig-reference` is an experiment in cumulative systems engineering for humans and coding agents.
-
-It began as a library of small, explicit Zig 0.14.0 building blocks. It is becoming something larger:
+It has three connected parts:
 
 - **Z-Ref** — reusable systems knowledge: source, contracts, dependencies, failure behavior, diagnostics, validation, evidence, and porting knowledge;
-- **Morphic** — machine-independent composition whose behavior can be carried across different machine bodies;
-- **Alpz** — the real kernel embodiment currently pressure-testing the idea on RV64.
+- **Morphic** — machine-independent composition intended to preserve behavior across different machine bodies;
+- **Alpz** — the RV64 kernel currently being used to pressure-test those ideas against real machine boundaries.
 
-The long-term target is deliberately absurd in the best possible way:
+The central question is simple:
+
+> Can a systems repository preserve enough engineering truth that later contributors and coding agents spend less time rediscovering solved problems?
+
+The project is trying to answer that question with an operating system rather than with toy examples.
+
+## Current state
+
+As of August 10, 2026, the current completed machine milestone is **Batch 23**.
+
+Alpz has already demonstrated, under real `qemu-system-riscv64` execution:
 
 ```text
-reusable proved primitives
+S-mode execution
+→ synchronous and timer traps
+→ allocator-owned physical frames
+→ active Sv39
+→ RX / R-NX / RW-NX permission domains
+→ real S→U→S transitions
+→ ECALL service and return to U-mode
+→ bounded real copy-IN and copy-OUT
+→ bounded RV64 ELF load planning
+→ real RV64 ELF execution from parsed e_entry
+→ separate R-X and RW- PT_LOAD segments
+→ initialized writable data
+→ non-empty BSS zeroed before U-mode
+→ U-mode mutation of ELF-backed writable storage
+→ supervisor observation of that mutation in the backing frame
+```
+
+These are not intended as broad Linux-compatibility claims. Each machine milestone has focused tests, strict verifiers, explicit nonclaims, and repeated real-QEMU execution where the claim depends on the machine.
+
+The next planned boundary is **Batch 24A**: a reusable bounded RV64 Linux initial-process-stack planner for `argc`, `argv`, `envp`, and `auxv`.
+
+The plan exists. The implementation does not yet count as accomplished.
+
+For the exact current evidence, see [`docs/reports/AGENTIC_SNOWBALL_BATCH_23.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_23.md).
+
+## The long path
+
+The intended progression is:
+
+```text
+reusable systems primitives
         ↓
 real RV64 kernel
         ↓
-Linux-compatible userspace
+Linux-compatible process startup
         ↓
-BusyBox / musl / Alpine
+Linux syscall / fd / VFS / memory / process semantics
+        ↓
+BusyBox and musl
+        ↓
+Alpine
         ↓
 QEMU/TCG running inside Alpz
         ↓
-Alpz tests a newer Alpz
+Alpz testing a newer Alpz
         ↓
 recursive differential qualification
         ↓
 RISC-V H-extension virtualization
         ↓
-VMM / eventually /dev/kvm
+VMM
         ↓
-QEMU + hardware-accelerated guests
+possible /dev/kvm-compatible interface
 ```
 
-The point is not merely to write an operating system.
-
-The point is to see whether **solved engineering can compound**.
-
----
-
-## Less than a week in
-
-On **August 10, 2026**, this repository was still less than a week old.
-
-Zig 0.14.0, the toolchain version this repository deliberately targets, had itself only been released on **March 5, 2025**. Zig's own release notes still warn that non-trivial work on the language may encounter bugs, miscompilations, and regressions.
-
-And yet, before the repository was a week old, Alpz had already crossed these real machine boundaries:
-
-```text
-S-mode execution
-→ synchronous traps
-→ asynchronous supervisor timer interrupts
-→ bounded monotonic time
-→ deterministic scheduling pressure
-→ allocator-owned physical frames
-→ active Sv39
-→ hardened RX / R-NX / RW-NX permission domains
-→ real S→U→S transition
-→ ECALL service and return to U-mode
-→ bounded real copy-IN
-→ bounded real copy-OUT
-→ bounded RV64 ELF load planning
-→ real RV64 ELF execution from parsed e_entry
-→ separate writable PT_LOAD
-→ initialized data
-→ real non-empty BSS
-→ U-mode mutation of ELF-backed writable memory
-→ supervisor observes the mutation in the actual backing frame
-```
-
-Those are not roadmap bullets pretending to be accomplishments. They are checked-in milestones with focused tests, strict verifiers, explicit nonclaims, and real `qemu-system-riscv64` execution.
-
-The current completed machine milestone is **Batch 23**.
-
-The current frontier is **Batch 24A**: a reusable bounded RV64 Linux initial-process-stack planner for `argc`, `argv`, `envp`, and `auxv`. The plan exists. The implementation has not yet been earned.
-
-That distinction matters here.
-
-A plan is a plan.
-
-A claim is a claim.
-
-A passing machine proof is something else.
-
----
-
-# Why this could matter historically
-
-History is not something a README gets to award itself.
-
-There are already serious alternative operating-system projects. [Redox](https://github.com/redox-os/redox) is a substantial Rust microkernel operating system. [Theseus](https://github.com/theseus-os/Theseus) is a research OS written from scratch in Rust and explores using language semantics to reshape operating-system design. [Pluto](https://github.com/ZystemOS/pluto) demonstrates that a kernel written almost entirely in Zig is not itself a unique idea. [VibeOS](https://github.com/kaansenol5/VibeOS) demonstrates how quickly an AI-assisted ARM64 hobby OS can accumulate visible features, applications, and ports.
-
-So we will not claim:
-
-> first Zig kernel
-
-or:
-
-> first AI-built OS
-
-or:
-
-> first memory-safe-language operating system
-
-or:
-
-> first experimental hypervisor project
-
-Those claims would be false or meaningless.
-
-The potentially unusual thing is the **combination**.
-
-`zig-reference` is trying to build a real operating system while simultaneously building a machine-readable memory of how the operating system was built, what each layer promises, what it does **not** promise, what depends on it, what failures have already been understood, and what evidence qualifies a replacement.
-
-If that works at scale, the historical contribution is not:
-
-> an AI wrote a kernel quickly.
-
-It is closer to:
-
-> **a software repository learned to preserve enough engineering truth that later agents could continue from validated knowledge instead of repeatedly rediscovering the same system.**
-
-That is the bet.
-
-## The historical case, without the bullshit
-
-A project like this becomes historically interesting only if several hard things eventually become true.
-
-### 1. The repository gets easier to extend as it gets larger
-
-Most large software accumulates knowledge debt.
-
-More code means more assumptions, more hidden coupling, more archaeology, and more fear of touching anything.
-
-Z-Ref is attempting the opposite curve:
-
-```text
-solve boundary
-→ record contract
-→ record dependencies
-→ record failures
-→ record validation
-→ record evidence
-→ expose it through deterministic indexes
-→ next contributor reuses it
-```
-
-If the thousandth change is cheaper because the first 999 left behind usable truth, that is a meaningful systems-engineering result whether or not Alpz itself ever becomes famous.
-
-### 2. Applications eventually stop caring that Alpz exists
-
-Many experimental operating systems expose their own application API and then port software to that environment.
-
-That is legitimate engineering, but Alpz is making the more expensive bet: **absorb compatibility into the operating system**.
-
-The intended target is the Linux userspace contract closely enough that existing software increasingly does not need an Alpz-specific edition.
-
-The dream demo is therefore not a bespoke graphical application.
-
-It is something much more boring and much more powerful:
-
-```text
-existing Linux program
-        ↓
-run it
-        ↓
-it works
-```
-
-No Alpz port.
-
-No special application API.
-
-Bring your programs.
-
-### 3. The implementation language becomes less important than the preserved semantics
-
-The repository currently targets Zig 0.14.0.
-
-That is intentional, but Zig is not meant to become a prison.
-
-A future agent should eventually be able to take a proved subsystem and ask:
-
-> Re-embody this in a newer Zig.
-
-Or:
-
-> Re-embody this in C.
-
-Or Rust.
-
-Or a language that does not exist yet.
-
-The goal is not mechanical translation. The goal is semantic transfer:
-
-```text
-implementation A
-      ↓
-contracts + evidence + tests
-      ↓
-implementation B
-      ↓
-same qualification boundary
-```
-
-If that becomes routine, then the repository has preserved something more durable than source code.
-
-### 4. The operating system eventually participates in qualifying its own successor
-
-The long-range experiment is recursive.
-
-Once Alpz can host enough Alpine userspace to run QEMU/TCG, a trusted generation can become a laboratory for the next one:
-
-```text
-trusted Alpz N
-      ↓
-Alpine userspace
-      ↓
-QEMU/TCG
-      ↓
-Alpz N+1 candidate
-      ↓
-controlled probes
-      ↓
-compare against known-good behavior
-      ↓
-minimize disagreement
-      ↓
-repair
-      ↓
-permanent regression
-      ↓
-promote N+1
-```
-
-The concise version is:
-
-> **A trusted generation of the system should eventually be able to construct, execute, interrogate, compare, and qualify its successor before handing control to it.**
-
-If we reach that point, Alpz is no longer merely an operating system project.
-
-It becomes an experiment in **regenerative engineering infrastructure**.
-
-### 5. The principles may matter even if this repository does not become the standard
-
-The highest ambition is that one day an engineering agent might begin low-level work by synchronizing an approved corpus like Z-Ref before inventing anything.
-
-Maybe that corpus is literally this repository.
-
-Maybe it is not.
-
-Perhaps another project eventually implements these ideas better, at larger scale, in another language.
-
-That would still be a victory for the underlying principle:
-
-```text
-search before inventing
-reuse before rewriting
-make contracts machine-readable
-separate claims from evidence
-preserve negative knowledge
-qualify replacements mechanically
-leave the next agent less uncertainty
-```
-
-The standard does not have to carry our name for the idea to have mattered.
-
----
-
-# Where we actually are
-
-## Proven now
-
-The repository already contains a broad set of reusable, contracted systems modules covering bounded storage, checked arithmetic and ranges, byte parsing/writing, ELF64 parsing, typed addresses, physical memory regions and frame allocation, Sv39 page-table primitives, walkers/builders, invalidation semantics, user-memory transfer planning, and bounded ELF load planning.
-
-The agent-facing layer provides deterministic discovery, dependency information, machine-readable `details.json` contracts, validation evidence, generated indexes, diagnostics, composition information, impact queries, and repository-wide validation.
-
-The real RV64 kernel has mechanically demonstrated, among other things:
-
-- active Sv39 translation using allocator-owned page-table frames;
-- supervisor text RX, rodata R/NX, writable memory RW/NX;
-- no intentional supervisor/user W+X mapping in the proved leaf sets;
-- real U-mode entry through `SRET`;
-- trusted U→S trap-stack switching;
-- ECALL return to supervisor and deliberate return back to U-mode;
-- bounded real user-memory copy-IN and copy-OUT;
-- one real separately built RV64 ET_EXEC executing from the ELF planner's parsed `e_entry`;
-- a second real ELF fixture with separate R-X and RW- `PT_LOAD` segments;
-- exact initialized writable bytes;
-- an 8-byte non-empty BSS tail proven zero before U-mode;
-- a U-mode write into that BSS-backed storage;
-- supervisor observation of the exact mutation in the same allocator-owned backing frame;
-- repeated real-QEMU verification while preserving the same canonical 765-byte Morphic result across hosted, fake, and machine embodiments.
-
-The complete Batch 23 record is in [`docs/reports/AGENTIC_SNOWBALL_BATCH_23.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_23.md).
-
-## Not proven yet
-
-This is **not Linux yet**.
-
-We do not currently claim:
-
-- Linux syscall compatibility;
-- a general process model;
-- `fork`, `clone`, or `execve`;
-- file descriptors or a VFS;
-- `mmap`, `brk`, or mature fault recovery;
-- Linux signals;
-- futex/thread completeness;
-- musl compatibility;
-- dynamic ELF / `PT_INTERP` support;
-- BusyBox compatibility;
-- an Alpine shell;
-- `/proc`, `/sys`, or general `/dev` support;
-- networking;
-- QEMU running inside Alpz;
-- SMP;
-- production security;
-- RISC-V H-extension virtualization;
-- `/dev/kvm`;
-- production readiness of any kind.
-
-There is also known proof-hardening debt. Milestone tags and reports are expected to preserve the good, the bad, and the ugly rather than laundering old limitations into future guarantees.
-
-That is not modesty theater.
-
-It is how later agents avoid building on fictional truth.
-
----
-
-# How far from the big goal?
-
-The batch numbers are **planning bands, not promises**. If one real workload exposes five closely related missing behaviors, they may belong in one batch. If one supposedly tiny boundary turns out to hide three independent contracts, it may be split.
-
-The current working shape is roughly:
-
-```text
-23      DONE: real R-X + RW ELF, initialized data, BSS, U-mode mutation
-24A     NEXT: bounded Linux initial-stack planner
-24B     real argc/argv/envp/auxv stack under U-mode + QEMU
-
-25–35   core Linux ABI
-         syscalls / fd / VFS / mmap / process / signals / futex
-
-~35     static BusyBox / first serious shell territory
-
-~40s    musl + dynamic ELF pressure
-
-~45–50  first credible Alpine shell
-
-~50–55  increasingly useful Alpine
-         networking / apk / proc/dev / broader compatibility
-
-~60s    QEMU/TCG pressure inside Alpz
-         eventually booting another machine
-
-~70     recursive successor-qualification laboratory
-
-~75–90 RISC-V H-extension / stage-2 / VS-mode VMM work
-
-~100    serious native hypervisor territory
-
-101+    optional KVM-compatible interface pressure
-```
-
-Do not fetishize the numbers.
-
-The destination matters more:
-
-```text
-ALPZ RUNS PROGRAMS
-      ↓
-ALPZ LOOKS LIKE LINUX
-      ↓
-ALPINE RUNS
-      ↓
-QEMU RUNS
-      ↓
-ALPZ CAN TEST ALPZ
-      ↓
-HARDWARE VIRTUALIZATION
-```
+This is a roadmap, not a completion claim. The batch numbers are planning bands and may move as real workloads expose the actual dependency structure.
 
 See [`docs/roadmaps/ALPZ_TO_ALPINE_QEMU_KVM_AND_BEYOND.md`](docs/roadmaps/ALPZ_TO_ALPINE_QEMU_KVM_AND_BEYOND.md).
 
----
+## Why this project is unusual
 
-# If we stop, you should take it
+There are already serious operating-system projects in Rust, Zig, C, C++, and other languages. Redox and Theseus explore substantial Rust-based operating-system designs. Pluto and other projects demonstrate that writing a kernel in Zig is not itself novel. AI-assisted operating-system projects also exist.
 
-Maybe the original maintainer gets Alpz all the way to Alpine, recursive QEMU, and hardware virtualization.
+So the interesting part here is not a claim to be the first Zig kernel, the first AI-assisted OS, or the first experimental hypervisor.
 
-Maybe not.
+The unusual part is the combination of goals:
 
-That possibility is part of the architecture.
+1. build a real kernel rather than only a reference library;
+2. target an existing userspace contract instead of inventing a private application ABI;
+3. preserve reusable low-level knowledge in machine-readable form;
+4. distinguish claims from executed evidence;
+5. keep negative knowledge and known proof limitations visible;
+6. make later agents discover and reuse earlier work mechanically;
+7. eventually use the running system itself as part of the qualification environment for its successor.
 
-This repository is specifically trying **not** to require the original author's memory in order to continue.
+That combination is the experiment.
 
-If development stops, the intended reaction is not:
+If it works, the interesting result will not be that an AI helped write a kernel. It will be that a large systems project became easier to continue because previous engineering decisions, invariants, failures, and validation paths remained usable by later contributors.
 
-> Damn. I wonder what he meant by all this.
+## A young project on a young toolchain
 
-It is:
+The public work represented here is very recent. By August 10, 2026, the kernel progression above had been assembled in less than a week of repository development.
 
-> I can see the exact last proved boundary. I can see the contracts. I can see the nonclaims. I can run the validators. I can see what depends on what. I can continue.
+The repository deliberately targets **Zig 0.14.0**, a comparatively young systems-language release. That makes portability, version-sensitive behavior, and explicit migration knowledge part of the project rather than an afterthought.
 
-And yes, there is a real opportunity here for an ambitious systems engineer.
+The speed of the early work is interesting, but it is not the argument for the project. Early kernel milestones are much smaller than Linux compatibility, a useful distribution, QEMU self-hosting, or a hardware VMM.
 
-If you are the person who takes this from the current RV64 process-image boundary to a real Alpine shell, that is objectively difficult public engineering.
+What matters is whether the pace continues to benefit from accumulated reusable work instead of collapsing under its own complexity.
 
-If you are the person who makes Alpz host QEMU and qualify a successor generation, you will have completed a genuinely unusual systems experiment.
+That is what the later batches are meant to test.
 
-If you are the person who turns the accumulated RISC-V machinery into a real H-extension VMM or a credible KVM-compatible substrate, your work will be attached permanently to that milestone.
+## The Snowball Principle
 
-That is not a promise of fame.
+Every expensive discovery should leave behind something cheaper to reuse.
 
-Nobody can promise historical importance in advance.
+A checked range should make later parsers simpler.
 
-But difficult public projects have identifiable firsts **inside their own history**, and the person who closes one of these boundaries gets to own the work that closed it.
+A frame allocator should make paging simpler.
 
-So if your reaction to this README is:
+A page-table builder should make U-mode work smaller.
 
-> He got this far. I think I can get farther.
+A settled U-mode boundary should make ELF execution smaller.
 
-Good.
+A settled user-memory boundary should make many future syscalls smaller.
 
-That is exactly the reaction we want.
-
-Think the architecture is overbuilt? Prove a simpler one while preserving the evidence.
-
-Think the batch plan is too conservative? Collapse three milestones without weakening the truth boundary.
-
-Think the original implementation is wrong? Replace it and make the same qualification suite pass.
-
-Think you can get to Alpine faster?
-
-**Please do.**
-
-The repository is not a monument to its author.
-
-It is a challenge to its successor.
-
----
-
-# Why not just build features?
-
-Because features are only one form of progress.
-
-A feature-first OS can optimize for visible capability:
+The intended loop is:
 
 ```text
-kernel
-→ custom API
-→ port applications
-→ visible demos
-```
-
-That is a perfectly legitimate project shape. VibeOS, for example, openly documents an ARM64 hobby OS built with Claude Code over 64 sessions, with a GUI, networking, MicroPython, TinyCC, DOOM, and other software, including several third-party components.
-
-Alpz is optimizing for a different long-term payoff:
-
-```text
-primitive
-→ explicit contract
-→ machine-readable dependency truth
-→ focused tests
-→ real machine evidence
-→ reusable composition
-→ Linux compatibility pressure
-→ existing ecosystem
-```
-
-One produces screenshots earlier.
-
-The other is trying to make the next thousand changes cheaper.
-
-Neither automatically wins.
-
-This repository exists to find out whether the second strategy can compound far enough to become extraordinary.
-
----
-
-# The Snowball Principle
-
-Every expensive discovery should leave behind something cheap enough to reuse.
-
-A solved checked range should make future parsers easier.
-
-A solved frame allocator should make paging easier.
-
-A solved page-table builder should make U-mode easier.
-
-A solved U-mode boundary should make ELF execution easier.
-
-A solved ELF process-image boundary should make Linux startup easier.
-
-A solved user-pointer boundary should make many syscalls cheaper.
-
-Eventually:
-
-```text
-one difficult discovery
+solve one boundary
       ↓
-small permanent proof
+record its contract
       ↓
-future agent finds it
+record its failure behavior
       ↓
-future agent does not rediscover it
+record focused validation
+      ↓
+make it discoverable
+      ↓
+reuse it in the next boundary
 ```
 
-That is **Snowball Yield**.
+That is the **Snowball Principle**.
 
-Read [`SNOWBALL_PRINCIPLE.md`](SNOWBALL_PRINCIPLE.md) and [`docs/standards/SNOWBALL_YIELD.md`](docs/standards/SNOWBALL_YIELD.md).
+The repository records **Snowball Yield** for major composition work: what already existed, what was genuinely missing, what new reusable work was created, and what evidence closed the run.
 
----
+See [`SNOWBALL_PRINCIPLE.md`](SNOWBALL_PRINCIPLE.md) and [`docs/standards/SNOWBALL_YIELD.md`](docs/standards/SNOWBALL_YIELD.md).
 
-# Evidence, not vibes
+## More than source code
 
-This repository is comfortable saying **no**.
+A normal source tree often leaves later contributors to reconstruct important facts from implementation details and commit history.
 
-No, a test is not a formal proof.
+Z-Ref tries to keep those facts explicit.
 
-No, a JSON contract does not make code trustworthy by declaration.
-
-No, a boot message does not prove an invariant.
-
-No, an old milestone does not automatically remain numerically identical after the machine changes.
-
-No, a successful happy path does not prove the verifier rejects contradictory evidence.
-
-The preferred pattern is:
-
-```text
-claim
-→ exact evidence relationship
-→ focused positive test
-→ negative / mutation test when appropriate
-→ real machine execution when the claim is machine-specific
-→ explicit nonclaims
-→ repository validation
-```
-
-A later milestone should preserve earlier strict verifiers whenever practical instead of quietly weakening them to make new work pass.
-
-Known weaknesses should remain visible until they are actually repaired.
-
----
-
-# Agent-native by design
-
-A coding agent should not need to read the entire repository before touching one component.
-
-Start with:
-
-```sh
-python3 tools/query-reference.py agent bootstrap
-python3 tools/query-reference.py agent doctor
-```
-
-Then ask the repository what it already knows:
-
-```sh
-python3 tools/query-reference.py agent decide "YOUR TASK"
-python3 tools/query-reference.py capability "CAPABILITY"
-```
-
-The intended workflow is:
-
-```text
-task
-→ discover
-→ select or reject
-→ inspect compact contract
-→ compose existing capabilities
-→ inspect impact
-→ implement only the missing behavior
-→ validate narrowly
-→ validate globally
-→ leave better knowledge behind
-```
-
-Not:
-
-```text
-open random files
-→ guess architecture
-→ rewrite solved primitive
-→ debug for an hour
-→ discover the primitive already existed
-```
-
-Each reusable module normally carries:
+A reusable module normally carries:
 
 ```text
 src/*.zig
@@ -604,29 +168,247 @@ port.js
 focused tests
 ```
 
-The human-readable files teach.
+Where relevant, the repository also records:
 
-The machine-readable files let agents select and compose.
+```text
+public symbols
+ownership and borrowing
+resource bounds
+failure atomicity
+invalid states
+known diagnostics
+canonical repairs
+dependency edges
+reverse impact
+validation commands
+machine evidence
+porting risks
+```
 
-The tests and evidence decide what may actually be claimed.
+The goal is not documentation volume. The goal is to make selection and reuse cheaper than rediscovery.
 
----
+## Agent-native, not agent-dependent
 
-# Portability is part of the experiment
+The repository is designed so a coding agent can begin with a capability query rather than a blind source-tree crawl:
 
-`zig-reference` currently targets **Zig 0.14.0**.
+```sh
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+python3 tools/query-reference.py agent decide "YOUR TASK"
+python3 tools/query-reference.py capability "CAPABILITY"
+```
 
-That version was released on March 5, 2025, and the repository deliberately treats version migration as engineering work rather than search-and-replace.
+The intended workflow is:
+
+```text
+task
+→ discover
+→ select or reject
+→ inspect compact contract
+→ inspect impact
+→ reuse existing capability
+→ implement only the missing behavior
+→ validate narrowly
+→ validate globally
+→ leave better knowledge behind
+```
+
+Humans can use the same path. Nothing important is intended to be locked inside model context or a private service.
+
+## Evidence, not declaration
+
+This repository deliberately separates different levels of confidence.
+
+A component can be implemented without being system-proven. A test can pass without proving every invariant. A machine-readable contract can describe intended behavior without making that behavior true by declaration.
+
+For machine-specific claims, the preferred pattern is:
+
+```text
+claim
+→ exact observable relationship
+→ focused positive test
+→ rejection / mutation test where useful
+→ real machine execution
+→ explicit nonclaims
+→ repository-wide validation
+```
+
+Known weaknesses are supposed to remain visible until repaired.
+
+A milestone report should make it possible to tell the difference between:
+
+- what happened;
+- what was inferred;
+- what was tested;
+- and what remains outside the claim.
+
+## What is not done
+
+Alpz is **not Linux** today.
+
+The project does not currently claim:
+
+- Linux syscall compatibility;
+- a general process model;
+- `fork`, `clone`, or `execve`;
+- file descriptors or a VFS;
+- `mmap`, `brk`, or mature fault recovery;
+- Linux signal semantics;
+- futex/thread completeness;
+- musl compatibility;
+- dynamic ELF / `PT_INTERP` support;
+- BusyBox compatibility;
+- an Alpine shell;
+- general `/proc`, `/sys`, or `/dev` support;
+- networking;
+- QEMU running inside Alpz;
+- SMP;
+- production security;
+- RISC-V H-extension virtualization;
+- `/dev/kvm`;
+- production readiness.
+
+Those are future pressures, not implied accomplishments.
+
+## Rough distance to the larger milestones
+
+The current planning bands are approximately:
+
+```text
+23      completed: writable two-segment RV64 ELF + BSS machine proof
+24A     next: bounded Linux initial-stack planner
+24B     real argc/argv/envp/auxv stack under U-mode
+25–35   core Linux ABI and process/filesystem/memory foundations
+~35     static BusyBox / serious shell territory
+~40s    musl and dynamic ELF pressure
+~45–50  first credible Alpine shell
+~50–55  increasingly useful Alpine
+~60s    QEMU/TCG running as an Alpz workload
+~70     recursive successor-qualification laboratory
+~75–90 RISC-V H-extension and VMM work
+~100    serious native hypervisor territory
+101+    optional KVM-compatible interface pressure
+```
+
+These numbers are intentionally rough. The repository follows dependency pressure rather than a fixed release calendar.
+
+## Why Linux compatibility
+
+Many experimental operating systems define a new application environment and then port software to it. That is a valid design choice.
+
+Alpz is taking a different route: move the compatibility burden downward so existing software increasingly does not need to know that Alpz is underneath it.
+
+The eventual test is intentionally ordinary:
+
+```text
+existing Linux program
+        ↓
+Alpz
+        ↓
+works without an Alpz-specific port
+```
+
+That makes the Linux ABI campaign larger and slower than a private application API, but it also makes success more broadly useful.
+
+## Why QEMU matters
+
+QEMU/TCG is not only a flashy workload milestone.
+
+If Alpz can host enough Linux-compatible userspace to run QEMU, the system gains a useful recursive laboratory:
+
+```text
+trusted Alpz generation
+        ↓
+QEMU/TCG
+        ↓
+known-good guest       candidate Alpz guest
+        ↓                    ↓
+       same controlled workload
+                 ↓
+               compare
+                 ↓
+        smallest reproducer
+                 ↓
+              permanent test
+```
+
+That is where operating-system compatibility work can begin feeding directly back into Z-Ref as small, permanent pieces of executable knowledge.
+
+## Why the hypervisor path comes later
+
+Native virtualization is not required for the first recursive laboratory. QEMU/TCG can provide that earlier.
+
+The RISC-V H-extension path is therefore deliberately later:
+
+```text
+HS-mode
+→ hypervisor CSRs
+→ guest-physical address model
+→ stage-2 translation
+→ VS-mode entry
+→ VM exits
+→ virtual interrupts and timers
+→ guest devices
+→ usable VMM
+```
+
+If that matures, a later compatibility layer may explore a `/dev/kvm`-style interface so existing QEMU acceleration paths can target Alpz rather than a bespoke VMM API.
+
+That is a long-term research direction, not a present capability.
+
+## Why it may be worth finishing
+
+The project is far enough along that a new contributor does not have to begin with a blank kernel, but early enough that many of the consequential boundaries remain open.
+
+Someone continuing the work could still be responsible for the first version of this project that:
+
+- starts a Linux-shaped process with a real initial stack;
+- runs a serious BusyBox shell;
+- boots Alpine;
+- runs QEMU/TCG as an ordinary workload;
+- uses one Alpz generation to qualify another;
+- enters a guest through the RISC-V H extension;
+- or exposes a useful hardware-virtualization interface.
+
+Those are substantial systems milestones on their own. They do not need exaggerated claims attached to them.
+
+The repository is structured so that, if development changes hands, a contributor should be able to identify the last proved boundary, reproduce it, inspect its known limitations, and continue from there.
+
+That continuity is itself part of what Z-Ref is trying to demonstrate.
+
+## The larger hope
+
+The strongest outcome would be for agent-assisted engineering to stop treating every new repository as a blank slate.
+
+Perhaps Z-Ref itself eventually becomes a corpus that agents routinely query before generating low-level infrastructure.
+
+Perhaps a different project implements the idea better.
+
+Either way, the principles are intended to be portable:
+
+```text
+search before inventing
+reuse before rewriting
+make important contracts machine-readable
+preserve negative knowledge
+separate claims from evidence
+qualify replacements against the same boundary
+leave the next contributor less uncertainty
+```
+
+If those practices become ordinary, then the project will have succeeded at something broader than producing one kernel.
+
+## Portability
+
+The repository currently targets Zig 0.14.0.
 
 Implemented modules carry `port.js` migration knowledge describing version-sensitive syntax, standard-library APIs, build definitions, dependency order, semantic risks, and validation commands.
 
-The long-term experiment is whether a future agent can migrate or re-embody a subsystem while preserving what **solved** meant.
+The longer-term experiment is not only whether the source can be upgraded. It is whether a subsystem can be reimplemented while preserving the same semantic and validation boundary.
 
 See [`docs/porting/PORTING.md`](docs/porting/PORTING.md).
 
----
-
-# Validate it yourself
+## Validate it yourself
 
 Create the repository-local Python environment:
 
@@ -643,93 +425,25 @@ zig build check
 python3 tools/developer-command.py validate-repository
 ```
 
-For the current machine frontier, read:
+For the current frontier:
 
 - [`docs/reports/AGENTIC_SNOWBALL_BATCH_23.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_23.md)
 - [`docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_24A_BOUNDED_RV64_LINUX_INITIAL_STACK_PLAN.txt`](docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_24A_BOUNDED_RV64_LINUX_INITIAL_STACK_PLAN.txt)
 - [`COMMANDS.md`](COMMANDS.md)
 
-Do not weaken a gate merely to make new work pass.
+Do not weaken a gate merely to make new work pass. Fix the work.
 
-Fix the work.
+## Start here
 
----
+If you are new to the repository:
 
-# Start here
-
-If you are a human contributor:
-
-1. Read [`AGENTS.md`](AGENTS.md). Yes, really. It describes the repository's intended engineering discipline just as much for humans as for agents.
-2. Run the agent bootstrap and doctor commands.
-3. Read the current batch report and next plan.
-4. Query before inventing.
+1. Read [`AGENTS.md`](AGENTS.md).
+2. Run `agent bootstrap` and `agent doctor`.
+3. Read the latest completed batch report and the next plan.
+4. Query existing capabilities before adding another primitive.
 5. Preserve explicit nonclaims.
-6. Make a PR that another person can review without reading your mind.
+6. Keep evidence reproducible by someone who was not present when the code was written.
 
-If you are a coding agent:
+The project does not require anyone to believe the vision in advance.
 
-> Search before inventing. Reuse before rewriting. Distinguish evidence from claims. Never silently stop after a long run. Leave the next agent less uncertainty than you inherited.
-
-If you are here because the project appears abandoned:
-
-**Good. You may be exactly who this repository was designed for.**
-
-Find the latest merged milestone.
-
-Run its proof.
-
-Find the next pressure.
-
-Then continue.
-
----
-
-# The ambition
-
-The best possible future for this repository is not that everyone uses our kernel.
-
-It is that the idea becomes obvious in retrospect:
-
-> Of course coding agents should inherit structured engineering memory.
->
-> Of course low-level contracts should be machine-readable.
->
-> Of course known failures should remain indexed.
->
-> Of course replacements should cross the same qualification boundary.
->
-> Of course an autonomous system should test its successor before promoting it.
-
-Maybe one day agents really do call Z-Ref before generating low-level infrastructure.
-
-Maybe they call something else built on the same principles.
-
-Either outcome would mean the experiment mattered.
-
-For now, the work is much less romantic.
-
-There is a real RV64 kernel.
-
-There is a real two-segment ELF.
-
-There is initialized writable data.
-
-There is BSS.
-
-There is a user-mode mutation.
-
-There is a supervisor that sees it.
-
-And there is a very long road from here to Alpine, QEMU, and a hypervisor.
-
-**Want to be the person who closes the next impossible-looking gap?**
-
-Clone it.
-
-Prove it.
-
-Leave the next person a better starting point.
-
----
-
-> **Why redo the rework? Help an agent out. Don't make the same thing twice.**
+The repository is meant to make the next result testable.
