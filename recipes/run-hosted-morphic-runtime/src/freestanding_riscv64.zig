@@ -11,6 +11,7 @@ const sfence_vma = @import("riscv-sfence-vma-invalidation");
 const user_transfer = @import("bounded-user-memory-transfer-plan");
 const elf_load = @import("bounded-elf64-load-plan");
 const userspace_elf = @embedFile("userspace-elf-rv64");
+const userspace_elf_data_bss = @embedFile("userspace-elf-rv64-data-bss");
 
 const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
@@ -39,6 +40,9 @@ extern var __user_trap_stack_end: u8;
 const sv39_alias: usize = 0x8040_0000;
 const user_code_va: usize = 0x8040_1000;
 const user_stack_va: usize = 0x8040_2000;
+const user_data_va: usize = 0x8040_3000;
+const batch23_initialized: usize = 0x23da_7a11_5eed_c0de;
+const batch23_mutation: usize = 0x23b5_5a5a_a55a_c33c;
 var sv39_continuation_marker: usize = 0;
 var sv39_permission_global: usize = 0;
 const sv39_permission_rodata: usize = 0x18_39_2026;
@@ -132,6 +136,9 @@ export var user_returned: bool linksection(".bss") = false;
 var userspace_elf_active: bool linksection(".bss") = false;
 var userspace_elf_entry: usize linksection(".bss") = 0;
 var userspace_elf_memory_end: usize linksection(".bss") = 0;
+var userspace_elf_expected_a0: usize linksection(".bss") = 0;
+var userspace_elf_expected_t0: usize linksection(".bss") = 0;
+var userspace_elf_expected_t1: usize linksection(".bss") = 0;
 
 export var service_trap_count: usize linksection(".bss") = 0;
 var service_frames: [2]usize linksection(".bss") = .{ 0, 0 };
@@ -690,8 +697,8 @@ export fn recordUserTrap(frame: *TrapFrame) callconv(.c) void {
     if (userspace_elf_active) {
         if (frame.scause != 8 or (frame.sstatus & 0x100) != 0 or
             frame.sepc < userspace_elf_entry or frame.sepc >= userspace_elf_memory_end or
-            frame.x[2] != user_stack_va + frames.PageSize or frame.x[10] != 0x22b0 or
-            frame.x[5] != 0x22b1 or frame.x[6] != 0x22b2) shutdown();
+            frame.x[2] != user_stack_va + frames.PageSize or frame.x[10] != userspace_elf_expected_a0 or
+            frame.x[5] != userspace_elf_expected_t0 or frame.x[6] != userspace_elf_expected_t1) shutdown();
         userspace_elf_active = false;
         return;
     }
@@ -1182,6 +1189,9 @@ noinline fn executeUserspaceElf(allocator: anytype, page_owner: anytype, builder
     asm volatile ("fence.i" ::: "memory");
     userspace_elf_entry = load.entry.raw();
     userspace_elf_memory_end = segment.memory.end;
+    userspace_elf_expected_a0 = 0x22b0;
+    userspace_elf_expected_t0 = 0x22b1;
+    userspace_elf_expected_t1 = 0x22b2;
     userspace_elf_active = true;
     user_returned = false;
     asm volatile ("mv a0, %[entry]; mv a1, %[stack]; mv a2, %[trap_stack]; call enterUser; la t0, user_supervisor_sp; ld sp, 0(t0); addi sp, sp, 112"
@@ -1279,6 +1289,199 @@ noinline fn executeUserspaceElf(allocator: anytype, page_owner: anytype, builder
     write("\nstack_pte=");
     writeUsizeHex(elf_stack_leaf.raw_entry);
     write("\ntranslation_change=none\nsfence_vma=not-required-no-pte-change\nfence_i=local-hart-executed\nsupervisor_resume=PASS\ncomplete=PASS\nZIGREF_USERSPACE_ELF_END\nZIGREF_USERSPACE_ELF_RETURNED\n");
+}
+
+noinline fn executeUserspaceElfDataBss(allocator: anytype, page_owner: anytype, builder: anytype, user_code_pa: usize, user_stack_pa: usize, trap_end: usize, historical_stvec: usize, root_physical: usize) void {
+    const destination: [*]volatile u8 = @ptrFromInt(user_code_pa);
+    write("ZIGREF_USERSPACE_ELF_DATA_BSS_PHASE plan-load-execute\n");
+    // Batch 23 consumes a distinct two-segment guest through module 54 while
+    // preserving the preceding Batch 22B execution and its original fixture.
+    const elf_alloc_before = allocator.allocatedCount();
+    const elf_tables_before = page_owner.page_count;
+    const elf_satp_before = asm volatile ("csrr %[value], satp"
+        : [value] "=r" (-> usize),
+    );
+    const load = elf_load.plan(2, userspace_elf_data_bss) catch |err| {
+        write("ZIGREF_USERSPACE_ELF_DATA_BSS_FAILURE planner=");
+        write(@errorName(err));
+        write("\n");
+        shutdown();
+    };
+    write("ZIGREF_USERSPACE_ELF_DATA_BSS_PHASE plan-complete\n");
+    if (load.items().len != 2) {
+        write("ZIGREF_USERSPACE_ELF_DATA_BSS_FAILURE fixture-shape\n");
+        shutdown();
+    }
+    const segment = load.items()[0];
+    const data_segment = load.items()[1];
+    if (segment.memory_start.raw() != user_code_va or segment.memory.start != user_code_va or
+        segment.memory.end > user_code_va + frames.PageSize or segment.file_byte_count != segment.memory_byte_count or
+        segment.zero_fill_byte_count != 0 or !segment.permissions.read or segment.permissions.write or
+        !segment.permissions.execute or load.entry.raw() < segment.memory.start or load.entry.raw() >= segment.memory.end or
+        data_segment.memory_start.raw() != user_data_va or data_segment.memory.end > user_data_va + frames.PageSize or
+        data_segment.file_byte_count == 0 or data_segment.zero_fill_byte_count == 0 or !data_segment.permissions.read or
+        !data_segment.permissions.write or data_segment.permissions.execute)
+    {
+        write("ZIGREF_USERSPACE_ELF_DATA_BSS_FAILURE plan-destination\n");
+        shutdown();
+    }
+    for (0..frames.PageSize) |index| destination[index] = 0;
+    const elf_source = userspace_elf_data_bss[segment.source.start..segment.source.end];
+    for (elf_source, 0..) |byte, index| destination[index] = byte;
+    const loaded: [*]const volatile u8 = @ptrFromInt(user_code_pa);
+    var loaded_hash: u64 = 0xcbf29ce484222325;
+    for (elf_source, 0..) |source_byte, index| {
+        const loaded_byte = loaded[index];
+        if (loaded_byte != source_byte) {
+            write("ZIGREF_USERSPACE_ELF_DATA_BSS_FAILURE loaded-byte-mismatch\n");
+            shutdown();
+        }
+        loaded_hash = (loaded_hash ^ loaded_byte) *% 0x100000001b3;
+    }
+    const source_hash = fnv1a64(elf_source);
+    const data_frame = allocator.allocate() catch shutdown();
+    const data_pa = (data_frame.toAddress() catch unreachable).raw();
+    const data_destination: [*]volatile u8 = @ptrFromInt(data_pa);
+    const data_source = userspace_elf_data_bss[data_segment.source.start..data_segment.source.end];
+    for (data_source, 0..) |byte, index| data_destination[index] = byte;
+    for (data_source, 0..) |byte, index| if (data_destination[index] != byte) shutdown();
+    for (data_segment.file_byte_count..data_segment.memory_byte_count) |index| data_destination[index] = 0;
+    for (data_segment.file_byte_count..data_segment.memory_byte_count) |index| if (data_destination[index] != 0) shutdown();
+    const bss_offset = data_segment.file_byte_count;
+    const bss_before: *volatile usize = @ptrFromInt(data_pa + bss_offset);
+    if (@as(*volatile usize, @ptrFromInt(data_pa)).* != batch23_initialized or bss_before.* != 0) shutdown();
+    const data_permissions = sv39_entries.Permissions{ .read = true, .write = true, .user = true, .accessed = true, .dirty = true };
+    _ = builder.mapPage(user_data_va, data_pa, .page_4k, data_permissions) catch shutdown();
+    sfence_vma.executeUnsafe(sfence_vma.global());
+    write("ZIGREF_USERSPACE_ELF_DATA_BSS_PHASE bytes-verified\n");
+    asm volatile ("fence.i" ::: "memory");
+    userspace_elf_entry = load.entry.raw();
+    userspace_elf_memory_end = segment.memory.end;
+    userspace_elf_expected_a0 = 0x2300;
+    userspace_elf_expected_t0 = batch23_initialized;
+    userspace_elf_expected_t1 = batch23_mutation;
+    userspace_elf_active = true;
+    user_returned = false;
+    asm volatile ("mv a0, %[entry]; mv a1, %[stack]; mv a2, %[trap_stack]; call enterUser; la t0, user_supervisor_sp; ld sp, 0(t0); addi sp, sp, 112"
+        :
+        : [entry] "r" (load.entry.raw()),
+          [stack] "r" (user_stack_va + frames.PageSize),
+          [trap_stack] "r" (trap_end),
+        : "memory", "ra", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "t0", "t1", "t2", "t3", "t4", "t5", "t6"
+    );
+    asm volatile ("csrw stvec, %[entry]; csrw sscratch, zero"
+        :
+        : [entry] "r" (historical_stvec),
+        : "memory"
+    );
+    const elf_satp_after = asm volatile ("csrr %[value], satp"
+        : [value] "=r" (-> usize),
+    );
+    const elf_code_leaf = builder.query(user_code_va) catch shutdown();
+    const elf_stack_leaf = builder.query(user_stack_va) catch shutdown();
+    const elf_data_leaf = builder.query(user_data_va) catch shutdown();
+    for (elf_source, 0..) |source_byte, index| if (loaded[index] != source_byte) shutdown();
+    if (userspace_elf_active or !user_returned or user_scause != 8 or
+        elf_alloc_before + 1 != allocator.allocatedCount() or elf_tables_before != page_owner.page_count or
+        elf_satp_before != elf_satp_after or elf_code_leaf.physical_address != user_code_pa or
+        elf_stack_leaf.physical_address != user_stack_pa or elf_data_leaf.physical_address != data_pa or
+        elf_code_leaf.raw_entry & 0x16 != 0x12 or elf_stack_leaf.raw_entry & 0x16 != 0x16 or
+        elf_data_leaf.raw_entry & 0x16 != 0x16 or elf_data_leaf.raw_entry & 0x8 != 0 or bss_before.* != batch23_mutation) shutdown();
+    write("ZIGREF_USERSPACE_ELF_DATA_BSS_BEGIN\nartifact=userspace-elf-rv64-data-bss\nartifact_bytes=");
+    writeUsizeHex(userspace_elf_data_bss.len);
+    write("\nartifact_fnv1a64=");
+    writeUsizeHex(fnv1a64(userspace_elf_data_bss));
+    write("\nsource_fnv1a64=");
+    writeUsizeHex(source_hash);
+    write("\nentry=");
+    writeUsizeHex(load.entry.raw());
+    write("\nsegment_count=0000000000000002\nsource_start=");
+    writeUsizeHex(segment.source.start);
+    write("\nsource_end=");
+    writeUsizeHex(segment.source.end);
+    write("\nmemory_start=");
+    writeUsizeHex(segment.memory.start);
+    write("\nmemory_end=");
+    writeUsizeHex(segment.memory.end);
+    write("\nfile_bytes=");
+    writeUsizeHex(segment.file_byte_count);
+    write("\nmemory_bytes=");
+    writeUsizeHex(segment.memory_byte_count);
+    write("\nzero_fill=");
+    writeUsizeHex(segment.zero_fill_byte_count);
+    write("\nalignment=");
+    writeUsizeHex(@intCast(segment.alignment));
+    write("\npermissions=R-X\ndestination_va=");
+    writeUsizeHex(segment.memory_start.raw());
+    write("\ndestination_pa=");
+    writeUsizeHex(user_code_pa);
+    write("\ncopied_bytes=");
+    writeUsizeHex(segment.file_byte_count);
+    write("\nloaded_bytes_equal=PASS");
+    write("\nloaded_fnv1a64=");
+    writeUsizeHex(loaded_hash);
+    write("\ndata_source_start=");
+    writeUsizeHex(data_segment.source.start);
+    write("\ndata_source_end=");
+    writeUsizeHex(data_segment.source.end);
+    write("\ndata_memory_start=");
+    writeUsizeHex(data_segment.memory.start);
+    write("\ndata_memory_end=");
+    writeUsizeHex(data_segment.memory.end);
+    write("\ndata_file_bytes=");
+    writeUsizeHex(data_segment.file_byte_count);
+    write("\ndata_memory_bytes=");
+    writeUsizeHex(data_segment.memory_byte_count);
+    write("\ndata_zero_fill=");
+    writeUsizeHex(data_segment.zero_fill_byte_count);
+    write("\ndata_permissions=RW-\ndata_loaded_bytes_equal=PASS\nbss_zero_before=PASS\ndata_destination_pa=");
+    writeUsizeHex(data_pa);
+    write("\nbss_mutation_address=");
+    writeUsizeHex(data_segment.memory.start + bss_offset);
+    write("\nbss_mutation_value=");
+    writeUsizeHex(bss_before.*);
+    write("\nprepared_entry=");
+    writeUsizeHex(userspace_elf_entry);
+    write("\ntrap_cause=");
+    writeUsizeHex(user_scause);
+    write("\ntrap_sepc=");
+    writeUsizeHex(user_sepc);
+    write("\ntrap_sstatus=");
+    writeUsizeHex(user_sstatus);
+    write("\ntrap_frame=");
+    writeUsizeHex(user_trap_frame_address);
+    write("\nmarker_a0=");
+    writeUsizeHex(user_a0);
+    write("\nmarker_t0=");
+    writeUsizeHex(user_t0);
+    write("\nmarker_t1=");
+    writeUsizeHex(user_t1);
+    write("\nphysical_allocated_before=");
+    writeUsizeHex(elf_alloc_before);
+    write("\nphysical_allocated_after=");
+    writeUsizeHex(allocator.allocatedCount());
+    write("\npage_table_count_before=");
+    writeUsizeHex(elf_tables_before);
+    write("\npage_table_count_after=");
+    writeUsizeHex(page_owner.page_count);
+    write("\nsatp_before=");
+    writeUsizeHex(elf_satp_before);
+    write("\nsatp_after=");
+    writeUsizeHex(elf_satp_after);
+    write("\nroot_physical=");
+    writeUsizeHex(root_physical);
+    write("\nuser_code_pa=");
+    writeUsizeHex(user_code_pa);
+    write("\nuser_stack_pa=");
+    writeUsizeHex(user_stack_pa);
+    write("\nuser_leaf_count=0000000000000003\nwx_leaf_count=0000000000000000");
+    write("\ncode_pte=");
+    writeUsizeHex(elf_code_leaf.raw_entry);
+    write("\nstack_pte=");
+    writeUsizeHex(elf_stack_leaf.raw_entry);
+    write("\ndata_pte=");
+    writeUsizeHex(elf_data_leaf.raw_entry);
+    write("\ntranslation_change=one-user-rw-leaf\nsfence_vma=global-executed\nfence_i=local-hart-executed\nsupervisor_resume=PASS\ncomplete=PASS\nZIGREF_USERSPACE_ELF_DATA_BSS_END\nZIGREF_USERSPACE_ELF_DATA_BSS_RETURNED\n");
 }
 
 export fn freestandingMain() callconv(.c) noreturn {
@@ -2521,6 +2724,7 @@ export fn freestandingMain() callconv(.c) noreturn {
     writeUsizeHex(out_leaf_count);
     write("\ntranslation_change=none\nsfence_vma=not-required-no-pte-change\nfence_i=local-hart-executed\nsum=observed-zero\ncomplete=PASS\nZIGREF_USER_COPY_OUT_END\nZIGREF_USER_COPY_OUT_RETURNED\n");
     executeUserspaceElf(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
+    executeUserspaceElfDataBss(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
 
     var output: [128]u8 = undefined;
     var trace: [2048]u8 = undefined;

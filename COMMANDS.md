@@ -387,3 +387,11 @@ PR #44 final Batch 22A merge-gate repair added deterministic planner rejection f
 - `python3 tools/verify-freestanding-riscv64-userspace-elf.py` is the strict Batch 22B lab. It independently parses the exact guest ELF embedded through the build graph, composes the Batch 21C parser, runs two real system-QEMU machines, and requires ELF-to-plan-to-loaded-byte-to-U-mode-trap agreement plus unchanged safety and Morphic truth.
 
 PR #45 merge-gate repair directly compared every planner-selected ELF source byte with its volatile loaded destination byte, regenerated all 55 validation-evidence records and the seven deterministic agent indexes, and reran `zig build check`, the strict one-QEMU mutation self-test, the strict two-QEMU verifier, and the complete 330/330-step, 225/225-test repository validation successfully under Zig 0.14.0 and QEMU 8.2.2.
+
+## First writable RV64 userspace ELF data/BSS proof (Batch 23)
+
+- `zig build install-userspace-rv64-data-bss-elf --prefix PATH` separately builds and installs the static two-`PT_LOAD` RV64 ET_EXEC fixture at `PATH/bin/userspace-elf-rv64-data-bss`; its image has one R-X code segment and one initialized RW- segment with a non-empty BSS tail.
+- `python3 tools/verify-freestanding-riscv64-userspace-elf-data-bss.py --self-test` executes one real QEMU fixture and mutation-rejects the initialized-byte, BSS-zero, RW/NX, mutation, entry/trap, resource-accounting, and artifact/plan proof relationships.
+- `python3 tools/verify-freestanding-riscv64-userspace-elf-data-bss.py` is the strict Batch 23 lab. It independently inspects the exact two-segment guest artifact, composes the unchanged Batch 22B parser, runs two independent real system-QEMU machines, and requires exact writable-data/BSS/mutation agreement plus unchanged Morphic equality.
+
+Batch 23 executed the historical Batch 22B self-test and two-QEMU verifier independently, then executed its own self-test and strict two-QEMU verifier under Zig 0.14.0 and QEMU 8.2.2. Each Batch 23 machine proved 8 initialized bytes, an 8-byte BSS tail zeroed before U-mode, mutation `0x23b55a5aa55ac33c` in the allocator-owned backing frame, three U leaves, zero W+X leaves, and the unchanged 765-byte Morphic artifact.

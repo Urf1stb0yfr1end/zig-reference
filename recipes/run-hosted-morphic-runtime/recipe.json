@@ -23,7 +23,8 @@
     "The scheduler owns target-neutral time and runnable ordering policy.",
     "The event trace records normalized bounded behavior.",
     "The existing physical-region and page-frame modules turn only the eight-page linker-reserved interval into deterministic owned frames; address types and PFN conversion preserve domain and alignment truth.",
-    "The freestanding-only owner adapter binds the existing generic Sv39 builder, entry, indexing, walker, and SFENCE.VMA semantics to page-table frames allocated from the linker-owned physical pool."
+    "The freestanding-only owner adapter binds the existing generic Sv39 builder, entry, indexing, walker, and SFENCE.VMA semantics to page-table frames allocated from the linker-owned physical pool.",
+    "The bounded ELF planner remains the sole process-image policy authority for both the preserved one-segment Batch 22B fixture and the distinct Batch 23 R-X plus initialized RW-/BSS fixture."
   ],
   "direct_dependencies": [
     "bounded-system-resource-plan",
@@ -133,7 +134,8 @@
     "python3 tools/verify-freestanding-riscv64-active-sv39.py",
     "python3 tools/verify-freestanding-riscv64-sv39-permissions.py --self-test",
     "python3 tools/verify-freestanding-riscv64-sv39-permissions.py",
-    "install-userspace-rv64-elf"
+    "zig build install-userspace-rv64-elf --prefix PATH",
+    "zig build install-userspace-rv64-data-bss-elf --prefix PATH"
   ],
   "intended_smoke_commands": [
     "python3 tools/verify-freestanding-riscv64-umode-round-trip.py --self-test",
@@ -145,13 +147,16 @@
     "python3 tools/verify-freestanding-riscv64-user-memory-transfer.py --self-test",
     "python3 tools/verify-freestanding-riscv64-user-memory-transfer.py",
     "python3 tools/verify-freestanding-riscv64-userspace-elf.py --self-test",
-    "python3 tools/verify-freestanding-riscv64-userspace-elf.py"
+    "python3 tools/verify-freestanding-riscv64-userspace-elf.py",
+    "python3 tools/verify-freestanding-riscv64-userspace-elf-data-bss.py --self-test",
+    "python3 tools/verify-freestanding-riscv64-userspace-elf-data-bss.py"
   ],
   "validation_evidence_references": [
     "docs/reports/AGENTIC_SNOWBALL_BATCH_19.md",
     "docs/reports/AGENTIC_SNOWBALL_BATCH_20.md",
     "docs/reports/AGENTIC_SNOWBALL_BATCH_21B.md",
     "docs/reports/AGENTIC_SNOWBALL_BATCH_21C.md",
-    "docs/reports/AGENTIC_SNOWBALL_BATCH_22B.md"
+    "docs/reports/AGENTIC_SNOWBALL_BATCH_22B.md",
+    "docs/reports/AGENTIC_SNOWBALL_BATCH_23.md"
   ]
 }
