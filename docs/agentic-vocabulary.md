@@ -563,6 +563,57 @@ The number of steps between a code change and the narrowest command that can mea
 
 Low Validation Distance accelerates agent iteration and reduces unnecessary full-repository runs during repair.
 
+## Regression Test
+
+A test that detects whether behavior already established as correct has changed unexpectedly after a code, dependency, compiler, or environment change.
+
+For an agent-driven migration, regression tests turn the previous working state into an executable constraint. Compiling successfully is not sufficient; the migrated implementation must continue to satisfy the relevant behavioral expectations.
+
+## Characterization Test
+
+A test written to capture what an existing implementation actually does before it is refactored, replaced, or ported, including behavior that is not yet fully documented.
+
+Characterization tests preserve observed behavior without claiming that every observed behavior is ideal. They are especially useful when migrating old code whose implementation is more complete than its written contract.
+
+## Differential or Parity Test
+
+A test that gives a reference implementation and a candidate implementation the same inputs and compares their externally observable results.
+
+For a Zig compiler-version migration, the ordinary pattern is:
+
+```text
+Zig 0.14 reference + fixed inputs → reference observations
+Zig 0.16 candidate + same inputs  → candidate observations
+compare outputs, errors, state transitions, side effects, and bounded performance
+```
+
+Agreement is evidence that the candidate preserves the tested Compatibility Surface. It is not proof that the reference implementation is itself correct.
+
+**Differential Test** emphasizes comparison between implementations. **Parity Test** emphasizes the requirement that the candidate match the reference for the declared behavior.
+
+## Golden-Master Test
+
+A test that compares current output, artifacts, traces, or other observable behavior against a previously recorded and approved baseline.
+
+Golden-master tests are useful when behavior is broad or cumbersome to express as many individual assertions. A changed master must be treated as an intentional contract change and reviewed rather than automatically accepted merely to make the suite pass.
+
+## Regression Suite
+
+The maintained collection of tests that protects previously established behavior against future breakage.
+
+A Regression Suite may contain ordinary assertion-based tests, Characterization Tests, Differential or Parity Tests, and Golden-Master Tests. For a compiler-version port, it acts as the behavioral gate between “the new code compiles” and “the new code works as before.”
+
+Conceptually:
+
+```text
+capture old behavior
+→ compile under the new compiler
+→ repair incompatibilities
+→ compare against the reference
+→ reject regressions
+→ preserve the tests for future changes
+```
+
 ## Evidence Distance
 
 The number of indirections between a claim and the concrete evidence supporting it.
