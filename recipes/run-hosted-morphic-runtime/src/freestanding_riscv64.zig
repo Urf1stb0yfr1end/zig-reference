@@ -202,6 +202,91 @@ extern var userCopyInProbeAfterService: u8;
 extern var userCopyInProbeTerminalEcall: u8;
 extern var userCopyInProbeTemplateEnd: u8;
 
+var copy_out_active = false;
+var copy_out_query: user_transfer.PageQuery = undefined;
+var copy_out_traps: usize = 0;
+var copy_out_frames: [4]usize = .{0} ** 4;
+var copy_out_sepcs: [4]usize = .{0} ** 4;
+var copy_out_status: [4]usize = .{0} ** 4;
+var copy_out_prepared: [3]usize = .{0} ** 3;
+var copy_out_destination: usize = 0;
+var copy_out_stack_pa: usize = 0;
+var copy_out_code_pa: usize = 0;
+var copy_out_segment_pa: usize = 0;
+var copy_out_guard_before: usize = 0;
+var copy_out_guard_after: usize = 0;
+var copy_out_code_before: usize = 0;
+var copy_out_code_after: usize = 0;
+var copy_out_prefix_before: usize = 0;
+var copy_out_prefix_after: usize = 0;
+var copy_out_return_count: usize = 0;
+const copy_out_payload = "kernel-to-user!!";
+
+export fn userCopyOutProbeContainer() linksection(".text.user_copy_out_probe") callconv(.naked) void {
+    asm volatile (
+        \\.global userCopyOutProbeTemplateBegin
+        \\userCopyOutProbeTemplateBegin:
+        \\addi sp, sp, -64
+        \\li t0, 0x1111222233334444
+        \\sd t0, 0(sp)
+        \\sd zero, 8(sp)
+        \\sd zero, 16(sp)
+        \\li t0, 0x5555666677778888
+        \\sd t0, 24(sp)
+        \\addi a0, sp, 8
+        \\li a1, 16
+        \\.global userCopyOutProbeServiceEcall
+        \\userCopyOutProbeServiceEcall: ecall
+        \\.global userCopyOutProbeAfterService
+        \\userCopyOutProbeAfterService:
+        \\li t0, 0x21c1
+        \\bne a0, t0, userCopyOutProbeFail
+        \\ld t0, 8(sp)
+        \\li t1, 0x742d6c656e72656b
+        \\bne t0, t1, userCopyOutProbeFail
+        \\ld t0, 16(sp)
+        \\li t1, 0x2121726573752d6f
+        \\bne t0, t1, userCopyOutProbeFail
+        \\li a0, 0x80401000
+        \\li a1, 16
+        \\.global userCopyOutProbePermissionRejectEcall
+        \\userCopyOutProbePermissionRejectEcall: ecall
+        \\.global userCopyOutProbeAfterPermissionReject
+        \\userCopyOutProbeAfterPermissionReject:
+        \\li t0, 0x21c2
+        \\bne a0, t0, userCopyOutProbeFail
+        \\li t0, 0x8877665544332211
+        \\sd t0, 56(sp)
+        \\addi a0, sp, 56
+        \\li a1, 16
+        \\.global userCopyOutProbeAtomicRejectEcall
+        \\userCopyOutProbeAtomicRejectEcall: ecall
+        \\.global userCopyOutProbeAfterAtomicReject
+        \\userCopyOutProbeAfterAtomicReject:
+        \\li t0, 0x21c3
+        \\bne a0, t0, userCopyOutProbeFail
+        \\ld t0, 56(sp)
+        \\li t1, 0x8877665544332211
+        \\bne t0, t1, userCopyOutProbeFail
+        \\li a2, 0x21cf
+        \\.global userCopyOutProbeTerminalEcall
+        \\userCopyOutProbeTerminalEcall: ecall
+        \\userCopyOutProbeFail: unimp
+        \\j userCopyOutProbeFail
+        \\.global userCopyOutProbeTemplateEnd
+        \\userCopyOutProbeTemplateEnd:
+    );
+}
+extern var userCopyOutProbeTemplateBegin: u8;
+extern var userCopyOutProbeServiceEcall: u8;
+extern var userCopyOutProbeAfterService: u8;
+extern var userCopyOutProbePermissionRejectEcall: u8;
+extern var userCopyOutProbeAfterPermissionReject: u8;
+extern var userCopyOutProbeAtomicRejectEcall: u8;
+extern var userCopyOutProbeAfterAtomicReject: u8;
+extern var userCopyOutProbeTerminalEcall: u8;
+extern var userCopyOutProbeTemplateEnd: u8;
+
 export fn userServiceProbeTemplateBegin() linksection(".text.user_service_probe") callconv(.naked) void {
     asm volatile (
         \\addi sp, sp, -32
@@ -338,7 +423,15 @@ export fn userServiceTrapEntry() linksection(".text.user_service_trap") callconv
 }
 
 export fn recordUserServiceTrap(frame: *TrapFrame) callconv(.c) void {
-    if (copy_active) return recordUserCopyTrap(frame);
+    write("\n");
+    if (copy_out_active) {
+        @call(.never_tail, recordUserCopyOutTrap, .{frame});
+        return;
+    }
+    if (copy_active) {
+        @call(.never_tail, recordUserCopyTrap, .{frame});
+        return;
+    }
     const index = service_trap_count;
     if (index >= 2 or frame.scause >> 63 != 0 or (frame.scause & 0x7fff_ffff_ffff_ffff) != 8 or frame.sstatus & 0x100 != 0) shutdown();
     const template_begin = @intFromPtr(&userServiceProbeTemplateBegin);
@@ -381,6 +474,83 @@ export fn recordUserServiceTrap(frame: *TrapFrame) callconv(.c) void {
         service_terminal_return_sstatus = frame.sstatus;
         service_terminal_to_supervisor_count += 1;
     }
+}
+
+fn recordUserCopyOutTrap(frame: *TrapFrame) void {
+    const index = copy_out_traps;
+    const begin = @intFromPtr(&userCopyOutProbeTemplateBegin);
+    const sites = [_]usize{
+        @intFromPtr(&userCopyOutProbeServiceEcall),      @intFromPtr(&userCopyOutProbePermissionRejectEcall),
+        @intFromPtr(&userCopyOutProbeAtomicRejectEcall), @intFromPtr(&userCopyOutProbeTerminalEcall),
+    };
+    if (index >= 4 or frame.scause != 8 or frame.sstatus & (0x100 | 0x40000) != 0 or
+        frame.x[2] != user_stack_va + frames.PageSize - 64 or frame.sepc != user_code_va + sites[index] - begin) shutdown();
+    copy_out_frames[index] = @intFromPtr(frame);
+    copy_out_sepcs[index] = frame.sepc;
+    copy_out_status[index] = frame.sstatus;
+    copy_out_traps += 1;
+    if (index == 0) {
+        copy_out_destination = frame.x[10];
+        if (copy_out_destination != user_stack_va + frames.PageSize - 56 or frame.x[11] != 16) shutdown();
+        const physical_base = copy_out_stack_pa + frames.PageSize - 64;
+        copy_out_guard_before = @as(*volatile usize, @ptrFromInt(physical_base)).*;
+        copy_out_guard_after = @as(*volatile usize, @ptrFromInt(physical_base + 24)).*;
+        const plan = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(copy_out_destination), 16, .write_to_user, copy_out_query) catch shutdown();
+        if (plan.items().len != 1) shutdown();
+        for (plan.items()) |segment| {
+            copy_out_segment_pa = segment.physical_start.raw();
+            const target: [*]volatile u8 = @ptrFromInt(segment.physical_start.raw());
+            for (0..segment.byte_count) |i| target[i] = copy_out_payload[segment.request_offset + i];
+        }
+        frame.x[10] = 0x21c1;
+        frame.sepc = user_code_va + @intFromPtr(&userCopyOutProbeAfterService) - begin;
+    } else if (index == 1) {
+        const guard: *volatile usize = @ptrFromInt(copy_out_code_pa);
+        copy_out_code_before = guard.*;
+        _ = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(frame.x[10]), frame.x[11], .write_to_user, copy_out_query) catch |err| {
+            if (err != error.NotWritable) shutdown();
+            copy_out_code_after = guard.*;
+            frame.x[10] = 0x21c2;
+            frame.sepc = user_code_va + @intFromPtr(&userCopyOutProbeAfterPermissionReject) - begin;
+            prepareCopyOutReturn(frame, index);
+            return;
+        };
+        shutdown();
+    } else if (index == 2) {
+        const prefix: *volatile usize = @ptrFromInt(copy_out_stack_pa + frames.PageSize - 8);
+        copy_out_prefix_before = prefix.*;
+        _ = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(frame.x[10]), frame.x[11], .write_to_user, copy_out_query) catch |err| {
+            if (err != error.Unmapped) shutdown();
+            copy_out_prefix_after = prefix.*;
+            frame.x[10] = 0x21c3;
+            frame.sepc = user_code_va + @intFromPtr(&userCopyOutProbeAfterAtomicReject) - begin;
+            prepareCopyOutReturn(frame, index);
+            return;
+        };
+        shutdown();
+    } else {
+        if (frame.x[12] != 0x21cf) shutdown();
+        frame.sepc = @intFromPtr(&userServiceSupervisorResume);
+        frame.sstatus = (frame.sstatus & ~@as(usize, 0x40122)) | 0x100;
+        asm volatile ("csrw sepc, %[pc]; csrw sstatus, %[status]"
+            :
+            : [pc] "r" (frame.sepc),
+              [status] "r" (frame.sstatus),
+            : "memory"
+        );
+        service_trap_count = 2; // assembly terminal-return discriminator
+        return;
+    }
+    prepareCopyOutReturn(frame, index);
+}
+fn prepareCopyOutReturn(frame: *TrapFrame, index: usize) void {
+    frame.sstatus &= ~@as(usize, 0x40122);
+    copy_out_prepared[index] = frame.sepc;
+    copy_out_return_count += 1;
+    asm volatile ("csrw sepc, %[value]"
+        :
+        : [value] "r" (frame.sepc),
+    );
 }
 
 fn recordUserCopyTrap(frame: *TrapFrame) void {
@@ -1997,6 +2167,173 @@ export fn freestandingMain() callconv(.c) noreturn {
         copy_stvec_after != historical_stvec or copy_sscratch_after != 0 or post_marker.* != 0x21c0 or copy_trap_count != 2 or
         copy_prepared_sepc != user_code_va + @intFromPtr(&userCopyInProbeAfterService) - copy_begin or
         copy_final_leaf_count != final_leaf_count or copy_final_u_leaves != 2 or copy_final_wx_leaves != 0) shutdown();
+    // Batch 21C reuses every mapping and frame, then validates complete
+    // write-to-user plans before performing physical-segment writes.
+    const out_alloc_before = allocator.allocatedCount();
+    const out_tables_before = page_owner.page_count;
+    const out_satp_before = asm volatile ("csrr %[value], satp"
+        : [value] "=r" (-> usize),
+    );
+    const out_begin = @intFromPtr(&userCopyOutProbeTemplateBegin);
+    const out_end = @intFromPtr(&userCopyOutProbeTemplateEnd);
+    if (out_end <= out_begin or out_end - out_begin >= frames.PageSize) shutdown();
+    for (0..frames.PageSize) |index| destination[index] = 0;
+    const out_source: [*]const u8 = @ptrFromInt(out_begin);
+    for (0..out_end - out_begin) |index| destination[index] = out_source[index];
+    asm volatile ("fence.i" ::: "memory");
+    copy_out_stack_pa = user_stack_pa;
+    copy_out_code_pa = user_code_pa;
+    copy_out_query = .{ .context = &active_query, .queryFn = ActiveQuery.query };
+    copy_out_active = true;
+    service_trap_count = 0;
+    asm volatile ("mv a2, %[trap_stack]; li a0, 0x80401000; li a1, 0x80403000; call enterUserService"
+        :
+        : [trap_stack] "r" (trap_end),
+        : "memory", "ra", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "t0", "t1", "t2", "t3", "t4", "t5", "t6"
+    );
+    copy_out_active = false;
+    asm volatile ("csrw stvec, %[entry]; csrw sscratch, zero"
+        :
+        : [entry] "r" (historical_stvec),
+        : "memory"
+    );
+    const out_stvec_after = asm volatile ("csrr %[value], stvec"
+        : [value] "=r" (-> usize),
+    );
+    const out_sscratch_after = asm volatile ("csrr %[value], sscratch"
+        : [value] "=r" (-> usize),
+    );
+    const out_satp_after = asm volatile ("csrr %[value], satp"
+        : [value] "=r" (-> usize),
+    );
+    const out_guard_after_before: *volatile usize = @ptrFromInt(user_stack_pa + frames.PageSize - 64);
+    const out_observed: [*]const volatile u8 = @ptrFromInt(user_stack_pa + frames.PageSize - 56);
+    if (copy_out_traps != 4 or copy_out_return_count != 3 or out_alloc_before != allocator.allocatedCount() or
+        out_tables_before != page_owner.page_count or out_satp_before != out_satp_after or out_stvec_after != historical_stvec or
+        out_sscratch_after != 0 or copy_out_guard_before != out_guard_after_before.* or copy_out_guard_after != @as(*volatile usize, @ptrFromInt(user_stack_pa + frames.PageSize - 40)).* or
+        copy_out_code_before != copy_out_code_after or copy_out_prefix_before != copy_out_prefix_after) shutdown();
+    for (0..16) |i| if (out_observed[i] != copy_out_payload[i]) shutdown();
+    write("ZIGREF_USER_COPY_OUT_BEGIN\nuser_code_va=");
+    writeUsizeHex(user_code_va);
+    write("\nuser_code_pa=");
+    writeUsizeHex(user_code_pa);
+    write("\nuser_stack_va=");
+    writeUsizeHex(user_stack_va);
+    write("\nuser_stack_pa=");
+    writeUsizeHex(user_stack_pa);
+    write("\nsatp_before=");
+    writeUsizeHex(out_satp_before);
+    write("\nsatp_after=");
+    writeUsizeHex(out_satp_after);
+    write("\nroot_physical=");
+    writeUsizeHex(root_physical);
+    write("\nphysical_allocated_before=");
+    writeUsizeHex(out_alloc_before);
+    write("\nphysical_allocated_after=");
+    writeUsizeHex(allocator.allocatedCount());
+    write("\npage_table_count_before=");
+    writeUsizeHex(out_tables_before);
+    write("\npage_table_count_after=");
+    writeUsizeHex(page_owner.page_count);
+    write("\ntemplate_begin=");
+    writeUsizeHex(out_begin);
+    write("\nservice_ecall=");
+    writeUsizeHex(@intFromPtr(&userCopyOutProbeServiceEcall));
+    write("\nafter_service=");
+    writeUsizeHex(@intFromPtr(&userCopyOutProbeAfterService));
+    write("\npermission_ecall=");
+    writeUsizeHex(@intFromPtr(&userCopyOutProbePermissionRejectEcall));
+    write("\nafter_permission=");
+    writeUsizeHex(@intFromPtr(&userCopyOutProbeAfterPermissionReject));
+    write("\natomic_ecall=");
+    writeUsizeHex(@intFromPtr(&userCopyOutProbeAtomicRejectEcall));
+    write("\nafter_atomic=");
+    writeUsizeHex(@intFromPtr(&userCopyOutProbeAfterAtomicReject));
+    write("\nterminal_ecall=");
+    writeUsizeHex(@intFromPtr(&userCopyOutProbeTerminalEcall));
+    write("\ntemplate_end=");
+    writeUsizeHex(out_end);
+    write("\ndestination_va=");
+    writeUsizeHex(copy_out_destination);
+    write("\nlength=0000000000000010\nsegment_count=0000000000000001\nsegment_pa=");
+    writeUsizeHex(copy_out_segment_pa);
+    write("\nsegment_offset=0000000000000000\nsegment_bytes=0000000000000010\nsegment_coverage=0000000000000010\ntrusted_hex=6b65726e656c2d746f2d757365722121\nobserved_hex=6b65726e656c2d746f2d757365722121");
+    write("\nguard_before=");
+    writeUsizeHex(copy_out_guard_before);
+    write("\nguard_before_after=");
+    writeUsizeHex(out_guard_after_before.*);
+    write("\nguard_after=");
+    writeUsizeHex(copy_out_guard_after);
+    write("\nguard_after_after=");
+    writeUsizeHex(@as(*volatile usize, @ptrFromInt(user_stack_pa + frames.PageSize - 40)).*);
+    write("\npermission_va=0000000080401000\npermission_length=0000000000000010\npermission_result=NotWritable\ncode_guard_before=");
+    writeUsizeHex(copy_out_code_before);
+    write("\ncode_guard_after=");
+    writeUsizeHex(copy_out_code_after);
+    write("\natomic_va=0000000080402ff8\natomic_length=0000000000000010\nvalid_prefix_length=0000000000000008\natomic_result=Unmapped\nprefix_before=");
+    writeUsizeHex(copy_out_prefix_before);
+    write("\nprefix_after=");
+    writeUsizeHex(copy_out_prefix_after);
+    write("\ntrap_count=");
+    writeUsizeHex(copy_out_traps);
+    write("\nreturn_count=");
+    writeUsizeHex(copy_out_return_count);
+    inline for (0..4) |i| {
+        write("\ntrap" ++ ([_]u8{'0' + i}) ++ "_frame=");
+        writeUsizeHex(copy_out_frames[i]);
+        write("\ntrap" ++ ([_]u8{'0' + i}) ++ "_sepc=");
+        writeUsizeHex(copy_out_sepcs[i]);
+        write("\ntrap" ++ ([_]u8{'0' + i}) ++ "_sstatus=");
+        writeUsizeHex(copy_out_status[i]);
+    }
+    inline for (0..3) |i| {
+        write("\nprepared" ++ ([_]u8{'0' + i}) ++ "_sepc=");
+        writeUsizeHex(copy_out_prepared[i]);
+    }
+    write("\nstvec_after=");
+    writeUsizeHex(out_stvec_after);
+    write("\nsscratch_after=");
+    writeUsizeHex(out_sscratch_after);
+    var out_leaf_count: usize = 0;
+    var out_u: usize = 0;
+    var out_wx: usize = 0;
+    address = text_begin;
+    while (address < writable_end) : (address += frames.PageSize) {
+        const leaf = builder.query(address) catch shutdown();
+        out_leaf_count += 1;
+        out_u += @intFromBool(leaf.raw_entry & 0x10 != 0);
+        out_wx += @intFromBool(leaf.raw_entry & 0xc == 0xc);
+        write("\nleaf_va=");
+        writeUsizeHex(address);
+        write(",pa=");
+        writeUsizeHex(leaf.physical_address);
+        write(",pte=");
+        writeUsizeHex(leaf.raw_entry);
+        write(",level=");
+        writeUsizeHex(@intFromEnum(leaf.level));
+    }
+    for ([_]usize{ sv39_alias, user_code_va, user_stack_va }) |va| {
+        const leaf = builder.query(va) catch shutdown();
+        out_leaf_count += 1;
+        out_u += @intFromBool(leaf.raw_entry & 0x10 != 0);
+        out_wx += @intFromBool(leaf.raw_entry & 0xc == 0xc);
+        write("\nleaf_va=");
+        writeUsizeHex(va);
+        write(",pa=");
+        writeUsizeHex(leaf.physical_address);
+        write(",pte=");
+        writeUsizeHex(leaf.raw_entry);
+        write(",level=");
+        writeUsizeHex(@intFromEnum(leaf.level));
+    }
+    write("\nfinal_u_leaves=");
+    writeUsizeHex(out_u);
+    write("\nfinal_wx_leaves=");
+    writeUsizeHex(out_wx);
+    write("\nfinal_leaf_count=");
+    writeUsizeHex(out_leaf_count);
+    write("\ntranslation_change=none\nsfence_vma=not-required-no-pte-change\nfence_i=local-hart-executed\nsum=observed-zero\ncomplete=PASS\nZIGREF_USER_COPY_OUT_END\nZIGREF_USER_COPY_OUT_RETURNED\n");
+    if (out_u != 2 or out_wx != 0 or out_leaf_count != copy_final_leaf_count) shutdown();
     var output: [128]u8 = undefined;
     var trace: [2048]u8 = undefined;
     const result = morphic.runFake(&output, &trace) catch {
