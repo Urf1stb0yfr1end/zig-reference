@@ -267,6 +267,42 @@
         ],
         "zigVersion": "0.14.0"
       },
+      "module": "bounded-elf64-load-plan",
+      "path": "projects/54-bounded-elf64-load-plan/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "Error",
+            "LoadPlan",
+            "Permissions",
+            "SegmentPlan",
+            "max_program_headers",
+            "plan",
+            "riscv_machine"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-bounded-elf64-load-plan",
+            "zig build smoke-bounded-elf64-load-plan"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented bounded-elf64-load-plan public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
       "module": "bounded-integer",
       "path": "projects/12-bounded-integer/port.js",
       "risks": [

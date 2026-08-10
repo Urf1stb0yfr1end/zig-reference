@@ -19,6 +19,14 @@
     "bounded-deterministic-scheduler": [
       "fixed-capacity-priority-queue"
     ],
+    "bounded-elf64-load-plan": [
+      "bounded-byte-reader",
+      "checked-half-open-range",
+      "distinct-memory-address-types",
+      "elf64-file-header-parser",
+      "elf64-program-header-parser",
+      "fixed-capacity-vector"
+    ],
     "bounded-integer": [],
     "bounded-system-resource-plan": [
       "aligned-address-and-size-helpers",

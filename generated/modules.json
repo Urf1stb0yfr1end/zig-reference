@@ -974,6 +974,24 @@
       "status": "experimental-unverified",
       "summary": "Plan bounded user virtual ranges as validated physical fragments.",
       "target_maturity_level": 2
+    },
+    {
+      "aliases": [],
+      "declared_maturity": "experimental",
+      "deprecated_names": [],
+      "details": "projects/54-bounded-elf64-load-plan/details.json",
+      "directory": "projects/54-bounded-elf64-load-plan",
+      "display_name": "Bounded Elf64 Load Plan",
+      "id": "54",
+      "implementation_version": "1.0.0",
+      "lifecycle": "experimental",
+      "name": "bounded-elf64-load-plan",
+      "public_contract_version": "1.0.0",
+      "replacement_module": "",
+      "source": "projects/54-bounded-elf64-load-plan/src/bounded_elf64_load_plan.zig",
+      "status": "experimental-unverified",
+      "summary": "Convert bounded ELF64 bytes into a failure-atomic RV64 load plan.",
+      "target_maturity_level": 2
     }
   ],
   "repository_index_version": "1.0.0"

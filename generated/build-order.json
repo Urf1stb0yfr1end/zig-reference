@@ -55,6 +55,7 @@
     "elf64-program-header-parser",
     "length-prefixed-binary-field",
     "physical-page-frame-allocator",
+    "bounded-elf64-load-plan",
     "type-length-value-decoder"
   ],
   "generator": "tools/build-repository-index.py",

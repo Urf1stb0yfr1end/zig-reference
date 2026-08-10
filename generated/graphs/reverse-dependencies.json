@@ -32,6 +32,7 @@
     "bounded-byte-reader": [
       "binary-cursor-checkpoint",
       "bounded-binary-sub-reader",
+      "bounded-elf64-load-plan",
       "elf64-file-header-parser",
       "elf64-program-header-parser",
       "length-prefixed-binary-field",
@@ -39,6 +40,7 @@
     ],
     "bounded-deterministic-event-trace": [],
     "bounded-deterministic-scheduler": [],
+    "bounded-elf64-load-plan": [],
     "bounded-integer": [
       "bounded-system-resource-plan"
     ],
@@ -48,6 +50,7 @@
       "owned-byte-buffer"
     ],
     "checked-half-open-range": [
+      "bounded-elf64-load-plan",
       "bounded-user-memory-transfer-plan",
       "elf64-file-header-parser",
       "elf64-program-header-parser",
@@ -62,6 +65,7 @@
       "type-length-value-decoder"
     ],
     "distinct-memory-address-types": [
+      "bounded-elf64-load-plan",
       "bounded-user-memory-transfer-plan",
       "elf64-program-header-parser",
       "physical-memory-region-set",
@@ -74,9 +78,12 @@
       "stack"
     ],
     "elf64-file-header-parser": [
+      "bounded-elf64-load-plan",
       "elf64-program-header-parser"
     ],
-    "elf64-program-header-parser": [],
+    "elf64-program-header-parser": [
+      "bounded-elf64-load-plan"
+    ],
     "endian-integer-codec": [
       "elf64-file-header-parser",
       "elf64-program-header-parser",
@@ -95,6 +102,7 @@
       "bounded-system-resource-plan"
     ],
     "fixed-capacity-vector": [
+      "bounded-elf64-load-plan",
       "bounded-user-memory-transfer-plan",
       "elf64-program-header-parser",
       "fixed-capacity-priority-queue",

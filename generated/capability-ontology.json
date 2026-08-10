@@ -211,6 +211,7 @@
       "description": "Repository capability represented by: allocation-free.",
       "implementing_modules": [
         "bounded-deterministic-event-trace",
+        "bounded-elf64-load-plan",
         "bounded-user-memory-transfer-plan"
       ],
       "narrower_capabilities": [],
@@ -540,6 +541,7 @@
       "implementing_modules": [
         "bounded-deterministic-event-trace",
         "bounded-deterministic-scheduler",
+        "bounded-elf64-load-plan",
         "bounded-system-resource-plan",
         "bounded-user-memory-transfer-plan",
         "fixed-bump-allocator",
@@ -709,6 +711,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "bounded-elf64-load-planning",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bounded-elf64-load-planning"
+      ],
+      "description": "Repository capability represented by: bounded-elf64-load-planning.",
+      "implementing_modules": [
+        "bounded-elf64-load-plan"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "bounds",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -718,6 +737,23 @@
       "implementing_modules": [
         "bounded-byte-reader",
         "checked-half-open-range"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bss",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bss"
+      ],
+      "description": "Repository capability represented by: bss.",
+      "implementing_modules": [
+        "bounded-elf64-load-plan"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -1394,6 +1430,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "elf64",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "elf64"
+      ],
+      "description": "Repository capability represented by: elf64.",
+      "implementing_modules": [
+        "bounded-elf64-load-plan"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "endian integer decode",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -1454,6 +1507,23 @@
       "implementing_modules": [
         "bounded-byte-reader",
         "endian-integer-codec"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "entry",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "entry"
+      ],
+      "description": "Repository capability represented by: entry.",
+      "implementing_modules": [
+        "bounded-elf64-load-plan"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -1556,6 +1626,23 @@
       "description": "Repository capability represented by: failure-atomic transition.",
       "implementing_modules": [
         "state-machine"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "failure-atomic-load-planning",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "failure-atomic-load-planning"
+      ],
+      "description": "Repository capability represented by: failure-atomic-load-planning.",
+      "implementing_modules": [
+        "bounded-elf64-load-plan"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -3172,6 +3259,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "partial or policy-ambiguous elf load planning",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "partial or policy-ambiguous elf load planning"
+      ],
+      "description": "Repository capability represented by: partial or policy-ambiguous elf load planning.",
+      "implementing_modules": [
+        "bounded-elf64-load-plan"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "permission bits",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -3410,6 +3514,23 @@
       "description": "Repository capability represented by: protocols.",
       "implementing_modules": [
         "validated-bit-flags"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "pt_load",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "pt_load"
+      ],
+      "description": "Repository capability represented by: pt_load.",
+      "implementing_modules": [
+        "bounded-elf64-load-plan"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -3866,6 +3987,40 @@
       "description": "Repository capability represented by: rollover.",
       "implementing_modules": [
         "wrapping-sequence-number"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "rv64",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "rv64"
+      ],
+      "description": "Repository capability represented by: rv64.",
+      "implementing_modules": [
+        "bounded-elf64-load-plan"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "rv64-elf-acceptance",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "rv64-elf-acceptance"
+      ],
+      "description": "Repository capability represented by: rv64-elf-acceptance.",
+      "implementing_modules": [
+        "bounded-elf64-load-plan"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],

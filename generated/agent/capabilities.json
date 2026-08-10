@@ -42,6 +42,9 @@
     "bounded-deterministic-scheduling": [
       "bounded-deterministic-scheduler"
     ],
+    "bounded-elf64-load-planning": [
+      "bounded-elf64-load-plan"
+    ],
     "bounded-integer": [
       "bounded-integer"
     ],
@@ -132,6 +135,9 @@
     ],
     "explicit-endian-writing": [
       "byte-writer"
+    ],
+    "failure-atomic-load-planning": [
+      "bounded-elf64-load-plan"
     ],
     "fixed-bit-set": [
       "bit-set"
@@ -237,6 +243,9 @@
     ],
     "riscv-sv39-page-table-walker": [
       "riscv-sv39-page-table-walker"
+    ],
+    "rv64-elf-acceptance": [
+      "bounded-elf64-load-plan"
     ],
     "safe-integer-narrowing": [
       "checked-integer-cast"

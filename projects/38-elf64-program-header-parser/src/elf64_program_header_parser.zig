@@ -68,7 +68,7 @@ pub fn parseTable(comptime capacity_: usize, file_reader: *bounded.BoundedReader
         error.OutOfRange => return error.OutOfRange,
         error.TableOutOfBounds => return error.TableOutOfBounds,
     };
-    try file_reader.seek(table.start);
+    file_reader.seek(table.start) catch return error.TableOutOfBounds;
     var region = sub.BoundedBinarySubReader.create(file_reader, table.length(), .immediate) catch return error.TableOutOfBounds;
     var result = vectors.FixedVector(Segment, capacity_).init();
     var i: usize = 0;

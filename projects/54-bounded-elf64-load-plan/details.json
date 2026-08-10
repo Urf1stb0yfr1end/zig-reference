@@ -1,0 +1,1130 @@
+{
+  "schema_version": "3.0.0",
+  "contract_version": "0.1.0",
+  "generated_at": "2026-08-10",
+  "last_reviewed_at": "2026-08-10",
+  "module": {
+    "id": "54",
+    "canonical_name": "bounded-elf64-load-plan",
+    "display_name": "Bounded Elf64 Load Plan",
+    "directory": "projects/54-bounded-elf64-load-plan",
+    "summary": "Convert bounded ELF64 bytes into a failure-atomic RV64 load plan.",
+    "long_description": "Allocation-free composition of canonical ELF parsers with a narrow static RV64 acceptance policy.",
+    "status": "experimental-unverified",
+    "maturity": "experimental",
+    "lifecycle": "experimental",
+    "target_maturity_level": 2,
+    "implementation_version": "1.0.0",
+    "public_contract_version": "1.0.0",
+    "introduced_version": "1.0.0",
+    "deprecated_version": "",
+    "superseded_version": "",
+    "removed_version": "",
+    "replacement_module": "",
+    "migration_guide": "",
+    "support_policy": "Experimental; semantic contract versioning applies.",
+    "deprecation_reason": "",
+    "category": "foundation",
+    "subcategory": "binary",
+    "tags": [
+      "elf64",
+      "rv64",
+      "bounded",
+      "allocation-free"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Convert bounded ELF64 bytes into a failure-atomic RV64 load plan.",
+    "secondary": [
+      "Preserve load, zero-fill, permission, alignment, ordering, and entry truth."
+    ],
+    "non_goals": [
+      "execute ELF files",
+      "map pages",
+      "support dynamic ELF"
+    ],
+    "problems_solved": [
+      "partial or policy-ambiguous ELF load planning"
+    ],
+    "future_role": "Batch 22B machine orchestration consumes the settled plan."
+  },
+  "c_pain": {
+    "summary": "A direct C loader is compact, but checked arithmetic, whole-file policy, and failure atomicity remain conventions.",
+    "common_failure_modes": [
+      "wrapped ranges",
+      "partial loads",
+      "widened permissions"
+    ],
+    "maintenance_burdens": [
+      "duplicated loader policy"
+    ],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "Straight-line parsing and copying are direct.",
+    "where_c_degrades": "Validation and mutation are easily interleaved."
+  },
+  "zig_response": {
+    "summary": "Error unions, checked ranges, typed addresses, and fixed storage expose acceptance truth.",
+    "language_features": [
+      "error unions",
+      "comptime",
+      "tagged unions"
+    ],
+    "guarantees_made_visible": [
+      "failure atomicity",
+      "bounded capacity",
+      "permission truth"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "consume the plan without widening policy"
+    ],
+    "tradeoffs": [
+      "static ET_EXEC RV64 subset only",
+      "64 program-header bound"
+    ]
+  },
+  "locations": {
+    "module_root": "projects/54-bounded-elf64-load-plan",
+    "implementation": [
+      "projects/54-bounded-elf64-load-plan/src/bounded_elf64_load_plan.zig"
+    ],
+    "public_entrypoint": "projects/54-bounded-elf64-load-plan/src/bounded_elf64_load_plan.zig",
+    "readme": "projects/54-bounded-elf64-load-plan/README.md",
+    "mastery": "projects/54-bounded-elf64-load-plan/MASTERY.md",
+    "details_markdown": "projects/54-bounded-elf64-load-plan/DETAILS.md",
+    "details_json": "projects/54-bounded-elf64-load-plan/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": [],
+    "unit_tests": [
+      "projects/54-bounded-elf64-load-plan/src/bounded_elf64_load_plan.zig"
+    ],
+    "smoke_tests": [
+      "projects/54-bounded-elf64-load-plan/tests/smoke_test.zig"
+    ],
+    "generated_files": [],
+    "dependency_contracts": [
+      "projects/04-bounded-byte-reader/details.json",
+      "projects/00-fixed-capacity-vector/details.json",
+      "projects/17-checked-half-open-range/details.json",
+      "projects/18-distinct-memory-address-types/details.json",
+      "projects/37-elf64-file-header-parser/details.json",
+      "projects/38-elf64-program-header-parser/details.json"
+    ]
+  },
+  "public_surface": {
+    "root_symbols": [
+      "Error",
+      "LoadPlan",
+      "Permissions",
+      "SegmentPlan",
+      "max_program_headers",
+      "plan",
+      "riscv_machine"
+    ],
+    "types": [
+      {
+        "name": "Error",
+        "kind": "public declaration"
+      },
+      {
+        "name": "LoadPlan",
+        "kind": "public declaration"
+      },
+      {
+        "name": "Permissions",
+        "kind": "public declaration"
+      },
+      {
+        "name": "SegmentPlan",
+        "kind": "public declaration"
+      }
+    ],
+    "functions": [
+      {
+        "name": "LoadPlan",
+        "signature": "LoadPlan(comptime capacity: usize) type"
+      },
+      {
+        "name": "plan",
+        "signature": "plan(comptime capacity: usize, bytes: []const u8) Error!LoadPlan(capacity)"
+      }
+    ],
+    "methods": [],
+    "constants": [
+      {
+        "name": "max_program_headers",
+        "type": "usize",
+        "value": "64",
+        "summary": "Maximum parsed program-header rows."
+      },
+      {
+        "name": "riscv_machine",
+        "type": "u16",
+        "value": "243",
+        "summary": "ELF RISC-V machine identity."
+      }
+    ],
+    "errors": [
+      "UnsupportedEndian",
+      "UnsupportedMachine",
+      "UnsupportedObjectType",
+      "UnsupportedFeature",
+      "NoLoadableSegment",
+      "SegmentFileOutOfBounds",
+      "UnsupportedPermissions",
+      "UnsupportedAlignment",
+      "OverlappingLoadSegments",
+      "EntryNotExecutable",
+      "PlanCapacityExceeded"
+    ],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": [],
+    "endpoints": [
+      {
+        "name": "LoadPlan",
+        "kind": "function",
+        "signature": "LoadPlan(comptime capacity: usize) type",
+        "visibility": "public",
+        "summary": "Construct the fixed-capacity owned plan type.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "capacity",
+            "type": "usize",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Construct the fixed-capacity owned plan type.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "No partial plan escapes on failure.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "plan",
+        "kind": "function",
+        "signature": "plan(comptime capacity: usize, bytes: []const u8) Error!LoadPlan(capacity)",
+        "visibility": "public",
+        "summary": "Validate bounded ELF bytes and return a complete plan.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "capacity",
+            "type": "usize",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          },
+          {
+            "name": "bytes",
+            "type": "[]const u8",
+            "role": "operation input",
+            "ownership": "borrowed",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Validate bounded ELF bytes and return a complete plan.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "No partial plan escapes on failure.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "items",
+        "kind": "function",
+        "signature": "items(self: *const LoadPlan) []const SegmentPlan",
+        "visibility": "public",
+        "summary": "Borrow immutable planned segments.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "self",
+            "type": "*const LoadPlan",
+            "role": "operation input",
+            "ownership": "borrowed",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Borrow immutable planned segments.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "No partial plan escapes on failure.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      }
+    ]
+  },
+  "inputs": [],
+  "outputs": [],
+  "state": {
+    "fields": [],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [],
+    "ownership": [
+      "The returned plan owns inline segment storage."
+    ],
+    "ordering": [
+      "Segments remain in program-header order."
+    ],
+    "bounds": [
+      "At most 64 program headers and capacity admitted loads."
+    ],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": [
+      "Canonical ELF parsers define structural decoding."
+    ]
+  },
+  "ownership": {
+    "owns": [
+      "Returned inline segment plan values."
+    ],
+    "borrows": [
+      "ELF bytes for the duration of plan only."
+    ],
+    "copies": [
+      "All returned plan facts."
+    ],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [],
+    "optional_empty_results": [],
+    "failure_atomicity": "No LoadPlan value is returned until every row and the entry relation validate.",
+    "state_after_failure": [
+      "No module or caller-owned state changes."
+    ],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [
+      {
+        "module": "bounded-byte-reader",
+        "path": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig",
+        "symbol": "BoundedReader",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "fixed-capacity-vector",
+        "path": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig",
+        "symbol": "FixedVector",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "checked-half-open-range",
+        "path": "projects/17-checked-half-open-range/src/checked_half_open_range.zig",
+        "symbol": "CheckedRange",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "distinct-memory-address-types",
+        "path": "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig",
+        "symbol": "GuestVirtualAddress",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "elf64-file-header-parser",
+        "path": "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig",
+        "symbol": "parse",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "elf64-program-header-parser",
+        "path": "projects/38-elf64-program-header-parser/src/elf64_program_header_parser.zig",
+        "symbol": "parseTable",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      }
+    ],
+    "standard_library": [],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": []
+  },
+  "dependency_contracts": [
+    {
+      "module": "bounded-byte-reader",
+      "directory": "projects/04-bounded-byte-reader",
+      "import_name": "bounded-byte-reader",
+      "import_path": "projects/04-bounded-byte-reader/src/bounded_byte_reader.zig",
+      "symbols_used": [
+        "BoundedReader"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/04-bounded-byte-reader/details.json"
+    },
+    {
+      "module": "fixed-capacity-vector",
+      "directory": "projects/00-fixed-capacity-vector",
+      "import_name": "fixed-capacity-vector",
+      "import_path": "projects/00-fixed-capacity-vector/src/fixed_capacity_vector.zig",
+      "symbols_used": [
+        "FixedVector"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/00-fixed-capacity-vector/details.json"
+    },
+    {
+      "module": "checked-half-open-range",
+      "directory": "projects/17-checked-half-open-range",
+      "import_name": "checked-half-open-range",
+      "import_path": "projects/17-checked-half-open-range/src/checked_half_open_range.zig",
+      "symbols_used": [
+        "CheckedRange"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/17-checked-half-open-range/details.json"
+    },
+    {
+      "module": "distinct-memory-address-types",
+      "directory": "projects/18-distinct-memory-address-types",
+      "import_name": "distinct-memory-address-types",
+      "import_path": "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig",
+      "symbols_used": [
+        "GuestVirtualAddress"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/18-distinct-memory-address-types/details.json"
+    },
+    {
+      "module": "elf64-file-header-parser",
+      "directory": "projects/37-elf64-file-header-parser",
+      "import_name": "elf64-file-header-parser",
+      "import_path": "projects/37-elf64-file-header-parser/src/elf64_file_header_parser.zig",
+      "symbols_used": [
+        "parse"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/37-elf64-file-header-parser/details.json"
+    },
+    {
+      "module": "elf64-program-header-parser",
+      "directory": "projects/38-elf64-program-header-parser",
+      "import_name": "elf64-program-header-parser",
+      "import_path": "projects/38-elf64-program-header-parser/src/elf64_program_header_parser.zig",
+      "symbols_used": [
+        "parseTable"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/38-elf64-program-header-parser/details.json"
+    }
+  ],
+  "expected_dependents": [],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "bounded-elf64-load-plan",
+    "import_path": "projects/54-bounded-elf64-load-plan/src/bounded_elf64_load_plan.zig",
+    "import_configuration": "Root build named module.",
+    "minimal_example": "const p = try planner.plan(4, elf_bytes);",
+    "integration_patterns": [],
+    "pipeline_position": [
+      "bounded ELF bytes",
+      "canonical parsers",
+      "load plan",
+      "later machine orchestration"
+    ],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "",
+    "minimum_zig_version": "",
+    "maximum_tested_zig_version": "",
+    "hosted": "",
+    "freestanding": "",
+    "thread_safe": "",
+    "reentrant": "",
+    "interrupt_safe": "",
+    "async_safe": "",
+    "signal_safe": "",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "",
+    "no_std_equivalent": ""
+  },
+  "concurrency": {
+    "internal_synchronization": "",
+    "caller_synchronization_required": "",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-bounded-elf64-load-plan",
+    "commands": [
+      "zig build test-bounded-elf64-load-plan"
+    ],
+    "unit_tests": [
+      "positive load plan and BSS",
+      "overlap and touching ranges",
+      "policy/bounds/entry/capacity rejection",
+      "parser propagation",
+      "later-row failure atomicity"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [
+      "exclusive entry end",
+      "touching ranges",
+      "capacity"
+    ],
+    "regression_tests": [],
+    "test_dependencies": [],
+    "smoke_test_commands": [
+      "zig build smoke-bounded-elf64-load-plan"
+    ],
+    "smoke_test_behaviors": [
+      "external import and public constants/type"
+    ],
+    "smoke_test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "",
+    "continuous_integration": "",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [],
+    "status_dimensions": {
+      "implementation_present": true,
+      "contract_complete": true,
+      "contract_formatted": true,
+      "unit_tests_present": true,
+      "smoke_test_present": true,
+      "contract_checker_passed": false,
+      "compiler_validated": false,
+      "unit_tests_passed": false,
+      "smoke_tests_passed": false
+    }
+  },
+  "documentation": {
+    "read_order": [],
+    "examples_covered": [],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [],
+    "related_modules": [],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "",
+    "breaking_change_policy": "",
+    "deprecation_policy": "",
+    "known_gaps": [],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [],
+    "synchronization_requirements": [],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "bounded-elf64-load-planning",
+      "rv64-elf-acceptance",
+      "failure-atomic-load-planning"
+    ],
+    "problems": [],
+    "inputs": [
+      "bounded ELF64 bytes"
+    ],
+    "outputs": [
+      "owned immutable LoadPlan"
+    ],
+    "environments": [
+      "hosted",
+      "freestanding"
+    ],
+    "keywords": [
+      "ELF64",
+      "RV64",
+      "PT_LOAD",
+      "entry",
+      "BSS"
+    ],
+    "grep_terms": [],
+    "natural_language_queries": [],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "ELF acceptance and planning",
+    "reuses_modules": [
+      "elf64-file-header-parser",
+      "elf64-program-header-parser",
+      "fixed-capacity-vector",
+      "checked-half-open-range",
+      "distinct-memory-address-types"
+    ],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [
+      "Batch 22B RV64 ELF machine orchestration"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Settles ELF interpretation before machine mutation.",
+    "snowball_score": ""
+  },
+  "agent_guidance": {
+    "use_when": [],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [],
+    "verification_steps": [],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [],
+    "files_to_read_first": [],
+    "files_not_required_for_basic_use": [],
+    "smoke_test_before_integration": ""
+  },
+  "source_map": {
+    "symbols_to_files": [],
+    "tests_to_behaviors": [],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": [],
+    "smoke_tests_to_public_symbols": [],
+    "smoke_tests_to_dependencies": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": []
+  },
+  "smoke_test": {
+    "required": true,
+    "implemented": true,
+    "status": "implemented-unverified",
+    "source_path": "projects/54-bounded-elf64-load-plan/tests/smoke_test.zig",
+    "build_step": "smoke-bounded-elf64-load-plan",
+    "commands": [
+      "zig build smoke-bounded-elf64-load-plan"
+    ],
+    "public_import_used": "bounded-elf64-load-plan",
+    "public_symbols_exercised": [
+      "LoadPlan",
+      "max_program_headers",
+      "riscv_machine"
+    ],
+    "successful_operations": [
+      "external import compiles"
+    ],
+    "failure_or_boundary_operations": [],
+    "cleanup_exercised": [],
+    "repository_dependencies_exercised": [],
+    "hosted_environment_required": "yes",
+    "freestanding_environment_required": "no",
+    "fixtures": [],
+    "expected_exit_status": "0",
+    "expected_output": [],
+    "forbidden_private_access": true,
+    "last_run": "",
+    "last_result": "unverified",
+    "last_validated_commit": "",
+    "compiler_version": "",
+    "known_failures": [],
+    "notes": []
+  },
+  "portability": {
+    "baseline_zig_version": "0.14.0",
+    "port_contract": "projects/54-bounded-elf64-load-plan/port.js",
+    "port_contract_schema": "port.schema.json",
+    "tested_zig_versions": [],
+    "untested_zig_versions": [
+      ">0.14.0"
+    ],
+    "dependencies_must_port_first": [
+      "elf64-file-header-parser",
+      "elf64-program-header-parser",
+      "fixed-capacity-vector",
+      "checked-half-open-range",
+      "distinct-memory-address-types"
+    ],
+    "version_sensitive_symbols": [],
+    "version_sensitive_files": [],
+    "semantic_guarantees_to_preserve": [],
+    "validation_commands": [
+      "zig build test-bounded-elf64-load-plan",
+      "zig build smoke-bounded-elf64-load-plan"
+    ],
+    "known_porting_blockers": [],
+    "automatic_port_guaranteed": false,
+    "notes": []
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Convert bounded ELF64 bytes into a failure-atomic RV64 load plan.",
+    "search_aliases": [
+      "RV64 ELF load planner",
+      "PT_LOAD plan",
+      "bounded ELF acceptance"
+    ],
+    "capability_ids": [
+      "bounded-elf64-load-planning",
+      "rv64-elf-acceptance",
+      "failure-atomic-load-planning"
+    ],
+    "use_when": [
+      "Need to accept bounded static RV64 ELF bytes before any machine mutation."
+    ],
+    "do_not_use_when": [
+      "Need dynamic linking, page mapping, byte copying, or U-mode execution."
+    ],
+    "entrypoint": "projects/54-bounded-elf64-load-plan/src/bounded_elf64_load_plan.zig",
+    "public_symbols": [
+      "Error",
+      "LoadPlan",
+      "Permissions",
+      "SegmentPlan",
+      "max_program_headers",
+      "plan",
+      "riscv_machine"
+    ],
+    "dependency_ids": [
+      "bounded-byte-reader",
+      "fixed-capacity-vector",
+      "checked-half-open-range",
+      "distinct-memory-address-types",
+      "elf64-file-header-parser",
+      "elf64-program-header-parser"
+    ],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "resolver": [
+        "Borrowed synchronously during plan."
+      ],
+      "items": [
+        "Borrows returned plan storage."
+      ]
+    },
+    "invalidation": {
+      "plan move or destruction": [
+        "items slice is invalidated."
+      ]
+    },
+    "failure_guarantees": [
+      "Every failure returns no plan value; no machine state changes."
+    ],
+    "effects": [
+      "borrows_caller_memory",
+      "returns_borrow",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "test-bounded-elf64-load-plan",
+      "smoke-bounded-elf64-load-plan"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [
+        "target-neutral mechanism",
+        "RV64 acceptance policy"
+      ],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "little",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": [
+        "capacity"
+      ]
+    },
+    "construction": {
+      "named_import": "bounded-elf64-load-plan",
+      "primary_symbol": "plan",
+      "initialization": "const load = try plan(4, elf_bytes);"
+    },
+    "operation_map": {
+      "build plan": "plan",
+      "segments": "items"
+    },
+    "error_map": [
+      {
+        "error": "UnsupportedEndian",
+        "operation": "plan",
+        "meaning": "UnsupportedEndian acceptance or planning failure.",
+        "handling": "Reject the ELF or correct the bounded fixture before retrying."
+      },
+      {
+        "error": "UnsupportedMachine",
+        "operation": "plan",
+        "meaning": "UnsupportedMachine acceptance or planning failure.",
+        "handling": "Reject the ELF or correct the bounded fixture before retrying."
+      },
+      {
+        "error": "UnsupportedObjectType",
+        "operation": "plan",
+        "meaning": "UnsupportedObjectType acceptance or planning failure.",
+        "handling": "Reject the ELF or correct the bounded fixture before retrying."
+      },
+      {
+        "error": "UnsupportedFeature",
+        "operation": "plan",
+        "meaning": "UnsupportedFeature acceptance or planning failure.",
+        "handling": "Reject the ELF or correct the bounded fixture before retrying."
+      },
+      {
+        "error": "NoLoadableSegment",
+        "operation": "plan",
+        "meaning": "NoLoadableSegment acceptance or planning failure.",
+        "handling": "Reject the ELF or correct the bounded fixture before retrying."
+      },
+      {
+        "error": "SegmentFileOutOfBounds",
+        "operation": "plan",
+        "meaning": "SegmentFileOutOfBounds acceptance or planning failure.",
+        "handling": "Reject the ELF or correct the bounded fixture before retrying."
+      },
+      {
+        "error": "UnsupportedPermissions",
+        "operation": "plan",
+        "meaning": "UnsupportedPermissions acceptance or planning failure.",
+        "handling": "Reject the ELF or correct the bounded fixture before retrying."
+      },
+      {
+        "error": "UnsupportedAlignment",
+        "operation": "plan",
+        "meaning": "UnsupportedAlignment acceptance or planning failure.",
+        "handling": "Reject the ELF or correct the bounded fixture before retrying."
+      },
+      {
+        "error": "OverlappingLoadSegments",
+        "operation": "plan",
+        "meaning": "OverlappingLoadSegments acceptance or planning failure.",
+        "handling": "Reject the ELF or correct the bounded fixture before retrying."
+      },
+      {
+        "error": "EntryNotExecutable",
+        "operation": "plan",
+        "meaning": "EntryNotExecutable acceptance or planning failure.",
+        "handling": "Reject the ELF or correct the bounded fixture before retrying."
+      },
+      {
+        "error": "PlanCapacityExceeded",
+        "operation": "plan",
+        "meaning": "PlanCapacityExceeded acceptance or planning failure.",
+        "handling": "Reject the ELF or correct the bounded fixture before retrying."
+      }
+    ],
+    "composition": {
+      "commonly_with": [
+        "riscv-sv39-page-table-walker"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Program-header order.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Does not copy, map, zero, fence, or execute ELF segments."
+    ],
+    "minimal_usage": [
+      "const elf_plan = @import(\"bounded-elf64-load-plan\");",
+      "const load = try elf_plan.plan(4, elf_bytes);"
+    ],
+    "integration_notes": [
+      "Consume exact segment facts without widening permissions."
+    ],
+    "canonical_invariants": []
+  }
+}

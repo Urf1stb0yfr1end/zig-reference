@@ -148,6 +148,12 @@
     },
     {
       "kind": "function",
+      "module": "bounded-elf64-load-plan",
+      "name": "LoadPlan",
+      "signature": "LoadPlan(comptime capacity: usize) type"
+    },
+    {
+      "kind": "function",
       "module": "nonzero-integer",
       "name": "NonZeroInteger",
       "signature": "NonZeroInteger(comptime T: type) type"
@@ -1360,6 +1366,12 @@
     },
     {
       "kind": "function",
+      "module": "bounded-elf64-load-plan",
+      "name": "items",
+      "signature": "items(self: *const LoadPlan) []const SegmentPlan"
+    },
+    {
+      "kind": "function",
       "module": "bounded-user-memory-transfer-plan",
       "name": "items",
       "signature": "items(self: *const Self) []const Segment"
@@ -1585,6 +1597,12 @@
       "module": "riscv-sv39-page-table-entry",
       "name": "permissions",
       "signature": "permissions()"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-elf64-load-plan",
+      "name": "plan",
+      "signature": "plan(comptime capacity: usize, bytes: []const u8) Error!LoadPlan(capacity)"
     },
     {
       "kind": "function",

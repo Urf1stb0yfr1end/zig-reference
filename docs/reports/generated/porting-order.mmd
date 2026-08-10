@@ -52,4 +52,5 @@ graph LR
   n49["bounded-system-resource-plan"] --> n50["elf64-program-header-parser"]
   n50["elf64-program-header-parser"] --> n51["length-prefixed-binary-field"]
   n51["length-prefixed-binary-field"] --> n52["physical-page-frame-allocator"]
-  n52["physical-page-frame-allocator"] --> n53["type-length-value-decoder"]
+  n52["physical-page-frame-allocator"] --> n53["bounded-elf64-load-plan"]
+  n53["bounded-elf64-load-plan"] --> n54["type-length-value-decoder"]
