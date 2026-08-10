@@ -379,3 +379,9 @@ PR #43 final review repair made both Batch 21C verifier modes append one bounded
 `zig build test-bounded-elf64-load-plan` runs the deterministic positive and rejection matrix for static RV64 ELF acceptance and failure-atomic PT_LOAD planning. `zig build smoke-bounded-elf64-load-plan` verifies the external named import. Batch 22A ran both successfully under Zig 0.14.0; it did not execute an ELF or require system QEMU. The complete validation record is `docs/reports/AGENTIC_SNOWBALL_BATCH_22A.md`.
 
 PR #44 final Batch 22A merge-gate repair added deterministic planner rejection for ELF write-without-read permissions and checked `e_entry` conversion boundaries; the focused planner/parser stack and complete repository validation were rerun under Zig 0.14.0. This remains load planning only and does not execute an ELF.
+
+## First real RV64 userspace ELF execution (Batch 22B)
+
+- `zig build install-userspace-rv64-elf --prefix PATH` separately builds and installs the stripped, static, one-PT_LOAD RV64 ET_EXEC fixture at `PATH/bin/userspace-elf-rv64`.
+- `python3 tools/verify-freestanding-riscv64-userspace-elf.py --self-test` runs one real-QEMU fixture and mutation-rejects the artifact, plan, byte-copy, entry, fence, trap, marker, resource, SATP, and PTE proof relationships.
+- `python3 tools/verify-freestanding-riscv64-userspace-elf.py` is the strict Batch 22B lab. It independently parses the exact guest ELF embedded through the build graph, composes the Batch 21C parser, runs two real system-QEMU machines, and requires ELF-to-plan-to-loaded-byte-to-U-mode-trap agreement plus unchanged safety and Morphic truth.

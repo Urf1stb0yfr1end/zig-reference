@@ -15,7 +15,8 @@
     "riscv-sv39-page-table-walker",
     "riscv-sfence-vma-invalidation",
     "riscv-sv39-page-table-builder",
-    "riscv-page-table-page-owner"
+    "riscv-page-table-page-owner",
+    "bounded-elf64-load-plan"
   ],
   "selection_reasons": [
     "The resource planner derives fixed storage and initialization order.",
@@ -37,7 +38,8 @@
     "riscv-sv39-page-table-walker",
     "riscv-sfence-vma-invalidation",
     "riscv-sv39-page-table-builder",
-    "riscv-page-table-page-owner"
+    "riscv-page-table-page-owner",
+    "bounded-elf64-load-plan"
   ],
   "dependency_order": [
     "fixed-capacity-vector",
@@ -130,7 +132,8 @@
     "python3 tools/verify-freestanding-riscv64-physical-memory.py",
     "python3 tools/verify-freestanding-riscv64-active-sv39.py",
     "python3 tools/verify-freestanding-riscv64-sv39-permissions.py --self-test",
-    "python3 tools/verify-freestanding-riscv64-sv39-permissions.py"
+    "python3 tools/verify-freestanding-riscv64-sv39-permissions.py",
+    "install-userspace-rv64-elf"
   ],
   "intended_smoke_commands": [
     "python3 tools/verify-freestanding-riscv64-umode-round-trip.py --self-test",
@@ -140,12 +143,15 @@
     "python3 tools/verify-freestanding-riscv64-user-copy-in.py --self-test",
     "python3 tools/verify-freestanding-riscv64-user-copy-in.py",
     "python3 tools/verify-freestanding-riscv64-user-memory-transfer.py --self-test",
-    "python3 tools/verify-freestanding-riscv64-user-memory-transfer.py"
+    "python3 tools/verify-freestanding-riscv64-user-memory-transfer.py",
+    "python3 tools/verify-freestanding-riscv64-userspace-elf.py --self-test",
+    "python3 tools/verify-freestanding-riscv64-userspace-elf.py"
   ],
   "validation_evidence_references": [
     "docs/reports/AGENTIC_SNOWBALL_BATCH_19.md",
     "docs/reports/AGENTIC_SNOWBALL_BATCH_20.md",
     "docs/reports/AGENTIC_SNOWBALL_BATCH_21B.md",
-    "docs/reports/AGENTIC_SNOWBALL_BATCH_21C.md"
+    "docs/reports/AGENTIC_SNOWBALL_BATCH_21C.md",
+    "docs/reports/AGENTIC_SNOWBALL_BATCH_22B.md"
   ]
 }
