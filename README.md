@@ -358,6 +358,3 @@ The architectural documents describe intended pressure and possible futures. Pro
 
 ---
 
-## Licensing
-
-No repository license is currently declared. Do not assume redistribution or reuse terms until a license is added explicitly.
