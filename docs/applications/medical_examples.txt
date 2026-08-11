@@ -1,23 +1,32 @@
 QUIRKM MEDICAL EXAMPLES
-CONTEXT-COMPLETE, CLOSED-LOOP, LOW-AMBIGUITY MEDICAL COMPUTING
+ORGAN SUPPORT, TRANSPLANTATION, ENGINEERED ORGANS, AND CONTEXT-COMPLETE MEDICAL COMPUTING
 
 Status:
 Application hypothesis and research note.
 
-This document is not medical advice, not a clinical protocol, and not a claim that QuirkM is ready for medical-device use. It does not claim that Linux is unsafe for medical systems, that a language model should directly control a life-critical actuator, or that any architecture described here satisfies FDA, IEC, ISO, or other regulatory requirements.
+This document is not medical advice, not a clinical protocol, and not a claim that QuirkM is ready for medical-device use. It does not claim that Linux is unsafe for medical systems, that a language model should be given unrestricted control of a life-critical actuator, or that any architecture described here satisfies FDA, IEC, ISO, or other regulatory requirements.
 
-The narrower question is worth asking:
+The narrower research question is worth asking:
 
-    If a future artificial organ or life-supporting device must already cope with
-    biological uncertainty, can its computer be designed so that the computer
-    itself contributes as little avoidable uncertainty as possible?
+    If a future organ-support system, transplant-assist device, or engineered organ
+    must already cope with biological uncertainty, can its computer be designed
+    so that the computer itself contributes as little avoidable uncertainty as
+    possible?
 
 The QuirkM hypothesis is:
 
     Do not promise to eliminate the unknowns of biology.
     Eliminate as many unnecessary unknowns of the machine as possible.
 
-That remains a useful goal even under a conservative assumption: QuirkM does not "solve Linux" and does not successfully improve every one of the first 100 paramount Linux compatibility-debt candidates cataloged by this project. If it merely replaces a meaningful subset of those historically sticky semantics with smaller, typed, explicit, testable native contracts, the result could still be valuable in systems where the operator must answer not only "what happened?" but "why did it happen, which component caused it, what evidence supports that conclusion, and what is still unknown?"
+This remains useful even under a conservative assumption: QuirkM does not "solve Linux" and does not improve every one of the first 100 paramount Linux compatibility-debt candidates cataloged by this project. If it merely replaces a meaningful subset of historically sticky semantics with smaller, typed, explicit, testable native contracts, that alone may matter in systems where clinicians and maintainers need to answer:
+
+    What happened?
+    Which component produced the observation?
+    Which software state existed at the time?
+    Which rule authorized the action?
+    Which sensor or actuator is degraded?
+    Which hypotheses have been eliminated?
+    Which uncertainty is biological and which is electronic?
 
 See:
 
@@ -26,173 +35,217 @@ See:
     QUIRKM_CONTEXT_COMPLETE_BIOLOGICAL_ORGAN_CONTROL.md
 
 ======================================================================
-1. WHY BEGIN WITH THE HEART?
+1. THE ACTUAL APPLICATION: TECHNOLOGY-ASSISTED ORGANS AND TRANSPLANTS
 ======================================================================
 
-Heart disease remains the leading cause of death in the United States. CDC's 2024 mortality table reports 683,491 deaths from heart disease, and CDC identifies coronary artery disease as the most common type of heart disease. "Heart disease" is not one failure mode: serious illness and death can involve coronary artery disease and heart attack, heart failure, arrhythmia and cardiac arrest, structural disease, and interacting vascular problems.
+The long-horizon application is broader than one heart pump.
 
-These categories overlap and should not be read as a mutually exclusive ranking. They are useful here because they expose several different control problems:
+It is a family of systems in which electronics participate directly in maintaining, replacing, protecting, transporting, monitoring, or eventually helping control an organ.
 
-    coronary ischemia / heart attack
-        -> blood supply to heart muscle becomes inadequate
+Examples already exist in medicine:
 
-    heart failure
-        -> the heart cannot pump enough blood and oxygen for the body
+    ventricular-assist devices
+        -> mechanically support circulation, sometimes as a bridge to transplant
 
-    dangerous arrhythmia / cardiac arrest
-        -> electrical control of effective pumping fails
+    dialysis
+        -> replaces part of lost kidney function while a patient may await transplant
 
-    structural / mechanical disease
-        -> valves, chambers, vessels, or congenital anatomy impair flow
+    mechanical ventilation / extracorporeal support
+        -> can support failing physiology while definitive treatment is pursued
 
-    assisted-circulation failure
-        -> a pump, graft, power source, controller, sensor, or interface may fail
+    transplant monitoring
+        -> tracks graft function, rejection risk, medication state, and complications
 
-For the last category, the computer is not merely observing medicine. It can become part of the organ-support chain.
+    automated insulin delivery
+        -> already demonstrates an organ-like closed physiological feedback loop
 
-Real ventricular-assist systems already illustrate this. FDA records describe the HeartMate 3 System Controller as the central power and communication hub for the LVAS, monitoring system performance and producing alarms. FDA recall records also show that real-world faults can originate in very different domains: outflow-graft obstruction can produce persistent low-flow alarms; controller UI/fluid-ingress damage can produce unexpected or false-positive alarms and potentially loss of power; backup-battery failures can produce warnings and require replacement or service.
+A future platform can extend this idea:
 
-The important engineering lesson is not about one manufacturer. It is that the same visible symptom, "alarm" or "low flow," may sit above several very different causal domains.
+    donor-organ preservation and machine perfusion
+    transplant-assist instrumentation
+    long-term graft monitoring
+    artificial-organ control
+    biohybrid-organ control
+    tissue-engineered organ support
+    bioprinted or recellularized organ monitoring
 
-A future system should therefore try to preserve causal evidence all the way through the stack.
+The point is not that QuirkM presently performs any of these jobs.
+
+The point is that they all reward the same computing properties:
+
+    explicit identity
+    explicit authority
+    bounded control
+    complete event provenance
+    deterministic safety layers
+    strong fault localization
+    small comprehensible mechanisms
+    local operation without cloud dependence
+    machine-readable system topology
+    context-complete diagnostics
 
 ======================================================================
-2. A TOTALLY LOCAL CLOSED SYSTEM
+2. A TOTALLY LOCAL CLOSED ORGAN SYSTEM
 ======================================================================
 
-"Closed" can mean two things here.
+"Closed" can mean two things.
 
-First, physiological closed loop:
+First, physiological closure:
 
-    BODY
-      |
-      v
-    sensors
-      |
-      v
+    ORGAN / BODY
+        |
+        v
+      sensors
+        |
+        v
     state estimator
-      |
-      v
+        |
+        v
     deterministic controller
-      |
-      v
+        |
+        v
     deterministic safety envelope
-      |
-      v
-    actuator
-      |
-      +---------------------> BODY
+        |
+        v
+      actuator
+        |
+        +-----------------------> ORGAN / BODY
 
-FDA already treats physiologic closed-loop control as a real medical-device design category. Automated insulin-delivery systems are a familiar example: sensor data, a control algorithm, and a pump form a feedback loop.
+Second, computational closure:
 
-Second, deployment closure:
-
-    no cloud required
-    no internet required for ordinary operation
-    local models
-    local protocols
+    no cloud required for ordinary operation
+    no internet required for emergency operation
+    local device model
+    local patient/graft profile
+    local protocol corpus
     local logs
     local diagnostics
     local safety policy
-    local device description
     local recovery logic
+    local model inference where used
 
 A future QuirkM medical system could combine both.
 
-The hard life-critical loop should remain small and deterministic. A plausible division is:
+The life-critical core should remain small and deterministic:
 
     QUIRKM / MORPHIC HARD PLANE
         typed sensor resources
         typed actuator resources
         monotonic time
         bounded memory
-        deterministic control state
         explicit resource lifetime
-        safety invariants
+        deterministic state machines
         watchdogs
-        event provenance
+        safety invariants
+        event sequence/provenance
 
     NATIVE CONTROL SOFTWARE
-        Zig / Rust / similarly constrained native code
-        finite-state control
+        constrained Zig / Rust / equivalent native code
         state estimation
-        hard limits
-        fail-safe transitions
+        finite-state control
+        validated actuator limits
+        safe fallback modes
 
     ISOLATED COMPONENT PLANE
-        WAMR or another small WebAssembly runtime
+        small WebAssembly runtime such as WAMR where appropriate
         diagnostic modules
         telemetry transforms
         model adapters
         replaceable noncritical logic
 
-    LOCAL ML PLANE
-        TensorFlow Lite Micro-class anomaly models on small sensor processors
-        or a local narrow language model on a larger external controller
+    NARROW MEDICAL MODEL
+        local inference
+        device topology in context
+        bounded medical domain
+        locked protocol corpus
+        emergency interpretation
+        diagnostic reasoning
 
     COMPATIBILITY / DEVELOPMENT PLANE
-        Linux personality / Alpine when broad tooling is needed
+        Linux personality / Alpine when broad tooling is useful
         Python
         compilers
         analysis packages
-        offline service tools
+        service and research tooling
 
-The hard controller never needs to become "an LLM with a pump attached."
+The hard controller never needs to become "an LLM with an organ attached."
 
 ======================================================================
-3. THE NARROW MEDICAL MODEL
+3. THE NARROW MEDICAL MODEL: EMERGENCY REASONING WITHOUT OPAQUE AUTHORITY
 ======================================================================
 
-There is nevertheless a plausible role for a medically trained narrow language model during unusual events.
+A mature system could plausibly delegate part of a sudden emergency response to a narrow medically trained model, but the delegation should itself be explicit and inspectable.
 
-The safest useful role is not free-form actuator authority. It is bounded emergency interpretation and protocol selection.
+The useful model is not a general chatbot improvising medicine.
 
-A local model could be supplied with:
+Its world can be bounded:
 
-    the complete current device topology
-    the complete resource/capability map
+    one organ-support device family
+    one patient or graft profile
+    one finite set of sensors
+    one finite set of actuators
+    one finite emergency state graph
+    one validated protocol corpus
+    one current software build
+    one current device topology
+    one bounded recent event history
+
+The model receives:
+
+    complete current device topology
+    current resource/capability map
     current and recent sensor telemetry
-    sensor confidence and calibration state
+    confidence/calibration state
     actuator acknowledgements
     power state
     controller state
     recent alarms
-    known device failure modes
-    patient-specific clinician-approved limits
-    a locked, versioned corpus of clinician-approved protocols
-    exact software and model versions
+    known failure modes
+    patient- or graft-specific clinician-approved limits
+    locked, versioned clinician-approved protocols
+    exact software/model versions
 
-It could then produce a STRUCTURED PROPOSAL such as:
+It produces a structured, traceable action proposal:
 
     event_id: E-88231
-    suspected_domain: power/controller
-    confidence: 0.83
+    suspected_domain: perfusion / graft / sensor / pump / power
+    confidence: 0.86
 
-    supporting_observations:
-        battery_A voltage transition abnormal
-        pump speed remained in expected envelope
-        flow estimate remained stable
-        pressure sensors agree
-        alarm began during source exchange
+    evidence:
+        observation O-1881
+        observation O-1884
+        actuator acknowledgement A-221
+        resource-health record R-91
 
     protocol_basis:
-        local_protocol: POWER-TRANSITION-04 rev 7
-        device_rule: HM-POWER-STATE-12
-        clinician_profile: patient-profile-19 rev 3
+        TRANSPLANT-PERFUSION-07 rev 4
+        DEVICE-SAFE-STATE-12 rev 8
+        patient-profile-19 rev 3
 
-    proposed_state_transition:
-        enter_preapproved_backup_power_mode
+    proposed_transition:
+        PREAUTHORIZED_STATE_4
 
-    prohibited_actions:
-        no pump-speed change
-        no therapy-policy change
+    prohibited:
+        no unlisted medication instruction
+        no unvalidated pump setting
+        no authority expansion
 
     unresolved:
-        battery fault vs controller measurement path
+        graft resistance vs pressure-sensor degradation
 
-Every proposal is therefore traceable to the evidence and to a locked practice/protocol corpus.
+Every model-assisted transition should therefore be traceable to:
 
-The model still does not get the final word.
+    evidence
+        +
+    protocol
+        +
+    device state
+        +
+    authority
+        +
+    validator result
+
+The preferred architecture is:
 
     narrow medical model
             |
@@ -203,356 +256,471 @@ The model still does not get the final word.
     deterministic protocol validator
             |
             v
-    deterministic safety gate
+    deterministic safety envelope
             |
-       YES / NO only
+       allowed / rejected
             |
             v
-    actuator/controller transition
+    predefined actuator or controller transition
 
-If a proposed action is not present in the pre-authorized state machine, violates a patient-specific limit, depends on an unavailable sensor, exceeds timing constraints, or cannot be traced to a permitted protocol, it is rejected.
+At greater maturity, a device could permit the model to trigger a strictly enumerated emergency transition when all deterministic predicates are satisfied and the complete action certificate is logged. That is still very different from granting free-form therapeutic authority.
 
-The narrow model can help answer "what known situation does this most resemble?" It should not be permitted to invent a new emergency treatment in real time.
+The model should not invent a new drug dose, shock program, pump speed, anticoagulation regimen, or therapy outside the pre-authorized graph.
 
-For a sufficiently capable external controller, a real local inference engine such as llama.cpp is a plausible research building block: the project is a C/C++ local LLM inference implementation and currently includes RISC-V-specific instruction support. For smaller anomaly classifiers, TensorFlow Lite for Microcontrollers is explicitly designed for low-power resource-constrained embedded targets. For sandboxed replaceable logic, WAMR is a small WebAssembly runtime supporting embedded use and RISC-V.
+The attraction is not "AI makes the medical decision."
 
-These are examples of software surfaces a future QuirkM platform might inherit or port. They are not endorsements for unvalidated use in medical devices.
+It is:
+
+    a bounded medical reasoner can inspect the whole electronic organ-support
+    system at once, rapidly map an emergency to validated practice, and leave
+    a machine-readable explanation of exactly why that action path was chosen.
 
 ======================================================================
-4. WHY QUIRKM IF IT ONLY BEATS SOME OF THE FIRST 100 ISSUES?
+4. WHY THE LEAST-OPAQUE ELECTRONIC COMPONENT MATTERS
 ======================================================================
 
-The first 100 QuirkM entries are candidate compatibility debts, not 100 adjudicated Linux bugs. Many exist because Linux must preserve decades of successful software behavior.
+The biological side already contains unavoidable uncertainty:
 
-That is precisely why they are interesting for a clean native medical control plane.
+    individual physiology
+    changing metabolism
+    inflammation
+    rejection
+    healing/remodeling
+    vascular changes
+    sensor drift
+    mechanical wear
+    measurement noise
+    rare disease states
 
-Suppose QuirkM only materially improves six classes from that ledger:
+The computer should not gratuitously add more:
+
+    stale reusable identities
+    hidden aliasing
+    ambient authority
+    implicit inheritance
+    unclear operation lifetime
+    asynchronous interruption folklore
+    unexplained event loss
+    unclear provenance
+    giant hidden dependency chains
+
+The project therefore aims for a context-complete electronic architecture:
+
+    complete organ-support topology
+    complete resource graph
+    complete safety graph
+    complete authority graph
+    complete current degraded-state map
+    complete controller/protocol versions
+
+represented compactly enough that a maintenance or diagnostic model can reason over nearly the whole relevant machine at once.
+
+The objective is not literally "fewest lines of code."
+
+It is:
+
+    smallest permanent mechanism
+    maximum useful capability
+    maximum whole-system mental model
+
+For medicine, that becomes:
+
+    make the machine capable of explaining itself.
+
+======================================================================
+5. WHY QUIRKM CAN BE USEFUL WITHOUT WINNING EVERY LINUX ARGUMENT
+======================================================================
+
+The first 100 QuirkM entries are candidate compatibility debts and design pressures, not 100 adjudicated Linux bugs. Many exist because Linux successfully preserves decades of software behavior.
+
+Linux can absolutely be used in medical and safety-oriented systems. It can be restricted, hardened, audited, isolated, tested, and surrounded by rigorous application-level safety engineering.
+
+QuirkM's case is narrower:
+
+    where a historical compatibility behavior is not required by the native
+    medical control plane, do not make that behavior the native default.
+
+Suppose QuirkM improves only a subset of the first 100 candidate pressures:
 
     Q-0001 / Q-0002
-    reusable small-integer descriptors and stale identity
-        -> native generational typed resource identity
+    reusable small-integer descriptors / stale identity
+        -> generation-safe typed resource identity
 
     Q-0005 / Q-0006
-    descriptor identity vs shared underlying object identity
+    descriptor identity vs underlying object identity
         -> explicit reference/object/share semantics
 
+    Q-0008 / Q-0009
+    inherited descriptor state and create/configure races
+        -> explicit non-inheritance and atomic policy
+
     Q-0021 through Q-0025
-    asynchronous signals, EINTR/restart, partial completion
-        -> explicit operation completion/cancellation semantics
+    asynchronous signals / EINTR / restart / partial completion
+        -> explicit operation completion and cancellation
 
     Q-0031 through Q-0040
-    ambient path/root authority and path-as-authority
-        -> explicit directory/configuration capabilities
+    ambient path/root authority
+        -> explicit configuration and namespace capabilities
 
     Q-0041 through Q-0050
-    event loss/coalescing/provenance limitations
-        -> sequence-aware events with explicit loss metadata and object identity
+    notification loss/coalescing/provenance limitations
+        -> sequence-aware typed events with explicit loss metadata
 
-    Q-0061 onward
-    numeric-descriptor-shaped waiting/readiness APIs
-        -> typed waitable resources independent of integer magnitude
+That is already enough to change the diagnostic search space.
 
-That alone changes the diagnostic character of the machine.
+Instead of:
 
-Instead of asking:
-
-    Did fd 14 get closed and reused?
-    Did the supervisor still hold a stale integer?
-    Did this signal interrupt an operation before or after a partial effect?
-    Did an event queue overflow without preserving enough provenance?
-    Did configuration come from ambient process state?
-    Are two descriptors separate things or aliases of one underlying object?
+    Did integer handle 14 get reused?
+    Is this sensor identity stale?
+    Did another task inherit authority?
+    Did interruption occur before or after a partial effect?
+    Did an event disappear in an overflow?
+    Are these two handles independent objects or aliases?
 
 one can increasingly ask:
 
-    Which typed resource produced this observation?
-    Is the reference still live?
+    Which exact typed resource produced this observation?
+    Is its generation live?
     Which underlying object does it name?
     Which rights were exercised?
     Which operation completed?
-    Was any effect partial?
-    Which event sequence was lost, if any?
-    Which exact policy authorized this transition?
+    Which exact event sequence is missing?
+    Which policy authorized this transition?
 
-Linux can absolutely be engineered to answer many of these questions. Linux-based medical and safety-critical systems can and do use disciplined subsets, hardened configurations, static analysis, process isolation, real-time extensions, explicit application-level provenance, and certification-oriented development processes.
+That does not magically make QuirkM safer than Linux.
 
-The QuirkM proposition is different:
+It creates a testable hypothesis:
 
-    make the cleaner semantics the native default
-    instead of reconstructing them as a disciplined convention
-    on top of compatibility behavior that must remain available forever.
+    if the software system contains fewer ambiguous states and stronger
+    provenance, then a dangerous medical observation may be easier to localize
+    to software, hardware, actuator, graft, or biology.
 
-If that works for only part of the Quirk Ledger, it can still reduce the causal search space.
+For an organ-support system, eliminating even one entire false fault domain can be valuable.
 
 ======================================================================
-5. SIX LIKELY MEDICAL SCENARIOS
+6. SIX REALISTIC ORGAN / TRANSPLANT SCENARIOS
 ======================================================================
 
-These scenarios are architectural examples, not treatment instructions.
+These are architectural scenarios, not treatment instructions.
 
 ---------------------------------------------------------------------
-EXAMPLE 1: LOW-FLOW ALARM -- TRUE OBSTRUCTION OR FALSE SIGNAL?
+EXAMPLE 1: ADULT OR PEDIATRIC VENTRICULAR ASSIST -- LOW FLOW
 ---------------------------------------------------------------------
 
-Real-world basis:
-FDA has documented HeartMate 3 outflow-graft twist occlusion associated with persistent low-flow alarms and serious hemodynamic consequences. FDA has separately documented controller membrane/fluid-ingress damage capable of producing unexpected or false-positive alarms.
+A ventricular-assist system reports low flow.
 
-A modeled QuirkM system might observe:
+Possible domains include:
 
-    pump.speed             stable
-    pump.power             rising
-    estimated.flow         falling
-    arterial.pressure_A    falling
-    arterial.pressure_B    falling
-    controller.selftest    pass
-    alarm.path             pass
+    genuine hemodynamic deterioration
+    pump/graft obstruction
+    sensor error
+    controller error
+    power abnormality
+    communication failure
 
-The diagnostic conclusion can legitimately narrow toward a hydraulic/mechanical or physiological fault domain because independent measurements agree with the low-flow state.
+A context-complete system can correlate:
 
-Contrast:
+    pump speed
+    pump power
+    estimated flow
+    arterial pressure
+    inlet/outlet pressure if available
+    power-rail state
+    controller self-test
+    sensor confidence
+    recent hardware events
 
-    pump.speed             stable
-    pump.power             normal
-    estimated.flow         low on one channel only
-    arterial.pressure_A    normal
-    arterial.pressure_B    normal
-    sensor_flow.confidence degraded
-    controller.UI          degraded
-    recent fluid-ingress   detected
+The diagnostic system does not treat "low-flow alarm" as synonymous with "the patient has low flow."
 
-Now "low-flow alarm" and "low systemic flow" are not treated as synonyms.
+It tries to eliminate competing fault domains with independent evidence.
 
-QuirkM value:
+QuirkM contribution:
 
-    stable resource identity
-    explicit sensor quality
-    provenance for every alarm
-    no hidden aliasing between observation channels
-    full event sequence
-    context-complete dependency graph
-
-Narrow-model role:
-classify the observed pattern against versioned known-fault/protocol records and explain which evidence contradicts each competing hypothesis.
-
-Hard-controller role:
-continue only preauthorized safe-state behavior regardless of model prose.
+    typed resource identity
+    complete alarm provenance
+    explicit degraded-sensor state
+    deterministic action log
+    narrow model can inspect the entire dependency graph
 
 ---------------------------------------------------------------------
-EXAMPLE 2: POWER-SOURCE TRANSITION / BACKUP-BATTERY DEGRADATION
+EXAMPLE 2: PEDIATRIC HEART FAILURE -- BRIDGE TO TRANSPLANT
 ---------------------------------------------------------------------
 
-Real-world basis:
-FDA's 2026 HeartMate 3 controller/backup-battery recall describes backup-battery warnings and failures. FDA records also describe the controller as the LVAS central power and communications hub.
+This is not a hypothetical category.
 
-A future closed system can model power as first-class resources:
+The FDA-approved Berlin Heart EXCOR Pediatric ventricular-assist device is intended to provide mechanical circulatory support as a bridge to cardiac transplantation for pediatric patients with severe isolated left-ventricular or biventricular dysfunction who are transplant candidates and require circulatory support.
 
-    PowerSource<PrimaryA>
-    PowerSource<PrimaryB>
-    BackupBattery<Internal>
-    PumpPowerRail
-    ControllerPowerRail
+That is precisely a technology-assisted organ bridge.
 
-Each observation carries:
+A future QuirkM-like controller could model:
 
-    source identity
-    timestamp
-    measured voltage/current
-    calibration epoch
-    confidence
-    transition reason
+    Pump<Left>
+    Pump<Right> optional
+    PressureSensor<Inlet>
+    PressureSensor<Outlet>
+    FlowEstimator
+    PowerDomain<A>
+    PowerDomain<B>
+    ControllerState
+    AlarmChannel
+    EmergencyProtocolSet
 
-During a sudden warning the narrow model may determine:
+The system's job is not only to run the pump.
 
-    physiology appears stable
-    pump remains within expected operating envelope
-    fault coincides exactly with power-source exchange
-    backup-battery measurement path changed state first
+It can preserve a continuous causal history while the child waits for a donor organ:
 
-It can select a preapproved power-fault protocol and cite the exact local protocol revision.
+    what changed
+    when it changed
+    which measurement supported it
+    which actuator responded
+    which safety rule limited the response
+    whether the physiology responded as predicted
 
-QuirkM value:
-no stale fd standing in for "whatever power device currently occupies slot 7"; the safety system reasons about a typed, generation-safe power resource whose provenance is explicit.
+If an emergency occurs, a narrow device-specific medical model can classify the pattern against the locked pediatric support protocol corpus, produce a traceable proposal, and request only a predefined safe transition.
 
----------------------------------------------------------------------
-EXAMPLE 3: SENSOR DRIFT VS REAL HEART-FAILURE DETERIORATION
----------------------------------------------------------------------
+This is much closer to the intended application than "a child with a heart defect."
 
-A long-lived assist system may slowly accumulate sensor drift while the patient's physiology also changes.
-
-Suppose one pressure channel gradually reports falling pressure over hours while:
-
-    redundant pressure channel remains stable
-    pump electrical behavior remains stable
-    flow estimator remains stable
-    patient motion/position explains part of variance
-    drifting sensor calibration residual increases
-
-The system should be able to say:
-
-    observed abnormality: real
-    physiological deterioration: weakly supported
-    sensor drift: strongly supported
-    control quorum: healthy without sensor B
-    unresolved risk: sensor B unavailable for redundancy
-
-That is a more useful statement than "alarm: pressure low."
-
-QuirkM value:
-important state has provenance, sensor identity cannot silently be recycled, confidence is part of the observation contract, and degraded-resource transitions are explicit.
-
-A small TFLite-Micro-class anomaly model could be one independent detector here, but deterministic plausibility bounds and redundant measurements remain authoritative.
+The child has organ failure severe enough to need technological circulatory support while awaiting transplantation.
 
 ---------------------------------------------------------------------
-EXAMPLE 4: SUDDEN ELECTRICAL EMERGENCY
+EXAMPLE 3: PEDIATRIC KIDNEY FAILURE -- DIALYSIS TO TRANSPLANT
 ---------------------------------------------------------------------
 
-Dangerous arrhythmias and sudden cardiac arrest represent a different failure class from pump mechanics. A ventricular-assist controller by itself is not an implantable defibrillator, so this scenario assumes a future integrated support platform with authorized rhythm-management hardware or a connected certified rhythm device.
+Children can develop kidney failure from congenital, hereditary, metabolic, inflammatory, and other kidney diseases. NIDDK states that children whose kidneys fail require kidney replacement therapy: kidney transplant, hemodialysis, or peritoneal dialysis.
 
-The event begins suddenly:
+This naturally creates a technology-assisted bridge:
 
-    ECG/rhythm sensors change
-    pressure waveform changes
-    effective flow changes
-    pump itself remains mechanically healthy
+    failing kidneys
+        -> dialysis / monitoring
+        -> transplant candidate
+        -> donor kidney
+        -> post-transplant graft monitoring
 
-A narrow medical model can rapidly correlate the streams and map the state to one of a finite set of clinician-approved emergency protocols.
+A QuirkM-oriented support platform would not replace nephrology or the dialysis machine's validated controller.
 
-It returns:
+It could provide a compact supervisory and diagnostic substrate around the technical system:
 
-    suspected event class
-    supporting signals
-    conflicting signals
-    exact protocol IDs
-    permitted device transition
-    confidence
-    unresolved alternatives
+    dialysate flow resource
+    blood-flow resource
+    pressure resources
+    pump resources
+    temperature resource
+    ultrafiltration state
+    machine alarms
+    patient-specific bounds
+    maintenance state
 
-It cannot invent a shock, drug dose, pump speed, pacing program, or other therapy outside the preauthorized deterministic protocol graph.
+Every observation and command can be provenance-linked.
 
-QuirkM value:
-the model can potentially hold the entire device topology, current resource state, safety graph, and recent event history in one context-complete representation, reducing the chance that an emergency interpretation is based on an incomplete software picture.
+After transplant, the same architecture can shift from replacement-therapy supervision to graft monitoring:
 
----------------------------------------------------------------------
-EXAMPLE 5: SOFTWARE-RESOURCE FAULT THAT MUST NOT MASQUERADE AS BIOLOGY
----------------------------------------------------------------------
+    graft-function observations
+    medication/adherence records
+    device or home-monitoring data
+    alarm provenance
+    clinician-defined thresholds
 
-Imagine an older descriptor-oriented design:
+The deeper point is continuity of model:
 
-    controller task keeps integer handle 12 for pressure sensor B
-    sensor B is reset
-    descriptor 12 is closed
-    another resource receives descriptor 12
-    stale application state still uses integer 12
+    organ failed
+        -> machine temporarily performs essential function
+        -> transplant occurs
+        -> new organ becomes the monitored resource
 
-A disciplined Linux program should prevent this. The point is that reusable integer identities make the class of mistake possible and therefore require discipline everywhere that identity escapes.
-
-A native QuirkM design can instead make the original reference generation-bound:
-
-    old PressureSensorHandle<B, generation=41>
-
-After reset:
-
-    new PressureSensorHandle<B, generation=42>
-
-Generation 41 cannot silently become a battery monitor, log stream, or unrelated sensor.
-
-It fails closed as stale.
-
-The diagnostic value is substantial:
-
-    software resource invariant violated
-        -> software fault domain
-
-rather than:
-
-    nonsensical physiological reading
-        -> maybe patient?
-        -> maybe sensor?
-        -> maybe memory corruption?
-        -> maybe resource reuse?
-
-This is precisely the kind of avoidable ambiguity QuirkM can remove even if it does nothing revolutionary elsewhere.
+The electronic system can preserve one traceable history across the transition.
 
 ---------------------------------------------------------------------
-EXAMPLE 6: THE SAME ARCHITECTURE OUTSIDE THE HEART -- CLOSED-LOOP INSULIN
+EXAMPLE 4: PEDIATRIC LIVER FAILURE -- TRANSPLANT AND GRAFT SURVEILLANCE
 ---------------------------------------------------------------------
 
-This one already exists in principle in approved medicine.
+Children have real liver diseases that progress to transplantation.
 
-FDA describes artificial-pancreas/automated-insulin-delivery systems as a continuous glucose monitor plus a control algorithm plus an infusion pump, with systems that automatically adjust insulin delivery. FDA has approved automated insulin systems for pediatric populations as well.
+NIDDK identifies biliary atresia as the most common reason children need a liver transplant. Pediatric acute liver failure can also require urgent transplantation.
 
-A QuirkM-style implementation research target could make every glucose observation and every delivery command traceable:
+This is a different problem from pump control because the liver is chemically and metabolically complex.
 
-    glucose observation
-        -> exact CGM resource
-        -> calibration/quality state
-        -> controller state
-        -> deterministic dosing decision
-        -> safety constraints
-        -> pump command
-        -> pump acknowledgement
-        -> subsequent glucose response
+The early QuirkM role is therefore more diagnostic and supervisory than actuator-heavy:
 
-If a local narrow model participates, its role should be diagnostic or protocol-selection support around anomalous situations, not unrestricted dosing authority.
+    laboratory/biomarker observations
+    hemodynamic observations
+    medication records
+    graft-function trends
+    infection-related observations
+    device/sensor provenance
+    immunosuppression adherence state
+    transplant-team protocol versions
 
-This example matters because it demonstrates that "computer as part of an organ-like feedback system" is not science fiction. Closed-loop medical control is already real. QuirkM's research question is whether the computing substrate itself can become smaller, more explicit, more context-complete, and easier to audit.
+NIDDK's pediatric liver research already includes monitoring of medication levels and remote communication to improve adherence after transplant.
+
+A future context-complete transplant monitor could add stronger causal bookkeeping:
+
+    this alert came from this laboratory value
+    from this sample/time
+    evaluated by this rule
+    against this graft profile
+    under this protocol revision
+    with these confounding measurements
+
+The narrow model can reason across the complete local transplant history and point clinicians toward a known protocol pathway, while deterministic rules prevent it from inventing therapy.
+
+---------------------------------------------------------------------
+EXAMPLE 5: PEDIATRIC LUNG / MULTI-ORGAN TRANSPLANT SUPPORT
+---------------------------------------------------------------------
+
+Children are also listed for lung and other solid-organ transplants. HRSA/OPTN maintains pediatric transplant policy and pediatric waiting-list processes for kidney, liver, heart, lung, and other organs.
+
+A useful QuirkM deployment need not control the transplanted lung directly.
+
+It can act as the least-opaque supervisory layer across the machinery surrounding the organ:
+
+    ventilation resources
+    oxygenation observations
+    pressure/flow resources
+    pump or extracorporeal-support resources where present
+    power state
+    alarm state
+    graft-monitoring observations
+    medication/protocol state
+
+This is especially valuable when several systems interact.
+
+The diagnostic question becomes:
+
+    Is the abnormal oxygenation caused by the graft?
+    ventilation?
+    circulation?
+    sensor failure?
+    support-device failure?
+    power or communication?
+
+A context-complete system cannot answer physiology perfectly, but it can make the electronic branches of that causal tree far less mysterious.
+
+---------------------------------------------------------------------
+EXAMPLE 6: FUTURE ENGINEERED OR BIOFABRICATED ORGAN
+---------------------------------------------------------------------
+
+This is the long-horizon case.
+
+Research in tissue engineering and 3D bioprinting is actively exploring heart, liver, kidney, pancreas, lung, vascular, and other tissues. Whole clinically transplantable bioprinted solid organs are not a solved technology today. Major challenges include vascularization, maturation, integration of multiple cell types, reproducibility, long-term function, immune interaction, and manufacturing/regulatory translation.
+
+But suppose those problems improve enough to produce an engineered kidney, liver, cardiac tissue construct, or biohybrid organ.
+
+Such an organ may be more instrumentable than a natural donor organ from the beginning.
+
+Its design could include:
+
+    embedded pressure sensing
+    perfusion sensing
+    oxygenation sensing
+    temperature sensing
+    biochemical sensing
+    flow-control elements
+    micro-pumps or valves where appropriate
+    stimulation interfaces
+    calibration state
+    manufacturing provenance
+    tissue-lot / cell-line provenance
+    organ-model version
+
+Now QuirkM becomes more than the controller of a medical device around the organ.
+
+It can become part of the organ's electronic nervous system:
+
+    ENGINEERED ORGAN
+          |
+          v
+    embedded observations
+          |
+          v
+    organ state model
+          |
+          v
+    deterministic homeostatic controller
+          |
+          v
+    safety envelope
+          |
+          v
+    bounded actuator
+          |
+          +--------------------> ENGINEERED ORGAN
+
+Alongside it:
+
+    narrow medical/maintenance model
+          |
+          +-> diagnosis
+          +-> anomaly correlation
+          +-> protocol selection
+          +-> maintenance explanation
+          +-> invalidated-assumption detection
+
+At first, QuirkM's role might be mostly:
+
+    logging
+    provenance
+    diagnostics
+    safe alarms
+    component-health tracking
+    emergency-state selection
+
+With sufficient maturity and validation it could go further:
+
+    adaptive state estimation
+    bounded homeostatic adjustment
+    redundant-sensor arbitration
+    predictive maintenance
+    controlled reconfiguration
+    limited emergency actuation
+
+But the progression should be earned by evidence.
+
+The architecture is valuable even before autonomous organ control is justified.
 
 ======================================================================
-6. THE CONTEXT-COMPLETE ADVANTAGE
+7. THE TRANSPLANT / ENGINEERED-ORGAN CONTINUUM
 ======================================================================
 
-The most unusual QuirkM possibility is not merely small code size.
+The same computing substrate could plausibly follow an organ problem across several eras of technology:
 
-It is that the essential control architecture might fit into the working context of the system that maintains and diagnoses it.
+    NATIVE ORGAN FAILURE
+            |
+            v
+    MACHINE ASSIST / REPLACEMENT
+    VAD / dialysis / other support
+            |
+            v
+    DONOR TRANSPLANT
+            |
+            v
+    GRAFT MONITORING
+            |
+            v
+    FUTURE BIOHYBRID / ENGINEERED ORGAN
+            |
+            v
+    INSTRUMENTED HOMEOSTATIC ORGAN
 
-A maintenance model could potentially receive one generated capsule containing:
+The software need not know whether "the organ" is entirely natural, donor-derived, mechanically assisted, or partially engineered in the same way.
 
-    every sensor class
-    every actuator class
-    every resource identity
-    every authority edge
-    every safety invariant
-    every controller state
-    every allowed emergency transition
-    every current degraded component
-    every versioned protocol
-    every dependency
-    every known failure signature
-    every current software build identity
+It needs explicit resources and contracts for what can actually be observed and controlled.
 
-Then implementation detail is retrieved only when needed.
+That is important.
 
-The desired property is:
+QuirkM should model capabilities, not fantasies:
 
-    context-complete architecture
-        + task-complete implementation closure
+    if pressure is observable -> expose PressureObservation
+    if perfusion is controllable -> expose bounded PerfusionControl
+    if graft chemistry is only sampled every six hours -> represent that latency
+    if an actuator has no certified emergency mode -> no software path can invent one
 
-not:
-
-    load millions of lines and hope the important relationship is present.
-
-In a medical system this has a specific benefit. When an anomaly appears, the machine can try to eliminate complete fault domains:
-
-    software invariant path        PASS
-    command-delivery path          PASS
-    actuator acknowledgement       PASS
-    independent sensor consensus   PASS
-    expected physiological response FAIL
-
-Result:
-
-    remaining likely domain:
-    mechanical / biological interface
-
-The computer has not diagnosed the patient merely by being simple.
-
-It has made itself less plausible as the unexplained cause.
+The architecture can therefore evolve with medicine without lying about what the organ can do.
 
 ======================================================================
-7. NO IMPORTANT STATE WITHOUT PROVENANCE
+8. NO IMPORTANT STATE WITHOUT PROVENANCE
 ======================================================================
 
-A bio-oriented QuirkM system should treat this as nearly sacred:
+A transplant or organ-support QuirkM system should treat this as nearly sacred:
 
     NO IMPORTANT STATE WITHOUT PROVENANCE.
 
@@ -574,6 +742,21 @@ but:
 
 Not:
 
+    graft warning
+
+but:
+
+    graft warning G-218
+        <- biomarker observation B-912
+        <- timestamp / laboratory provenance
+        <- compared with patient graft baseline P-44
+        <- rule TRANSPLANT-LIVER-31 rev 6
+        <- corroborating observation O-811 absent
+        <- confidence reduced accordingly
+        <- clinician review requested
+
+Not:
+
     sensor ignored
 
 but:
@@ -585,93 +768,181 @@ but:
         <- transition authorized by policy Q-6
         <- alarm and maintenance request emitted
 
-This makes explanation a stored systems property rather than an after-the-fact reconstruction.
+Explanation becomes a stored systems property instead of forensic reconstruction.
 
 ======================================================================
-8. WHY A LOCAL LLM MAY ACTUALLY FIT THIS PARTICULAR SYSTEM
+9. THE CONTEXT-COMPLETE ADVANTAGE FOR MAINTENANCE
 ======================================================================
 
-A general medical model asked to understand a hospital, every disease, every device, and every patient is an enormous problem.
+The most unusual QuirkM possibility is not merely small code size.
 
-A narrow device model has a much smaller world:
+It is that the essential organ-support architecture might fit into the working context of the model that maintains and diagnoses it.
 
-    one device family
-    one patient profile
-    one finite actuator set
-    one finite sensor set
-    one safety graph
-    one protocol corpus
-    one current software build
-    one bounded recent history
+A generated maintenance capsule could contain:
 
-That is a very different task.
+    every sensor class
+    every actuator class
+    every resource identity
+    every authority edge
+    every safety invariant
+    every controller state
+    every allowed emergency transition
+    every current degraded component
+    every protocol version
+    every dependency
+    every known failure signature
+    every current software build identity
+    every transplant/organ device relationship
 
-If Morphic/QuirkM stays small enough that its complete architecture can be machine-described compactly, the narrow model may be able to reason with nearly the entire relevant electronic system in context at once.
+Then implementation detail is retrieved only when needed.
 
-Its uncertainty then comes principally from:
+A failure can be localized systematically:
 
-    incomplete physiology
-    imperfect sensors
-    imperfect models
-    rare unknown hardware failures
+    software invariant path        PASS
+    command-delivery path          PASS
+    actuator acknowledgement       PASS
+    independent sensor consensus   PASS
+    expected organ response        FAIL
 
-rather than from not knowing what half of its own operating system is doing.
+Remaining likely domain:
 
-That is the research value of context completeness.
+    organ / graft / mechanical-biological interface
+
+Or:
+
+    physiological observations    internally consistent
+    actuator mechanically healthy
+    power healthy
+    resource generation mismatch  FAIL
+
+Remaining likely domain:
+
+    software/resource lifecycle
+
+The computer has not diagnosed the patient merely by being simple.
+
+It has made itself less plausible as an unexplained cause.
 
 ======================================================================
-9. CHILDREN MERIT EXPLICIT MENTION
+10. CHILDREN: REAL ORGAN FAILURE, REAL TRANSPLANTS, REAL MACHINES
 ======================================================================
 
-I did not want to rely on an image of a sick child to make the technology sound important. The architecture should support its own case.
+I did not want to mention children merely to add emotional force. The technology should support its own case.
 
-But children merit explicit mention because the underlying need is real.
+But the pediatric transplant reality merits explicit mention because this application is exactly about organs, organ failure, machine support, and transplantation.
 
-CDC reports that congenital heart defects are the most common type of birth defect, affecting nearly 1% of U.S. births, roughly 40,000 babies per year, and that about one in four babies born with a heart defect has a critical heart defect requiring surgery or another procedure in the first year of life. Closed-loop insulin technology has also already been approved for pediatric patients.
+Children genuinely experience end-stage organ disease.
 
-A future context-complete medical platform could therefore matter not only for adult ventricular assistance but for pediatric cardiac support, congenital-heart monitoring, diabetes, respiratory support, and other organ-support problems where continuous sensing and carefully bounded actuation are useful.
+Kidney failure in children can require dialysis or kidney transplantation. NIDDK describes congenital and hereditary pediatric kidney diseases including renal dysplasia, cystic kidney diseases, congenital nephrotic syndrome, hereditary glomerulopathies, and metabolic disorders; when kidneys fail, children require kidney replacement therapy.
+
+Children genuinely require liver transplantation. NIDDK identifies biliary atresia as the most common reason children need a liver transplant, and acute liver failure is another major pediatric transplant problem.
+
+Children with severe ventricular dysfunction can genuinely require mechanical circulatory support while waiting for a heart. The FDA-approved Berlin Heart EXCOR Pediatric is specifically intended as a bridge to cardiac transplantation for pediatric patients requiring circulatory support.
+
+Children are listed for kidney, liver, heart, lung, and other organ transplants under the national transplant system. HRSA explicitly maintains pediatric transplant policy because pediatric transplantation is a real, distinct clinical field, not a rhetorical example.
+
+That means the future path discussed here is concrete:
+
+    CHILD WITH ORGAN FAILURE
+            |
+            v
+    TECHNOLOGY-ASSISTED SURVIVAL
+    dialysis / VAD / intensive support
+            |
+            v
+    TRANSPLANT
+            |
+            v
+    CONTINUOUS GRAFT MONITORING
+            |
+            v
+    perhaps someday
+    ENGINEERED / BIOFABRICATED ORGAN
+
+A context-complete QuirkM system could contribute at every electronic boundary:
+
+    diagnostic aggregation
+    event logging
+    provenance
+    device-health monitoring
+    graft monitoring
+    power/resource supervision
+    safe alarm interpretation
+    narrow-model emergency reasoning
+    preauthorized emergency transitions
+    maintenance guidance
+
+Later, after enough maturity, validation, redundancy, and regulatory evidence, the same architecture might earn a deeper control role in an engineered organ itself.
 
 This is not a call to emotion so much as a call to truth.
 
-If one wants what is best for a child, one should also want to know as much as reasonably possible about the machine being trusted with that child's body: what it can do, what it cannot do, which component produced a measurement, which rule authorized an action, which state changed, which assumptions failed, and which facts remain uncertain.
+If one wants what is best for a child whose life depends on an organ-support machine, transplant-monitoring system, or someday an engineered organ, one should want to know as much as reasonably possible about the electronic system sharing responsibility for that child's survival:
 
-That does not mean the implementation must literally be tiny, nor does it mean a Linux-based system cannot be engineered to an equally high standard. Linux can be restricted, hardened, audited, and surrounded by excellent safety engineering.
+    what it can do
+    what it cannot do
+    which sensor produced a measurement
+    which component is degraded
+    which rule authorized an action
+    which model proposed it
+    which deterministic gate approved it
+    which assumptions failed
+    which facts remain uncertain
+
+That does not mean Linux cannot do an equally good job in a carefully engineered system. Linux is extraordinarily capable, and compatibility is one of its greatest strengths.
 
 QuirkM's proposed advantage is more specific:
 
-    it is being designed precisely at the places where decades of compatibility
-    make cleaner semantics difficult to retrofit as defaults.
+    it is designed precisely around places where a clean native system can avoid
+    historical compatibility pressures that Linux cannot simply remove.
 
-If QuirkM can surpass even a meaningful subset of those known compatibility pressures -- stale reusable identities, implicit authority, ambiguous lifetime, interruption folklore, event provenance gaps, shared-object ambiguity, and similar classes -- then a medical system receives something valuable before any grand claim of superiority is needed:
+If QuirkM surpasses even a meaningful subset of those known pressure classes, then the medical system gains something important without any need for exaggerated claims:
 
-    fewer avoidable software explanations for a dangerous observation.
+    fewer avoidable electronic ambiguities
+    fewer accidental state interpretations
+    stronger provenance
+    a smaller causal search space
+    a better chance that the entire safety-relevant machine can be modeled at once
 
-The goal is not "trust QuirkM because it is new."
+The aim is not:
 
-The goal is:
+    trust QuirkM because it is new.
 
-    know the whole machine as far as possible,
+The aim is:
+
+    know the machine as completely as practical,
     model what remains uncertain,
     trace every important action,
     fail closed when identity or authority is uncertain,
-    keep emergency authority inside deterministic validated bounds,
-    and refuse to make biology harder to understand by hiding the computer
-    underneath unnecessary opacity.
+    keep emergency authority inside validated bounds,
+    and make the electronic half of an organ-support system the least mysterious
+    part of the problem.
 
-When the body is already uncertain, the computer should not be mysterious too.
+When the organ is already uncertain, the computer should not be mysterious too.
 
 ======================================================================
 REFERENCES / REAL-WORLD ANCHORS
 ======================================================================
 
-CDC — About Heart Disease
-https://www.cdc.gov/heart-disease/about/index.html
+NIDDK — Kidney Disease in Children
+https://www.niddk.nih.gov/health-information/kidney-disease/children
 
-CDC — Leading Causes of Death / 2024 mortality data
-https://www.cdc.gov/nchs/fastats/leading-causes-of-death.htm
+NIDDK — Pediatric Kidney Disease research areas
+https://www.niddk.nih.gov/research-funding/research-programs/pediatric-kidney-disease
 
-CDC — About Heart Failure
-https://www.cdc.gov/heart-disease/about/heart-failure.html
+NIDDK — Growth Failure in Children with Chronic Kidney Disease
+https://www.niddk.nih.gov/health-information/kidney-disease/children/helping-child-adapt-life-chronic-kidney-disease/growth-failure-chronic-kidney-disease
+
+NIDDK — Definition & Facts of Liver Transplant
+https://www.niddk.nih.gov/health-information/liver-disease/liver-transplant/definition-facts
+
+NIDDK — Research Aims to Triumph Against Childhood Liver Disease
+https://www.niddk.nih.gov/news/archive/2024/research-aims-triumph-against-childhood-liver-disease
+
+HRSA / OPTN — Pediatric Transplants
+https://www.hrsa.gov/optn/patients/organ-transplants/pediatric-transplants
+
+FDA — EXCOR Pediatric Ventricular Assist Device PMA P160035
+https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?ID=P160035
 
 FDA — Technical Considerations for Medical Devices with Physiologic Closed-Loop Control Technology
 https://www.fda.gov/regulatory-information/search-fda-guidance-documents/technical-considerations-medical-devices-physiologic-closed-loop-control-technology
@@ -685,14 +956,11 @@ https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRes/res.cfm?ID=208997
 FDA — HeartMate 3 outflow graft twist / low-flow recall
 https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfres/res.cfm?id=163823
 
-FDA — 2026 HeartMate 3 controller / backup battery recall
-https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfres/res.cfm?id=220519
+PubMed — Progress in Organ Bioprinting for Regenerative Medicine
+https://pubmed.ncbi.nlm.nih.gov/41567882/
 
-CDC — Congenital Heart Defects data
-https://www.cdc.gov/heart-defects/data/index.html
-
-FDA — Pediatric automated insulin delivery approval example
-https://www.fda.gov/news-events/press-announcements/fda-approves-automated-insulin-delivery-and-monitoring-system-use-younger-pediatric-patients
+PubMed — Applications, advancements, and challenges of 3D bioprinting in organ transplantation
+https://pubmed.ncbi.nlm.nih.gov/38374788/
 
 WAMR — WebAssembly Micro Runtime
 https://github.com/bytecodealliance/wasm-micro-runtime
