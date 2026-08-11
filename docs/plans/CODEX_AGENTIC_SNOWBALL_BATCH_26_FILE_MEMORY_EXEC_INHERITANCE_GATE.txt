@@ -1,0 +1,636 @@
+CODEX AGENTIC SNOWBALL — BATCH 26
+FILE + MEMORY + EXECUTION INHERITANCE GATE
+
+Repository:
+thanks-cohn/zig-reference
+
+Canonical plan path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_26_FILE_MEMORY_EXEC_INHERITANCE_GATE.txt
+
+MISSION
+
+Batch 25B is complete. The repository now has a real Linux/RV64 syscall boundary over a Linux-independent Morphic semantic seam plus a bounded generational resource substrate. Linux fd integers are process-visible compatibility identities; the permanent Morphic resource identity is generation-bearing and reusable by future non-Linux personalities.
+
+Batch 26 must use that foundation to cross the next major ecosystem threshold in ONE campaign:
+
+    isolated ELF/syscall proof
+              ↓
+    real file-backed resources
+              ↓
+    real pathname/openat pressure
+              ↓
+    real memory-management pressure
+              ↓
+    real exec replacement
+              ↓
+    real PT_INTERP/dynamic-ELF handoff pressure
+              ↓
+    an execution environment capable of supporting the next musl/BusyBox/Alpine inheritance campaigns
+
+The goal is NOT to count Linux syscalls.
+The goal is NOT to implement a complete POSIX filesystem.
+The goal is NOT to duplicate Linux internals inside Morphic.
+
+The goal is to implement the smallest coherent permanent mechanisms that unlock the largest next slice of the existing software world.
+
+The Batch 26 planning rule is:
+
+    smallest permanent mechanism
+              ↓
+    largest inherited software surface
+
+or, in project vocabulary:
+
+    MINIMUM IMPLEMENTATION SURFACE
+    MAXIMUM CAPABILITY / INHERITANCE SURFACE
+    MAXIMUM WHOLE-SYSTEM MENTAL MODEL
+
+======================================================================
+NON-NEGOTIABLE CONTINUATION + OUTPUT LAW
+======================================================================
+
+THIS IS A COMPLETION RUN, NOT AN INSPECTION RUN.
+
+Do not stop merely because:
+
+- the first build fails;
+- the first design is wrong;
+- a verifier rejects evidence;
+- QEMU hangs once;
+- a syscall assumption is wrong;
+- a generated index drifts;
+- a module contract fails schema validation;
+- a linker script needs repair;
+- an ELF fixture exposes a missing prerequisite;
+- an attempted implementation must be redesigned;
+- repository-wide validation finds an in-scope regression.
+
+A repairable failure is the next debugging task.
+
+Required loop:
+
+    observe failure
+        ↓
+    isolate first divergent fact
+        ↓
+    query existing repository knowledge
+        ↓
+    instrument narrowly if needed
+        ↓
+    diagnose root cause
+        ↓
+    repair the root cause
+        ↓
+    rerun the smallest decisive proof
+        ↓
+    rerun affected regressions
+        ↓
+    continue toward Batch 26 PASS
+
+Never silently stop after a long run.
+Never end with only prose if repository work has been performed.
+Never abandon useful generated implementation/evidence because the campaign became larger than expected.
+
+OUTPUT CONTINUITY REQUIREMENT:
+
+Create/update `docs/reports/AGENTIC_SNOWBALL_BATCH_26.md` during the run, not only at the very end. It may begin as WORKING and be updated as gates are proved. This gives the campaign a persistent progress ledger and prevents a long run from disappearing without output.
+
+At every meaningful completed internal gate, preserve a coherent checkpoint commit when practical. One final PR is preferred, but multiple coherent commits inside the same task branch are encouraged when they reduce interruption risk.
+
+If an unavoidable external/tool/environment limit prevents total completion, do NOT simply stop. Preserve the maximum coherent implementation, tests, report state, exact remaining blocker, exact next command, branch, commit SHA, and PR state. Push/create or update the PR whenever the environment permits. A genuine BLOCKED result must still produce useful files and a resumable repository state.
+
+BLOCKED is reserved for an external impossibility that cannot reasonably be repaired from the repository or available execution environment. It is not a synonym for difficult, time-consuming, unexpected, or initially failing.
+
+Do not weaken acceptance tests, verifier strictness, or inherited evidence merely to obtain PASS.
+
+======================================================================
+BASELINE — CHECKED-OUT REPOSITORY IS TRUTH
+======================================================================
+
+Treat current checked-out HEAD as authoritative.
+
+Current expected truth includes Batch 25B and its generation-preservation repair, but do not reset to a SHA written in this plan and do not overwrite newer work if main has advanced.
+
+Before broad reading:
+
+1. read `AGENTS.md`;
+2. read the fast-track roadmap `docs/roadmaps/ALPZ_FAST_TRACK_ALPINE_TO_QEMU_HYPERVISOR_KVM.md`;
+3. read `docs/reports/AGENTIC_SNOWBALL_BATCH_25B.md`;
+4. run:
+
+       python3 tools/query-reference.py agent bootstrap
+       python3 tools/query-reference.py agent doctor
+
+5. use `agent decide`, `agent compose`, `agent card`, `agent preflight`, `agent impact`, and diagnostics before broad source archaeology;
+6. inspect project 57 bounded-resource-table, project 56 semantic operations, project 53 bounded user-memory transfer, project 54 ELF load planning, project 55 Linux initial-stack planning, and only other modules selected by the query tools;
+7. search existing pathname, memory-region, mapping, page-table, range, ELF, resource, and container primitives before creating new ones;
+8. preserve all newer unrelated documentation and branding work.
+
+Do not read all historical reports, all QuirkM issue ledgers, or the whole repository just to begin.
+
+======================================================================
+SETTLED TRUTHS — INHERIT, DO NOT RE-SOLVE
+======================================================================
+
+Batch 26 must preserve the following proved truths:
+
+- real RV64 U-mode ELF execution;
+- real S→U→S ECALL transitions;
+- exact returning `sepc + 4` behavior;
+- terminal exit/exit_group handoff;
+- Sv39 active translation;
+- R-X and RW-NX userspace domains;
+- W+X=0;
+- bounded user-memory validation/copy planning;
+- full-range validation before externally visible write/read side effects where atomicity is claimed;
+- Linux syscall numbers and errno remain compatibility-edge details;
+- Morphic semantic operations remain Linux-independent;
+- project 57 generational ResourceRef is the permanent resource identity for this path;
+- stale ResourceRef generations are rejected;
+- Linux fd aliases bind to ResourceRef and do not replace it;
+- two-QEMU deterministic machine proof discipline;
+- mutation/rejection tests for decisive evidence;
+- explicit nonclaims;
+- generated indexes/contracts are derived outputs, not hand-maintained alternative truth.
+
+Do not replace project 57 with a filesystem-specific handle table.
+Do not collapse fd identity, pathname identity, inode/object identity, and Morphic resource identity into one integer.
+Do not hard-code generation 1 or otherwise weaken generational identity.
+
+======================================================================
+BATCH 26 — ONE CAMPAIGN, FOUR INTERNAL GATES
+======================================================================
+
+Batch 26 is intentionally large because it targets one ecosystem threshold. Use internal gates/checkpoints rather than splitting the roadmap into four externally named batches unless a true architectural reason appears.
+
+Internal Gate A — FILE / DIRECTORY RESOURCE WORLD
+Internal Gate B — MEMORY MAPPING WORLD
+Internal Gate C — EXEC REPLACEMENT WORLD
+Internal Gate D — PT_INTERP / DYNAMIC-ELF HANDOFF WORLD
+
+The final PASS should compose all four where feasible.
+
+======================================================================
+GATE A — FILE / DIRECTORY RESOURCE WORLD
+======================================================================
+
+Goal:
+
+    pathname + directory context
+          ↓
+    filesystem object lookup
+          ↓
+    Morphic file/directory resource
+          ↓
+    project 57 ResourceRef
+          ↓
+    Linux fd binding
+          ↓
+    existing read/write/lifecycle machinery
+
+Create only the smallest reusable filesystem substrate required by the proof.
+
+Required permanent concepts should be Linux-independent where possible, for example:
+
+- directory/root capability or object;
+- file object/resource;
+- bounded name/path traversal;
+- file byte content / file length;
+- current/open-file offset ONLY if real lseek/read pressure requires it, with the distinction between descriptor binding and underlying open-file state represented truthfully;
+- directory enumeration only if required by the selected pressure fixture;
+- metadata sufficient for the chosen Linux-facing proof;
+- deterministic bounded storage for the proof filesystem;
+- explicit errors independent of Linux errno.
+
+Linux owns compatibility semantics such as:
+
+- `AT_FDCWD` if implemented;
+- Linux `openat` flags;
+- Linux fd allocation;
+- negative errno encoding;
+- Linux pathname edge rules required by the bounded proof;
+- Linux stat structure layout if implemented;
+- Linux syscall numbers/register decoding.
+
+Do not freeze the future QuirkM public filesystem API.
+Do not implement a complete Unix inode/VFS architecture unless the evidence proves it is the smallest reusable mechanism.
+
+Minimum machine proof for Gate A:
+
+- a real RV64 userspace ELF issues a real Linux open/openat-class request against a deterministic filesystem fixture;
+- success returns a real process-local Linux fd bound to a generation-bearing ResourceRef;
+- read through that fd returns exact file bytes through the existing bounded user-memory path;
+- close releases the binding/resource lifetime correctly;
+- opening a missing path returns the correct Linux compatibility failure;
+- an invalid userspace pathname pointer/range returns EFAULT without creating a resource/fd or mutating filesystem state;
+- a file resource can reuse a resource-table slot at a later generation without breaking semantic I/O;
+- if write/create/truncate behavior is implemented, every claimed mutation has failure-atomic evidence.
+
+Strongly preferred additional pressure if it fits coherently:
+
+- lseek with shared/open-file offset semantics represented at the right layer;
+- minimal stat/fstat metadata;
+- bounded directory iteration/getdents-style proof;
+- root-relative path traversal rather than ambient ad-hoc string lookup.
+
+The goal is a permanent file-resource mechanism that future Linux, QuirkM, Wasm, loaders, package tools, and VMM tooling can reuse.
+
+======================================================================
+GATE B — MEMORY MAPPING WORLD
+======================================================================
+
+Goal:
+
+    process virtual-memory request
+          ↓
+    Linux mmap/brk compatibility adapter
+          ↓
+    Linux-independent mapping / memory-region operation
+          ↓
+    existing page ownership + Sv39 machinery
+
+Search and compose existing memory-region, physical-page, address, range, page-table, and mapping modules before inventing a new subsystem.
+
+Required pressure:
+
+- anonymous writable user mapping;
+- unmap;
+- protection change where required;
+- deterministic bounded address selection policy for the proof;
+- preservation of W+X=0;
+- mapping failure leaves prior mappings unchanged where atomicity is claimed;
+- user access through the new mapping is mechanically proved.
+
+Linux-facing minimum should be driven by the next inheritance thresholds, likely including the smallest credible subset of:
+
+- `mmap`;
+- `munmap`;
+- `mprotect`;
+- `brk` only if required by the chosen executable/runtime pressure.
+
+File-backed mapping should be implemented in this campaign if it is necessary to reach Gate D or if it composes cleanly with Gate A without speculative complexity.
+
+Do not emulate Linux internal vm_area_struct design simply because Linux has it.
+The permanent Morphic concepts are memory object / mapping / permissions / ownership / address range, not Linux kernel implementation details.
+
+Required proof:
+
+- real U-mode code obtains/maps writable memory through the Linux adapter;
+- writes/reads exact bytes;
+- invalid/unmapped access is rejected according to the established trap policy;
+- mprotect-like transition changes permissions as claimed;
+- unmap removes accessibility;
+- W+X remains zero;
+- two QEMU runs agree on the evidence relevant to the deterministic proof.
+
+======================================================================
+GATE C — EXEC REPLACEMENT WORLD
+======================================================================
+
+Goal:
+
+    running Linux process
+          ↓
+    pathname to executable
+          ↓
+    existing ELF planner
+          ↓
+    new process image construction
+          ↓
+    new Linux initial stack
+          ↓
+    enter new e_entry
+
+Implement the smallest correct `execve`-class path necessary to replace the current process image with another real RV64 ELF obtained through the filesystem substrate.
+
+Reuse:
+
+- project 54 ELF load planning;
+- project 55 Linux initial-stack planning;
+- existing page-permission and user-entry machinery;
+- project 57 resource identity;
+- existing transfer and checked-range primitives.
+
+Do not fork/clone a new process in this gate. Exec replacement is enough.
+
+Required semantics/proof:
+
+- executable bytes come from the filesystem path, not a compile-time special case wired directly into the kernel;
+- argv/envp are validated from the old image before destructive replacement;
+- new image construction is failure-atomic to the strongest practical bounded point: invalid ELF/path/arguments must not leave a half-replaced process image;
+- successful exec replaces mappings according to the documented bounded policy;
+- selected descriptor inheritance behavior is explicitly documented; do not accidentally invent CLOEXEC support unless implemented and proved;
+- the new program receives a correct Linux-style initial stack through project 55;
+- execution reaches the new ELF `e_entry` in U-mode;
+- the new program performs at least one returning syscall through the existing Batch 25A/25B path and then terminates with a mechanically checked result.
+
+A successful Gate C should prove a shell-like future is structurally plausible:
+
+    program A
+       ↓ execve
+    program B
+
+without yet claiming fork, clone, shell job control, signals, pipes, or BusyBox shell compatibility.
+
+======================================================================
+GATE D — PT_INTERP / DYNAMIC-ELF HANDOFF WORLD
+======================================================================
+
+This is the highest-leverage part of Batch 26 because dynamic ELF handoff is the bridge toward ordinary libc-linked software.
+
+The kernel does NOT need to become a userspace dynamic linker.
+
+Required architectural shape:
+
+    executable ELF contains PT_INTERP
+              ↓
+    kernel locates interpreter path through Gate A filesystem
+              ↓
+    kernel maps executable + interpreter using reusable mapping/ELF machinery
+              ↓
+    Linux startup auxv/entry state identifies executable/interpreter facts correctly for the bounded proof
+              ↓
+    control enters interpreter entry
+              ↓
+    userspace interpreter is responsible for relocations/linking
+
+Do not implement ELF relocations in the kernel merely to make a dynamic test pass.
+Do not bake a specific musl path into Morphic architecture.
+Linux pathname/PT_INTERP semantics belong to the Linux execution personality.
+
+Minimum acceptable proof:
+
+- parse a real or deliberately minimal RV64 ELF containing PT_INTERP;
+- resolve the interpreter path through the real bounded filesystem mechanism;
+- load/map both the main executable and interpreter through existing/reusable ELF/mapping machinery;
+- enter the interpreter entry, not the main executable entry directly;
+- provide enough initial-stack/auxv truth for the chosen interpreter fixture to independently verify main-program and interpreter placement/identity;
+- the interpreter fixture transfers control or otherwise proves the required handoff relationship mechanically;
+- mutations to PT_INTERP path, interpreter mapping, auxv values, or selected entry relationship cause the verifier to fail.
+
+STRONG OPTIONAL SUCCESSOR PRESSURE:
+
+If the environment can produce or contains a tiny real RV64 musl-linked dynamic executable/interpreter pair without introducing a large external dependency, use it as additional pressure. Do not fabricate a claim that full musl works if the proof is only a controlled PT_INTERP handoff.
+
+======================================================================
+MAXIMUM INHERITANCE CHECK
+======================================================================
+
+At the end of Batch 26, explicitly answer in the report:
+
+1. Which new mechanisms are genuinely Linux-independent and reusable by QuirkM?
+2. Which can a future Wasm/WASI adapter use without Linux fd/path/errno/syscall identities?
+3. Which are direct prerequisites for musl/BusyBox/Alpine?
+4. Which are direct prerequisites for Python/Node/Clang/Wasmtime later?
+5. Which are direct prerequisites for QEMU/TCG later?
+6. Which are direct prerequisites for the hypervisor path later?
+7. Which Linux quirks were quarantined rather than promoted into Morphic?
+8. What one next missing surface now unlocks the largest software world?
+
+A Batch 26 design is worse if it satisfies one test by creating a bespoke mechanism that later consumers cannot inherit.
+
+======================================================================
+REAL PRESSURE OVER SPECULATIVE COMPLETENESS
+======================================================================
+
+Implement only Linux behavior justified by:
+
+- the selected Batch 26 fixtures;
+- the immediate musl/BusyBox/Alpine inheritance path;
+- a reusable permanent mechanism required by multiple consumers;
+- a primary-source Linux ABI requirement necessary for correctness.
+
+Do not try to implement every open/mmap/stat/exec flag.
+Do not chase obscure ioctl, socket, signal, tty, namespace, mount, clone, or device behavior in this campaign unless it is a direct prerequisite for the actual proof and cannot be deferred coherently.
+
+However, do not stop merely because a prerequisite was not predicted. If a directly necessary in-scope prerequisite appears, implement the smallest reusable version and continue.
+
+======================================================================
+PRIMARY-SOURCE ABI VERIFICATION
+======================================================================
+
+Before encoding Linux/RV64 syscall numbers, flags, structures, errno values, mmap/protection semantics, openat behavior, execve behavior, or PT_INTERP startup relationships, verify them against primary sources available to the environment, preferring:
+
+- installed Linux UAPI headers;
+- Linux kernel documentation/source where necessary;
+- ELF/System V ABI material and RISC-V ABI material;
+- musl source only when testing a musl-specific expectation.
+
+Record exact sources checked in the Batch 26 report.
+
+Do not trust remembered constants when a primary source is available.
+
+======================================================================
+TEST / EVIDENCE REQUIREMENTS
+======================================================================
+
+Batch 26 must retain the repository's strict evidence style.
+
+Required classes of evidence:
+
+- focused module unit tests;
+- focused external smoke tests for new reusable modules;
+- machine fixture(s) issuing real raw RV64 Linux syscalls;
+- independent verifier that parses relevant ELF artifacts rather than trusting kernel-emitted claims;
+- decisive negative/mutation tests;
+- two independent QEMU processes for final deterministic machine evidence where applicable;
+- inherited Batch 25B generation-2 identity proof remains passing;
+- exact `sepc + 4` for returning ECALLs;
+- terminal handoff semantics remain correct;
+- user/supervisor page permissions remain correct;
+- W+X=0 remains proved;
+- generated repository/agent/port indexes are regenerated deterministically;
+- full repository validation passes before final PASS.
+
+Prefer one strict Batch 26 verifier that composes smaller proofs over several weak scripts that duplicate parsing logic.
+
+The verifier must reject meaningful mutations such as, as applicable:
+
+- wrong file bytes;
+- wrong fd/resource identity;
+- stale generation accepted;
+- pathname EFAULT after resource allocation;
+- wrong seek/file offset;
+- incorrect mapping permissions;
+- W+X mapping;
+- wrong new exec entry;
+- half-replaced image after failed exec;
+- wrong PT_INTERP path;
+- wrong interpreter entry;
+- wrong auxv relationship;
+- wrong resume PC;
+- lost inherited Batch 25B result.
+
+======================================================================
+MODULE / ARCHITECTURE DISCIPLINE
+======================================================================
+
+Do not force all of Batch 26 into one giant source file.
+Do not create four new modules merely because there are four internal gates.
+
+Use query/impact/compose to determine the smallest permanent module additions.
+
+A good result may be:
+
+- one bounded filesystem/path module;
+- one bounded process-mapping/address-space module only if existing modules do not already cover it;
+- mostly recipe/kernel orchestration using projects 53–57 and existing memory/ELF primitives.
+
+Every new reusable module must satisfy normal repository module contract requirements and be cheaper for future agents to discover than reverse-engineering the implementation.
+
+Preserve the project principle:
+
+    maximum visibility, minimum context
+
+For every important new capability, ensure an agent can cheaply discover:
+
+- that it exists;
+- when to use it;
+- when not to use it;
+- exact symbols;
+- dependencies;
+- ownership/lifetime;
+- failure guarantees;
+- focused validation;
+- change impact.
+
+======================================================================
+INTERNAL CHECKPOINT STRATEGY
+======================================================================
+
+This campaign is large. Use coherent internal checkpoints so an interruption never erases the work.
+
+Suggested checkpoints, not mandatory commit names:
+
+Checkpoint A:
+- reusable file/directory resource substrate;
+- open/read/close machine proof;
+- report updated with Gate A evidence.
+
+Checkpoint B:
+- mapping operations and proof;
+- report updated with Gate B evidence.
+
+Checkpoint C:
+- exec replacement proof;
+- report updated with Gate C evidence.
+
+Checkpoint D:
+- PT_INTERP handoff proof;
+- final report/validation/PR.
+
+Do not open separate PRs for A/B/C/D unless repository state or reviewability truly requires it. Prefer one Batch 26 PR with coherent commits.
+
+If later gates expose a flaw in an earlier gate, repair the earlier design and amend/add a new checkpoint; do not preserve a known-wrong checkpoint architecture for historical neatness.
+
+======================================================================
+FINAL REPORT — REQUIRED FILE
+======================================================================
+
+Maintain:
+
+    docs/reports/AGENTIC_SNOWBALL_BATCH_26.md
+
+It must contain at least:
+
+- Result: PASS, or genuine externally BLOCKED with preserved output;
+- exact architecture implemented;
+- Gate A/B/C/D status;
+- exact real-machine proof;
+- exact syscalls/ABI subset implemented;
+- primary ABI sources checked;
+- failures found and root-cause repairs;
+- mutation/rejection evidence;
+- regression evidence;
+- inheritance analysis for Linux / QuirkM / Wasm / Python-Node-Clang-Wasmtime / QEMU / hypervisor;
+- Quirk Extraction;
+- Snowball Yield;
+- explicit nonclaims;
+- LOCATIONS;
+- MINIMUS handoff;
+- next pressure selected by maximum inherited software per permanent mechanism.
+
+Do not claim full VFS, POSIX, musl, BusyBox, Alpine, generic dynamic linking, fork/clone, signals, futexes, pipes, poll, sockets, tty, Wasm, Python, Node, QEMU, hypervisor, or KVM unless the actual proof unexpectedly and honestly establishes the claim.
+
+======================================================================
+FINAL VALIDATION / DELIVERY
+======================================================================
+
+Before declaring PASS:
+
+1. run all focused tests for new/changed modules;
+2. run inherited Batch 25B focused verifier(s);
+3. run the Batch 26 verifier self-tests/mutations;
+4. run the real Batch 26 machine verifier;
+5. regenerate derived deterministic artifacts through canonical tools;
+6. run formatting/contract/port/index drift checks;
+7. run full repository validation;
+8. inspect git diff/status for accidental artifacts, generated drift, binaries, caches, or unrelated changes;
+9. repair every in-scope failure;
+10. commit coherent final state;
+11. push task branch if remote is available;
+12. create/update PR targeting main if remote is available;
+13. inspect CI if available and repair failures caused by Batch 26;
+14. emit a final handoff with exact branch, SHA, push state, CI state, PR URL/state, and report path.
+
+Do not stop immediately after creating a PR if CI is already available and failing for an in-scope reason. Inspect, repair, push, and continue.
+
+Do not silently terminate after tests.
+Do not silently terminate after a commit.
+Do not silently terminate after a push.
+Do not silently terminate after opening the PR.
+
+The run ends only after either:
+
+A) Batch 26 is PASS with evidence and a reviewable repository/PR state; or
+
+B) a genuine external blocker prevents completion, in which case maximum coherent work is preserved and published/checkpointed with exact resumption instructions.
+
+======================================================================
+PASS SHAPE
+======================================================================
+
+A successful Batch 26 should make this diagram true at the level actually proved:
+
+                         ALPZ / MORPHIC
+                              │
+                     generational resources
+                              │
+              ┌───────────────┼────────────────┐
+              │               │                │
+              ▼               ▼                ▼
+          file/dir          memory           process image
+          resources         mappings         replacement
+              │               │                │
+              └───────────────┼────────────────┘
+                              │
+                         Linux adapter
+                              │
+                 open/read/map/exec/PT_INTERP
+                              │
+                              ▼
+                    increasingly ordinary ELF
+
+The strategic outcome is not "we added N syscalls."
+
+The strategic outcome is:
+
+    one reusable file/resource world
+       + one reusable mapping world
+       + one real exec world
+       + one dynamic-loader handoff
+                 ↓
+    dramatically more existing software becomes reachable
+                 ↓
+    Batch 27/28 can use real Unix software as pressure instead of handcrafted syscall demonstrations
+
+======================================================================
+MINIMUS TARGET
+======================================================================
+
+status: PASS
+command: Batch 26 file + memory + exec inheritance gate
+summary: file_resource=real mmap=real execve=real pt_interp=real resource_generation=preserved W+X=0 qemu_deterministic=yes
+next: smallest process/thread/futex/poll/pipe surface required to make real musl/BusyBox pressure compound
+
+END PLAN
