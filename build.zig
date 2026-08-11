@@ -59,6 +59,7 @@ const specs = [_]ModuleSpec{
     .{ .name = "bounded-elf64-load-plan", .source = "projects/54-bounded-elf64-load-plan/src/bounded_elf64_load_plan.zig", .dependencies = &.{ "bounded-byte-reader", "checked-integer-cast", "fixed-capacity-vector", "checked-half-open-range", "distinct-memory-address-types", "elf64-file-header-parser", "elf64-program-header-parser" } },
     .{ .name = "bounded-rv64-linux-initial-stack-plan", .source = "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig", .dependencies = &.{ "aligned-address-and-size-helpers", "checked-half-open-range", "distinct-memory-address-types", "endian-integer-codec" } },
     .{ .name = "morphic-semantic-operation", .source = "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig", .dependencies = &.{} },
+    .{ .name = "bounded-resource-table", .source = "projects/57-bounded-resource-table/src/bounded_resource_table.zig", .dependencies = &.{ "generational-handles", "morphic-semantic-operation" } },
 };
 
 const RecipeSpec = struct { name: []const u8, dependencies: []const []const u8 };
@@ -280,6 +281,7 @@ pub fn build(b: *std.Build) void {
             freestanding_module.addImport("bounded-elf64-load-plan", findModule("bounded-elf64-load-plan", &modules));
             freestanding_module.addImport("bounded-rv64-linux-initial-stack-plan", findModule("bounded-rv64-linux-initial-stack-plan", &modules));
             freestanding_module.addImport("morphic-semantic-operation", findModule("morphic-semantic-operation", &modules));
+            freestanding_module.addImport("bounded-resource-table", findModule("bounded-resource-table", &modules));
             freestanding_module.addAnonymousImport("userspace-elf-rv64", .{ .root_source_file = userspace_elf.getEmittedBin() });
             freestanding_module.addAnonymousImport("userspace-elf-rv64-data-bss", .{ .root_source_file = userspace_data_elf.getEmittedBin() });
             freestanding_module.addAnonymousImport("userspace-elf-rv64-initial-stack", .{ .root_source_file = userspace_stack_elf.getEmittedBin() });

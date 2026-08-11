@@ -60,6 +60,9 @@
     "bounded-priority-ordering": [
       "fixed-capacity-priority-queue"
     ],
+    "bounded-resource-identity": [
+      "bounded-resource-table"
+    ],
     "bounded-rv64-linux-initial-stack-planning": [
       "bounded-rv64-linux-initial-stack-plan"
     ],
@@ -117,6 +120,9 @@
     ],
     "deterministic-linux-startup-image": [
       "bounded-rv64-linux-initial-stack-plan"
+    ],
+    "deterministic-process-bindings": [
+      "bounded-resource-table"
     ],
     "deterministic-slot-reuse": [
       "fixed-free-list"
@@ -247,6 +253,9 @@
     "replay-observation-foundation": [
       "bounded-deterministic-event-trace"
     ],
+    "resource-alias-lifecycle": [
+      "bounded-resource-table"
+    ],
     "ring-buffer": [
       "ring-buffer"
     ],
@@ -295,6 +304,9 @@
     "stale-handle-rejection": [
       "fixed-capacity-object-pool",
       "generational-handles"
+    ],
+    "stale-resource-reference-rejection": [
+      "bounded-resource-table"
     ],
     "state-machine": [
       "state-machine"

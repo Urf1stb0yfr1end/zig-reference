@@ -1,0 +1,1542 @@
+{
+  "schema_version": "3.0.0",
+  "contract_version": "0.1.0",
+  "generated_at": "",
+  "last_reviewed_at": "",
+  "module": {
+    "id": "57",
+    "canonical_name": "bounded-resource-table",
+    "display_name": "Bounded Resource Table",
+    "directory": "projects/57-bounded-resource-table",
+    "summary": "Linux- and ABI-independent bounded generational resource storage with process-local alias bindings with lossless generation-bearing semantic I/O identity.",
+    "long_description": "Composes generational handles into bounded resource identity, reference counting, capability metadata, and deterministic local binding tables.",
+    "status": "implemented",
+    "maturity": "experimental",
+    "lifecycle": "active",
+    "target_maturity_level": 4,
+    "implementation_version": "0.1.0",
+    "public_contract_version": "0.1.0",
+    "introduced_version": "",
+    "deprecated_version": "",
+    "superseded_version": "",
+    "removed_version": "",
+    "replacement_module": "",
+    "migration_guide": "",
+    "support_policy": "",
+    "deprecation_reason": "",
+    "category": "systems",
+    "subcategory": "resource-lifecycle",
+    "tags": [
+      "morphic",
+      "resource-table",
+      "generational-handles",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Provide bounded stale-safe resource identity and alias lifetime without compatibility-ABI identity.",
+    "secondary": [],
+    "non_goals": [
+      "Linux file descriptors, syscall numbers, errno values, RISC-V registers, VFS objects, concurrency"
+    ],
+    "problems_solved": [
+      "bounded resource identity",
+      "stale-reference rejection",
+      "alias reference lifetime",
+      "deterministic local bindings"
+    ],
+    "future_role": "Shared substrate directly consumable by QuirkM typed handles and Wasm adapters without Linux identity."
+  },
+  "c_pain": {
+    "summary": "C tagged unions rely on conventions for tag/payload agreement.",
+    "common_failure_modes": [],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "A direct enum, union, and switch are compact.",
+    "where_c_degrades": "Tag/payload and callback lifetime rules remain informal."
+  },
+  "zig_response": {
+    "summary": "Tagged unions make variants explicit.",
+    "language_features": [
+      "tagged union",
+      "enum",
+      "generic dispatch"
+    ],
+    "guarantees_made_visible": [
+      "exhaustive variants"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "backend resource and memory policy"
+    ],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/57-bounded-resource-table",
+    "implementation": [
+      "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
+    ],
+    "public_entrypoint": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+    "readme": "projects/57-bounded-resource-table/README.md",
+    "mastery": "projects/57-bounded-resource-table/MASTERY.md",
+    "details_markdown": "projects/57-bounded-resource-table/DETAILS.md",
+    "details_json": "projects/57-bounded-resource-table/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": [],
+    "unit_tests": [
+      "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
+    ],
+    "smoke_tests": [
+      "projects/57-bounded-resource-table/tests/smoke_test.zig"
+    ],
+    "generated_files": [],
+    "dependency_contracts": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "Capabilities",
+      "BackendId",
+      "ResourceTable",
+      "BindingTable",
+      "semanticIdentity",
+      "referenceFromIdentity"
+    ],
+    "types": [
+      {
+        "name": "Capabilities",
+        "kind": "public declaration"
+      },
+      {
+        "name": "BackendId",
+        "kind": "public declaration"
+      },
+      {
+        "name": "ResourceTable",
+        "kind": "public declaration"
+      },
+      {
+        "name": "BindingTable",
+        "kind": "public declaration"
+      }
+    ],
+    "functions": [
+      {
+        "name": "ResourceTable",
+        "signature": "ResourceTable(comptime capacity: usize) type"
+      },
+      {
+        "name": "BindingTable",
+        "signature": "BindingTable(comptime ResourceRef: type, comptime capacity: usize) type"
+      },
+      {
+        "name": "semanticIdentity",
+        "signature": "semanticIdentity(reference: anytype) morphic-semantic-operation.ResourceId"
+      },
+      {
+        "name": "referenceFromIdentity",
+        "signature": "referenceFromIdentity(comptime ResourceRef: type, identity: morphic-semantic-operation.ResourceId) ResourceRef"
+      }
+    ],
+    "methods": [
+      {
+        "name": "create",
+        "signature": "create(self: *Self, description: Description) Error!ResourceRef"
+      },
+      {
+        "name": "retain",
+        "signature": "retain(self: *Self, reference: ResourceRef) Error!void"
+      },
+      {
+        "name": "release",
+        "signature": "release(self: *Self, reference: ResourceRef) Error!bool"
+      },
+      {
+        "name": "resolve",
+        "signature": "resolve(self: *const Self, reference_or_slot: anytype) optional result"
+      },
+      {
+        "name": "referenceCount",
+        "signature": "referenceCount(self: *const Self, reference: ResourceRef) ?usize"
+      },
+      {
+        "name": "count",
+        "signature": "count(self: *const Self) usize"
+      },
+      {
+        "name": "bindAt",
+        "signature": "bindAt(self: *Self, slot: usize, reference: ResourceRef) Error!void"
+      },
+      {
+        "name": "duplicateLowest",
+        "signature": "duplicateLowest(self: *Self, source: usize) Error!usize"
+      },
+      {
+        "name": "unbind",
+        "signature": "unbind(self: *Self, slot: usize) Error!ResourceRef"
+      }
+    ],
+    "constants": [],
+    "errors": [],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": [],
+    "endpoints": [
+      {
+        "name": "ResourceTable",
+        "kind": "function",
+        "signature": "ResourceTable(comptime capacity: usize) type",
+        "visibility": "public",
+        "summary": "Provides the bounded resource-table ResourceTable operation.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "capacity",
+            "type": "usize",
+            "role": "Value supplied as T.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "type",
+            "meaning": "Result of ResourceTable.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The HandleTable contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "BindingTable",
+        "kind": "function",
+        "signature": "BindingTable(comptime ResourceRef: type, comptime capacity: usize) type",
+        "visibility": "public",
+        "summary": "Provides the bounded resource-table BindingTable operation.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "ResourceRef",
+            "type": "type",
+            "role": "Value supplied as T.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          },
+          {
+            "name": "capacity",
+            "type": "usize",
+            "role": "Value supplied as T.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "type",
+            "meaning": "Result of BindingTable.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The HandleTable contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "create",
+        "kind": "method",
+        "signature": "create(self: *Self, description: Description) Error!ResourceRef",
+        "visibility": "public",
+        "summary": "Provides the bounded resource-table create operation.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate"
+        },
+        "inputs": [
+          {
+            "name": "description",
+            "type": "Description",
+            "role": "Value supplied as T.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error!ResourceRef",
+            "meaning": "Result of create.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The count contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "retain",
+        "kind": "method",
+        "signature": "retain(self: *Self, reference: ResourceRef) Error!void",
+        "visibility": "public",
+        "summary": "Provides the bounded resource-table retain operation.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate"
+        },
+        "inputs": [
+          {
+            "name": "reference",
+            "type": "ResourceRef",
+            "role": "Value supplied as T.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error!void",
+            "meaning": "Result of retain.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The count contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "release",
+        "kind": "method",
+        "signature": "release(self: *Self, reference: ResourceRef) Error!bool",
+        "visibility": "public",
+        "summary": "Provides the bounded resource-table release operation.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate"
+        },
+        "inputs": [
+          {
+            "name": "reference",
+            "type": "ResourceRef",
+            "role": "Value supplied as T.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error!bool",
+            "meaning": "Result of release.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The count contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "resolve",
+        "kind": "method",
+        "signature": "resolve(self: *const Self, reference_or_slot: anytype) optional result",
+        "visibility": "public",
+        "summary": "Provides the bounded resource-table resolve operation.",
+        "receiver": {
+          "name": "self",
+          "type": "*const Self",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [
+          {
+            "name": "reference_or_slot",
+            "type": "anytype",
+            "role": "Value supplied as T.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "optional result",
+            "meaning": "Result of resolve.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The count contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "referenceCount",
+        "kind": "method",
+        "signature": "referenceCount(self: *const Self, reference: ResourceRef) ?usize",
+        "visibility": "public",
+        "summary": "Provides the bounded resource-table referenceCount operation.",
+        "receiver": {
+          "name": "self",
+          "type": "*const Self",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [
+          {
+            "name": "reference",
+            "type": "ResourceRef",
+            "role": "Value supplied as T.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "?usize",
+            "meaning": "Result of referenceCount.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The count contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "count",
+        "kind": "method",
+        "signature": "count(self: *const Self) usize",
+        "visibility": "public",
+        "summary": "Provides the bounded resource-table count operation.",
+        "receiver": {
+          "name": "self",
+          "type": "*const Self",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "usize",
+            "meaning": "Result of count.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The count contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "bindAt",
+        "kind": "method",
+        "signature": "bindAt(self: *Self, slot: usize, reference: ResourceRef) Error!void",
+        "visibility": "public",
+        "summary": "Provides the bounded resource-table bindAt operation.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate"
+        },
+        "inputs": [
+          {
+            "name": "slot",
+            "type": "usize",
+            "role": "Value supplied as T.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          },
+          {
+            "name": "reference",
+            "type": "ResourceRef",
+            "role": "Value supplied as T.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error!void",
+            "meaning": "Result of bindAt.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The count contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "duplicateLowest",
+        "kind": "method",
+        "signature": "duplicateLowest(self: *Self, source: usize) Error!usize",
+        "visibility": "public",
+        "summary": "Provides the bounded resource-table duplicateLowest operation.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate"
+        },
+        "inputs": [
+          {
+            "name": "source",
+            "type": "usize",
+            "role": "Value supplied as T.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error!usize",
+            "meaning": "Result of duplicateLowest.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The count contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "unbind",
+        "kind": "method",
+        "signature": "unbind(self: *Self, slot: usize) Error!ResourceRef",
+        "visibility": "public",
+        "summary": "Provides the bounded resource-table unbind operation.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate"
+        },
+        "inputs": [
+          {
+            "name": "slot",
+            "type": "usize",
+            "role": "Value supplied as T.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error!ResourceRef",
+            "meaning": "Result of unbind.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The count contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "semanticIdentity",
+        "kind": "function",
+        "signature": "semanticIdentity(reference: anytype) morphic-semantic-operation.ResourceId",
+        "visibility": "public",
+        "summary": "Losslessly converts between a full generation-bearing resource reference and semantic resource identity.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "reference",
+            "type": "anytype",
+            "role": "Value supplied as T.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "morphic-semantic-operation.ResourceId",
+            "meaning": "Result of ResourceTable.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The HandleTable contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "referenceFromIdentity",
+        "kind": "function",
+        "signature": "referenceFromIdentity(comptime ResourceRef: type, identity: morphic-semantic-operation.ResourceId) ResourceRef",
+        "visibility": "public",
+        "summary": "Losslessly converts between a full generation-bearing resource reference and semantic resource identity.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "ResourceRef",
+            "type": "type",
+            "role": "Value supplied as T.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          },
+          {
+            "name": "identity",
+            "type": "morphic-semantic-operation.ResourceId",
+            "role": "Value supplied as T.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "mutable only when the type permits mutation",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "all values satisfying the listed constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error or requires the stated preconditions"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "ResourceRef",
+            "meaning": "Result of ResourceTable.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The HandleTable contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      }
+    ]
+  },
+  "inputs": [],
+  "outputs": [],
+  "state": {
+    "fields": [],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": [
+      "A Morphic semantic I/O request carries both resource slot and generation, distinguishing successive generations in the same bounded slot."
+    ]
+  },
+  "ownership": {
+    "owns": [],
+    "borrows": [],
+    "copies": [],
+    "transfers": [],
+    "shared": [],
+    "allocator": "",
+    "allocator_lifetime": "",
+    "element_cleanup": "",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [],
+    "optional_empty_results": [],
+    "failure_atomicity": "",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [
+      {
+        "module": "generational-handles",
+        "path": "projects/08-generational-handles/src/generational_handles.zig",
+        "symbol": "HandleTable",
+        "guarantee": "stale-reference rejection and bounded inline storage",
+        "reason": "reuse canonical generational storage"
+      },
+      {
+        "module": "morphic-semantic-operation",
+        "path": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig",
+        "symbol": "ResourceId",
+        "guarantee": "OS-neutral full generation-bearing semantic identity",
+        "reason": "carry complete ResourceRef identity through semantic I/O"
+      }
+    ],
+    "standard_library": [],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": []
+  },
+  "dependency_contracts": [],
+  "expected_dependents": [],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "bounded-resource-table",
+    "import_path": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+    "import_configuration": "",
+    "minimal_example": "const completion = operations.create(request, backend);",
+    "integration_patterns": [],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "",
+    "minimum_zig_version": "",
+    "maximum_tested_zig_version": "",
+    "hosted": "",
+    "freestanding": "",
+    "thread_safe": "",
+    "reentrant": "",
+    "interrupt_safe": "",
+    "async_safe": "",
+    "signal_safe": "",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "",
+    "no_std_equivalent": ""
+  },
+  "concurrency": {
+    "internal_synchronization": "",
+    "caller_synchronization_required": "",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-bounded-resource-table",
+    "commands": [],
+    "unit_tests": [],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": [],
+    "smoke_test_commands": [
+      "zig build smoke-bounded-resource-table"
+    ],
+    "smoke_test_behaviors": [],
+    "smoke_test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "",
+    "continuous_integration": "",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [],
+    "status_dimensions": {
+      "implementation_present": true,
+      "contract_complete": true,
+      "contract_formatted": true,
+      "unit_tests_present": true,
+      "smoke_test_present": true,
+      "contract_checker_passed": false,
+      "compiler_validated": false,
+      "unit_tests_passed": false,
+      "smoke_tests_passed": false
+    }
+  },
+  "documentation": {
+    "read_order": [],
+    "examples_covered": [],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [],
+    "related_modules": [],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "",
+    "breaking_change_policy": "",
+    "deprecation_policy": "",
+    "known_gaps": [],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [],
+    "synchronization_requirements": [],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "bounded-resource-table-dispatch",
+      "architecture-independent-write-and-termination"
+    ],
+    "problems": [],
+    "inputs": [],
+    "outputs": [],
+    "environments": [],
+    "keywords": [],
+    "grep_terms": [],
+    "natural_language_queries": [],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "",
+    "snowball_score": ""
+  },
+  "agent_guidance": {
+    "use_when": [],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [],
+    "verification_steps": [],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [],
+    "files_to_read_first": [],
+    "files_not_required_for_basic_use": [],
+    "smoke_test_before_integration": ""
+  },
+  "source_map": {
+    "symbols_to_files": [],
+    "tests_to_behaviors": [],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": [],
+    "smoke_tests_to_public_symbols": [],
+    "smoke_tests_to_dependencies": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": []
+  },
+  "smoke_test": {
+    "required": true,
+    "implemented": true,
+    "status": "implemented-unverified",
+    "source_path": "projects/57-bounded-resource-table/tests/smoke_test.zig",
+    "build_step": "smoke-bounded-resource-table",
+    "commands": [
+      "zig build smoke-bounded-resource-table"
+    ],
+    "public_import_used": "bounded-resource-table",
+    "public_symbols_exercised": [],
+    "successful_operations": [],
+    "failure_or_boundary_operations": [],
+    "cleanup_exercised": [],
+    "repository_dependencies_exercised": [],
+    "hosted_environment_required": "",
+    "freestanding_environment_required": "",
+    "fixtures": [],
+    "expected_exit_status": "",
+    "expected_output": [],
+    "forbidden_private_access": true,
+    "last_run": "",
+    "last_result": "unverified",
+    "last_validated_commit": "",
+    "compiler_version": "",
+    "known_failures": [],
+    "notes": []
+  },
+  "portability": {
+    "baseline_zig_version": "0.14.0",
+    "port_contract": "projects/57-bounded-resource-table/port.js",
+    "port_contract_schema": "port.schema.json",
+    "tested_zig_versions": [],
+    "untested_zig_versions": [],
+    "dependencies_must_port_first": [],
+    "version_sensitive_symbols": [],
+    "version_sensitive_files": [],
+    "semantic_guarantees_to_preserve": [],
+    "validation_commands": [],
+    "known_porting_blockers": [],
+    "automatic_port_guaranteed": false,
+    "notes": []
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Bounded generational resource identity and deterministic process-local alias bindings.",
+    "search_aliases": [
+      "resource table",
+      "resource reference",
+      "process binding table"
+    ],
+    "capability_ids": [
+      "bounded-resource-identity",
+      "stale-resource-reference-rejection",
+      "resource-alias-lifecycle",
+      "deterministic-process-bindings"
+    ],
+    "use_when": [
+      "Need bounded Linux-independent resource identity and alias lifetime."
+    ],
+    "do_not_use_when": [
+      "Need dynamically growing storage or synchronized concurrent mutation."
+    ],
+    "entrypoint": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+    "public_symbols": [
+      "Capabilities",
+      "BackendId",
+      "ResourceTable",
+      "BindingTable",
+      "semanticIdentity",
+      "referenceFromIdentity"
+    ],
+    "dependency_ids": [
+      "generational-handles",
+      "morphic-semantic-operation"
+    ],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {},
+    "invalidation": {},
+    "failure_guarantees": [
+      "Failed resource and binding operations preserve state.",
+      "Semantic I/O identity preserves both the resource slot and generation; stale identities remain rejected after slot reuse."
+    ],
+    "effects": [
+      "borrows_caller_memory",
+      "returns_borrow",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "test-bounded-resource-table",
+      "smoke-bounded-resource-table"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [
+        "target-neutral mechanism"
+      ],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": [
+        "capacity"
+      ]
+    },
+    "construction": {
+      "named_import": "bounded-resource-table",
+      "primary_symbol": "ResourceTable",
+      "initialization": "var resources = ResourceTable(16){};"
+    },
+    "operation_map": {
+      "create resource": "ResourceTable.create",
+      "bind local slot": "BindingTable.bindAt",
+      "duplicate binding": "BindingTable.duplicateLowest",
+      "release alias": "ResourceTable.release"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [
+        "bounded-user-memory-transfer-plan"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Table order, then zero padding, then argv strings and env strings in input order.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Compile-time capacity; generation wrap remains bounded by project 08."
+    ],
+    "minimal_usage": [
+      "const r = @import(\"bounded-resource-table\");",
+      "var resources = r.ResourceTable(16){};"
+    ],
+    "integration_notes": [
+      "Adapters keep Linux fd and errno outside this module.",
+      "Pass semanticIdentity(reference) end-to-end and reconstruct only with referenceFromIdentity; never assume generation 1."
+    ],
+    "canonical_invariants": []
+  }
+}

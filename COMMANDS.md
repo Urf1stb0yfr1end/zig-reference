@@ -167,6 +167,7 @@ The following section is derived from `generated/modules.json` and canonical mod
 | `bounded-elf64-load-plan` | `zig build test-bounded-elf64-load-plan` | `zig build smoke-bounded-elf64-load-plan` | `projects/54-bounded-elf64-load-plan/details.json` |
 | `bounded-rv64-linux-initial-stack-plan` | `zig build test-bounded-rv64-linux-initial-stack-plan` | `zig build smoke-bounded-rv64-linux-initial-stack-plan` | `projects/55-bounded-rv64-linux-initial-stack-plan/details.json` |
 | `morphic-semantic-operation` | `zig build test-morphic-semantic-operation` | `zig build smoke-morphic-semantic-operation` | `projects/56-morphic-semantic-operation/details.json` |
+| `bounded-resource-table` | `zig build test-bounded-resource-table` | `zig build smoke-bounded-resource-table` | `projects/57-bounded-resource-table/details.json` |
 <!-- END GENERATED MODULE COMMANDS -->
 
 ## Recipes and conformance
@@ -211,7 +212,7 @@ Each module has `zig build test-<module>` and `zig build smoke-<module>` targets
 
 ## Agent-readable pilot commands
 
-<!-- CURRENT AGENT CORPUS --> Agent Fast Path v2 currently projects 57 contracted modules as 57 full cards with 0 partial cards.
+<!-- CURRENT AGENT CORPUS --> Agent Fast Path v2 currently projects 58 contracted modules as 58 full cards with 0 partial cards.
 The Batch 07 repair revalidated bootstrap/doctor discovery, deterministic preflight, command-reference drift, ports, Developer Minimus, hosted Morphic verification, and the complete repository pipeline under Zig 0.14.0; exact results are recorded in `docs/reports/AGENTIC_SNOWBALL_BATCH_07_REPAIR.md`.
 The root-document policy is checked by `node tools/check-port-contracts.js`; it accepts
 only the explicit flagship/root allowlist and rejects any other root Markdown file.
@@ -412,3 +413,10 @@ Batch 24B executed the project-53/54/55 focused regressions, Batch 23 strict sel
 - `python3 tools/verify-freestanding-riscv64-linux-syscalls.py` runs two independent QEMU machines, independently inspects the exact ELF and five ECALL sites, verifies four exact `sepc + 4` returns plus terminal `exit_group`, exact write bytes and negative errno results, inherited Batch 24B truth, unchanged resource/mapping evidence, and Morphic equality.
 
 Batch 25A executed the semantic-operation unit/smoke tests, project 53/54/55 regressions, Batch 24B one- and two-QEMU proofs, its mutation self-test and strict two-QEMU proof under Zig 0.14.0 and QEMU 8.2.2. The raw trap-entry repair explicitly aligns `.text.user_service_trap` to the four-byte `stvec.BASE` requirement.
+
+### Batch 25B bounded resource table and Linux FD lifecycle
+
+- `python3 tools/verify-freestanding-riscv64-linux-fd-lifecycle.py --self-test` runs one real QEMU machine and rejects decisive descriptor allocation, alias lifetime, EFAULT atomicity, event, result, resource-count, `sepc + 4`, and inherited process-start mutations.
+- `python3 tools/verify-freestanding-riscv64-linux-fd-lifecycle.py` runs two independent QEMU machines and proves the 15-ECALL raw RV64 ELF path, 14 exact returns, terminal `exit_group`, deterministic stdin, real fd 0/1/2 bindings, `dup`/`close` alias lifetime, EBADF/EFAULT/ENOSYS, unchanged mappings, W+X=0, and hosted/fake/machine Morphic equality.
+
+Batch 25B executed both verifier modes successfully with Zig 0.14.0 and QEMU 8.2.2. Linux UAPI constants were checked from the installed kernel UAPI headers before implementation. The generation-preservation repair forces machine stdin into reused slot generation 2 and requires the full generation-bearing semantic identity in focused smoke and both QEMU proof modes.

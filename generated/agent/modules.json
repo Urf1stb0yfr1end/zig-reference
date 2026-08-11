@@ -1279,6 +1279,7 @@
       ],
       "change_impact": {
         "dependents": [
+          "bounded-resource-table",
           "fixed-capacity-object-pool"
         ],
         "recipes": [
@@ -1309,6 +1310,7 @@
       "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
+        "bounded-resource-table",
         "fixed-capacity-object-pool"
       ],
       "do_not_use_when": [
@@ -1405,6 +1407,7 @@
       "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
       "transitive_dependents": [
+        "bounded-resource-table",
         "fixed-capacity-object-pool"
       ],
       "use_when": [
@@ -8612,7 +8615,9 @@
         "architecture-independent-write-and-termination"
       ],
       "change_impact": {
-        "dependents": [],
+        "dependents": [
+          "bounded-resource-table"
+        ],
         "recipes": []
       },
       "composition": {
@@ -8638,7 +8643,9 @@
       },
       "diagnostic_ids": [],
       "direct_dependencies": [],
-      "direct_dependents": [],
+      "direct_dependents": [
+        "bounded-resource-table"
+      ],
       "do_not_use_when": [
         "Linux syscall decoding or errno encoding is the requested layer."
       ],
@@ -8716,9 +8723,150 @@
       "summary": "ABI-neutral synchronous write and termination semantic operation dispatch.",
       "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
-      "transitive_dependents": [],
+      "transitive_dependents": [
+        "bounded-resource-table"
+      ],
       "use_when": [
         "A compatibility personality or runtime needs shared write/terminate semantics."
+      ]
+    },
+    {
+      "aliases": [
+        "resource table",
+        "resource reference",
+        "process binding table"
+      ],
+      "alternatives": [],
+      "borrowing": {},
+      "canonical_invariants": [],
+      "capabilities": [
+        "bounded-resource-identity",
+        "stale-resource-reference-rejection",
+        "resource-alias-lifecycle",
+        "deterministic-process-bindings"
+      ],
+      "change_impact": {
+        "dependents": [],
+        "recipes": []
+      },
+      "composition": {
+        "commonly_with": [
+          "bounded-user-memory-transfer-plan"
+        ],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "var resources = ResourceTable(16){};",
+        "named_import": "bounded-resource-table",
+        "primary_symbol": "ResourceTable"
+      },
+      "dependency_build_order": [
+        "generational-handles",
+        "morphic-semantic-operation",
+        "bounded-resource-table"
+      ],
+      "details": "projects/57-bounded-resource-table/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Table order, then zero padding, then argv strings and env strings in input order."
+      },
+      "diagnostic_ids": [],
+      "direct_dependencies": [
+        "generational-handles",
+        "morphic-semantic-operation"
+      ],
+      "direct_dependents": [],
+      "do_not_use_when": [
+        "Need dynamically growing storage or synchronized concurrent mutation."
+      ],
+      "environment_constraints": {
+        "architectures": [
+          "target-neutral mechanism"
+        ],
+        "endianness": "independent",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [],
+      "evidence_summary": {
+        "conformance_validated": false,
+        "evidence_records": 1,
+        "lifecycle": "active",
+        "maturity_level": 4,
+        "module": "bounded-resource-table",
+        "smoke_validated": true,
+        "target_maturity_level": 4,
+        "unit_validated": true
+      },
+      "failure_guarantees": [
+        "Failed resource and binding operations preserve state.",
+        "Semantic I/O identity preserves both the resource slot and generation; stale identities remain rejected after slot reuse."
+      ],
+      "focused_validation_commands": [
+        "zig build test-bounded-resource-table",
+        "zig build smoke-bounded-resource-table"
+      ],
+      "id": "57",
+      "integration_notes": [
+        "Adapters keep Linux fd and errno outside this module.",
+        "Pass semanticIdentity(reference) end-to-end and reconstruct only with referenceFromIdentity; never assume generation 1."
+      ],
+      "invalidation": {},
+      "known_gaps": [
+        "Compile-time capacity; generation wrap remains bounded by project 08."
+      ],
+      "matching_recipes": [],
+      "minimal_usage": [
+        "const r = @import(\"bounded-resource-table\");",
+        "var resources = r.ResourceTable(16){};"
+      ],
+      "module": "bounded-resource-table",
+      "operation_map": {
+        "bind local slot": "BindingTable.bindAt",
+        "create resource": "ResourceTable.create",
+        "duplicate binding": "BindingTable.duplicateLowest",
+        "release alias": "ResourceTable.release"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "public_symbols": [
+        "Capabilities",
+        "BackendId",
+        "ResourceTable",
+        "BindingTable",
+        "semanticIdentity",
+        "referenceFromIdentity"
+      ],
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [
+          "capacity"
+        ],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
+      "source": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+      "status": "full",
+      "summary": "Bounded generational resource identity and deterministic process-local alias bindings.",
+      "thread_safety": "not_synchronized",
+      "transitive_dependencies": [
+        "generational-handles",
+        "morphic-semantic-operation"
+      ],
+      "transitive_dependents": [],
+      "use_when": [
+        "Need bounded Linux-independent resource identity and alias lifetime."
       ]
     }
   ]

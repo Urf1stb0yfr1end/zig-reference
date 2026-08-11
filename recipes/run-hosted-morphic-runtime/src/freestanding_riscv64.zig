@@ -12,6 +12,7 @@ const user_transfer = @import("bounded-user-memory-transfer-plan");
 const elf_load = @import("bounded-elf64-load-plan");
 const initial_stack = @import("bounded-rv64-linux-initial-stack-plan");
 const morphic_operation = @import("morphic-semantic-operation");
+const resource_tables = @import("bounded-resource-table");
 const userspace_elf = @embedFile("userspace-elf-rv64");
 const userspace_elf_data_bss = @embedFile("userspace-elf-rv64-data-bss");
 const userspace_elf_initial_stack = @embedFile("userspace-elf-rv64-initial-stack");
@@ -251,16 +252,24 @@ var copy_out_return_count: usize = 0;
 var syscall_active = false;
 var syscall_query: user_transfer.PageQuery = undefined;
 var syscall_count: usize = 0;
-var syscall_numbers: [5]usize = .{0} ** 5;
-var syscall_pcs: [5]usize = .{0} ** 5;
-var syscall_sstatus: [5]usize = .{0} ** 5;
-var syscall_resume_pcs: [4]usize = .{0} ** 4;
-var syscall_args: [5][3]usize = .{.{0} ** 3} ** 5;
-var syscall_results: [4]usize = .{0} ** 4;
-var syscall_semantics: [5]u8 = .{0} ** 5;
+const syscall_capacity = 16;
+var syscall_numbers: [syscall_capacity]usize = .{0} ** syscall_capacity;
+var syscall_pcs: [syscall_capacity]usize = .{0} ** syscall_capacity;
+var syscall_sstatus: [syscall_capacity]usize = .{0} ** syscall_capacity;
+var syscall_resume_pcs: [syscall_capacity]usize = .{0} ** syscall_capacity;
+var syscall_args: [syscall_capacity][3]usize = .{.{0} ** 3} ** syscall_capacity;
+var syscall_results: [syscall_capacity]usize = .{0} ** syscall_capacity;
+var syscall_semantics: [syscall_capacity]u8 = .{0} ** syscall_capacity;
 var syscall_terminal_status: usize = 0;
 var syscall_output: [64]u8 = .{0} ** 64;
 var syscall_output_len: usize = 0;
+const ResourceStore = resource_tables.ResourceTable(4);
+const ResourceRef = ResourceStore.ResourceRef;
+const ProcessBindings = resource_tables.BindingTable(ResourceRef, 8);
+var syscall_resources: ResourceStore = .{};
+var syscall_bindings: ProcessBindings = .{};
+var syscall_stdin_cursor: usize = 0;
+const syscall_stdin = "stdin-25b-proof";
 const copy_out_payload = "kernel-to-user!!";
 
 export fn userCopyOutProbeContainer() linksection(".text.user_copy_out_probe") callconv(.naked) void {
@@ -522,9 +531,23 @@ export fn recordUserServiceTrap(frame: *TrapFrame) callconv(.c) void {
 }
 
 const SyscallBackend = struct {
+    pub fn readBytes(_: @This(), operation: morphic_operation.ReadBytes) morphic_operation.Completion {
+        const resource = syscall_resources.resolve(resource_tables.referenceFromIdentity(ResourceRef, operation.source)) orelse return .{ .failure = .invalid_resource };
+        if (!resource.capabilities.read) return .{ .failure = .operation_not_supported };
+        const available = syscall_stdin.len - syscall_stdin_cursor;
+        const amount = @min(operation.byte_count, available);
+        if (amount == 0) return .{ .success = 0 };
+        const plan = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(@intFromEnum(operation.destination)), amount, .write_to_user, syscall_query) catch return .{ .failure = .invalid_user_memory };
+        for (plan.items()) |segment| {
+            const destination: [*]volatile u8 = @ptrFromInt(segment.physical_start.raw());
+            for (0..segment.byte_count) |i| destination[i] = syscall_stdin[syscall_stdin_cursor + segment.request_offset + i];
+        }
+        syscall_stdin_cursor += amount;
+        return .{ .success = amount };
+    }
     pub fn writeBytes(_: @This(), operation: morphic_operation.WriteBytes) morphic_operation.Completion {
-        const resource = @intFromEnum(operation.destination);
-        if (resource != 1 and resource != 2) return .{ .failure = .invalid_resource };
+        const resource = syscall_resources.resolve(resource_tables.referenceFromIdentity(ResourceRef, operation.destination)) orelse return .{ .failure = .invalid_resource };
+        if (!resource.capabilities.write) return .{ .failure = .operation_not_supported };
         if (operation.byte_count == 0) return .{ .success = 0 };
         const plan = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(@intFromEnum(operation.source)), operation.byte_count, .read_from_user, syscall_query) catch return .{ .failure = .invalid_user_memory };
         if (operation.byte_count > syscall_output.len - syscall_output_len) return .{ .failure = .invalid_user_memory };
@@ -545,54 +568,99 @@ const SyscallBackend = struct {
 fn negativeErrno(value: usize) usize {
     return 0 -% value;
 }
-const LinuxRequestKind = enum { write, terminate, unsupported };
+const LinuxRequestKind = enum { duplicate, close, read, write, terminate, unsupported };
 fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     return switch (number) {
+        23 => .duplicate,
+        57 => .close,
+        63 => .read,
         64 => .write,
         93, 94 => .terminate,
         else => .unsupported,
     };
 }
 comptime {
-    if (decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+    if (decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
 }
 
 fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
     const index = syscall_count;
-    if (index >= 5 or frame.scause != 8 or frame.sstatus & (0x100 | 0x40000) != 0) shutdown();
+    if (index >= syscall_capacity or frame.scause != 8 or frame.sstatus & (0x100 | 0x40000) != 0) shutdown();
     syscall_numbers[index] = frame.x[17];
     syscall_pcs[index] = frame.sepc;
     syscall_sstatus[index] = frame.sstatus;
     syscall_args[index] = .{ frame.x[10], frame.x[11], frame.x[12] };
     syscall_count += 1;
-    const request: ?morphic_operation.Request = switch (decodeLinuxRequestKind(frame.x[17])) {
+    var request: ?morphic_operation.Request = null;
+    switch (decodeLinuxRequestKind(frame.x[17])) {
+        .duplicate => {
+            syscall_semantics[index] = 4;
+            if (syscall_bindings.resolve(frame.x[10])) |reference| {
+                const old_slot = frame.x[10];
+                const new_slot = syscall_bindings.duplicateLowest(old_slot) catch {
+                    frame.x[10] = negativeErrno(24);
+                    return finishReturningSyscall(frame, index);
+                };
+                syscall_resources.retain(reference) catch shutdown();
+                frame.x[10] = new_slot;
+            } else frame.x[10] = negativeErrno(9);
+        },
+        .close => {
+            syscall_semantics[index] = 5;
+            const reference = syscall_bindings.unbind(frame.x[10]) catch {
+                frame.x[10] = negativeErrno(9);
+                return finishReturningSyscall(frame, index);
+            };
+            _ = syscall_resources.release(reference) catch shutdown();
+            frame.x[10] = 0;
+        },
+        .read => blk: {
+            syscall_semantics[index] = 6;
+            const reference = syscall_bindings.resolve(frame.x[10]) orelse {
+                frame.x[10] = negativeErrno(9);
+                break :blk;
+            };
+            request = .{ .read_bytes = .{ .source = resource_tables.semanticIdentity(reference), .destination = @enumFromInt(@as(u64, frame.x[11])), .byte_count = frame.x[12] } };
+        },
         .write => blk: {
             syscall_semantics[index] = 2;
-            break :blk .{ .write_bytes = .{ .destination = @enumFromInt(@as(u32, @truncate(frame.x[10]))), .source = @enumFromInt(@as(u64, frame.x[11])), .byte_count = frame.x[12] } };
+            const reference = syscall_bindings.resolve(frame.x[10]) orelse {
+                frame.x[10] = negativeErrno(9);
+                break :blk;
+            };
+            request = .{ .write_bytes = .{ .destination = resource_tables.semanticIdentity(reference), .source = @enumFromInt(@as(u64, frame.x[11])), .byte_count = frame.x[12] } };
         },
         .terminate => blk: {
             syscall_semantics[index] = 3;
-            break :blk .{ .terminate = @truncate(frame.x[10]) };
+            request = .{ .terminate = @truncate(frame.x[10]) };
+            break :blk;
         },
-        .unsupported => null,
-    };
-    if (request == null) {
+        .unsupported => syscall_semantics[index] = 1,
+    }
+    if (request == null and syscall_semantics[index] == 1) {
         syscall_semantics[index] = 1;
         frame.x[10] = negativeErrno(38);
-    } else switch (morphic_operation.execute(request.?, SyscallBackend{})) {
-        .success => |value| frame.x[10] = value,
-        .failure => |failure| frame.x[10] = negativeErrno(switch (failure) {
-            .invalid_resource => 9,
-            .invalid_user_memory => 14,
-        }),
-        .terminated => |status| {
-            syscall_terminal_status = status;
-            frame.sepc = @intFromPtr(&userServiceSupervisorResume);
-            frame.sstatus = (frame.sstatus & ~@as(usize, 0x40122)) | 0x100;
-            service_trap_count = 2;
-            return;
-        },
+    } else if (request) |semantic_request| {
+        switch (morphic_operation.execute(semantic_request, SyscallBackend{})) {
+            .success => |value| frame.x[10] = value,
+            .failure => |failure| frame.x[10] = negativeErrno(switch (failure) {
+                .invalid_resource => 9,
+                .operation_not_supported => 9,
+                .invalid_user_memory => 14,
+            }),
+            .terminated => |status| {
+                syscall_terminal_status = status;
+                frame.sepc = @intFromPtr(&userServiceSupervisorResume);
+                frame.sstatus = (frame.sstatus & ~@as(usize, 0x40122)) | 0x100;
+                service_trap_count = 2;
+                return;
+            },
+        }
     }
+    finishReturningSyscall(frame, index);
+}
+
+fn finishReturningSyscall(frame: *TrapFrame, index: usize) void {
     syscall_results[index] = frame.x[10];
     frame.sepc += 4;
     syscall_resume_pcs[index] = frame.sepc;
@@ -1748,13 +1816,28 @@ noinline fn executeLinuxRv64Syscalls(allocator: anytype, page_owner: anytype, bu
     syscall_output_len = 0;
     syscall_terminal_status = 0;
     service_trap_count = 0;
-    syscall_numbers = .{0} ** 5;
-    syscall_pcs = .{0} ** 5;
-    syscall_sstatus = .{0} ** 5;
-    syscall_resume_pcs = .{0} ** 4;
-    syscall_args = .{.{0} ** 3} ** 5;
-    syscall_results = .{0} ** 4;
-    syscall_semantics = .{0} ** 5;
+    syscall_numbers = .{0} ** syscall_capacity;
+    syscall_pcs = .{0} ** syscall_capacity;
+    syscall_sstatus = .{0} ** syscall_capacity;
+    syscall_resume_pcs = .{0} ** syscall_capacity;
+    syscall_args = .{.{0} ** 3} ** syscall_capacity;
+    syscall_results = .{0} ** syscall_capacity;
+    syscall_semantics = .{0} ** syscall_capacity;
+    syscall_resources = .{};
+    syscall_bindings = .{};
+    syscall_stdin_cursor = 0;
+    // Force the real machine I/O path through a reused slot. Any conversion
+    // that drops the generation or reconstructs generation 1 now fails before
+    // the first successful read.
+    const retired_ref = syscall_resources.create(.{ .backend = @enumFromInt(3), .capabilities = .{ .read = true } }) catch shutdown();
+    if (!(syscall_resources.release(retired_ref) catch shutdown())) shutdown();
+    const stdin_ref = syscall_resources.create(.{ .backend = @enumFromInt(0), .capabilities = .{ .read = true } }) catch shutdown();
+    if (stdin_ref.index != retired_ref.index or stdin_ref.generation != retired_ref.generation + 1) shutdown();
+    const stdout_ref = syscall_resources.create(.{ .backend = @enumFromInt(1), .capabilities = .{ .write = true } }) catch shutdown();
+    const stderr_ref = syscall_resources.create(.{ .backend = @enumFromInt(2), .capabilities = .{ .write = true } }) catch shutdown();
+    syscall_bindings.bindAt(0, stdin_ref) catch shutdown();
+    syscall_bindings.bindAt(1, stdout_ref) catch shutdown();
+    syscall_bindings.bindAt(2, stderr_ref) catch shutdown();
     const allocated_before = allocator.allocatedCount();
     const tables_before = page_owner.page_count;
     const satp_before = asm volatile ("csrr %[value], satp"
@@ -1781,15 +1864,17 @@ noinline fn executeLinuxRv64Syscalls(allocator: anytype, page_owner: anytype, bu
     const code_leaf = builder.query(user_code_va) catch shutdown();
     const stack_leaf = builder.query(user_stack_va) catch shutdown();
     const data_leaf = builder.query(user_data_va) catch shutdown();
-    if (syscall_count != 5 or !std.mem.eql(usize, &syscall_numbers, &.{ 0x7fff, 64, 64, 64, 94 }) or !std.mem.eql(usize, &syscall_results, &.{ negativeErrno(38), 24, negativeErrno(9), negativeErrno(14) }) or syscall_terminal_status != 37 or syscall_output_len != 24 or allocated_before != allocator.allocatedCount() or tables_before != page_owner.page_count or satp_before != satp_after or code_leaf.raw_entry & 0x1e != 0x1a or stack_leaf.raw_entry & 0x1e != 0x16 or data_leaf.raw_entry & 0x1e != 0x16) {
-        write("ZIGREF_25A_FAIL final-relations\n");
+    const expected_numbers = [_]usize{ 0x7fff, 63, 23, 57, 63, 63, 63, 64, 57, 63, 57, 64, 64, 63, 94 };
+    const expected_results = [_]usize{ negativeErrno(38), 5, 3, 0, negativeErrno(9), negativeErrno(14), 4, 9, 0, negativeErrno(9), negativeErrno(9), negativeErrno(9), negativeErrno(14), negativeErrno(9) };
+    if (syscall_count != 15 or !std.mem.eql(usize, syscall_numbers[0..15], &expected_numbers) or !std.mem.eql(usize, syscall_results[0..14], &expected_results) or syscall_terminal_status != 37 or syscall_output_len != 9 or !std.mem.eql(u8, syscall_output[0..9], "stdin-25b") or syscall_stdin_cursor != 9 or syscall_resources.count() != 2 or allocated_before != allocator.allocatedCount() or tables_before != page_owner.page_count or satp_before != satp_after or code_leaf.raw_entry & 0x1e != 0x1a or stack_leaf.raw_entry & 0x1e != 0x16 or data_leaf.raw_entry & 0x1e != 0x16) {
+        write("ZIGREF_25B_FAIL final-relations\n");
         shutdown();
     }
     write("ZIGREF_LINUX_RV64_SYSCALL_BEGIN\nartifact=userspace-elf-rv64-linux-syscalls\nentry=");
     writeUsizeHex(load.entry.raw());
     write("\ninitial_sp=");
     writeUsizeHex(stack.initial_sp.raw());
-    for (0..5) |i| {
+    for (0..15) |i| {
         write("\nevent=");
         writeUsizeHex(i);
         write(",nr=");
@@ -1797,7 +1882,7 @@ noinline fn executeLinuxRv64Syscalls(allocator: anytype, page_owner: anytype, bu
         write(",pc=");
         writeUsizeHex(syscall_pcs[i]);
         write(",resume=");
-        writeUsizeHex(if (i < 4) syscall_resume_pcs[i] else 0);
+        writeUsizeHex(if (i < 14) syscall_resume_pcs[i] else 0);
         write(",sstatus=");
         writeUsizeHex(syscall_sstatus[i]);
         write(",a0=");
@@ -1811,13 +1896,22 @@ noinline fn executeLinuxRv64Syscalls(allocator: anytype, page_owner: anytype, bu
             1 => "unsupported",
             2 => "write_bytes",
             3 => "terminate",
+            4 => "duplicate",
+            5 => "close",
+            6 => "read_bytes",
             else => "INVALID",
         });
         write(",result=");
-        writeUsizeHex(if (i < 4) syscall_results[i] else syscall_terminal_status);
+        writeUsizeHex(if (i < 14) syscall_results[i] else syscall_terminal_status);
     }
     write("\noutput_hex=");
     writeHex(syscall_output[0..syscall_output_len]);
+    write("\nstdin_cursor=");
+    writeUsizeHex(syscall_stdin_cursor);
+    write("\nresource_count=");
+    writeUsizeHex(syscall_resources.count());
+    write("\nstdin_generation=");
+    writeUsizeHex(stdin_ref.generation);
     write("\ntrap_cause=0000000000000008\nterminal_status=");
     writeUsizeHex(syscall_terminal_status);
     write("\ncode_pte=");

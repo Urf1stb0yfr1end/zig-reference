@@ -1026,7 +1026,25 @@
       "replacement_module": "",
       "source": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig",
       "status": "implemented",
-      "summary": "Architecture- and OS-independent bounded write/terminate operation vocabulary.",
+      "summary": "Architecture- and OS-independent bounded read/write/terminate operations with generation-bearing resource identity.",
+      "target_maturity_level": 4
+    },
+    {
+      "aliases": [],
+      "declared_maturity": "experimental",
+      "deprecated_names": [],
+      "details": "projects/57-bounded-resource-table/details.json",
+      "directory": "projects/57-bounded-resource-table",
+      "display_name": "Bounded Resource Table",
+      "id": "57",
+      "implementation_version": "0.1.0",
+      "lifecycle": "active",
+      "name": "bounded-resource-table",
+      "public_contract_version": "0.1.0",
+      "replacement_module": "",
+      "source": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+      "status": "implemented",
+      "summary": "Linux- and ABI-independent bounded generational resource storage with process-local alias bindings with lossless generation-bearing semantic I/O identity.",
       "target_maturity_level": 4
     }
   ],

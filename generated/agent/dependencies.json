@@ -60,6 +60,13 @@
       "dependencies": [],
       "status": "full"
     },
+    "bounded-resource-table": {
+      "dependencies": [
+        "generational-handles",
+        "morphic-semantic-operation"
+      ],
+      "status": "full"
+    },
     "bounded-rv64-linux-initial-stack-plan": {
       "dependencies": [
         "aligned-address-and-size-helpers",

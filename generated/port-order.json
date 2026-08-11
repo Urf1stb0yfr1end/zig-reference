@@ -38,6 +38,7 @@
     "wrapping-sequence-number",
     "binary-cursor-checkpoint",
     "bitmap-allocator",
+    "bounded-resource-table",
     "bounded-rv64-linux-initial-stack-plan",
     "bounded-user-memory-transfer-plan",
     "byte-writer",

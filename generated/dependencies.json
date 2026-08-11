@@ -29,6 +29,10 @@
       "fixed-capacity-vector"
     ],
     "bounded-integer": [],
+    "bounded-resource-table": [
+      "generational-handles",
+      "morphic-semantic-operation"
+    ],
     "bounded-rv64-linux-initial-stack-plan": [
       "aligned-address-and-size-helpers",
       "checked-half-open-range",
