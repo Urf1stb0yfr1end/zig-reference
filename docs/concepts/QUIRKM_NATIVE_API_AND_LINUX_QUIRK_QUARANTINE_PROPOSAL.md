@@ -647,6 +647,376 @@ Linux compatibility therefore becomes a research program for Native Morphic rath
 
 ---
 
+# 14A. Progressive de-quirking as an agentic migration program
+
+QuirkM should not treat application porting as a binary choice between "Linux program" and "native rewrite."
+
+The stronger long-term model is **progressive semantic migration**.
+
+A program may begin entirely on the Linux personality, then move one interface family at a time onto QuirkM-native contracts while preserving the functionality that made the original program useful.
+
+Conceptually:
+
+```text
+LEVEL 0
+unchanged Linux application
+        |
+        v
+Linux compatibility personality
+
+LEVEL 1
+Linux application with generated/adapted boundaries
+        |
+        +--> some Linux interfaces
+        |
+        +--> some QuirkM-native services
+
+LEVEL 2
+mostly QuirkM-native application
+        |
+        +--> a small explicit Linux compatibility remainder
+
+LEVEL 3
+fully QuirkM-native application
+        |
+        v
+no Linux semantic dependency required for normal execution
+```
+
+The compatibility side therefore serves not only as an escape hatch, but also as a **migration scaffold**.
+
+A useful future execution model could allow a package to declare both a preferred native personality and a Linux fallback:
+
+```text
+execution:
+    preferred: quirkm
+    fallback: linux
+
+interfaces:
+    filesystem: quirkm-v2
+    memory: quirkm-v1
+    networking: quirkm-v1
+    process: linux
+    graphics: linux
+```
+
+Migration can then happen subsystem by subsystem rather than requiring a risky all-at-once port.
+
+Later the same package might become:
+
+```text
+interfaces:
+    filesystem: quirkm-v2
+    memory: quirkm-v1
+    networking: quirkm-v1
+    process: quirkm-v2
+    graphics: linux
+```
+
+and eventually:
+
+```text
+interfaces:
+    filesystem: quirkm-v2
+    memory: quirkm-v1
+    networking: quirkm-v1
+    process: quirkm-v2
+    graphics: quirkm-v3
+```
+
+## The Quirk Ledger becomes a bounded work queue
+
+This structure is unusually well suited to agents because it provides both:
+
+1. one stable, comprehensible end goal; and
+2. many small, named, independently testable subgoals.
+
+Instead of asking an agent:
+
+```text
+Port this large Linux application to QuirkM.
+```
+
+which is broad and underspecified, the platform should be able to say:
+
+```text
+APPLICATION: example-app
+
+Linux semantic dependencies discovered: 137
+Already QuirkM-native: 121
+Known compatibility remainder: 16
+
+remaining work:
+    Q-0042 fd duplication/sharing assumption
+    Q-0071 signal/EINTR assumption
+    Q-0118 ambient path-resolution assumption
+    Q-0134 ioctl operation family
+    ...
+```
+
+Each remaining item can have:
+
+```text
+quirk id
+Linux behavior
+native replacement contract
+source/binding locations
+required capability
+compatibility fallback
+acceptance tests
+differential oracle where available
+known nonclaims
+```
+
+That changes the task from "understand and port an enormous program" to:
+
+> **Remove one named semantic dependency without regressing the application's required behavior.**
+
+When one quirk class is solved generically, the solution should become reusable migration knowledge for every later program that encounters the same class.
+
+```text
+agent solves Q-0042 once
+        |
+        v
+adapter/transformation + proof recorded
+        |
+        v
+future application encounters Q-0042
+        |
+        v
+reuse before reinvention
+```
+
+This is application-level Snowball.
+
+## A possible agent migration loop
+
+A mature toolchain could expose a deterministic loop such as:
+
+```text
+discover Linux dependency
+        |
+        v
+classify against Quirk Ledger
+        |
+        v
+find existing QuirkM counterdesign/provider
+        |
+        +--> known transformation: apply it
+        |
+        +--> missing transformation: create bounded task
+        |
+        v
+rebuild / relink / regenerate bindings
+        |
+        v
+run native contract tests
+        |
+        v
+run Linux-vs-QuirkM differential tests where meaningful
+        |
+        v
+repair until the declared behavior matches
+        |
+        v
+record reusable migration result
+        |
+        v
+reduce application's remaining Linux compatibility debt
+```
+
+The desired unit of progress is not necessarily "one application ported."
+
+A more valuable unit is often:
+
+> **one entire class of future porting work eliminated.**
+
+## Source, component, and binary cases are different
+
+The proposal must not pretend every Linux application is equally transformable.
+
+A reasonable expectation hierarchy is:
+
+```text
+source available
+    strongest candidate for agent-assisted API/binding migration
+
+Wasm/componentized software
+    strong candidate because interfaces can be explicit and replaceable
+
+dynamic Linux binary
+    some boundaries may be redirected through shims/providers/relinking
+
+static or unusual binary-only software
+    may remain permanently on the Linux personality unless binary translation is justified
+```
+
+Therefore Linux fallback is a permanent feature, not evidence that migration failed.
+
+The system wins if valuable software can run immediately and increasingly migrate toward cleaner native contracts where the cost is justified.
+
+## Functional preservation, not textual conversion
+
+A migration is not successful merely because calls named `open`, `poll`, or `ioctl` disappear from source.
+
+The target is preservation of the application's required externally observable behavior under the cleaner QuirkM contract.
+
+Where possible, use differential evidence:
+
+```text
+same test/input corpus
+        |
+        +--> Linux-personality implementation
+        |
+        +--> QuirkM-native implementation
+        |
+        v
+compare the behavior the contract says must match
+```
+
+Do not demand equivalence for behavior that QuirkM intentionally rejects as a quirk.
+
+Instead, state the semantic mapping explicitly:
+
+```text
+Linux behavior to preserve:
+QuirkM behavior replacing it:
+behavior intentionally not inherited:
+application-visible invariant that must remain true:
+```
+
+This keeps "quirk-free" from becoming a vague rewrite slogan.
+
+## Why this maps naturally to agentic development
+
+There is a real structural resemblance between this proposal and current coding-agent workflows, but it should be stated narrowly.
+
+Modern coding agents are commonly given bounded repository tasks, allowed to inspect and modify code, run tests and linters, and return reviewable changes. Agent products also increasingly support multiple isolated tasks or agents working concurrently.
+
+QuirkM's proposed migration graph naturally supplies that kind of work:
+
+```text
+large end state
+    "remove unnecessary Linux semantic dependence"
+
+        broken into
+
+small explicit tasks
+    Q-0042
+    Q-0071
+    Q-0118
+    ...
+
+        each with
+
+machine-readable context
+bounded source locations
+acceptance criteria
+compatibility oracle
+native counter-proof
+regression suite
+```
+
+The resemblance is architectural, not prophetic.
+
+QuirkM is not justified by claiming agents will inevitably solve arbitrary ports, nor by claiming this workflow is unique to QuirkM.
+
+Its stronger claim is simply:
+
+> **If software migration can be decomposed into explicit semantic deltas with deterministic evidence, it becomes a much better target for humans and coding agents than an undifferentiated port.**
+
+## Fact, inference, aspiration, and nonclaim
+
+To keep this proposal evidence-led, distinguish four categories.
+
+### Fact
+
+Current coding-agent systems already operate effectively around bounded tasks, repository context, code modification, test execution, reviewable diffs/commits, and in some products parallel isolated work.
+
+### Inference
+
+A machine-readable Quirk Ledger, explicit compatibility boundaries, narrow migration tasks, and deterministic differential tests are therefore likely to be a particularly agent-friendly way to organize QuirkM compatibility work.
+
+This is a design inference, not yet a measured QuirkM result.
+
+### Aspiration
+
+A mature QuirkM toolchain may eventually let an agent inspect an application, enumerate its remaining Linux-semantic dependencies, automatically migrate known classes, open bounded tasks for unresolved classes, prove behavior, and steadily raise a measurable native-compatibility percentage.
+
+Conceptually:
+
+```text
+$ quirkm inspect example-app
+
+Linux runnable:                  yes
+QuirkM-native coverage:          93.8%
+Known automatic migrations:     12
+Remaining quirk classes:        3
+Unknown semantic dependencies:  0
+```
+
+and later:
+
+```text
+$ quirkm migrate example-app
+
+known migrations applied:       12
+new transformations proved:      1
+Linux-vs-QuirkM tests:        PASS
+remaining Linux dependencies:    2
+```
+
+### Nonclaim
+
+This proposal does **not** currently prove:
+
+- arbitrary Linux applications can be automatically converted to QuirkM;
+- binary-only software can always be de-quirked;
+- semantic equivalence can always be inferred automatically;
+- a finite Quirk Ledger will capture every future compatibility problem;
+- agents can safely approve their own compatibility claims without independent evidence;
+- QuirkM is uniquely or inevitably aligned with the future of software engineering.
+
+Those are hypotheses to test, not achievements to advertise.
+
+## A measurable agentic objective
+
+If this program matures, track progress in terms such as:
+
+```text
+known Linux semantic dependencies
+native replacements available
+verified automatic migrations
+agent-authored migrations accepted after proof
+remaining compatibility-only dependencies
+unknown/unclassified dependencies
+applications with zero Linux dependency
+average context required per migration
+reused migrations vs newly invented migrations
+```
+
+The desired long-run curve is:
+
+```text
+new application encountered
+        |
+        v
+more dependencies already classified
+        |
+        v
+more transformations already proved
+        |
+        v
+less novel work required
+        |
+        v
+agents and humans solve an increasingly small remainder
+```
+
+That is the strongest form of the QuirkM/Snowball thesis: **compatibility work compounds because every solved semantic difference narrows the work required by the next port.**
+
+---
+
 # 15. Compatibility should be callable without contaminating Native
 
 There are at least three legitimate ways a QuirkM application may need Linux behavior.
@@ -1009,11 +1379,16 @@ QuirkM should eventually be judged by measurable properties.
 ## Replaceability
 
 - Linux-backed providers can later be replaced by native or Wasm providers behind stable contracts.
+- Applications can migrate interface families independently rather than requiring all-or-nothing native rewrites.
+- The compatibility personality remains a valid fallback when native migration is not economical or technically justified.
 
 ## Agent usability
 
 - An agent can query why QuirkM differs from Linux and receive a compact, machine-readable answer.
 - It can determine the compatibility escape hatch without source archaeology.
+- It can enumerate an application's known Linux-semantic dependencies as bounded migration work.
+- A solved migration class can be reused across later applications.
+- Agent-authored migrations are accepted on evidence, not merely because the generated patch compiles.
 
 ## Complexity control
 
@@ -1046,4 +1421,23 @@ Morphic extracts the fundamental mechanism
 future work starts from a stronger base
 ```
 
-That is the intended role of QuirkM: not a rejection of Linux, but a native system built with the benefit of Linux's entire compatibility history available as design evidence.
+The agentic migration extension adds a second compounding loop:
+
+```text
+application reveals Linux dependency
+        |
+        v
+Quirk Ledger classifies it
+        |
+        +--> known migration reused
+        |
+        +--> unknown migration becomes one bounded task
+        |
+        v
+proof turns the solution into reusable knowledge
+        |
+        v
+future applications require less novel porting work
+```
+
+That is the intended role of QuirkM: not a rejection of Linux, but a native system built with the benefit of Linux's entire compatibility history available as design evidence, and structured so that humans and agents can progressively convert that evidence into reusable, verified migration knowledge.
