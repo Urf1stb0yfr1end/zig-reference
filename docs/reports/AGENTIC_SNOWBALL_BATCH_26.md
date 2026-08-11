@@ -129,3 +129,12 @@ status: PARTIAL
 command: Batch 26 file + memory + exec inheritance gate
 summary: file_substrate=PASS mapping_candidate=PASS exec_candidate=PARTIAL pt_interp_candidate=PARTIAL machine_batch26=NOT_PROVED resource_generation=preserved W+X=0 inherited_qemu=PASS
 next: add the distinct Batch 26 RV64 fixture/kernel adapter/verifier and run it twice under QEMU
+
+## PR #52 review repair checkpoint (2026-08-11)
+
+The two inherited review findings are repaired without weakening the static proof:
+
+1. Project 54's original `plan` remains the narrow static RV64 `ET_EXEC` surface and still rejects `ET_DYN`, `PT_INTERP`, and `PT_DYNAMIC`. The adjacent `planDynamic` surface accepts RV64 `ET_EXEC`/`ET_DYN`, validates and owns a single `PT_INTERP` pathname, represents `PT_DYNAMIC` as userspace-interpreter work, and performs no relocation. Project 59 now derives the path from the main ELF, requires separately resolved interpreter bytes, accepts an `ET_DYN` interpreter through that policy, rejects a recursively interpreted interpreter, and selects the interpreter entry while retaining `main_entry`.
+2. Project 58 now compile-time rejects `object_capacity == 0` and every capacity greater than the 65,536-value `u16` `ObjectId` namespace. Dedicated compile-fail fixtures require both exact structural rejections.
+
+Focused unit tests exercise dynamic main/interpreter handoff, malformed `PT_INTERP`, missing interpreter bytes, and preservation of the static rejection. The capacity checker passed both compile-fail mutations. Machine Gate A-D work continues below; this checkpoint does not convert planner evidence into QEMU evidence.
