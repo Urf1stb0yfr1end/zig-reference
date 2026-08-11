@@ -249,6 +249,12 @@
       "signature": "Stack(comptime T: type) type"
     },
     {
+      "kind": "function",
+      "module": "bounded-rv64-linux-initial-stack-plan",
+      "name": "StackPlan",
+      "signature": "StackPlan(comptime byte_capacity: usize) type"
+    },
+    {
       "kind": "type_or_constant",
       "module": "state-machine",
       "name": "StateMachine",
@@ -445,6 +451,12 @@
       "module": "riscv-sv39-page-table-entry",
       "name": "branch",
       "signature": "branch()"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-rv64-linux-initial-stack-plan",
+      "name": "bytes",
+      "signature": "bytes(self: *const StackPlan) []const u8"
     },
     {
       "kind": "method",
@@ -1603,6 +1615,12 @@
       "module": "bounded-elf64-load-plan",
       "name": "plan",
       "signature": "plan(comptime capacity: usize, bytes: []const u8) Error!LoadPlan(capacity)"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-rv64-linux-initial-stack-plan",
+      "name": "plan",
+      "signature": "plan(comptime byte_capacity: usize, comptime argv_capacity: usize, comptime env_capacity: usize, comptime aux_capacity: usize, stack_range: GuestStackRange, argv: []const []const u8, envp: []const []const u8, auxv: []const AuxEntry) Error!StackPlan(byte_capacity)"
     },
     {
       "kind": "function",

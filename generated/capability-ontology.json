@@ -212,6 +212,7 @@
       "implementing_modules": [
         "bounded-deterministic-event-trace",
         "bounded-elf64-load-plan",
+        "bounded-rv64-linux-initial-stack-plan",
         "bounded-user-memory-transfer-plan"
       ],
       "narrower_capabilities": [],
@@ -310,6 +311,40 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "argc",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "argc"
+      ],
+      "description": "Repository capability represented by: argc.",
+      "implementing_modules": [
+        "bounded-rv64-linux-initial-stack-plan"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "argv",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "argv"
+      ],
+      "description": "Repository capability represented by: argv.",
+      "implementing_modules": [
+        "bounded-rv64-linux-initial-stack-plan"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "array list",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -352,6 +387,23 @@
       "description": "Repository capability represented by: ascii classifier.",
       "implementing_modules": [
         "validated-ascii-byte"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "auxv",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "auxv"
+      ],
+      "description": "Repository capability represented by: auxv.",
+      "implementing_modules": [
+        "bounded-rv64-linux-initial-stack-plan"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -542,6 +594,7 @@
         "bounded-deterministic-event-trace",
         "bounded-deterministic-scheduler",
         "bounded-elf64-load-plan",
+        "bounded-rv64-linux-initial-stack-plan",
         "bounded-system-resource-plan",
         "bounded-user-memory-transfer-plan",
         "fixed-bump-allocator",
@@ -719,6 +772,23 @@
       "description": "Repository capability represented by: bounded-elf64-load-planning.",
       "implementing_modules": [
         "bounded-elf64-load-plan"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bounded-rv64-linux-initial-stack-planning",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bounded-rv64-linux-initial-stack-planning"
+      ],
+      "description": "Repository capability represented by: bounded-rv64-linux-initial-stack-planning.",
+      "implementing_modules": [
+        "bounded-rv64-linux-initial-stack-plan"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -1328,6 +1398,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "deterministic-linux-startup-image",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "deterministic-linux-startup-image"
+      ],
+      "description": "Repository capability represented by: deterministic-linux-startup-image.",
+      "implementing_modules": [
+        "bounded-rv64-linux-initial-stack-plan"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "dfs",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -1387,6 +1474,23 @@
       "description": "Repository capability represented by: doubly.",
       "implementing_modules": [
         "intrusive-doubly-linked-list"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "duplicated and partially checked initial-stack layout",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "duplicated and partially checked initial-stack layout"
+      ],
+      "description": "Repository capability represented by: duplicated and partially checked initial-stack layout.",
+      "implementing_modules": [
+        "bounded-rv64-linux-initial-stack-plan"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -1567,6 +1671,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "envp",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "envp"
+      ],
+      "description": "Repository capability represented by: envp.",
+      "implementing_modules": [
+        "bounded-rv64-linux-initial-stack-plan"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "explicit endian integers",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -1643,6 +1764,23 @@
       "description": "Repository capability represented by: failure-atomic-load-planning.",
       "implementing_modules": [
         "bounded-elf64-load-plan"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "failure-atomic-stack-planning",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "failure-atomic-stack-planning"
+      ],
+      "description": "Repository capability represented by: failure-atomic-stack-planning.",
+      "implementing_modules": [
+        "bounded-rv64-linux-initial-stack-plan"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -2559,6 +2697,40 @@
       "description": "Repository capability represented by: linked.",
       "implementing_modules": [
         "intrusive-doubly-linked-list"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "linux initial stack",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "linux initial stack"
+      ],
+      "description": "Repository capability represented by: linux initial stack.",
+      "implementing_modules": [
+        "bounded-rv64-linux-initial-stack-plan"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "linux-abi",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "linux-abi"
+      ],
+      "description": "Repository capability represented by: linux-abi.",
+      "implementing_modules": [
+        "bounded-rv64-linux-initial-stack-plan"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -4003,7 +4175,8 @@
       ],
       "description": "Repository capability represented by: rv64.",
       "implementing_modules": [
-        "bounded-elf64-load-plan"
+        "bounded-elf64-load-plan",
+        "bounded-rv64-linux-initial-stack-plan"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -4413,6 +4586,7 @@
       ],
       "description": "Repository capability represented by: stack.",
       "implementing_modules": [
+        "bounded-rv64-linux-initial-stack-plan",
         "stack"
       ],
       "narrower_capabilities": [],

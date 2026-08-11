@@ -1,0 +1,1387 @@
+{
+  "schema_version": "3.0.0",
+  "contract_version": "0.1.0",
+  "generated_at": "2026-08-11",
+  "last_reviewed_at": "2026-08-11",
+  "module": {
+    "id": "55",
+    "canonical_name": "bounded-rv64-linux-initial-stack-plan",
+    "display_name": "Bounded Rv64 Linux Initial Stack Plan",
+    "directory": "projects/55-bounded-rv64-linux-initial-stack-plan",
+    "summary": "Construct an exact bounded RV64 Linux initial process stack image.",
+    "long_description": "Allocation-free failure-atomic planning of argc, argv, envp, auxv, sentinels, pointers, strings, padding, and aligned initial SP.",
+    "status": "experimental",
+    "maturity": "experimental",
+    "lifecycle": "experimental",
+    "target_maturity_level": 2,
+    "implementation_version": "1.0.0",
+    "public_contract_version": "1.0.0",
+    "introduced_version": "1.0.0",
+    "deprecated_version": "",
+    "superseded_version": "",
+    "removed_version": "",
+    "replacement_module": "",
+    "migration_guide": "",
+    "support_policy": "Experimental; semantic contract versioning applies.",
+    "deprecation_reason": "",
+    "category": "foundation",
+    "subcategory": "process-startup",
+    "tags": [
+      "rv64",
+      "linux-abi",
+      "stack",
+      "bounded",
+      "allocation-free"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Construct an exact bounded RV64 Linux initial process stack image.",
+    "secondary": [
+      "Emit deterministic in-image pointer and sentinel relationships."
+    ],
+    "non_goals": [
+      "write guest memory",
+      "execute under QEMU",
+      "provide syscalls or full Linux create_elf_tables"
+    ],
+    "problems_solved": [
+      "duplicated and partially checked initial-stack layout"
+    ],
+    "future_role": "Batch 24B consumes the settled image without re-deriving layout policy."
+  },
+  "c_pain": {
+    "summary": "Direct C loops are compact, but bounds, pointer conversion, padding initialization, and failure atomicity remain conventions.",
+    "common_failure_modes": [
+      "wrapped size arithmetic",
+      "missing sentinels",
+      "dangling or misdirected pointers",
+      "uninitialized padding"
+    ],
+    "maintenance_burdens": [
+      "duplicated startup layout policy"
+    ],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "The layout is naturally expressed as sequential stores.",
+    "where_c_degrades": "Validation and mutation are easily interleaved."
+  },
+  "zig_response": {
+    "summary": "Checked errors, tagged symbolic values, compile-time capacity, typed guest addresses, and owned inline bytes expose layout truth.",
+    "language_features": [
+      "error unions",
+      "tagged unions",
+      "comptime"
+    ],
+    "guarantees_made_visible": [
+      "failure atomicity",
+      "bounded capacity",
+      "deterministic bytes",
+      "exact pointer relationships"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "choose truthful auxv entries",
+      "copy bytes only into matching writable guest memory"
+    ],
+    "tradeoffs": [
+      "nonempty argv",
+      "bounded capacities",
+      "narrow RV64 little-endian contract"
+    ]
+  },
+  "locations": {
+    "module_root": "projects/55-bounded-rv64-linux-initial-stack-plan",
+    "implementation": [
+      "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig"
+    ],
+    "public_entrypoint": "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig",
+    "readme": "projects/55-bounded-rv64-linux-initial-stack-plan/README.md",
+    "mastery": "projects/55-bounded-rv64-linux-initial-stack-plan/MASTERY.md",
+    "details_markdown": "projects/55-bounded-rv64-linux-initial-stack-plan/DETAILS.md",
+    "details_json": "projects/55-bounded-rv64-linux-initial-stack-plan/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": [],
+    "unit_tests": [
+      "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig"
+    ],
+    "smoke_tests": [
+      "projects/55-bounded-rv64-linux-initial-stack-plan/tests/smoke_test.zig"
+    ],
+    "generated_files": [],
+    "dependency_contracts": [
+      "projects/15-aligned-address-and-size-helpers/details.json",
+      "projects/17-checked-half-open-range/details.json",
+      "projects/18-distinct-memory-address-types/details.json",
+      "projects/22-endian-integer-codec/details.json"
+    ]
+  },
+  "public_surface": {
+    "root_symbols": [
+      "AuxEntry",
+      "AuxValue",
+      "Error",
+      "GuestStackRange",
+      "GuestVirtualAddress",
+      "StackPlan",
+      "at_null",
+      "plan",
+      "stack_alignment",
+      "word_size"
+    ],
+    "types": [
+      {
+        "name": "AuxEntry",
+        "kind": "public declaration"
+      },
+      {
+        "name": "AuxValue",
+        "kind": "public declaration"
+      },
+      {
+        "name": "Error",
+        "kind": "public declaration"
+      },
+      {
+        "name": "GuestStackRange",
+        "kind": "public declaration"
+      },
+      {
+        "name": "GuestVirtualAddress",
+        "kind": "public declaration"
+      },
+      {
+        "name": "StackPlan",
+        "kind": "public declaration"
+      }
+    ],
+    "functions": [
+      {
+        "name": "StackPlan",
+        "signature": "StackPlan(comptime byte_capacity: usize) type"
+      },
+      {
+        "name": "plan",
+        "signature": "plan(comptime byte_capacity, argv_capacity, env_capacity, aux_capacity: usize, stack_range: GuestStackRange, argv: []const []const u8, envp: []const []const u8, auxv: []const AuxEntry) Error!StackPlan(byte_capacity)"
+      }
+    ],
+    "methods": [],
+    "constants": [
+      {
+        "name": "word_size",
+        "type": "usize",
+        "value": "8",
+        "summary": "RV64 table word bytes."
+      },
+      {
+        "name": "stack_alignment",
+        "type": "usize",
+        "value": "16",
+        "summary": "RISC-V procedure-entry SP alignment."
+      },
+      {
+        "name": "at_null",
+        "type": "u64",
+        "value": "0",
+        "summary": "Auxiliary vector terminator key."
+      }
+    ],
+    "errors": [
+      "EmptyArgv",
+      "TooManyArgv",
+      "TooManyEnv",
+      "TooManyAuxv",
+      "InteriorNul",
+      "CallerSuppliedAtNull",
+      "DuplicateAuxType",
+      "InvalidSymbolicTarget",
+      "AddressOverflow",
+      "StackRangeTooSmall",
+      "OutputCapacityExceeded"
+    ],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": [],
+    "endpoints": [
+      {
+        "name": "StackPlan",
+        "kind": "function",
+        "signature": "StackPlan(comptime byte_capacity: usize) type",
+        "visibility": "public",
+        "summary": "Construct inline owned plan type.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "byte_capacity",
+            "type": "usize",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Construct the fixed-capacity owned plan type.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "No partial plan escapes on failure.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "plan",
+        "kind": "function",
+        "signature": "plan(comptime byte_capacity: usize, comptime argv_capacity: usize, comptime env_capacity: usize, comptime aux_capacity: usize, stack_range: GuestStackRange, argv: []const []const u8, envp: []const []const u8, auxv: []const AuxEntry) Error!StackPlan(byte_capacity)",
+        "visibility": "public",
+        "summary": "Validate inputs and construct exact stack image.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "byte_capacity",
+            "type": "usize",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          },
+          {
+            "name": "argv_capacity",
+            "type": "usize",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          },
+          {
+            "name": "env_capacity",
+            "type": "usize",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          },
+          {
+            "name": "aux_capacity",
+            "type": "usize",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          },
+          {
+            "name": "stack_range",
+            "type": "GuestStackRange",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          },
+          {
+            "name": "argv",
+            "type": "[]const []const u8",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          },
+          {
+            "name": "envp",
+            "type": "[]const []const u8",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          },
+          {
+            "name": "auxv",
+            "type": "[]const AuxEntry",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Construct the fixed-capacity owned plan type.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "No partial plan escapes on failure.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      },
+      {
+        "name": "bytes",
+        "kind": "function",
+        "signature": "bytes(self: *const StackPlan) []const u8",
+        "visibility": "public",
+        "summary": "Borrow immutable exact image bytes.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "self",
+            "type": "*const StackPlan",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "source-declared return type",
+            "meaning": "Construct the fixed-capacity owned plan type.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "No partial plan escapes on failure.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      }
+    ]
+  },
+  "inputs": [],
+  "outputs": [],
+  "state": {
+    "fields": [],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [
+      "Bytes correspond exactly to [initial_sp, stack top).",
+      "All RV64 words are little-endian."
+    ],
+    "ownership": [
+      "Returned plan owns inline bytes."
+    ],
+    "ordering": [
+      "argv strings then env strings; inputs preserve order."
+    ],
+    "bounds": [
+      "Every byte and pointer remains inside the supplied range."
+    ],
+    "lifetime": [
+      "bytes() is borrowed from the plan."
+    ],
+    "concurrency": [
+      "Independent plans share no state."
+    ],
+    "cross_module": [
+      "Guest virtual addresses retain their distinct domain."
+    ]
+  },
+  "ownership": {
+    "owns": [
+      "inline byte image"
+    ],
+    "borrows": [
+      "input slices synchronously",
+      "bytes() borrows returned plan"
+    ],
+    "copies": [
+      "all emitted input bytes and values"
+    ],
+    "transfers": [],
+    "shared": [],
+    "allocator": "none",
+    "allocator_lifetime": "",
+    "element_cleanup": "none",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "Value lifetime.",
+    "inputs": [
+      "Borrowed only for plan call."
+    ],
+    "outputs": [
+      "Owned inline plan."
+    ],
+    "borrowed_views": [
+      "bytes() until plan mutation, move, or destruction."
+    ],
+    "escaped_references": [
+      "none"
+    ],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [],
+    "optional_empty_results": [],
+    "failure_atomicity": "No plan escapes on error.",
+    "state_after_failure": [
+      "No external state changes."
+    ],
+    "partial_effects": [],
+    "rollback": [
+      "Local construction is discarded."
+    ],
+    "panic_conditions": [
+      "Internal debug assertion only after validated size computation."
+    ],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [
+      {
+        "reference": "bytes()",
+        "trigger": "plan mutation, move, or destruction",
+        "effect": "borrow invalidated"
+      }
+    ],
+    "mutation_invalidation": [
+      "bytes()"
+    ],
+    "growth_invalidation": [],
+    "move_invalidation": [
+      "bytes()"
+    ],
+    "reset_invalidation": [],
+    "deinit_invalidation": [
+      "bytes()"
+    ]
+  },
+  "dependencies": {
+    "repository": [
+      {
+        "module": "aligned-address-and-size-helpers",
+        "path": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig",
+        "symbol": "public surface",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "checked-half-open-range",
+        "path": "projects/17-checked-half-open-range/src/checked_half_open_range.zig",
+        "symbol": "public surface",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "distinct-memory-address-types",
+        "path": "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig",
+        "symbol": "public surface",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      },
+      {
+        "module": "endian-integer-codec",
+        "path": "projects/22-endian-integer-codec/src/endian_integer_codec.zig",
+        "symbol": "public surface",
+        "guarantee": "checked lower-layer contract",
+        "reason": "reuses existing mechanism"
+      }
+    ],
+    "standard_library": [
+      "std.math",
+      "std.mem",
+      "std.debug.assert"
+    ],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": []
+  },
+  "dependency_contracts": [
+    {
+      "module": "aligned-address-and-size-helpers",
+      "directory": "projects/15-aligned-address-and-size-helpers",
+      "import_name": "aligned-address-and-size-helpers",
+      "import_path": "projects/15-aligned-address-and-size-helpers/src/aligned_address_and_size_helpers.zig",
+      "symbols_used": [
+        "alignDown"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/15-aligned-address-and-size-helpers/details.json"
+    },
+    {
+      "module": "checked-half-open-range",
+      "directory": "projects/17-checked-half-open-range",
+      "import_name": "checked-half-open-range",
+      "import_path": "projects/17-checked-half-open-range/src/checked_half_open_range.zig",
+      "symbols_used": [
+        "CheckedRange"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/17-checked-half-open-range/details.json"
+    },
+    {
+      "module": "distinct-memory-address-types",
+      "directory": "projects/18-distinct-memory-address-types",
+      "import_name": "distinct-memory-address-types",
+      "import_path": "projects/18-distinct-memory-address-types/src/distinct_memory_address_types.zig",
+      "symbols_used": [
+        "GuestVirtualAddress"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/18-distinct-memory-address-types/details.json"
+    },
+    {
+      "module": "endian-integer-codec",
+      "directory": "projects/22-endian-integer-codec",
+      "import_name": "endian-integer-codec",
+      "import_path": "projects/22-endian-integer-codec/src/endian_integer_codec.zig",
+      "symbols_used": [
+        "EndianIntegerCodec"
+      ],
+      "reason": "reuses existing mechanism rather than duplicating it",
+      "guarantees_inherited": [
+        "checked lower-layer contract"
+      ],
+      "guarantees_not_inherited": [],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "compile_time_and_runtime",
+      "smoke_test_exercises_dependency": true,
+      "contract_path": "projects/22-endian-integer-codec/details.json"
+    }
+  ],
+  "expected_dependents": [],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "bounded-rv64-linux-initial-stack-plan",
+    "import_path": "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig",
+    "import_configuration": "Named build import.",
+    "minimal_example": "const image = try stack.plan(128, 1, 0, 0, range, &.{\"app\"}, &.{}, &.{});",
+    "integration_patterns": [
+      {
+        "with": "bounded-user-memory-transfer-plan",
+        "pattern": "Copy bytes() to initial_sp only after complete planning succeeds."
+      }
+    ],
+    "pipeline_position": [
+      "bounded inputs",
+      "stack plan",
+      "future guest-memory copy"
+    ],
+    "common_combinations": [
+      "bounded-user-memory-transfer-plan"
+    ],
+    "incompatible_combinations": [
+      "32-bit word layout"
+    ],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [
+      "argv/env byte slices; ordered AuxEntry values; checked half-open guest range"
+    ],
+    "output_formats": [
+      "contiguous owned byte image"
+    ],
+    "binary_layouts": [
+      "argc; argv pointers; zero; envp pointers; zero; auxv pairs; AT_NULL/0; zero padding; strings"
+    ],
+    "endianness": "little",
+    "alignment": [
+      "initial_sp 16 bytes",
+      "table words 8 bytes"
+    ],
+    "serialization_stability": "Public contract version 1.0.0.",
+    "abi_stability": "Narrow Linux-style RV64 startup shape."
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "0.14.0",
+    "hosted": "supported",
+    "freestanding": "supported",
+    "thread_safe": "yes for independent values",
+    "reentrant": "yes",
+    "interrupt_safe": "",
+    "async_safe": "",
+    "signal_safe": "",
+    "platforms": [
+      "hosted",
+      "freestanding"
+    ],
+    "architectures": [
+      "RV64 data contract; host mechanism target-neutral"
+    ],
+    "allocator_assumptions": "none",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "",
+    "no_std_equivalent": ""
+  },
+  "concurrency": {
+    "internal_synchronization": "",
+    "caller_synchronization_required": "",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [
+      "Compile-time byte, argv, env, and aux capacities.",
+      "argc must be at least one."
+    ],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [
+      "All size/address arithmetic checked."
+    ],
+    "recursion_limits": [],
+    "capacity_behavior": [
+      "Explicit error; no partial plan."
+    ]
+  },
+  "security": {
+    "trust_boundary": "",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-bounded-rv64-linux-initial-stack-plan",
+    "commands": [
+      "zig build test-bounded-rv64-linux-initial-stack-plan"
+    ],
+    "unit_tests": [
+      "independent decode",
+      "capacity and range boundaries",
+      "policy rejection matrix",
+      "near-usize boundary"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [
+      "one-byte capacity/range short",
+      "maximum configured capacities",
+      "near-usize stack top"
+    ],
+    "regression_tests": [],
+    "test_dependencies": [
+      "aligned-address-and-size-helpers",
+      "checked-half-open-range",
+      "distinct-memory-address-types",
+      "endian-integer-codec"
+    ],
+    "smoke_test_commands": [
+      "zig build smoke-bounded-rv64-linux-initial-stack-plan"
+    ],
+    "smoke_test_behaviors": [
+      "external import plans aligned image"
+    ],
+    "smoke_test_dependencies": [
+      "aligned-address-and-size-helpers",
+      "checked-half-open-range",
+      "distinct-memory-address-types",
+      "endian-integer-codec"
+    ]
+  },
+  "validation": {
+    "compiler_validated": true,
+    "compiler_version": "0.14.0",
+    "last_validated_commit": "9f5544aed9ea59cfa4bf88cb0d3958f8d6a299cf",
+    "last_validation_result": "pass",
+    "continuous_integration": "",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [
+      "No Batch 24B machine execution."
+    ],
+    "notes": [],
+    "status_dimensions": {
+      "implementation_present": true,
+      "contract_complete": true,
+      "contract_formatted": true,
+      "unit_tests_present": true,
+      "smoke_test_present": true,
+      "contract_checker_passed": false,
+      "compiler_validated": true,
+      "unit_tests_passed": true,
+      "smoke_tests_passed": true
+    }
+  },
+  "documentation": {
+    "read_order": [
+      "README.md",
+      "details.json",
+      "DETAILS.md",
+      "MASTERY.md",
+      "source"
+    ],
+    "examples_covered": [],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [],
+    "related_modules": [
+      "aligned-address-and-size-helpers",
+      "checked-half-open-range",
+      "distinct-memory-address-types",
+      "endian-integer-codec",
+      "bounded-user-memory-transfer-plan",
+      "bounded-elf64-load-plan"
+    ],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "",
+    "breaking_change_policy": "",
+    "deprecation_policy": "",
+    "known_gaps": [],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [],
+    "synchronization_requirements": [],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "bounded-rv64-linux-initial-stack-planning",
+      "deterministic-linux-startup-image",
+      "failure-atomic-stack-planning"
+    ],
+    "problems": [
+      "initial process stack layout"
+    ],
+    "inputs": [
+      "argv",
+      "envp",
+      "auxv",
+      "guest stack range"
+    ],
+    "outputs": [
+      "owned exact byte image",
+      "aligned initial SP"
+    ],
+    "environments": [
+      "hosted",
+      "freestanding"
+    ],
+    "keywords": [
+      "argc",
+      "argv",
+      "envp",
+      "auxv",
+      "RV64",
+      "Linux initial stack"
+    ],
+    "grep_terms": [],
+    "natural_language_queries": [],
+    "negative_search_terms": [
+      "QEMU execution",
+      "syscalls"
+    ]
+  },
+  "snowball": {
+    "foundation_layer": "process startup planning",
+    "reuses_modules": [
+      "aligned-address-and-size-helpers",
+      "checked-half-open-range",
+      "distinct-memory-address-types",
+      "endian-integer-codec"
+    ],
+    "guarantees_inherited": [
+      "checked range",
+      "typed address",
+      "alignment",
+      "endian encoding"
+    ],
+    "future_modules_enabled": [
+      "Batch 24B machine composition",
+      "future process creation"
+    ],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "Later consumers copy one authoritative image rather than rebuilding layout.",
+    "snowball_score": ""
+  },
+  "agent_guidance": {
+    "use_when": [
+      "Need a bounded RV64 Linux-style initial stack image."
+    ],
+    "do_not_use_when": [
+      "Need machine execution, syscalls, or full create_elf_tables compatibility."
+    ],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Construct checked range.",
+      "Call plan.",
+      "Copy bytes to initial_sp only after success."
+    ],
+    "verification_steps": [
+      "Run focused unit and smoke commands."
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [],
+    "files_to_read_first": [
+      "projects/55-bounded-rv64-linux-initial-stack-plan/details.json"
+    ],
+    "files_not_required_for_basic_use": [],
+    "smoke_test_before_integration": "zig build smoke-bounded-rv64-linux-initial-stack-plan"
+  },
+  "source_map": {
+    "symbols_to_files": [
+      {
+        "symbol": "AuxEntry",
+        "file": "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig"
+      },
+      {
+        "symbol": "AuxValue",
+        "file": "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig"
+      },
+      {
+        "symbol": "Error",
+        "file": "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig"
+      },
+      {
+        "symbol": "GuestStackRange",
+        "file": "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig"
+      },
+      {
+        "symbol": "GuestVirtualAddress",
+        "file": "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig"
+      },
+      {
+        "symbol": "StackPlan",
+        "file": "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig"
+      },
+      {
+        "symbol": "at_null",
+        "file": "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig"
+      },
+      {
+        "symbol": "plan",
+        "file": "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig"
+      },
+      {
+        "symbol": "stack_alignment",
+        "file": "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig"
+      },
+      {
+        "symbol": "word_size",
+        "file": "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig"
+      }
+    ],
+    "tests_to_behaviors": [],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": [],
+    "smoke_tests_to_public_symbols": [],
+    "smoke_tests_to_dependencies": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": []
+  },
+  "smoke_test": {
+    "required": true,
+    "implemented": true,
+    "status": "pass",
+    "source_path": "projects/55-bounded-rv64-linux-initial-stack-plan/tests/smoke_test.zig",
+    "build_step": "smoke-bounded-rv64-linux-initial-stack-plan",
+    "commands": [
+      "zig build smoke-bounded-rv64-linux-initial-stack-plan"
+    ],
+    "public_import_used": "bounded-rv64-linux-initial-stack-plan",
+    "public_symbols_exercised": [
+      "plan",
+      "AuxEntry",
+      "GuestStackRange",
+      "stack_alignment"
+    ],
+    "successful_operations": [
+      "construct exact image"
+    ],
+    "failure_or_boundary_operations": [],
+    "cleanup_exercised": [],
+    "repository_dependencies_exercised": [
+      "aligned-address-and-size-helpers",
+      "checked-half-open-range",
+      "distinct-memory-address-types",
+      "endian-integer-codec"
+    ],
+    "hosted_environment_required": "supported",
+    "freestanding_environment_required": "mechanism compatible",
+    "fixtures": [],
+    "expected_exit_status": "0",
+    "expected_output": [],
+    "forbidden_private_access": true,
+    "last_run": "2026-08-11",
+    "last_result": "pass",
+    "last_validated_commit": "",
+    "compiler_version": "0.14.0",
+    "known_failures": [],
+    "notes": []
+  },
+  "portability": {
+    "baseline_zig_version": "0.14.0",
+    "port_contract": "projects/55-bounded-rv64-linux-initial-stack-plan/port.js",
+    "port_contract_schema": "port.schema.json",
+    "tested_zig_versions": [],
+    "untested_zig_versions": [],
+    "dependencies_must_port_first": [
+      "aligned-address-and-size-helpers",
+      "checked-half-open-range",
+      "distinct-memory-address-types",
+      "endian-integer-codec"
+    ],
+    "version_sensitive_symbols": [],
+    "version_sensitive_files": [],
+    "semantic_guarantees_to_preserve": [
+      "exact byte layout and failure behavior"
+    ],
+    "validation_commands": [
+      "zig build test-bounded-rv64-linux-initial-stack-plan",
+      "zig build smoke-bounded-rv64-linux-initial-stack-plan"
+    ],
+    "known_porting_blockers": [],
+    "automatic_port_guaranteed": false,
+    "notes": []
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "Construct an exact bounded RV64 Linux initial process stack image.",
+    "search_aliases": [
+      "RV64 Linux initial stack",
+      "argc argv envp auxv planner",
+      "bounded process startup image"
+    ],
+    "capability_ids": [
+      "bounded-rv64-linux-initial-stack-planning",
+      "deterministic-linux-startup-image",
+      "failure-atomic-stack-planning"
+    ],
+    "use_when": [
+      "Need an exact bounded RV64 Linux-style startup stack image before machine mutation."
+    ],
+    "do_not_use_when": [
+      "Need QEMU execution, guest-memory copying, syscalls, or full Linux create_elf_tables."
+    ],
+    "entrypoint": "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig",
+    "public_symbols": [
+      "AuxEntry",
+      "AuxValue",
+      "Error",
+      "GuestStackRange",
+      "GuestVirtualAddress",
+      "StackPlan",
+      "at_null",
+      "plan",
+      "stack_alignment",
+      "word_size"
+    ],
+    "dependency_ids": [
+      "aligned-address-and-size-helpers",
+      "checked-half-open-range",
+      "distinct-memory-address-types",
+      "endian-integer-codec"
+    ],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "inputs": [
+        "Borrowed synchronously during plan."
+      ],
+      "bytes": [
+        "Borrows returned plan storage."
+      ]
+    },
+    "invalidation": {
+      "plan move, mutation, or destruction": [
+        "bytes slice is invalidated."
+      ]
+    },
+    "failure_guarantees": [
+      "Every failure returns no plan value and changes no external state."
+    ],
+    "effects": [
+      "borrows_caller_memory",
+      "returns_borrow",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "test-bounded-rv64-linux-initial-stack-plan",
+      "smoke-bounded-rv64-linux-initial-stack-plan"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [
+        "target-neutral mechanism",
+        "RV64 startup data contract"
+      ],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "little",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "inline",
+      "capacity_model": "compile_time",
+      "bounded": true,
+      "caller_provided_memory": false,
+      "compile_time_parameters": [
+        "byte_capacity",
+        "argv_capacity",
+        "env_capacity",
+        "aux_capacity"
+      ]
+    },
+    "construction": {
+      "named_import": "bounded-rv64-linux-initial-stack-plan",
+      "primary_symbol": "plan",
+      "initialization": "const image = try stack.plan(128, 1, 0, 0, range, &.{\"app\"}, &.{}, &.{});"
+    },
+    "operation_map": {
+      "build exact image": "plan",
+      "borrow bytes": "bytes"
+    },
+    "error_map": [
+      {
+        "error": "EmptyArgv",
+        "operation": "plan",
+        "meaning": "EmptyArgv rejects an invalid or unrepresentable bounded input.",
+        "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying."
+      },
+      {
+        "error": "TooManyArgv",
+        "operation": "plan",
+        "meaning": "TooManyArgv rejects an invalid or unrepresentable bounded input.",
+        "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying."
+      },
+      {
+        "error": "TooManyEnv",
+        "operation": "plan",
+        "meaning": "TooManyEnv rejects an invalid or unrepresentable bounded input.",
+        "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying."
+      },
+      {
+        "error": "TooManyAuxv",
+        "operation": "plan",
+        "meaning": "TooManyAuxv rejects an invalid or unrepresentable bounded input.",
+        "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying."
+      },
+      {
+        "error": "InteriorNul",
+        "operation": "plan",
+        "meaning": "InteriorNul rejects an invalid or unrepresentable bounded input.",
+        "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying."
+      },
+      {
+        "error": "CallerSuppliedAtNull",
+        "operation": "plan",
+        "meaning": "CallerSuppliedAtNull rejects an invalid or unrepresentable bounded input.",
+        "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying."
+      },
+      {
+        "error": "DuplicateAuxType",
+        "operation": "plan",
+        "meaning": "DuplicateAuxType rejects an invalid or unrepresentable bounded input.",
+        "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying."
+      },
+      {
+        "error": "InvalidSymbolicTarget",
+        "operation": "plan",
+        "meaning": "InvalidSymbolicTarget rejects an invalid or unrepresentable bounded input.",
+        "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying."
+      },
+      {
+        "error": "AddressOverflow",
+        "operation": "plan",
+        "meaning": "AddressOverflow rejects an invalid or unrepresentable bounded input.",
+        "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying."
+      },
+      {
+        "error": "StackRangeTooSmall",
+        "operation": "plan",
+        "meaning": "StackRangeTooSmall rejects an invalid or unrepresentable bounded input.",
+        "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying."
+      },
+      {
+        "error": "OutputCapacityExceeded",
+        "operation": "plan",
+        "meaning": "OutputCapacityExceeded rejects an invalid or unrepresentable bounded input.",
+        "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying."
+      }
+    ],
+    "composition": {
+      "commonly_with": [
+        "bounded-user-memory-transfer-plan",
+        "bounded-elf64-load-plan"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Table order, then zero padding, then argv strings and env strings in input order.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "Does not copy to guest memory, execute, implement syscalls, or reproduce full Linux create_elf_tables."
+    ],
+    "minimal_usage": [
+      "const stack = @import(\"bounded-rv64-linux-initial-stack-plan\");",
+      "const image = try stack.plan(128, 1, 0, 0, range, &.{\"app\"}, &.{}, &.{});"
+    ],
+    "integration_notes": [
+      "Copy bytes() exactly to initial_sp without rebuilding layout semantics."
+    ],
+    "canonical_invariants": []
+  }
+}

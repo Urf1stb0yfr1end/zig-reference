@@ -5,6 +5,7 @@
   "repository_index_version": "1.0.0",
   "reverse_dependencies": {
     "aligned-address-and-size-helpers": [
+      "bounded-rv64-linux-initial-stack-plan",
       "bounded-system-resource-plan",
       "elf64-program-header-parser",
       "fixed-bump-allocator"
@@ -44,6 +45,7 @@
     "bounded-integer": [
       "bounded-system-resource-plan"
     ],
+    "bounded-rv64-linux-initial-stack-plan": [],
     "bounded-system-resource-plan": [],
     "bounded-user-memory-transfer-plan": [],
     "byte-writer": [
@@ -51,6 +53,7 @@
     ],
     "checked-half-open-range": [
       "bounded-elf64-load-plan",
+      "bounded-rv64-linux-initial-stack-plan",
       "bounded-user-memory-transfer-plan",
       "elf64-file-header-parser",
       "elf64-program-header-parser",
@@ -67,6 +70,7 @@
     ],
     "distinct-memory-address-types": [
       "bounded-elf64-load-plan",
+      "bounded-rv64-linux-initial-stack-plan",
       "bounded-user-memory-transfer-plan",
       "elf64-program-header-parser",
       "physical-memory-region-set",
@@ -86,6 +90,7 @@
       "bounded-elf64-load-plan"
     ],
     "endian-integer-codec": [
+      "bounded-rv64-linux-initial-stack-plan",
       "elf64-file-header-parser",
       "elf64-program-header-parser",
       "length-prefixed-binary-field",

@@ -12,6 +12,10 @@ digraph modules {
   "bounded-elf64-load-plan" -> "elf64-file-header-parser";
   "bounded-elf64-load-plan" -> "elf64-program-header-parser";
   "bounded-elf64-load-plan" -> "fixed-capacity-vector";
+  "bounded-rv64-linux-initial-stack-plan" -> "aligned-address-and-size-helpers";
+  "bounded-rv64-linux-initial-stack-plan" -> "checked-half-open-range";
+  "bounded-rv64-linux-initial-stack-plan" -> "distinct-memory-address-types";
+  "bounded-rv64-linux-initial-stack-plan" -> "endian-integer-codec";
   "bounded-system-resource-plan" -> "aligned-address-and-size-helpers";
   "bounded-system-resource-plan" -> "bounded-integer";
   "bounded-system-resource-plan" -> "checked-integer-cast";

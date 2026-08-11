@@ -61,6 +61,7 @@ Use this file for fast discovery. Open a module's `DETAILS.md` or `details.json`
 | `52-bounded-deterministic-scheduler` | Allocation-free caller-timed scheduling with stable `(ready_at, priority, insertion)` order | `42-fixed-capacity-priority-queue` | deterministic runtimes, simulations | [`DETAILS.md`](../../projects/52-bounded-deterministic-scheduler/DETAILS.md) | [`details.json`](../../projects/52-bounded-deterministic-scheduler/details.json) |
 | `53-bounded-user-memory-transfer-plan` | Failure-atomic bounded user-range planning into physical page fragments | `00`, `17`, `18` | kernels, hypervisors, emulators | [`DETAILS.md`](../../projects/53-bounded-user-memory-transfer-plan/DETAILS.md) | [`details.json`](../../projects/53-bounded-user-memory-transfer-plan/details.json) |
 | `54-bounded-elf64-load-plan` | Failure-atomic bounded static RV64 ELF64 acceptance and PT_LOAD planning | `00`, `04`, `17`, `18`, `37`, `38` | kernels, hypervisors, emulators | [`DETAILS.md`](../../projects/54-bounded-elf64-load-plan/DETAILS.md) | [`details.json`](../../projects/54-bounded-elf64-load-plan/details.json) |
+| `55-bounded-rv64-linux-initial-stack-plan` | Exact bounded RV64 Linux initial process stack image planning | `15`, `17`, `18`, `22` | kernels, process loaders, emulators | [`DETAILS.md`](../../projects/55-bounded-rv64-linux-initial-stack-plan/DETAILS.md) | [`details.json`](../../projects/55-bounded-rv64-linux-initial-stack-plan/details.json) |
 
 ## Selection workflow
 

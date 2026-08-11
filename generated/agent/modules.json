@@ -2235,6 +2235,7 @@
       "change_impact": {
         "dependents": [
           "bounded-elf64-load-plan",
+          "bounded-rv64-linux-initial-stack-plan",
           "bounded-system-resource-plan",
           "elf64-program-header-parser",
           "fixed-bump-allocator"
@@ -2267,6 +2268,7 @@
       "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
+        "bounded-rv64-linux-initial-stack-plan",
         "bounded-system-resource-plan",
         "elf64-program-header-parser",
         "fixed-bump-allocator"
@@ -2367,6 +2369,7 @@
       "transitive_dependencies": [],
       "transitive_dependents": [
         "bounded-elf64-load-plan",
+        "bounded-rv64-linux-initial-stack-plan",
         "bounded-system-resource-plan",
         "elf64-program-header-parser",
         "fixed-bump-allocator"
@@ -2519,6 +2522,7 @@
       "change_impact": {
         "dependents": [
           "bounded-elf64-load-plan",
+          "bounded-rv64-linux-initial-stack-plan",
           "bounded-user-memory-transfer-plan",
           "elf64-file-header-parser",
           "elf64-program-header-parser",
@@ -2554,6 +2558,7 @@
       "direct_dependencies": [],
       "direct_dependents": [
         "bounded-elf64-load-plan",
+        "bounded-rv64-linux-initial-stack-plan",
         "bounded-user-memory-transfer-plan",
         "elf64-file-header-parser",
         "elf64-program-header-parser",
@@ -2652,6 +2657,7 @@
       "transitive_dependencies": [],
       "transitive_dependents": [
         "bounded-elf64-load-plan",
+        "bounded-rv64-linux-initial-stack-plan",
         "bounded-user-memory-transfer-plan",
         "elf64-file-header-parser",
         "elf64-program-header-parser",
@@ -2682,6 +2688,7 @@
       "change_impact": {
         "dependents": [
           "bounded-elf64-load-plan",
+          "bounded-rv64-linux-initial-stack-plan",
           "bounded-user-memory-transfer-plan",
           "elf64-program-header-parser",
           "physical-memory-region-set",
@@ -2718,6 +2725,7 @@
       "direct_dependencies": [],
       "direct_dependents": [
         "bounded-elf64-load-plan",
+        "bounded-rv64-linux-initial-stack-plan",
         "bounded-user-memory-transfer-plan",
         "elf64-program-header-parser",
         "physical-memory-region-set",
@@ -2818,6 +2826,7 @@
       "transitive_dependencies": [],
       "transitive_dependents": [
         "bounded-elf64-load-plan",
+        "bounded-rv64-linux-initial-stack-plan",
         "bounded-user-memory-transfer-plan",
         "elf64-program-header-parser",
         "physical-memory-region-set",
@@ -3214,6 +3223,7 @@
       "change_impact": {
         "dependents": [
           "bounded-elf64-load-plan",
+          "bounded-rv64-linux-initial-stack-plan",
           "elf64-file-header-parser",
           "elf64-program-header-parser",
           "length-prefixed-binary-field",
@@ -3247,6 +3257,7 @@
       "diagnostic_ids": [],
       "direct_dependencies": [],
       "direct_dependents": [
+        "bounded-rv64-linux-initial-stack-plan",
         "elf64-file-header-parser",
         "elf64-program-header-parser",
         "length-prefixed-binary-field",
@@ -3329,6 +3340,7 @@
       "transitive_dependencies": [],
       "transitive_dependents": [
         "bounded-elf64-load-plan",
+        "bounded-rv64-linux-initial-stack-plan",
         "elf64-file-header-parser",
         "elf64-program-header-parser",
         "length-prefixed-binary-field",
@@ -8353,6 +8365,233 @@
       "transitive_dependents": [],
       "use_when": [
         "Need to accept bounded static RV64 ELF bytes before any machine mutation."
+      ]
+    },
+    {
+      "aliases": [
+        "RV64 Linux initial stack",
+        "argc argv envp auxv planner",
+        "bounded process startup image"
+      ],
+      "alternatives": [],
+      "borrowing": {
+        "bytes": [
+          "Borrows returned plan storage."
+        ],
+        "inputs": [
+          "Borrowed synchronously during plan."
+        ]
+      },
+      "canonical_invariants": [],
+      "capabilities": [
+        "bounded-rv64-linux-initial-stack-planning",
+        "deterministic-linux-startup-image",
+        "failure-atomic-stack-planning"
+      ],
+      "change_impact": {
+        "dependents": [],
+        "recipes": []
+      },
+      "composition": {
+        "commonly_with": [
+          "bounded-user-memory-transfer-plan",
+          "bounded-elf64-load-plan"
+        ],
+        "conflicts_with": [],
+        "preferred_recipes": []
+      },
+      "construction": {
+        "initialization": "const image = try stack.plan(128, 1, 0, 0, range, &.{\"app\"}, &.{}, &.{});",
+        "named_import": "bounded-rv64-linux-initial-stack-plan",
+        "primary_symbol": "plan"
+      },
+      "dependency_build_order": [
+        "aligned-address-and-size-helpers",
+        "checked-half-open-range",
+        "distinct-memory-address-types",
+        "endian-integer-codec",
+        "bounded-rv64-linux-initial-stack-plan"
+      ],
+      "details": "projects/55-bounded-rv64-linux-initial-stack-plan/details.json",
+      "determinism": {
+        "deterministic": true,
+        "external_nondeterminism": [],
+        "ordering": "Table order, then zero padding, then argv strings and env strings in input order."
+      },
+      "diagnostic_ids": [],
+      "direct_dependencies": [
+        "aligned-address-and-size-helpers",
+        "checked-half-open-range",
+        "distinct-memory-address-types",
+        "endian-integer-codec"
+      ],
+      "direct_dependents": [],
+      "do_not_use_when": [
+        "Need QEMU execution, guest-memory copying, syscalls, or full Linux create_elf_tables."
+      ],
+      "environment_constraints": {
+        "architectures": [
+          "target-neutral mechanism",
+          "RV64 startup data contract"
+        ],
+        "endianness": "little",
+        "freestanding": "supported",
+        "hosted": "supported",
+        "libc_required": false,
+        "os_dependency": false,
+        "privilege": "none"
+      },
+      "error_map": [
+        {
+          "error": "EmptyArgv",
+          "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying.",
+          "meaning": "EmptyArgv rejects an invalid or unrepresentable bounded input.",
+          "operation": "plan"
+        },
+        {
+          "error": "TooManyArgv",
+          "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying.",
+          "meaning": "TooManyArgv rejects an invalid or unrepresentable bounded input.",
+          "operation": "plan"
+        },
+        {
+          "error": "TooManyEnv",
+          "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying.",
+          "meaning": "TooManyEnv rejects an invalid or unrepresentable bounded input.",
+          "operation": "plan"
+        },
+        {
+          "error": "TooManyAuxv",
+          "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying.",
+          "meaning": "TooManyAuxv rejects an invalid or unrepresentable bounded input.",
+          "operation": "plan"
+        },
+        {
+          "error": "InteriorNul",
+          "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying.",
+          "meaning": "InteriorNul rejects an invalid or unrepresentable bounded input.",
+          "operation": "plan"
+        },
+        {
+          "error": "CallerSuppliedAtNull",
+          "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying.",
+          "meaning": "CallerSuppliedAtNull rejects an invalid or unrepresentable bounded input.",
+          "operation": "plan"
+        },
+        {
+          "error": "DuplicateAuxType",
+          "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying.",
+          "meaning": "DuplicateAuxType rejects an invalid or unrepresentable bounded input.",
+          "operation": "plan"
+        },
+        {
+          "error": "InvalidSymbolicTarget",
+          "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying.",
+          "meaning": "InvalidSymbolicTarget rejects an invalid or unrepresentable bounded input.",
+          "operation": "plan"
+        },
+        {
+          "error": "AddressOverflow",
+          "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying.",
+          "meaning": "AddressOverflow rejects an invalid or unrepresentable bounded input.",
+          "operation": "plan"
+        },
+        {
+          "error": "StackRangeTooSmall",
+          "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying.",
+          "meaning": "StackRangeTooSmall rejects an invalid or unrepresentable bounded input.",
+          "operation": "plan"
+        },
+        {
+          "error": "OutputCapacityExceeded",
+          "handling": "Correct the input range, capacity, string, auxv, or symbolic target before retrying.",
+          "meaning": "OutputCapacityExceeded rejects an invalid or unrepresentable bounded input.",
+          "operation": "plan"
+        }
+      ],
+      "evidence_summary": {
+        "conformance_validated": false,
+        "evidence_records": 1,
+        "lifecycle": "experimental",
+        "maturity_level": 4,
+        "module": "bounded-rv64-linux-initial-stack-plan",
+        "smoke_validated": true,
+        "target_maturity_level": 2,
+        "unit_validated": true
+      },
+      "failure_guarantees": [
+        "Every failure returns no plan value and changes no external state."
+      ],
+      "focused_validation_commands": [
+        "zig build test-bounded-rv64-linux-initial-stack-plan",
+        "zig build smoke-bounded-rv64-linux-initial-stack-plan"
+      ],
+      "id": "55",
+      "integration_notes": [
+        "Copy bytes() exactly to initial_sp without rebuilding layout semantics."
+      ],
+      "invalidation": {
+        "plan move, mutation, or destruction": [
+          "bytes slice is invalidated."
+        ]
+      },
+      "known_gaps": [
+        "Does not copy to guest memory, execute, implement syscalls, or reproduce full Linux create_elf_tables."
+      ],
+      "matching_recipes": [],
+      "minimal_usage": [
+        "const stack = @import(\"bounded-rv64-linux-initial-stack-plan\");",
+        "const image = try stack.plan(128, 1, 0, 0, range, &.{\"app\"}, &.{}, &.{});"
+      ],
+      "module": "bounded-rv64-linux-initial-stack-plan",
+      "operation_map": {
+        "borrow bytes": "bytes",
+        "build exact image": "plan"
+      },
+      "ownership": {
+        "cleanup": "none",
+        "storage": "inline",
+        "values": "copied"
+      },
+      "public_symbols": [
+        "AuxEntry",
+        "AuxValue",
+        "Error",
+        "GuestStackRange",
+        "GuestVirtualAddress",
+        "StackPlan",
+        "at_null",
+        "plan",
+        "stack_alignment",
+        "word_size"
+      ],
+      "resource_profile": {
+        "bounded": true,
+        "caller_provided_memory": false,
+        "capacity_model": "compile_time",
+        "compile_time_parameters": [
+          "byte_capacity",
+          "argv_capacity",
+          "env_capacity",
+          "aux_capacity"
+        ],
+        "hidden_allocation": false,
+        "storage_model": "inline"
+      },
+      "selection_priority": "canonical",
+      "source": "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig",
+      "status": "full",
+      "summary": "Construct an exact bounded RV64 Linux initial process stack image.",
+      "thread_safety": "not_synchronized",
+      "transitive_dependencies": [
+        "aligned-address-and-size-helpers",
+        "checked-half-open-range",
+        "distinct-memory-address-types",
+        "endian-integer-codec"
+      ],
+      "transitive_dependents": [],
+      "use_when": [
+        "Need an exact bounded RV64 Linux-style startup stack image before machine mutation."
       ]
     }
   ]
