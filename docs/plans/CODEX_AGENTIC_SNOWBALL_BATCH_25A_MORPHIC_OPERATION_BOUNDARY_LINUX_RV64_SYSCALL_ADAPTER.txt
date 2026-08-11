@@ -1,0 +1,708 @@
+CODEX AGENTIC SNOWBALL — BATCH 25A
+MORPHIC OPERATION BOUNDARY + FIRST REAL LINUX/RV64 SYSCALL ADAPTER
+
+Repository:
+thanks-cohn/zig-reference
+
+Plan path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_25A_MORPHIC_OPERATION_BOUNDARY_LINUX_RV64_SYSCALL_ADAPTER.txt
+
+MISSION
+
+Batch 24B proved that Alpz can load a real RV64 ELF, materialize the exact project-55 Linux-style initial process stack into real U RW/NX memory, enter at planner-derived e_entry with planner-derived SP, have U-mode independently parse argc/argv/envp/auxv, and return through the trusted ECALL boundary under strict two-QEMU evidence.
+
+Batch 25A must turn that one terminal ECALL proof into the first real Linux/RV64 syscall boundary WITHOUT allowing Linux register numbers, syscall numbers, errno values, or file-descriptor conventions to become the internal architecture of Morphic.
+
+Prove exactly this new architectural fact:
+
+    a real RV64 Linux userspace ELF
+              ↓
+    Linux syscall register decoder
+              ↓
+    Linux-independent Morphic semantic operation request
+              ↓
+    bounded kernel operation execution
+              ↓
+    Linux result / negative-errno encoder
+              ↓
+    resume U-mode for returning operations
+              ↓
+    terminate only for terminal operation
+              ↓
+    strict external proof + second QEMU run
+
+The first compatibility personality is Linux/RV64.
+The reusable semantic operation boundary must not itself know Linux syscall numbers, RISC-V register names, or Linux errno numbers.
+
+This batch is deliberately the first inheritance seam for later:
+
+- Linux fd/resource work;
+- Morphic native userspace;
+- an early WebAssembly host/runtime consumer;
+- pipes/sockets/timers/devices through shared resources;
+- later hypervisor-control operations where the semantics genuinely fit.
+
+Do NOT freeze a public Morphic native ABI in this batch.
+Do NOT implement WebAssembly in this batch.
+Do NOT build a general FD/resource table yet; that is the immediate next pressure.
+Do NOT begin VFS, mmap, execve, fork/clone, signals, futexes, sockets, or dynamic linking.
+
+The goal is maximum inherited semantics per unit of new privileged complexity, while still moving directly toward real Linux/BusyBox compatibility.
+
+CURRENT BASELINE
+
+Current main at plan creation:
+
+11bbd4e38fbd71bc593f28ecd579bbe384b106a3
+
+Historical Batch 24B merge:
+
+1f44cb03a1aff65be98e1b93c56a569ff479337d
+
+Treat checked-out HEAD as truth.
+
+Before editing:
+
+1. record `git rev-parse HEAD`;
+2. record `git status --short --branch`;
+3. inspect any delta from the baseline above;
+4. preserve newer compatible work;
+5. never reset or discard newer work merely to reproduce this historical plan.
+
+SETTLED TRUTHS TO INHERIT
+
+Do not recreate these mechanisms:
+
+- real S→U→S transition;
+- trusted trap frame with all integer registers, sepc, sstatus, scause, stval;
+- real U-mode ECALL cause 8 proof;
+- explicit U initial SP;
+- Sv39 U mappings and permission proof;
+- project 53 bounded user-memory transfer planning;
+- real copy-IN/copy-OUT machine compositions from Batches 21B/21C;
+- project 54 bounded ELF64 load planning;
+- real R-X ELF code + U RW/NX writable data/BSS;
+- project 55 exact Linux initial process stack;
+- Batch 24B strict external verifier, mutation philosophy, two-QEMU execution, and inherited Batch 23 proof.
+
+Batch 25A must consume those truths and make the syscall boundary a new dependent, not a parallel implementation.
+
+ARCHITECTURAL LAW
+
+The external compatibility contract is Linux/RV64.
+The internal semantic contract is Morphic.
+
+Forbidden shape:
+
+    trap handler
+        switch (Linux syscall number)
+            directly manipulate kernel internals forever
+
+Required shape, modulo current-repository naming:
+
+    trap frame
+        ↓
+    Linux/RV64 adapter
+        ↓
+    semantic Morphic operation
+        ↓
+    executor
+        ↓
+    semantic completion/failure/termination
+        ↓
+    Linux/RV64 adapter
+        ↓
+    trap frame / resume or terminal return
+
+Linux-specific facts belong at the adapter edge.
+
+At minimum, the semantic operation layer must be callable/testable without constructing a RISC-V trap frame and without knowing a Linux syscall number or errno value.
+
+If the cleanest implementation discovers an existing repository abstraction that already supplies this separation, reuse it instead of inventing another module.
+
+QUERY FIRST / CONTEXT DISCIPLINE
+
+Follow AGENTS.md and the current Agent Fast Path.
+
+Use repository queries/indexes before broad reads. Read only the smallest useful current contracts/source ranges.
+
+At minimum inspect current equivalents of:
+
+- AGENTS.md;
+- COMMANDS.md only for commands relevant to this batch;
+- docs/roadmaps/ALPZ_TO_ALPINE_QEMU_KVM_AND_BEYOND.md;
+- docs/roadmaps/MORPHIC_FOUR_BRANCH_STRATEGY.md;
+- docs/reports/AGENTIC_SNOWBALL_BATCH_24B.md;
+- this Batch 25A plan;
+- projects/53 bounded user-memory transfer contract/source as needed;
+- projects/54 ELF load contract only as needed for fixture inheritance;
+- projects/55 initial-stack contract only as needed for process-start inheritance;
+- current generational/typed-handle/result modules if relevant;
+- current freestanding RV64 trap/ECALL composition;
+- current Batch 24B ELF fixture and strict verifier.
+
+Do not load the complete module catalog, every old report, or unrelated design documents unless the Agent Fast Path cannot answer a required question.
+
+REQUIREMENT / CAPABILITY FREEZE
+
+Before implementation, freeze and report the requirement map.
+
+At minimum classify:
+
+1. raw RV64 trap-register capture;
+2. Linux/RV64 syscall ABI decode;
+3. architecture/OS-independent semantic operation request;
+4. architecture/OS-independent semantic completion/failure/termination;
+5. Linux negative-errno encoding;
+6. bounded whole-range user-read validation before externally visible write output;
+7. bootstrap stdout/stderr resource resolution;
+8. returning syscall sepc advancement and U-mode resume;
+9. terminal process-exit operation;
+10. unknown syscall -> -ENOSYS;
+11. real external RV64 ELF fixture;
+12. strict external verifier and decisive mutation tests;
+13. two independent QEMU executions;
+14. unchanged Batch 24B proof and repository regressions.
+
+Expected result:
+
+- most low-level machinery is inherited;
+- one small reusable semantic operation abstraction may be genuinely missing;
+- Linux/RV64 adaptation is compatibility-layer work, not the new universal ontology;
+- no general resource table should be invented merely to complete this batch.
+
+If a new reusable project is justified, use the next canonical project number and give it one narrow responsibility. Prefer reusing existing typed-handle, tagged-result, address/range, and other contracts where they genuinely fit. Do not force a dependency merely to increase reuse counts.
+
+PRIMARY LINUX ABI FACTS TO FREEZE
+
+Before implementation, independently verify against current primary Linux UAPI/toolchain sources available in the environment.
+
+For generic Linux/RISC-V syscall numbering, expected relevant values are:
+
+    __NR_write       = 64
+    __NR_exit        = 93
+    __NR_exit_group  = 94
+
+Future read work will use:
+
+    __NR_read        = 63
+
+Expected generic Linux errno values needed here are:
+
+    EBADF  = 9
+    EFAULT = 14
+    ENOSYS = 38
+
+For RV64 Linux syscall invocation, verify the actual convention before freezing the implementation. The expected convention is syscall number in a7, integer arguments in a0-a5 for the normal six-argument boundary, and return value / negative errno in a0.
+
+Do not cite the RISC-V psABI as if it defines the Linux syscall calling convention; the psABI explicitly leaves system-call convention to the execution environment.
+
+Record the primary source paths used in the Batch 25A report.
+
+SEMANTIC MORPHIC OPERATION BOUNDARY
+
+Create or reuse the smallest architecture-neutral semantic boundary that can express this batch without importing Linux ABI identity.
+
+Required semantic concepts:
+
+1. WRITE BYTES TO A RESOURCE-LIKE DESTINATION
+
+Conceptually:
+
+    write_bytes {
+        destination/resource identity,
+        user guest address,
+        byte count
+    }
+
+2. TERMINATE CURRENT PROCESS-LIKE EXECUTION
+
+Conceptually:
+
+    terminate {
+        status
+    }
+
+3. COMPLETION
+
+Conceptually distinguish:
+
+    success(value/count)
+    semantic failure
+    terminal completion(status)
+
+The exact Zig API is implementation work and must follow current repository conventions.
+
+The semantic types MUST NOT contain:
+
+- Linux syscall numbers;
+- `__NR_*` names;
+- Linux errno numbers;
+- RISC-V register names such as a0/a7;
+- raw trap-frame layout;
+- Linux fd table ownership semantics that do not exist yet.
+
+RESOURCE IDENTITY — KEEP IT NARROW
+
+Batch 25A needs enough resource identity to prove write without prematurely designing the entire resource model.
+
+A preferred shape is an opaque/typed resource identity at the semantic layer, with a proof-only bootstrap resolver mapping Linux descriptors 1 and 2 to writable console resources.
+
+If current typed-handle machinery fits cleanly, reuse it.
+
+Do NOT claim this bootstrap resolver is a general process FD table.
+Do NOT claim generation, duplication, inheritance, rights restriction, close-on-exec, transfer, or lifetime semantics unless actually implemented and proved.
+
+Batch 25B should be able to replace the bootstrap resolver with a real bounded per-process resource/FD table WITHOUT changing the Linux syscall register decoder and WITHOUT forcing Linux errno/syscall numbers into the semantic operation executor.
+
+That replacement property is a major acceptance criterion.
+
+LINUX/RV64 ADAPTER
+
+The Linux/RV64 adapter must have two directions:
+
+A. DECODE
+
+From saved user register state, derive a supported semantic request or unsupported-syscall result.
+
+At minimum support:
+
+- write(64)
+- exit(93)
+- exit_group(94) through the same current single-thread termination semantic where truthful
+- unknown syscall -> ENOSYS
+
+B. ENCODE
+
+Translate semantic completion/failure back into Linux/RV64 user-visible results.
+
+At minimum:
+
+- successful write => a0 = exact byte count;
+- invalid descriptor/resource => a0 = -EBADF;
+- invalid/unmapped user range => a0 = -EFAULT;
+- unsupported syscall => a0 = -ENOSYS;
+- returning syscall => advance user sepc by exactly one 32-bit ECALL instruction and resume U-mode;
+- terminal exit => do not resume after that ECALL.
+
+Linux errno encoding belongs in this adapter, not in the semantic executor.
+
+Do not silently return zero for unsupported operations.
+Do not collapse all failures to one errno.
+Do not invent Linux semantics beyond what is actually implemented.
+
+WRITE SEMANTICS
+
+For this batch, Linux descriptors 1 and 2 must resolve to deterministic writable console/output resources through the explicit bootstrap resolver.
+
+Other descriptors must fail with EBADF.
+
+`write(fd, user_ptr, count)` must use the existing bounded user-memory machinery.
+
+Critical rule:
+
+Validate the ENTIRE requested readable user range before emitting any externally visible bytes.
+
+The failure path must not print a prefix and then discover an invalid later page.
+
+Required behavior:
+
+- count 0 succeeds with return 0 after the descriptor check, without dereferencing user memory;
+- a valid readable mapped range emits exactly the requested bytes and returns exactly count;
+- invalid/unmapped/non-readable range returns EFAULT and emits no bytes;
+- invalid fd returns EBADF and emits no bytes;
+- no supervisor direct dereference of an untrusted user virtual pointer;
+- no hidden SUM relaxation;
+- use project 53/current copy machinery rather than another address walker.
+
+If the current transfer planner requires a bounded segment capacity, choose a capacity sufficient for the currently proved process address-space shape and report the bound honestly. Do not call it arbitrary Linux write length support.
+
+Do not introduce partial-write semantics unless a real output backend requires them in this batch. If the proof backend is deterministic and all-or-nothing, claim only that bounded behavior.
+
+EXIT / EXIT_GROUP SEMANTICS
+
+The semantic operation is termination of the currently executing bounded process-like U-mode instance with a supplied status.
+
+`exit` and `exit_group` may map to the same semantic terminal operation at this single-thread boundary because there is no thread group yet.
+
+The report must explicitly say:
+
+- both Linux syscall numbers are decoded;
+- the current machine has no general thread-group/process model;
+- therefore their current observable terminal effect is intentionally identical;
+- this does NOT claim complete Linux exit_group semantics.
+
+At least one of exit/exit_group must be exercised through real U-mode QEMU execution. The other must have deterministic adapter/executor test coverage at minimum. If it can be real-QEMU exercised cleanly without duplicating the whole fixture or creating fake process machinery, do so; otherwise preserve the narrower evidence distinction.
+
+REAL RV64 USERSPACE FIXTURE
+
+Add a separately built RV64 ELF dedicated to Batch 25A, preferably inheriting the Batch 24B two-segment R-X + RW-/BSS shape and exact startup-stack entry.
+
+The fixture should use raw ECALLs and no libc/runtime/startup object.
+
+It must prove a returning-syscall sequence before terminal exit.
+
+A strong deterministic sequence is:
+
+1. preserve/validate enough Batch 24B startup truth to establish the same process-start inheritance;
+2. issue one deliberately unsupported syscall number and require a0 == -ENOSYS;
+3. write a frozen message from real user memory to fd 1 and require a0 == message length;
+4. attempt write with an invalid fd and require -EBADF with no output;
+5. attempt write from a deliberately invalid/unmapped user range and require -EFAULT with no output;
+6. optionally write a second frozen marker to fd 2 and require exact byte count;
+7. terminate with a frozen status through real Linux exit or exit_group;
+8. execution after the terminal ECALL must be an impossible/failure path.
+
+Use unique artifact-derived ECALL PCs and deterministic message bytes.
+
+Do not let the fixture read kernel success flags.
+The fixture must judge return values from its own architectural a0 state.
+
+RETURN-PATH PROOF
+
+Batch 24B treated the successful ECALL as terminal. Batch 25A must prove the stronger repeated boundary:
+
+    U-mode
+      ↓ ECALL
+    S-mode trap
+      ↓ decode/execute/encode
+    sepc += 4
+      ↓ SRET
+    same U-mode ELF continues
+      ↓ another ECALL
+    ...
+      ↓ terminal exit ECALL
+    S-mode terminal handoff
+
+For every returning syscall prove at minimum:
+
+- scause = U-mode ECALL;
+- SPP indicates U-origin;
+- trap PC equals the expected artifact ECALL PC;
+- resumed PC equals trap PC + 4;
+- expected SP remains the planner-derived initial/process stack state unless the fixture intentionally adjusts it;
+- no unintended page-table/resource allocation change;
+- no W+X mapping;
+- relevant code/data/stack PTE truth remains unchanged;
+- Linux return value is exact.
+
+Do not rely only on a final success marker; record the ordered syscall evidence.
+
+STRICT EXTERNAL VERIFIER
+
+Add a Batch 25A verifier following the Batch 24B style.
+
+It must NOT be a grep-only log checker.
+
+At minimum it must:
+
+A. compose the existing Batch 24B strict proof, so Batch 25A cannot silently weaken process startup;
+
+B. independently inspect the exact new RV64 ELF and locate/validate the expected ECALL instruction sites and segment/entry relationships;
+
+C. validate the exact ordered syscall evidence:
+
+    unsupported -> -ENOSYS
+    write(fd=1) -> exact count + exact message
+    invalid fd -> -EBADF + no message
+    invalid pointer -> -EFAULT + no message
+    optional fd=2 write -> exact count
+    terminal exit/exit_group -> exact status
+
+D. validate trap/resume relationships for returning calls:
+
+    cause
+    SPP
+    trap PC
+    resume PC = trap PC + 4
+    syscall number
+    raw arguments where relevant
+    semantic operation identity
+    semantic completion/failure
+    Linux-encoded a0
+
+E. validate inherited page/SATP/resource invariants honestly;
+
+F. independently verify that the emitted successful write bytes equal the fixture bytes, not merely a digest;
+
+G. run decisive mutation/self-tests;
+
+H. run the decisive machine proof in at least two independent qemu-system-riscv64 processes and compare deterministic evidence.
+
+MUTATION SELF-TESTS
+
+At minimum reject mutations of:
+
+- syscall number;
+- syscall order;
+- trap PC;
+- resume PC;
+- write fd;
+- write user pointer;
+- write count;
+- expected message byte;
+- write return count;
+- EBADF result;
+- EFAULT result;
+- ENOSYS result;
+- semantic operation identity;
+- terminal status;
+- SPP/cause;
+- executable stack or W+X evidence;
+- inherited Batch 24B decisive proof relation.
+
+Where the verifier records both Linux-facing and semantic evidence, mutation must prove they cannot drift independently unnoticed.
+
+TWO-QEMU RULE
+
+The full Batch 25A verifier must execute the decisive fixture in two independent qemu-system-riscv64 processes.
+
+Require deterministic agreement on all stable evidence including:
+
+- artifact identity/entry;
+- initial SP and inherited startup facts;
+- ordered syscall numbers/args relevant to the proof;
+- ordered semantic operations;
+- return values/errors;
+- emitted message bytes;
+- trap/resume PCs;
+- terminal status;
+- mapping/W+X truth;
+- Morphic equality if the current proof chain still carries it.
+
+Do not weaken the existing repeated-machine standard.
+
+INHERITANCE ACCEPTANCE TEST
+
+Batch 25A is not complete merely because Linux write works.
+
+The code structure must make these statements true:
+
+1. A future WebAssembly host can construct/execute the semantic write/terminate operation without importing Linux syscall numbers or a RISC-V TrapFrame.
+
+2. A future native Morphic ABI can construct the same semantic operations without Linux errno values.
+
+3. Batch 25B can replace the proof-only stdout/stderr resolver with a real bounded resource/FD table without rewriting the Linux register decoder or the semantic executor contract unnecessarily.
+
+4. A future non-RISC-V Linux personality can reuse the semantic executor while supplying a different register adapter.
+
+Do not implement those future consumers here. Prove the separation through unit/API structure and report it as architectural inheritance, not as runtime compatibility already achieved.
+
+ANTI-OVERDESIGN RULES
+
+Do NOT add, unless real current pressure makes them unavoidable:
+
+- a giant syscall table;
+- a generic object hierarchy;
+- dynamic allocation for operation dispatch;
+- runtime registration/plugin machinery;
+- a stable public Native Morphic ABI;
+- a WASI/WIT implementation;
+- a full capability-security model;
+- a full rights lattice;
+- descriptor duplication/inheritance;
+- process trees;
+- thread groups;
+- blocking I/O queues;
+- async/future framework;
+- VFS;
+- sockets;
+- signals;
+- generalized scheduler changes.
+
+Leave clean seams for those pressures rather than pre-solving them speculatively.
+
+REUSABLE MODULE RULE
+
+If a new semantic-operation module is created, it must be genuinely architecture/OS-independent and satisfy the normal Z-Ref module contract.
+
+It should be small enough that its public surface can plausibly survive Linux, Native, and Wasm consumers.
+
+Prefer semantic names such as resource/write/terminate/completion over Linux names.
+
+Do not make a reusable module that merely wraps a `switch` on Linux syscall numbers.
+
+Do not create a second user-memory range planner.
+
+VALIDATION
+
+Run the smallest focused closure first, then the complete repository validation.
+
+At minimum, where current command names exist or their new equivalents are added:
+
+- focused tests/smoke for any new reusable module;
+- project 53 focused regression;
+- project 54 focused regression if ELF planner integration changed;
+- project 55 focused regression;
+- Batch 24B one-QEMU mutation self-test;
+- Batch 24B strict two-QEMU proof;
+- Batch 25A mutation self-test;
+- Batch 25A strict two-QEMU proof;
+- `zig fmt --check` on changed Zig/build paths;
+- `zig build check`;
+- command-reference drift check;
+- repository index/agent-contract checks required by current policy;
+- `python3 tools/developer-command.py validate-repository`.
+
+If generated validation evidence is required because build/module wiring changed, regenerate it through the canonical recorder/generator. Never hand-edit generated evidence to make a gate pass.
+
+COMMAND / DOCUMENTATION MAINTENANCE
+
+Add only the new commands actually created by this batch to COMMANDS.md according to current repository policy.
+
+Create:
+
+    docs/reports/AGENTIC_SNOWBALL_BATCH_25A.md
+
+Do not update long-horizon roadmaps merely to restate this report unless their current wording becomes materially false.
+
+The report must distinguish:
+
+- generic semantic operation support;
+- Linux/RV64 adapter support;
+- machine-proved behavior;
+- unit-only behavior;
+- proof-only bootstrap resource resolution;
+- future inheritance seams;
+- nonclaims.
+
+EXPECTED SOURCE SHAPE
+
+Likely changed/added areas:
+
+- one small reusable semantic-operation project if capability freeze proves it is missing;
+- current freestanding RV64 machine trap/syscall composition;
+- new RV64 syscall fixture;
+- build/install plumbing;
+- strict Batch 25A verifier;
+- COMMANDS.md;
+- Batch 25A report;
+- generated indexes/evidence only through canonical tooling when required.
+
+Avoid touching unrelated modules.
+
+EXPLICIT NONCLAIMS
+
+Batch 25A must NOT claim:
+
+- full Linux syscall compatibility;
+- general file descriptors;
+- `read` support unless explicitly added/proved by real pressure;
+- `openat`, VFS, files/directories;
+- general process objects;
+- real thread-group semantics;
+- signals;
+- futex/TLS/threading;
+- mmap/brk/mprotect;
+- execve;
+- pipes/poll;
+- sockets/networking;
+- libc/musl startup;
+- BusyBox;
+- Alpine;
+- Native Morphic ABI stability;
+- WebAssembly/WASI compatibility;
+- capability security;
+- async I/O;
+- hypervisor/VMM/KVM support;
+- production security/readiness.
+
+SNOWBALL YIELD
+
+The final report must state mechanically what was inherited instead of recreated.
+
+At minimum account for reuse of:
+
+- Batch 24B process startup;
+- project 55 startup stack;
+- project 54 ELF loading;
+- project 53 user-memory planning;
+- prior copy-IN machinery;
+- existing trap frame/entry/return path;
+- existing Sv39 mappings;
+- existing strict verifier chain;
+- existing typed-handle/result modules if actually consumed.
+
+Also state:
+
+- new reusable modules count;
+- new Linux-specific adapter code;
+- new generic semantic code;
+- whether the next FD/resource batch can reuse the new boundary unchanged.
+
+Do not invent token/time/productivity savings. If not measured, say `unmeasured`.
+
+NEXT PRESSURE
+
+The intended immediate successor is Batch 25B / 26:
+
+REAL BOUNDED PROCESS RESOURCE + LINUX FD TABLE
+
+Pressure should include:
+
+- real per-process descriptor mapping;
+- stdin/stdout/stderr as table entries rather than proof-only resolver cases;
+- typed/generational resource identity where current Z-Ref modules fit;
+- rights/lifetime rules no broader than demanded;
+- `read`, `write`, `close`, and then `dup` family;
+- preserve the Batch 25A semantic operation boundary;
+- make that same resource substrate ready for a deliberately early WebAssembly consumer after the minimum stream/wait semantics exist.
+
+Do NOT pull Batch 25B into 25A merely because it is the next plan.
+
+FINAL HANDOFF
+
+Before stopping, ALWAYS emit the normal explicit handoff, even on timeout/failure.
+
+Status must be one of:
+
+PASS
+PARTIAL
+BLOCKED
+
+Include:
+
+- exact starting revision;
+- final branch and SHA;
+- push status;
+- PR URL targeting main if created;
+- environment and Zig/QEMU versions;
+- frozen requirement/capability map;
+- exact Linux ABI facts/sources used;
+- generic operation API summary;
+- exact Linux adapter behavior;
+- real fixture syscall sequence;
+- exact proof relationships;
+- mutation cases;
+- two-QEMU result;
+- Batch 24B preservation result;
+- full validation result;
+- failures and repairs;
+- explicit nonclaims;
+- Snowball Yield;
+- LOCATIONS;
+- MINIMUS;
+- remaining work;
+- one next pressure.
+
+Never silently stop after a long run.
+
+SUCCESS CONDITION
+
+Batch 25A is PASS only when all of the following are true:
+
+- a real RV64 Linux ELF begins from the inherited Batch 24B process-start boundary;
+- at least one real returning Linux syscall crosses U→S→U correctly;
+- real `write` uses the existing bounded user-memory machinery and returns exact Linux-visible results;
+- invalid fd, invalid pointer, and unknown syscall produce exact negative Linux errno behavior without false output;
+- at least one real exit/exit_group terminates without returning;
+- Linux/RV64 ABI identity is confined to an adapter edge;
+- the semantic Morphic operation boundary is independently testable and does not know Linux syscall/errno/register identity;
+- strict mutation-tested two-QEMU evidence passes;
+- Batch 24B remains independently green;
+- complete repository validation passes;
+- the result leaves a clean immediate path to a real resource/FD table and later Native/Wasm consumers without re-deriving the operation semantics.
+
+Suggested PR title:
+
+Establish Morphic operation boundary and first Linux/RV64 syscalls (Batch 25A)
