@@ -331,7 +331,7 @@ Do not weaken a gate merely to make new work pass. Fix the work or narrow the cl
 
 Start with [`docs/README.md`](docs/README.md).
 
-Important entry points include [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/catalog/MODULES.md`](docs/catalog/MODULES.md), [`docs/concepts/SNOWBALL_PRINCIPLE.md`](docs/concepts/SNOWBALL_PRINCIPLE.md), [`docs/standards/SNOWBALL_YIELD.md`](docs/standards/SNOWBALL_YIELD.md), [`docs/project_vocab.md`](docs/project_vocab.md), the long-horizon Alpz roadmap under [`docs/roadmaps/`](docs/roadmaps/), and the QuirkM research area at [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/).
+Important entry points include [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/catalog/MODULES.md`](docs/catalog/MODULES.md), [`docs/concepts/SNOWBALL_PRINCIPLE.md`](docs/concepts/SNOWBALL_PRINCIPLE.md), [`docs/standards/SNOWBALL_YIELD.md`](docs/standards/SNOWBALL_YIELD.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), the long-horizon Alpz roadmap under [`docs/roadmaps/`](docs/roadmaps/), and the QuirkM research area at [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/).
 
 ---
 
