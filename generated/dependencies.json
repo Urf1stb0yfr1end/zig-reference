@@ -103,6 +103,7 @@
       "checked-integer-cast",
       "endian-integer-codec"
     ],
+    "morphic-semantic-operation": [],
     "nonzero-integer": [],
     "optional-typed-handle": [],
     "owned-byte-buffer": [

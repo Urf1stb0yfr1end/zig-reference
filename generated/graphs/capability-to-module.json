@@ -19,6 +19,12 @@
       ]
     },
     {
+      "capability": "abi-neutral operation dispatch",
+      "modules": [
+        "morphic-semantic-operation"
+      ]
+    },
+    {
       "capability": "address",
       "modules": [
         "aligned-address-and-size-helpers",
@@ -130,6 +136,12 @@
       "capability": "api",
       "modules": [
         "tagged-result"
+      ]
+    },
+    {
+      "capability": "architecture-independent-write-and-termination",
+      "modules": [
+        "morphic-semantic-operation"
       ]
     },
     {
@@ -799,6 +811,7 @@
         "generational-handles",
         "intrusive-doubly-linked-list",
         "length-prefixed-binary-field",
+        "morphic-semantic-operation",
         "nonzero-integer",
         "optional-typed-handle",
         "owned-byte-buffer",
@@ -1107,6 +1120,18 @@
       "capability": "modulo counter",
       "modules": [
         "wrapping-sequence-number"
+      ]
+    },
+    {
+      "capability": "morphic",
+      "modules": [
+        "morphic-semantic-operation"
+      ]
+    },
+    {
+      "capability": "morphic-semantic-operation-dispatch",
+      "modules": [
+        "morphic-semantic-operation"
       ]
     },
     {
@@ -1654,6 +1679,12 @@
       "capability": "semantic version",
       "modules": [
         "semantic-version"
+      ]
+    },
+    {
+      "capability": "semantic-operation",
+      "modules": [
+        "morphic-semantic-operation"
       ]
     },
     {

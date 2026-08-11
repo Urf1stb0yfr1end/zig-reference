@@ -77,6 +77,10 @@
       "symbol": "CheckedRange"
     },
     {
+      "module": "morphic-semantic-operation",
+      "symbol": "Completion"
+    },
+    {
       "module": "riscv-sv39-page-table-entry",
       "symbol": "DecodeError"
     },
@@ -145,6 +149,10 @@
       "symbol": "EventInput"
     },
     {
+      "module": "morphic-semantic-operation",
+      "symbol": "Failure"
+    },
+    {
       "module": "fixed-bump-allocator",
       "symbol": "FixedBumpAllocator"
     },
@@ -167,6 +175,10 @@
     {
       "module": "fourcc-code",
       "symbol": "FourCC"
+    },
+    {
+      "module": "morphic-semantic-operation",
+      "symbol": "GuestAddress"
     },
     {
       "module": "distinct-memory-address-types",
@@ -337,6 +349,14 @@
       "symbol": "RegionKind"
     },
     {
+      "module": "morphic-semantic-operation",
+      "symbol": "Request"
+    },
+    {
+      "module": "morphic-semantic-operation",
+      "symbol": "ResourceId"
+    },
+    {
       "module": "riscv-sv39-page-table-walker",
       "symbol": "Result"
     },
@@ -421,6 +441,10 @@
       "symbol": "WrappingSequenceNumber"
     },
     {
+      "module": "morphic-semantic-operation",
+      "symbol": "WriteBytes"
+    },
+    {
       "module": "aligned-address-and-size-helpers",
       "symbol": "alignDown"
     },
@@ -455,6 +479,10 @@
     {
       "module": "riscv-page-table-page-owner",
       "symbol": "entries_per_page"
+    },
+    {
+      "module": "morphic-semantic-operation",
+      "symbol": "execute"
     },
     {
       "module": "riscv-sfence-vma-invalidation",

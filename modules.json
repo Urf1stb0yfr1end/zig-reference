@@ -503,6 +503,15 @@
       "details": "projects/55-bounded-rv64-linux-initial-stack-plan/details.json",
       "unit_test_step": "test-bounded-rv64-linux-initial-stack-plan",
       "smoke_test_step": "smoke-bounded-rv64-linux-initial-stack-plan"
+    },
+    {
+      "id": "56",
+      "canonical_name": "morphic-semantic-operation",
+      "directory": "projects/56-morphic-semantic-operation",
+      "public_entrypoint": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig",
+      "details": "projects/56-morphic-semantic-operation/details.json",
+      "unit_test_step": "test-morphic-semantic-operation",
+      "smoke_test_step": "smoke-morphic-semantic-operation"
     }
   ]
 }

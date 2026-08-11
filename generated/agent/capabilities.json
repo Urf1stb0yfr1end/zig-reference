@@ -18,6 +18,9 @@
     "allocator-backed-container": [
       "dynamic-array"
     ],
+    "architecture-independent-write-and-termination": [
+      "morphic-semantic-operation"
+    ],
     "binary-cursor-checkpoint": [
       "binary-cursor-checkpoint"
     ],
@@ -192,6 +195,9 @@
     ],
     "monotonic-allocation": [
       "fixed-bump-allocator"
+    ],
+    "morphic-semantic-operation-dispatch": [
+      "morphic-semantic-operation"
     ],
     "nonzero-integer": [
       "nonzero-integer"

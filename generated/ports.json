@@ -1000,6 +1000,42 @@
         ],
         "zigVersion": "0.14.0"
       },
+      "module": "morphic-semantic-operation",
+      "path": "projects/56-morphic-semantic-operation/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "ResourceId",
+            "GuestAddress",
+            "WriteBytes",
+            "Request",
+            "Failure",
+            "Completion",
+            "execute"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-morphic-semantic-operation",
+            "zig build smoke-morphic-semantic-operation"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented morphic-semantic-operation public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
       "module": "nonzero-integer",
       "path": "projects/11-nonzero-integer/port.js",
       "risks": [

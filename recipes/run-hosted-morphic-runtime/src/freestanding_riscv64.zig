@@ -11,9 +11,11 @@ const sfence_vma = @import("riscv-sfence-vma-invalidation");
 const user_transfer = @import("bounded-user-memory-transfer-plan");
 const elf_load = @import("bounded-elf64-load-plan");
 const initial_stack = @import("bounded-rv64-linux-initial-stack-plan");
+const morphic_operation = @import("morphic-semantic-operation");
 const userspace_elf = @embedFile("userspace-elf-rv64");
 const userspace_elf_data_bss = @embedFile("userspace-elf-rv64-data-bss");
 const userspace_elf_initial_stack = @embedFile("userspace-elf-rv64-initial-stack");
+const userspace_elf_linux_syscalls = @embedFile("userspace-elf-rv64-linux-syscalls");
 
 const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
@@ -141,7 +143,7 @@ var userspace_elf_memory_end: usize linksection(".bss") = 0;
 var userspace_elf_expected_a0: usize linksection(".bss") = 0;
 var userspace_elf_expected_t0: usize linksection(".bss") = 0;
 var userspace_elf_expected_t1: usize linksection(".bss") = 0;
-var userspace_elf_expected_sp: usize linksection(".bss") = user_stack_va + frames.PageSize;
+var userspace_elf_expected_sp: usize linksection(".bss") = 0;
 
 export var service_trap_count: usize linksection(".bss") = 0;
 var service_frames: [2]usize linksection(".bss") = .{ 0, 0 };
@@ -246,6 +248,19 @@ var copy_out_code_after: usize = 0;
 var copy_out_prefix_before: usize = 0;
 var copy_out_prefix_after: usize = 0;
 var copy_out_return_count: usize = 0;
+var syscall_active = false;
+var syscall_query: user_transfer.PageQuery = undefined;
+var syscall_count: usize = 0;
+var syscall_numbers: [5]usize = .{0} ** 5;
+var syscall_pcs: [5]usize = .{0} ** 5;
+var syscall_sstatus: [5]usize = .{0} ** 5;
+var syscall_resume_pcs: [4]usize = .{0} ** 4;
+var syscall_args: [5][3]usize = .{.{0} ** 3} ** 5;
+var syscall_results: [4]usize = .{0} ** 4;
+var syscall_semantics: [5]u8 = .{0} ** 5;
+var syscall_terminal_status: usize = 0;
+var syscall_output: [64]u8 = .{0} ** 64;
+var syscall_output_len: usize = 0;
 const copy_out_payload = "kernel-to-user!!";
 
 export fn userCopyOutProbeContainer() linksection(".text.user_copy_out_probe") callconv(.naked) void {
@@ -449,6 +464,10 @@ export fn userServiceTrapEntry() linksection(".text.user_service_trap") callconv
 }
 
 export fn recordUserServiceTrap(frame: *TrapFrame) callconv(.c) void {
+    if (syscall_active) {
+        @call(.never_tail, recordLinuxRv64Syscall, .{frame});
+        return;
+    }
     write("\n");
     if (copy_out_active) {
         @call(.never_tail, recordUserCopyOutTrap, .{frame});
@@ -500,6 +519,89 @@ export fn recordUserServiceTrap(frame: *TrapFrame) callconv(.c) void {
         service_terminal_return_sstatus = frame.sstatus;
         service_terminal_to_supervisor_count += 1;
     }
+}
+
+const SyscallBackend = struct {
+    pub fn writeBytes(_: @This(), operation: morphic_operation.WriteBytes) morphic_operation.Completion {
+        const resource = @intFromEnum(operation.destination);
+        if (resource != 1 and resource != 2) return .{ .failure = .invalid_resource };
+        if (operation.byte_count == 0) return .{ .success = 0 };
+        const plan = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(@intFromEnum(operation.source)), operation.byte_count, .read_from_user, syscall_query) catch return .{ .failure = .invalid_user_memory };
+        if (operation.byte_count > syscall_output.len - syscall_output_len) return .{ .failure = .invalid_user_memory };
+        for (plan.items()) |segment| {
+            const source: [*]const volatile u8 = @ptrFromInt(segment.physical_start.raw());
+            for (0..segment.byte_count) |i| syscall_output[syscall_output_len + segment.request_offset + i] = source[i];
+        }
+        const start = syscall_output_len;
+        syscall_output_len += operation.byte_count;
+        write(syscall_output[start..syscall_output_len]);
+        return .{ .success = operation.byte_count };
+    }
+    pub fn terminate(_: @This(), status: u8) morphic_operation.Completion {
+        return .{ .terminated = status };
+    }
+};
+
+fn negativeErrno(value: usize) usize {
+    return 0 -% value;
+}
+const LinuxRequestKind = enum { write, terminate, unsupported };
+fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
+    return switch (number) {
+        64 => .write,
+        93, 94 => .terminate,
+        else => .unsupported,
+    };
+}
+comptime {
+    if (decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+}
+
+fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
+    const index = syscall_count;
+    if (index >= 5 or frame.scause != 8 or frame.sstatus & (0x100 | 0x40000) != 0) shutdown();
+    syscall_numbers[index] = frame.x[17];
+    syscall_pcs[index] = frame.sepc;
+    syscall_sstatus[index] = frame.sstatus;
+    syscall_args[index] = .{ frame.x[10], frame.x[11], frame.x[12] };
+    syscall_count += 1;
+    const request: ?morphic_operation.Request = switch (decodeLinuxRequestKind(frame.x[17])) {
+        .write => blk: {
+            syscall_semantics[index] = 2;
+            break :blk .{ .write_bytes = .{ .destination = @enumFromInt(@as(u32, @truncate(frame.x[10]))), .source = @enumFromInt(@as(u64, frame.x[11])), .byte_count = frame.x[12] } };
+        },
+        .terminate => blk: {
+            syscall_semantics[index] = 3;
+            break :blk .{ .terminate = @truncate(frame.x[10]) };
+        },
+        .unsupported => null,
+    };
+    if (request == null) {
+        syscall_semantics[index] = 1;
+        frame.x[10] = negativeErrno(38);
+    } else switch (morphic_operation.execute(request.?, SyscallBackend{})) {
+        .success => |value| frame.x[10] = value,
+        .failure => |failure| frame.x[10] = negativeErrno(switch (failure) {
+            .invalid_resource => 9,
+            .invalid_user_memory => 14,
+        }),
+        .terminated => |status| {
+            syscall_terminal_status = status;
+            frame.sepc = @intFromPtr(&userServiceSupervisorResume);
+            frame.sstatus = (frame.sstatus & ~@as(usize, 0x40122)) | 0x100;
+            service_trap_count = 2;
+            return;
+        },
+    }
+    syscall_results[index] = frame.x[10];
+    frame.sepc += 4;
+    syscall_resume_pcs[index] = frame.sepc;
+    frame.sstatus &= ~@as(usize, 0x40122);
+    asm volatile ("csrw sepc, %[pc]"
+        :
+        : [pc] "r" (frame.sepc),
+        : "memory"
+    );
 }
 
 fn recordUserCopyOutTrap(frame: *TrapFrame) void {
@@ -1595,6 +1697,154 @@ noinline fn executeUserspaceElfInitialStack(allocator: anytype, page_owner: anyt
     write("\ndata_pte=");
     writeUsizeHex(data_leaf.raw_entry);
     write("\nuser_leaf_count=0000000000000003\nwx_leaf_count=0000000000000000\nstack_policy=project-55\ntranslation_change=none\nsfence_vma=not-required-no-pte-change\nfence_i=local-hart-executed\nsupervisor_resume=PASS\ncomplete=PASS\nZIGREF_USERSPACE_INITIAL_STACK_END\nZIGREF_USERSPACE_INITIAL_STACK_RETURNED\n");
+}
+
+noinline fn executeLinuxRv64Syscalls(allocator: anytype, page_owner: anytype, builder: anytype, user_code_pa: usize, user_stack_pa: usize, trap_end: usize, historical_stvec: usize, root_physical: usize) void {
+    write("ZIGREF_LINUX_RV64_SYSCALL_PHASE plan-materialize-execute\n");
+    const load = elf_load.plan(2, userspace_elf_linux_syscalls) catch {
+        write("ZIGREF_25A_FAIL load-plan\n");
+        shutdown();
+    };
+    if (load.items().len != 2) {
+        write("ZIGREF_25A_FAIL segments\n");
+        shutdown();
+    }
+    const code = load.items()[0];
+    const data = load.items()[1];
+    if (code.memory.start != user_code_va or data.memory.start != user_data_va) {
+        write("ZIGREF_25A_FAIL addresses\n");
+        shutdown();
+    }
+    const code_dst: [*]volatile u8 = @ptrFromInt(user_code_pa);
+    for (0..frames.PageSize) |i| code_dst[i] = 0;
+    for (userspace_elf_linux_syscalls[code.source.start..code.source.end], 0..) |b, i| code_dst[i] = b;
+    const data_leaf_before = builder.query(user_data_va) catch shutdown();
+    const data_pa = data_leaf_before.physical_address;
+    const data_dst: [*]volatile u8 = @ptrFromInt(data_pa);
+    for (0..frames.PageSize) |i| data_dst[i] = 0;
+    for (userspace_elf_linux_syscalls[data.source.start..data.source.end], 0..) |b, i| data_dst[i] = b;
+    const argv = [_][]const u8{ "alpz-24b", "stack-proof" };
+    const envp = [_][]const u8{ "ALPZ_BATCH=24B", "MODE=qemu-proof" };
+    const auxv = [_]initial_stack.AuxEntry{ .{ .type = 6, .value = .{ .immediate = 4096 } }, .{ .type = 9, .value = .{ .immediate = load.entry.raw() } }, .{ .type = 31, .value = .{ .argv_string = 0 } } };
+    const stack_range = initial_stack.GuestStackRange.init(user_stack_va, user_stack_va + frames.PageSize) catch shutdown();
+    const stack = initial_stack.plan(256, 2, 2, 3, stack_range, &argv, &envp, &auxv) catch shutdown();
+    const stack_dst: [*]volatile u8 = @ptrFromInt(user_stack_pa);
+    for (0..frames.PageSize) |i| stack_dst[i] = 0;
+    const stack_offset = stack.initial_sp.raw() - user_stack_va;
+    for (stack.bytes(), 0..) |b, i| stack_dst[stack_offset + i] = b;
+    const ActiveQuery = struct {
+        active: @TypeOf(&builder),
+        fn query(raw: *const anyopaque, page: user_transfer.GuestVirtualAddress) ?user_transfer.PageResolution {
+            const self: *const @This() = @ptrCast(@alignCast(raw));
+            const leaf = self.active.*.query(page.raw()) catch return null;
+            const flags = leaf.raw_entry & 0xff;
+            if (flags & 1 == 0 or flags & 0xe == 0) return null;
+            return .{ .physical_page_start = user_transfer.PhysicalAddress.init(leaf.physical_address & ~@as(usize, frames.PageSize - 1)), .user = flags & 0x10 != 0, .readable = flags & 0x2 != 0, .writable = flags & 0x4 != 0 };
+        }
+    };
+    const active_query = ActiveQuery{ .active = &builder };
+    syscall_query = .{ .context = &active_query, .queryFn = ActiveQuery.query };
+    syscall_count = 0;
+    syscall_output_len = 0;
+    syscall_terminal_status = 0;
+    service_trap_count = 0;
+    syscall_numbers = .{0} ** 5;
+    syscall_pcs = .{0} ** 5;
+    syscall_sstatus = .{0} ** 5;
+    syscall_resume_pcs = .{0} ** 4;
+    syscall_args = .{.{0} ** 3} ** 5;
+    syscall_results = .{0} ** 4;
+    syscall_semantics = .{0} ** 5;
+    const allocated_before = allocator.allocatedCount();
+    const tables_before = page_owner.page_count;
+    const satp_before = asm volatile ("csrr %[value], satp"
+        : [value] "=r" (-> usize),
+    );
+    syscall_active = true;
+    asm volatile ("fence.i" ::: "memory");
+    asm volatile ("mv a0, %[entry]; mv a1, %[stack]; mv a2, %[trap_stack]; call enterUserService"
+        :
+        : [entry] "r" (load.entry.raw()),
+          [stack] "r" (stack.initial_sp.raw()),
+          [trap_stack] "r" (trap_end),
+        : "memory", "ra", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "t0", "t1", "t2", "t3", "t4", "t5", "t6"
+    );
+    syscall_active = false;
+    asm volatile ("csrw stvec, %[entry]; csrw sscratch, zero"
+        :
+        : [entry] "r" (historical_stvec),
+        : "memory"
+    );
+    const satp_after = asm volatile ("csrr %[value], satp"
+        : [value] "=r" (-> usize),
+    );
+    const code_leaf = builder.query(user_code_va) catch shutdown();
+    const stack_leaf = builder.query(user_stack_va) catch shutdown();
+    const data_leaf = builder.query(user_data_va) catch shutdown();
+    if (syscall_count != 5 or !std.mem.eql(usize, &syscall_numbers, &.{ 0x7fff, 64, 64, 64, 94 }) or !std.mem.eql(usize, &syscall_results, &.{ negativeErrno(38), 24, negativeErrno(9), negativeErrno(14) }) or syscall_terminal_status != 37 or syscall_output_len != 24 or allocated_before != allocator.allocatedCount() or tables_before != page_owner.page_count or satp_before != satp_after or code_leaf.raw_entry & 0x1e != 0x1a or stack_leaf.raw_entry & 0x1e != 0x16 or data_leaf.raw_entry & 0x1e != 0x16) {
+        write("ZIGREF_25A_FAIL final-relations\n");
+        shutdown();
+    }
+    write("ZIGREF_LINUX_RV64_SYSCALL_BEGIN\nartifact=userspace-elf-rv64-linux-syscalls\nentry=");
+    writeUsizeHex(load.entry.raw());
+    write("\ninitial_sp=");
+    writeUsizeHex(stack.initial_sp.raw());
+    for (0..5) |i| {
+        write("\nevent=");
+        writeUsizeHex(i);
+        write(",nr=");
+        writeUsizeHex(syscall_numbers[i]);
+        write(",pc=");
+        writeUsizeHex(syscall_pcs[i]);
+        write(",resume=");
+        writeUsizeHex(if (i < 4) syscall_resume_pcs[i] else 0);
+        write(",sstatus=");
+        writeUsizeHex(syscall_sstatus[i]);
+        write(",a0=");
+        writeUsizeHex(syscall_args[i][0]);
+        write(",a1=");
+        writeUsizeHex(syscall_args[i][1]);
+        write(",a2=");
+        writeUsizeHex(syscall_args[i][2]);
+        write(",semantic=");
+        write(switch (syscall_semantics[i]) {
+            1 => "unsupported",
+            2 => "write_bytes",
+            3 => "terminate",
+            else => "INVALID",
+        });
+        write(",result=");
+        writeUsizeHex(if (i < 4) syscall_results[i] else syscall_terminal_status);
+    }
+    write("\noutput_hex=");
+    writeHex(syscall_output[0..syscall_output_len]);
+    write("\ntrap_cause=0000000000000008\nterminal_status=");
+    writeUsizeHex(syscall_terminal_status);
+    write("\ncode_pte=");
+    writeUsizeHex(code_leaf.raw_entry);
+    write("\nstack_pte=");
+    writeUsizeHex(stack_leaf.raw_entry);
+    write("\ndata_pte=");
+    writeUsizeHex(data_leaf.raw_entry);
+    write("\nuser_leaf_count=0000000000000003\nwx_leaf_count=0000000000000000\npage_table_count=");
+    writeUsizeHex(page_owner.page_count);
+    write("\nphysical_allocated=");
+    writeUsizeHex(allocator.allocatedCount());
+    write("\nroot_physical=");
+    writeUsizeHex(root_physical);
+    write("\nallocated_before=");
+    writeUsizeHex(allocated_before);
+    write("\nallocated_after=");
+    writeUsizeHex(allocator.allocatedCount());
+    write("\ntables_before=");
+    writeUsizeHex(tables_before);
+    write("\ntables_after=");
+    writeUsizeHex(page_owner.page_count);
+    write("\nsatp_before=");
+    writeUsizeHex(satp_before);
+    write("\nsatp_after=");
+    writeUsizeHex(satp_after);
+    write("\nwhole_range_before_output=PASS\ntranslation_change=none\ncomplete=PASS\nZIGREF_LINUX_RV64_SYSCALL_END\nZIGREF_LINUX_RV64_SYSCALL_RETURNED\n");
 }
 
 export fn freestandingMain() callconv(.c) noreturn {
@@ -2839,6 +3089,7 @@ export fn freestandingMain() callconv(.c) noreturn {
     executeUserspaceElf(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
     executeUserspaceElfDataBss(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
     executeUserspaceElfInitialStack(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
+    executeLinuxRv64Syscalls(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
 
     var output: [128]u8 = undefined;
     var trace: [2048]u8 = undefined;

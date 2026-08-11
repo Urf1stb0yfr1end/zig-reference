@@ -18,6 +18,7 @@
     "fourcc-code",
     "generational-handles",
     "intrusive-doubly-linked-list",
+    "morphic-semantic-operation",
     "nonzero-integer",
     "optional-typed-handle",
     "ring-buffer",
