@@ -16,6 +16,10 @@ This directory contains the long-form project record. The repository root is int
 - [`concepts/ARCHETYPES.md`](concepts/ARCHETYPES.md) — recurring systems-code contract shapes.
 - [`concepts/RECURSIVE_SUCCESSOR_QUALIFICATION_AND_KNOWLEDGE_TRANSFER.md`](concepts/RECURSIVE_SUCCESSOR_QUALIFICATION_AND_KNOWLEDGE_TRANSFER.md) — recursive successor and knowledge-transfer model, when present in the checked-out tree.
 
+## Applications
+
+- [`applications/QUIRKM_CONTEXT_COMPLETE_BIOLOGICAL_ORGAN_CONTROL.md`](applications/QUIRKM_CONTEXT_COMPLETE_BIOLOGICAL_ORGAN_CONTROL.md) — application hypothesis for a context-complete QuirkM control/diagnostic substrate for future artificial or biohybrid organs, including a real-world-grounded ventricular-assist-pump scenario and explicit safety/nonclaim boundaries.
+
 ## Standards
 
 - [`standards/REPOSITORY_LAYOUT.md`](standards/REPOSITORY_LAYOUT.md) — repository placement and root-discipline rules.
