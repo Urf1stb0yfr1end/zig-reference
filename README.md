@@ -254,6 +254,8 @@ record its contract
       ↓
 record failure behavior
       ↓
+record focused validation
+      ↓
 make it discoverable
       ↓
 reuse it in the next boundary
