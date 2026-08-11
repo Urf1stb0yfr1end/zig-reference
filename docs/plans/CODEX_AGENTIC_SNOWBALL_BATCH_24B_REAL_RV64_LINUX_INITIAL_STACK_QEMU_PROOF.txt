@@ -1,0 +1,562 @@
+CODEX AGENTIC SNOWBALL — BATCH 24B
+REAL RV64 LINUX INITIAL PROCESS STACK — U-MODE / QEMU PROOF
+
+Repository:
+thanks-cohn/zig-reference
+
+Plan path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_24B_REAL_RV64_LINUX_INITIAL_STACK_QEMU_PROOF.txt
+
+MISSION
+
+Batch 23 proved a real separately built RV64 ET_EXEC userspace ELF with executable code, initialized writable data, non-empty BSS, real U-mode mutation, and trusted U→S return under strict repeated QEMU evidence.
+
+Batch 24A then created the reusable bounded-rv64-linux-initial-stack-plan module. It deterministically owns the exact byte image for [initial_sp, stack_top), containing argc, argv, envp, ordered auxv pairs, required NULL/AT_NULL sentinels, zero padding, NUL-terminated strings, exact in-image guest pointers, and a 16-byte-aligned initial SP. It explicitly does not write guest memory or execute under QEMU.
+
+Batch 24B must prove exactly one new machine fact:
+
+The existing Batch 24A planner can be consumed unchanged by Alpz to materialize one exact Linux-style initial process stack into real mapped U RW/NX memory, enter a separately built RV64 ELF at planner-derived ELF e_entry with exactly planner.initial_sp, and have real U-mode code independently parse and validate argc/argv/envp/auxv and their pointer/string relationships before returning through the trusted supervisor trap boundary under strict mutation-tested two-QEMU evidence.
+
+The decisive boundary is:
+
+    settled stack policy in project 55
+                ↓
+    exact planner-owned byte image
+                ↓
+    real mapped U RW/NX stack memory
+                ↓
+    SRET with SP = planner.initial_sp
+                ↓
+    independently parsing RV64 U-mode ELF
+                ↓
+    successful terminal ECALL
+                ↓
+    strict external proof + second QEMU run
+
+Do not begin Batch 25 Linux syscall ABI work in this run.
+Do not create a process abstraction merely to make this proof look more Linux-like.
+Do not duplicate the 24A stack-layout policy in kernel code, fixture code, verifier code, or a second planner.
+
+CURRENT BASELINE
+
+Canonical Batch 24A merge revision:
+
+8d634de8d02772eb5f02d8d46912bcef92973ea7
+
+Treat checked-out HEAD as truth.
+
+Before changing source:
+
+1. record `git rev-parse HEAD`;
+2. record `git status --short --branch`;
+3. inspect any delta from the canonical Batch 24A merge to checked-out HEAD;
+4. preserve compatible newer work;
+5. never reset/discard newer work merely to reproduce the historical baseline.
+
+Settled relevant truths at this boundary:
+
+- real Sv39 U-mode execution exists;
+- trusted S→U→S transition exists;
+- a U RW/NX stack mapping already exists in the machine composition;
+- a real R-X ELF code segment and RW-/BSS data segment are proved;
+- bounded ELF load planning exists in project 54;
+- bounded supervisor/user memory transfer planning exists in project 53;
+- Batch 24A owns startup-stack layout policy in project 55;
+- Batch 24A exposes exact `initial_sp`, `used_range`, canonical bytes, argv/env/aux structure, symbolic string-backed aux values, and deterministic padding.
+
+Batch 24B must consume those truths rather than replace them.
+
+READ / QUERY BEFORE IMPLEMENTATION
+
+Follow AGENTS.md and the current Agent Fast Path.
+
+At minimum inspect the current equivalents of:
+
+- AGENTS.md
+- COMMANDS.md
+- docs/standards/SNOWBALL_YIELD.md
+- docs/roadmaps/ALPZ_TO_ALPINE_QEMU_KVM_AND_BEYOND.md
+- docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_23_FIRST_WRITABLE_RV64_USERSPACE_ELF_DATA_BSS.txt
+- docs/reports/AGENTIC_SNOWBALL_BATCH_23.md
+- docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_24A_BOUNDED_RV64_LINUX_INITIAL_STACK_PLAN.txt
+- docs/reports/AGENTIC_SNOWBALL_BATCH_24A.md
+- projects/53-bounded-user-memory-transfer-plan/details.json
+- projects/54-bounded-elf64-load-plan/details.json
+- projects/55-bounded-rv64-linux-initial-stack-plan/details.json
+- projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig
+- the current freestanding RISC-V machine composition used by Batch 23
+- the current Batch 23 RV64 ELF fixture/linker script
+- the current Batch 23 strict verifier and QEMU command path
+
+Use repository queries/indexes first. Do not assume historical filenames if current HEAD has moved them.
+
+REQUIREMENT / CAPABILITY FREEZE
+
+Before implementation, freeze and report the requirement map.
+
+At minimum classify:
+
+1. RV64 ELF load planning/e_entry truth;
+2. exact startup-stack image/layout policy;
+3. S→U entry with explicit initial SP;
+4. supervisor-to-user stack byte materialization;
+5. writable user stack mapping and permission proof;
+6. user-page sanitization before exposure/use;
+7. independently parsing U-mode fixture;
+8. trusted U→S ECALL return;
+9. strict external ELF/startup-stack verifier;
+10. mutation/self-test of decisive evidence;
+11. second independent real QEMU execution;
+12. preservation of Batch 23 and Batch 24A regressions.
+
+Expected classification:
+
+- projects 53/54/55 and current machine composition should satisfy most reusable requirements;
+- new work should primarily be composition/fixture/verifier orchestration;
+- do not create a new reusable project/module unless a genuinely general missing primitive is discovered.
+
+If a missing reusable capability is small, general, and clearly required, add it canonically and continue. If it causes real scope explosion, preserve coherent work, publish a blocker handoff, and stop rather than inventing project-specific policy hidden inside the machine recipe.
+
+STRICT MACHINE SCOPE
+
+Batch 24B should remain a bounded one-process startup proof.
+
+Use the existing proven user address-space shape where possible:
+
+- planner-derived ELF e_entry;
+- existing U R-X code leaf;
+- existing U RW/NX stack leaf;
+- existing U RW/NX writable data/BSS leaf if the new fixture preserves the Batch 23 data/BSS pressure;
+- no W+X mapping;
+- no arbitrary process address-space manager;
+- no fork/clone/execve;
+- no VFS;
+- no file descriptors;
+- no Linux syscall dispatcher.
+
+Do not add more mapped pages merely for convenience if the existing bounded stack page can hold the 24A image.
+
+BATCH 24A MUST REMAIN THE POLICY AUTHORITY
+
+The machine-side code must call the real project-55 planner.
+
+Choose bounded fixture inputs, construct one StackPlan, and then consume:
+
+- plan.initial_sp;
+- plan.used_range;
+- plan.bytes();
+- any planner metadata needed for evidence only.
+
+The machine composition must NOT independently calculate:
+
+- argc table offsets;
+- argv pointer placement;
+- envp pointer placement;
+- auxv placement;
+- AT_NULL location;
+- string offsets;
+- padding;
+- aligned initial SP.
+
+If the kernel contains a second sequence of arithmetic that reconstructs the stack format, Batch 24B has failed its architectural goal even if the guest happens to boot.
+
+CANONICAL BOUNDED FIXTURE INPUT
+
+Select one small deterministic startup fixture and freeze it in the proof/report.
+
+A strong default is conceptually:
+
+    argv:
+      [0] "alpz-24b"
+      [1] "stack-proof"
+
+    envp:
+      [0] "ALPZ_BATCH=24B"
+      [1] "MODE=qemu-proof"
+
+    auxv, ordered:
+      AT_PAGESZ = 4096
+      AT_ENTRY  = exact ELF planner e_entry
+      AT_EXECFN = symbolic reference to argv[0]
+
+with the planner appending:
+
+      AT_NULL = 0
+      value   = 0
+
+The exact strings may be adjusted before implementation if a cleaner fixture already exists, but once selected they must be explicit, deterministic, independently verified, and not changed merely to make a failing proof pass.
+
+Prefer this deliberately small truthful auxv over fabricating a realistic-looking Linux vector.
+
+Do NOT add AT_PHDR unless the relevant program-header table is truthfully mapped into the process image.
+Do NOT add AT_RANDOM unless a real 16-byte random payload is present at the referenced address.
+Do NOT fabricate HWCAP/HWCAP2, VDSO, platform strings, interpreter base, rseq, clock-tick, or identity values solely for appearance.
+
+MATERIALIZE THE EXACT IMAGE
+
+Before U-mode entry:
+
+1. identify the exact physical backing of the existing user-stack leaf;
+2. sanitize the entire user-visible stack page/frame before installing startup data, unless current composition already proves an equivalent stronger sanitization step;
+3. construct the project-55 StackPlan;
+4. use the existing bounded transfer/copy machinery where truthful and practical to place `plan.bytes()` at exactly `plan.initial_sp`;
+5. directly compare the copied user backing bytes against the planner bytes before entry;
+6. prove all bytes in the planner-declared image match exactly, not by hash only;
+7. preserve U RW/NX permissions for the stack leaf;
+8. preserve SUM policy/invariants established by earlier user-copy batches;
+9. perform only the translation/cache invalidation operations actually required by the current implementation.
+
+Do not claim whole-page sanitization unless it is actually performed and checked.
+
+If the stack mapping is already active and its PTE does not change, do not emit a fake mapping-change claim merely because the bytes changed.
+
+INITIAL SP ENTRY BOUNDARY
+
+The U-mode entry path must receive an explicit initial stack pointer.
+
+If the current `enterUser` boundary does not accept SP, evolve it minimally so the new proof can set:
+
+    user sp = plan.initial_sp.raw()
+
+immediately before SRET.
+
+Preserve old callers through a wrapper or a mechanically reviewed migration if that keeps existing proofs clear.
+
+Require before SRET:
+
+- entry PC == bounded-ELF planner e_entry;
+- SP == project-55 planner initial_sp;
+- SP % 16 == 0;
+- SP lies inside the proved U RW/NX stack mapping;
+- complete plan.used_range lies inside that mapping.
+
+Do not hardcode a second SP constant into the guest to prove the kernel set it.
+
+NEW REAL RV64 ELF FIXTURE
+
+Create a separately built RV64 ELF fixture for Batch 24B or cleanly extend a dedicated copy of the Batch 23 fixture.
+
+Prefer preserving the Batch 23 two-segment executable+writable/BSS shape so the new machine proof demonstrates startup-stack progress without regressing real writable ELF behavior.
+
+The fixture must:
+
+- be a real separately linked RV64 ELF artifact;
+- enter at its ELF-defined `_start`;
+- observe the actual architectural SP supplied by the kernel;
+- avoid relying on a C runtime/libc/startup object;
+- independently parse the raw initial stack shape;
+- validate the exact bounded fixture semantics;
+- terminate with one unique ECALL marker only after every check succeeds;
+- enter a deterministic failure path if any startup relationship is wrong.
+
+Be careful when capturing initial SP: no compiler-generated prologue may change SP before the fixture records the entry value. A naked assembly entry shim that captures the original SP and then transfers to normal verification code is acceptable if implemented cleanly.
+
+U-MODE MUST INDEPENDENTLY VALIDATE
+
+The U-mode fixture must validate from raw memory, not from kernel-emitted metadata:
+
+1. initial SP is 16-byte aligned;
+2. argc is the exact expected count;
+3. argv pointers appear in order;
+4. argv NULL sentinel exists exactly where expected;
+5. envp pointers appear in order;
+6. envp NULL sentinel exists;
+7. auxv entries appear in the expected order for this bounded fixture;
+8. AT_NULL,0 terminates auxv;
+9. every argv/env pointer lies within the mapped startup-stack image/range;
+10. every pointer reaches the exact expected NUL-terminated bytes;
+11. AT_EXECFN equals the exact argv[0] pointer if used;
+12. AT_PAGESZ equals 4096 if used;
+13. AT_ENTRY equals the actual fixture ELF entry relationship, preferably derived from the fixture symbol/linked image rather than a second kernel constant;
+14. no expected relationship depends on a kernel-provided success flag.
+
+Where practical, preserve the Batch 23 initialized-data/BSS check and BSS mutation too. If retained, require the supervisor to observe the real mutation in the actual writable backing frame exactly as Batch 23 did.
+
+The guest may set deterministic register markers after successful independent checks so the supervisor/verifier can prove which path executed. Those markers are evidence of successful guest validation, not substitutes for external proof of the stack bytes.
+
+SUPERVISOR RETURN EVIDENCE
+
+On the unique terminal ECALL require the supervisor to prove at minimum:
+
+- trap cause = U-mode ECALL;
+- SPP indicates return from U-mode;
+- trap PC is the independently expected ECALL location in the fixture artifact;
+- terminal success marker(s) are exact;
+- initial SP recorded for entry equals planner.initial_sp;
+- stack PTE remains U RW/NX;
+- code PTE remains U R-X;
+- writable data PTE remains U RW/NX if the Batch 23 data/BSS shape is retained;
+- no W+X relationship is introduced;
+- code bytes remain unchanged;
+- startup image bytes remain exactly the planner bytes unless the fixture intentionally mutates a specifically documented stack byte (prefer read-only observation for this batch);
+- Batch 23 BSS mutation remains observable if retained.
+
+Do not emit aggregate user-leaf/W+X counts as stronger evidence than their implementation supports. If current code now has an independent enumerator, use it. Otherwise keep the bounded individual-leaf proof explicit and preserve known hardening caveats.
+
+STRICT EXTERNAL VERIFIER
+
+Add a strict Batch 24B verifier, following the existing Batch 22B/23 pattern rather than writing a loose log grep.
+
+It should independently establish as much as practical from artifacts and machine evidence.
+
+At minimum it must:
+
+A. independently parse the RV64 ELF artifact:
+   - ELF64 little-endian;
+   - ET_EXEC unless scope intentionally and explicitly changes;
+   - EM_RISCV;
+   - expected PT_LOAD structure;
+   - exact e_entry;
+   - expected permissions;
+   - unique terminal ECALL relationship;
+
+B. independently reconstruct the expected bounded startup-stack image in Python from the frozen fixture inputs, WITHOUT calling the Zig project-55 implementation;
+
+C. compare the externally reconstructed expected image against exact machine-emitted/captured planner/materialized bytes, not merely a digest;
+
+D. require:
+   - initial_sp equality;
+   - 16-byte alignment;
+   - exact argc/argv/envp/auxv/sentinel layout;
+   - exact pointer-to-string relationships;
+   - exact AT_ENTRY relationship to parsed ELF e_entry;
+   - exact AT_EXECFN relationship if present;
+   - exact stack used range containment;
+   - exact stack PTE U/R/W/X expectations;
+   - trusted ECALL return evidence and markers;
+   - preserved resource/SATP/page-table relationships that are actually meaningful for the bounded composition;
+
+E. compose or independently run the existing Batch 23 proof so Batch 24B cannot silently weaken the previous milestone;
+
+F. include self-test mutation cases that alter decisive relationships and prove the verifier rejects them.
+
+Useful mutation cases include:
+
+- argc changed;
+- one argv pointer shifted by one byte;
+- argv NULL made nonzero;
+- one env pointer redirected;
+- AT_PAGESZ changed;
+- AT_ENTRY changed;
+- AT_EXECFN changed away from argv[0];
+- AT_NULL removed/altered;
+- one string byte changed;
+- initial_sp misaligned or shifted;
+- stack PTE made executable;
+- trap cause/SPP/ECALL PC marker changed;
+- success marker changed.
+
+Do not call a hash match an exact byte proof.
+
+TWO REAL QEMU EXECUTIONS
+
+The full Batch 24B verifier must execute the decisive machine fixture at least twice in independent `qemu-system-riscv64` processes, following the established Batch 22B/23 repeated-machine pattern.
+
+Require the two runs to agree on all deterministic evidence that should be equal.
+
+If Morphic hosted/fake/machine equality is part of the current recipe contract, preserve and verify it. Do not invent a new equality claim if the current composition does not expose one.
+
+PRESERVE EXISTING PROOFS
+
+Before declaring PASS, preserve at minimum:
+
+- project-55 Batch 24A unit tests;
+- project-55 smoke test;
+- bounded ELF load-plan focused regression;
+- bounded user-memory-transfer-plan focused regression;
+- existing strict Batch 23 verifier/self-test/full real-QEMU proof;
+- repository command/index/contract integrity;
+- full repository validation.
+
+Do not rewrite Batch 23 just to make Batch 24B easier.
+
+EXPECTED IMPLEMENTATION LOCATIONS
+
+Use current repository structure as truth. Likely changes belong primarily in the existing hosted/freestanding Morphic runtime recipe/composition, fixture/build plumbing, strict verifier tooling, and a Batch 24B report.
+
+Conceptually expect equivalents of:
+
+- existing freestanding RV64 machine composition source;
+- a Batch 24B userspace ELF fixture source;
+- a linker script or fixture build target if needed;
+- a strict Batch 24B Python verifier;
+- build/command integration;
+- docs/reports/AGENTIC_SNOWBALL_BATCH_24B.md;
+- generated evidence/index updates only through canonical tools.
+
+Do not create project 56 merely because the batch number advanced. Batch 24B is primarily machine composition unless a genuinely reusable missing capability is discovered.
+
+FOCUSED VALIDATION TARGETS
+
+Discover exact current commands through COMMANDS.md/build.zig rather than assuming historical spellings.
+
+The completed batch should have explicit runnable focused commands for:
+
+- Batch 24A planner unit/smoke regression;
+- Batch 23 strict regression;
+- Batch 24B verifier self-test;
+- Batch 24B full two-QEMU proof;
+- any dedicated fixture build/inspection step;
+- `zig build check`;
+- command-reference drift check;
+- complete repository validation.
+
+Run the full repository gate after focused success.
+
+REPORT
+
+Create:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_24B.md
+
+It must state:
+
+- exact starting revision;
+- exact implementation revision;
+- frozen requirement/capability map;
+- exact fixture ELF shape;
+- exact argv/envp/auxv fixture;
+- exact initial_sp and used range observed;
+- exact U-mode checks performed;
+- exact trap/result evidence;
+- exact stack/code/data PTE relationships;
+- exact sanitization statement and its limits;
+- strict verifier design;
+- two-QEMU result;
+- all validation commands/results;
+- Snowball Yield;
+- explicit nonclaims;
+- next pressure.
+
+EXPLICIT NONCLAIMS
+
+Even on PASS, Batch 24B does NOT claim:
+
+- complete Linux `create_elf_tables` behavior;
+- arbitrary argv/env sizes;
+- ASLR;
+- AT_RANDOM;
+- HWCAP/HWCAP2;
+- VDSO;
+- PT_INTERP;
+- PIE/ET_DYN;
+- dynamic linking;
+- musl/libc startup generally;
+- Linux syscall compatibility;
+- errno semantics;
+- file descriptors;
+- VFS/path lookup;
+- mmap/brk;
+- execve;
+- process creation;
+- fork/clone;
+- signals;
+- futex/threads;
+- BusyBox;
+- Alpine;
+- QEMU hosted inside Alpz;
+- KVM;
+- RISC-V H-extension virtualization;
+- a general secure multi-process loader.
+
+The exact claim is the bounded startup-stack machine boundary only.
+
+BATCH 23 HARDENING DEBT
+
+Do not broaden this run into a general Batch 23 hardening campaign.
+
+However, because Batch 24B actively exposes/uses the user stack page, its own proof should sanitize that user-visible stack backing before installing the startup image and should state exactly what was sanitized.
+
+Known older proof-hardening opportunities such as independent aggregate leaf enumeration and stronger external PTE→PPN reconstruction remain separate unless naturally required by the new strict proof.
+
+SOURCE CONTROL / PR COMPLETION CONTRACT
+
+A successful technical implementation is NOT complete until source-control handoff is complete.
+
+On PASS:
+
+1. leave a reviewable worktree;
+2. commit all intended Batch 24B changes on a dedicated branch;
+3. push that branch;
+4. create or update a pull request targeting `main`;
+5. ensure PR title/body claim only mechanically established facts;
+6. report exact branch, final commit SHA, PR number, and PR URL.
+
+If GitHub authentication/tooling prevents PR creation:
+
+- do not silently stop;
+- state the exact blocker;
+- give the exact pushed branch and SHA if push succeeded;
+- provide the exact human handoff command/action needed.
+
+If a technical blocker prevents PASS:
+
+- preserve coherent useful work;
+- commit/push a coherent partial branch when appropriate;
+- use a draft/blocker PR when appropriate;
+- still emit the full final handoff.
+
+NEVER finish a long run with no final status and no source-control handoff.
+
+MANDATORY FINAL OUTPUT
+
+Before stopping, output all of:
+
+STATUS: PASS / PARTIAL / BLOCKED
+
+IMPLEMENTATION
+- what changed
+
+PROOFS
+- what is mechanically established
+
+VALIDATION
+- focused commands and outcomes
+- full repository validation outcome
+- two-QEMU outcome
+
+FAILURES / REPAIRS
+- every material failure encountered and how it was resolved
+
+NONCLAIMS
+- what remains explicitly unproved
+
+SNOWBALL YIELD
+- requirement counts/classification
+- reused modules/compositions
+- new reusable capability if any
+- project-specific orchestration
+- validations
+
+LOCATIONS
+- important changed files
+
+MINIMUS
+- smallest facts another zero-context agent needs to continue
+
+SOURCE CONTROL
+- starting revision
+- final commit SHA
+- branch
+- push status
+- PR number and URL, or exact reason unavailable
+
+REMAINING WORK
+- anything incomplete
+
+NEXT PRESSURE
+- exactly one actionable next pressure
+
+SUCCESS CRITERION
+
+Batch 24B is complete only when a reviewer can truthfully say:
+
+A real separately built RV64 ELF is loaded by the already-proved ELF machinery; the exact project-55 Linux-style startup-stack image is copied into real allocator-backed U RW/NX stack memory; the U-mode entry receives exactly the planner-derived 16-byte-aligned SP; the guest independently parses and validates argc/argv/envp/auxv and exact pointed-to strings; it returns through the trusted U-mode ECALL boundary; a strict external verifier independently reconstructs and checks the decisive ELF/stack relationships; and the result repeats in two independent QEMU processes without weakening Batch 23 or beginning Linux syscall work.
+
+NEXT PRESSURE AFTER PASS
+
+Batch 25:
+
+Linux RV64 syscall entry ABI.
+
+The smallest next fact should be a real U-mode ECALL dispatcher that consumes the RV64 Linux syscall register convention, returns Linux-style results/errors, proves unknown syscall → ENOSYS, and supports only the first deliberately bounded syscall set (likely exit/exit_group/write, with read only if naturally justified by the selected fixture).
