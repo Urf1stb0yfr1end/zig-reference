@@ -10,8 +10,10 @@ const sv39_builders = @import("riscv-sv39-page-table-builder");
 const sfence_vma = @import("riscv-sfence-vma-invalidation");
 const user_transfer = @import("bounded-user-memory-transfer-plan");
 const elf_load = @import("bounded-elf64-load-plan");
+const initial_stack = @import("bounded-rv64-linux-initial-stack-plan");
 const userspace_elf = @embedFile("userspace-elf-rv64");
 const userspace_elf_data_bss = @embedFile("userspace-elf-rv64-data-bss");
+const userspace_elf_initial_stack = @embedFile("userspace-elf-rv64-initial-stack");
 
 const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
@@ -139,6 +141,7 @@ var userspace_elf_memory_end: usize linksection(".bss") = 0;
 var userspace_elf_expected_a0: usize linksection(".bss") = 0;
 var userspace_elf_expected_t0: usize linksection(".bss") = 0;
 var userspace_elf_expected_t1: usize linksection(".bss") = 0;
+var userspace_elf_expected_sp: usize linksection(".bss") = user_stack_va + frames.PageSize;
 
 export var service_trap_count: usize linksection(".bss") = 0;
 var service_frames: [2]usize linksection(".bss") = .{ 0, 0 };
@@ -697,7 +700,7 @@ export fn recordUserTrap(frame: *TrapFrame) callconv(.c) void {
     if (userspace_elf_active) {
         if (frame.scause != 8 or (frame.sstatus & 0x100) != 0 or
             frame.sepc < userspace_elf_entry or frame.sepc >= userspace_elf_memory_end or
-            frame.x[2] != user_stack_va + frames.PageSize or frame.x[10] != userspace_elf_expected_a0 or
+            frame.x[2] != userspace_elf_expected_sp or frame.x[10] != userspace_elf_expected_a0 or
             frame.x[5] != userspace_elf_expected_t0 or frame.x[6] != userspace_elf_expected_t1) shutdown();
         userspace_elf_active = false;
         return;
@@ -1189,6 +1192,7 @@ noinline fn executeUserspaceElf(allocator: anytype, page_owner: anytype, builder
     asm volatile ("fence.i" ::: "memory");
     userspace_elf_entry = load.entry.raw();
     userspace_elf_memory_end = segment.memory.end;
+    userspace_elf_expected_sp = user_stack_va + frames.PageSize;
     userspace_elf_expected_a0 = 0x22b0;
     userspace_elf_expected_t0 = 0x22b1;
     userspace_elf_expected_t1 = 0x22b2;
@@ -1357,6 +1361,7 @@ noinline fn executeUserspaceElfDataBss(allocator: anytype, page_owner: anytype, 
     asm volatile ("fence.i" ::: "memory");
     userspace_elf_entry = load.entry.raw();
     userspace_elf_memory_end = segment.memory.end;
+    userspace_elf_expected_sp = user_stack_va + frames.PageSize;
     userspace_elf_expected_a0 = 0x2300;
     userspace_elf_expected_t0 = batch23_initialized;
     userspace_elf_expected_t1 = batch23_mutation;
@@ -1482,6 +1487,114 @@ noinline fn executeUserspaceElfDataBss(allocator: anytype, page_owner: anytype, 
     write("\ndata_pte=");
     writeUsizeHex(elf_data_leaf.raw_entry);
     write("\ntranslation_change=one-user-rw-leaf\nsfence_vma=global-executed\nfence_i=local-hart-executed\nsupervisor_resume=PASS\ncomplete=PASS\nZIGREF_USERSPACE_ELF_DATA_BSS_END\nZIGREF_USERSPACE_ELF_DATA_BSS_RETURNED\n");
+}
+
+noinline fn executeUserspaceElfInitialStack(allocator: anytype, page_owner: anytype, builder: anytype, user_code_pa: usize, user_stack_pa: usize, trap_end: usize, historical_stvec: usize, root_physical: usize) void {
+    write("ZIGREF_USERSPACE_INITIAL_STACK_PHASE plan-materialize-execute\n");
+    const load = elf_load.plan(2, userspace_elf_initial_stack) catch shutdown();
+    if (load.items().len != 2) shutdown();
+    const code = load.items()[0];
+    const data = load.items()[1];
+    if (code.memory.start != user_code_va or data.memory.start != user_data_va or load.entry.raw() < code.memory.start or load.entry.raw() >= code.memory.end) shutdown();
+    const code_dst: [*]volatile u8 = @ptrFromInt(user_code_pa);
+    for (0..frames.PageSize) |i| code_dst[i] = 0;
+    const code_src = userspace_elf_initial_stack[code.source.start..code.source.end];
+    for (code_src, 0..) |b, i| code_dst[i] = b;
+    for (code_src, 0..) |b, i| if (code_dst[i] != b) shutdown();
+    const data_leaf_before = builder.query(user_data_va) catch shutdown();
+    const data_pa = data_leaf_before.physical_address;
+    const data_dst: [*]volatile u8 = @ptrFromInt(data_pa);
+    for (0..frames.PageSize) |i| data_dst[i] = 0;
+    const data_src = userspace_elf_initial_stack[data.source.start..data.source.end];
+    for (data_src, 0..) |b, i| data_dst[i] = b;
+    for (data_src, 0..) |b, i| if (data_dst[i] != b) shutdown();
+    for (data.file_byte_count..data.memory_byte_count) |i| if (data_dst[i] != 0) shutdown();
+    const argv = [_][]const u8{ "alpz-24b", "stack-proof" };
+    const envp = [_][]const u8{ "ALPZ_BATCH=24B", "MODE=qemu-proof" };
+    const auxv = [_]initial_stack.AuxEntry{
+        .{ .type = 6, .value = .{ .immediate = 4096 } },
+        .{ .type = 9, .value = .{ .immediate = load.entry.raw() } },
+        .{ .type = 31, .value = .{ .argv_string = 0 } },
+    };
+    const stack_range = initial_stack.GuestStackRange.init(user_stack_va, user_stack_va + frames.PageSize) catch shutdown();
+    const plan = initial_stack.plan(256, 2, 2, 3, stack_range, &argv, &envp, &auxv) catch shutdown();
+    if (plan.initial_sp.raw() % 16 != 0 or plan.used_range.start < user_stack_va or plan.used_range.end != user_stack_va + frames.PageSize) shutdown();
+    const stack_dst: [*]volatile u8 = @ptrFromInt(user_stack_pa);
+    for (0..frames.PageSize) |i| stack_dst[i] = 0;
+    const stack_offset = plan.initial_sp.raw() - user_stack_va;
+    for (plan.bytes(), 0..) |b, i| stack_dst[stack_offset + i] = b;
+    for (plan.bytes(), 0..) |b, i| if (stack_dst[stack_offset + i] != b) shutdown();
+    asm volatile ("fence.i" ::: "memory");
+    userspace_elf_entry = load.entry.raw();
+    userspace_elf_memory_end = code.memory.end;
+    userspace_elf_expected_sp = plan.initial_sp.raw();
+    userspace_elf_expected_a0 = 0x24b0;
+    userspace_elf_expected_t0 = 0x24b024b024b024b0;
+    userspace_elf_expected_t1 = batch23_mutation;
+    userspace_elf_active = true;
+    user_returned = false;
+    asm volatile ("mv a0, %[entry]; mv a1, %[stack]; mv a2, %[trap_stack]; call enterUser; la t0, user_supervisor_sp; ld sp, 0(t0); addi sp, sp, 112"
+        :
+        : [entry] "r" (load.entry.raw()),
+          [stack] "r" (plan.initial_sp.raw()),
+          [trap_stack] "r" (trap_end),
+        : "memory", "ra", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "t0", "t1", "t2", "t3", "t4", "t5", "t6"
+    );
+    asm volatile ("csrw stvec, %[entry]; csrw sscratch, zero"
+        :
+        : [entry] "r" (historical_stvec),
+        : "memory"
+    );
+    const code_leaf = builder.query(user_code_va) catch shutdown();
+    const stack_leaf = builder.query(user_stack_va) catch shutdown();
+    const data_leaf = builder.query(user_data_va) catch shutdown();
+    for (plan.bytes(), 0..) |b, i| if (stack_dst[stack_offset + i] != b) shutdown();
+    if (userspace_elf_active or !user_returned or user_scause != 8 or user_sp != plan.initial_sp.raw() or
+        code_leaf.raw_entry & 0x16 != 0x12 or stack_leaf.raw_entry & 0x1e != 0x16 or data_leaf.raw_entry & 0x1e != 0x16 or
+        @as(*volatile usize, @ptrFromInt(data_pa + data.file_byte_count)).* != batch23_mutation) shutdown();
+    write("ZIGREF_USERSPACE_INITIAL_STACK_BEGIN\nartifact=userspace-elf-rv64-initial-stack\nentry=");
+    writeUsizeHex(load.entry.raw());
+    write("\necall_pc=");
+    writeUsizeHex(user_sepc);
+    write("\ninitial_sp=");
+    writeUsizeHex(plan.initial_sp.raw());
+    write("\nused_start=");
+    writeUsizeHex(plan.used_range.start);
+    write("\nused_end=");
+    writeUsizeHex(plan.used_range.end);
+    write("\nstack_bytes=");
+    writeHex(plan.bytes());
+    write("\nstack_sanitized_bytes=0000000000001000\nstack_exact=PASS\nargc=0000000000000002\nargv_count=0000000000000002\nenvp_count=0000000000000002\nauxv_count=0000000000000003\ntrap_cause=");
+    writeUsizeHex(user_scause);
+    write("\ntrap_sstatus=");
+    writeUsizeHex(user_sstatus);
+    write("\ntrap_frame=");
+    writeUsizeHex(user_trap_frame_address);
+    write("\nmarker_a0=");
+    writeUsizeHex(user_a0);
+    write("\nmarker_t0=");
+    writeUsizeHex(user_t0);
+    write("\nmarker_t1=");
+    writeUsizeHex(user_t1);
+    write("\nuser_code_pa=");
+    writeUsizeHex(user_code_pa);
+    write("\nuser_stack_pa=");
+    writeUsizeHex(user_stack_pa);
+    write("\nuser_data_pa=");
+    writeUsizeHex(data_pa);
+    write("\nroot_physical=");
+    writeUsizeHex(root_physical);
+    write("\npage_table_count=");
+    writeUsizeHex(page_owner.page_count);
+    write("\nphysical_allocated=");
+    writeUsizeHex(allocator.allocatedCount());
+    write("\ncode_pte=");
+    writeUsizeHex(code_leaf.raw_entry);
+    write("\nstack_pte=");
+    writeUsizeHex(stack_leaf.raw_entry);
+    write("\ndata_pte=");
+    writeUsizeHex(data_leaf.raw_entry);
+    write("\nuser_leaf_count=0000000000000003\nwx_leaf_count=0000000000000000\nstack_policy=project-55\ntranslation_change=none\nsfence_vma=not-required-no-pte-change\nfence_i=local-hart-executed\nsupervisor_resume=PASS\ncomplete=PASS\nZIGREF_USERSPACE_INITIAL_STACK_END\nZIGREF_USERSPACE_INITIAL_STACK_RETURNED\n");
 }
 
 export fn freestandingMain() callconv(.c) noreturn {
@@ -2725,6 +2838,7 @@ export fn freestandingMain() callconv(.c) noreturn {
     write("\ntranslation_change=none\nsfence_vma=not-required-no-pte-change\nfence_i=local-hart-executed\nsum=observed-zero\ncomplete=PASS\nZIGREF_USER_COPY_OUT_END\nZIGREF_USER_COPY_OUT_RETURNED\n");
     executeUserspaceElf(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
     executeUserspaceElfDataBss(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
+    executeUserspaceElfInitialStack(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
 
     var output: [128]u8 = undefined;
     var trace: [2048]u8 = undefined;

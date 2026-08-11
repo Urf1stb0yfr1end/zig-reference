@@ -395,3 +395,11 @@ PR #45 merge-gate repair directly compared every planner-selected ELF source byt
 - `python3 tools/verify-freestanding-riscv64-userspace-elf-data-bss.py` is the strict Batch 23 lab. It independently inspects the exact two-segment guest artifact, composes the unchanged Batch 22B parser, runs two independent real system-QEMU machines, and requires exact writable-data/BSS/mutation agreement plus unchanged Morphic equality.
 
 Batch 23 executed the historical Batch 22B self-test and two-QEMU verifier independently, then executed its own self-test and strict two-QEMU verifier under Zig 0.14.0 and QEMU 8.2.2. Each Batch 23 machine proved 8 initialized bytes, an 8-byte BSS tail zeroed before U-mode, mutation `0x23b55a5aa55ac33c` in the allocator-owned backing frame, three U leaves, zero W+X leaves, and the unchanged 765-byte Morphic artifact.
+
+### Batch 24B real RV64 Linux initial-stack proof
+
+- `zig build install-userspace-rv64-initial-stack-elf --prefix PATH` separately builds and installs the static two-`PT_LOAD` RV64 ET_EXEC startup-stack fixture at `PATH/bin/userspace-elf-rv64-initial-stack`.
+- `python3 tools/verify-freestanding-riscv64-initial-stack.py --self-test` runs one real QEMU machine and mutation-rejects exact startup image, planner-derived SP, stack permission, trap, and marker relationships while composing the Batch 23 proof.
+- `python3 tools/verify-freestanding-riscv64-initial-stack.py` runs two independent real system-QEMU machines, independently reconstructs and byte-compares the frozen Linux-style stack, verifies ELF/entry/ECALL/U-mode/PTE evidence, preserves Batch 23 and Morphic equality, and emits the canonical Batch 24B handoff.
+
+Batch 24B executed the project-53/54/55 focused regressions, Batch 23 strict self-test and two-QEMU proof, its mutation self-test and strict two-QEMU proof under Zig 0.14.0 and QEMU 8.2.2. Both machines used planner-derived `SP=0x80402f50`, independently parsed the exact 176-byte image, returned through the unique ECALL, retained three U leaves and zero W+X leaves, and preserved the 765-byte Morphic artifact.
