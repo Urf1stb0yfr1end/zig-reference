@@ -165,6 +165,7 @@ The following section is derived from `generated/modules.json` and canonical mod
 | `bounded-deterministic-scheduler` | `zig build test-bounded-deterministic-scheduler` | `zig build smoke-bounded-deterministic-scheduler` | `projects/52-bounded-deterministic-scheduler/details.json` |
 | `bounded-user-memory-transfer-plan` | `zig build test-bounded-user-memory-transfer-plan` | `zig build smoke-bounded-user-memory-transfer-plan` | `projects/53-bounded-user-memory-transfer-plan/details.json` |
 | `bounded-elf64-load-plan` | `zig build test-bounded-elf64-load-plan` | `zig build smoke-bounded-elf64-load-plan` | `projects/54-bounded-elf64-load-plan/details.json` |
+| `bounded-rv64-linux-initial-stack-plan` | `zig build test-bounded-rv64-linux-initial-stack-plan` | `zig build smoke-bounded-rv64-linux-initial-stack-plan` | `projects/55-bounded-rv64-linux-initial-stack-plan/details.json` |
 <!-- END GENERATED MODULE COMMANDS -->
 
 ## Recipes and conformance
@@ -209,8 +210,7 @@ Each module has `zig build test-<module>` and `zig build smoke-<module>` targets
 
 ## Agent-readable pilot commands
 
-<!-- CURRENT AGENT CORPUS -->
-Agent Fast Path v2 currently projects 55 contracted modules as 55 full cards with 0 partial cards.
+<!-- CURRENT AGENT CORPUS --> Agent Fast Path v2 currently projects 56 contracted modules as 56 full cards with 0 partial cards.
 The Batch 07 repair revalidated bootstrap/doctor discovery, deterministic preflight, command-reference drift, ports, Developer Minimus, hosted Morphic verification, and the complete repository pipeline under Zig 0.14.0; exact results are recorded in `docs/reports/AGENTIC_SNOWBALL_BATCH_07_REPAIR.md`.
 The root-document policy is checked by `node tools/check-port-contracts.js`; it accepts
 only the explicit flagship/root allowlist and rejects any other root Markdown file.

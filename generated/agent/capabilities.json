@@ -57,6 +57,9 @@
     "bounded-priority-ordering": [
       "fixed-capacity-priority-queue"
     ],
+    "bounded-rv64-linux-initial-stack-planning": [
+      "bounded-rv64-linux-initial-stack-plan"
+    ],
     "bounded-sequence": [
       "fixed-capacity-vector"
     ],
@@ -109,6 +112,9 @@
     "deterministic-initialization-planning": [
       "bounded-system-resource-plan"
     ],
+    "deterministic-linux-startup-image": [
+      "bounded-rv64-linux-initial-stack-plan"
+    ],
     "deterministic-slot-reuse": [
       "fixed-free-list"
     ],
@@ -138,6 +144,9 @@
     ],
     "failure-atomic-load-planning": [
       "bounded-elf64-load-plan"
+    ],
+    "failure-atomic-stack-planning": [
+      "bounded-rv64-linux-initial-stack-plan"
     ],
     "fixed-bit-set": [
       "bit-set"

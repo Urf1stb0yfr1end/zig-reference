@@ -494,6 +494,15 @@
       "details": "projects/54-bounded-elf64-load-plan/details.json",
       "unit_test_step": "test-bounded-elf64-load-plan",
       "smoke_test_step": "smoke-bounded-elf64-load-plan"
+    },
+    {
+      "id": "55",
+      "canonical_name": "bounded-rv64-linux-initial-stack-plan",
+      "directory": "projects/55-bounded-rv64-linux-initial-stack-plan",
+      "public_entrypoint": "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig",
+      "details": "projects/55-bounded-rv64-linux-initial-stack-plan/details.json",
+      "unit_test_step": "test-bounded-rv64-linux-initial-stack-plan",
+      "smoke_test_step": "smoke-bounded-rv64-linux-initial-stack-plan"
     }
   ]
 }

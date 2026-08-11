@@ -16,6 +16,12 @@
     "AsciiByte": [
       "validated-ascii-byte"
     ],
+    "AuxEntry": [
+      "bounded-rv64-linux-initial-stack-plan"
+    ],
+    "AuxValue": [
+      "bounded-rv64-linux-initial-stack-plan"
+    ],
     "BinaryCursorCheckpoint": [
       "binary-cursor-checkpoint"
     ],
@@ -81,6 +87,7 @@
     ],
     "Error": [
       "bounded-elf64-load-plan",
+      "bounded-rv64-linux-initial-stack-plan",
       "bounded-user-memory-transfer-plan",
       "riscv-page-table-page-owner",
       "riscv-sv39-page-table-builder",
@@ -111,7 +118,11 @@
     "GuestPhysicalAddress": [
       "distinct-memory-address-types"
     ],
+    "GuestStackRange": [
+      "bounded-rv64-linux-initial-stack-plan"
+    ],
     "GuestVirtualAddress": [
+      "bounded-rv64-linux-initial-stack-plan",
       "bounded-user-memory-transfer-plan",
       "distinct-memory-address-types"
     ],
@@ -241,6 +252,9 @@
     "Stack": [
       "stack"
     ],
+    "StackPlan": [
+      "bounded-rv64-linux-initial-stack-plan"
+    ],
     "StateMachine": [
       "state-machine"
     ],
@@ -270,6 +284,9 @@
     ],
     "alignUp": [
       "aligned-address-and-size-helpers"
+    ],
+    "at_null": [
+      "bounded-rv64-linux-initial-stack-plan"
     ],
     "capture": [
       "binary-cursor-checkpoint"
@@ -338,7 +355,8 @@
       "elf64-program-header-parser"
     ],
     "plan": [
-      "bounded-elf64-load-plan"
+      "bounded-elf64-load-plan",
+      "bounded-rv64-linux-initial-stack-plan"
     ],
     "requireAligned": [
       "riscv-sv39-virtual-address-indexing"
@@ -349,11 +367,17 @@
     "riscv_machine": [
       "bounded-elf64-load-plan"
     ],
+    "stack_alignment": [
+      "bounded-rv64-linux-initial-stack-plan"
+    ],
     "validateRange": [
       "riscv-sv39-virtual-address-indexing"
     ],
     "walk": [
       "riscv-sv39-page-table-walker"
+    ],
+    "word_size": [
+      "bounded-rv64-linux-initial-stack-plan"
     ]
   }
 }

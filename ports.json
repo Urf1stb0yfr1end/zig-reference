@@ -708,6 +708,22 @@
       "baselineValidated": false,
       "testedTargetVersions": [],
       "knownMigrationBlockers": []
+    },
+    {
+      "id": "55",
+      "canonicalName": "bounded-rv64-linux-initial-stack-plan",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/55-bounded-rv64-linux-initial-stack-plan/port.js",
+      "implementationPath": "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig",
+      "dependenciesMustPortFirst": [
+        "aligned-address-and-size-helpers",
+        "checked-half-open-range",
+        "distinct-memory-address-types",
+        "endian-integer-codec"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
     }
   ]
 }

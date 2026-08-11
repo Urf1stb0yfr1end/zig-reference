@@ -60,6 +60,15 @@
       "dependencies": [],
       "status": "full"
     },
+    "bounded-rv64-linux-initial-stack-plan": {
+      "dependencies": [
+        "aligned-address-and-size-helpers",
+        "checked-half-open-range",
+        "distinct-memory-address-types",
+        "endian-integer-codec"
+      ],
+      "status": "full"
+    },
     "bounded-system-resource-plan": {
       "dependencies": [
         "aligned-address-and-size-helpers",

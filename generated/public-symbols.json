@@ -21,6 +21,14 @@
       "symbol": "AsciiByte"
     },
     {
+      "module": "bounded-rv64-linux-initial-stack-plan",
+      "symbol": "AuxEntry"
+    },
+    {
+      "module": "bounded-rv64-linux-initial-stack-plan",
+      "symbol": "AuxValue"
+    },
+    {
       "module": "binary-cursor-checkpoint",
       "symbol": "BinaryCursorCheckpoint"
     },
@@ -109,6 +117,10 @@
       "symbol": "Error"
     },
     {
+      "module": "bounded-rv64-linux-initial-stack-plan",
+      "symbol": "Error"
+    },
+    {
       "module": "bounded-user-memory-transfer-plan",
       "symbol": "Error"
     },
@@ -159,6 +171,14 @@
     {
       "module": "distinct-memory-address-types",
       "symbol": "GuestPhysicalAddress"
+    },
+    {
+      "module": "bounded-rv64-linux-initial-stack-plan",
+      "symbol": "GuestStackRange"
+    },
+    {
+      "module": "bounded-rv64-linux-initial-stack-plan",
+      "symbol": "GuestVirtualAddress"
     },
     {
       "module": "bounded-user-memory-transfer-plan",
@@ -357,6 +377,10 @@
       "symbol": "Stack"
     },
     {
+      "module": "bounded-rv64-linux-initial-stack-plan",
+      "symbol": "StackPlan"
+    },
+    {
       "module": "state-machine",
       "symbol": "StateMachine"
     },
@@ -403,6 +427,10 @@
     {
       "module": "aligned-address-and-size-helpers",
       "symbol": "alignUp"
+    },
+    {
+      "module": "bounded-rv64-linux-initial-stack-plan",
+      "symbol": "at_null"
     },
     {
       "module": "binary-cursor-checkpoint",
@@ -497,6 +525,10 @@
       "symbol": "plan"
     },
     {
+      "module": "bounded-rv64-linux-initial-stack-plan",
+      "symbol": "plan"
+    },
+    {
       "module": "riscv-sv39-virtual-address-indexing",
       "symbol": "requireAligned"
     },
@@ -509,12 +541,20 @@
       "symbol": "riscv_machine"
     },
     {
+      "module": "bounded-rv64-linux-initial-stack-plan",
+      "symbol": "stack_alignment"
+    },
+    {
       "module": "riscv-sv39-virtual-address-indexing",
       "symbol": "validateRange"
     },
     {
       "module": "riscv-sv39-page-table-walker",
       "symbol": "walk"
+    },
+    {
+      "module": "bounded-rv64-linux-initial-stack-plan",
+      "symbol": "word_size"
     }
   ]
 }

@@ -333,6 +333,45 @@
         ],
         "zigVersion": "0.14.0"
       },
+      "module": "bounded-rv64-linux-initial-stack-plan",
+      "path": "projects/55-bounded-rv64-linux-initial-stack-plan/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "AuxEntry",
+            "AuxValue",
+            "Error",
+            "GuestStackRange",
+            "GuestVirtualAddress",
+            "StackPlan",
+            "at_null",
+            "plan",
+            "stack_alignment",
+            "word_size"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-bounded-rv64-linux-initial-stack-plan",
+            "zig build smoke-bounded-rv64-linux-initial-stack-plan"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented bounded-rv64-linux-initial-stack-plan public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
       "module": "bounded-system-resource-plan",
       "path": "projects/50-bounded-system-resource-plan/port.js",
       "risks": [

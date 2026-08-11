@@ -52,6 +52,22 @@
     },
     {
       "dependency": "aligned-address-and-size-helpers",
+      "module": "bounded-rv64-linux-initial-stack-plan"
+    },
+    {
+      "dependency": "checked-half-open-range",
+      "module": "bounded-rv64-linux-initial-stack-plan"
+    },
+    {
+      "dependency": "distinct-memory-address-types",
+      "module": "bounded-rv64-linux-initial-stack-plan"
+    },
+    {
+      "dependency": "endian-integer-codec",
+      "module": "bounded-rv64-linux-initial-stack-plan"
+    },
+    {
+      "dependency": "aligned-address-and-size-helpers",
       "module": "bounded-system-resource-plan"
     },
     {

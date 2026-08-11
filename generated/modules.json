@@ -992,6 +992,24 @@
       "status": "experimental-unverified",
       "summary": "Convert bounded ELF64 bytes into a failure-atomic RV64 load plan.",
       "target_maturity_level": 2
+    },
+    {
+      "aliases": [],
+      "declared_maturity": "experimental",
+      "deprecated_names": [],
+      "details": "projects/55-bounded-rv64-linux-initial-stack-plan/details.json",
+      "directory": "projects/55-bounded-rv64-linux-initial-stack-plan",
+      "display_name": "Bounded Rv64 Linux Initial Stack Plan",
+      "id": "55",
+      "implementation_version": "1.0.0",
+      "lifecycle": "experimental",
+      "name": "bounded-rv64-linux-initial-stack-plan",
+      "public_contract_version": "1.0.0",
+      "replacement_module": "",
+      "source": "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig",
+      "status": "experimental",
+      "summary": "Construct an exact bounded RV64 Linux initial process stack image.",
+      "target_maturity_level": 2
     }
   ],
   "repository_index_version": "1.0.0"
