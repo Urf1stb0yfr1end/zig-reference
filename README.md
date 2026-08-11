@@ -45,6 +45,66 @@ The short architectural idea is:
 
 ---
 
+## Maximum visibility, minimum context
+
+A useful way to state one of Zig's attractions to this project is a simple question:
+
+> **Why can’t everything be visible?**
+
+Zig does not literally make every property of a program visible, nor is that an official Zig slogan. The point is the engineering instinct: prefer explicit mechanisms, inspectable structure, understandable control, and fewer hidden layers when the cost is reasonable. `zig-reference` takes that instinct and asks a second question for machine-scale software engineering:
+
+> **How can everything be made as visible as possible to a machine without requiring the machine to read everything?**
+
+The governing principle is:
+
+> **Maximum visibility, minimum context.**
+
+Visibility is not the same as putting the entire repository into an LLM context window. A human engineer can glance at a directory tree, names, types, call relationships, conventions, tests, and familiar abstractions and acquire useful peripheral knowledge without reading every implementation. The repository tries to build a machine-readable equivalent of that peripheral vision.
+
+The intended progression is:
+
+```text
+everything exists
+      |
+      v
+everything important is addressable
+      |
+      v
+cheap semantic descriptions expose what exists
+      |
+      v
+capability / dependency / symbol / validation indexes expose relationships
+      |
+      v
+an agent decides what is relevant
+      |
+      v
+only the relevant contract, evidence, or source is loaded
+```
+
+An agent should be able to answer progressively more expensive questions without immediately reading source:
+
+```text
+0. Does the capability exist?
+1. What does it do?
+2. What does it depend on?
+3. What guarantees and failure semantics does it provide?
+4. How is it used?
+5. Which symbols and files matter?
+6. Which exact implementation details matter?
+7. Read the source only when the task actually requires it.
+```
+
+That is why the generated indexes, module cards, dependency graphs, capability maps, diagnostics, validation records, query tools, and focused contracts are not treated as decorative documentation. They are attempts to make a growing codebase **navigable as knowledge rather than only readable as text**.
+
+A useful design test follows:
+
+> **Every important piece of repository knowledge should have a cheap representation sufficient to decide whether its expensive representation needs to be read.**
+
+The long-horizon research problem is therefore not merely whether an agent can ingest a large repository. It is whether an arbitrarily large software system can remain **perceptible through a bounded context window**, with progressive disclosure allowing humans and machines to descend from a cheap whole-system map to exact source only where necessary.
+
+---
+
 ## Why growth in one direction can strengthen the others
 
 One of the central bets in Morphic is that compatibility work can become **positive inheritance** rather than architectural contamination.
