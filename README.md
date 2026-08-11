@@ -166,7 +166,7 @@ See [`docs/project_vocab.md`](docs/project_vocab.md).
 
 ## Current machine status
 
-The current completed machine milestone is **Batch 24B**.
+The current completed machine milestone is **Batch 25A**.
 
 Under real `qemu-system-riscv64` execution, Alpz has progressed through:
 
@@ -187,12 +187,17 @@ S-mode execution
 → exact Linux-style argc/argv/envp/auxv stack planning
 → materialization of that stack into real U RW/NX memory
 → U-mode independent parsing/validation of the initial stack
+→ generic Morphic semantic write/terminate operation boundary
+→ Linux/RV64 syscall decode and negative-errno encoding at the adapter edge
+→ real returning write/error ECALLs plus terminal exit_group
 → strict external verification across two QEMU executions
 ```
 
-The next planned machine boundary is **Batch 25A: Morphic operation boundary + first real Linux/RV64 syscall adapter**. Its purpose is to gain real Linux syscall compatibility while keeping Linux register numbers, syscall numbers, errno values, and temporary descriptor conventions outside the internal Morphic semantic layer.
+Batch 25A proves a deliberately narrow Linux/RV64 syscall surface: unsupported syscall → `-ENOSYS`, `write` success plus `EBADF`/`EFAULT`, exact returning `sepc + 4`, and terminal `exit_group`, while Linux syscall numbers and errno remain outside the reusable semantic-operation module.
 
-See [`docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_25A_MORPHIC_OPERATION_BOUNDARY_LINUX_RV64_SYSCALL_ADAPTER.txt`](docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_25A_MORPHIC_OPERATION_BOUNDARY_LINUX_RV64_SYSCALL_ADAPTER.txt).
+The next pressure is **Batch 25B/26**: a bounded per-process resource/FD table with real stdin/stdout/stderr entries, then read/write/close and dup-family pressure while preserving the Batch 25A semantic boundary.
+
+See [`docs/reports/AGENTIC_SNOWBALL_BATCH_25A.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_25A.md) and the executed plan [`docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_25A_MORPHIC_OPERATION_BOUNDARY_LINUX_RV64_SYSCALL_ADAPTER.txt`](docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_25A_MORPHIC_OPERATION_BOUNDARY_LINUX_RV64_SYSCALL_ADAPTER.txt).
 
 ---
 
@@ -248,8 +253,6 @@ solve one boundary
 record its contract
       ↓
 record failure behavior
-      ↓
-record focused validation
       ↓
 make it discoverable
       ↓
