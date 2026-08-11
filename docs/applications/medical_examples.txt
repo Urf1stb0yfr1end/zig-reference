@@ -2,31 +2,64 @@ QUIRKM MEDICAL EXAMPLES
 ORGAN SUPPORT, TRANSPLANTATION, ENGINEERED ORGANS, AND CONTEXT-COMPLETE MEDICAL COMPUTING
 
 Status:
-Application hypothesis and research note.
+Application hypothesis and research direction.
 
 This document is not medical advice, not a clinical protocol, and not a claim that QuirkM is ready for medical-device use. It does not claim that Linux is unsafe for medical systems, that a language model should be given unrestricted control of a life-critical actuator, or that any architecture described here satisfies FDA, IEC, ISO, or other regulatory requirements.
 
-The narrower research question is worth asking:
+It does make a serious proposal.
 
-    If a future organ-support system, transplant-assist device, or engineered organ
-    must already cope with biological uncertainty, can its computer be designed
-    so that the computer itself contributes as little avoidable uncertainty as
-    possible?
+If more of medicine becomes technology-assisted -- through ventricular-assist devices, dialysis, transplant preservation, graft monitoring, artificial organs, biohybrid organs, or eventually engineered organs -- then the software inside and around those systems should be designed with the same seriousness as the biological and mechanical components.
 
-The QuirkM hypothesis is:
+QuirkM is being designed for exactly that kind of environment.
+
+Not because Linux is bad.
+Not because existing medical computers are careless.
+Not because new automatically means safer.
+
+The reason is simpler:
+
+    Linux must preserve an enormous historical compatibility world.
+
+    QuirkM gets to ask, at each native boundary:
+
+        if we were designing this mechanism for comprehension,
+        provenance, explicit authority, bounded failure, and modern
+        machine reasoning from the beginning, what would we choose?
+
+That freedom is valuable anywhere. It may be unusually valuable when the computer is participating in the support of a human organ.
+
+The QuirkM medical hypothesis is:
 
     Do not promise to eliminate the unknowns of biology.
     Eliminate as many unnecessary unknowns of the machine as possible.
 
-This remains useful even under a conservative assumption: QuirkM does not "solve Linux" and does not improve every one of the first 100 paramount Linux compatibility-debt candidates cataloged by this project. If it merely replaces a meaningful subset of historically sticky semantics with smaller, typed, explicit, testable native contracts, that alone may matter in systems where clinicians and maintainers need to answer:
+And the ambition is stronger than merely being "interesting."
 
-    What happened?
-    Which component produced the observation?
-    Which software state existed at the time?
-    Which rule authorized the action?
-    Which sensor or actuator is degraded?
-    Which hypotheses have been eliminated?
-    Which uncertainty is biological and which is electronic?
+We intend to build toward a system that could eventually deserve to be considered among the best computational substrates for technology-assisted human physiology precisely because it is designed to be unusually understandable, explicit, inspectable, bounded, and diagnosable.
+
+That claim is not assumed.
+It must be earned.
+
+The measure is not whether QuirkM is newer than Linux.
+The measure is whether QuirkM can demonstrate, mechanism by mechanism and failure by failure, that important classes of ambiguity have actually been removed or made easier to reason about.
+
+The project already catalogs the first 100 paramount Linux compatibility-debt candidates as research pressures. They are not 100 adjudicated Linux bugs. Many are successful historical interfaces that Linux cannot simply remove because enormous amounts of software depend on them.
+
+That is exactly why they are useful design pressure for QuirkM.
+
+If QuirkM can do substantially better at only a meaningful subset of those pressures, and prove it, then a medical system may gain something concrete:
+
+    fewer ambiguous identities
+    fewer hidden authority paths
+    clearer operation lifetime
+    stronger event provenance
+    more explicit failure semantics
+    a smaller diagnostic search space
+    a better chance that the whole safety-relevant machine can be modeled at once
+
+The goal is not to win an argument about operating systems.
+
+The goal is to build the electronic component we would want beside a human organ if our own life depended on understanding what it was doing.
 
 See:
 
@@ -35,43 +68,47 @@ See:
     QUIRKM_CONTEXT_COMPLETE_BIOLOGICAL_ORGAN_CONTROL.md
 
 ======================================================================
-1. THE ACTUAL APPLICATION: TECHNOLOGY-ASSISTED ORGANS AND TRANSPLANTS
+1. THE ACTUAL APPLICATION: TECHNOLOGY-ASSISTED HUMAN PHYSIOLOGY
 ======================================================================
 
-The long-horizon application is broader than one heart pump.
+The long-horizon application is broader than one heart pump and broader than transplantation.
 
-It is a family of systems in which electronics participate directly in maintaining, replacing, protecting, transporting, monitoring, or eventually helping control an organ.
+It is a family of systems in which electronics participate directly in maintaining, replacing, protecting, transporting, monitoring, or eventually helping regulate a human organ or physiological function.
 
-Examples already exist in medicine:
+Examples already exist:
 
     ventricular-assist devices
         -> mechanically support circulation, sometimes as a bridge to transplant
 
     dialysis
-        -> replaces part of lost kidney function while a patient may await transplant
+        -> replaces part of lost kidney function
 
-    mechanical ventilation / extracorporeal support
-        -> can support failing physiology while definitive treatment is pursued
+    mechanical ventilation and extracorporeal support
+        -> support failing physiology while recovery or definitive treatment is pursued
+
+    transplant preservation and machine perfusion
+        -> support donor organs outside the body before transplantation
 
     transplant monitoring
-        -> tracks graft function, rejection risk, medication state, and complications
+        -> follows graft function, complications, medication state, and other clinical signals
 
     automated insulin delivery
         -> already demonstrates an organ-like closed physiological feedback loop
 
-A future platform can extend this idea:
+A future platform may extend this continuum:
 
-    donor-organ preservation and machine perfusion
+    donor-organ preservation
     transplant-assist instrumentation
-    long-term graft monitoring
-    artificial-organ control
+    continuous graft monitoring
+    long-term artificial-organ control
     biohybrid-organ control
     tissue-engineered organ support
     bioprinted or recellularized organ monitoring
+    instrumented homeostatic organs
 
-The point is not that QuirkM presently performs any of these jobs.
+QuirkM does not presently perform these jobs.
 
-The point is that they all reward the same computing properties:
+This document argues that these systems reward exactly the properties QuirkM is trying to make native:
 
     explicit identity
     explicit authority
@@ -84,11 +121,16 @@ The point is that they all reward the same computing properties:
     machine-readable system topology
     context-complete diagnostics
 
+The broader human goal is straightforward:
+
+    when technology must help keep a person alive,
+    the technology should be as understandable as we can make it.
+
 ======================================================================
 2. A TOTALLY LOCAL CLOSED ORGAN SYSTEM
 ======================================================================
 
-"Closed" can mean two things.
+"Closed" can mean two different things.
 
 First, physiological closure:
 
@@ -155,7 +197,7 @@ The life-critical core should remain small and deterministic:
 
     NARROW MEDICAL MODEL
         local inference
-        device topology in context
+        complete device topology in context
         bounded medical domain
         locked protocol corpus
         emergency interpretation
@@ -168,13 +210,27 @@ The life-critical core should remain small and deterministic:
         analysis packages
         service and research tooling
 
+This distinction matters.
+
+QuirkM does not need to reject the Linux ecosystem in order to improve the native medical control plane.
+
+The system can have both:
+
+    clean native QuirkM semantics
+            +
+    explicit Linux compatibility where useful
+
+Linux can remain an extraordinary inheritance mechanism for tools, packages, research software, Python, compilers, and service utilities.
+
+QuirkM can remain the deliberately smaller native authority boundary for the part of the system where ambiguity matters most.
+
 The hard controller never needs to become "an LLM with an organ attached."
 
 ======================================================================
-3. THE NARROW MEDICAL MODEL: EMERGENCY REASONING WITHOUT OPAQUE AUTHORITY
+3. THE NARROW MEDICAL MODEL: EMERGENCY REASONING WITH TRACEABLE AUTHORITY
 ======================================================================
 
-A mature system could plausibly delegate part of a sudden emergency response to a narrow medically trained model, but the delegation should itself be explicit and inspectable.
+A mature system could plausibly delegate part of a sudden emergency response to a narrow medically trained model, but the delegation itself should be explicit, finite, logged, and inspectable.
 
 The useful model is not a general chatbot improvising medicine.
 
@@ -200,12 +256,12 @@ The model receives:
     power state
     controller state
     recent alarms
-    known failure modes
+    known device failure modes
     patient- or graft-specific clinician-approved limits
     locked, versioned clinician-approved protocols
     exact software/model versions
 
-It produces a structured, traceable action proposal:
+It produces a structured, traceable proposal:
 
     event_id: E-88231
     suspected_domain: perfusion / graft / sensor / pump / power
@@ -245,7 +301,7 @@ Every model-assisted transition should therefore be traceable to:
         +
     validator result
 
-The preferred architecture is:
+Preferred architecture:
 
     narrow medical model
             |
@@ -263,36 +319,43 @@ The preferred architecture is:
             v
     predefined actuator or controller transition
 
-At greater maturity, a device could permit the model to trigger a strictly enumerated emergency transition when all deterministic predicates are satisfied and the complete action certificate is logged. That is still very different from granting free-form therapeutic authority.
+At greater maturity, a device might permit the model to trigger a strictly enumerated emergency transition when every deterministic predicate is satisfied and the complete action certificate is logged.
+
+That is still very different from granting free-form therapeutic authority.
 
 The model should not invent a new drug dose, shock program, pump speed, anticoagulation regimen, or therapy outside the pre-authorized graph.
 
-The attraction is not "AI makes the medical decision."
+The attraction is not:
 
-It is:
+    AI makes the medical decision.
 
-    a bounded medical reasoner can inspect the whole electronic organ-support
-    system at once, rapidly map an emergency to validated practice, and leave
-    a machine-readable explanation of exactly why that action path was chosen.
+The attraction is:
+
+    a bounded medical reasoner can inspect nearly the whole electronic
+    organ-support system at once, rapidly map a sudden event to validated
+    practice, identify contradictory evidence, and leave a machine-readable
+    explanation of exactly why an action path was proposed.
+
+That role can deepen only as evidence justifies it.
 
 ======================================================================
-4. WHY THE LEAST-OPAQUE ELECTRONIC COMPONENT MATTERS
+4. THE LEAST-OPAQUE ELECTRONIC COMPONENT
 ======================================================================
 
-The biological side already contains unavoidable uncertainty:
+The biological side already contains uncertainty that cannot simply be designed away:
 
     individual physiology
     changing metabolism
     inflammation
     rejection
-    healing/remodeling
+    healing and remodeling
     vascular changes
     sensor drift
     mechanical wear
     measurement noise
     rare disease states
 
-The computer should not gratuitously add more:
+The computer should not gratuitously add more uncertainty of its own:
 
     stale reusable identities
     hidden aliasing
@@ -304,7 +367,9 @@ The computer should not gratuitously add more:
     unclear provenance
     giant hidden dependency chains
 
-The project therefore aims for a context-complete electronic architecture:
+This is where QuirkM's context-complete goal becomes medically interesting.
+
+The project aims for an electronic architecture whose safety-relevant model can be represented compactly enough to include:
 
     complete organ-support topology
     complete resource graph
@@ -312,8 +377,9 @@ The project therefore aims for a context-complete electronic architecture:
     complete authority graph
     complete current degraded-state map
     complete controller/protocol versions
+    complete dependency relationships
 
-represented compactly enough that a maintenance or diagnostic model can reason over nearly the whole relevant machine at once.
+A maintenance or diagnostic model could then reason over nearly the whole relevant electronic machine at once and retrieve implementation detail only when needed.
 
 The objective is not literally "fewest lines of code."
 
@@ -327,48 +393,58 @@ For medicine, that becomes:
 
     make the machine capable of explaining itself.
 
+And more strongly:
+
+    make the electronic system the part of the medical problem
+    whose behavior we have the best chance of knowing completely.
+
 ======================================================================
-5. WHY QUIRKM CAN BE USEFUL WITHOUT WINNING EVERY LINUX ARGUMENT
+5. THIS IS NOT AN ANTI-LINUX ARGUMENT
 ======================================================================
 
-The first 100 QuirkM entries are candidate compatibility debts and design pressures, not 100 adjudicated Linux bugs. Many exist because Linux successfully preserves decades of software behavior.
+Linux is one of the most successful software compatibility platforms ever built.
 
-Linux can absolutely be used in medical and safety-oriented systems. It can be restricted, hardened, audited, isolated, tested, and surrounded by rigorous application-level safety engineering.
+Its ability to support enormous amounts of existing software is precisely why QuirkM wants Linux compatibility.
 
-QuirkM's case is narrower:
+But compatibility and native design are different jobs.
 
-    where a historical compatibility behavior is not required by the native
-    medical control plane, do not make that behavior the native default.
+Linux must preserve historical interfaces because real users depend on them.
+A clean native QuirkM personality is free to learn from those interfaces without making every historical compromise the default for new software.
 
-Suppose QuirkM improves only a subset of the first 100 candidate pressures:
+The first 100 QuirkM entries are therefore candidate compatibility debts and design pressures, not 100 adjudicated Linux bugs.
 
-    Q-0001 / Q-0002
+Some may prove to be excellent tradeoffs.
+Some may prove irrelevant to QuirkM.
+Some may reveal that Linux already has a newer interface that solves most of the problem.
+Some may reveal a genuine opportunity for a cleaner native contract.
+
+The project should follow the evidence.
+
+The medical case does not require winning all 100.
+
+Suppose QuirkM materially improves only these classes:
+
     reusable small-integer descriptors / stale identity
         -> generation-safe typed resource identity
 
-    Q-0005 / Q-0006
     descriptor identity vs underlying object identity
         -> explicit reference/object/share semantics
 
-    Q-0008 / Q-0009
-    inherited descriptor state and create/configure races
+    inherited resource state and create/configure races
         -> explicit non-inheritance and atomic policy
 
-    Q-0021 through Q-0025
     asynchronous signals / EINTR / restart / partial completion
         -> explicit operation completion and cancellation
 
-    Q-0031 through Q-0040
     ambient path/root authority
         -> explicit configuration and namespace capabilities
 
-    Q-0041 through Q-0050
     notification loss/coalescing/provenance limitations
         -> sequence-aware typed events with explicit loss metadata
 
-That is already enough to change the diagnostic search space.
+That alone could change the diagnostic character of the system.
 
-Instead of:
+Instead of asking:
 
     Did integer handle 14 get reused?
     Is this sensor identity stale?
@@ -387,15 +463,29 @@ one can increasingly ask:
     Which exact event sequence is missing?
     Which policy authorized this transition?
 
-That does not magically make QuirkM safer than Linux.
+This does not prove that QuirkM is safer than Linux.
 
-It creates a testable hypothesis:
+It defines what QuirkM intends to prove.
 
-    if the software system contains fewer ambiguous states and stronger
-    provenance, then a dangerous medical observation may be easier to localize
-    to software, hardware, actuator, graft, or biology.
+Our ambition should be stated plainly:
 
-For an organ-support system, eliminating even one entire false fault domain can be valuable.
+    where Linux carries historical ambiguity because compatibility requires it,
+    QuirkM intends to offer a cleaner native contract where a cleaner contract
+    is actually possible.
+
+    where Linux already has the better answer, QuirkM should learn from it.
+
+    where QuirkM claims improvement, the improvement should be demonstrated
+    mechanically rather than advertised rhetorically.
+
+This is how QuirkM could eventually earn the stronger claim we actually want:
+
+    not merely "good enough for medical computing,"
+
+    but one of the best-understood and least-opaque foundations available for
+    systems that directly assist human physiology.
+
+That is an ambition, not a present certification.
 
 ======================================================================
 6. SIX REALISTIC ORGAN / TRANSPLANT SCENARIOS
@@ -404,15 +494,15 @@ For an organ-support system, eliminating even one entire false fault domain can 
 These are architectural scenarios, not treatment instructions.
 
 ---------------------------------------------------------------------
-EXAMPLE 1: ADULT OR PEDIATRIC VENTRICULAR ASSIST -- LOW FLOW
+EXAMPLE 1: VENTRICULAR ASSIST -- LOW FLOW
 ---------------------------------------------------------------------
 
 A ventricular-assist system reports low flow.
 
-Possible domains include:
+Possible fault domains include:
 
     genuine hemodynamic deterioration
-    pump/graft obstruction
+    pump or graft obstruction
     sensor error
     controller error
     power abnormality
@@ -440,13 +530,13 @@ QuirkM contribution:
     complete alarm provenance
     explicit degraded-sensor state
     deterministic action log
-    narrow model can inspect the entire dependency graph
+    whole dependency graph available to diagnostic reasoning
+
+A narrow model can classify the pattern against a locked fault/protocol corpus and explain which observations support or contradict each hypothesis.
 
 ---------------------------------------------------------------------
 EXAMPLE 2: PEDIATRIC HEART FAILURE -- BRIDGE TO TRANSPLANT
 ---------------------------------------------------------------------
-
-This is not a hypothetical category.
 
 The FDA-approved Berlin Heart EXCOR Pediatric ventricular-assist device is intended to provide mechanical circulatory support as a bridge to cardiac transplantation for pediatric patients with severe isolated left-ventricular or biventricular dysfunction who are transplant candidates and require circulatory support.
 
@@ -467,7 +557,7 @@ A future QuirkM-like controller could model:
 
 The system's job is not only to run the pump.
 
-It can preserve a continuous causal history while the child waits for a donor organ:
+It can preserve a continuous causal history while the patient waits for a donor organ:
 
     what changed
     when it changed
@@ -476,19 +566,19 @@ It can preserve a continuous causal history while the child waits for a donor or
     which safety rule limited the response
     whether the physiology responded as predicted
 
-If an emergency occurs, a narrow device-specific medical model can classify the pattern against the locked pediatric support protocol corpus, produce a traceable proposal, and request only a predefined safe transition.
+If an emergency occurs, a narrow device-specific medical model can classify the pattern against the locked support protocol corpus, produce a traceable proposal, and request only a predefined safe transition.
 
-This is much closer to the intended application than "a child with a heart defect."
+The important point is not the patient's age.
 
-The child has organ failure severe enough to need technological circulatory support while awaiting transplantation.
+It is that a human life may depend for days, weeks, or longer on a machine temporarily helping perform the work of a failing organ.
+
+That is exactly the kind of machine whose internal state should be as comprehensible as engineering can make it.
 
 ---------------------------------------------------------------------
-EXAMPLE 3: PEDIATRIC KIDNEY FAILURE -- DIALYSIS TO TRANSPLANT
+EXAMPLE 3: KIDNEY FAILURE -- DIALYSIS TO TRANSPLANT
 ---------------------------------------------------------------------
 
-Children can develop kidney failure from congenital, hereditary, metabolic, inflammatory, and other kidney diseases. NIDDK states that children whose kidneys fail require kidney replacement therapy: kidney transplant, hemodialysis, or peritoneal dialysis.
-
-This naturally creates a technology-assisted bridge:
+Kidney failure can create a technology-assisted bridge:
 
     failing kidneys
         -> dialysis / monitoring
@@ -496,9 +586,9 @@ This naturally creates a technology-assisted bridge:
         -> donor kidney
         -> post-transplant graft monitoring
 
-A QuirkM-oriented support platform would not replace nephrology or the dialysis machine's validated controller.
+A QuirkM-oriented platform would not replace nephrology or a dialysis machine's validated controller merely because QuirkM exists.
 
-It could provide a compact supervisory and diagnostic substrate around the technical system:
+Its plausible early role is supervisory and diagnostic:
 
     dialysate flow resource
     blood-flow resource
@@ -512,7 +602,7 @@ It could provide a compact supervisory and diagnostic substrate around the techn
 
 Every observation and command can be provenance-linked.
 
-After transplant, the same architecture can shift from replacement-therapy supervision to graft monitoring:
+After transplant, the same architecture can shift from replacement-therapy supervision toward graft monitoring:
 
     graft-function observations
     medication/adherence records
@@ -525,19 +615,15 @@ The deeper point is continuity of model:
     organ failed
         -> machine temporarily performs essential function
         -> transplant occurs
-        -> new organ becomes the monitored resource
+        -> transplanted organ becomes the monitored biological resource
 
 The electronic system can preserve one traceable history across the transition.
 
 ---------------------------------------------------------------------
-EXAMPLE 4: PEDIATRIC LIVER FAILURE -- TRANSPLANT AND GRAFT SURVEILLANCE
+EXAMPLE 4: LIVER FAILURE -- TRANSPLANT AND GRAFT SURVEILLANCE
 ---------------------------------------------------------------------
 
-Children have real liver diseases that progress to transplantation.
-
-NIDDK identifies biliary atresia as the most common reason children need a liver transplant. Pediatric acute liver failure can also require urgent transplantation.
-
-This is a different problem from pump control because the liver is chemically and metabolically complex.
+Liver failure presents a different problem because liver function is chemically and metabolically complex and there is no simple pump equivalent that reproduces the entire organ.
 
 The early QuirkM role is therefore more diagnostic and supervisory than actuator-heavy:
 
@@ -547,53 +633,51 @@ The early QuirkM role is therefore more diagnostic and supervisory than actuator
     graft-function trends
     infection-related observations
     device/sensor provenance
-    immunosuppression adherence state
+    adherence state where relevant
     transplant-team protocol versions
 
-NIDDK's pediatric liver research already includes monitoring of medication levels and remote communication to improve adherence after transplant.
-
-A future context-complete transplant monitor could add stronger causal bookkeeping:
+A future context-complete transplant monitor could preserve causal bookkeeping such as:
 
     this alert came from this laboratory value
-    from this sample/time
+    from this sample and timestamp
     evaluated by this rule
     against this graft profile
     under this protocol revision
     with these confounding measurements
 
-The narrow model can reason across the complete local transplant history and point clinicians toward a known protocol pathway, while deterministic rules prevent it from inventing therapy.
+A narrow model can reason across the complete local transplant history and point clinicians toward a known protocol pathway, while deterministic rules prevent it from inventing therapy.
 
 ---------------------------------------------------------------------
-EXAMPLE 5: PEDIATRIC LUNG / MULTI-ORGAN TRANSPLANT SUPPORT
+EXAMPLE 5: LUNG / MULTI-ORGAN SUPPORT
 ---------------------------------------------------------------------
 
-Children are also listed for lung and other solid-organ transplants. HRSA/OPTN maintains pediatric transplant policy and pediatric waiting-list processes for kidney, liver, heart, lung, and other organs.
+A patient with severe lung or multi-organ disease may be surrounded by several interacting technical systems.
 
-A useful QuirkM deployment need not control the transplanted lung directly.
+A useful QuirkM deployment need not directly "control the transplanted lung."
 
-It can act as the least-opaque supervisory layer across the machinery surrounding the organ:
+It can act as the least-opaque supervisory layer across machinery surrounding the physiology:
 
     ventilation resources
     oxygenation observations
-    pressure/flow resources
-    pump or extracorporeal-support resources where present
+    pressure and flow resources
+    extracorporeal-support resources where present
     power state
     alarm state
     graft-monitoring observations
-    medication/protocol state
+    protocol state
 
-This is especially valuable when several systems interact.
+The diagnostic question may be:
 
-The diagnostic question becomes:
-
-    Is the abnormal oxygenation caused by the graft?
+    Is abnormal oxygenation caused by the graft?
     ventilation?
     circulation?
     sensor failure?
     support-device failure?
     power or communication?
 
-A context-complete system cannot answer physiology perfectly, but it can make the electronic branches of that causal tree far less mysterious.
+A context-complete system cannot answer physiology perfectly.
+
+It can make the electronic branches of that causal tree far less mysterious.
 
 ---------------------------------------------------------------------
 EXAMPLE 6: FUTURE ENGINEERED OR BIOFABRICATED ORGAN
@@ -601,11 +685,11 @@ EXAMPLE 6: FUTURE ENGINEERED OR BIOFABRICATED ORGAN
 
 This is the long-horizon case.
 
-Research in tissue engineering and 3D bioprinting is actively exploring heart, liver, kidney, pancreas, lung, vascular, and other tissues. Whole clinically transplantable bioprinted solid organs are not a solved technology today. Major challenges include vascularization, maturation, integration of multiple cell types, reproducibility, long-term function, immune interaction, and manufacturing/regulatory translation.
+Research in tissue engineering and 3D bioprinting is exploring heart, liver, kidney, pancreas, lung, vascular, and other tissues. Whole clinically transplantable bioprinted solid organs are not a solved technology today. Major challenges include vascularization, maturation, integration of multiple cell types, reproducibility, long-term function, immune interaction, and manufacturing/regulatory translation.
 
-But suppose those problems improve enough to produce an engineered kidney, liver, cardiac tissue construct, or biohybrid organ.
+But suppose those problems improve enough to produce an engineered kidney, liver, cardiac construct, or biohybrid organ.
 
-Such an organ may be more instrumentable than a natural donor organ from the beginning.
+Such an organ might be intentionally instrumentable from the beginning.
 
 Its design could include:
 
@@ -624,7 +708,7 @@ Its design could include:
 
 Now QuirkM becomes more than the controller of a medical device around the organ.
 
-It can become part of the organ's electronic nervous system:
+It could become part of the organ's electronic nervous system:
 
     ENGINEERED ORGAN
           |
@@ -647,7 +731,7 @@ It can become part of the organ's electronic nervous system:
 
 Alongside it:
 
-    narrow medical/maintenance model
+    narrow medical / maintenance model
           |
           +-> diagnosis
           +-> anomaly correlation
@@ -673,15 +757,17 @@ With sufficient maturity and validation it could go further:
     controlled reconfiguration
     limited emergency actuation
 
-But the progression should be earned by evidence.
+And only after still more evidence might deeper autonomous control become justified.
 
-The architecture is valuable even before autonomous organ control is justified.
+The progression should be earned.
+
+The architecture is valuable long before autonomous organ control is justified.
 
 ======================================================================
 7. THE TRANSPLANT / ENGINEERED-ORGAN CONTINUUM
 ======================================================================
 
-The same computing substrate could plausibly follow an organ problem across several eras of technology:
+The same computing substrate could plausibly follow an organ problem across several technological stages:
 
     NATIVE ORGAN FAILURE
             |
@@ -701,18 +787,23 @@ The same computing substrate could plausibly follow an organ problem across seve
             v
     INSTRUMENTED HOMEOSTATIC ORGAN
 
-The software need not know whether "the organ" is entirely natural, donor-derived, mechanically assisted, or partially engineered in the same way.
+The software should not pretend that all of these are the same thing.
 
-It needs explicit resources and contracts for what can actually be observed and controlled.
-
-That is important.
+It should expose what can actually be observed and controlled.
 
 QuirkM should model capabilities, not fantasies:
 
-    if pressure is observable -> expose PressureObservation
-    if perfusion is controllable -> expose bounded PerfusionControl
-    if graft chemistry is only sampled every six hours -> represent that latency
-    if an actuator has no certified emergency mode -> no software path can invent one
+    if pressure is observable
+        -> expose PressureObservation
+
+    if perfusion is controllable
+        -> expose bounded PerfusionControl
+
+    if graft chemistry is sampled only periodically
+        -> represent the true sampling latency
+
+    if an actuator has no validated emergency mode
+        -> no software path can invent one
 
 The architecture can therefore evolve with medicine without lying about what the organ can do.
 
@@ -771,7 +862,7 @@ but:
 Explanation becomes a stored systems property instead of forensic reconstruction.
 
 ======================================================================
-9. THE CONTEXT-COMPLETE ADVANTAGE FOR MAINTENANCE
+9. CONTEXT COMPLETENESS: KNOWING THE MACHINE THAT IS HELPING THE BODY
 ======================================================================
 
 The most unusual QuirkM possibility is not merely small code size.
@@ -823,43 +914,35 @@ The computer has not diagnosed the patient merely by being simple.
 
 It has made itself less plausible as an unexplained cause.
 
+That is a substantial engineering achievement in its own right.
+
 ======================================================================
-10. CHILDREN: REAL ORGAN FAILURE, REAL TRANSPLANTS, REAL MACHINES
+10. CHILDREN MERIT MENTION, BUT THEY ARE NOT THE SALES PITCH
 ======================================================================
 
-I did not want to mention children merely to add emotional force. The technology should support its own case.
+Children genuinely experience organ failure, depend on machines that replace or support organ function, wait for donor organs, receive transplants, and live with long-term graft monitoring.
 
-But the pediatric transplant reality merits explicit mention because this application is exactly about organs, organ failure, machine support, and transplantation.
+That reality belongs in this proposal because it is part of the actual application space, not because a sick child is a useful image for selling technology.
 
-Children genuinely experience end-stage organ disease.
+A child may move through:
 
-Kidney failure in children can require dialysis or kidney transplantation. NIDDK describes congenital and hereditary pediatric kidney diseases including renal dysplasia, cystic kidney diseases, congenital nephrotic syndrome, hereditary glomerulopathies, and metabolic disorders; when kidneys fail, children require kidney replacement therapy.
-
-Children genuinely require liver transplantation. NIDDK identifies biliary atresia as the most common reason children need a liver transplant, and acute liver failure is another major pediatric transplant problem.
-
-Children with severe ventricular dysfunction can genuinely require mechanical circulatory support while waiting for a heart. The FDA-approved Berlin Heart EXCOR Pediatric is specifically intended as a bridge to cardiac transplantation for pediatric patients requiring circulatory support.
-
-Children are listed for kidney, liver, heart, lung, and other organ transplants under the national transplant system. HRSA explicitly maintains pediatric transplant policy because pediatric transplantation is a real, distinct clinical field, not a rhetorical example.
-
-That means the future path discussed here is concrete:
-
-    CHILD WITH ORGAN FAILURE
-            |
-            v
+    ORGAN FAILURE
+        |
+        v
     TECHNOLOGY-ASSISTED SURVIVAL
     dialysis / VAD / intensive support
-            |
-            v
+        |
+        v
     TRANSPLANT
-            |
-            v
+        |
+        v
     CONTINUOUS GRAFT MONITORING
-            |
-            v
+        |
+        v
     perhaps someday
     ENGINEERED / BIOFABRICATED ORGAN
 
-A context-complete QuirkM system could contribute at every electronic boundary:
+A context-complete QuirkM system could contribute at the electronic boundaries:
 
     diagnostic aggregation
     event logging
@@ -872,11 +955,16 @@ A context-complete QuirkM system could contribute at every electronic boundary:
     preauthorized emergency transitions
     maintenance guidance
 
-Later, after enough maturity, validation, redundancy, and regulatory evidence, the same architecture might earn a deeper control role in an engineered organ itself.
+Later, after enough maturity, validation, redundancy, clinical evidence, and regulatory work, the same architecture might earn a deeper role in an engineered organ itself.
 
-This is not a call to emotion so much as a call to truth.
+The point extends to every human being who depends on technology-assisted physiology.
 
-If one wants what is best for a child whose life depends on an organ-support machine, transplant-monitoring system, or someday an engineered organ, one should want to know as much as reasonably possible about the electronic system sharing responsibility for that child's survival:
+Child or adult, the standard should be the same:
+
+    if a machine shares responsibility for keeping a body alive,
+    we should want to know what that machine is doing as completely as practical.
+
+We should want to know:
 
     what it can do
     what it cannot do
@@ -888,34 +976,110 @@ If one wants what is best for a child whose life depends on an organ-support mac
     which assumptions failed
     which facts remain uncertain
 
-That does not mean Linux cannot do an equally good job in a carefully engineered system. Linux is extraordinarily capable, and compatibility is one of its greatest strengths.
+This is not a call to emotion so much as a call to engineering responsibility.
 
-QuirkM's proposed advantage is more specific:
+======================================================================
+11. WHAT WE ARE ACTUALLY TRYING TO BUILD
+======================================================================
 
-    it is designed precisely around places where a clean native system can avoid
-    historical compatibility pressures that Linux cannot simply remove.
+The medical proposal should not apologize for having ambition.
 
-If QuirkM surpasses even a meaningful subset of those known pressure classes, then the medical system gains something important without any need for exaggerated claims:
+QuirkM is not being built merely to be different from Linux.
 
-    fewer avoidable electronic ambiguities
-    fewer accidental state interpretations
-    stronger provenance
-    a smaller causal search space
-    a better chance that the entire safety-relevant machine can be modeled at once
+It is being built because we believe there are places where a clean native design can do materially better than a compatibility-first interface, and we intend to spend the effort required to find those places, prove them, and preserve the result.
 
-The aim is not:
+The aspiration is:
+
+    Linux compatibility when the Linux world is valuable.
+
+    QuirkM native semantics when clarity, explicitness, and bounded authority
+    are more valuable than historical compatibility.
+
+    Morphic underneath when a mechanism is genuinely universal.
+
+That means the medical case and the operating-system case reinforce each other.
+
+Every time QuirkM replaces a historically ambiguous native pattern with a smaller, typed, explicit, mechanically verified contract, the result is useful for ordinary software.
+
+In a medical control system, the same improvement may also reduce the number of plausible explanations for a dangerous observation.
+
+That is why the project can sincerely aim high without becoming callous.
+
+We are not saying:
+
+    "people suffer, therefore buy our operating system."
+
+We are saying:
+
+    "if computing is going to become increasingly intimate with the human body,
+    then we want to build the kind of computing substrate we would personally
+    want trusted there -- one that is deliberately designed to expose identity,
+    authority, state, provenance, failure, and uncertainty rather than hiding
+    them behind avoidable complexity."
+
+And we intend to compete on exactly those properties.
+
+If another system is clearer, safer, more inspectable, and better validated, medicine should use that system.
+
+Our job is to make that comparison increasingly difficult to lose.
+
+That is the right meaning of "we intend to be the best."
+
+Not entitlement.
+Not marketing by suffering.
+Not hostility toward Linux.
+
+A technical ambition:
+
+    make the machine smaller in concept,
+    stronger in evidence,
+    more explicit in authority,
+    richer in provenance,
+    easier to diagnose,
+    easier to model as a whole,
+    and better suited to the places where software failure must not become
+    another unexplained variable in an already uncertain biological system.
+
+If QuirkM eventually earns that standard, the benefit is not limited to children, transplant recipients, or any single disease.
+
+It applies to any person whose body depends on a machine:
+
+    organ support
+    dialysis
+    artificial circulation
+    respiratory support
+    transplant preservation
+    graft monitoring
+    closed-loop drug delivery
+    neural or electrical stimulation
+    artificial organs
+    future engineered organs
+    other technology-assisted physiological systems
+
+The strongest version of this proposal is therefore universal:
+
+    the closer computing gets to the human body,
+    the less mysterious that computing should be.
+
+We do not hate Linux.
+
+We intend to learn from the places where decades of Linux compatibility expose difficult design pressures, preserve Linux compatibility where its ecosystem is useful, and use QuirkM's clean native surface to do our best work exactly where historical constraints leave room for something clearer.
+
+Then we intend to prove whether we succeeded.
+
+The goal is not:
 
     trust QuirkM because it is new.
 
-The aim is:
+The goal is:
 
     know the machine as completely as practical,
     model what remains uncertain,
     trace every important action,
     fail closed when identity or authority is uncertain,
     keep emergency authority inside validated bounds,
-    and make the electronic half of an organ-support system the least mysterious
-    part of the problem.
+    and make the electronic half of a technology-assisted organ the least
+    mysterious part of the problem.
 
 When the organ is already uncertain, the computer should not be mysterious too.
 
@@ -928,9 +1092,6 @@ https://www.niddk.nih.gov/health-information/kidney-disease/children
 
 NIDDK — Pediatric Kidney Disease research areas
 https://www.niddk.nih.gov/research-funding/research-programs/pediatric-kidney-disease
-
-NIDDK — Growth Failure in Children with Chronic Kidney Disease
-https://www.niddk.nih.gov/health-information/kidney-disease/children/helping-child-adapt-life-chronic-kidney-disease/growth-failure-chronic-kidney-disease
 
 NIDDK — Definition & Facts of Liver Transplant
 https://www.niddk.nih.gov/health-information/liver-disease/liver-transplant/definition-facts
