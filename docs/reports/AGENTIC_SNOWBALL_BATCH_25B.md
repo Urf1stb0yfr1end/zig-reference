@@ -39,6 +39,8 @@ Project 57 unit and external smoke tests independently prove generation-2 slot r
 
 The initial environment lacked the repository venv and QEMU; the documented doctor repair created `.venv`, installed requirements, and the environment installed QEMU 8.2.2. Compilation exposed fixed Batch-25A array widths; they became a bounded 16-event trace. Contract validation exposed schema/endpoint, port dependency, generated manifest, catalog, and command-manual drift; canonical contracts were completed and textual indexes regenerated. A misplaced evidence field was moved into the Batch 25B frame. No proof gate was weakened.
 
+Remote PR CI after the generation-preservation repair initially failed only because its synthetic merge inherited four intentionally tracked branding PNGs from `main` while the repository policy still rejected every image file. The base branch policy was repaired separately with an exact branding allowlist; no Batch 25B proof or validation gate was weakened to address that unrelated failure.
+
 ## Inheritance check
 
 A future QuirkM adapter can wrap project 57's generational `ResourceRef` in a typed handle and call `resolve`/lifecycle operations directly. A future Wasm adapter can bind the same `ResourceRef` in its own process-local table. Neither path passes through Linux fd integers, Linux errno, syscall numbers, or RISC-V registers. Backend identities and capabilities are Morphic values. This is a concrete structural check, not a frozen QuirkM Native ABI or Wasm interface.
