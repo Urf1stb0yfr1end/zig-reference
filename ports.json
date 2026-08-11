@@ -724,6 +724,17 @@
       "baselineValidated": false,
       "testedTargetVersions": [],
       "knownMigrationBlockers": []
+    },
+    {
+      "id": "56",
+      "canonicalName": "morphic-semantic-operation",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/56-morphic-semantic-operation/port.js",
+      "implementationPath": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
     }
   ]
 }

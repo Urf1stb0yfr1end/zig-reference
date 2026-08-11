@@ -32,6 +32,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "abi-neutral operation dispatch",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "abi-neutral operation dispatch"
+      ],
+      "description": "Repository capability represented by: abi-neutral operation dispatch.",
+      "implementing_modules": [
+        "morphic-semantic-operation"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "address",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -302,6 +319,23 @@
       "description": "Repository capability represented by: api.",
       "implementing_modules": [
         "tagged-result"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "architecture-independent-write-and-termination",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "architecture-independent-write-and-termination"
+      ],
+      "description": "Repository capability represented by: architecture-independent-write-and-termination.",
+      "implementing_modules": [
+        "morphic-semantic-operation"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -2104,6 +2138,7 @@
         "generational-handles",
         "intrusive-doubly-linked-list",
         "length-prefixed-binary-field",
+        "morphic-semantic-operation",
         "nonzero-integer",
         "optional-typed-handle",
         "owned-byte-buffer",
@@ -2907,6 +2942,40 @@
       "description": "Repository capability represented by: modulo counter.",
       "implementing_modules": [
         "wrapping-sequence-number"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "morphic",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "morphic"
+      ],
+      "description": "Repository capability represented by: morphic.",
+      "implementing_modules": [
+        "morphic-semantic-operation"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "morphic-semantic-operation-dispatch",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "morphic-semantic-operation-dispatch"
+      ],
+      "description": "Repository capability represented by: morphic-semantic-operation-dispatch.",
+      "implementing_modules": [
+        "morphic-semantic-operation"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -4279,6 +4348,23 @@
       "description": "Repository capability represented by: semantic version.",
       "implementing_modules": [
         "semantic-version"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "semantic-operation",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "semantic-operation"
+      ],
+      "description": "Repository capability represented by: semantic-operation.",
+      "implementing_modules": [
+        "morphic-semantic-operation"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],

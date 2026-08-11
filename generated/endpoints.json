@@ -826,6 +826,12 @@
     },
     {
       "kind": "function",
+      "module": "morphic-semantic-operation",
+      "name": "execute",
+      "signature": "execute(request: Request, backend: anytype) Completion"
+    },
+    {
+      "kind": "function",
       "module": "riscv-sfence-vma-invalidation",
       "name": "executeUnsafe",
       "signature": "executeUnsafe()"

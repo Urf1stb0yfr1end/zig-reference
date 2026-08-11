@@ -10,6 +10,8 @@ SECTIONS {
     . = ALIGN(4);
     *(.text.usertrap)
     . = ALIGN(4);
+    *(.text.user_service_trap)
+    . = ALIGN(4);
     *(.text.enteruser)
     . = ALIGN(4);
     *(.text.trap)

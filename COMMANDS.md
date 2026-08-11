@@ -166,6 +166,7 @@ The following section is derived from `generated/modules.json` and canonical mod
 | `bounded-user-memory-transfer-plan` | `zig build test-bounded-user-memory-transfer-plan` | `zig build smoke-bounded-user-memory-transfer-plan` | `projects/53-bounded-user-memory-transfer-plan/details.json` |
 | `bounded-elf64-load-plan` | `zig build test-bounded-elf64-load-plan` | `zig build smoke-bounded-elf64-load-plan` | `projects/54-bounded-elf64-load-plan/details.json` |
 | `bounded-rv64-linux-initial-stack-plan` | `zig build test-bounded-rv64-linux-initial-stack-plan` | `zig build smoke-bounded-rv64-linux-initial-stack-plan` | `projects/55-bounded-rv64-linux-initial-stack-plan/details.json` |
+| `morphic-semantic-operation` | `zig build test-morphic-semantic-operation` | `zig build smoke-morphic-semantic-operation` | `projects/56-morphic-semantic-operation/details.json` |
 <!-- END GENERATED MODULE COMMANDS -->
 
 ## Recipes and conformance
@@ -210,7 +211,7 @@ Each module has `zig build test-<module>` and `zig build smoke-<module>` targets
 
 ## Agent-readable pilot commands
 
-<!-- CURRENT AGENT CORPUS --> Agent Fast Path v2 currently projects 56 contracted modules as 56 full cards with 0 partial cards.
+<!-- CURRENT AGENT CORPUS --> Agent Fast Path v2 currently projects 57 contracted modules as 57 full cards with 0 partial cards.
 The Batch 07 repair revalidated bootstrap/doctor discovery, deterministic preflight, command-reference drift, ports, Developer Minimus, hosted Morphic verification, and the complete repository pipeline under Zig 0.14.0; exact results are recorded in `docs/reports/AGENTIC_SNOWBALL_BATCH_07_REPAIR.md`.
 The root-document policy is checked by `node tools/check-port-contracts.js`; it accepts
 only the explicit flagship/root allowlist and rejects any other root Markdown file.
@@ -403,3 +404,11 @@ Batch 23 executed the historical Batch 22B self-test and two-QEMU verifier indep
 - `python3 tools/verify-freestanding-riscv64-initial-stack.py` runs two independent real system-QEMU machines, independently reconstructs and byte-compares the frozen Linux-style stack, verifies ELF/entry/ECALL/U-mode/PTE evidence, preserves Batch 23 and Morphic equality, and emits the canonical Batch 24B handoff.
 
 Batch 24B executed the project-53/54/55 focused regressions, Batch 23 strict self-test and two-QEMU proof, its mutation self-test and strict two-QEMU proof under Zig 0.14.0 and QEMU 8.2.2. Both machines used planner-derived `SP=0x80402f50`, independently parsed the exact 176-byte image, returned through the unique ECALL, retained three U leaves and zero W+X leaves, and preserved the 765-byte Morphic artifact.
+
+### Batch 25A Morphic operation boundary and Linux/RV64 syscalls
+
+- `zig build install-userspace-rv64-linux-syscalls-elf --prefix PATH` builds and installs the raw two-segment RV64 Linux syscall fixture at `PATH/bin/userspace-elf-rv64-linux-syscalls`.
+- `python3 tools/verify-freestanding-riscv64-linux-syscalls.py --self-test` runs one real QEMU machine, composes the Batch 24B strict parser, and rejects decisive Linux/semantic/event/PC/result/message/PTE mutations.
+- `python3 tools/verify-freestanding-riscv64-linux-syscalls.py` runs two independent QEMU machines, independently inspects the exact ELF and five ECALL sites, verifies four exact `sepc + 4` returns plus terminal `exit_group`, exact write bytes and negative errno results, inherited Batch 24B truth, unchanged resource/mapping evidence, and Morphic equality.
+
+Batch 25A executed the semantic-operation unit/smoke tests, project 53/54/55 regressions, Batch 24B one- and two-QEMU proofs, its mutation self-test and strict two-QEMU proof under Zig 0.14.0 and QEMU 8.2.2. The raw trap-entry repair explicitly aligns `.text.user_service_trap` to the four-byte `stvec.BASE` requirement.

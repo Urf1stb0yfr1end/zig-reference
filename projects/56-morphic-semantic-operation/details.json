@@ -1,0 +1,652 @@
+{
+  "schema_version": "3.0.0",
+  "contract_version": "0.1.0",
+  "generated_at": "",
+  "last_reviewed_at": "",
+  "module": {
+    "id": "56",
+    "canonical_name": "morphic-semantic-operation",
+    "display_name": "Morphic Semantic Operation",
+    "directory": "projects/56-morphic-semantic-operation",
+    "summary": "Architecture- and OS-independent bounded write/terminate operation vocabulary.",
+    "long_description": "Tagged semantic requests and completions with synchronous caller-owned backend dispatch.",
+    "status": "implemented",
+    "maturity": "experimental",
+    "lifecycle": "active",
+    "target_maturity_level": 4,
+    "implementation_version": "0.1.0",
+    "public_contract_version": "0.1.0",
+    "introduced_version": "",
+    "deprecated_version": "",
+    "superseded_version": "",
+    "removed_version": "",
+    "replacement_module": "",
+    "migration_guide": "",
+    "support_policy": "",
+    "deprecation_reason": "",
+    "category": "systems",
+    "subcategory": "operation-boundary",
+    "tags": [
+      "morphic",
+      "semantic-operation",
+      "freestanding"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Separate reusable write and termination semantics from compatibility ABIs.",
+    "secondary": [],
+    "non_goals": [
+      "Linux syscall numbers, errno encoding, register layouts, descriptor tables"
+    ],
+    "problems_solved": [
+      "ABI-neutral operation dispatch"
+    ],
+    "future_role": "Shared boundary for Linux personalities, Native Morphic, and Wasm hosts."
+  },
+  "c_pain": {
+    "summary": "C tagged unions rely on conventions for tag/payload agreement.",
+    "common_failure_modes": [],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "A direct enum, union, and switch are compact.",
+    "where_c_degrades": "Tag/payload and callback lifetime rules remain informal."
+  },
+  "zig_response": {
+    "summary": "Tagged unions make variants explicit.",
+    "language_features": [
+      "tagged union",
+      "enum",
+      "generic dispatch"
+    ],
+    "guarantees_made_visible": [
+      "exhaustive variants"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "backend resource and memory policy"
+    ],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/56-morphic-semantic-operation",
+    "implementation": [
+      "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
+    ],
+    "public_entrypoint": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig",
+    "readme": "projects/56-morphic-semantic-operation/README.md",
+    "mastery": "projects/56-morphic-semantic-operation/MASTERY.md",
+    "details_markdown": "projects/56-morphic-semantic-operation/DETAILS.md",
+    "details_json": "projects/56-morphic-semantic-operation/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": [],
+    "unit_tests": [
+      "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
+    ],
+    "smoke_tests": [
+      "projects/56-morphic-semantic-operation/tests/smoke_test.zig"
+    ],
+    "generated_files": [],
+    "dependency_contracts": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "ResourceId",
+      "GuestAddress",
+      "WriteBytes",
+      "Request",
+      "Failure",
+      "Completion",
+      "execute"
+    ],
+    "types": [
+      {
+        "name": "ResourceId",
+        "kind": "public declaration"
+      },
+      {
+        "name": "GuestAddress",
+        "kind": "public declaration"
+      },
+      {
+        "name": "WriteBytes",
+        "kind": "public declaration"
+      },
+      {
+        "name": "Request",
+        "kind": "public declaration"
+      },
+      {
+        "name": "Failure",
+        "kind": "public declaration"
+      },
+      {
+        "name": "Completion",
+        "kind": "public declaration"
+      }
+    ],
+    "functions": [
+      {
+        "name": "execute",
+        "signature": "execute(request: Request, backend: anytype) Completion"
+      }
+    ],
+    "methods": [],
+    "constants": [],
+    "errors": [],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": [],
+    "endpoints": [
+      {
+        "name": "execute",
+        "kind": "function",
+        "signature": "execute(request: Request, backend: anytype) Completion",
+        "visibility": "public",
+        "summary": "Synchronously dispatch one semantic request to a caller-owned backend.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "request",
+            "type": "Request",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "independent",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          },
+          {
+            "name": "backend",
+            "type": "anytype",
+            "role": "operation input",
+            "ownership": "copied",
+            "borrowing": "synchronous only",
+            "mutability": "immutable",
+            "lifetime": "call",
+            "valid_range": "documented contract",
+            "alignment": "type alignment",
+            "endianness": "independent",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "Returns documented error or absence."
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Completion",
+            "meaning": "Semantic success, failure, or terminal completion.",
+            "ownership": "not applicable",
+            "borrowed_from": "",
+            "lifetime": "program",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [],
+            "aliasing": "not applicable",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "not applicable",
+            "absence_meaning": "not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "Module invariants hold on success."
+        ],
+        "failure_atomicity": "The module performs no mutation; backend effects follow the backend contract.",
+        "complexity": {
+          "time": "not applicable",
+          "space": "not applicable"
+        },
+        "invalidates": [],
+        "thread_safety": "not applicable",
+        "examples": []
+      }
+    ]
+  },
+  "inputs": [],
+  "outputs": [],
+  "state": {
+    "fields": [],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [],
+    "borrows": [],
+    "copies": [],
+    "transfers": [],
+    "shared": [],
+    "allocator": "",
+    "allocator_lifetime": "",
+    "element_cleanup": "",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [],
+    "optional_empty_results": [],
+    "failure_atomicity": "",
+    "state_after_failure": [],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [],
+    "standard_library": [],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": []
+  },
+  "dependency_contracts": [],
+  "expected_dependents": [],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "morphic-semantic-operation",
+    "import_path": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig",
+    "import_configuration": "",
+    "minimal_example": "const completion = operations.execute(request, backend);",
+    "integration_patterns": [],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "",
+    "minimum_zig_version": "",
+    "maximum_tested_zig_version": "",
+    "hosted": "",
+    "freestanding": "",
+    "thread_safe": "",
+    "reentrant": "",
+    "interrupt_safe": "",
+    "async_safe": "",
+    "signal_safe": "",
+    "platforms": [],
+    "architectures": [],
+    "allocator_assumptions": "",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "",
+    "no_std_equivalent": ""
+  },
+  "concurrency": {
+    "internal_synchronization": "",
+    "caller_synchronization_required": "",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-morphic-semantic-operation",
+    "commands": [],
+    "unit_tests": [],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": [],
+    "smoke_test_commands": [
+      "zig build smoke-morphic-semantic-operation"
+    ],
+    "smoke_test_behaviors": [],
+    "smoke_test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "",
+    "continuous_integration": "",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [],
+    "notes": [],
+    "status_dimensions": {
+      "implementation_present": true,
+      "contract_complete": true,
+      "contract_formatted": true,
+      "unit_tests_present": true,
+      "smoke_test_present": true,
+      "contract_checker_passed": false,
+      "compiler_validated": false,
+      "unit_tests_passed": false,
+      "smoke_tests_passed": false
+    }
+  },
+  "documentation": {
+    "read_order": [],
+    "examples_covered": [],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [],
+    "related_modules": [],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "",
+    "breaking_change_policy": "",
+    "deprecation_policy": "",
+    "known_gaps": [],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [],
+    "synchronization_requirements": [],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "morphic-semantic-operation-dispatch",
+      "architecture-independent-write-and-termination"
+    ],
+    "problems": [],
+    "inputs": [],
+    "outputs": [],
+    "environments": [],
+    "keywords": [],
+    "grep_terms": [],
+    "natural_language_queries": [],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "",
+    "snowball_score": ""
+  },
+  "agent_guidance": {
+    "use_when": [],
+    "do_not_use_when": [],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [],
+    "verification_steps": [],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [],
+    "files_to_read_first": [],
+    "files_not_required_for_basic_use": [],
+    "smoke_test_before_integration": ""
+  },
+  "source_map": {
+    "symbols_to_files": [],
+    "tests_to_behaviors": [],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": [],
+    "smoke_tests_to_public_symbols": [],
+    "smoke_tests_to_dependencies": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": []
+  },
+  "smoke_test": {
+    "required": true,
+    "implemented": true,
+    "status": "implemented-unverified",
+    "source_path": "projects/56-morphic-semantic-operation/tests/smoke_test.zig",
+    "build_step": "smoke-morphic-semantic-operation",
+    "commands": [
+      "zig build smoke-morphic-semantic-operation"
+    ],
+    "public_import_used": "morphic-semantic-operation",
+    "public_symbols_exercised": [],
+    "successful_operations": [],
+    "failure_or_boundary_operations": [],
+    "cleanup_exercised": [],
+    "repository_dependencies_exercised": [],
+    "hosted_environment_required": "",
+    "freestanding_environment_required": "",
+    "fixtures": [],
+    "expected_exit_status": "",
+    "expected_output": [],
+    "forbidden_private_access": true,
+    "last_run": "",
+    "last_result": "unverified",
+    "last_validated_commit": "",
+    "compiler_version": "",
+    "known_failures": [],
+    "notes": []
+  },
+  "portability": {
+    "baseline_zig_version": "0.14.0",
+    "port_contract": "projects/56-morphic-semantic-operation/port.js",
+    "port_contract_schema": "port.schema.json",
+    "tested_zig_versions": [],
+    "untested_zig_versions": [],
+    "dependencies_must_port_first": [],
+    "version_sensitive_symbols": [],
+    "version_sensitive_files": [],
+    "semantic_guarantees_to_preserve": [],
+    "validation_commands": [],
+    "known_porting_blockers": [],
+    "automatic_port_guaranteed": false,
+    "notes": []
+  },
+  "agent_contract": {
+    "schema_version": "2.0.0",
+    "summary": "ABI-neutral synchronous write and termination semantic operation dispatch.",
+    "search_aliases": [
+      "morphic operation",
+      "semantic write",
+      "termination request"
+    ],
+    "capability_ids": [
+      "morphic-semantic-operation-dispatch",
+      "architecture-independent-write-and-termination"
+    ],
+    "use_when": [
+      "A compatibility personality or runtime needs shared write/terminate semantics."
+    ],
+    "do_not_use_when": [
+      "Linux syscall decoding or errno encoding is the requested layer."
+    ],
+    "entrypoint": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig",
+    "public_symbols": [
+      "ResourceId",
+      "GuestAddress",
+      "WriteBytes",
+      "Request",
+      "Failure",
+      "Completion",
+      "execute"
+    ],
+    "dependency_ids": [],
+    "ownership": {
+      "storage": "inline",
+      "values": "copied",
+      "cleanup": "none"
+    },
+    "borrowing": {
+      "backend": [
+        "Borrowed synchronously during execute."
+      ]
+    },
+    "invalidation": {},
+    "failure_guarantees": [
+      "The vocabulary itself performs no externally visible effect."
+    ],
+    "effects": [
+      "borrows_caller_memory",
+      "returns_borrow",
+      "no_hidden_allocation",
+      "deterministic_order"
+    ],
+    "thread_safety": "not_synchronized",
+    "unsafe_boundaries": [],
+    "examples": [],
+    "recipes": [],
+    "validation_commands": [
+      "test-bounded-rv64-linux-initial-stack-plan",
+      "smoke-bounded-rv64-linux-initial-stack-plan"
+    ],
+    "proof_contract": null,
+    "diagnostics": [],
+    "selection_priority": "canonical",
+    "alternatives": [],
+    "environment_constraints": {
+      "hosted": "supported",
+      "freestanding": "supported",
+      "architectures": [
+        "target-neutral mechanism"
+      ],
+      "os_dependency": false,
+      "libc_required": false,
+      "endianness": "independent",
+      "privilege": "none"
+    },
+    "resource_profile": {
+      "hidden_allocation": false,
+      "storage_model": "caller_owned",
+      "capacity_model": "runtime_bounded",
+      "bounded": true,
+      "caller_provided_memory": true,
+      "compile_time_parameters": []
+    },
+    "construction": {
+      "named_import": "morphic-semantic-operation",
+      "primary_symbol": "execute",
+      "initialization": "Construct a Request tagged union value."
+    },
+    "operation_map": {
+      "dispatch request": "execute"
+    },
+    "error_map": [],
+    "composition": {
+      "commonly_with": [
+        "bounded-user-memory-transfer-plan"
+      ],
+      "conflicts_with": [],
+      "preferred_recipes": []
+    },
+    "determinism": {
+      "deterministic": true,
+      "ordering": "Table order, then zero padding, then argv strings and env strings in input order.",
+      "external_nondeterminism": []
+    },
+    "known_gaps": [
+      "No resource table or I/O backend."
+    ],
+    "minimal_usage": [
+      "const op = @import(\"morphic-semantic-operation\");",
+      "const completion = op.execute(request, backend);"
+    ],
+    "integration_notes": [
+      "Supply a synchronous backend implementing writeBytes and terminate."
+    ],
+    "canonical_invariants": []
+  }
+}

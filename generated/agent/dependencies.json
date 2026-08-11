@@ -197,6 +197,10 @@
       ],
       "status": "full"
     },
+    "morphic-semantic-operation": {
+      "dependencies": [],
+      "status": "full"
+    },
     "nonzero-integer": {
       "dependencies": [],
       "status": "full"

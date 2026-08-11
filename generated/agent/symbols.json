@@ -58,6 +58,9 @@
     "CheckedRange": [
       "checked-half-open-range"
     ],
+    "Completion": [
+      "morphic-semantic-operation"
+    ],
     "DecodeError": [
       "riscv-sv39-page-table-entry"
     ],
@@ -97,6 +100,9 @@
     "EventInput": [
       "bounded-deterministic-event-trace"
     ],
+    "Failure": [
+      "morphic-semantic-operation"
+    ],
     "FixedBumpAllocator": [
       "fixed-bump-allocator"
     ],
@@ -114,6 +120,9 @@
     ],
     "FourCC": [
       "fourcc-code"
+    ],
+    "GuestAddress": [
+      "morphic-semantic-operation"
     ],
     "GuestPhysicalAddress": [
       "distinct-memory-address-types"
@@ -224,6 +233,12 @@
     "RegionKind": [
       "physical-memory-region-set"
     ],
+    "Request": [
+      "morphic-semantic-operation"
+    ],
+    "ResourceId": [
+      "morphic-semantic-operation"
+    ],
     "Result": [
       "riscv-sv39-page-table-walker"
     ],
@@ -279,6 +294,9 @@
     "WrappingSequenceNumber": [
       "wrapping-sequence-number"
     ],
+    "WriteBytes": [
+      "morphic-semantic-operation"
+    ],
     "alignDown": [
       "aligned-address-and-size-helpers"
     ],
@@ -305,6 +323,9 @@
     ],
     "entries_per_page": [
       "riscv-page-table-page-owner"
+    ],
+    "execute": [
+      "morphic-semantic-operation"
     ],
     "executeUnsafe": [
       "riscv-sfence-vma-invalidation"
