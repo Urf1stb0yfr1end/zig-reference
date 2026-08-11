@@ -16,7 +16,10 @@ pub const AuxValue = union(enum) {
     env_string: usize,
 };
 
-pub const AuxEntry = struct { type: u64, value: AuxValue };
+pub const AuxEntry = struct {
+    type: u64,
+    value: AuxValue,
+};
 
 pub const Error = error{
     EmptyArgv,
@@ -44,7 +47,9 @@ pub fn StackPlan(comptime byte_capacity: usize) type {
         auxv_offset: usize,
         strings_offset: usize,
 
-        pub fn bytes(self: *const Self) []const u8 { return self.storage[0..self.len]; }
+        pub fn bytes(self: *const Self) []const u8 {
+            return self.storage[0..self.len];
+        }
     };
 }
 
@@ -80,7 +85,9 @@ pub fn plan(
     }
     for (auxv, 0..) |entry, i| {
         if (entry.type == at_null) return error.CallerSuppliedAtNull;
-        for (auxv[0..i]) |prior| if (prior.type == entry.type) return error.DuplicateAuxType;
+        for (auxv[0..i]) |prior| {
+            if (prior.type == entry.type) return error.DuplicateAuxType;
+        }
         switch (entry.value) {
             .argv_string => |index| if (index >= argv.len) return error.InvalidSymbolicTarget,
             .env_string => |index| if (index >= envp.len) return error.InvalidSymbolicTarget,
@@ -88,7 +95,11 @@ pub fn plan(
         }
     }
 
-    const words = std.math.add(usize, 1 + argv.len + 1 + envp.len + 1, 2 * (auxv.len + 1)) catch return error.AddressOverflow;
+    const words = std.math.add(
+        usize,
+        1 + argv.len + 1 + envp.len + 1,
+        2 * (auxv.len + 1),
+    ) catch return error.AddressOverflow;
     const table_len = std.math.mul(usize, words, word_size) catch return error.AddressOverflow;
     const raw_len = std.math.add(usize, table_len, strings_len) catch return error.AddressOverflow;
     if (raw_len > stack_range.end) return error.StackRangeTooSmall;
@@ -160,14 +171,28 @@ fn readWord(bytes: []const u8, offset: usize) u64 {
 test "independently decodes ordered argv envp auxv pointers and sentinels" {
     const argv = [_][]const u8{ "app", "different" };
     const envp = [_][]const u8{ "A=1", "B=two" };
-    const auxv = [_]AuxEntry{ .{ .type = 6, .value = .{ .immediate = 4096 } }, .{ .type = 31, .value = .{ .argv_string = 0 } } };
-    const made = try plan(256, 2, 2, 2, try GuestStackRange.init(0x7000, 0x7100), &argv, &envp, &auxv);
+    const auxv = [_]AuxEntry{
+        .{ .type = 6, .value = .{ .immediate = 4096 } },
+        .{ .type = 31, .value = .{ .argv_string = 0 } },
+    };
+    const made = try plan(
+        256,
+        2,
+        2,
+        2,
+        try GuestStackRange.init(0x7000, 0x7100),
+        &argv,
+        &envp,
+        &auxv,
+    );
     try std.testing.expectEqual(@as(usize, 0), made.initial_sp.raw() % 16);
     const b = made.bytes();
     try std.testing.expectEqual(@as(u64, 2), readWord(b, 0));
-    const a0 = readWord(b, 8); const a1 = readWord(b, 16);
+    const a0 = readWord(b, 8);
+    const a1 = readWord(b, 16);
     try std.testing.expectEqual(@as(u64, 0), readWord(b, 24));
-    const e0 = readWord(b, 32); const e1 = readWord(b, 40);
+    const e0 = readWord(b, 32);
+    const e1 = readWord(b, 40);
     try std.testing.expectEqual(@as(u64, 0), readWord(b, 48));
     try std.testing.expectEqual(@as(u64, 6), readWord(b, 56));
     try std.testing.expectEqual(@as(u64, 4096), readWord(b, 64));
@@ -180,23 +205,44 @@ test "independently decodes ordered argv envp auxv pointers and sentinels" {
     try std.testing.expectEqualStrings("different", std.mem.sliceTo(b[@intCast(a1 - base)..], 0));
     try std.testing.expectEqualStrings("A=1", std.mem.sliceTo(b[@intCast(e0 - base)..], 0));
     try std.testing.expectEqualStrings("B=two", std.mem.sliceTo(b[@intCast(e1 - base)..], 0));
-    for (b[104..made.strings_offset]) |byte| try std.testing.expectEqual(@as(u8, 0), byte);
+    for (b[104..made.strings_offset]) |byte| {
+        try std.testing.expectEqual(@as(u8, 0), byte);
+    }
 }
 
 test "minimal empty environment has deterministic padding and exact capacity boundaries" {
     const argv = [_][]const u8{"x"};
     const auxv = [_]AuxEntry{};
-    const made = try plan(64, 1, 0, 0, try GuestStackRange.init(0x1000, 0x1040), &argv, &.{}, &auxv);
+    const made = try plan(
+        64,
+        1,
+        0,
+        0,
+        try GuestStackRange.init(0x1000, 0x1040),
+        &argv,
+        &.{},
+        &auxv,
+    );
     try std.testing.expectEqual(@as(usize, 64), made.bytes().len);
-    try std.testing.expectError(error.OutputCapacityExceeded, plan(63, 1, 0, 0, try GuestStackRange.init(0x1000, 0x1040), &argv, &.{}, &auxv));
-    try std.testing.expectError(error.StackRangeTooSmall, plan(64, 1, 0, 0, try GuestStackRange.init(0x1001, 0x1040), &argv, &.{}, &auxv));
+    try std.testing.expectError(
+        error.OutputCapacityExceeded,
+        plan(63, 1, 0, 0, try GuestStackRange.init(0x1000, 0x1040), &argv, &.{}, &auxv),
+    );
+    try std.testing.expectError(
+        error.StackRangeTooSmall,
+        plan(64, 1, 0, 0, try GuestStackRange.init(0x1001, 0x1040), &argv, &.{}, &auxv),
+    );
 }
 
 test "rejects every bounded input policy violation" {
-    const one = [_][]const u8{"x"}; const two = [_][]const u8{ "x", "y" };
+    const one = [_][]const u8{"x"};
+    const two = [_][]const u8{ "x", "y" };
     const bad = [_][]const u8{"a\x00b"};
     const a = [_]AuxEntry{.{ .type = 1, .value = .{ .immediate = 0 } }};
-    const dup = [_]AuxEntry{ .{ .type = 1, .value = .{ .immediate = 0 } }, .{ .type = 1, .value = .{ .immediate = 1 } } };
+    const dup = [_]AuxEntry{
+        .{ .type = 1, .value = .{ .immediate = 0 } },
+        .{ .type = 1, .value = .{ .immediate = 1 } },
+    };
     const terminal = [_]AuxEntry{.{ .type = 0, .value = .{ .immediate = 0 } }};
     const symbolic = [_]AuxEntry{.{ .type = 31, .value = .{ .argv_string = 1 } }};
     const range = try GuestStackRange.init(0x1000, 0x1100);
@@ -206,17 +252,45 @@ test "rejects every bounded input policy violation" {
     try std.testing.expectError(error.TooManyAuxv, plan(256, 1, 0, 0, range, &one, &.{}, &a));
     try std.testing.expectError(error.InteriorNul, plan(256, 1, 0, 0, range, &bad, &.{}, &.{}));
     try std.testing.expectError(error.InteriorNul, plan(256, 1, 1, 0, range, &one, &bad, &.{}));
-    try std.testing.expectError(error.CallerSuppliedAtNull, plan(256, 1, 0, 1, range, &one, &.{}, &terminal));
-    try std.testing.expectError(error.DuplicateAuxType, plan(256, 1, 0, 2, range, &one, &.{}, &dup));
-    try std.testing.expectError(error.InvalidSymbolicTarget, plan(256, 1, 0, 1, range, &one, &.{}, &symbolic));
+    try std.testing.expectError(
+        error.CallerSuppliedAtNull,
+        plan(256, 1, 0, 1, range, &one, &.{}, &terminal),
+    );
+    try std.testing.expectError(
+        error.DuplicateAuxType,
+        plan(256, 1, 0, 2, range, &one, &.{}, &dup),
+    );
+    try std.testing.expectError(
+        error.InvalidSymbolicTarget,
+        plan(256, 1, 0, 1, range, &one, &.{}, &symbolic),
+    );
 }
 
 test "maximum capacities, no-padding boundary, and near-usize top remain checked" {
-    const argv = [_][]const u8{ "a", "bb" }; const envp = [_][]const u8{"E=v"};
+    const argv = [_][]const u8{ "a", "bb" };
+    const envp = [_][]const u8{"E=v"};
     const auxv = [_]AuxEntry{.{ .type = 9, .value = .{ .immediate = 0x1234 } }};
-    const made = try plan(128, 2, 1, 1, try GuestStackRange.init(0x2000, 0x2070), &argv, &envp, &auxv);
+    const made = try plan(
+        128,
+        2,
+        1,
+        1,
+        try GuestStackRange.init(0x2000, 0x2070),
+        &argv,
+        &envp,
+        &auxv,
+    );
     try std.testing.expectEqual(@as(usize, 0), made.initial_sp.raw() % 16);
     const high = std.math.maxInt(usize);
-    const near = try plan(128, 1, 0, 0, try GuestStackRange.init(high - 127, high), &[_][]const u8{"z"}, &.{}, &.{});
+    const near = try plan(
+        128,
+        1,
+        0,
+        0,
+        try GuestStackRange.init(high - 127, high),
+        &[_][]const u8{"z"},
+        &.{},
+        &.{},
+    );
     try std.testing.expect(near.used_range.end == high);
 }
