@@ -1,0 +1,1022 @@
+CODEX AGENTIC SNOWBALL — BATCH 25B
+BOUNDED PROCESS RESOURCE TABLE + FIRST REAL LINUX FD LIFECYCLE
+
+Repository:
+thanks-cohn/zig-reference
+
+Plan path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_25B_BOUNDED_PROCESS_RESOURCE_TABLE_LINUX_FD_LIFECYCLE.txt
+
+MISSION
+
+Batch 25A proved the first real Linux/RV64 syscall boundary while establishing the architectural inheritance seam:
+
+    real RV64 Linux userspace ELF
+              ↓
+    thin Linux/RV64 syscall adapter
+              ↓
+    Linux-independent Morphic semantic operation request
+              ↓
+    bounded kernel execution
+              ↓
+    semantic completion/failure/termination
+              ↓
+    Linux result / negative-errno adapter
+              ↓
+    exact U→S→U return or terminal handoff
+
+That boundary must now become economically useful.
+
+Batch 25B must replace the proof-only stdout/stderr resolver with the first bounded per-process resource table and first real Linux file-descriptor lifecycle, while preserving the Batch 25A law that Linux descriptor numbers and Linux errno values are compatibility-edge identities rather than Morphic internal architecture.
+
+Prove exactly this new architectural fact:
+
+    Linux fd integer
+          ↓
+    Linux per-process fd adapter/table view
+          ↓
+    Morphic resource reference / resource-table entry
+          ↓
+    shared semantic resource operation
+          ↓
+    bounded resource backend
+          ↓
+    semantic completion/failure
+          ↓
+    Linux result / errno encoding
+
+and prove that the same underlying Morphic resource-table mechanism is suitable, without Linux identity, for later:
+
+- QuirkM native typed handles;
+- WebAssembly host resources;
+- pipes, sockets, timers, shared memory, devices, files, and process-like resources;
+- compatibility providers and agent-visible capability composition;
+- later hypervisor-control resources where the semantics genuinely fit.
+
+The immediate compatibility target is Linux/RV64.
+The permanent architecture target is a reusable resource substrate.
+
+Batch 25B is PASS only if Linux compatibility becomes materially stronger AND the reusable Morphic seam becomes stronger at the same time.
+
+======================================================================
+NON-NEGOTIABLE EXECUTION / CONTINUATION LAW
+======================================================================
+
+The objective is to COMPLETE Batch 25B, not merely to produce a handoff.
+
+A failed build, failed test, failed proof assertion, QEMU hang, missing event, stale generated file, verifier failure, mutation-test failure, aggregate-validation failure, compiler/linker error, or newly discovered bug is NOT a stopping condition.
+
+It is the next debugging task.
+
+Required loop:
+
+    observe failure
+        ↓
+    isolate first divergent fact
+        ↓
+    instrument narrowly
+        ↓
+    diagnose root cause
+        ↓
+    repair
+        ↓
+    rebuild
+        ↓
+    rerun focused proof
+        ↓
+    rerun regressions
+        ↓
+    continue toward full Batch 25B PASS
+
+Do not stop after identifying a repairable bug.
+Do not return PARTIAL merely because the first design needs revision.
+Do not weaken proof gates to make implementation pass.
+Do not discard useful work while debugging.
+
+Before risky or broad experiments, preserve current work with a WIP patch or local task-branch checkpoint.
+
+BLOCKED is reserved ONLY for a genuine external impossibility that cannot reasonably be repaired from inside the repository or available execution environment.
+
+Never silently stop after a long run.
+
+======================================================================
+BASELINE — CHECKED-OUT REPOSITORY IS TRUTH
+======================================================================
+
+At plan creation, current main is expected to include:
+
+- Batch 25A merge commit `029bf4b6feaaa2595838307c3641f50131f422de`;
+- post-merge README status commits through `e5cd6d5e2ecc429f133ee93523cede4a9de9a76f`;
+- project 56 `morphic-semantic-operation`;
+- Batch 25A strict Linux/RV64 syscall verifier and real raw-ECALL ELF fixture;
+- the canonical QuirkM concept area under `docs/concepts/QuirkM/`;
+- the MinMax Memo in `docs/project_vocab.md`.
+
+Treat the checked-out HEAD as authoritative.
+
+Do NOT reset to any SHA named in this plan.
+Do NOT overwrite newer work.
+Do NOT resurrect obsolete duplicate QuirkM documentation paths.
+If repository truth has moved, preserve newer work and adapt this plan to it.
+
+Before implementation:
+
+1. read `AGENTS.md` and obey the Agent Fast Path;
+2. run the repository bootstrap/doctor path;
+3. query/index before broad reading;
+4. inspect the current Batch 25A report, project 56 contract/source, current freestanding Linux adapter, project 53 transfer machinery, and only the resource/handle modules actually relevant to this pressure;
+5. search existing modules before inventing a new primitive;
+6. treat generated files as derived outputs and regenerate through repository tooling.
+
+Do NOT load the entire catalog, every historical report, every roadmap, or all QuirkM research entries unless a focused query proves they are needed.
+
+======================================================================
+SETTLED TRUTHS TO INHERIT — DO NOT RE-SOLVE
+======================================================================
+
+Batch 25B inherits and must preserve all proved Batch 25A / 24B truths relevant to this path:
+
+- real RV64 ELF execution in U-mode;
+- exact project-55 Linux-style initial process stack;
+- real S→U→S privilege transitions;
+- U-mode ECALL trap cause 8;
+- SPP clear for U-origin service traps;
+- full trap frame with integer registers plus `sepc`, `sstatus`, `scause`, `stval`;
+- exact returning `sepc + 4` behavior;
+- terminal exit/exit_group handoff where currently supported;
+- Sv39 U mappings and R-X / RW-NX permission truth;
+- W+X=0;
+- project 53 bounded whole-range user-memory transfer planning;
+- failure-atomic write validation: no externally visible prefix before a later-range fault;
+- project 54 ELF planning;
+- project 55 startup stack planning/materialization;
+- Batch 25A Linux/RV64 register decoder and Linux errno encoder as compatibility-edge logic;
+- Batch 25A semantic operation boundary as Linux-independent logic;
+- Batch 25A strict mutation-tested two-QEMU evidence;
+- hosted/fake/machine Morphic equality where the existing proof composes it;
+- explicit nonclaims and bounded proof policy.
+
+Do not replace a proved reusable mechanism with a bespoke Batch 25B copy.
+
+======================================================================
+ARCHITECTURAL LAW — RESOURCE IDENTITY MUST NOT BECOME “LINUX FD”
+======================================================================
+
+FORBIDDEN permanent architecture:
+
+    Morphic core
+        stores Linux fd integer as resource identity
+        switch(fd)
+        embeds EBADF
+        embeds dup/close syscall numbering
+        assumes every native/Wasm resource is a Unix descriptor
+
+REQUIRED architecture:
+
+    Linux process-visible fd
+              ↓
+    Linux FD personality / adapter
+              ↓
+    process-local descriptor binding
+              ↓
+    Linux-independent Morphic resource reference
+              ↓
+    bounded resource table / object identity
+              ↓
+    semantic resource operation
+              ↓
+    resource implementation/backend
+
+The Linux FD layer owns:
+
+- descriptor integer allocation policy;
+- Linux-visible descriptor validity;
+- Linux close/dup-family compatibility behavior implemented in this batch;
+- Linux errno mapping;
+- descriptor flags only to the extent actually proved;
+- Linux-specific edge rules.
+
+The reusable Morphic layer owns only concepts independently justified outside Linux, such as:
+
+- resource identity/reference;
+- slot occupancy/lifetime;
+- stale-reference rejection if a generational model is used;
+- resource kind/capability metadata if required by real pressure;
+- rights/operation availability if required by real pressure;
+- shared underlying-object identity only if required to implement the proved descriptor semantics truthfully;
+- bounded deterministic allocation/release behavior;
+- failure behavior that does not mention Linux errno or fd numbers.
+
+MAJOR ACCEPTANCE TEST:
+
+A later QuirkM or Wasm consumer must be able to use the resource-table mechanism without knowing:
+
+- Linux syscall numbers;
+- Linux errno numbers;
+- RISC-V register names;
+- Linux fd integers;
+- `dup` syscall names;
+- `close-on-exec` semantics unless explicitly adapting to them.
+
+======================================================================
+MINMAX / INHERITANCE RULE
+======================================================================
+
+Apply the MinMax Memo:
+
+    minimum permanent mechanism
+    maximum capability unlocked
+    maximum whole-system mental model
+
+Do not build an over-general object manager merely because one could be useful someday.
+Do not hard-code a console-only table merely because it is enough for one proof.
+
+Implement the smallest reusable resource mechanism that real Batch 25B pressure demands and that later files/pipes/sockets/timers/Wasm/QuirkM can extend without replacing the architecture.
+
+For every proposed field or rule ask:
+
+1. Is this fundamental resource machinery?
+2. Is this Linux descriptor compatibility behavior?
+3. Is this only proof-fixture policy?
+4. Can it stay at the edge until another consumer proves it belongs deeper?
+
+Fundamental → reusable Morphic layer.
+Linux-specific → Linux compatibility adapter/quarantine.
+Proof-only → fixture/backend policy with explicit nonclaim.
+Unknown → do not freeze it yet.
+
+======================================================================
+REUSE-FIRST RESOURCE DISCOVERY
+======================================================================
+
+Before creating the new resource-table capability, query the repository for existing solved pieces likely to matter, including but not limited to concepts represented by modules such as:
+
+- generational handles;
+- optional typed handles;
+- fixed-capacity object pools;
+- fixed free lists;
+- fixed-capacity vectors;
+- bounded system resource plans;
+- tagged results;
+- checked integer/range/address helpers;
+- project 53 bounded user-memory transfer;
+- project 56 Morphic semantic operation.
+
+Do NOT assume every named module must be used.
+Use only what the actual current contracts justify.
+
+If the repository already contains the exact primitive required, compose it.
+If it contains 80% of the primitive, prefer a thin new composition over a duplicate foundational implementation.
+If a new reusable module is necessary, give it the normal source/README/DETAILS/MASTERY/details.json/port.js/smoke/agent contract surface required by current repository policy.
+
+======================================================================
+REQUIREMENT FREEZE
+======================================================================
+
+Batch 25B must deliver all of the following unless checked-out repository truth proves an equivalent stronger form already exists:
+
+1. A bounded Linux-independent per-process resource-table mechanism.
+2. Deterministic resource-slot allocation/release behavior.
+3. Bootstrap population of real process-local stdin/stdout/stderr descriptor bindings.
+4. Elimination of the Batch 25A proof-only direct fd→console resolver.
+5. Linux `read` support sufficient for a deterministic bounded stdin proof.
+6. Existing Linux `write` routed through the real descriptor/resource table rather than hard-coded fd identity.
+7. Linux `close` support with real post-close failure behavior.
+8. At least one Linux duplication operation, preferably `dup` or `dup3`/`fcntl` only if the chosen ABI pressure is simpler and semantically truthful. Choose the smallest real Linux interface that proves descriptor aliasing/lifecycle without prematurely implementing unrelated flag semantics.
+9. Correct `-EBADF` behavior for invalid/closed descriptors at the Linux edge.
+10. Correct `-EFAULT` behavior for invalid user memory on read/write, with no partial externally visible transfer where the bounded backend claims all-or-nothing semantics.
+11. Correct unknown-syscall `-ENOSYS` behavior inherited from Batch 25A.
+12. Exact returning `sepc + 4` behavior for all returning ECALLs.
+13. A real raw-ECALL RV64 ELF fixture that judges returned Linux-visible results itself.
+14. A deterministic resource-lifecycle event/evidence record sufficient for an external verifier to prove allocation, aliasing, close, stale/invalid rejection, and continued operation of surviving aliases.
+15. Strict mutation tests for the new resource/FD facts.
+16. Two independent real `qemu-system-riscv64` executions with deterministic comparison.
+17. Focused regressions for every reused module whose contract is directly stressed.
+18. Full repository validation.
+19. A Batch 25B report with exact nonclaims, Snowball Yield, LOCATIONS, MINIMUS, branch/SHA/push/PR status, remaining work, and one next pressure.
+20. Successful commit, push, and PR targeting `main` when all required evidence is green.
+
+======================================================================
+RESOURCE-TABLE MODEL — MINIMUM REQUIRED SEMANTICS
+======================================================================
+
+The exact Zig API is not frozen here. Codex must choose the smallest API consistent with current repository conventions and actual reuse.
+
+At minimum the reusable layer must distinguish:
+
+- an empty slot from a live resource binding;
+- one process-local descriptor binding from the underlying resource identity/reference;
+- release of a binding from destruction of an underlying resource when aliases still exist, if aliasing is proved in this batch;
+- live resource from stale/invalid resource reference if generational safety is adopted;
+- resource operation availability sufficiently to reject reading from a write-only proof resource or writing to a read-only proof resource if Batch 25B exposes distinct stdin/stdout/stderr directions.
+
+Do NOT force a complete future rights system into this batch unless current existing modules make it essentially free and the proof uses it.
+
+A plausible internal shape, NOT a mandated public API, is:
+
+    ProcessResourceTable
+        descriptor bindings / local slots
+            ↓
+        opaque Morphic ResourceRef
+            ↓
+        bounded backing resource entries
+            ↓
+        backend capability/kind
+
+or, if current repository modules support it more cleanly:
+
+    LinuxFdTable
+        fd → ResourceHandle
+
+    ResourceTable
+        generational ResourceHandle → resource entry/backend identity
+
+The crucial property is separation, not exact type names.
+
+Do not conflate:
+
+- Linux descriptor number;
+- descriptor-table slot identity;
+- resource handle/reference;
+- backing object identity;
+- device/backend implementation.
+
+If Batch 25B can truthfully use a single table with a clear abstraction boundary, do so. Do not create layers only for diagram aesthetics.
+
+======================================================================
+STDIN / STDOUT / STDERR BOOTSTRAP
+======================================================================
+
+The initial process must now receive real descriptor bindings through the process resource/FD table rather than a syscall-local special case.
+
+At minimum:
+
+- fd 0 → bounded deterministic readable stdin-like resource;
+- fd 1 → bounded deterministic writable stdout-like resource;
+- fd 2 → bounded deterministic writable stderr-like resource.
+
+These are bootstrap resources for the proof, not a complete TTY implementation.
+
+Preferred stdin proof backend:
+
+- frozen deterministic byte payload known to the external verifier;
+- bounded cursor/read behavior only as far as actually implemented;
+- no hidden dependence on host terminal timing/input;
+- explicit EOF behavior if reached;
+- if read semantics are all-or-nothing for this bounded proof, say so;
+- do not claim general terminal line discipline, blocking, signals, canonical mode, pipes, or asynchronous input.
+
+stdout/stderr may continue using deterministic proof output, but descriptor resolution must occur through the real table.
+
+======================================================================
+SEMANTIC OPERATION BOUNDARY — EXTEND, DO NOT COLLAPSE
+======================================================================
+
+Project 56 currently proves ABI-neutral write and terminate semantics.
+
+Batch 25B should evolve the reusable semantic operation vocabulary only where real pressure requires it.
+
+Expected pressure likely includes:
+
+- read bytes from resource into guest memory;
+- write bytes from guest memory to resource;
+- terminate process-like execution.
+
+Descriptor `close` and `dup` are process-resource-table lifecycle operations and do NOT automatically belong in the same semantic I/O request union merely because Linux exposes them as syscalls.
+
+Codex must explicitly decide and document whether close/duplicate are:
+
+- resource-table operations;
+- semantic resource operations;
+- or Linux adapter operations over a reusable table primitive.
+
+Choose the layer that remains meaningful for QuirkM/Wasm without importing Linux fd semantics.
+
+Preferred architectural pressure:
+
+    Linux read(fd,...)
+         ↓ fd lookup
+    ResourceRef
+         ↓
+    semantic read_bytes(resource,...)
+         ↓
+    bounded backend
+
+    Linux write(fd,...)
+         ↓ fd lookup
+    ResourceRef
+         ↓
+    semantic write_bytes(resource,...)
+         ↓
+    bounded backend
+
+    Linux close(fd)
+         ↓
+    descriptor binding release
+         ↓
+    resource reference released/destructed only when appropriate
+
+    Linux dup*(fd,...)
+         ↓
+    second descriptor binding to same underlying resource/open state
+
+Do not make `read_bytes` or `write_bytes` know Linux descriptor integers.
+
+======================================================================
+READ SEMANTICS
+======================================================================
+
+Add the smallest truthful Linux `read` behavior that exercises the resource table and project 53-style user transfer safety.
+
+Required properties:
+
+- valid readable descriptor + valid writable U range → bytes copied to U memory and exact count returned;
+- invalid/closed descriptor → `-EBADF`, no U-memory mutation;
+- descriptor not readable under implemented proof capability → Linux-visible failure chosen from verified primary ABI semantics; do not invent an errno from memory;
+- invalid/unmapped/non-writable U destination → `-EFAULT`, no partial user-memory mutation for an all-or-nothing proof backend;
+- count 0 follows verified Linux edge semantics for descriptor validation and memory dereference behavior; encode exactly what is implemented and tested;
+- EOF behavior deterministic and externally proved if input can be exhausted;
+- no supervisor direct dereference of arbitrary U virtual addresses;
+- reuse current bounded user-copy/page-table machinery;
+- no SUM relaxation merely to make copy-out convenient.
+
+Whole-range validation must occur before externally visible state is consumed if the backend claims failure atomicity.
+
+If stdin has a cursor, an EFAULT must not consume input bytes before the operation is known to succeed.
+
+That rollback/non-consumption property is important and should be mutation-tested/evidenced.
+
+======================================================================
+WRITE SEMANTICS THROUGH THE REAL TABLE
+======================================================================
+
+Preserve Batch 25A write truth, but remove proof-only fd resolution from the syscall handler/backend.
+
+Required:
+
+- fd lookup through process-local table;
+- stdout and stderr both resolve through table entries;
+- valid writable resource + valid U source → exact bytes/count;
+- invalid/closed fd → `-EBADF`, no output;
+- unreadable/unmapped U source → `-EFAULT`, no output;
+- whole requested readable range validated before visible output under current all-or-nothing proof semantics;
+- zero-length behavior verified and tested;
+- no new direct page-table walker;
+- no claim of general Linux partial-write behavior unless actually implemented.
+
+======================================================================
+CLOSE SEMANTICS
+======================================================================
+
+Prove real descriptor lifetime.
+
+At minimum:
+
+1. a live descriptor succeeds for its supported operation;
+2. `close(fd)` succeeds once;
+3. subsequent operation using that fd returns `-EBADF`;
+4. second close of the same now-invalid fd returns `-EBADF`;
+5. closing one descriptor alias must not invalidate another surviving alias to the same underlying resource where duplication has been performed;
+6. resource-table evidence must show the correct lifetime transition without leaking Linux errno into the reusable layer.
+
+Do not claim:
+
+- close-on-exec;
+- multithreaded close races;
+- file-description offset semantics;
+- asynchronous close completion;
+- device flush semantics;
+- socket shutdown;
+- general POSIX lifetime semantics
+
+unless specifically implemented and proved.
+
+======================================================================
+DUPLICATION / ALIASING SEMANTICS
+======================================================================
+
+This batch should prove at least one descriptor duplication path because it is the first pressure that forces a useful distinction between a descriptor binding and an underlying resource.
+
+Choose the smallest Linux interface whose ABI semantics can be implemented truthfully and verified from primary sources.
+
+Preferred if simple in the current ABI: `dup`.
+If RV64 generic Linux exposes a more convenient path through `fcntl(F_DUPFD...)` or if `dup3` is materially easier without overclaiming flags, Codex may choose it, but document the decision.
+
+Minimum proof:
+
+- duplicate a valid descriptor;
+- returned descriptor is a distinct Linux-visible descriptor number;
+- both descriptors name the same underlying resource/open state for the semantics currently represented;
+- close one alias;
+- other alias remains usable;
+- closed alias is `-EBADF`;
+- deterministic allocation chooses the expected lowest/eligible slot according to the selected Linux interface’s verified rule;
+- invalid source descriptor fails correctly;
+- table-full behavior is bounded, deterministic, and mapped to a verified Linux errno only at the adapter edge.
+
+Do not fake full Linux open-file-description semantics if the backing proof resources have no offset/status state yet.
+State narrowly what “same underlying resource” means in this implementation.
+
+======================================================================
+STALE REFERENCE / GENERATIONAL SAFETY
+======================================================================
+
+The repository already has generational-handle knowledge. Query it before deciding how resource references should reject stale identities.
+
+If it composes cleanly, prefer stale-safe resource references so a released internal resource slot cannot silently become a different resource when reused.
+
+If introducing generation tracking would require disproportionate unrelated architecture in this batch, preserve the seam and defer it explicitly rather than implementing a half-correct generation model.
+
+Important distinction:
+
+Linux fd reuse after close is compatibility behavior and is allowed.
+A stale internal Morphic resource reference silently becoming a different underlying object should be avoided if the existing reusable machinery can prevent it cheaply.
+
+This is a concrete example of QuirkM/Linux separation:
+
+    Linux personality:
+        reusable integer fd semantics preserved
+
+    Morphic/QuirkM direction:
+        stale-safe typed/generational resource reference
+
+If implemented, prove both truths separately.
+
+======================================================================
+LINUX ABI FACTS — VERIFY FROM PRIMARY SOURCES BEFORE CODING
+======================================================================
+
+Do not rely on this plan’s memory for syscall numbers or errno constants.
+
+Before implementation, verify the exact RV64/generic Linux UAPI values and semantics from primary sources available in the environment/repository/toolchain for every syscall/error used.
+
+Expected pressure includes:
+
+- read;
+- write;
+- close;
+- selected duplication syscall/interface;
+- exit / exit_group inherited;
+- EBADF;
+- EFAULT;
+- ENOSYS;
+- any table-full / permission/mode errno newly required.
+
+Also verify:
+
+- RV64 register calling convention used by Linux syscalls;
+- duplication slot-allocation rule for the selected interface;
+- zero-length read/write edge behavior relevant to this bounded implementation.
+
+Keep a concise source/evidence note in the Batch 25B report.
+The RISC-V psABI alone is not sufficient authority for Linux syscall-number/errno semantics.
+
+======================================================================
+REAL RV64 USERSPACE FIXTURE
+======================================================================
+
+Use a separately built real RV64 ET_EXEC fixture with raw ECALLs and no libc/runtime.
+
+Inherit the Batch 25A two-segment/startup shape unless current implementation pressure requires a narrowly justified change.
+
+The fixture must judge returned Linux-visible values itself and write U-owned sentinels/results so the external verifier is not the only thing asserting correctness.
+
+A strong ordered sequence is:
+
+1. preserve enough Batch 24B/25A startup truth to prove same real process entry;
+2. unknown syscall → require `-ENOSYS`;
+3. read from fd 0 into valid U buffer → require exact frozen bytes/count;
+4. prove the read bytes in U memory, not merely a kernel log;
+5. read with invalid U destination → require `-EFAULT` and prove stdin cursor/non-consumption unchanged;
+6. write read bytes or a frozen message through fd 1 → exact output/count;
+7. duplicate fd 1 using selected Linux interface → require deterministic new descriptor;
+8. write through duplicate → exact output/count;
+9. close original fd 1 → success;
+10. write through original fd 1 → `-EBADF`, no output;
+11. write through duplicate → still succeeds;
+12. close duplicate → success;
+13. second close / use-after-close → `-EBADF`;
+14. optional stderr proof through fd 2 if it materially strengthens table bootstrap evidence;
+15. terminal exit/exit_group with frozen status;
+16. impossible post-exit path.
+
+Codex may reorder or slightly refine this sequence to fit exact fixture constraints, but the proof must include read, real table lookup, duplicate aliasing, close lifetime, surviving alias, invalid/closed rejection, and terminal handoff.
+
+Unique artifact-derived ECALL PCs must remain externally verifiable.
+
+======================================================================
+RESOURCE EVIDENCE RECORD
+======================================================================
+
+Add a compact deterministic evidence form that allows an independent verifier to establish resource-table transitions without trusting kernel prose.
+
+Evidence should be sufficient to prove facts such as:
+
+- initial occupied descriptor set includes 0/1/2;
+- descriptor→resource binding before operation;
+- duplicate allocated descriptor number;
+- duplicate refers to the same underlying resource identity/reference as the source under current semantics;
+- close removes only the selected descriptor binding;
+- surviving alias remains bound/live;
+- closed descriptor becomes invalid;
+- internal resource lifetime survives until the final alias closes if reference lifetime is implemented;
+- stale resource reference rejection if generational safety is implemented;
+- bounded table occupancy/capacity transitions;
+- no unexpected allocation/page-table/SATP changes during ordinary syscall returns unless the new table design truthfully requires a frozen bounded allocation at process setup.
+
+Do not expose raw internal pointers as the permanent evidence identity.
+Prefer deterministic stable IDs/slot+generation or similarly bounded proof identity.
+
+======================================================================
+STRICT EXTERNAL VERIFIER
+======================================================================
+
+Build Batch 25B verification by composing Batch 25A rather than rewriting its parser from scratch.
+
+The verifier must independently inspect enough of the fixture/artifact and machine output to establish:
+
+- real ELF identity and expected load shape;
+- Linux-style initial stack truth inherited;
+- exact ECALL instruction locations/order;
+- U-origin trap cause and exact resume PCs for returning syscalls;
+- raw Linux syscall numbers/arguments/results at the adapter edge;
+- semantic operation identities after fd/resource resolution;
+- exact read bytes copied into user memory;
+- exact write bytes emitted;
+- fd 0/1/2 bootstrap bindings;
+- duplicate descriptor allocation;
+- aliasing to same underlying resource identity under current semantics;
+- close transition;
+- post-close `-EBADF`;
+- surviving alias success;
+- `-EFAULT` with no mutation/output/input-consumption where claimed;
+- `-ENOSYS` inherited;
+- terminal status and no return after terminal operation;
+- U page permissions and W+X=0;
+- deterministic resource-table state;
+- two independent QEMU runs agree;
+- hosted/fake/machine Morphic equality remains true where current architecture expects it.
+
+Do not let the verifier simply trust a single `PASS` line printed by the kernel.
+
+======================================================================
+DECISIVE MUTATION TESTS
+======================================================================
+
+The verifier self-test must reject targeted mutations covering the new facts.
+
+At minimum mutate/reject examples equivalent to:
+
+- fd 0 initial binding missing/wrong;
+- fd 1 initial binding missing/wrong;
+- fd 2 initial binding missing/wrong;
+- read syscall number/order;
+- read destination pointer/count;
+- read returned count;
+- one input byte;
+- user-memory readback byte/sentinel;
+- EFAULT result;
+- claimed stdin cursor/non-consumption state after EFAULT;
+- write descriptor/resource identity;
+- emitted byte/count;
+- duplicate returned descriptor;
+- duplicate underlying resource identity;
+- close target descriptor;
+- close success result;
+- post-close EBADF result;
+- surviving-alias operation result;
+- table occupancy transition;
+- terminal status;
+- trap cause;
+- one ECALL PC/resume PC;
+- executable-stack or W+X evidence;
+- inherited Batch 24B/25A startup fact.
+
+Mutation tests should attack architectural relationships, not merely formatting.
+
+======================================================================
+FAILURE ATOMICITY / ORDERING
+======================================================================
+
+Preserve the strongest useful bounded property from Batch 25A:
+
+- validate guest ranges before visible output;
+- validate guest destination before consuming readable backend state if failure atomicity is claimed;
+- invalid fd before guest-memory mutation/output;
+- failed duplication must not change table state;
+- failed close must not change table state;
+- failed resource-table allocation must leave prior bindings intact;
+- verifier must be able to distinguish before/after state.
+
+If true Linux allows partial effects in broader circumstances but this bounded proof intentionally implements a stricter all-or-nothing subset, say so explicitly and do not claim general Linux I/O completeness.
+
+======================================================================
+QUIRKM / WASM INHERITANCE CHECK
+======================================================================
+
+Do NOT implement the QuirkM public API or Wasm host in this run.
+
+But before declaring the resource table complete, perform a design-level inheritance check:
+
+Could a future consumer plausibly do:
+
+    QuirkM typed handle
+          ↓
+    Morphic ResourceRef
+          ↓
+    same resource table/backend
+
+or:
+
+    Wasm resource handle
+          ↓
+    Wasm host adapter
+          ↓
+    Morphic ResourceRef
+          ↓
+    same resource table/backend
+
+without passing through Linux fd integers or Linux errno?
+
+The Batch 25B report must answer this concretely based on the implemented types, not with aspirational prose.
+
+If the answer is no, the architectural boundary is wrong and must be repaired before PASS.
+
+======================================================================
+QUIRK EXTRACTION
+======================================================================
+
+Because this is the first real fd-lifecycle batch, add a compact Quirk Extraction section to the report.
+
+For each important Linux behavior encountered, record:
+
+- Linux behavior;
+- fundamental mechanism;
+- compatibility-specific/historical behavior;
+- QuirkM-native counterdesign candidate;
+- whether the shared Morphic core absorbed the fundamental part;
+- whether the Linux behavior remained quarantined;
+- whether a current QuirkM ledger entry already covers it;
+- whether a new ledger entry/update is warranted.
+
+At minimum consider:
+
+- reusable integer fd identity after close;
+- descriptor aliasing/duplication;
+- implicit bootstrap descriptors 0/1/2;
+- descriptor-local versus underlying-resource lifetime;
+- ambient process-local descriptor namespace.
+
+Do not mechanically add or rewrite hundreds of ledger entries.
+Update only focused canonical QuirkM material if the Batch 25B implementation produces a genuinely new evidenced fact.
+
+======================================================================
+NON-GOALS — DO NOT EXPAND THE BATCH
+======================================================================
+
+Do NOT begin these unless a tiny prerequisite is absolutely necessary to make the frozen Batch 25B proof truthful:
+
+- VFS/path lookup/openat;
+- real filesystem objects;
+- file offsets/seek;
+- mmap/brk/mprotect;
+- execve;
+- fork/clone/vfork;
+- wait/process hierarchy;
+- Linux signals;
+- threads/TLS/futexes;
+- pipes;
+- poll/select/epoll;
+- sockets/networking;
+- tty/termios/line discipline;
+- PT_INTERP/PIE/dynamic linking;
+- libc/musl;
+- BusyBox;
+- Alpine rootfs/init;
+- Wasm runtime/WASI;
+- stable QuirkM Native ABI;
+- complete rights/capability security model;
+- asynchronous I/O framework;
+- SMP;
+- hypervisor/KVM/VMM work.
+
+Do not implement open/openat merely to obtain descriptors. Bootstrap the bounded resources directly for this proof.
+
+The next VFS/file pressure should arrive only after resource identity and descriptor lifetime are real.
+
+======================================================================
+EXPECTED IMPLEMENTATION SHAPE — ADAPT TO REPOSITORY TRUTH
+======================================================================
+
+A likely clean shape is:
+
+    project 56
+        morphic-semantic-operation
+        + read_bytes if real pressure requires it
+        + existing write_bytes/terminate
+
+    new reusable module/composition if needed
+        bounded process/resource table
+        Linux-independent resource references/lifetime
+
+    freestanding Morphic runtime
+        process bootstrap creates resource table
+        binds stdin/stdout/stderr resources
+
+    Linux/RV64 adapter
+        decode fd/syscall args
+        lookup/bind/release/duplicate descriptor entries
+        translate semantic failures to Linux errno
+        encode a0
+
+    proof backends
+        deterministic stdin
+        deterministic stdout/stderr
+
+    real RV64 fixture
+        read/write/dup/close/error/exit sequence
+
+    strict verifier
+        Batch 25A composition + resource lifecycle proof
+
+This is a guide, not permission to duplicate existing solved modules.
+
+======================================================================
+FOCUSED VALIDATION EXPECTATIONS
+======================================================================
+
+Use repository-discovered canonical commands, but expected coverage includes:
+
+- unit + smoke for any new reusable resource-table module;
+- unit + smoke for project 56 if extended;
+- focused tests for actually reused handle/pool/free-list modules if their behavior is newly relied upon;
+- project 53 focused validation;
+- project 54/55 only where startup/ELF regression is materially touched;
+- Batch 25A self-test and strict proof as a regression;
+- Batch 25B one-QEMU mutation self-test;
+- Batch 25B strict two-QEMU proof;
+- hosted/fake Morphic regressions;
+- `zig fmt --check` on touched Zig trees;
+- `zig build check`;
+- generated index/graph checks;
+- command-reference check;
+- full `zig build validate-repository` / canonical developer validation;
+- repository policy.
+
+Do not claim a command passed unless it actually ran successfully in the final checked-out state.
+
+======================================================================
+GENERATED / DOCUMENTATION HYGIENE
+======================================================================
+
+If a new module or command surface is added:
+
+- update canonical source/contracts first;
+- regenerate deterministic indexes via repository tooling;
+- update `COMMANDS.md` where required;
+- update module catalogs through normal generation/workflow;
+- add the Batch 25B report;
+- do not manually hand-edit generated truth when a generator owns it;
+- keep root documentation policy satisfied;
+- do not create duplicate QuirkM proposal paths;
+- do not make public README claims ahead of proof.
+
+If README status is advanced in the task branch, do it only after Batch 25B is fully proved and in a way that cleanly composes with current main.
+
+======================================================================
+REPORT / HANDOFF — REQUIRED
+======================================================================
+
+Create:
+
+    docs/reports/AGENTIC_SNOWBALL_BATCH_25B.md
+
+The final handoff and report must include:
+
+STATUS
+- PASS / PARTIAL / BLOCKED, with PASS only if every frozen requirement is satisfied.
+
+ARCHITECTURE
+- exact resource table types/modules;
+- exact Linux fd edge;
+- exact semantic operation changes;
+- exact stdin/stdout/stderr bootstrap model;
+- exact duplication/lifetime model;
+- where Linux identity is quarantined.
+
+PROOF
+- real fixture identity;
+- syscall sequence;
+- exact returned values/errors;
+- exact read bytes;
+- exact write bytes;
+- duplicate descriptor and alias identity;
+- close/use-after-close behavior;
+- exact returning ECALL PCs/resume PCs;
+- terminal status;
+- two-QEMU result;
+- mutation-test result.
+
+REGRESSIONS
+- Batch 25A proof result;
+- focused module results;
+- aggregate repository results.
+
+FAILURES / REPAIRS
+- first divergence(s) encountered;
+- root cause(s);
+- exact repair(s);
+- evidence after repair.
+
+NONCLAIMS
+- everything intentionally still not implemented.
+
+INHERITANCE CHECK
+- how QuirkM could consume the resource mechanism without Linux fd/errno;
+- how Wasm could consume it without Linux fd/errno;
+- what remains intentionally unfrozen.
+
+QUIRK EXTRACTION
+- focused Linux behavior → fundamental mechanism → QuirkM counterdesign mapping.
+
+SNOWBALL YIELD
+- requirements at start;
+- reused modules/compositions actually used;
+- missing reusable capabilities discovered;
+- new reusable modules/compositions created;
+- diagnostics reused/added;
+- tests/evidence added;
+- what this batch makes cheaper for the next batch.
+
+LOCATIONS
+- key source/module/fixture/verifier/report paths.
+
+MINIMUS
+- canonical minimal reproduction/validation commands and results.
+
+GIT / PR
+- exact branch;
+- exact final commit SHA;
+- push status;
+- PR URL;
+- current CI state;
+- remaining work outside this batch;
+- exactly one next pressure.
+
+Never silently stop after a long run.
+
+======================================================================
+SUCCESS CONDITION
+======================================================================
+
+Batch 25B is PASS only when all of the following are true:
+
+- the Batch 25A proof-only fd resolver is gone from the real syscall path;
+- a bounded Linux-independent resource-table mechanism exists and is mechanically tested;
+- process bootstrap creates real fd 0/1/2 bindings;
+- Linux read works from deterministic stdin into real U memory;
+- Linux write works through the table;
+- Linux close proves descriptor invalidation;
+- at least one real Linux duplication path proves descriptor aliasing;
+- closing one alias leaves the surviving alias usable;
+- invalid/closed descriptor paths return verified Linux `-EBADF`;
+- invalid U memory returns `-EFAULT` with no forbidden partial effects;
+- unsupported syscall still returns `-ENOSYS`;
+- every returning ECALL resumes exactly at `sepc + 4`;
+- terminal exit path still does not resume;
+- Linux syscall/errno/fd identity does not enter the reusable resource-table or semantic-operation architecture;
+- inheritance into future QuirkM/Wasm consumers is concrete from implemented types;
+- strict verifier independently reconstructs the new relationships;
+- decisive mutations are rejected;
+- two independent QEMU runs agree;
+- Batch 25A strict proof still passes;
+- focused and full repository validation pass;
+- all claims remain bounded to the evidence;
+- completed work is committed, pushed, and represented by a PR to main;
+- the final normal PASS handoff is emitted.
+
+======================================================================
+NEXT PRESSURE AFTER 25B — DO NOT IMPLEMENT NOW
+======================================================================
+
+If Batch 25B passes cleanly, the preferred next pressure is:
+
+    BATCH 26 — BOUNDED VFS / PATH LOOKUP + OPENAT
+
+using the now-real resource/FD lifecycle to create the first actual file-backed descriptor without redesigning resource identity.
+
+That should begin the path from:
+
+    syscall boundary
+        ↓
+    resource / fd lifecycle
+        ↓
+    VFS + openat
+        ↓
+    file-backed read/write
+        ↓
+    mmap / exec / process semantics
+        ↓
+    first static BusyBox pressure
+
+Do not pull Batch 26 work into Batch 25B.
