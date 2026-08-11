@@ -1,0 +1,110 @@
+# Project Vocabulary
+
+## MinMax Memo™
+
+**Minimum implementation surface. Maximum capability surface. Maximum whole-system mental model.**
+
+The **MinMax Memo™** is the project doctrine for deciding what belongs in Morphic's permanent foundation.
+
+It has three simultaneous goals:
+
+1. **Minimize what must be implemented and permanently understood.**
+   Keep the privileged kernel, compatibility machinery, special cases, and conceptual surface as small and coherent as practical.
+
+2. **Maximize what the small foundation unlocks.**
+   Prefer general mechanisms and compatibility surfaces that enable large classes of software, runtimes, desktops, browsers, build systems, and future userspaces instead of implementing each capability separately.
+
+3. **Maximize the whole-system mental model.**
+   Preserve a system whose essential native machinery can still be understood coherently by one sufficiently skilled person from boot through memory, execution, I/O, networking, isolation, and the interfaces exposed to userspace.
+
+The short form is:
+
+> **Minimize what must be understood. Maximize what can be built. Preserve the whole-machine mental model.**
+
+Or:
+
+> **Minimum mechanism. Maximum possibility.**
+
+### Mental model
+
+```text
+MINIMUM
+kernel complexity
+special cases
+privileged LOC
+conceptual machinery
+        |
+        v
+     MinMax
+        |
+        v
+MAXIMUM
+software unlocked
+things buildable on top
+ecosystem compatibility
+future possibilities
+
+while preserving:
+
+MAXIMUM MENTAL MODEL
+one person can understand
+the complete foundation
+```
+
+### Feature test
+
+A proposed addition should be evaluated with the following questions:
+
+```text
+Does it keep the permanent mechanism small?
+        |
+        v
+Does it unlock a broad class of capabilities?
+        |
+        v
+Is it general rather than application-specific?
+        |
+        v
+Could the same capability live above the kernel instead?
+        |
+        v
+Can one person still explain the complete path?
+        |
+        v
+YES -> MinMax-aligned
+```
+
+A tiny kernel that cannot support useful software is not automatically MinMax. It may have minimized the wrong thing.
+
+Likewise, a compatibility layer that unlocks enormous software ecosystems but becomes too large or historically tangled to understand can violate the mental-model side of MinMax.
+
+The target is therefore not simply the smallest kernel. It is:
+
+> **The smallest understandable kernel that unlocks the largest possible computing world.**
+
+### Complexity leverage
+
+MinMax prefers additions with high capability leverage. A small general interface that unlocks hundreds of programs is usually preferable to a large bespoke implementation that unlocks one feature.
+
+Conceptually:
+
+```text
+                 capability unlocked
+MinMax leverage = -------------------
+                 permanent complexity
+```
+
+This is a decision model rather than a literal required metric.
+
+Examples of MinMax-aligned moves include supporting a compact standards-shaped interface that enables an existing runtime, toolkit, browser engine, build ecosystem, or software family. Poor MinMax moves include application-specific kernel hacks, duplicated userspace functionality in privileged code, and compatibility behavior whose maintenance cost substantially exceeds the software world it unlocks.
+
+### Relationship to Morphic branches
+
+The MinMax Memo applies most directly to the **Compatibility Maximizer** branch, but it can guide all Morphic development.
+
+- **Native branch:** minimize foundational mechanism while preserving maximum freedom for future native worlds.
+- **Compatibility Maximizer branch:** add the smallest compatibility surfaces with the largest direct software payoff.
+- **Alpine branch:** use real compatibility pressure to validate mechanisms without automatically adopting every Linux historical behavior into the permanent core.
+- **Hypervisor branch:** contain complexity rather than absorbing it when direct compatibility would be disproportionately expensive.
+
+The doctrine is ultimately about preserving a foundation that is both powerful and teachable: a machine that can grow far beyond what its original authors build while its essential substrate remains coherent enough to be learned as a whole.
