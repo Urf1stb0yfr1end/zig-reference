@@ -391,6 +391,9 @@
       "bounded-elf64-load-plan",
       "bounded-rv64-linux-initial-stack-plan"
     ],
+    "referenceFromIdentity": [
+      "bounded-resource-table"
+    ],
     "requireAligned": [
       "riscv-sv39-virtual-address-indexing"
     ],
@@ -399,6 +402,9 @@
     ],
     "riscv_machine": [
       "bounded-elf64-load-plan"
+    ],
+    "semanticIdentity": [
+      "bounded-resource-table"
     ],
     "stack_alignment": [
       "bounded-rv64-linux-initial-stack-plan"

@@ -62,7 +62,8 @@
     },
     "bounded-resource-table": {
       "dependencies": [
-        "generational-handles"
+        "generational-handles",
+        "morphic-semantic-operation"
       ],
       "status": "full"
     },

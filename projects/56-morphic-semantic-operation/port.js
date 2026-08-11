@@ -176,20 +176,6 @@ module.exports = {
         "portingRisk": "medium",
         "likelyChangeCategory": "syntax_or_type_semantics",
         "notes": []
-      },
-      {
-        "name": "@intFromEnum",
-        "files": [
-          {
-            "path": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig",
-            "lines": [],
-            "symbols": []
-          }
-        ],
-        "baselineBehavior": "Zig 0.14.0 @intFromEnum behavior as exercised by this module",
-        "portingRisk": "medium",
-        "likelyChangeCategory": "syntax_or_type_semantics",
-        "notes": []
       }
     ],
     "notUsed": []

@@ -126,7 +126,9 @@
     "length-prefixed-binary-field": [
       "type-length-value-decoder"
     ],
-    "morphic-semantic-operation": [],
+    "morphic-semantic-operation": [
+      "bounded-resource-table"
+    ],
     "nonzero-integer": [],
     "optional-typed-handle": [],
     "owned-byte-buffer": [],

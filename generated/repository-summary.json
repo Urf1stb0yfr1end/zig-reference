@@ -30,7 +30,7 @@
       "total": 58
     },
     "recipe_coverage": 11,
-    "reused_modules": 30,
+    "reused_modules": 31,
     "smoke_tested_modules": 58,
     "stable_modules": 0,
     "stale_generated_textual_files": 0,

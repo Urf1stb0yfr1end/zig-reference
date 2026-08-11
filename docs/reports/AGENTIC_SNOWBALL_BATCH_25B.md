@@ -17,6 +17,8 @@ Linux fd integer
   -> Linux negative errno adapter
 ```
 
+**Generation-preservation invariant:** A Morphic semantic I/O request carries enough identity to distinguish successive generations occupying the same resource-table slot. Linux resolves an fd to the full `ResourceRef`; `semanticIdentity` carries both slot and generation; the backend reconstructs that complete reference without a fixed-generation assumption.
+
 Project 57 composes project 08 `HandleTable`; it does not duplicate generation or bounded-storage machinery. Project 53 validates an entire user range before read copy-out or write copy-in. Project 56 gains only justified ABI-neutral `read_bytes` and `operation_not_supported`; close and duplicate remain binding/resource lifetime operations rather than I/O union variants. The Linux layer alone owns descriptor allocation, fd 0/1/2/3 meanings, syscall numbers, EBADF/EFAULT/EMFILE/ENOSYS, and register decoding.
 
 ## Primary ABI sources checked
@@ -25,13 +27,13 @@ The implementation checked local installed Linux UAPI primary headers: `/usr/inc
 
 ## Machine and lifecycle proof
 
-Bootstrap creates three distinct resource entries and binds readable stdin to fd 0 and writable stdout/stderr to fd 1/2. The ordered fixture proves unsupported→ENOSYS; `read(0,...,5)`→`stdin`; `dup(0)`→3; `close(0)`; fd 0→EBADF; bad-destination read on fd 3→EFAULT without cursor movement; valid alias read→the unconsumed `-25b`; fd-table-routed write→exact `stdin-25b`; close fd 3; repeated read/close→EBADF; invalid write fd→EBADF; invalid write memory→EFAULT; read from write-only fd 1→EBADF; terminal exit group→37. Final resource count is two, proving stdin destruction only after the final alias closes.
+Bootstrap first creates and finally releases a disposable resource, then reuses that same slot at generation 2 for stdin; it subsequently creates three distinct live resource entries and binds readable stdin to fd 0 and writable stdout/stderr to fd 1/2. The ordered fixture proves unsupported→ENOSYS; `read(0,...,5)`→`stdin`; `dup(0)`→3; `close(0)`; fd 0→EBADF; bad-destination read on fd 3→EFAULT without cursor movement; valid alias read→the unconsumed `-25b`; fd-table-routed write→exact `stdin-25b`; close fd 3; repeated read/close→EBADF; invalid write fd→EBADF; invalid write memory→EFAULT; read from write-only fd 1→EBADF; terminal exit group→37. The verifier requires `stdin_generation=2`. Final resource count is two, proving stdin destruction only after the final alias closes.
 
 The backend plans the complete destination before copying or moving the stdin cursor, so the EFAULT read cannot consume input. Write likewise validates the complete source before appending output. Every returning event records cause 8, clear SPP, exact artifact ECALL PC and `PC+4`; the terminal event records no resume. The strict verifier independently parses the ELF and its 15 ECALL sites, composes the Batch 24B parser, checks event relations and exact bytes, compares two QEMU processes, and preserves hosted/fake/machine Morphic equality.
 
 ## Independent evidence and decisive mutations
 
-Project 57 unit and external smoke tests independently prove bounded creation, lowest-slot binding duplication, shared reference counts, surviving aliases, final destruction, stale-reference rejection, table-full behavior, invalid unbind, and failed-mutation preservation. The machine verifier mutation mode rejects descriptor allocation, close/use-after-close results, EFAULT atomicity evidence, semantic kind, exact output, cursor, resource count, resume PC, and inherited argc evidence.
+Project 57 unit and external smoke tests independently prove generation-2 slot reuse through real `morphic-semantic-operation.execute` dispatch, stale-generation rejection, bounded creation, lowest-slot binding duplication, shared reference counts, surviving aliases, final destruction, stale-reference rejection, table-full behavior, invalid unbind, and failed-mutation preservation. The machine verifier mutation mode rejects descriptor allocation, close/use-after-close results, EFAULT atomicity evidence, semantic kind, exact output, cursor, resource count, resume PC, and inherited argc evidence.
 
 ## Failures and repairs
 
@@ -79,7 +81,7 @@ QuirkM should inherit typed access to `ResourceRef`, explicit capability failure
 status: PASS
 command: Batch 25B bounded resource/FD lifecycle
 branch: work
-summary: modules=58 qemu_runs=2 ecalls=15 returns=14 terminal=37 stdin_cursor=9 resources_after=2 W+X=0
+summary: modules=58 qemu_runs=2 ecalls=15 returns=14 terminal=37 stdin_generation=2 stdin_cursor=9 resources_after=2 W+X=0
 next: Batch 26 VFS/openat pressure without replacing resource identity
 
 ## Next pressure

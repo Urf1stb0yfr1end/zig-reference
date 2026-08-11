@@ -1,8 +1,19 @@
 const handles = @import("generational-handles");
+const semantic = @import("morphic-semantic-operation");
 
 /// Operations are substrate capabilities, not Linux access-mode bits.
 pub const Capabilities = packed struct { read: bool = false, write: bool = false };
 pub const BackendId = enum(u32) { _ };
+
+/// Lossless boundary between the canonical generational handle and semantic
+/// I/O identity. Compatibility adapters must pass both fields.
+pub fn semanticIdentity(reference: anytype) semantic.ResourceId {
+    return .{ .slot = reference.index, .generation = reference.generation };
+}
+
+pub fn referenceFromIdentity(comptime ResourceRef: type, identity: semantic.ResourceId) ResourceRef {
+    return .{ .index = identity.slot, .generation = identity.generation };
+}
 
 pub fn ResourceTable(comptime capacity: usize) type {
     return struct {

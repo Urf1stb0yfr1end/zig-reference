@@ -743,7 +743,8 @@
       "portContract": "projects/57-bounded-resource-table/port.js",
       "implementationPath": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
       "dependenciesMustPortFirst": [
-        "generational-handles"
+        "generational-handles",
+        "morphic-semantic-operation"
       ],
       "baselineValidated": false,
       "testedTargetVersions": [],

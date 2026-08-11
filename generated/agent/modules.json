@@ -8615,7 +8615,9 @@
         "architecture-independent-write-and-termination"
       ],
       "change_impact": {
-        "dependents": [],
+        "dependents": [
+          "bounded-resource-table"
+        ],
         "recipes": []
       },
       "composition": {
@@ -8641,7 +8643,9 @@
       },
       "diagnostic_ids": [],
       "direct_dependencies": [],
-      "direct_dependents": [],
+      "direct_dependents": [
+        "bounded-resource-table"
+      ],
       "do_not_use_when": [
         "Linux syscall decoding or errno encoding is the requested layer."
       ],
@@ -8719,7 +8723,9 @@
       "summary": "ABI-neutral synchronous write and termination semantic operation dispatch.",
       "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
-      "transitive_dependents": [],
+      "transitive_dependents": [
+        "bounded-resource-table"
+      ],
       "use_when": [
         "A compatibility personality or runtime needs shared write/terminate semantics."
       ]
@@ -8757,6 +8763,7 @@
       },
       "dependency_build_order": [
         "generational-handles",
+        "morphic-semantic-operation",
         "bounded-resource-table"
       ],
       "details": "projects/57-bounded-resource-table/details.json",
@@ -8767,7 +8774,8 @@
       },
       "diagnostic_ids": [],
       "direct_dependencies": [
-        "generational-handles"
+        "generational-handles",
+        "morphic-semantic-operation"
       ],
       "direct_dependents": [],
       "do_not_use_when": [
@@ -8796,7 +8804,8 @@
         "unit_validated": true
       },
       "failure_guarantees": [
-        "Failed resource and binding operations preserve state."
+        "Failed resource and binding operations preserve state.",
+        "Semantic I/O identity preserves both the resource slot and generation; stale identities remain rejected after slot reuse."
       ],
       "focused_validation_commands": [
         "zig build test-bounded-resource-table",
@@ -8804,7 +8813,8 @@
       ],
       "id": "57",
       "integration_notes": [
-        "Adapters keep Linux fd and errno outside this module."
+        "Adapters keep Linux fd and errno outside this module.",
+        "Pass semanticIdentity(reference) end-to-end and reconstruct only with referenceFromIdentity; never assume generation 1."
       ],
       "invalidation": {},
       "known_gaps": [
@@ -8831,7 +8841,9 @@
         "Capabilities",
         "BackendId",
         "ResourceTable",
-        "BindingTable"
+        "BindingTable",
+        "semanticIdentity",
+        "referenceFromIdentity"
       ],
       "resource_profile": {
         "bounded": true,
@@ -8849,7 +8861,8 @@
       "summary": "Bounded generational resource identity and deterministic process-local alias bindings.",
       "thread_safety": "not_synchronized",
       "transitive_dependencies": [
-        "generational-handles"
+        "generational-handles",
+        "morphic-semantic-operation"
       ],
       "transitive_dependents": [],
       "use_when": [

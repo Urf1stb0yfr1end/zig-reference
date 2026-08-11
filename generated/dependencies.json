@@ -30,7 +30,8 @@
     ],
     "bounded-integer": [],
     "bounded-resource-table": [
-      "generational-handles"
+      "generational-handles",
+      "morphic-semantic-operation"
     ],
     "bounded-rv64-linux-initial-stack-plan": [
       "aligned-address-and-size-helpers",

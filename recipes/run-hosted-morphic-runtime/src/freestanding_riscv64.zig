@@ -532,7 +532,7 @@ export fn recordUserServiceTrap(frame: *TrapFrame) callconv(.c) void {
 
 const SyscallBackend = struct {
     pub fn readBytes(_: @This(), operation: morphic_operation.ReadBytes) morphic_operation.Completion {
-        const resource = syscall_resources.resolve(.{ .index = @intFromEnum(operation.source), .generation = 1 }) orelse return .{ .failure = .invalid_resource };
+        const resource = syscall_resources.resolve(resource_tables.referenceFromIdentity(ResourceRef, operation.source)) orelse return .{ .failure = .invalid_resource };
         if (!resource.capabilities.read) return .{ .failure = .operation_not_supported };
         const available = syscall_stdin.len - syscall_stdin_cursor;
         const amount = @min(operation.byte_count, available);
@@ -546,7 +546,7 @@ const SyscallBackend = struct {
         return .{ .success = amount };
     }
     pub fn writeBytes(_: @This(), operation: morphic_operation.WriteBytes) morphic_operation.Completion {
-        const resource = syscall_resources.resolve(.{ .index = @intFromEnum(operation.destination), .generation = 1 }) orelse return .{ .failure = .invalid_resource };
+        const resource = syscall_resources.resolve(resource_tables.referenceFromIdentity(ResourceRef, operation.destination)) orelse return .{ .failure = .invalid_resource };
         if (!resource.capabilities.write) return .{ .failure = .operation_not_supported };
         if (operation.byte_count == 0) return .{ .success = 0 };
         const plan = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(@intFromEnum(operation.source)), operation.byte_count, .read_from_user, syscall_query) catch return .{ .failure = .invalid_user_memory };
@@ -620,7 +620,7 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                 frame.x[10] = negativeErrno(9);
                 break :blk;
             };
-            request = .{ .read_bytes = .{ .source = @enumFromInt(@as(u32, @intCast(reference.index))), .destination = @enumFromInt(@as(u64, frame.x[11])), .byte_count = frame.x[12] } };
+            request = .{ .read_bytes = .{ .source = resource_tables.semanticIdentity(reference), .destination = @enumFromInt(@as(u64, frame.x[11])), .byte_count = frame.x[12] } };
         },
         .write => blk: {
             syscall_semantics[index] = 2;
@@ -628,7 +628,7 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                 frame.x[10] = negativeErrno(9);
                 break :blk;
             };
-            request = .{ .write_bytes = .{ .destination = @enumFromInt(@as(u32, @intCast(reference.index))), .source = @enumFromInt(@as(u64, frame.x[11])), .byte_count = frame.x[12] } };
+            request = .{ .write_bytes = .{ .destination = resource_tables.semanticIdentity(reference), .source = @enumFromInt(@as(u64, frame.x[11])), .byte_count = frame.x[12] } };
         },
         .terminate => blk: {
             syscall_semantics[index] = 3;
@@ -1826,7 +1826,13 @@ noinline fn executeLinuxRv64Syscalls(allocator: anytype, page_owner: anytype, bu
     syscall_resources = .{};
     syscall_bindings = .{};
     syscall_stdin_cursor = 0;
+    // Force the real machine I/O path through a reused slot. Any conversion
+    // that drops the generation or reconstructs generation 1 now fails before
+    // the first successful read.
+    const retired_ref = syscall_resources.create(.{ .backend = @enumFromInt(3), .capabilities = .{ .read = true } }) catch shutdown();
+    if (!(syscall_resources.release(retired_ref) catch shutdown())) shutdown();
     const stdin_ref = syscall_resources.create(.{ .backend = @enumFromInt(0), .capabilities = .{ .read = true } }) catch shutdown();
+    if (stdin_ref.index != retired_ref.index or stdin_ref.generation != retired_ref.generation + 1) shutdown();
     const stdout_ref = syscall_resources.create(.{ .backend = @enumFromInt(1), .capabilities = .{ .write = true } }) catch shutdown();
     const stderr_ref = syscall_resources.create(.{ .backend = @enumFromInt(2), .capabilities = .{ .write = true } }) catch shutdown();
     syscall_bindings.bindAt(0, stdin_ref) catch shutdown();
@@ -1904,6 +1910,8 @@ noinline fn executeLinuxRv64Syscalls(allocator: anytype, page_owner: anytype, bu
     writeUsizeHex(syscall_stdin_cursor);
     write("\nresource_count=");
     writeUsizeHex(syscall_resources.count());
+    write("\nstdin_generation=");
+    writeUsizeHex(stdin_ref.generation);
     write("\ntrap_cause=0000000000000008\nterminal_status=");
     writeUsizeHex(syscall_terminal_status);
     write("\ncode_pte=");

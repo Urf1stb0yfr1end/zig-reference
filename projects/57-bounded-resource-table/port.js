@@ -56,7 +56,9 @@ module.exports = {
       "Capabilities",
       "BackendId",
       "ResourceTable",
-      "BindingTable"
+      "BindingTable",
+      "semanticIdentity",
+      "referenceFromIdentity"
     ],
     "publicTypes": [
       {
@@ -84,6 +86,14 @@ module.exports = {
       {
         "name": "BindingTable",
         "signature": "BindingTable(comptime ResourceRef: type, comptime capacity: usize) type"
+      },
+      {
+        "name": "semanticIdentity",
+        "signature": "semanticIdentity(reference: anytype) morphic-semantic-operation.ResourceId"
+      },
+      {
+        "name": "referenceFromIdentity",
+        "signature": "referenceFromIdentity(comptime ResourceRef: type, identity: morphic-semantic-operation.ResourceId) ResourceRef"
       }
     ],
     "publicMethods": [
@@ -144,14 +154,19 @@ module.exports = {
         "canonicalName": "generational-handles",
         "portContract": "projects/08-generational-handles/port.js",
         "importName": "generational-handles",
-        "symbolsUsed": [
-          "HandleTable"
-        ],
+        "symbolsUsed": [],
         "mustPortFirst": true,
         "reason": "The module imports this direct repository dependency in build.zig.",
-        "guaranteesInherited": [
-          "stale-reference rejection and bounded inline storage"
-        ]
+        "guaranteesInherited": []
+      },
+      {
+        "canonicalName": "morphic-semantic-operation",
+        "portContract": "projects/56-morphic-semantic-operation/port.js",
+        "importName": "morphic-semantic-operation",
+        "symbolsUsed": [],
+        "mustPortFirst": true,
+        "reason": "The module imports this direct repository dependency in build.zig.",
+        "guaranteesInherited": []
       }
     ],
     "standardLibrary": [],
@@ -352,12 +367,14 @@ module.exports = {
   ],
   "migrationOrder": {
     "portAfter": [
-      "generational-handles"
+      "generational-handles",
+      "morphic-semantic-operation"
     ],
     "portBefore": [],
     "independentOf": [],
     "recommendedSequence": [
       "generational-handles",
+      "morphic-semantic-operation",
       "bounded-resource-table"
     ],
     "cycleRisks": []

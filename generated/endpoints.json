@@ -1851,6 +1851,12 @@
       "signature": "referenceCount(self: *const Self, reference: ResourceRef) ?usize"
     },
     {
+      "kind": "function",
+      "module": "bounded-resource-table",
+      "name": "referenceFromIdentity",
+      "signature": "referenceFromIdentity(comptime ResourceRef: type, identity: morphic-semantic-operation.ResourceId) ResourceRef"
+    },
+    {
       "kind": "method",
       "module": "bounded-resource-table",
       "name": "release",
@@ -2053,6 +2059,12 @@
       "module": "bounded-byte-reader",
       "name": "seek",
       "signature": "seek(self: *BoundedReader, position_: usize) error{InvalidPosition}!void"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-resource-table",
+      "name": "semanticIdentity",
+      "signature": "semanticIdentity(reference: anytype) morphic-semantic-operation.ResourceId"
     },
     {
       "kind": "method",

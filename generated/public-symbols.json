@@ -577,6 +577,10 @@
       "symbol": "plan"
     },
     {
+      "module": "bounded-resource-table",
+      "symbol": "referenceFromIdentity"
+    },
+    {
       "module": "riscv-sv39-virtual-address-indexing",
       "symbol": "requireAligned"
     },
@@ -587,6 +591,10 @@
     {
       "module": "bounded-elf64-load-plan",
       "symbol": "riscv_machine"
+    },
+    {
+      "module": "bounded-resource-table",
+      "symbol": "semanticIdentity"
     },
     {
       "module": "bounded-rv64-linux-initial-stack-plan",

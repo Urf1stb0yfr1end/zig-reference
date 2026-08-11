@@ -35,7 +35,7 @@ def num(v):
 def parse(raw,t,t24,old,kt):
  b24.parse(raw,t24,old,kt);d,ev=fields(raw)
  if d.get('artifact')!='userspace-elf-rv64-linux-syscalls' or d.get('whole_range_before_output')!='PASS' or d.get('translation_change')!='none' or d.get('complete')!='PASS':raise RuntimeError('policy')
- if num(d['entry'])!=t['entry'] or num(d['initial_sp'])!=0x80402f50 or num(d['trap_cause'])!=8 or num(d['terminal_status'])!=37 or num(d['stdin_cursor'])!=9 or num(d['resource_count'])!=2:raise RuntimeError('header relation')
+ if num(d['entry'])!=t['entry'] or num(d['initial_sp'])!=0x80402f50 or num(d['trap_cause'])!=8 or num(d['terminal_status'])!=37 or num(d['stdin_cursor'])!=9 or num(d['resource_count'])!=2 or num(d['stdin_generation'])!=2:raise RuntimeError('header relation')
  if len(ev)!=15:raise RuntimeError('event count/order')
  exp=[
   (0,0x7fff,'unsupported',-38,(0x1111,0x2222,0x3333)),
@@ -70,7 +70,7 @@ def reject(raw,t,t24,o,k,a,b):
  raise AssertionError('mutation accepted '+repr(a))
 def selftest():
  td,t,t24,o,k,r,_=fixture();d=parse(r,t,t24,o,k);f=d['fields'];e=d['events']
- muts=[(b'nr='+e[2]['nr'].encode(),b'nr=0000000000000040'),(b'resume='+e[6]['resume'].encode(),b'resume=0000000080401000'),(b'result='+e[2]['result'].encode(),b'result=0000000000000004'),(b'result='+e[4]['result'].encode(),b'result=fffffffffffffff8'),(b'result='+e[5]['result'].encode(),b'result=fffffffffffffff3'),(b'semantic='+e[6]['semantic'].encode(),b'semantic=write_bytes'),(MESSAGE,b'X'+MESSAGE[1:]),(b'stdin_cursor='+f['stdin_cursor'].encode(),b'stdin_cursor=000000000000000a'),(b'resource_count='+f['resource_count'].encode(),b'resource_count=0000000000000003'),(b'argc=0000000000000002',b'argc=0000000000000001')]
+ muts=[(b'nr='+e[2]['nr'].encode(),b'nr=0000000000000040'),(b'resume='+e[6]['resume'].encode(),b'resume=0000000080401000'),(b'result='+e[2]['result'].encode(),b'result=0000000000000004'),(b'result='+e[4]['result'].encode(),b'result=fffffffffffffff8'),(b'result='+e[5]['result'].encode(),b'result=fffffffffffffff3'),(b'semantic='+e[6]['semantic'].encode(),b'semantic=write_bytes'),(MESSAGE,b'X'+MESSAGE[1:]),(b'stdin_cursor='+f['stdin_cursor'].encode(),b'stdin_cursor=000000000000000a'),(b'resource_count='+f['resource_count'].encode(),b'resource_count=0000000000000003'),(b'stdin_generation='+f['stdin_generation'].encode(),b'stdin_generation=0000000000000001'),(b'argc=0000000000000002',b'argc=0000000000000001')]
  for a,b in muts:reject(r,t,t24,o,k,a,b)
  td.cleanup();print('PASS: Batch 25B one-QEMU proof and decisive mutations rejected')
 def handoff(st,s,f=None,n=None):
@@ -87,7 +87,7 @@ def main():
    if da!=db:raise RuntimeError('two-machine evidence drift')
    native=run(['zig','build','run-hosted-morphic-runtime']);fake=run(['zig','build','run-fake-morphic-runtime']);payload=[b24.b23.batch22b.prior.prior.prior.prior.perm.morphic.extract(x) for x in (a,b)]
    if not(native==fake==payload[0]==payload[1]):raise RuntimeError('Morphic equality drift')
-   print('PASS: Batch 25B runs=2 syscalls=15 returns=14 terminal=37 U=3 W+X=0 Morphic=765');s='runs=2 syscalls=15 returns=14 terminal=37 Morphic=765';td.cleanup()
+   print('PASS: Batch 25B runs=2 syscalls=15 returns=14 terminal=37 stdin_generation=2 U=3 W+X=0 Morphic=765');s='runs=2 syscalls=15 returns=14 terminal=37 stdin_generation=2 Morphic=765';td.cleanup()
  except Exception as e:traceback.print_exc();handoff('FAIL','Batch 25B verification failed',str(e));return getattr(e,'returncode',1)
  handoff('PASS',s,n=COMMAND if sys.argv[1:] else 'python3 tools/developer-command.py validate-repository');return 0
 if __name__=='__main__':raise SystemExit(main())

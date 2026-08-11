@@ -13,6 +13,7 @@ digraph modules {
   "bounded-elf64-load-plan" -> "elf64-program-header-parser";
   "bounded-elf64-load-plan" -> "fixed-capacity-vector";
   "bounded-resource-table" -> "generational-handles";
+  "bounded-resource-table" -> "morphic-semantic-operation";
   "bounded-rv64-linux-initial-stack-plan" -> "aligned-address-and-size-helpers";
   "bounded-rv64-linux-initial-stack-plan" -> "checked-half-open-range";
   "bounded-rv64-linux-initial-stack-plan" -> "distinct-memory-address-types";
