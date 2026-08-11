@@ -749,6 +749,30 @@
       "baselineValidated": false,
       "testedTargetVersions": [],
       "knownMigrationBlockers": []
+    },
+    {
+      "id": "58",
+      "canonicalName": "bounded-filesystem",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/58-bounded-filesystem/port.js",
+      "implementationPath": "projects/58-bounded-filesystem/src/bounded_filesystem.zig",
+      "dependenciesMustPortFirst": [],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
+    },
+    {
+      "id": "59",
+      "canonicalName": "bounded-address-space-exec-image",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/59-bounded-address-space-exec-image/port.js",
+      "implementationPath": "projects/59-bounded-address-space-exec-image/src/bounded_address_space_exec_image.zig",
+      "dependenciesMustPortFirst": [
+        "bounded-elf64-load-plan"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
     }
   ]
 }

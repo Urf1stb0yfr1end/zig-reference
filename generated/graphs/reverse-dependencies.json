@@ -25,6 +25,7 @@
       "fixed-capacity-object-pool",
       "physical-page-frame-allocator"
     ],
+    "bounded-address-space-exec-image": [],
     "bounded-binary-sub-reader": [
       "elf64-program-header-parser",
       "length-prefixed-binary-field",
@@ -41,7 +42,10 @@
     ],
     "bounded-deterministic-event-trace": [],
     "bounded-deterministic-scheduler": [],
-    "bounded-elf64-load-plan": [],
+    "bounded-elf64-load-plan": [
+      "bounded-address-space-exec-image"
+    ],
+    "bounded-filesystem": [],
     "bounded-integer": [
       "bounded-system-resource-plan"
     ],

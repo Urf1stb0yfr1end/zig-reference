@@ -325,9 +325,27 @@
       ]
     },
     {
+      "capability": "bounded-address-space",
+      "modules": [
+        "bounded-address-space-exec-image"
+      ]
+    },
+    {
       "capability": "bounded-elf64-load-planning",
       "modules": [
         "bounded-elf64-load-plan"
+      ]
+    },
+    {
+      "capability": "bounded-filesystem",
+      "modules": [
+        "bounded-filesystem"
+      ]
+    },
+    {
+      "capability": "bounded-path-traversal",
+      "modules": [
+        "bounded-filesystem"
       ]
     },
     {
@@ -582,6 +600,12 @@
       ]
     },
     {
+      "capability": "directory-capability",
+      "modules": [
+        "bounded-filesystem"
+      ]
+    },
+    {
       "capability": "double-free detection",
       "modules": [
         "bitmap-allocator"
@@ -609,6 +633,12 @@
       "capability": "dynamic array",
       "modules": [
         "dynamic-array"
+      ]
+    },
+    {
+      "capability": "elf-interpreter-handoff",
+      "modules": [
+        "bounded-address-space-exec-image"
       ]
     },
     {
@@ -667,6 +697,12 @@
       ]
     },
     {
+      "capability": "exec-image-planning",
+      "modules": [
+        "bounded-address-space-exec-image"
+      ]
+    },
+    {
       "capability": "explicit endian integers",
       "modules": [
         "bounded-byte-reader"
@@ -697,6 +733,12 @@
       ]
     },
     {
+      "capability": "failure-atomic-mapping",
+      "modules": [
+        "bounded-address-space-exec-image"
+      ]
+    },
+    {
       "capability": "failure-atomic-stack-planning",
       "modules": [
         "bounded-rv64-linux-initial-stack-plan"
@@ -718,6 +760,12 @@
       "capability": "fifo queue",
       "modules": [
         "ring-buffer"
+      ]
+    },
+    {
+      "capability": "file-byte-storage",
+      "modules": [
+        "bounded-filesystem"
       ]
     },
     {
@@ -2111,6 +2159,12 @@
       "capability": "wrapping sequence",
       "modules": [
         "wrapping-sequence-number"
+      ]
+    },
+    {
+      "capability": "wx-prohibition",
+      "modules": [
+        "bounded-address-space-exec-image"
       ]
     }
   ],

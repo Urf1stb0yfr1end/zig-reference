@@ -26,6 +26,7 @@
       ],
       "change_impact": {
         "dependents": [
+          "bounded-address-space-exec-image",
           "bounded-deterministic-scheduler",
           "bounded-elf64-load-plan",
           "bounded-system-resource-plan",
@@ -165,6 +166,7 @@
       "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
       "transitive_dependents": [
+        "bounded-address-space-exec-image",
         "bounded-deterministic-scheduler",
         "bounded-elf64-load-plan",
         "bounded-system-resource-plan",
@@ -641,6 +643,7 @@
       "change_impact": {
         "dependents": [
           "binary-cursor-checkpoint",
+          "bounded-address-space-exec-image",
           "bounded-binary-sub-reader",
           "bounded-elf64-load-plan",
           "elf64-file-header-parser",
@@ -785,6 +788,7 @@
       "transitive_dependencies": [],
       "transitive_dependents": [
         "binary-cursor-checkpoint",
+        "bounded-address-space-exec-image",
         "bounded-binary-sub-reader",
         "bounded-elf64-load-plan",
         "elf64-file-header-parser",
@@ -1565,6 +1569,7 @@
       ],
       "change_impact": {
         "dependents": [
+          "bounded-address-space-exec-image",
           "bounded-elf64-load-plan",
           "bounded-system-resource-plan",
           "elf64-file-header-parser",
@@ -1681,6 +1686,7 @@
       "thread_safety": "immutable_reads_only",
       "transitive_dependencies": [],
       "transitive_dependents": [
+        "bounded-address-space-exec-image",
         "bounded-elf64-load-plan",
         "bounded-system-resource-plan",
         "elf64-file-header-parser",
@@ -2097,6 +2103,7 @@
       ],
       "change_impact": {
         "dependents": [
+          "bounded-address-space-exec-image",
           "bounded-elf64-load-plan",
           "elf64-file-header-parser",
           "elf64-program-header-parser",
@@ -2209,6 +2216,7 @@
       "thread_safety": "immutable_reads_only",
       "transitive_dependencies": [],
       "transitive_dependents": [
+        "bounded-address-space-exec-image",
         "bounded-elf64-load-plan",
         "elf64-file-header-parser",
         "elf64-program-header-parser",
@@ -2237,6 +2245,7 @@
       ],
       "change_impact": {
         "dependents": [
+          "bounded-address-space-exec-image",
           "bounded-elf64-load-plan",
           "bounded-rv64-linux-initial-stack-plan",
           "bounded-system-resource-plan",
@@ -2371,6 +2380,7 @@
       "thread_safety": "immutable_reads_only",
       "transitive_dependencies": [],
       "transitive_dependents": [
+        "bounded-address-space-exec-image",
         "bounded-elf64-load-plan",
         "bounded-rv64-linux-initial-stack-plan",
         "bounded-system-resource-plan",
@@ -2398,6 +2408,7 @@
       ],
       "change_impact": {
         "dependents": [
+          "bounded-address-space-exec-image",
           "bounded-elf64-load-plan",
           "elf64-program-header-parser"
         ],
@@ -2500,6 +2511,7 @@
       "thread_safety": "not_synchronized",
       "transitive_dependencies": [],
       "transitive_dependents": [
+        "bounded-address-space-exec-image",
         "bounded-elf64-load-plan",
         "elf64-program-header-parser"
       ],
@@ -2524,6 +2536,7 @@
       ],
       "change_impact": {
         "dependents": [
+          "bounded-address-space-exec-image",
           "bounded-elf64-load-plan",
           "bounded-rv64-linux-initial-stack-plan",
           "bounded-user-memory-transfer-plan",
@@ -2659,6 +2672,7 @@
       "thread_safety": "immutable_reads_only",
       "transitive_dependencies": [],
       "transitive_dependents": [
+        "bounded-address-space-exec-image",
         "bounded-elf64-load-plan",
         "bounded-rv64-linux-initial-stack-plan",
         "bounded-user-memory-transfer-plan",
@@ -2690,6 +2704,7 @@
       ],
       "change_impact": {
         "dependents": [
+          "bounded-address-space-exec-image",
           "bounded-elf64-load-plan",
           "bounded-rv64-linux-initial-stack-plan",
           "bounded-user-memory-transfer-plan",
@@ -2828,6 +2843,7 @@
       "thread_safety": "immutable_reads_only",
       "transitive_dependencies": [],
       "transitive_dependents": [
+        "bounded-address-space-exec-image",
         "bounded-elf64-load-plan",
         "bounded-rv64-linux-initial-stack-plan",
         "bounded-user-memory-transfer-plan",
@@ -3225,6 +3241,7 @@
       ],
       "change_impact": {
         "dependents": [
+          "bounded-address-space-exec-image",
           "bounded-elf64-load-plan",
           "bounded-rv64-linux-initial-stack-plan",
           "elf64-file-header-parser",
@@ -3342,6 +3359,7 @@
       "thread_safety": "immutable_reads_only",
       "transitive_dependencies": [],
       "transitive_dependents": [
+        "bounded-address-space-exec-image",
         "bounded-elf64-load-plan",
         "bounded-rv64-linux-initial-stack-plan",
         "elf64-file-header-parser",
@@ -4148,6 +4166,7 @@
       ],
       "change_impact": {
         "dependents": [
+          "bounded-address-space-exec-image",
           "bounded-binary-sub-reader",
           "bounded-elf64-load-plan",
           "elf64-file-header-parser",
@@ -4269,6 +4288,7 @@
         "bounded-byte-reader"
       ],
       "transitive_dependents": [
+        "bounded-address-space-exec-image",
         "bounded-binary-sub-reader",
         "bounded-elf64-load-plan",
         "elf64-file-header-parser",
@@ -4296,6 +4316,7 @@
       ],
       "change_impact": {
         "dependents": [
+          "bounded-address-space-exec-image",
           "bounded-elf64-load-plan",
           "elf64-program-header-parser",
           "length-prefixed-binary-field",
@@ -4417,6 +4438,7 @@
         "bounded-byte-reader"
       ],
       "transitive_dependents": [
+        "bounded-address-space-exec-image",
         "bounded-elf64-load-plan",
         "elf64-program-header-parser",
         "length-prefixed-binary-field",
@@ -5371,6 +5393,7 @@
       ],
       "change_impact": {
         "dependents": [
+          "bounded-address-space-exec-image",
           "bounded-elf64-load-plan",
           "elf64-program-header-parser"
         ],
@@ -5507,6 +5530,7 @@
         "validated-enum-decoder"
       ],
       "transitive_dependents": [
+        "bounded-address-space-exec-image",
         "bounded-elf64-load-plan",
         "elf64-program-header-parser"
       ],
@@ -5526,6 +5550,7 @@
       ],
       "change_impact": {
         "dependents": [
+          "bounded-address-space-exec-image",
           "bounded-elf64-load-plan"
         ],
         "recipes": []
@@ -5686,6 +5711,7 @@
         "validated-enum-decoder"
       ],
       "transitive_dependents": [
+        "bounded-address-space-exec-image",
         "bounded-elf64-load-plan"
       ],
       "use_when": [
@@ -8135,7 +8161,9 @@
         "failure-atomic-load-planning"
       ],
       "change_impact": {
-        "dependents": [],
+        "dependents": [
+          "bounded-address-space-exec-image"
+        ],
         "recipes": [
           "run-hosted-morphic-runtime"
         ]
@@ -8184,7 +8212,9 @@
         "elf64-program-header-parser",
         "fixed-capacity-vector"
       ],
-      "direct_dependents": [],
+      "direct_dependents": [
+        "bounded-address-space-exec-image"
+      ],
       "do_not_use_when": [
         "Need dynamic linking, page mapping, byte copying, or U-mode execution."
       ],
@@ -8365,7 +8395,9 @@
         "validated-bit-flags",
         "validated-enum-decoder"
       ],
-      "transitive_dependents": [],
+      "transitive_dependents": [
+        "bounded-address-space-exec-image"
+      ],
       "use_when": [
         "Need to accept bounded static RV64 ELF bytes before any machine mutation."
       ]
@@ -8868,6 +8900,103 @@
       "use_when": [
         "Need bounded Linux-independent resource identity and alias lifetime."
       ]
+    },
+    {
+      "change_impact": {
+        "dependents": [],
+        "recipes": []
+      },
+      "dependency_build_order": [
+        "bounded-filesystem"
+      ],
+      "details": "projects/58-bounded-filesystem/details.json",
+      "direct_dependencies": [],
+      "direct_dependents": [],
+      "evidence_summary": {
+        "conformance_validated": false,
+        "evidence_records": 1,
+        "lifecycle": "active",
+        "maturity_level": 4,
+        "module": "bounded-filesystem",
+        "smoke_validated": true,
+        "target_maturity_level": 4,
+        "unit_validated": true
+      },
+      "focused_validation_commands": [
+        "zig build test-bounded-filesystem",
+        "zig build smoke-bounded-filesystem"
+      ],
+      "id": "58",
+      "matching_recipes": [],
+      "module": "bounded-filesystem",
+      "source": "projects/58-bounded-filesystem/src/bounded_filesystem.zig",
+      "status": "partial",
+      "transitive_dependencies": [],
+      "transitive_dependents": []
+    },
+    {
+      "change_impact": {
+        "dependents": [],
+        "recipes": []
+      },
+      "dependency_build_order": [
+        "aligned-address-and-size-helpers",
+        "bounded-byte-reader",
+        "checked-half-open-range",
+        "checked-integer-cast",
+        "distinct-memory-address-types",
+        "endian-integer-codec",
+        "fixed-capacity-vector",
+        "validated-bit-flags",
+        "validated-enum-decoder",
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "bounded-elf64-load-plan",
+        "bounded-address-space-exec-image"
+      ],
+      "details": "projects/59-bounded-address-space-exec-image/details.json",
+      "direct_dependencies": [
+        "bounded-elf64-load-plan"
+      ],
+      "direct_dependents": [],
+      "evidence_summary": {
+        "conformance_validated": false,
+        "evidence_records": 1,
+        "lifecycle": "active",
+        "maturity_level": 4,
+        "module": "bounded-address-space-exec-image",
+        "smoke_validated": true,
+        "target_maturity_level": 4,
+        "unit_validated": true
+      },
+      "focused_validation_commands": [
+        "zig build test-bounded-address-space-exec-image",
+        "zig build smoke-bounded-address-space-exec-image"
+      ],
+      "id": "59",
+      "matching_recipes": [],
+      "module": "bounded-address-space-exec-image",
+      "source": "projects/59-bounded-address-space-exec-image/src/bounded_address_space_exec_image.zig",
+      "status": "partial",
+      "transitive_dependencies": [
+        "aligned-address-and-size-helpers",
+        "binary-cursor-checkpoint",
+        "bounded-binary-sub-reader",
+        "bounded-byte-reader",
+        "bounded-elf64-load-plan",
+        "checked-half-open-range",
+        "checked-integer-cast",
+        "distinct-memory-address-types",
+        "elf64-file-header-parser",
+        "elf64-program-header-parser",
+        "endian-integer-codec",
+        "fixed-capacity-vector",
+        "validated-bit-flags",
+        "validated-enum-decoder"
+      ],
+      "transitive_dependents": []
     }
   ]
 }

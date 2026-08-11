@@ -10,6 +10,9 @@
     "bitmap-allocator": [
       "bit-set"
     ],
+    "bounded-address-space-exec-image": [
+      "bounded-elf64-load-plan"
+    ],
     "bounded-binary-sub-reader": [
       "binary-cursor-checkpoint",
       "bounded-byte-reader"
@@ -28,6 +31,7 @@
       "elf64-program-header-parser",
       "fixed-capacity-vector"
     ],
+    "bounded-filesystem": [],
     "bounded-integer": [],
     "bounded-resource-table": [
       "generational-handles",

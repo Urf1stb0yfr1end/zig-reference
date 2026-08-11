@@ -1,0 +1,1022 @@
+{
+  "schema_version": "3.0.0",
+  "contract_version": "0.1.0",
+  "generated_at": "",
+  "last_reviewed_at": "",
+  "module": {
+    "id": "59",
+    "canonical_name": "bounded-address-space-exec-image",
+    "display_name": "Bounded Address Space Exec Image",
+    "directory": "projects/59-bounded-address-space-exec-image",
+    "summary": "Failure-atomic bounded mappings and main/interpreter ELF replacement planning with W+X prohibited.",
+    "long_description": "Failure-atomic bounded mappings and main/interpreter ELF replacement planning with W+X prohibited.",
+    "status": "implemented",
+    "maturity": "experimental",
+    "lifecycle": "active",
+    "target_maturity_level": 4,
+    "implementation_version": "0.1.0",
+    "public_contract_version": "0.1.0",
+    "introduced_version": "",
+    "deprecated_version": "",
+    "superseded_version": "",
+    "removed_version": "",
+    "replacement_module": "",
+    "migration_guide": "",
+    "support_policy": "",
+    "deprecation_reason": "",
+    "category": "systems",
+    "subcategory": "process-image",
+    "tags": [
+      "bounded-address-space",
+      "failure-atomic-mapping",
+      "wx-prohibition",
+      "exec-image-planning",
+      "elf-interpreter-handoff"
+    ],
+    "aliases": [],
+    "deprecated_names": []
+  },
+  "purpose": {
+    "primary": "Stage reusable mapping mutations and ELF process-image replacement without Linux ABI identity.",
+    "secondary": [],
+    "non_goals": [
+      "Linux syscall numbers, errno values, descriptor allocation, ELF relocation, hidden allocation"
+    ],
+    "problems_solved": [
+      "bounded-address-space",
+      "failure-atomic-mapping",
+      "wx-prohibition",
+      "exec-image-planning",
+      "elf-interpreter-handoff"
+    ],
+    "future_role": "Reusable by Linux, QuirkM, Wasm, loaders, and later VMM tooling."
+  },
+  "c_pain": {
+    "summary": "Direct fixed arrays are attractive but capacity, traversal, and mutation ordering remain convention-based.",
+    "common_failure_modes": [],
+    "maintenance_burdens": [],
+    "undefined_or_implementation_defined_behavior": [],
+    "ownership_ambiguities": [],
+    "why_c_is_attractive": "Arrays and integer indexes are compact and freestanding.",
+    "where_c_degrades": "Bounds, identity domains, and failure atomicity rely on disciplined conventions."
+  },
+  "zig_response": {
+    "summary": "Typed values, error unions, and checked arithmetic expose validation and mutation boundaries.",
+    "language_features": [
+      "error unions",
+      "comptime capacities",
+      "tagged enums"
+    ],
+    "guarantees_made_visible": [
+      "bounded inline storage",
+      "explicit failure",
+      "W+X rejection"
+    ],
+    "invalid_states_removed": [],
+    "remaining_programmer_responsibilities": [
+      "external synchronization and compatibility adapters"
+    ],
+    "tradeoffs": []
+  },
+  "locations": {
+    "module_root": "projects/59-bounded-address-space-exec-image",
+    "implementation": [
+      "projects/59-bounded-address-space-exec-image/src/bounded_address_space_exec_image.zig"
+    ],
+    "public_entrypoint": "projects/59-bounded-address-space-exec-image/src/bounded_address_space_exec_image.zig",
+    "readme": "projects/59-bounded-address-space-exec-image/README.md",
+    "mastery": "projects/59-bounded-address-space-exec-image/MASTERY.md",
+    "details_markdown": "projects/59-bounded-address-space-exec-image/DETAILS.md",
+    "details_json": "projects/59-bounded-address-space-exec-image/details.json",
+    "examples": [],
+    "benchmarks": [],
+    "fixtures": [],
+    "fuzz_targets": [],
+    "architecture_notes": [],
+    "unit_tests": [
+      "projects/59-bounded-address-space-exec-image/src/bounded_address_space_exec_image.zig"
+    ],
+    "smoke_tests": [
+      "projects/59-bounded-address-space-exec-image/tests/smoke_test.zig"
+    ],
+    "generated_files": [],
+    "dependency_contracts": []
+  },
+  "public_surface": {
+    "root_symbols": [
+      "page_size",
+      "Permissions",
+      "Mapping",
+      "Error",
+      "AddressSpace",
+      "ExecPlan"
+    ],
+    "types": [
+      {
+        "name": "Permissions",
+        "kind": "public declaration"
+      },
+      {
+        "name": "Mapping",
+        "kind": "public declaration"
+      },
+      {
+        "name": "Error",
+        "kind": "public declaration"
+      }
+    ],
+    "functions": [
+      {
+        "name": "AddressSpace",
+        "signature": "AddressSpace(comptime capacity: usize) type"
+      },
+      {
+        "name": "ExecPlan",
+        "signature": "ExecPlan(comptime segment_capacity: usize, comptime interp_capacity: usize) type"
+      }
+    ],
+    "methods": [
+      {
+        "name": "map",
+        "signature": "map(self: *Self, start: usize, length: usize, permissions: Permissions) Error!void"
+      },
+      {
+        "name": "protect",
+        "signature": "protect(self: *Self, start: usize, length: usize, permissions: Permissions) Error!void"
+      },
+      {
+        "name": "unmap",
+        "signature": "unmap(self: *Self, start: usize, length: usize) Error!void"
+      },
+      {
+        "name": "contains",
+        "signature": "contains(self: *const Self, address: usize, access: Permissions) bool"
+      },
+      {
+        "name": "prepare",
+        "signature": "prepare(main_bytes: []const u8, interp_path: ?[]const u8, interp_bytes: ?[]const u8) Error!ExecPlan"
+      }
+    ],
+    "constants": [],
+    "errors": [],
+    "callbacks": [],
+    "interfaces": [],
+    "compile_time_parameters": [],
+    "endpoints": [
+      {
+        "name": "AddressSpace",
+        "kind": "function",
+        "signature": "AddressSpace(comptime capacity: usize) type",
+        "visibility": "public",
+        "summary": "Provides AddressSpace.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "arguments",
+            "type": "signature-defined",
+            "role": "Explicit operation inputs.",
+            "ownership": "copied or borrowed as declared",
+            "borrowing": "signature-defined",
+            "mutability": "signature-defined",
+            "lifetime": "call duration unless copied",
+            "valid_range": "documented constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable",
+            "format": "Zig values",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "type",
+            "meaning": "Result of ResourceTable.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The HandleTable contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "ExecPlan",
+        "kind": "function",
+        "signature": "ExecPlan(comptime segment_capacity: usize, comptime interp_capacity: usize) type",
+        "visibility": "public",
+        "summary": "Provides ExecPlan.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "arguments",
+            "type": "signature-defined",
+            "role": "Explicit operation inputs.",
+            "ownership": "copied or borrowed as declared",
+            "borrowing": "signature-defined",
+            "mutability": "signature-defined",
+            "lifetime": "call duration unless copied",
+            "valid_range": "documented constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable",
+            "format": "Zig values",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "type",
+            "meaning": "Result of ResourceTable.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The HandleTable contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "map",
+        "kind": "method",
+        "signature": "map(self: *Self, start: usize, length: usize, permissions: Permissions) Error!void",
+        "visibility": "public",
+        "summary": "Provides map.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed",
+          "mutation": "operation-defined"
+        },
+        "inputs": [
+          {
+            "name": "arguments",
+            "type": "signature-defined",
+            "role": "Explicit operation inputs.",
+            "ownership": "copied or borrowed as declared",
+            "borrowing": "signature-defined",
+            "mutability": "signature-defined",
+            "lifetime": "call duration unless copied",
+            "valid_range": "documented constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable",
+            "format": "Zig values",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "type",
+            "meaning": "Result of ResourceTable.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The HandleTable contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "protect",
+        "kind": "method",
+        "signature": "protect(self: *Self, start: usize, length: usize, permissions: Permissions) Error!void",
+        "visibility": "public",
+        "summary": "Provides protect.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed",
+          "mutation": "operation-defined"
+        },
+        "inputs": [
+          {
+            "name": "arguments",
+            "type": "signature-defined",
+            "role": "Explicit operation inputs.",
+            "ownership": "copied or borrowed as declared",
+            "borrowing": "signature-defined",
+            "mutability": "signature-defined",
+            "lifetime": "call duration unless copied",
+            "valid_range": "documented constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable",
+            "format": "Zig values",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "type",
+            "meaning": "Result of ResourceTable.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The HandleTable contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "unmap",
+        "kind": "method",
+        "signature": "unmap(self: *Self, start: usize, length: usize) Error!void",
+        "visibility": "public",
+        "summary": "Provides unmap.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed",
+          "mutation": "operation-defined"
+        },
+        "inputs": [
+          {
+            "name": "arguments",
+            "type": "signature-defined",
+            "role": "Explicit operation inputs.",
+            "ownership": "copied or borrowed as declared",
+            "borrowing": "signature-defined",
+            "mutability": "signature-defined",
+            "lifetime": "call duration unless copied",
+            "valid_range": "documented constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable",
+            "format": "Zig values",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "type",
+            "meaning": "Result of ResourceTable.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The HandleTable contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "contains",
+        "kind": "method",
+        "signature": "contains(self: *const Self, address: usize, access: Permissions) bool",
+        "visibility": "public",
+        "summary": "Provides contains.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed",
+          "mutation": "operation-defined"
+        },
+        "inputs": [
+          {
+            "name": "arguments",
+            "type": "signature-defined",
+            "role": "Explicit operation inputs.",
+            "ownership": "copied or borrowed as declared",
+            "borrowing": "signature-defined",
+            "mutability": "signature-defined",
+            "lifetime": "call duration unless copied",
+            "valid_range": "documented constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable",
+            "format": "Zig values",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "type",
+            "meaning": "Result of ResourceTable.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The HandleTable contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "prepare",
+        "kind": "method",
+        "signature": "prepare(main_bytes: []const u8, interp_path: ?[]const u8, interp_bytes: ?[]const u8) Error!ExecPlan",
+        "visibility": "public",
+        "summary": "Provides prepare.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed",
+          "mutation": "operation-defined"
+        },
+        "inputs": [
+          {
+            "name": "arguments",
+            "type": "signature-defined",
+            "role": "Explicit operation inputs.",
+            "ownership": "copied or borrowed as declared",
+            "borrowing": "signature-defined",
+            "mutability": "signature-defined",
+            "lifetime": "call duration unless copied",
+            "valid_range": "documented constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable",
+            "format": "Zig values",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "type",
+            "meaning": "Result of ResourceTable.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The HandleTable contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      }
+    ]
+  },
+  "inputs": [],
+  "outputs": [],
+  "state": {
+    "fields": [],
+    "states": [],
+    "state_transitions": [],
+    "terminal_states": [],
+    "initial_state": ""
+  },
+  "invariants": {
+    "representation": [],
+    "ownership": [],
+    "ordering": [],
+    "bounds": [],
+    "lifetime": [],
+    "concurrency": [],
+    "cross_module": []
+  },
+  "ownership": {
+    "owns": [],
+    "borrows": [],
+    "copies": [],
+    "transfers": [],
+    "shared": [],
+    "allocator": "",
+    "allocator_lifetime": "",
+    "element_cleanup": "",
+    "resource_release_order": []
+  },
+  "lifetime": {
+    "instance": "",
+    "inputs": [],
+    "outputs": [],
+    "borrowed_views": [],
+    "escaped_references": [],
+    "shutdown_requirements": []
+  },
+  "cleanup": {
+    "required": false,
+    "operations": [],
+    "automatic_cleanup": [],
+    "manual_cleanup": [],
+    "partial_construction_cleanup": [],
+    "failure_cleanup": [],
+    "cleanup_order": []
+  },
+  "failure_behavior": {
+    "errors": [],
+    "optional_empty_results": [],
+    "failure_atomicity": "All public mutations validate before changing state.",
+    "state_after_failure": [
+      "unchanged"
+    ],
+    "partial_effects": [],
+    "rollback": [],
+    "panic_conditions": [],
+    "assertion_conditions": [],
+    "undefined_behavior_preconditions": []
+  },
+  "invalidation": {
+    "rules": [],
+    "mutation_invalidation": [],
+    "growth_invalidation": [],
+    "move_invalidation": [],
+    "reset_invalidation": [],
+    "deinit_invalidation": []
+  },
+  "dependencies": {
+    "repository": [
+      {
+        "module": "bounded-elf64-load-plan",
+        "path": "projects/54-bounded-elf64-load-plan/src/bounded_elf64_load_plan.zig",
+        "symbol": "plan",
+        "guarantee": "failure-atomic RV64 PT_LOAD validation",
+        "reason": "validate both images before replacement"
+      }
+    ],
+    "standard_library": [],
+    "external": [],
+    "platform": [],
+    "architecture": [],
+    "conceptual": []
+  },
+  "dependency_contracts": [
+    {
+      "module": "bounded-elf64-load-plan",
+      "directory": "projects/54-bounded-elf64-load-plan",
+      "import_name": "bounded-elf64-load-plan",
+      "import_path": "projects/54-bounded-elf64-load-plan/src/bounded_elf64_load_plan.zig",
+      "symbols_used": [
+        "plan",
+        "LoadPlan"
+      ],
+      "reason": "stage main and interpreter ELF images",
+      "guarantees_inherited": [
+        "failure-atomic RV64 load planning"
+      ],
+      "guarantees_not_inherited": [
+        "mapping, copying, relocation, and execution"
+      ],
+      "contract_version_assumption": "compatible repository contract",
+      "usage_phase": "runtime",
+      "smoke_test_exercises_dependency": false,
+      "contract_path": "projects/54-bounded-elf64-load-plan/details.json"
+    }
+  ],
+  "expected_dependents": [],
+  "known_consumers": [],
+  "composition": {
+    "import_name": "bounded-address-space-exec-image",
+    "import_path": "projects/59-bounded-address-space-exec-image/src/bounded_address_space_exec_image.zig",
+    "import_configuration": "",
+    "minimal_example": "Import the named module and instantiate its bounded generic with explicit capacities.",
+    "integration_patterns": [],
+    "pipeline_position": [],
+    "common_combinations": [],
+    "incompatible_combinations": [],
+    "replacement_options": [],
+    "extension_points": []
+  },
+  "data_contracts": {
+    "input_formats": [],
+    "output_formats": [],
+    "binary_layouts": [],
+    "endianness": "",
+    "alignment": [],
+    "serialization_stability": "",
+    "abi_stability": ""
+  },
+  "compatibility": {
+    "zig_version": "0.14.0",
+    "minimum_zig_version": "0.14.0",
+    "maximum_tested_zig_version": "0.14.0",
+    "hosted": "supported",
+    "freestanding": "supported",
+    "thread_safe": "not synchronized",
+    "reentrant": "separate instances",
+    "interrupt_safe": "",
+    "async_safe": "",
+    "signal_safe": "",
+    "platforms": [
+      "target-neutral"
+    ],
+    "architectures": [
+      "target-neutral"
+    ],
+    "allocator_assumptions": "none; inline storage",
+    "libc_required": false,
+    "operating_system_required": false,
+    "ffi": "",
+    "no_std_equivalent": ""
+  },
+  "concurrency": {
+    "internal_synchronization": "",
+    "caller_synchronization_required": "",
+    "atomic_operations": [],
+    "memory_ordering": [],
+    "lock_ordering": [],
+    "thread_ownership": "",
+    "interrupt_context_rules": []
+  },
+  "performance": {
+    "time_complexity": [],
+    "space_complexity": "",
+    "allocation_behavior": [],
+    "cache_behavior": "",
+    "branch_behavior": "",
+    "compile_time_cost": "",
+    "known_hot_paths": [],
+    "benchmark_commands": [],
+    "benchmark_results": []
+  },
+  "limits": {
+    "hard_limits": [],
+    "soft_limits": [],
+    "resource_quotas": [],
+    "overflow_boundaries": [],
+    "recursion_limits": [],
+    "capacity_behavior": []
+  },
+  "security": {
+    "trust_boundary": "",
+    "untrusted_inputs": [],
+    "validation_performed": [],
+    "resource_exhaustion_controls": [],
+    "side_channel_considerations": [],
+    "unsafe_operations": [],
+    "security_non_goals": []
+  },
+  "testing": {
+    "build_step": "test-bounded-address-space-exec-image",
+    "commands": [
+      "zig build test-bounded-address-space-exec-image"
+    ],
+    "unit_tests": [
+      "success, boundary, capacity, and failure-atomic behavior"
+    ],
+    "integration_tests": [],
+    "property_tests": [],
+    "fuzz_tests": [],
+    "failure_injection_tests": [],
+    "zero_capacity_tests": [],
+    "boundary_tests": [],
+    "regression_tests": [],
+    "test_dependencies": [],
+    "smoke_test_commands": [
+      "zig build smoke-bounded-address-space-exec-image"
+    ],
+    "smoke_test_behaviors": [
+      "external import and core lifecycle"
+    ],
+    "smoke_test_dependencies": []
+  },
+  "validation": {
+    "compiler_validated": false,
+    "compiler_version": "",
+    "last_validated_commit": "",
+    "last_validation_result": "",
+    "continuous_integration": "",
+    "known_compile_failures": [],
+    "known_test_failures": [],
+    "unverified_claims": [
+      "real-machine integration is recorded separately in the Batch 26 report"
+    ],
+    "notes": [],
+    "status_dimensions": {
+      "implementation_present": true,
+      "contract_complete": true,
+      "contract_formatted": true,
+      "unit_tests_present": true,
+      "smoke_test_present": true,
+      "contract_checker_passed": false,
+      "compiler_validated": false,
+      "unit_tests_passed": false,
+      "smoke_tests_passed": false
+    }
+  },
+  "documentation": {
+    "read_order": [],
+    "examples_covered": [],
+    "exercises": [],
+    "readiness_questions": [],
+    "glossary_terms": [],
+    "related_modules": [],
+    "external_references": []
+  },
+  "maintenance": {
+    "stability": "",
+    "breaking_change_policy": "",
+    "deprecation_policy": "",
+    "known_gaps": [
+      "Bounded proof surface; no complete POSIX or dynamic-linker implementation."
+    ],
+    "known_bugs": [],
+    "planned_extensions": [],
+    "review_triggers": [],
+    "synchronization_requirements": [],
+    "owners": []
+  },
+  "discovery": {
+    "capabilities": [
+      "bounded-address-space",
+      "failure-atomic-mapping",
+      "wx-prohibition",
+      "exec-image-planning",
+      "elf-interpreter-handoff"
+    ],
+    "problems": [
+      "bounded-address-space",
+      "failure-atomic-mapping",
+      "wx-prohibition",
+      "exec-image-planning",
+      "elf-interpreter-handoff"
+    ],
+    "inputs": [],
+    "outputs": [],
+    "environments": [
+      "hosted",
+      "freestanding"
+    ],
+    "keywords": [
+      "bounded-address-space",
+      "failure-atomic-mapping",
+      "wx-prohibition",
+      "exec-image-planning",
+      "elf-interpreter-handoff"
+    ],
+    "grep_terms": [],
+    "natural_language_queries": [
+      "Stage reusable mapping mutations and ELF process-image replacement without Linux ABI identity."
+    ],
+    "negative_search_terms": []
+  },
+  "snowball": {
+    "foundation_layer": "",
+    "reuses_modules": [],
+    "guarantees_inherited": [],
+    "future_modules_enabled": [],
+    "future_code_removed": [],
+    "future_reasoning_removed": [],
+    "composition_value": "",
+    "snowball_score": ""
+  },
+  "agent_guidance": {
+    "use_when": [
+      "Stage reusable mapping mutations and ELF process-image replacement without Linux ABI identity."
+    ],
+    "do_not_use_when": [
+      "Need dynamically allocated or synchronized concurrent state."
+    ],
+    "selection_questions": [],
+    "required_preconditions": [],
+    "integration_steps": [
+      "Read DETAILS.md, instantiate explicit capacities, keep compatibility identities at the adapter edge."
+    ],
+    "verification_steps": [
+      "zig build test-bounded-address-space-exec-image",
+      "zig build smoke-bounded-address-space-exec-image"
+    ],
+    "common_agent_mistakes": [],
+    "safe_modification_boundaries": [],
+    "files_to_read_first": [
+      "projects/59-bounded-address-space-exec-image/details.json",
+      "projects/59-bounded-address-space-exec-image/src/bounded_address_space_exec_image.zig"
+    ],
+    "files_not_required_for_basic_use": [],
+    "smoke_test_before_integration": "zig build smoke-bounded-address-space-exec-image"
+  },
+  "source_map": {
+    "symbols_to_files": [],
+    "tests_to_behaviors": [],
+    "errors_to_operations": [],
+    "invariants_to_tests": [],
+    "dependencies_to_imports": [],
+    "smoke_tests_to_public_symbols": [],
+    "smoke_tests_to_dependencies": []
+  },
+  "provenance": {
+    "original_author": "",
+    "created_commit": "",
+    "last_modified_commit": "",
+    "derived_from": [],
+    "design_sources": [],
+    "migration_history": []
+  },
+  "smoke_test": {
+    "required": true,
+    "implemented": false,
+    "status": "not-implemented",
+    "source_path": "projects/59-bounded-address-space-exec-image/tests/smoke_test.zig",
+    "build_step": "smoke-bounded-address-space-exec-image",
+    "commands": [
+      "zig build smoke-bounded-address-space-exec-image"
+    ],
+    "public_import_used": "bounded-address-space-exec-image",
+    "public_symbols_exercised": [],
+    "successful_operations": [],
+    "failure_or_boundary_operations": [],
+    "cleanup_exercised": [],
+    "repository_dependencies_exercised": [],
+    "hosted_environment_required": "",
+    "freestanding_environment_required": "",
+    "fixtures": [],
+    "expected_exit_status": "",
+    "expected_output": [],
+    "forbidden_private_access": true,
+    "last_run": "",
+    "last_result": "unverified",
+    "last_validated_commit": "",
+    "compiler_version": "",
+    "known_failures": [],
+    "notes": []
+  },
+  "portability": {
+    "baseline_zig_version": "0.14.0",
+    "port_contract": "projects/59-bounded-address-space-exec-image/port.js",
+    "port_contract_schema": "port.schema.json",
+    "tested_zig_versions": [],
+    "untested_zig_versions": [],
+    "dependencies_must_port_first": [],
+    "version_sensitive_symbols": [],
+    "version_sensitive_files": [],
+    "semantic_guarantees_to_preserve": [],
+    "validation_commands": [],
+    "known_porting_blockers": [],
+    "automatic_port_guaranteed": false,
+    "notes": []
+  }
+}

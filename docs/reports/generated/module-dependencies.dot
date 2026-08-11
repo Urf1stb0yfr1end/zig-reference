@@ -2,6 +2,7 @@
 digraph modules {
   "binary-cursor-checkpoint" -> "bounded-byte-reader";
   "bitmap-allocator" -> "bit-set";
+  "bounded-address-space-exec-image" -> "bounded-elf64-load-plan";
   "bounded-binary-sub-reader" -> "binary-cursor-checkpoint";
   "bounded-binary-sub-reader" -> "bounded-byte-reader";
   "bounded-deterministic-scheduler" -> "fixed-capacity-priority-queue";

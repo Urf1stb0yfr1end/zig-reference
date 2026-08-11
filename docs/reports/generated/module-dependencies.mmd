@@ -2,6 +2,7 @@
 graph TD
   binary_cursor_checkpoint --> bounded_byte_reader
   bitmap_allocator --> bit_set
+  bounded_address_space_exec_image --> bounded_elf64_load_plan
   bounded_binary_sub_reader --> binary_cursor_checkpoint
   bounded_binary_sub_reader --> bounded_byte_reader
   bounded_deterministic_scheduler --> fixed_capacity_priority_queue

@@ -9,6 +9,10 @@
       "symbol": "Access"
     },
     {
+      "module": "bounded-address-space-exec-image",
+      "symbol": "AddressSpace"
+    },
+    {
       "module": "bounded-binary-sub-reader",
       "symbol": "AdvancementPolicy"
     },
@@ -129,7 +133,15 @@
       "symbol": "Entry"
     },
     {
+      "module": "bounded-address-space-exec-image",
+      "symbol": "Error"
+    },
+    {
       "module": "bounded-elf64-load-plan",
+      "symbol": "Error"
+    },
+    {
+      "module": "bounded-filesystem",
       "symbol": "Error"
     },
     {
@@ -161,8 +173,16 @@
       "symbol": "EventInput"
     },
     {
+      "module": "bounded-address-space-exec-image",
+      "symbol": "ExecPlan"
+    },
+    {
       "module": "morphic-semantic-operation",
       "symbol": "Failure"
+    },
+    {
+      "module": "bounded-filesystem",
+      "symbol": "FileSystem"
     },
     {
       "module": "fixed-bump-allocator",
@@ -229,6 +249,10 @@
       "symbol": "IntrusiveDoublyLinkedList"
     },
     {
+      "module": "bounded-filesystem",
+      "symbol": "Kind"
+    },
+    {
       "module": "riscv-sv39-page-table-entry",
       "symbol": "Kind"
     },
@@ -249,6 +273,10 @@
       "symbol": "LoadPlan"
     },
     {
+      "module": "bounded-address-space-exec-image",
+      "symbol": "Mapping"
+    },
+    {
       "module": "riscv-sv39-page-table-builder",
       "symbol": "Mutation"
     },
@@ -259,6 +287,10 @@
     {
       "module": "bounded-deterministic-event-trace",
       "symbol": "NormalizedEvent"
+    },
+    {
+      "module": "bounded-filesystem",
+      "symbol": "ObjectId"
     },
     {
       "module": "fixed-capacity-object-pool",
@@ -303,6 +335,10 @@
     {
       "module": "elf64-program-header-parser",
       "symbol": "Permission"
+    },
+    {
+      "module": "bounded-address-space-exec-image",
+      "symbol": "Permissions"
     },
     {
       "module": "bounded-elf64-load-plan",
@@ -551,6 +587,10 @@
     {
       "module": "riscv-sv39-virtual-address-indexing",
       "symbol": "pageSize"
+    },
+    {
+      "module": "bounded-address-space-exec-image",
+      "symbol": "page_size"
     },
     {
       "module": "bounded-user-memory-transfer-plan",

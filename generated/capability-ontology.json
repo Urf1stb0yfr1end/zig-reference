@@ -833,6 +833,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "bounded-address-space",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bounded-address-space"
+      ],
+      "description": "Repository capability represented by: bounded-address-space.",
+      "implementing_modules": [
+        "bounded-address-space-exec-image"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "bounded-elf64-load-planning",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -841,6 +858,40 @@
       "description": "Repository capability represented by: bounded-elf64-load-planning.",
       "implementing_modules": [
         "bounded-elf64-load-plan"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bounded-filesystem",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bounded-filesystem"
+      ],
+      "description": "Repository capability represented by: bounded-filesystem.",
+      "implementing_modules": [
+        "bounded-filesystem"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bounded-path-traversal",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bounded-path-traversal"
+      ],
+      "description": "Repository capability represented by: bounded-path-traversal.",
+      "implementing_modules": [
+        "bounded-filesystem"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -1552,6 +1603,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "directory-capability",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "directory-capability"
+      ],
+      "description": "Repository capability represented by: directory-capability.",
+      "implementing_modules": [
+        "bounded-filesystem"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "double-free detection",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -1628,6 +1696,23 @@
       "description": "Repository capability represented by: dynamic array.",
       "implementing_modules": [
         "dynamic-array"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "elf-interpreter-handoff",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "elf-interpreter-handoff"
+      ],
+      "description": "Repository capability represented by: elf-interpreter-handoff.",
+      "implementing_modules": [
+        "bounded-address-space-exec-image"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -1791,6 +1876,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "exec-image-planning",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "exec-image-planning"
+      ],
+      "description": "Repository capability represented by: exec-image-planning.",
+      "implementing_modules": [
+        "bounded-address-space-exec-image"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "explicit endian integers",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -1876,6 +1978,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "failure-atomic-mapping",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "failure-atomic-mapping"
+      ],
+      "description": "Repository capability represented by: failure-atomic-mapping.",
+      "implementing_modules": [
+        "bounded-address-space-exec-image"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "failure-atomic-stack-planning",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -1935,6 +2054,23 @@
       "description": "Repository capability represented by: fifo queue.",
       "implementing_modules": [
         "ring-buffer"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "file-byte-storage",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "file-byte-storage"
+      ],
+      "description": "Repository capability represented by: file-byte-storage.",
+      "implementing_modules": [
+        "bounded-filesystem"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -5539,6 +5675,23 @@
       "description": "Repository capability represented by: wrapping sequence.",
       "implementing_modules": [
         "wrapping-sequence-number"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "wx-prohibition",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "wx-prohibition"
+      ],
+      "description": "Repository capability represented by: wx-prohibition.",
+      "implementing_modules": [
+        "bounded-address-space-exec-image"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],

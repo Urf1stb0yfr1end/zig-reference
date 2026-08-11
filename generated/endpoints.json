@@ -3,6 +3,12 @@
   "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY",
   "endpoints": [
     {
+      "kind": "function",
+      "module": "bounded-address-space-exec-image",
+      "name": "AddressSpace",
+      "signature": "AddressSpace(comptime capacity: usize) type"
+    },
+    {
       "kind": "type_or_constant",
       "module": "aligned-address-and-size-helpers",
       "name": "AlignmentError",
@@ -85,6 +91,18 @@
       "module": "endian-integer-codec",
       "name": "EndianIntegerCodec",
       "signature": "EndianIntegerCodec(comptime T: type, comptime endian: std.builtin.Endian) type"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-address-space-exec-image",
+      "name": "ExecPlan",
+      "signature": "ExecPlan(comptime segment_capacity: usize, comptime interp_capacity: usize) type"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-filesystem",
+      "name": "FileSystem",
+      "signature": "FileSystem(comptime object_capacity: usize, comptime name_capacity: usize, comptime file_capacity: usize) type"
     },
     {
       "kind": "function",
@@ -646,6 +664,12 @@
     },
     {
       "kind": "method",
+      "module": "bounded-address-space-exec-image",
+      "name": "contains",
+      "signature": "contains(self: *const Self, address: usize, access: Permissions) bool"
+    },
+    {
+      "kind": "method",
       "module": "physical-memory-region-set",
       "name": "contains",
       "signature": "contains(self: @This(), address: addresses.PhysicalAddress) bool"
@@ -751,6 +775,12 @@
       "module": "bounded-binary-sub-reader",
       "name": "create",
       "signature": "create(parent: *bounded.BoundedReader, length: usize, policy: AdvancementPolicy)"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-filesystem",
+      "name": "create",
+      "signature": "create(self: *Self, parent: ObjectId, name: []const u8, kind: Kind, bytes: []const u8) Error!ObjectId"
     },
     {
       "kind": "method",
@@ -1509,6 +1539,18 @@
       "signature": "length(self:@This()"
     },
     {
+      "kind": "method",
+      "module": "bounded-filesystem",
+      "name": "lookup",
+      "signature": "lookup(self: *const Self, start: ObjectId, path: []const u8) Error!ObjectId"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-address-space-exec-image",
+      "name": "map",
+      "signature": "map(self: *Self, start: usize, length: usize, permissions: Permissions) Error!void"
+    },
+    {
       "kind": "function",
       "module": "riscv-sv39-page-table-builder",
       "name": "mapPage",
@@ -1732,9 +1774,21 @@
     },
     {
       "kind": "method",
+      "module": "bounded-address-space-exec-image",
+      "name": "prepare",
+      "signature": "prepare(main_bytes: []const u8, interp_path: ?[]const u8, interp_bytes: ?[]const u8) Error!ExecPlan"
+    },
+    {
+      "kind": "method",
       "module": "elf64-file-header-parser",
       "name": "programTableRange",
       "signature": "programTableRange(self:@This()"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-address-space-exec-image",
+      "name": "protect",
+      "signature": "protect(self: *Self, start: usize, length: usize, permissions: Permissions) Error!void"
     },
     {
       "kind": "function",
@@ -1789,6 +1843,12 @@
       "module": "validated-bit-flags",
       "name": "raw",
       "signature": "raw(self: Self) Storage"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-filesystem",
+      "name": "read",
+      "signature": "read(self: *const Self, id: ObjectId, offset: usize, destination: []u8) Error!usize"
     },
     {
       "kind": "method",
@@ -2008,6 +2068,12 @@
     },
     {
       "kind": "method",
+      "module": "bounded-filesystem",
+      "name": "resolve",
+      "signature": "resolve(self: *const Self, id: ObjectId) ?*const Object"
+    },
+    {
+      "kind": "method",
       "module": "bounded-resource-table",
       "name": "resolve",
       "signature": "resolve(self: *const Self, reference_or_slot: anytype) optional result"
@@ -2161,6 +2227,12 @@
       "module": "bounded-resource-table",
       "name": "unbind",
       "signature": "unbind(self: *Self, slot: usize) Error!ResourceRef"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-address-space-exec-image",
+      "name": "unmap",
+      "signature": "unmap(self: *Self, start: usize, length: usize) Error!void"
     },
     {
       "kind": "function",

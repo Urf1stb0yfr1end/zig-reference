@@ -60,6 +60,8 @@ const specs = [_]ModuleSpec{
     .{ .name = "bounded-rv64-linux-initial-stack-plan", .source = "projects/55-bounded-rv64-linux-initial-stack-plan/src/bounded_rv64_linux_initial_stack_plan.zig", .dependencies = &.{ "aligned-address-and-size-helpers", "checked-half-open-range", "distinct-memory-address-types", "endian-integer-codec" } },
     .{ .name = "morphic-semantic-operation", .source = "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig", .dependencies = &.{} },
     .{ .name = "bounded-resource-table", .source = "projects/57-bounded-resource-table/src/bounded_resource_table.zig", .dependencies = &.{ "generational-handles", "morphic-semantic-operation" } },
+    .{ .name = "bounded-filesystem", .source = "projects/58-bounded-filesystem/src/bounded_filesystem.zig", .dependencies = &.{} },
+    .{ .name = "bounded-address-space-exec-image", .source = "projects/59-bounded-address-space-exec-image/src/bounded_address_space_exec_image.zig", .dependencies = &.{"bounded-elf64-load-plan"} },
 };
 
 const RecipeSpec = struct { name: []const u8, dependencies: []const []const u8 };

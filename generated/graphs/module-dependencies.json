@@ -11,6 +11,10 @@
       "module": "bitmap-allocator"
     },
     {
+      "dependency": "bounded-elf64-load-plan",
+      "module": "bounded-address-space-exec-image"
+    },
+    {
       "dependency": "binary-cursor-checkpoint",
       "module": "bounded-binary-sub-reader"
     },

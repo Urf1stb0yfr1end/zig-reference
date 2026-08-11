@@ -23,6 +23,12 @@
       ],
       "status": "full"
     },
+    "bounded-address-space-exec-image": {
+      "dependencies": [
+        "bounded-elf64-load-plan"
+      ],
+      "status": "partial"
+    },
     "bounded-binary-sub-reader": {
       "dependencies": [
         "binary-cursor-checkpoint",
@@ -55,6 +61,10 @@
         "fixed-capacity-vector"
       ],
       "status": "full"
+    },
+    "bounded-filesystem": {
+      "dependencies": [],
+      "status": "partial"
     },
     "bounded-integer": {
       "dependencies": [],

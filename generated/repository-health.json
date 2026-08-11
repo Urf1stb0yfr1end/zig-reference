@@ -1,9 +1,9 @@
 {
   "_generated": true,
   "_notice": "GENERATED FILE — DO NOT EDIT DIRECTLY",
-  "compiler_validated_modules": 58,
+  "compiler_validated_modules": 60,
   "conformance_tested_modules": 0,
-  "contracted_modules": 58,
+  "contracted_modules": 60,
   "definitions": {
     "compiler_validated_modules": "modules whose canonical Zig 0.14.0 unit target passed and whose textual evidence source digest is current",
     "conformance_tested_modules": "modules named by a dedicated shared behavioral adapter with successful current evidence; unit-test reuse receives no credit",
@@ -21,16 +21,16 @@
     "note": "foundation contracts exist; complete integration evidence does not",
     "system_proven": false
   },
-  "implemented_modules": 58,
+  "implemented_modules": 60,
   "missing_contracts": 0,
   "port_contract_coverage": {
-    "covered": 58,
-    "total": 58
+    "covered": 60,
+    "total": 60
   },
   "recipe_coverage": 11,
   "repository_index_version": "1.0.0",
-  "reused_modules": 31,
-  "smoke_tested_modules": 58,
+  "reused_modules": 32,
+  "smoke_tested_modules": 60,
   "stable_modules": 0,
   "stale_generated_textual_files": 0,
   "system_proven_modules": 0,

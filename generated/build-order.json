@@ -6,6 +6,7 @@
     "bit-set",
     "bounded-byte-reader",
     "bounded-deterministic-event-trace",
+    "bounded-filesystem",
     "bounded-integer",
     "checked-half-open-range",
     "checked-integer-cast",
@@ -59,7 +60,8 @@
     "length-prefixed-binary-field",
     "physical-page-frame-allocator",
     "bounded-elf64-load-plan",
-    "type-length-value-decoder"
+    "type-length-value-decoder",
+    "bounded-address-space-exec-image"
   ],
   "generator": "tools/build-repository-index.py",
   "repository_index_version": "1.0.0"

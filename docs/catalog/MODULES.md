@@ -64,6 +64,8 @@ Use this file for fast discovery. Open a module's `DETAILS.md` or `details.json`
 | `55-bounded-rv64-linux-initial-stack-plan` | Exact bounded RV64 Linux initial process stack image planning | `15`, `17`, `18`, `22` | kernels, process loaders, emulators | [`DETAILS.md`](../../projects/55-bounded-rv64-linux-initial-stack-plan/DETAILS.md) | [`details.json`](../../projects/55-bounded-rv64-linux-initial-stack-plan/details.json) |
 | `56-morphic-semantic-operation` | ABI-neutral write and termination request/completion dispatch | none | kernels, runtimes, compatibility personalities | [`DETAILS.md`](../../projects/56-morphic-semantic-operation/DETAILS.md) | [`details.json`](../../projects/56-morphic-semantic-operation/details.json) |
 | `57-bounded-resource-table` | Bounded generational resource identity and process-local alias bindings | generational-handles | kernels, runtimes, compatibility personalities | [`DETAILS.md`](../../projects/57-bounded-resource-table/DETAILS.md) | [`details.json`](../../projects/57-bounded-resource-table/details.json) |
+| `58-bounded-filesystem` | Bounded directory-capability traversal and inline file bytes | none | kernels, loaders, WASI adapters | [`DETAILS.md`](../../projects/58-bounded-filesystem/DETAILS.md) | [`details.json`](../../projects/58-bounded-filesystem/details.json) |
+| `59-bounded-address-space-exec-image` | Failure-atomic mappings and main/interpreter ELF replacement planning | `54-bounded-elf64-load-plan` | kernels, loaders, runtimes | [`DETAILS.md`](../../projects/59-bounded-address-space-exec-image/DETAILS.md) | [`details.json`](../../projects/59-bounded-address-space-exec-image/details.json) |
 
 ## Selection workflow
 

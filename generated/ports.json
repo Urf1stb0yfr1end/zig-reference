@@ -143,6 +143,41 @@
         ],
         "zigVersion": "0.14.0"
       },
+      "module": "bounded-address-space-exec-image",
+      "path": "projects/59-bounded-address-space-exec-image/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "page_size",
+            "Permissions",
+            "Mapping",
+            "Error",
+            "AddressSpace",
+            "ExecPlan"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-bounded-address-space-exec-image",
+            "zig build smoke-bounded-address-space-exec-image"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented bounded-address-space-exec-image public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
       "module": "bounded-binary-sub-reader",
       "path": "projects/30-bounded-binary-sub-reader/port.js",
       "risks": [
@@ -287,6 +322,39 @@
           ],
           "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
           "risk": "Preserve the documented bounded-elf64-load-plan public behavior, boundaries, and failure semantics."
+        }
+      ]
+    },
+    {
+      "baseline": {
+        "baselineCompilerValidated": false,
+        "baselineSmokeTestsPassed": false,
+        "baselineUnitTestsPassed": false,
+        "lastValidatedCommit": "",
+        "maximumTestedVersion": "",
+        "minimumSupportedVersion": "0.14.0",
+        "validationEvidence": [
+          "Zig compiler was unavailable in the authoring environment; claims remain unverified."
+        ],
+        "zigVersion": "0.14.0"
+      },
+      "module": "bounded-filesystem",
+      "path": "projects/58-bounded-filesystem/port.js",
+      "risks": [
+        {
+          "affectedEndpoints": [
+            "ObjectId",
+            "Kind",
+            "Error",
+            "FileSystem"
+          ],
+          "consequence": "A syntactically successful port could violate the module contract.",
+          "detectionTests": [
+            "zig build test-bounded-filesystem",
+            "zig build smoke-bounded-filesystem"
+          ],
+          "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests.",
+          "risk": "Preserve the documented bounded-filesystem public behavior, boundaries, and failure semantics."
         }
       ]
     },

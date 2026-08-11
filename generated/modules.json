@@ -1046,6 +1046,42 @@
       "status": "implemented",
       "summary": "Linux- and ABI-independent bounded generational resource storage with process-local alias bindings with lossless generation-bearing semantic I/O identity.",
       "target_maturity_level": 4
+    },
+    {
+      "aliases": [],
+      "declared_maturity": "experimental",
+      "deprecated_names": [],
+      "details": "projects/58-bounded-filesystem/details.json",
+      "directory": "projects/58-bounded-filesystem",
+      "display_name": "Bounded Filesystem",
+      "id": "58",
+      "implementation_version": "0.1.0",
+      "lifecycle": "active",
+      "name": "bounded-filesystem",
+      "public_contract_version": "0.1.0",
+      "replacement_module": "",
+      "source": "projects/58-bounded-filesystem/src/bounded_filesystem.zig",
+      "status": "implemented",
+      "summary": "Allocation-free bounded file and directory object tree with explicit root-relative traversal.",
+      "target_maturity_level": 4
+    },
+    {
+      "aliases": [],
+      "declared_maturity": "experimental",
+      "deprecated_names": [],
+      "details": "projects/59-bounded-address-space-exec-image/details.json",
+      "directory": "projects/59-bounded-address-space-exec-image",
+      "display_name": "Bounded Address Space Exec Image",
+      "id": "59",
+      "implementation_version": "0.1.0",
+      "lifecycle": "active",
+      "name": "bounded-address-space-exec-image",
+      "public_contract_version": "0.1.0",
+      "replacement_module": "",
+      "source": "projects/59-bounded-address-space-exec-image/src/bounded_address_space_exec_image.zig",
+      "status": "implemented",
+      "summary": "Failure-atomic bounded mappings and main/interpreter ELF replacement planning with W+X prohibited.",
+      "target_maturity_level": 4
     }
   ],
   "repository_index_version": "1.0.0"

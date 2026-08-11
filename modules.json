@@ -521,6 +521,24 @@
       "details": "projects/57-bounded-resource-table/details.json",
       "unit_test_step": "test-bounded-resource-table",
       "smoke_test_step": "smoke-bounded-resource-table"
+    },
+    {
+      "id": "58",
+      "canonical_name": "bounded-filesystem",
+      "directory": "projects/58-bounded-filesystem",
+      "public_entrypoint": "projects/58-bounded-filesystem/src/bounded_filesystem.zig",
+      "details": "projects/58-bounded-filesystem/details.json",
+      "unit_test_step": "test-bounded-filesystem",
+      "smoke_test_step": "smoke-bounded-filesystem"
+    },
+    {
+      "id": "59",
+      "canonical_name": "bounded-address-space-exec-image",
+      "directory": "projects/59-bounded-address-space-exec-image",
+      "public_entrypoint": "projects/59-bounded-address-space-exec-image/src/bounded_address_space_exec_image.zig",
+      "details": "projects/59-bounded-address-space-exec-image/details.json",
+      "unit_test_step": "test-bounded-address-space-exec-image",
+      "smoke_test_step": "smoke-bounded-address-space-exec-image"
     }
   ]
 }
