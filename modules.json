@@ -512,6 +512,15 @@
       "details": "projects/56-morphic-semantic-operation/details.json",
       "unit_test_step": "test-morphic-semantic-operation",
       "smoke_test_step": "smoke-morphic-semantic-operation"
+    },
+    {
+      "id": "57",
+      "canonical_name": "bounded-resource-table",
+      "directory": "projects/57-bounded-resource-table",
+      "public_entrypoint": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+      "details": "projects/57-bounded-resource-table/details.json",
+      "unit_test_step": "test-bounded-resource-table",
+      "smoke_test_step": "smoke-bounded-resource-table"
     }
   ]
 }

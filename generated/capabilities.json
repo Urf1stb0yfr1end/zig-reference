@@ -43,6 +43,12 @@
       ]
     },
     {
+      "capability": "alias reference lifetime",
+      "modules": [
+        "bounded-resource-table"
+      ]
+    },
+    {
       "capability": "align down",
       "modules": [
         "aligned-address-and-size-helpers"
@@ -141,6 +147,7 @@
     {
       "capability": "architecture-independent-write-and-termination",
       "modules": [
+        "bounded-resource-table",
         "morphic-semantic-operation"
       ]
     },
@@ -306,6 +313,12 @@
       ]
     },
     {
+      "capability": "bounded resource identity",
+      "modules": [
+        "bounded-resource-table"
+      ]
+    },
+    {
       "capability": "bounded sequence",
       "modules": [
         "fixed-capacity-vector"
@@ -315,6 +328,12 @@
       "capability": "bounded-elf64-load-planning",
       "modules": [
         "bounded-elf64-load-plan"
+      ]
+    },
+    {
+      "capability": "bounded-resource-table-dispatch",
+      "modules": [
+        "bounded-resource-table"
       ]
     },
     {
@@ -530,6 +549,12 @@
       "capability": "deterministic",
       "modules": [
         "bounded-deterministic-event-trace"
+      ]
+    },
+    {
+      "capability": "deterministic local bindings",
+      "modules": [
+        "bounded-resource-table"
       ]
     },
     {
@@ -793,6 +818,7 @@
         "bounded-deterministic-event-trace",
         "bounded-deterministic-scheduler",
         "bounded-integer",
+        "bounded-resource-table",
         "bounded-system-resource-plan",
         "bounded-user-memory-transfer-plan",
         "checked-half-open-range",
@@ -840,6 +866,12 @@
       "capability": "generational handles",
       "modules": [
         "generational-handles"
+      ]
+    },
+    {
+      "capability": "generational-handles",
+      "modules": [
+        "bounded-resource-table"
       ]
     },
     {
@@ -1125,6 +1157,7 @@
     {
       "capability": "morphic",
       "modules": [
+        "bounded-resource-table",
         "morphic-semantic-operation"
       ]
     },
@@ -1568,6 +1601,12 @@
       ]
     },
     {
+      "capability": "resource-table",
+      "modules": [
+        "bounded-resource-table"
+      ]
+    },
+    {
       "capability": "result",
       "modules": [
         "tagged-result"
@@ -1814,6 +1853,12 @@
       "capability": "stale-reference",
       "modules": [
         "generational-handles"
+      ]
+    },
+    {
+      "capability": "stale-reference rejection",
+      "modules": [
+        "bounded-resource-table"
       ]
     },
     {

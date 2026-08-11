@@ -45,6 +45,7 @@
     "bounded-integer": [
       "bounded-system-resource-plan"
     ],
+    "bounded-resource-table": [],
     "bounded-rv64-linux-initial-stack-plan": [],
     "bounded-system-resource-plan": [],
     "bounded-user-memory-transfer-plan": [],
@@ -118,6 +119,7 @@
     "fixed-free-list": [],
     "fourcc-code": [],
     "generational-handles": [
+      "bounded-resource-table",
       "fixed-capacity-object-pool"
     ],
     "intrusive-doubly-linked-list": [],

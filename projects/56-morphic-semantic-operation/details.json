@@ -8,7 +8,7 @@
     "canonical_name": "morphic-semantic-operation",
     "display_name": "Morphic Semantic Operation",
     "directory": "projects/56-morphic-semantic-operation",
-    "summary": "Architecture- and OS-independent bounded write/terminate operation vocabulary.",
+    "summary": "Architecture- and OS-independent bounded read/write/terminate operation vocabulary.",
     "long_description": "Tagged semantic requests and completions with synchronous caller-owned backend dispatch.",
     "status": "implemented",
     "maturity": "experimental",
@@ -35,7 +35,7 @@
     "deprecated_names": []
   },
   "purpose": {
-    "primary": "Separate reusable write and termination semantics from compatibility ABIs.",
+    "primary": "Separate reusable read, write, and termination semantics from compatibility ABIs.",
     "secondary": [],
     "non_goals": [
       "Linux syscall numbers, errno encoding, register layouts, descriptor tables"
@@ -98,6 +98,7 @@
     "root_symbols": [
       "ResourceId",
       "GuestAddress",
+      "ReadBytes",
       "WriteBytes",
       "Request",
       "Failure",
@@ -111,6 +112,10 @@
       },
       {
         "name": "GuestAddress",
+        "kind": "public declaration"
+      },
+      {
+        "name": "ReadBytes",
         "kind": "public declaration"
       },
       {

@@ -2,14 +2,14 @@ module.exports = {
   "schemaVersion": "1.0.0",
   "contractVersion": "1.0.0",
   "module": {
-    "id": "56",
-    "canonicalName": "morphic-semantic-operation",
-    "displayName": "Morphic Semantic Operation",
-    "directory": "projects/56-morphic-semantic-operation",
-    "publicEntrypoint": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig",
-    "detailsContract": "projects/56-morphic-semantic-operation/details.json",
-    "humanContract": "projects/56-morphic-semantic-operation/DETAILS.md",
-    "portContract": "projects/56-morphic-semantic-operation/port.js"
+    "id": "57",
+    "canonicalName": "bounded-resource-table",
+    "displayName": "Bounded Resource Table",
+    "directory": "projects/57-bounded-resource-table",
+    "publicEntrypoint": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+    "detailsContract": "projects/57-bounded-resource-table/details.json",
+    "humanContract": "projects/57-bounded-resource-table/DETAILS.md",
+    "portContract": "projects/57-bounded-resource-table/port.js"
   },
   "baseline": {
     "zigVersion": "0.14.0",
@@ -25,16 +25,16 @@ module.exports = {
   },
   "sourceInventory": {
     "implementationFiles": [
-      "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
+      "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
     ],
     "publicEntrypoints": [
-      "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
+      "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
     ],
     "internalUnitTests": [
-      "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
+      "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
     ],
     "externalSmokeTests": [
-      "projects/56-morphic-semantic-operation/tests/smoke_test.zig"
+      "projects/57-bounded-resource-table/tests/smoke_test.zig"
     ],
     "examples": [],
     "fixtures": [],
@@ -44,65 +44,90 @@ module.exports = {
       "build.zig"
     ],
     "contracts": [
-      "projects/56-morphic-semantic-operation/README.md",
-      "projects/56-morphic-semantic-operation/MASTERY.md",
-      "projects/56-morphic-semantic-operation/DETAILS.md",
-      "projects/56-morphic-semantic-operation/details.json",
-      "projects/56-morphic-semantic-operation/port.js"
+      "projects/57-bounded-resource-table/README.md",
+      "projects/57-bounded-resource-table/MASTERY.md",
+      "projects/57-bounded-resource-table/DETAILS.md",
+      "projects/57-bounded-resource-table/details.json",
+      "projects/57-bounded-resource-table/port.js"
     ]
   },
   "publicContract": {
     "publicSymbols": [
-      "ResourceId",
-      "GuestAddress",
-      "ReadBytes",
-      "WriteBytes",
-      "Request",
-      "Failure",
-      "Completion",
-      "execute"
+      "Capabilities",
+      "BackendId",
+      "ResourceTable",
+      "BindingTable"
     ],
     "publicTypes": [
       {
-        "name": "ResourceId",
+        "name": "Capabilities",
         "kind": "public declaration"
       },
       {
-        "name": "GuestAddress",
+        "name": "BackendId",
         "kind": "public declaration"
       },
       {
-        "name": "ReadBytes",
+        "name": "ResourceTable",
         "kind": "public declaration"
       },
       {
-        "name": "WriteBytes",
-        "kind": "public declaration"
-      },
-      {
-        "name": "Request",
-        "kind": "public declaration"
-      },
-      {
-        "name": "Failure",
-        "kind": "public declaration"
-      },
-      {
-        "name": "Completion",
+        "name": "BindingTable",
         "kind": "public declaration"
       }
     ],
     "publicFunctions": [
       {
-        "name": "execute",
-        "signature": "execute(request: Request, backend: anytype) Completion"
+        "name": "ResourceTable",
+        "signature": "ResourceTable(comptime capacity: usize) type"
+      },
+      {
+        "name": "BindingTable",
+        "signature": "BindingTable(comptime ResourceRef: type, comptime capacity: usize) type"
       }
     ],
-    "publicMethods": [],
+    "publicMethods": [
+      {
+        "name": "create",
+        "signature": "create(self: *Self, description: Description) Error!ResourceRef"
+      },
+      {
+        "name": "retain",
+        "signature": "retain(self: *Self, reference: ResourceRef) Error!void"
+      },
+      {
+        "name": "release",
+        "signature": "release(self: *Self, reference: ResourceRef) Error!bool"
+      },
+      {
+        "name": "resolve",
+        "signature": "resolve(self: *const Self, reference_or_slot: anytype) optional result"
+      },
+      {
+        "name": "referenceCount",
+        "signature": "referenceCount(self: *const Self, reference: ResourceRef) ?usize"
+      },
+      {
+        "name": "count",
+        "signature": "count(self: *const Self) usize"
+      },
+      {
+        "name": "bindAt",
+        "signature": "bindAt(self: *Self, slot: usize, reference: ResourceRef) Error!void"
+      },
+      {
+        "name": "duplicateLowest",
+        "signature": "duplicateLowest(self: *Self, source: usize) Error!usize"
+      },
+      {
+        "name": "unbind",
+        "signature": "unbind(self: *Self, slot: usize) Error!ResourceRef"
+      }
+    ],
     "publicConstants": [],
     "publicErrors": [],
     "invariantsToPreserve": [
-      "Preserve the documented morphic-semantic-operation public behavior, boundaries, and failure semantics."
+      "Preserve the documented bounded-resource-table public behavior, boundaries, and failure semantics."
     ],
     "ownershipRulesToPreserve": [],
     "lifetimeRulesToPreserve": [],
@@ -114,7 +139,21 @@ module.exports = {
     "intentionallyUnstableDetails": []
   },
   "dependencies": {
-    "repository": [],
+    "repository": [
+      {
+        "canonicalName": "generational-handles",
+        "portContract": "projects/08-generational-handles/port.js",
+        "importName": "generational-handles",
+        "symbolsUsed": [
+          "HandleTable"
+        ],
+        "mustPortFirst": true,
+        "reason": "The module imports this direct repository dependency in build.zig.",
+        "guaranteesInherited": [
+          "stale-reference rejection and bounded inline storage"
+        ]
+      }
+    ],
     "standardLibrary": [],
     "external": []
   },
@@ -134,7 +173,7 @@ module.exports = {
         "name": "@This",
         "files": [
           {
-            "path": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig",
+            "path": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
             "lines": [],
             "symbols": []
           }
@@ -148,12 +187,7 @@ module.exports = {
         "name": "@as",
         "files": [
           {
-            "path": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig",
-            "lines": [],
-            "symbols": []
-          },
-          {
-            "path": "projects/56-morphic-semantic-operation/tests/smoke_test.zig",
+            "path": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
             "lines": [],
             "symbols": []
           }
@@ -167,26 +201,12 @@ module.exports = {
         "name": "@enumFromInt",
         "files": [
           {
-            "path": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig",
+            "path": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
             "lines": [],
             "symbols": []
           }
         ],
         "baselineBehavior": "Zig 0.14.0 @enumFromInt behavior as exercised by this module",
-        "portingRisk": "medium",
-        "likelyChangeCategory": "syntax_or_type_semantics",
-        "notes": []
-      },
-      {
-        "name": "@intFromEnum",
-        "files": [
-          {
-            "path": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig",
-            "lines": [],
-            "symbols": []
-          }
-        ],
-        "baselineBehavior": "Zig 0.14.0 @intFromEnum behavior as exercised by this module",
         "portingRisk": "medium",
         "likelyChangeCategory": "syntax_or_type_semantics",
         "notes": []
@@ -204,10 +224,10 @@ module.exports = {
     "metadataApis": []
   },
   "buildSystemUsage": {
-    "unitTestStep": "test-morphic-semantic-operation",
-    "smokeTestStep": "smoke-morphic-semantic-operation",
-    "namedModuleImport": "morphic-semantic-operation",
-    "sourcePath": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig",
+    "unitTestStep": "test-bounded-resource-table",
+    "smokeTestStep": "smoke-bounded-resource-table",
+    "namedModuleImport": "bounded-resource-table",
+    "sourcePath": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
     "directModuleDependencies": [],
     "buildApisUsed": [
       "std.Build.createModule",
@@ -226,8 +246,8 @@ module.exports = {
       "standardOptimizeOption"
     ],
     "runArtifacts": [
-      "test-morphic-semantic-operation",
-      "smoke-morphic-semantic-operation"
+      "test-bounded-resource-table",
+      "smoke-bounded-resource-table"
     ],
     "systemCommands": [],
     "likelyPortingRisks": [
@@ -275,10 +295,10 @@ module.exports = {
   },
   "testingUsage": {
     "unitTests": [
-      "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
+      "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
     ],
     "smokeTests": [
-      "projects/56-morphic-semantic-operation/tests/smoke_test.zig"
+      "projects/57-bounded-resource-table/tests/smoke_test.zig"
     ],
     "testingApis": [],
     "semanticCoverage": []
@@ -290,54 +310,55 @@ module.exports = {
       "topic": "semantic and build compatibility",
       "reason": "Unknown future Zig releases can change inference, standard-library contracts, or build graph identity.",
       "affectedSymbols": [
-        "ResourceId",
-        "GuestAddress",
-        "ReadBytes",
-        "WriteBytes",
-        "Request",
-        "Failure",
-        "Completion",
-        "execute"
+        "BackendId",
+        "Capabilities",
+        "ResourceTable",
+        "BindingTable",
+        "Description",
+        "ResourceRef",
+        "create"
       ],
       "affectedFiles": [
-        "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
+        "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
       ],
       "questionsToAnswer": [
         "Do public errors, ownership, layout, and failure atomicity still match the contracts?"
       ],
       "requiredTests": [
-        "zig build test-morphic-semantic-operation",
-        "zig build smoke-morphic-semantic-operation"
+        "zig build test-bounded-resource-table",
+        "zig build smoke-bounded-resource-table"
       ]
     }
   ],
   "semanticPortingRisks": [
     {
-      "risk": "Preserve the documented morphic-semantic-operation public behavior, boundaries, and failure semantics.",
+      "risk": "Preserve the documented bounded-resource-table public behavior, boundaries, and failure semantics.",
       "consequence": "A syntactically successful port could violate the module contract.",
       "affectedEndpoints": [
-        "ResourceId",
-        "GuestAddress",
-        "ReadBytes",
-        "WriteBytes",
-        "Request",
-        "Failure",
-        "Completion",
-        "execute"
+        "BackendId",
+        "Capabilities",
+        "ResourceTable",
+        "BindingTable",
+        "Description",
+        "ResourceRef",
+        "create"
       ],
       "detectionTests": [
-        "zig build test-morphic-semantic-operation",
-        "zig build smoke-morphic-semantic-operation"
+        "zig build test-bounded-resource-table",
+        "zig build smoke-bounded-resource-table"
       ],
       "mitigation": "Compare DETAILS.md and details.json, then run boundary and failure-path tests."
     }
   ],
   "migrationOrder": {
-    "portAfter": [],
+    "portAfter": [
+      "generational-handles"
+    ],
     "portBefore": [],
     "independentOf": [],
     "recommendedSequence": [
-      "morphic-semantic-operation"
+      "generational-handles",
+      "bounded-resource-table"
     ],
     "cycleRisks": []
   },
@@ -346,8 +367,8 @@ module.exports = {
       "zig version",
       "zig build check-module-contracts",
       "zig build check-port-contracts",
-      "zig build test-morphic-semantic-operation",
-      "zig build smoke-morphic-semantic-operation"
+      "zig build test-bounded-resource-table",
+      "zig build smoke-bounded-resource-table"
     ],
     "targetVersionCommands": [],
     "semanticTests": [],
@@ -378,25 +399,19 @@ module.exports = {
   ],
   "agentInstructions": {
     "readFirst": [
-      "projects/56-morphic-semantic-operation/port.js",
-      "projects/56-morphic-semantic-operation/details.json",
-      "projects/56-morphic-semantic-operation/DETAILS.md"
+      "projects/57-bounded-resource-table/port.js",
+      "projects/57-bounded-resource-table/details.json",
+      "projects/57-bounded-resource-table/DETAILS.md"
     ],
     "filesUsuallyNotRequired": [],
     "firstCommands": [
       "zig version",
-      "zig build test-morphic-semantic-operation"
+      "zig build test-bounded-resource-table"
     ],
     "recommendedPortOrder": [
-      "morphic-semantic-operation"
+      "bounded-resource-table"
     ],
     "searchTerms": [
-      "@This",
-      "@as",
-      "@enumFromInt",
-      "@intFromEnum"
-    ],
-    "likelyCompilerFailureAreas": [
       "@This",
       "@as",
       "@enumFromInt",
@@ -414,6 +429,12 @@ module.exports = {
       "Port dependencies first.",
       "Run contract checks, unit tests, and smoke tests.",
       "Record evidence without deleting baseline history."
+    ],
+    "likelyCompilerFailureAreas": [
+      "@This",
+      "@as",
+      "@enumFromInt",
+      "@intFromEnum"
     ]
   },
   "sourceMap": {
@@ -421,62 +442,58 @@ module.exports = {
       {
         "builtin": "@This",
         "files": [
-          "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
+          "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
         ]
       },
       {
         "builtin": "@as",
         "files": [
-          "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig",
-          "projects/56-morphic-semantic-operation/tests/smoke_test.zig"
+          "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+          "projects/57-bounded-resource-table/tests/smoke_test.zig"
         ]
       },
       {
         "builtin": "@enumFromInt",
         "files": [
-          "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
+          "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
         ]
       },
       {
         "builtin": "@intFromEnum",
         "files": [
-          "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
+          "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
         ]
       }
     ],
     "standardLibraryToFiles": [],
     "symbolsToFiles": [
       {
-        "symbol": "ResourceId",
-        "file": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
+        "symbol": "BackendId",
+        "file": "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
       },
       {
-        "symbol": "GuestAddress",
-        "file": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
+        "symbol": "Capabilities",
+        "file": "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
       },
       {
-        "symbol": "ReadBytes",
-        "file": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
+        "symbol": "ResourceTable",
+        "file": "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
       },
       {
-        "symbol": "WriteBytes",
-        "file": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
+        "symbol": "BindingTable",
+        "file": "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
       },
       {
-        "symbol": "Request",
-        "file": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
+        "symbol": "Description",
+        "file": "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
       },
       {
-        "symbol": "Failure",
-        "file": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
+        "symbol": "ResourceRef",
+        "file": "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
       },
       {
-        "symbol": "Completion",
-        "file": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
-      },
-      {
-        "symbol": "execute",
-        "file": "projects/56-morphic-semantic-operation/src/morphic_semantic_operation.zig"
+        "symbol": "create",
+        "file": "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
       }
     ]
   },

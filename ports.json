@@ -735,6 +735,19 @@
       "baselineValidated": false,
       "testedTargetVersions": [],
       "knownMigrationBlockers": []
+    },
+    {
+      "id": "57",
+      "canonicalName": "bounded-resource-table",
+      "currentZigVersion": "0.14.0",
+      "portContract": "projects/57-bounded-resource-table/port.js",
+      "implementationPath": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+      "dependenciesMustPortFirst": [
+        "generational-handles"
+      ],
+      "baselineValidated": false,
+      "testedTargetVersions": [],
+      "knownMigrationBlockers": []
     }
   ]
 }

@@ -16,6 +16,12 @@
     },
     {
       "kind": "function",
+      "module": "bounded-resource-table",
+      "name": "BindingTable",
+      "signature": "BindingTable(comptime ResourceRef: type, comptime capacity: usize) type"
+    },
+    {
+      "kind": "function",
       "module": "bit-set",
       "name": "BitSet",
       "signature": "BitSet(comptime bit_count: usize) type"
@@ -217,6 +223,12 @@
       "module": "unit-safe-quantity",
       "name": "Quantity",
       "signature": "Quantity(comptime Unit: type, comptime Scalar: type) type"
+    },
+    {
+      "kind": "function",
+      "module": "bounded-resource-table",
+      "name": "ResourceTable",
+      "signature": "ResourceTable(comptime capacity: usize) type"
     },
     {
       "kind": "function",
@@ -447,6 +459,12 @@
       "signature": "asBytes(self: FourCC) [4]u8"
     },
     {
+      "kind": "method",
+      "module": "bounded-resource-table",
+      "name": "bindAt",
+      "signature": "bindAt(self: *Self, slot: usize, reference: ResourceRef) Error!void"
+    },
+    {
       "kind": "function",
       "module": "riscv-sv39-page-table-entry",
       "name": "branch",
@@ -664,6 +682,12 @@
     },
     {
       "kind": "method",
+      "module": "bounded-resource-table",
+      "name": "count",
+      "signature": "count(self: *const Self) usize"
+    },
+    {
+      "kind": "method",
       "module": "fixed-capacity-object-pool",
       "name": "count",
       "signature": "count(self: *const @This()"
@@ -730,6 +754,12 @@
     },
     {
       "kind": "method",
+      "module": "bounded-resource-table",
+      "name": "create",
+      "signature": "create(self: *Self, description: Description) Error!ResourceRef"
+    },
+    {
+      "kind": "method",
       "module": "endian-integer-codec",
       "name": "decode",
       "signature": "decode(bytes: *const [byte_count]u8) T"
@@ -793,6 +823,12 @@
       "module": "wrapping-sequence-number",
       "name": "distanceForward",
       "signature": "distanceForward(from: Self, to: Self) T"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-resource-table",
+      "name": "duplicateLowest",
+      "signature": "duplicateLowest(self: *Self, source: usize) Error!usize"
     },
     {
       "kind": "method",
@@ -1809,6 +1845,18 @@
       "signature": "reader(self: *BoundedBinarySubReader)"
     },
     {
+      "kind": "method",
+      "module": "bounded-resource-table",
+      "name": "referenceCount",
+      "signature": "referenceCount(self: *const Self, reference: ResourceRef) ?usize"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-resource-table",
+      "name": "release",
+      "signature": "release(self: *Self, reference: ResourceRef) Error!bool"
+    },
+    {
       "kind": "function",
       "module": "fixed-free-list",
       "name": "release",
@@ -1954,6 +2002,12 @@
     },
     {
       "kind": "method",
+      "module": "bounded-resource-table",
+      "name": "resolve",
+      "signature": "resolve(self: *const Self, reference_or_slot: anytype) optional result"
+    },
+    {
+      "kind": "method",
       "module": "binary-cursor-checkpoint",
       "name": "restore",
       "signature": "restore(self: BinaryCursorCheckpoint, reader: *bounded.BoundedReader)"
@@ -1963,6 +2017,12 @@
       "module": "binary-cursor-checkpoint",
       "name": "restore",
       "signature": "restore(checkpoint: BinaryCursorCheckpoint, reader: *bounded.BoundedReader)"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-resource-table",
+      "name": "retain",
+      "signature": "retain(self: *Self, reference: ResourceRef) Error!void"
     },
     {
       "kind": "method",
@@ -2083,6 +2143,12 @@
       "module": "bit-set",
       "name": "toggle",
       "signature": "toggle(self: *Self, index: usize) Error!void"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-resource-table",
+      "name": "unbind",
+      "signature": "unbind(self: *Self, slot: usize) Error!ResourceRef"
     },
     {
       "kind": "function",

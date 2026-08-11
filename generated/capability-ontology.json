@@ -78,6 +78,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "alias reference lifetime",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "alias reference lifetime"
+      ],
+      "description": "Repository capability represented by: alias reference lifetime.",
+      "implementing_modules": [
+        "bounded-resource-table"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "align down",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -335,6 +352,7 @@
       ],
       "description": "Repository capability represented by: architecture-independent-write-and-termination.",
       "implementing_modules": [
+        "bounded-resource-table",
         "morphic-semantic-operation"
       ],
       "narrower_capabilities": [],
@@ -781,6 +799,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "bounded resource identity",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bounded resource identity"
+      ],
+      "description": "Repository capability represented by: bounded resource identity.",
+      "implementing_modules": [
+        "bounded-resource-table"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "bounded sequence",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -806,6 +841,23 @@
       "description": "Repository capability represented by: bounded-elf64-load-planning.",
       "implementing_modules": [
         "bounded-elf64-load-plan"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "bounded-resource-table-dispatch",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "bounded-resource-table-dispatch"
+      ],
+      "description": "Repository capability represented by: bounded-resource-table-dispatch.",
+      "implementing_modules": [
+        "bounded-resource-table"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -1406,6 +1458,23 @@
       "description": "Repository capability represented by: deterministic.",
       "implementing_modules": [
         "bounded-deterministic-event-trace"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "deterministic local bindings",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "deterministic local bindings"
+      ],
+      "description": "Repository capability represented by: deterministic local bindings.",
+      "implementing_modules": [
+        "bounded-resource-table"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -2120,6 +2189,7 @@
         "bounded-deterministic-event-trace",
         "bounded-deterministic-scheduler",
         "bounded-integer",
+        "bounded-resource-table",
         "bounded-system-resource-plan",
         "bounded-user-memory-transfer-plan",
         "checked-half-open-range",
@@ -2189,6 +2259,23 @@
       "description": "Repository capability represented by: generational handles.",
       "implementing_modules": [
         "generational-handles"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "generational-handles",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "generational-handles"
+      ],
+      "description": "Repository capability represented by: generational-handles.",
+      "implementing_modules": [
+        "bounded-resource-table"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],
@@ -2958,6 +3045,7 @@
       ],
       "description": "Repository capability represented by: morphic.",
       "implementing_modules": [
+        "bounded-resource-table",
         "morphic-semantic-operation"
       ],
       "narrower_capabilities": [],
@@ -4045,6 +4133,23 @@
     {
       "aliases": [],
       "broader_capability": null,
+      "canonical_name": "resource-table",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "resource-table"
+      ],
+      "description": "Repository capability represented by: resource-table.",
+      "implementing_modules": [
+        "bounded-resource-table"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
       "canonical_name": "result",
       "common_mistaken_matches": [],
       "common_queries": [
@@ -4725,6 +4830,23 @@
       "description": "Repository capability represented by: stale-reference.",
       "implementing_modules": [
         "generational-handles"
+      ],
+      "narrower_capabilities": [],
+      "negative_matches": [],
+      "partially_implementing_modules": [],
+      "related_terms": []
+    },
+    {
+      "aliases": [],
+      "broader_capability": null,
+      "canonical_name": "stale-reference rejection",
+      "common_mistaken_matches": [],
+      "common_queries": [
+        "stale-reference rejection"
+      ],
+      "description": "Repository capability represented by: stale-reference rejection.",
+      "implementing_modules": [
+        "bounded-resource-table"
       ],
       "narrower_capabilities": [],
       "negative_matches": [],

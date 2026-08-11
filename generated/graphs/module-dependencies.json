@@ -51,6 +51,10 @@
       "module": "bounded-elf64-load-plan"
     },
     {
+      "dependency": "generational-handles",
+      "module": "bounded-resource-table"
+    },
+    {
       "dependency": "aligned-address-and-size-helpers",
       "module": "bounded-rv64-linux-initial-stack-plan"
     },

@@ -573,6 +573,16 @@
       "smoke_validated": true,
       "target_maturity_level": 4,
       "unit_validated": true
+    },
+    {
+      "conformance_validated": false,
+      "evidence_records": 1,
+      "lifecycle": "active",
+      "maturity_level": 4,
+      "module": "bounded-resource-table",
+      "smoke_validated": true,
+      "target_maturity_level": 4,
+      "unit_validated": true
     }
   ]
 }

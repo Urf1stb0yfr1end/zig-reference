@@ -29,8 +29,16 @@
       "symbol": "AuxValue"
     },
     {
+      "module": "bounded-resource-table",
+      "symbol": "BackendId"
+    },
+    {
       "module": "binary-cursor-checkpoint",
       "symbol": "BinaryCursorCheckpoint"
+    },
+    {
+      "module": "bounded-resource-table",
+      "symbol": "BindingTable"
     },
     {
       "module": "bit-set",
@@ -67,6 +75,10 @@
     {
       "module": "byte-writer",
       "symbol": "ByteWriter"
+    },
+    {
+      "module": "bounded-resource-table",
+      "symbol": "Capabilities"
     },
     {
       "module": "bounded-system-resource-plan",
@@ -345,6 +357,10 @@
       "symbol": "Quantity"
     },
     {
+      "module": "morphic-semantic-operation",
+      "symbol": "ReadBytes"
+    },
+    {
       "module": "physical-memory-region-set",
       "symbol": "RegionKind"
     },
@@ -355,6 +371,10 @@
     {
       "module": "morphic-semantic-operation",
       "symbol": "ResourceId"
+    },
+    {
+      "module": "bounded-resource-table",
+      "symbol": "ResourceTable"
     },
     {
       "module": "riscv-sv39-page-table-walker",

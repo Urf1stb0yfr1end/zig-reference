@@ -22,8 +22,14 @@
     "AuxValue": [
       "bounded-rv64-linux-initial-stack-plan"
     ],
+    "BackendId": [
+      "bounded-resource-table"
+    ],
     "BinaryCursorCheckpoint": [
       "binary-cursor-checkpoint"
+    ],
+    "BindingTable": [
+      "bounded-resource-table"
     ],
     "BitSet": [
       "bit-set"
@@ -51,6 +57,9 @@
     ],
     "ByteWriter": [
       "byte-writer"
+    ],
+    "Capabilities": [
+      "bounded-resource-table"
     ],
     "CapacityConfiguration": [
       "bounded-system-resource-plan"
@@ -238,6 +247,9 @@
     ],
     "ResourceId": [
       "morphic-semantic-operation"
+    ],
+    "ResourceTable": [
+      "bounded-resource-table"
     ],
     "Result": [
       "riscv-sv39-page-table-walker"
