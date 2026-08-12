@@ -32,7 +32,10 @@ SECTIONS {
     . += 60K;
     __supervisor_stack_top = .;
     __user_trap_stack_begin = .;
-    . += 4K;
+    /* Real file/ELF syscall composition has deeper bounded call chains than
+       the original register-only probe. Keep a distinct supervisor-only
+       trap stack and make its bound explicit rather than overflowing it. */
+    . += 16K;
     __user_trap_stack_end = .;
     __user_trap_stack_top = .;
     __stack_top = .;

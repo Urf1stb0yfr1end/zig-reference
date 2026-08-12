@@ -2,7 +2,7 @@
 
 ## Result
 
-**PARTIAL.** Review of the first machine-gate attempt found that its emitted facts were prepared supervisor-side rather than caused by the required syscall and U-mode execution paths. The fixture/build/verifier scaffolding is retained, but Batch 26 is not accepted and no machine PASS is claimed.
+**PASS.** The rejected supervisor-precomputed attempt remains documented below, but it has been replaced by syscall-caused RV64 machine semantics and an independent artifact/machine oracle. The mutation mode and deterministic two-QEMU mode pass, inherited Batch 25B remains green, and repository validation is recorded in the completion evidence below.
 
 ## Frozen architecture
 
@@ -156,4 +156,50 @@ status: PARTIAL
 command: Batch 26 real file + memory + exec inheritance gate
 summary: scaffolding=preserved machine_batch26=NOT_PROVED inherited_batch25b=PASS
 next: repair real syscall-caused Gate A-D semantics, then run both required verifier modes
+```
+
+## Real machine completion (2026-08-12)
+
+The fail-closed checkpoint was replaced only after the underlying path became machine-caused:
+
+- Program A issues real RV64 `openat` and `read` ECALLs. The adapter copies the pathname with project 53, resolves project 58 objects, creates a project 57 generation-bearing resource, binds Linux fd 3, and returns ENOENT/EFAULT without partial bindings.
+- The `mmap` ECALL installs the live U=1 RW Sv39 leaf and userspace writes and reads `0x26`. The `mprotect` ECALL replaces that leaf with R-only permissions; the following U-mode store causes a real cause-15 fault at its ELF symbol. The `munmap` ECALL removes the leaf; the following U-mode load causes a real cause-13 missing-translation fault at its separate ELF symbol.
+- `/bin/main` is a real ET_EXEC ELF containing `/lib/ld-batch26-rv64.so` in PT_INTERP. The interpreter is a separate real ET_DYN ELF. `execve` resolves both through project 58, validates them with projects 54/59, constructs a fresh project 55 stack with AT_PHDR/AT_BASE/AT_ENTRY, atomically replaces Program A's code/data leaves, applies the deterministic interpreter bias, and transfers to the interpreter. The interpreter's distinct U-mode exit marker is the terminal machine event; successful exec does not return to Program A.
+- The verifier parses all three exact ELF files, hashes their complete bytes, decodes Program A's ECALL instruction sites and adjacent `li a7` identities, reads the explicit fault symbols, parses PT_INTERP/program headers/types/entries, reconstructs bias and auxv relations, checks raw PTE permissions and exact `sepc + 4`, and compares all canonical evidence across two QEMU machines. Its one-QEMU mode rejects eleven semantic/artifact mutations rather than trusting PASS labels.
+- The deeper but still bounded file/ELF trap call chain exposed the original 4 KiB trap stack as insufficient. The linker now reserves an explicit 16 KiB supervisor-only trap stack; the machine proof fails rather than overflowing silently.
+
+Executed completion evidence:
+
+```text
+python3 tools/verify-freestanding-riscv64-file-memory-exec.py --self-test
+PASS: fixture=1, mutations=11 rejected, exact artifact hashes=3
+
+python3 tools/verify-freestanding-riscv64-file-memory-exec.py
+PASS: runs=2, syscalls=9, real faults=2, exec=PT_INTERP, generation=2, W+X=0
+
+python3 tools/verify-freestanding-riscv64-linux-fd-lifecycle.py --self-test
+PASS: inherited Batch 25B decisive mutations rejected
+
+python3 tools/verify-freestanding-riscv64-linux-fd-lifecycle.py
+PASS: runs=2, syscalls=15, returns=14, terminal=37, stdin_generation=2, Morphic=765
+
+zig build check --summary all
+PASS: 74/74 steps, 30/30 tests
+
+zig build validate-repository --summary all
+PASS: 350/350 steps, 245/245 tests
+
+python3 tools/developer-command.py validate-repository
+PASS: canonical Developer Minimus validation surface
+```
+
+The rejected first attempt and PARTIAL checkpoint sections above remain historical evidence, not current status. No kernel dynamic relocation, general VFS, demand paging, musl, BusyBox, Alpine, process creation, threads, or broad POSIX compatibility is claimed.
+
+### Completion MINIMUS
+
+```text
+status: PASS
+command: Batch 26 real file + memory + exec inheritance gate
+summary: open_read=real mmap_faults=real exec_A_to_interp=real verifier_modes=PASS inherited_batch25b=PASS generation=2 W+X=0
+next: apply real musl/BusyBox pressure and add only the smallest missing reusable mechanisms
 ```
