@@ -1,8 +1,8 @@
 # Pressure-Oracle Inheritance Engineering Vocabulary
 
-This document defines project vocabulary for a recurring engineering method in `zig-reference`, Morphic, and Alpz: use real external software as a pressure source, implement the smallest missing reusable mechanism, retry, and let compatibility accumulate until an existing software ecosystem becomes reachable.
+This document defines project vocabulary for a recurring engineering method in `zig-reference`, Morphic, Alpz, and QuirkM: use real external software as a pressure source, implement the smallest missing reusable mechanism, retry, and let compatibility accumulate until an existing software ecosystem becomes reachable.
 
-These terms are project language, not claimed industry standards. The purpose is to give agents and humans a precise way to discuss why a small kernel mechanism can be more valuable than a large amount of locally invented functionality.
+These terms are project language, not claimed industry standards. Where an established systems or software-engineering term already fits, this document prefers that ordinary term over inventing a new label.
 
 The central question is:
 
@@ -12,13 +12,19 @@ The governing principle remains:
 
 > **Minimum permanent mechanism. Maximum inherited civilization.**
 
+A second constraint now sits beside it:
+
+> **Maximize inheritance without allowing compatibility policy to dictate the permanent foundation.**
+
+The goal is not merely to reach Linux, Alpine, QEMU, or KVM quickly. The goal is to reach them while preserving Morphic as a general-purpose foundation from which QuirkM and other future systems can be built without inheriting unnecessary historical constraints.
+
 ---
 
 ## 1. Pressure Oracle
 
 A **Pressure Oracle** is real target software used as an executable source of truth for what compatibility work is actually missing.
 
-Instead of beginning from a speculative checklist of every syscall, ioctl, flag, ABI rule, or subsystem that *might* be required, run the software that matters and observe the first concrete incompatibility.
+Instead of beginning from a speculative checklist of every syscall, ioctl, flag, ABI rule, or subsystem that might be required, run the software that matters and observe the first concrete incompatibility.
 
 Canonical loop:
 
@@ -70,18 +76,6 @@ An **Executable Specification** is a real program whose observed behavior constr
 
 Musl, BusyBox, `apk`, QEMU, and later stock applications can each act as executable specifications. Their source code and documentation remain useful, but the decisive question is whether the actual binary progresses under the implemented semantics.
 
-This changes engineering from:
-
-```text
-"we think this compatibility surface should be enough"
-```
-
-into:
-
-```text
-"the real consumer advanced to the next boundary"
-```
-
 A pressure target is therefore both software to inherit and a test instrument.
 
 ---
@@ -90,9 +84,7 @@ A pressure target is therefore both software to inherit and a test instrument.
 
 The **First Missing Mechanism** is the earliest reusable semantic capability whose absence prevents the pressure target from advancing.
 
-This term deliberately distinguishes a mechanism from the immediate symptom.
-
-Example:
+This deliberately distinguishes the underlying mechanism from the immediate symptom.
 
 ```text
 symptom:
@@ -102,17 +94,7 @@ possible first missing mechanism:
 VM-fd ioctl dispatch with one required KVM operation
 ```
 
-Or:
-
-```text
-symptom:
-BusyBox shell startup hangs
-
-possible first missing mechanism:
-futex wait/wake semantics
-```
-
-The engineering task is not merely to remove the observed error. It is to find the smallest underlying capability that explains the failure and is likely to be reusable by later software.
+The engineering task is not merely to remove the observed error. It is to identify the smallest underlying capability that explains the failure and is likely to remain useful later.
 
 ---
 
@@ -122,22 +104,12 @@ The **Smallest Sufficient Surface** is the minimum externally visible compatibil
 
 It is narrower than "implement the subsystem" and stronger than "hard-code the test."
 
-For KVM, the Smallest Sufficient Surface should not mean implementing the complete Linux KVM API. It means implementing the smallest correct subset stock RISC-V QEMU actually requires, discovered through pressure.
-
-Conceptually:
+For KVM, this does not mean implementing the complete Linux KVM API. It means implementing the smallest correct subset stock RISC-V QEMU actually requires, discovered through pressure.
 
 ```text
 complete historical API
         ≠
 required compatibility surface
-```
-
-The desired relationship is:
-
-```text
-small permanent adapter
-        ↓
-large inherited implementation above it
 ```
 
 ---
@@ -156,21 +128,13 @@ Examples include:
 
 Inheritance surfaces are strategically valuable because their payoff is nonlinear.
 
-```text
-implement interface boundary
-        ↓
-reuse software already written by others
-        ↓
-new capabilities arrive without equivalent kernel growth
-```
-
 ---
 
 ## 6. Inheritance Multiplier
 
 An **Inheritance Multiplier** is software that, once reachable, makes additional software dramatically easier to acquire.
 
-High-value examples:
+Examples:
 
 ```text
 musl
@@ -204,9 +168,9 @@ An Inheritance Multiplier should usually outrank a similarly sized isolated feat
 
 ## 7. Inheritance Steal
 
-An **Inheritance Steal** is the deliberate act of implementing a comparatively small compatibility boundary in order to reuse a mature external software civilization rather than rebuilding its upper layers locally.
+An **Inheritance Steal** is the deliberate act of implementing a comparatively small compatibility boundary in order to reuse a mature external software ecosystem rather than rebuilding its upper layers locally.
 
-"Steal" is used here informally and positively: no code is misappropriated. The project is inheriting through legitimate public interfaces and open-source software instead of needlessly reproducing solved engineering.
+"Steal" is informal project language. It does not mean misappropriating code. It means obtaining leverage from legitimate public interfaces and open-source software instead of recreating solved engineering.
 
 The KVM strategy is the archetypal example:
 
@@ -218,29 +182,21 @@ small stock-QEMU-compatible /dev/kvm surface
 QEMU supplies mature VM orchestration and device-model machinery
 ```
 
-Without the inheritance boundary, the project might be tempted to build VM launch logic, device models, disk formats, networking, firmware integration, monitor behavior, and other surrounding machinery itself.
-
-The Inheritance Steal asks whether one narrow interface can make that unnecessary.
-
 ---
 
 ## 8. Civilization Leverage
 
-**Civilization Leverage** measures how much useful existing software becomes reachable per unit of permanent new complexity.
+**Civilization Leverage** is a decision heuristic for how much useful existing software becomes reachable per unit of permanent new complexity.
 
 Conceptually:
 
 ```text
-                     useful existing software newly reachable
-Civilization Leverage = ------------------------------------
-                         permanent new system complexity
+                       useful existing software newly reachable
+Civilization Leverage = --------------------------------------
+                           permanent new system complexity
 ```
 
-This is not a literal universal metric. It is a decision heuristic.
-
-A feature with modest standalone usefulness may have enormous Civilization Leverage if it opens a stable inheritance boundary.
-
-For example, a small `/dev/kvm` adapter may be more strategically valuable than a much larger custom virtual-machine manager because QEMU already contains decades of surrounding virtualization work.
+A small `/dev/kvm` adapter may therefore be strategically more valuable than a much larger custom VM manager if it allows QEMU to supply the surrounding virtualization machinery.
 
 ---
 
@@ -260,27 +216,13 @@ Examples include:
 
 A Permanent Mechanism is preferred over a target-specific shortcut when both cost roughly the same.
 
-The ideal pressure repair looks like:
-
-```text
-QEMU exposes missing behavior
-        ↓
-repair identifies reusable mechanism
-        ↓
-Linux/KVM adapter becomes thin
-        ↓
-mechanism remains useful to QuirkM and future personalities
-```
-
 ---
 
 ## 10. Compatibility Adapter
 
-A **Compatibility Adapter** translates the historical semantics of an inherited ecosystem into small permanent Morphic mechanisms.
+A **Compatibility Adapter** translates the historical semantics of an inherited ecosystem into permanent Morphic mechanisms.
 
-The adapter owns quirks that should not contaminate the common core.
-
-Examples:
+The adapter owns details such as:
 
 ```text
 Linux syscall numbers
@@ -291,49 +233,35 @@ KVM ioctl numbers
 KVM fd hierarchy
 ```
 
-belong at compatibility edges, while mechanisms such as resource identity, address-space mutation, VM creation, vCPU state, and stage-2 mappings should remain semantically cleaner beneath them.
-
-The desired architecture is:
+while resource identity, address-space mutation, VM creation, vCPU state, and stage-2 mappings remain general mechanisms beneath it.
 
 ```text
 historical external ABI
         ↓
 compatibility adapter
         ↓
-small reusable Morphic mechanisms
+reusable Morphic mechanisms
 ```
-
-This is **Quirk Quarantine** applied to inheritance engineering.
 
 ---
 
 ## 11. Quirk Quarantine
 
-**Quirk Quarantine** is the rule that historical compatibility behavior should remain confined to the personality or adapter that requires it instead of becoming the internal ontology of the system.
+**Quirk Quarantine** is project shorthand for keeping historical compatibility behavior inside the personality or adapter that requires it rather than making it the internal ontology of the system.
 
-For example, KVM may expose VM fds, vCPU fds, `mmap(kvm_run)`, and ioctls because that is the interface QEMU expects. Morphic does not therefore need to define virtualization internally as "a pile of Linux ioctl numbers."
+The standard design idea behind it is **compatibility isolation** and **separation of mechanism and policy**.
 
-The adapter can translate:
+For example:
 
 ```text
 KVM_CREATE_VM
     ↓
-Morphic CreateVm operation
-```
-
-```text
-KVM_CREATE_VCPU
+KVM adapter
     ↓
-Morphic CreateVcpu operation
+Morphic VM creation
 ```
 
-```text
-KVM_RUN
-    ↓
-Morphic RunVcpu operation
-```
-
-External compatibility is preserved without allowing external historical accidents to dictate the clean core.
+Morphic need not define virtualization internally as Linux file descriptors and ioctl numbers merely because QEMU expects that external ABI.
 
 ---
 
@@ -363,15 +291,11 @@ stock QEMU through /dev/kvm
 
 The ladder is not sacred. If one step collapses into another, take the larger win immediately.
 
-Its purpose is to ensure each stage creates leverage for the next rather than merely accumulating unrelated features.
-
 ---
 
 ## 13. Pressure Cascade
 
 A **Pressure Cascade** occurs when satisfying one missing mechanism exposes the next missing mechanism immediately, creating a productive sequence of target-driven repairs.
-
-Example:
 
 ```text
 QEMU starts
@@ -395,15 +319,11 @@ KVM_RUN
 
 Each successful repair is evidence that the compatibility frontier moved forward.
 
-A healthy Pressure Cascade is preferable to designing the whole endpoint from imagination because it keeps implementation coupled to demonstrated demand.
-
 ---
 
 ## 14. Retry Distance
 
 **Retry Distance** is the amount of engineering work between observing a pressure failure and rerunning the same external target against a corrected system.
-
-Low Retry Distance is strategically important for agentic development.
 
 Desired cycle:
 
@@ -415,25 +335,13 @@ failure
 → rerun target
 ```
 
-rather than:
-
-```text
-failure
-→ redesign several subsystems
-→ implement speculative dependencies
-→ wait for broad integration
-→ discover original target still fails differently
-```
-
-Small, verifiable repairs make the pressure oracle useful at high frequency.
+Low Retry Distance lets external software serve as a high-frequency development instrument.
 
 ---
 
 ## 15. Frontier Movement
 
 **Frontier Movement** is measurable advancement in the most ambitious real external program the system can execute correctly.
-
-Examples of frontier states:
 
 ```text
 static RV64 fixture
@@ -448,8 +356,6 @@ static RV64 fixture
 
 A large patch with no Frontier Movement may still be necessary substrate, but it should not be confused with ecosystem inheritance.
 
-A small patch that moves the frontier through an important interface can be disproportionately valuable.
-
 ---
 
 ## 16. Boundary Win
@@ -458,21 +364,17 @@ A **Boundary Win** occurs when a compatibility boundary becomes sufficiently cor
 
 Examples:
 
-- once `PT_INTERP` handoff is correct, dynamic relocation belongs to the userspace loader rather than the kernel;
-- once `apk` can operate correctly, package acquisition belongs largely to Alpine tooling rather than bespoke project scripts;
-- once stock QEMU can use the Alpz KVM personality, virtual machine orchestration and device emulation remain QEMU's job rather than becoming kernel features.
+- correct `PT_INTERP` handoff transfers dynamic relocation to the userspace loader;
+- working `apk` transfers package acquisition to Alpine tooling;
+- a sufficient KVM boundary transfers VM frontend and device-model work to QEMU.
 
-Boundary Wins are the preferred stopping points for major campaigns.
-
-They mark where the project can stop implementing an upper layer because an inherited ecosystem has taken over.
+Boundary Wins are preferred stopping points for major campaigns.
 
 ---
 
 ## 17. Responsibility Transfer
 
 **Responsibility Transfer** is the deliberate handoff of work from the kernel to an existing userspace component once the kernel has supplied the minimum correct mechanism.
-
-The dynamic-loader case is illustrative:
 
 ```text
 kernel:
@@ -487,7 +389,7 @@ resolve symbols
 initialize runtime state
 ```
 
-The KVM/QEMU case follows the same pattern:
+The KVM/QEMU relationship follows the same principle:
 
 ```text
 Alpz/Morphic:
@@ -506,17 +408,11 @@ image formats
 VM orchestration
 ```
 
-The project should actively seek Responsibility Transfers because they prevent permanent kernel complexity from expanding into mature userspace domains.
-
 ---
 
 ## 18. Causal Proof
 
 A **Causal Proof** demonstrates that the external operation being tested actually caused the machine state being claimed.
-
-This term emerged from Batch 26, where a superficially convincing proof was rejected because supervisor-precomputed results could imitate successful behavior.
-
-A valid causal proof prefers:
 
 ```text
 userspace operation
@@ -530,17 +426,7 @@ real machine consequence
 independent verifier reconstructs relation
 ```
 
-rather than:
-
-```text
-expected operation number
-    ↓
-hard-coded expected answer
-    ↓
-print PASS
-```
-
-Pressure-oracle development depends on causal proof. Otherwise a target can appear to advance while the claimed compatibility mechanism is not actually present.
+This is stronger than returning the expected value or printing a success marker according to a predetermined fixture sequence.
 
 ---
 
@@ -548,7 +434,7 @@ Pressure-oracle development depends on causal proof. Otherwise a target can appe
 
 An **Independent Oracle** is a verifier that reconstructs decisive facts from artifacts and machine observations rather than trusting the implementation's own success labels.
 
-Examples include independently checking:
+It may independently check:
 
 - ELF structure;
 - ECALL instruction sites;
@@ -564,41 +450,21 @@ The Pressure Oracle tells us **what to implement next**.
 
 The Independent Oracle tells us **whether we actually implemented it**.
 
-These roles should not be confused.
-
 ---
 
 ## 20. Batch Collapse
 
 **Batch Collapse** is the desirable disappearance of planned intermediate milestones when one implemented mechanism unlocks several downstream targets at once.
 
-Example:
-
-```text
-planned:
-BusyBox compatibility
-then Alpine shell
-then apk prerequisites
-
-observed:
-one missing mechanism repaired
-    ↓
-BusyBox works
-    ↓
-Alpine shell also works immediately
-```
-
-The correct response is not to preserve the roadmap ceremonially. Accept the larger inheritance win and move the frontier forward.
-
 Batches organize objectives. They are not quotas of work.
+
+If one repair makes BusyBox, an Alpine shell, and part of the next planned campaign work, accept the larger result instead of manufacturing work to preserve the roadmap.
 
 ---
 
 ## 21. Inheritance Escape Velocity
 
 **Inheritance Escape Velocity** is the point where the system can acquire useful software through existing package managers, compilers, runtimes, and compatibility interfaces faster than equivalent functionality would need to be ported or recreated manually.
-
-A representative path is:
 
 ```text
 Alpine + apk
@@ -611,10 +477,6 @@ QEMU opens guest ecosystems
     ↓
 KVM compatibility accelerates those guests
 ```
-
-The important transition is from manually adding applications to creating mechanisms that make applications arrive through established ecosystems.
-
-This is the larger Snowball target.
 
 ---
 
@@ -667,15 +529,13 @@ populate kvm_run
 return to QEMU
 ```
 
-The first successful `KVM_RUN` round trip is a major boundary win because it proves the external KVM ABI is connected to the native virtualization engine rather than merely emulated as interface-shaped stubs.
+The first successful `KVM_RUN` round trip is a major Boundary Win because it proves that the external KVM ABI is connected to the native virtualization engine rather than merely emulated as interface-shaped stubs.
 
 ---
 
 ## 23. Hypervisor Steal
 
 A **Hypervisor Steal** is the high-leverage strategy of keeping the native hypervisor mechanism small while inheriting QEMU as the mature userspace virtualization frontend through a minimal KVM-compatible boundary.
-
-Target architecture:
 
 ```text
                  stock QEMU
@@ -686,29 +546,20 @@ Target architecture:
                      │
              Alpz KVM adapter
                      │
-        ┌────────────┴────────────┐
-        │ reusable Morphic VM/vCPU│
-        │ mechanisms              │
-        └────────────┬────────────┘
+        reusable Morphic VM/vCPU mechanisms
                      │
              RISC-V H extension
                      │
                guest execution
 ```
 
-The value comes from what *does not* need to move into the kernel.
-
-The project should avoid reimplementing mature QEMU responsibilities merely because native virtualization is exciting. The KVM boundary exists precisely so the hypervisor can remain a mechanism while QEMU remains the rich policy/frontend layer.
+The value comes from what does **not** need to move into the kernel.
 
 ---
 
 ## 24. Multiplicative Roadmap
 
 A **Multiplicative Roadmap** orders work by inheritance consequence rather than by subsystem taxonomy.
-
-A conventional roadmap might group all filesystem work, then all process work, then all signal work, and so on.
-
-A Multiplicative Roadmap asks which next boundary creates the greatest increase in reachable software.
 
 For Alpz, the intended shape is approximately:
 
@@ -732,9 +583,259 @@ The sequence may change under real pressure. Its invariant is that each major ca
 
 ---
 
+# Foundation Design Vocabulary
+
+The pressure method must not be allowed to turn Morphic into a historical compatibility clone. The following established engineering ideas constrain how pressure-driven features enter the permanent foundation.
+
+## 25. Architectural Neutrality
+
+**Architectural Neutrality** means that the permanent foundation does not structurally privilege one external ecosystem when the underlying capability is more general.
+
+Linux may be a major client of Morphic without becoming the definition of Morphic.
+
+```text
+BAD:
+Morphic resource = Linux fd
+
+GOOD:
+Morphic ResourceRef
+        ↓
+Linux compatibility adapter
+        ↓
+fd 3
+```
+
+Likewise, a Morphic virtual machine should not be defined as a `/dev/kvm` file descriptor. KVM is one external representation of a more general VM/vCPU mechanism.
+
+Architectural Neutrality is what allows QuirkM, Linux compatibility, WASI, future personalities, and systems not yet imagined to reuse the same foundation without first undoing Linux-specific assumptions.
+
+---
+
+## 26. Separation of Mechanism and Policy
+
+**Separation of Mechanism and Policy** is the classic systems-design rule that the foundation should provide general capabilities while higher layers decide how those capabilities are presented and governed.
+
+Examples:
+
+```text
+MECHANISM                     POLICY / ABI
+
+resource binding              Linux fd numbering
+address-space mapping         Linux mmap flags
+image replacement             execve ABI
+VM creation                   KVM_CREATE_VM
+vCPU execution                KVM_RUN
+clock source                  clock_gettime ABI
+```
+
+This distinction is central to making Morphic useful beyond Alpz.
+
+Pressure from Linux or QEMU may reveal that a mechanism is missing, but the historical interface that exposed the need does not automatically become the internal API.
+
+---
+
+## 27. Compatibility Isolation
+
+**Compatibility Isolation** is the containment of ecosystem-specific behavior in replaceable compatibility layers.
+
+Linux syscall numbers, Linux errno conventions, KVM ioctl layouts, POSIX edge cases, and similar historical details belong at the edge unless they reveal a truly general mechanism beneath them.
+
+Compatibility Isolation allows the project to inherit aggressively without permanently absorbing every historical design choice of the inherited system.
+
+`Quirk Quarantine` is the project's informal shorthand for this more ordinary engineering principle.
+
+---
+
+## 28. Stable Core, Replaceable Edges
+
+**Stable Core, Replaceable Edges** describes the preferred dependency shape of the system.
+
+The stable core contains mechanisms expected to survive many personalities and applications. The edges contain adapters, ABI translations, presentation choices, and compatibility policy that may evolve or be replaced.
+
+```text
+Linux personality      QuirkM native API      future personality
+        \                    |                    /
+         \                   |                   /
+          +--------- replaceable edges --------+
+                            ↓
+                     stable Morphic core
+```
+
+This lets the project move quickly at the edges while applying much stricter design standards to assumptions that would be expensive to reverse later.
+
+---
+
+## 29. Reversibility
+
+**Reversibility** is the degree to which an architectural decision can be changed later without forcing unrelated parts of the system to change with it.
+
+The deeper and more widely depended-on a decision is, the more important reversibility becomes.
+
+A useful design gradient is:
+
+```text
+easier to replace
+────────────────────────
+fixture
+verifier presentation
+Linux syscall adapter
+KVM compatibility adapter
+QuirkM API spelling
+
+harder to replace
+────────────────────────
+resource identity
+ownership model
+address-space semantics
+task model
+capability model
+VM/vCPU abstraction
+interrupt model
+concurrency primitives
+```
+
+This produces a practical rule:
+
+> Move fast on replaceable compatibility code. Move carefully on permanent ontology.
+
+---
+
+## 30. Dependency Inversion
+
+**Dependency Inversion** means high-level compatibility policy should depend on general mechanisms, rather than general mechanisms depending on one compatibility personality.
+
+For example:
+
+```text
+Linux dup
+    ↓
+duplicate resource binding
+    ↓
+Morphic resource mechanism
+```
+
+not:
+
+```text
+Morphic resource mechanism
+    ↓
+defined in terms of Linux dup semantics
+```
+
+The same applies to KVM:
+
+```text
+KVM_RUN
+    ↓
+KVM adapter
+    ↓
+Morphic vCPU run operation
+```
+
+This keeps Linux and KVM as clients of the foundation rather than architects of it.
+
+---
+
+## 31. Orthogonal Primitives
+
+**Orthogonal Primitives** are small mechanisms whose responsibilities overlap as little as practical and which can be composed into many higher-level behaviors.
+
+Examples might include:
+
+```text
+resource
+address space
+mapping
+task
+execution context
+channel
+event
+timer
+VM
+vCPU
+interrupt endpoint
+```
+
+The goal is not the fewest functions or the smallest source file. The goal is a small set of independent concepts that can be recombined without importing unrelated policy.
+
+Orthogonality is what lets the same mechanism support Linux compatibility, QuirkM-native interfaces, virtualization, and later personalities in different combinations.
+
+---
+
+## 32. Minimal Basis
+
+A **Minimal Basis** is the smallest set of sufficiently general primitives from which the required higher-level systems can be composed.
+
+This is a more useful target than simply minimizing the number of kernel features.
+
+```text
+smallest kernel
+        ≠
+fewest capabilities at any cost
+
+useful minimal basis
+        =
+fewest independent primitives
+that generate the largest useful design space
+```
+
+The Minimal Basis is therefore the foundation-side counterpart to MinMax inheritance.
+
+The objective is not a kernel that can only imitate today's target with very little code. It is a foundation whose compact set of mechanisms can express today's target and remain useful for systems built tomorrow.
+
+---
+
+## 33. Pressure-Informed Abstraction
+
+**Pressure-Informed Abstraction** means using a real compatibility failure to discover that a capability is needed, then designing the permanent abstraction according to the underlying general problem rather than copying the shape of the historical API that exposed it.
+
+Canonical decision:
+
+```text
+real target fails
+      ↓
+identify missing behavior
+      ↓
+ask what kind of thing it is
+  ┌───────────────┴───────────────┐
+  │                               │
+general mechanism          compatibility-specific rule
+  │                               │
+  ↓                               ↓
+Morphic core                 adapter/personality
+  └───────────────┬───────────────┘
+                  ↓
+                retry
+```
+
+Pressure determines **priority**. Architecture determines **placement and shape**.
+
+This prevents Pressure-Oracle engineering from degenerating into target-shaped kernel design.
+
+---
+
+## 34. General-Purpose Foundation
+
+A **General-Purpose Foundation** is a base system deliberately structured so that unrelated future systems can be built on it without first removing assumptions imposed by the first compatibility target.
+
+For Morphic, this means Linux compatibility may become extremely broad while remaining one client of mechanisms such as resources, address spaces, tasks, events, VM/vCPU state, and device control.
+
+A General-Purpose Foundation should allow someone to build:
+
+- a Linux-compatible Alpz system;
+- QuirkM-native userspace with cleaner APIs;
+- a virtualization-focused system;
+- a WASI-oriented personality;
+- a constrained embedded system;
+- or a future design not anticipated by the current roadmap.
+
+The test is not that every future system is already implemented. The test is that today's compatibility work does not unnecessarily close those design possibilities.
+
+---
+
 # Distilled Principles
 
-The vocabulary above reduces to a small set of unique principles.
+The vocabulary above reduces to a small set of project principles.
 
 ## Principle A — Let the Consumer Choose the Work
 
@@ -742,7 +843,7 @@ Do not guess the entire compatibility surface.
 
 Run the most valuable real consumer currently within reach. Treat its first legitimate failure as prioritization information.
 
-This prevents years of compatibility archaeology from replacing actual ecosystem progress.
+---
 
 ## Principle B — Repair Mechanisms, Not Symptoms
 
@@ -750,7 +851,7 @@ The first observed failure is evidence, not necessarily the correct abstraction 
 
 Trace it downward until the smallest reusable missing mechanism is identified. Implement that mechanism once, then keep the external quirk in a thin adapter.
 
-This is how pressure work compounds instead of becoming a collection of hacks.
+---
 
 ## Principle C — Stop at the Inheritance Boundary
 
@@ -760,7 +861,9 @@ A kernel that correctly enters a dynamic loader should not become a dynamic load
 
 A hypervisor with a sufficient KVM boundary should not become QEMU.
 
-The project grows by knowing where **not** to grow.
+The project grows partly by knowing where not to grow.
+
+---
 
 ## Principle D — Optimize for Leverage, Not Surface Count
 
@@ -768,15 +871,17 @@ Ten new syscalls are not automatically better than one.
 
 One interface operation that opens a major software world may have greater value than dozens of isolated capabilities.
 
-Measure progress by Frontier Movement and Civilization Leverage, not by the number of API entries implemented.
+Measure progress by Frontier Movement and Civilization Leverage, not raw API count.
+
+---
 
 ## Principle E — Require Machine-Caused Evidence
 
 Compatibility claims must be caused by the real operation and independently reconstructed where practical.
 
-The same discipline that rejected supervisor-precomputed Batch 26 evidence should apply to musl, `apk`, QEMU, H-extension entry/exit, and KVM.
+The same discipline applies to musl, `apk`, QEMU, H-extension entry/exit, and KVM.
 
-A pressure target is useful only if false progress is difficult to manufacture accidentally.
+---
 
 ## Principle F — Retry Aggressively
 
@@ -784,7 +889,7 @@ Keep Retry Distance low.
 
 Every correction should be followed quickly by the same real target. The target then reveals either success or the next pressure point.
 
-This converts external software into a high-frequency development instrument.
+---
 
 ## Principle G — Welcome Roadmap Collapse
 
@@ -792,11 +897,11 @@ If one repair makes several planned milestones work, do not manufacture addition
 
 The roadmap exists to predict inheritance gates. Reality is allowed to outperform it.
 
+---
+
 ## Principle H — Seek Responsibility Transfers
 
 The most valuable mechanism is often one that allows a large mature system to take over responsibility from us.
-
-Examples:
 
 ```text
 PT_INTERP handoff
@@ -809,7 +914,39 @@ KVM compatibility
     → QEMU owns rich VM frontend/device behavior
 ```
 
-Responsibility Transfer is one of the strongest forms of MinMax engineering.
+---
+
+## Principle I — Preserve Architectural Neutrality
+
+Maximize inherited capability, but do not buy it by making the permanent core synonymous with the first ecosystem that happens to need a feature.
+
+Linux can be a major compatibility target without becoming Morphic's internal ontology.
+
+---
+
+## Principle J — Separate Mechanism from Policy
+
+When pressure exposes a missing capability, first determine whether it is a general mechanism or merely a historical compatibility rule.
+
+General mechanisms belong in the stable foundation. Compatibility rules belong in adapters and personalities.
+
+---
+
+## Principle K — Prefer Reversible Edges and Conservative Foundations
+
+A compatibility adapter can be replaced cheaply. A flawed resource or VM model may constrain everything built above it.
+
+Spend design caution in proportion to the cost of reversal.
+
+---
+
+## Principle L — Build a Minimal Basis, Not a Minimal Dead End
+
+The objective is not the smallest kernel capable of passing the current test.
+
+The objective is the smallest coherent set of orthogonal mechanisms capable of generating the largest useful space of systems.
+
+A successful MinMax design therefore minimizes permanent mechanism while preserving generality and composability.
 
 ---
 
@@ -819,7 +956,7 @@ The method can be compressed into one project law:
 
 > **Run the most valuable real software that is almost reachable. Implement the first missing reusable mechanism it exposes. Prove the mechanism causally. Retry immediately. Stop implementing when a compatibility boundary transfers responsibility to the inherited ecosystem.**
 
-Or, in operational form:
+Operationally:
 
 ```text
 TARGET
@@ -828,7 +965,9 @@ PRESSURE
   ↓
 FIRST MISSING MECHANISM
   ↓
-MINIMUM PERMANENT REPAIR
+CLASSIFY: GENERAL OR COMPATIBILITY-SPECIFIC?
+  ↓
+MINIMUM PERMANENT REPAIR OR THIN ADAPTER
   ↓
 CAUSAL PROOF
   ↓
@@ -843,8 +982,8 @@ INHERITED MULTIPLIER
 NEXT TARGET
 ```
 
-This is the intended engineering loop for the path from musl to BusyBox to Alpine to `apk`, and then from QEMU/TCG to RISC-V H-extension virtualization and the smallest useful `/dev/kvm` surface.
+The long-term design constraint is equally compact:
 
-The final objective is not maximum local implementation.
+> **Inherit aggressively. Keep the core general. Put compatibility at the edges. Prefer a small set of orthogonal, permanent mechanisms over target-shaped foundations.**
 
-It is maximum capability under minimum permanent mechanism.
+This is the intended engineering method for moving quickly from musl to BusyBox to Alpine to `apk`, and then from QEMU/TCG to RISC-V H-extension virtualization and the smallest useful `/dev/kvm` surface, without sacrificing Morphic's usefulness as a general-purpose foundation.
