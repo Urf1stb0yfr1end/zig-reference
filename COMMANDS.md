@@ -216,6 +216,7 @@ Each module has `zig build test-<module>` and `zig build smoke-<module>` targets
 
 <!-- CURRENT AGENT CORPUS --> Agent Fast Path v2 currently projects 60 contracted modules as 58 full cards with 2 partial cards.
 Batch 26 established compiler-passing focused unit and smoke behavior for modules 58 and 59 and reran the inherited Batch 25B mutation and two-QEMU proof; the still-missing Batch 26 machine integration is recorded honestly in `docs/reports/AGENTIC_SNOWBALL_BATCH_26.md`.
+Batch 27 follow-up extends module 59 with bounded neutral multi-page/multi-segment materialization; `zig build test-bounded-address-space-exec-image` covers offsets, final partial pages, BSS, final RX/RW permissions, and explicit backing-capacity failure. The external pressure command remains golden-only until a Morphic artifact transport and machine verifier are integrated.
 The Batch 07 repair revalidated bootstrap/doctor discovery, deterministic preflight, command-reference drift, ports, Developer Minimus, hosted Morphic verification, and the complete repository pipeline under Zig 0.14.0; exact results are recorded in `docs/reports/AGENTIC_SNOWBALL_BATCH_07_REPAIR.md`.
 The root-document policy is checked by `node tools/check-port-contracts.js`; it accepts
 only the explicit flagship/root allowlist and rejects any other root Markdown file.

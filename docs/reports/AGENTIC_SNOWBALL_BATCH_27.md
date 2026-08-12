@@ -56,3 +56,23 @@ the tiny diagnostic, downloads and fail-closed hashes the pinned Alpine package
 and extracted executable, and executes both under the golden Linux-user oracle.
 `--artifact-only` performs acquisition and identity validation without executing
 the oracle. Temporary external artifacts are never committed.
+
+## Follow-up: neutral materializer checkpoint
+
+- **Before:** module 59 owned failure-atomic logical exec planning, while the
+  machine recipe copied only `load.items()[0]` into one page.
+- **Classification:** complete page-image construction is a reusable Morphic
+  mechanism; ELF remains the compatibility planner in module 54.
+- **Smallest repair:** `MaterializedImage(page_capacity)` consumes all validated
+  segment ranges, owns zero-initialized pages, handles partial pages and BSS,
+  merges shared-page contributions and final permissions, rejects W+X, and
+  reports checked overflow/source/capacity failures before live state changes.
+- **Focused proof:** `zig build test-bounded-address-space-exec-image` passed
+  under Zig 0.14.0, including two segments, four pages, non-page-aligned edges,
+  exact late-page bytes, BSS zeroing, RX/RW permissions, and insufficient
+  capacity rejection.
+- **Retry:** `python3 tools/pressure-real-rv64-userspace.py --artifact-only` was
+  rerun against the exact hashes. The current harness still has no Morphic
+  transport/machine mode, so no U-mode musl or BusyBox claim is made at this
+  checkpoint. Wiring prepared pages to reserved frames without weakening Batch
+  26 PREPARE/COMMIT remains the first machine-integration frontier.
