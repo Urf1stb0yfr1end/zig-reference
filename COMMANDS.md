@@ -445,3 +445,14 @@ The 2026-08-12 execve causality follow-up also passed `zig build check --summary
 ## Batch 27 real external-userspace pressure
 
 `python3 tools/pressure-real-rv64-userspace.py` reproducibly compiles the pinned-source tiny static RV64 musl diagnostic with Zig 0.14.0, downloads Alpine v3.22 `busybox-static-1.37.0-r20.apk`, fails closed on the committed executable/package SHA-256 identities, and executes the diagnostic plus `busybox.static sh -c 'echo batch27'` under `qemu-riscv64` as a golden Linux-user baseline. This command does **not** claim Morphic execution; the Batch 27 report records the current Morphic frontier. Use `python3 tools/pressure-real-rv64-userspace.py --artifact-only` to verify acquisition and artifact identity without the golden execution oracle. Both forms use temporary storage and do not vendor binary artifacts.
+
+## Batch 28 machine materializer checkpoint
+
+`zig build install-freestanding-riscv64-morphic-runtime --prefix PATH` compiled
+successfully under Zig 0.14.0 after the Batch 26 exec path was changed to consume
+all prepared `MaterializedImage` pages with final Sv39 permissions. The inherited
+`python3 tools/verify-freestanding-riscv64-file-memory-exec.py --self-test` and
+full verifier remain the exact machine checks, but could not execute in this run
+because `qemu-system-riscv64` was unavailable. Exact external artifact identity
+was rechecked with `python3 tools/pressure-real-rv64-userspace.py --artifact-only`;
+that command does not claim Morphic execution.

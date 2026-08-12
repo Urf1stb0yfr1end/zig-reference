@@ -16,7 +16,8 @@
     "riscv-sfence-vma-invalidation",
     "riscv-sv39-page-table-builder",
     "riscv-page-table-page-owner",
-    "bounded-elf64-load-plan"
+    "bounded-elf64-load-plan",
+    "bounded-address-space-exec-image"
   ],
   "selection_reasons": [
     "The resource planner derives fixed storage and initialization order.",
@@ -24,7 +25,8 @@
     "The event trace records normalized bounded behavior.",
     "The existing physical-region and page-frame modules turn only the eight-page linker-reserved interval into deterministic owned frames; address types and PFN conversion preserve domain and alignment truth.",
     "The freestanding-only owner adapter binds the existing generic Sv39 builder, entry, indexing, walker, and SFENCE.VMA semantics to page-table frames allocated from the linker-owned physical pool.",
-    "The bounded ELF planner remains the sole process-image policy authority for both the preserved one-segment Batch 22B fixture and the distinct Batch 23 R-X plus initialized RW-/BSS fixture."
+    "The bounded ELF planner remains the sole process-image policy authority for both the preserved one-segment Batch 22B fixture and the distinct Batch 23 R-X plus initialized RW-/BSS fixture.",
+    "The Batch 26 machine exec adapter consumes project 59 MaterializedImage pages generically, stages exact bytes in already-reserved physical backing, and installs final Sv39 permissions only after complete preparation."
   ],
   "direct_dependencies": [
     "bounded-system-resource-plan",
@@ -40,7 +42,8 @@
     "riscv-sfence-vma-invalidation",
     "riscv-sv39-page-table-builder",
     "riscv-page-table-page-owner",
-    "bounded-elf64-load-plan"
+    "bounded-elf64-load-plan",
+    "bounded-address-space-exec-image"
   ],
   "dependency_order": [
     "fixed-capacity-vector",
@@ -91,7 +94,9 @@
     "Builder.protect",
     "Builder.query",
     "global",
-    "executeUnsafe"
+    "executeUnsafe",
+    "MaterializedImage.prepare",
+    "MaterializedImage.items"
   ],
   "adapters_required": [
     "recipes/run-hosted-morphic-runtime/src/recipe.zig",
@@ -103,7 +108,8 @@
     "The synchronous breakpoint alone advances sepc by its ELF-proven 32-bit instruction width. Timer interrupts leave sepc unchanged. The one-shot masks STIE and sets the deadline to maximum; each non-final repeated tick re-arms from newly observed time plus 100000 counter units, and the fourth tick masks STIE and sets the deadline to maximum before sret.",
     "Scheduler-facing machine time uses the raw RV64 rdtime value as u64 through an identity mapping, so the bridge performs no narrowing or arithmetic; advanceTo retains the scheduler time-reversal rejection and ordering semantics.",
     "The freestanding adapter reserves one eight-page, 4096-byte-aligned NOLOAD pool in its ELF, reads the linker bounds and actual satp CSR, registers exactly that interval as usable, and exercises the existing allocator. Direct access is valid only for the mechanically observed Bare mode; this is neither platform RAM discovery nor a production PMM, and Sv39 remains inactive during that preserved phase; Batch 17 activates it only afterward.",
-    "After the preserved Batch 17 broad-RWX activation frame, Builder.protect directly replaces every live 4 KiB leaf without a transient unmap while preserving physical targets and levels. ELF-derived page-aligned domains then provide supervisor text RX/A, rodata R/A/NX, writable image/stack/pool and translated alias RW/A/D/NX; one global SFENCE.VMA precedes positive probes and the unchanged Morphic workload. The freestanding RealPageOwner supplies actual machine page-table frames; riscv-page-table-page-owner remains the reusable hosted semantic precedent and is not the machine provider."
+    "After the preserved Batch 17 broad-RWX activation frame, Builder.protect directly replaces every live 4 KiB leaf without a transient unmap while preserving physical targets and levels. ELF-derived page-aligned domains then provide supervisor text RX/A, rodata R/A/NX, writable image/stack/pool and translated alias RW/A/D/NX; one global SFENCE.VMA precedes positive probes and the unchanged Morphic workload. The freestanding RealPageOwner supplies actual machine page-table frames; riscv-page-table-page-owner remains the reusable hosted semantic precedent and is not the machine provider.",
+    "Batch 26 exec PREPARE now completes both neutral main/interpreter MaterializedImage values and verifies sufficient pre-existing backing before COMMIT; COMMIT performs no allocation and installs every prepared page with translated final U-mode permissions, followed by SFENCE.VMA and FENCE.I."
   ],
   "gaps_discovered": [
     "The hosted path still relies on Linux userspace. The freestanding riscv64 path proves one fixed-frame resumable synchronous breakpoint trap, one one-shot supervisor timer interrupt, one finite four-delivery monotonic repeated-tick phase, and non-preemptive scheduler decisions driven by those observations after sret; indefinite periodic ticking, timekeeping accuracy, preemption, sleeping tasks, clock accuracy, nested traps/interrupts, multiple harts, floating-point/vector context, hardware discovery, and Linux/POSIX/Alpine compatibility remain out of scope or unimplemented.",
