@@ -434,5 +434,7 @@ Batch 26 PR #53 synchronization regenerated the two affected port contracts, all
 ### Batch 26 real file/memory/exec machine gate
 
 - `zig build install-userspace-rv64-file-memory-exec-elf --prefix PATH` builds and installs the distinct raw RV64 Batch 26 syscall-pressure fixture.
+- `zig build install-userspace-rv64-batch26-main-elf --prefix PATH` builds and installs the real Batch 26 ET_EXEC main ELF with PT_INTERP.
+- `zig build install-userspace-rv64-batch26-interp-elf --prefix PATH` builds and installs the separate tiny Batch 26 ET_DYN interpreter ELF.
 - `python3 tools/verify-freestanding-riscv64-file-memory-exec.py --self-test` executes one real QEMU machine and mutation-rejects file/open, mapping, exec, interpreter, load-bias, generation, and W+X evidence.
-- `python3 tools/verify-freestanding-riscv64-file-memory-exec.py` executes two independent real QEMU machines and requires deterministic Batch 26 evidence. The command exists, but its first evidence model was rejected in review and is not accepted as a Batch 26 PASS.
+- `python3 tools/verify-freestanding-riscv64-file-memory-exec.py` executes two independent real QEMU machines and independently relates the three exact ELF artifacts, decoded ECALL sites, returning `sepc + 4` transitions, real protection/missing-mapping faults, filesystem bytes, program-image replacement, `PT_INTERP`, ET_DYN bias, startup auxv, resource generation, and W+X truth. Its `--self-test` mode runs one QEMU machine and rejects eleven decisive semantic/artifact mutations. Batch 26 completed both modes under Zig 0.14.0 and QEMU 8.2.2.

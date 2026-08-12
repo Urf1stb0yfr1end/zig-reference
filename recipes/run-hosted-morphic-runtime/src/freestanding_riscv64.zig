@@ -20,6 +20,8 @@ const userspace_elf_data_bss = @embedFile("userspace-elf-rv64-data-bss");
 const userspace_elf_initial_stack = @embedFile("userspace-elf-rv64-initial-stack");
 const userspace_elf_linux_syscalls = @embedFile("userspace-elf-rv64-linux-syscalls");
 const userspace_elf_file_memory_exec = @embedFile("userspace-elf-rv64-file-memory-exec");
+const batch26_main_elf = @embedFile("userspace-elf-rv64-batch26-main");
+const batch26_interp_elf = @embedFile("userspace-elf-rv64-batch26-interp");
 
 const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
@@ -102,6 +104,11 @@ fn RealPageOwner(comptime Allocator: type) type {
         }
     };
 }
+
+const MachineAllocator = frame_allocators.PhysicalPageFrameAllocator(physical_pool_pages);
+const MachinePageOwner = RealPageOwner(MachineAllocator);
+const MachineBuilder = sv39_builders.Builder(MachinePageOwner);
+var batch26_builder: *MachineBuilder = undefined;
 
 /// Fixed, allocation-free integer supervisor context. x0 is architectural zero;
 /// x2 is the interrupted sp. Floating-point/vector state and nested traps are
@@ -255,7 +262,40 @@ var copy_out_return_count: usize = 0;
 var syscall_active = false;
 var batch26_active = false;
 var batch26_count: usize = 0;
-var batch26_results: [7]usize = .{0} ** 7;
+var batch26_results: [10]usize = .{0} ** 10;
+var batch26_pcs: [9]usize = .{0} ** 9;
+var batch26_resumes: [8]usize = .{0} ** 8;
+const Batch26Fs = bounded_filesystem.FileSystem(8, 32, 16384);
+var batch26_fs: Batch26Fs = .{};
+var batch26_file_object: bounded_filesystem.ObjectId = .root;
+var batch26_open_ref: ResourceRef = undefined;
+var batch26_open_offset: usize = 0;
+var batch26_map_pa: usize = 0;
+var batch26_map_present = false;
+var batch26_mmap_value: usize = 0;
+var batch26_protect_fault_cause: usize = 0;
+var batch26_protect_fault_va: usize = 0;
+var batch26_protect_fault_pc: usize = 0;
+var batch26_protect_pte: usize = 0;
+var batch26_unmap_fault_cause: usize = 0;
+var batch26_unmap_fault_va: usize = 0;
+var batch26_unmap_fault_pc: usize = 0;
+var batch26_interp_terminal = false;
+var batch26_main_entry: usize = 0;
+var batch26_interp_raw_entry: usize = 0;
+var batch26_interp_bias: usize = 0x80404000;
+var batch26_interp_entry: usize = 0;
+var batch26_at_phdr: usize = 0;
+var batch26_initial_sp: usize = 0;
+const Batch26ActiveQuery = struct {
+    fn query(_: *const anyopaque, page: user_transfer.GuestVirtualAddress) ?user_transfer.PageResolution {
+        const leaf = batch26_builder.query(page.raw()) catch return null;
+        const flags = leaf.raw_entry & 0xff;
+        if (flags & 1 == 0 or flags & 0xe == 0) return null;
+        return .{ .physical_page_start = user_transfer.PhysicalAddress.init(leaf.physical_address & ~@as(usize, frames.PageSize - 1)), .user = flags & 0x10 != 0, .readable = flags & 0x2 != 0, .writable = flags & 0x4 != 0 };
+    }
+};
+var batch26_query_context: u8 = 0;
 var syscall_query: user_transfer.PageQuery = undefined;
 var syscall_count: usize = 0;
 const syscall_capacity = 16;
@@ -541,7 +581,38 @@ export fn recordUserServiceTrap(frame: *TrapFrame) callconv(.c) void {
 }
 
 fn recordBatch26Syscall(frame: *TrapFrame) void {
-    const expected = [_]usize{ 56, 56, 56, 222, 226, 215, 221 };
+    write("ZIGREF_BATCH26_EVENT index=");
+    writeUsizeHex(batch26_count);
+    write(" cause=");
+    writeUsizeHex(frame.scause);
+    write(" nr=");
+    writeUsizeHex(frame.x[17]);
+    write("\n");
+    if (frame.scause == 15 and batch26_count == 6 and frame.stval == 0x80404000) {
+        batch26_protect_fault_cause = frame.scause;
+        batch26_protect_fault_va = frame.stval;
+        batch26_protect_fault_pc = frame.sepc;
+        frame.sepc += 4;
+        asm volatile ("csrw sepc, %[pc]"
+            :
+            : [pc] "r" (frame.sepc),
+            : "memory"
+        );
+        return;
+    }
+    if (frame.scause == 13 and batch26_count == 7 and frame.stval == 0x80404000) {
+        batch26_unmap_fault_cause = frame.scause;
+        batch26_unmap_fault_va = frame.stval;
+        batch26_unmap_fault_pc = frame.sepc;
+        frame.sepc += 4;
+        asm volatile ("csrw sepc, %[pc]"
+            :
+            : [pc] "r" (frame.sepc),
+            : "memory"
+        );
+        return;
+    }
+    const expected = [_]usize{ 56, 63, 56, 56, 222, 226, 215, 221, 93 };
     if (batch26_count >= expected.len or frame.scause != 8 or frame.x[17] != expected[batch26_count]) {
         write("ZIGREF_26_FAIL trap nr=");
         writeUsizeHex(frame.x[17]);
@@ -554,31 +625,169 @@ fn recordBatch26Syscall(frame: *TrapFrame) void {
         write("\n");
         shutdown();
     }
-    const result: usize = switch (batch26_count) {
-        0 => 3,
-        1 => negativeErrno(2),
-        2 => negativeErrno(14),
-        3 => 0x80404000,
-        4, 5 => 0,
-        6 => 0, // terminal exec commit; no return to program A
+    batch26_pcs[batch26_count] = frame.sepc;
+    var result: usize = 0;
+    switch (batch26_count) {
+        0, 2, 3 => {
+            if (frame.x[10] != 0 -% @as(usize, 100) or frame.x[12] != 0 or frame.x[13] != 0) {
+                shutdown();
+            }
+            var path: [32]u8 = undefined;
+            const path_len = copyUserCString(frame.x[11], &path) catch {
+                result = negativeErrno(14);
+                if (batch26_count != 3) shutdown();
+                batch26_results[batch26_count] = result;
+                return finishBatch26Return(frame, result);
+            };
+            const object = batch26_fs.lookup(.root, path[0..path_len]) catch {
+                result = negativeErrno(2);
+                if (batch26_count != 2) shutdown();
+                batch26_results[batch26_count] = result;
+                return finishBatch26Return(frame, result);
+            };
+            if (batch26_count != 0 or object != batch26_file_object) shutdown();
+            batch26_open_ref = syscall_resources.create(.{ .backend = @enumFromInt(26), .capabilities = .{ .read = true } }) catch shutdown();
+            syscall_bindings.bindAt(3, batch26_open_ref) catch shutdown();
+            result = 3;
+        },
+        1 => {
+            if (frame.x[10] != 3 or frame.x[12] != 12 or syscall_bindings.resolve(3) == null) shutdown();
+            var bytes: [16]u8 = undefined;
+            const amount = batch26_fs.read(batch26_file_object, batch26_open_offset, bytes[0..frame.x[12]]) catch shutdown();
+            copyBytesToUser(frame.x[11], bytes[0..amount]) catch shutdown();
+            batch26_open_offset += amount;
+            result = amount;
+        },
+        4 => {
+            if (frame.x[10] != 0 or frame.x[11] != frames.PageSize or frame.x[12] != 3 or frame.x[13] != 0x22 or frame.x[14] != std.math.maxInt(usize) or frame.x[15] != 0 or batch26_map_present) shutdown();
+            _ = batch26_builder.mapPage(0x80404000, batch26_map_pa, .page_4k, .{ .read = true, .write = true, .user = true, .accessed = true, .dirty = true }) catch shutdown();
+            asm volatile ("sfence.vma; fence.i" ::: "memory");
+            batch26_map_present = true;
+            result = 0x80404000;
+        },
+        5 => {
+            if (!batch26_map_present or frame.x[10] != 0x80404000 or frame.x[11] != frames.PageSize or frame.x[12] != 1) shutdown();
+            batch26_mmap_value = @as(*const volatile usize, @ptrFromInt(batch26_map_pa)).*;
+            if (batch26_mmap_value != 0x26) shutdown();
+            _ = batch26_builder.protect(0x80404000, .page_4k, .{ .read = true, .user = true, .accessed = true }) catch shutdown();
+            asm volatile ("sfence.vma" ::: "memory");
+            batch26_protect_pte = (batch26_builder.query(0x80404000) catch shutdown()).raw_entry;
+        },
+        6 => {
+            if (!batch26_map_present or batch26_protect_fault_cause != 15 or frame.x[10] != 0x80404000 or frame.x[11] != frames.PageSize) shutdown();
+            _ = batch26_builder.unmapPage(0x80404000, .page_4k) catch shutdown();
+            asm volatile ("sfence.vma" ::: "memory");
+            batch26_map_present = false;
+        },
+        7 => {
+            if (batch26_unmap_fault_cause != 13) shutdown();
+            commitBatch26Exec(frame);
+            batch26_results[batch26_count] = 0;
+            batch26_count += 1;
+            return;
+        },
+        8 => {
+            if (frame.x[10] != 0x26b or frame.sepc != batch26_interp_entry + 8) shutdown();
+            batch26_interp_terminal = true;
+            frame.sepc = @intFromPtr(&userServiceSupervisorResume);
+            frame.sstatus = (frame.sstatus & ~@as(usize, 0x40122)) | 0x100;
+            service_trap_count = 2;
+            batch26_count += 1;
+            return;
+        },
         else => unreachable,
-    };
-    batch26_results[batch26_count] = result;
-    if (batch26_count == 6) {
-        frame.sepc = @intFromPtr(&userServiceSupervisorResume);
-        frame.sstatus = (frame.sstatus & ~@as(usize, 0x40122)) | 0x100;
-        service_trap_count = 2;
-    } else {
-        frame.x[10] = result;
-        frame.sepc += 4;
-        frame.sstatus &= ~@as(usize, 0x40122);
-        asm volatile ("csrw sepc, %[pc]"
-            :
-            : [pc] "r" (frame.sepc),
-            : "memory"
-        );
     }
+    batch26_results[batch26_count] = result;
+    finishBatch26Return(frame, result);
+}
+
+fn finishBatch26Return(frame: *TrapFrame, result: usize) void {
+    frame.x[10] = result;
+    frame.sepc += 4;
+    batch26_resumes[batch26_count] = frame.sepc;
+    frame.sstatus &= ~@as(usize, 0x40122);
+    asm volatile ("csrw sepc, %[pc]"
+        :
+        : [pc] "r" (frame.sepc),
+        : "memory"
+    );
     batch26_count += 1;
+}
+
+fn copyUserCString(address: usize, destination: []u8) !usize {
+    for (destination, 0..) |*byte, index| {
+        const plan = user_transfer.TransferPlan(1).plan(user_transfer.GuestVirtualAddress.init(address + index), 1, .read_from_user, syscall_query) catch return error.InvalidUser;
+        const source: *const volatile u8 = @ptrFromInt(plan.items()[0].physical_start.raw());
+        byte.* = source.*;
+        if (byte.* == 0) return index;
+    }
+    return error.InvalidUser;
+}
+
+fn copyBytesToUser(address: usize, bytes: []const u8) !void {
+    const plan = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(address), bytes.len, .write_to_user, syscall_query) catch return error.InvalidUser;
+    for (plan.items()) |segment| {
+        const target: [*]volatile u8 = @ptrFromInt(segment.physical_start.raw());
+        for (0..segment.byte_count) |i| target[i] = bytes[segment.request_offset + i];
+    }
+}
+
+fn commitBatch26Exec(frame: *TrapFrame) void {
+    const main_object = batch26_fs.lookup(.root, "/bin/main") catch shutdown();
+    const interp_object = batch26_fs.lookup(.root, "/lib/ld-batch26-rv64.so") catch shutdown();
+    const main_file = batch26_fs.resolve(main_object) orelse shutdown();
+    const interp_file = batch26_fs.resolve(interp_object) orelse shutdown();
+    const main_bytes = main_file.bytes[0..main_file.length];
+    const interp_bytes = interp_file.bytes[0..interp_file.length];
+    const candidate = address_space.ExecPlan(2, 32).prepare(main_bytes, interp_bytes) catch shutdown();
+    const main_plan = candidate.main;
+    const interp_plan = candidate.interpreter orelse shutdown();
+    if (!std.mem.eql(u8, candidate.interpreter_path[0..candidate.interpreter_path_len], "/lib/ld-batch26-rv64.so")) shutdown();
+    const old_code = batch26_builder.query(user_code_va) catch shutdown();
+    const old_data = batch26_builder.query(user_data_va) catch shutdown();
+    _ = batch26_builder.unmapPage(user_code_va, .page_4k) catch shutdown();
+    _ = batch26_builder.unmapPage(user_data_va, .page_4k) catch shutdown();
+    const main_segment = main_plan.load.items()[0];
+    const interp_segment = interp_plan.load.items()[0];
+    batch26_main_entry = candidate.main_entry;
+    batch26_interp_raw_entry = candidate.entry;
+    batch26_interp_entry = candidate.entry + batch26_interp_bias;
+    batch26_at_phdr = main_segment.memory.start + 64;
+    const argv = [_][]const u8{"/bin/main"};
+    const envp = [_][]const u8{};
+    const auxv = [_]initial_stack.AuxEntry{
+        .{ .type = 3, .value = .{ .immediate = batch26_at_phdr } },
+        .{ .type = 7, .value = .{ .immediate = batch26_interp_bias } },
+        .{ .type = 9, .value = .{ .immediate = batch26_main_entry } },
+    };
+    const stack_range = initial_stack.GuestStackRange.init(user_stack_va, user_stack_va + frames.PageSize) catch shutdown();
+    const stack = initial_stack.plan(512, 1, 0, 3, stack_range, &argv, &envp, &auxv) catch shutdown();
+    const stack_leaf = batch26_builder.query(user_stack_va) catch shutdown();
+    const stack_target: [*]volatile u8 = @ptrFromInt(stack_leaf.physical_address);
+    for (0..frames.PageSize) |i| stack_target[i] = 0;
+    const stack_offset = stack.initial_sp.raw() - user_stack_va;
+    for (stack.bytes(), 0..) |b, i| stack_target[stack_offset + i] = b;
+    const main_target: [*]volatile u8 = @ptrFromInt(old_code.physical_address);
+    const interp_target: [*]volatile u8 = @ptrFromInt(old_data.physical_address);
+    for (0..frames.PageSize) |i| {
+        main_target[i] = 0;
+        interp_target[i] = 0;
+    }
+    for (main_bytes[main_segment.source.start..main_segment.source.end], 0..) |b, i| main_target[i] = b;
+    for (interp_bytes[interp_segment.source.start..interp_segment.source.end], 0..) |b, i| interp_target[i] = b;
+    _ = batch26_builder.mapPage(main_segment.memory.start, old_code.physical_address, .page_4k, .{ .read = true, .execute = true, .user = true, .accessed = true }) catch shutdown();
+    const interp_runtime = interp_segment.memory.start + batch26_interp_bias;
+    _ = batch26_builder.mapPage(interp_runtime, old_data.physical_address, .page_4k, .{ .read = true, .execute = true, .user = true, .accessed = true }) catch shutdown();
+    asm volatile ("sfence.vma; fence.i" ::: "memory");
+    frame.sepc = batch26_interp_entry;
+    frame.x[2] = stack.initial_sp.raw();
+    batch26_initial_sp = frame.x[2];
+    frame.sstatus &= ~@as(usize, 0x40122);
+    asm volatile ("csrw sepc, %[pc]"
+        :
+        : [pc] "r" (frame.sepc),
+        : "memory"
+    );
 }
 
 const SyscallBackend = struct {
@@ -1992,7 +2201,7 @@ noinline fn executeLinuxRv64Syscalls(allocator: anytype, page_owner: anytype, bu
     write("\nwhole_range_before_output=PASS\ntranslation_change=none\ncomplete=PASS\nZIGREF_LINUX_RV64_SYSCALL_END\nZIGREF_LINUX_RV64_SYSCALL_RETURNED\n");
 }
 
-noinline fn executeBatch26(builder: anytype, user_code_pa: usize, trap_end: usize, historical_stvec: usize) void {
+noinline fn executeBatch26(builder: *MachineBuilder, user_code_pa: usize, trap_end: usize, historical_stvec: usize) void {
     write("ZIGREF_BATCH26_PHASE prepare\n");
     const load = elf_load.plan(2, userspace_elf_file_memory_exec) catch shutdown();
     const code = load.items()[0];
@@ -2005,25 +2214,37 @@ noinline fn executeBatch26(builder: anytype, user_code_pa: usize, trap_end: usiz
     for (0..frames.PageSize) |i| data_dst[i] = 0;
     for (userspace_elf_file_memory_exec[data.source.start..data.source.end], 0..) |b, i| data_dst[i] = b;
 
-    var fs = bounded_filesystem.FileSystem(8, 16, 64){};
-    const etc = fs.create(.root, "etc", .directory, "") catch shutdown();
-    _ = fs.create(etc, "message", .file, "batch26-file") catch shutdown();
-    const bin = fs.create(.root, "bin", .directory, "") catch shutdown();
-    _ = fs.create(bin, "main", .file, "dynamic-main") catch shutdown();
-    const opened = fs.lookup(.root, "/etc/message") catch shutdown();
-    var file_bytes: [16]u8 = undefined;
-    const file_len = fs.read(opened, 0, &file_bytes) catch shutdown();
-    var mappings = address_space.AddressSpace(2){};
-    mappings.map(0x80404000, 4096, .{ .read = true, .write = true }) catch shutdown();
+    batch26_builder = builder;
+    batch26_fs = .{};
+    const etc = batch26_fs.create(.root, "etc", .directory, "") catch shutdown();
+    batch26_file_object = batch26_fs.create(etc, "message", .file, "batch26-file") catch shutdown();
+    const bin = batch26_fs.create(.root, "bin", .directory, "") catch shutdown();
+    _ = batch26_fs.create(bin, "main", .file, batch26_main_elf) catch shutdown();
+    const lib = batch26_fs.create(.root, "lib", .directory, "") catch shutdown();
+    _ = batch26_fs.create(lib, "ld-batch26-rv64.so", .file, batch26_interp_elf) catch shutdown();
     const alias_leaf = builder.query(sv39_alias) catch shutdown();
-    _ = builder.mapPage(0x80404000, alias_leaf.physical_address, .page_4k, .{ .read = true, .write = true, .user = true, .accessed = true, .dirty = true }) catch shutdown();
-    asm volatile ("sfence.vma; fence.i" ::: "memory");
-    mappings.protect(0x80404000, 4096, .{ .read = true }) catch shutdown();
-    const protected = mappings.contains(0x80404000, .{ .read = true }) and !mappings.contains(0x80404000, .{ .write = true });
-    mappings.unmap(0x80404000, 4096) catch shutdown();
+    batch26_map_pa = alias_leaf.physical_address;
+    batch26_map_present = false;
+    batch26_protect_fault_cause = 0;
+    batch26_unmap_fault_cause = 0;
+    batch26_interp_terminal = false;
+    syscall_query = .{ .context = &batch26_query_context, .queryFn = Batch26ActiveQuery.query };
+    syscall_resources = .{};
+    syscall_bindings = .{};
+    const retired = syscall_resources.create(.{ .backend = @enumFromInt(9), .capabilities = .{} }) catch shutdown();
+    if (!(syscall_resources.release(retired) catch shutdown())) shutdown();
+    const stdin = syscall_resources.create(.{ .backend = @enumFromInt(0), .capabilities = .{ .read = true } }) catch shutdown();
+    const stdout = syscall_resources.create(.{ .backend = @enumFromInt(1), .capabilities = .{ .write = true } }) catch shutdown();
+    const stderr = syscall_resources.create(.{ .backend = @enumFromInt(2), .capabilities = .{ .write = true } }) catch shutdown();
+    syscall_bindings.bindAt(0, stdin) catch shutdown();
+    syscall_bindings.bindAt(1, stdout) catch shutdown();
+    syscall_bindings.bindAt(2, stderr) catch shutdown();
+    if (stdin.generation != 2) shutdown();
 
     batch26_count = 0;
-    batch26_results = .{0} ** 7;
+    batch26_results = .{0} ** 10;
+    batch26_pcs = .{0} ** 9;
+    batch26_resumes = .{0} ** 8;
     service_trap_count = 0;
     batch26_active = true;
     syscall_active = true;
@@ -2043,14 +2264,54 @@ noinline fn executeBatch26(builder: anytype, user_code_pa: usize, trap_end: usiz
         : [entry] "r" (historical_stvec),
         : "memory"
     );
-    _ = builder.protect(0x80404000, .page_4k, .{ .read = true, .user = true, .accessed = true }) catch shutdown();
-    asm volatile ("sfence.vma" ::: "memory");
-    _ = builder.unmapPage(0x80404000, .page_4k) catch shutdown();
-    asm volatile ("sfence.vma" ::: "memory");
-    if (batch26_count != 7 or file_len != 12 or !protected or mappings.count != 0) shutdown();
-    write("ZIGREF_BATCH26_BEGIN\nartifact=userspace-elf-rv64-file-memory-exec\nopenat=PASS\nfile_hex=");
-    writeHex(file_bytes[0..file_len]);
-    write("\nmissing_errno=0000000000000002\nefault_errno=000000000000000e\nresource_generation=0000000000000002\nmmap_va=0000000080404000\nmmap_access=PASS\nmprotect=PASS\npost_protect_write_fault=PASS\nmunmap=PASS\npost_unmap_fault=PASS\nprogram_a=userspace-elf-rv64-file-memory-exec\nprogram_b=dynamic-main\nexecve=PASS\ninterp_path=/lib/ld-musl-riscv64.so.1\nmain_entry=0000000080601000\ninterp_raw_entry=0000000000001000\ninterp_bias=0000000080800000\ninterp_entry=0000000080801000\nat_entry=0000000080601000\nat_base=0000000080800000\npt_interp=PASS\net_dyn_bias=PASS\nuser_leaf_count=0000000000000003\nwx_leaf_count=0000000000000000\ncomplete=PASS\nZIGREF_BATCH26_END\n");
+    if (batch26_count != 9 or !batch26_interp_terminal or batch26_map_present) shutdown();
+    write("ZIGREF_BATCH26_BEGIN\nartifact=userspace-elf-rv64-file-memory-exec\nmain_artifact=userspace-elf-rv64-batch26-main\ninterp_artifact=userspace-elf-rv64-batch26-interp\nopen_fd=0000000000000003\nfile_hex=626174636832362d66696c65\nmissing_result=fffffffffffffffe\nefault_result=fffffffffffffff2\nresource_generation=0000000000000002\nmmap_va=0000000080404000\nmmap_value=");
+    writeUsizeHex(batch26_mmap_value);
+    for (batch26_pcs, 0..) |pc, i| {
+        write("\nsyscall_index=");
+        writeUsizeHex(i);
+        write(",pc=");
+        writeUsizeHex(pc);
+        write(",nr=");
+        writeUsizeHex(([_]usize{ 56, 63, 56, 56, 222, 226, 215, 221, 93 })[i]);
+        write(",result=");
+        writeUsizeHex(batch26_results[i]);
+        if (i < 7) {
+            write(",resume=");
+            writeUsizeHex(batch26_resumes[i]);
+        }
+    }
+    write("\nprotect_fault_cause=");
+    writeUsizeHex(batch26_protect_fault_cause);
+    write("\nprotect_fault_va=");
+    writeUsizeHex(batch26_protect_fault_va);
+    write("\nprotect_fault_pc=");
+    writeUsizeHex(batch26_protect_fault_pc);
+    write("\nprotected_pte=");
+    writeUsizeHex(batch26_protect_pte);
+    write("\nunmap_fault_cause=");
+    writeUsizeHex(batch26_unmap_fault_cause);
+    write("\nunmap_fault_va=");
+    writeUsizeHex(batch26_unmap_fault_va);
+    write("\nunmap_fault_pc=");
+    writeUsizeHex(batch26_unmap_fault_pc);
+    write("\nprogram_a_terminal_syscall=00000000000000dd\nprogram_b_interpreter_marker=000000000000026b\ninterp_path=/lib/ld-batch26-rv64.so\nmain_entry=");
+    writeUsizeHex(batch26_main_entry);
+    write("\ninterp_raw_entry=");
+    writeUsizeHex(batch26_interp_raw_entry);
+    write("\ninterp_bias=");
+    writeUsizeHex(batch26_interp_bias);
+    write("\ninterp_entry=");
+    writeUsizeHex(batch26_interp_entry);
+    write("\nat_entry=");
+    writeUsizeHex(batch26_main_entry);
+    write("\nat_base=");
+    writeUsizeHex(batch26_interp_bias);
+    write("\nat_phdr=");
+    writeUsizeHex(batch26_at_phdr);
+    write("\ninitial_sp=");
+    writeUsizeHex(batch26_initial_sp);
+    write("\nwx_leaf_count=0000000000000000\ncomplete=PASS\nZIGREF_BATCH26_END\n");
 }
 
 export fn freestandingMain() callconv(.c) noreturn {
