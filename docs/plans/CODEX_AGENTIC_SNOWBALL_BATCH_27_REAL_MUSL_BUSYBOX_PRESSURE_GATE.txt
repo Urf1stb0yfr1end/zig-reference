@@ -1,0 +1,719 @@
+CODEX AGENTIC SNOWBALL — BATCH 27 REAL MUSL / BUSYBOX PRESSURE GATE
+PRESS REAL INHERITED USERSPACE UNTIL A DYNAMIC BUSYBOX BOUNDARY WIN OR THE FARTHEST CAUSAL FRONTIER THIS RUN CAN REACH
+
+Repository:
+thanks-cohn/zig-reference
+
+Canonical request path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_27_REAL_MUSL_BUSYBOX_PRESSURE_GATE.txt
+
+======================================================================
+AUTHORITATIVE STARTING POINT
+======================================================================
+
+Start from current main.
+
+The historical Batch 26 closure checkpoint is the annotated tag:
+
+    morphic-riscv-batch26-execve-causality-atomicity-closed
+
+which resolves to PR #57 merge commit:
+
+    549c9d9ec5f9a07efd5a2fff8c826e60b4ace30a
+
+Before implementing Batch 27, inspect that tag message and the current main history after it.
+
+Treat Batch 26 as a bounded closed machine gate, not as complete Linux compatibility.
+
+Preserve the repaired guarantees recorded by that tag:
+
+- real RV64 U-mode execution;
+- bounded real user-memory capture;
+- generation-bearing ResourceRef identity and fd binding;
+- real filesystem-backed open/read pressure;
+- live anonymous mmap;
+- live mprotect with a real U-mode protection fault;
+- live munmap with a real U-mode missing-mapping fault;
+- real ET_EXEC + PT_INTERP main image;
+- real ET_DYN interpreter image and biased interpreter execution;
+- userspace-authoritative execve pathname/argv/envp for the bounded proof;
+- failed exec returns and Program A demonstrably survives;
+- successful exec does not return to Program A;
+- PREPARE-before-COMMIT replacement semantics;
+- causal ResourceRef evidence;
+- independent mutation-resistant machine verification;
+- inherited Batch 25B resource/fd proof;
+- W+X=0;
+- canonical repository validation.
+
+Do not reopen Batch 26 merely to polish its bespoke fixture.
+
+Batch 27 begins the transition from proof fixtures to software we did not write.
+
+======================================================================
+GOVERNING METHOD
+======================================================================
+
+Read and obey the project concepts in:
+
+    docs/concepts/PRESSURE_ORACLE_INHERITANCE_ENGINEERING_VOCABULARY.md
+    docs/papers/EMPIRICAL_KERNEL_DISTILLATION.md
+
+The core loop is:
+
+    REAL TARGET
+        -> run it
+        -> observe the first real incompatibility
+        -> identify the underlying missing semantic mechanism
+        -> classify it as permanent mechanism or compatibility policy
+        -> implement the smallest sufficient correct repair
+        -> prove that repair causally
+        -> rerun the SAME target immediately
+        -> repeat
+
+This is a PRESSURE CAMPAIGN, not a speculative syscall checklist.
+
+Do not pre-implement a giant set of Linux syscalls because musl or BusyBox might someday ask for them.
+
+Do not stop merely because the first external target fails. The failure is the next debugging task.
+
+Do not stop after implementing one missing mechanism if the same target can be retried and further frontier movement is possible within the run.
+
+The desired outcome is maximal inheritance per permanent mechanism.
+
+======================================================================
+CORNERSTONE CONSTRAINT
+======================================================================
+
+Morphic must remain a cornerstone project: a general foundation upon which future systems can be built without first undoing Linux-specific historical policy.
+
+Therefore every newly required behavior must be classified.
+
+If the pressure exposes a GENERAL MECHANISM, implement the smallest clean Morphic primitive or extend an existing neutral primitive.
+
+If the pressure exposes a LINUX-SPECIFIC REPRESENTATION OR QUIRK, keep it in the Linux compatibility adapter/personality.
+
+Examples:
+
+    permanent mechanism:
+        wait/wake
+        address-space growth
+        file-object metadata query
+        file-backed mapping
+        task/execution-context creation
+        timer source
+
+    compatibility policy:
+        Linux syscall number
+        negative errno encoding
+        mmap flag bit layout
+        stat struct layout
+        AT_* constants
+        ioctl number
+
+Do not define a permanent Morphic object as a Linux fd merely because musl uses fds.
+
+Do not define permanent memory semantics in terms of Linux mmap flags.
+
+Do not define future VM/vCPU semantics in terms of KVM ioctl numbers.
+
+Compatibility may be historically ugly at the edge. The cornerstone should remain neutral at the center.
+
+======================================================================
+MISSION
+======================================================================
+
+Apply REAL RISC-V64 musl and BusyBox pressure to current main and move the inheritance frontier as far as correct implementation and validation permit.
+
+The preferred pressure ladder for this campaign is:
+
+    1. exact real musl-linked RV64 program executes
+        ->
+    2. real musl dynamic-loader path executes
+        ->
+    3. real dynamically linked BusyBox executable reaches useful startup
+        ->
+    4. real BusyBox builtin executes
+        ->
+    5. real BusyBox shell reaches a deterministic command boundary
+
+The ideal Batch 27 Boundary Win is:
+
+    REAL dynamically linked RISC-V64 BusyBox under real musl
+        +
+    deterministic shell or builtin execution
+        +
+    independent causal verification
+
+If one mechanism unexpectedly unlocks later targets such as an Alpine shell, take the larger win immediately. Do not preserve batch boundaries artificially.
+
+Do not claim a BusyBox boundary if the binary is a project-written imitation or if its output is supervisor-precomputed.
+
+======================================================================
+1. ACQUIRE REAL EXTERNAL ARTIFACTS REPRODUCIBLY
+======================================================================
+
+Use real upstream or distribution-produced RISC-V64 musl/BusyBox artifacts.
+
+Preferred approaches, in order of evidentiary value and practical reproducibility:
+
+A. build pinned upstream musl and BusyBox sources with a suitable RV64 toolchain;
+B. use exact pinned Alpine RISC-V64 package/rootfs artifacts when that is the shortest reproducible route to real musl/BusyBox pressure;
+C. use another clearly identified reproducible upstream artifact only if A/B are impractical in the execution environment.
+
+Do not silently rely on an unknown host binary.
+
+Record at minimum:
+
+- upstream project/package identity;
+- version/release;
+- architecture;
+- source URL or package provenance in the report where repository policy permits;
+- exact SHA-256 of every external executable/shared object used by the canonical pressure proof;
+- build command or extraction route;
+- whether the artifact is static, PIE, ET_EXEC, ET_DYN, and its PT_INTERP value when applicable;
+- DT_NEEDED entries for dynamically linked artifacts;
+- exact entry point and relevant program headers.
+
+Do not vendor an enormous third-party source tree into the repository merely to prove pressure unless repository policy and reproducibility clearly justify it.
+
+Prefer a deterministic acquisition/build script, fixture cache mechanism, or documented external-artifact step consistent with repository conventions.
+
+If network acquisition is required during development, pin the result strongly enough that the proof cannot silently drift to a different binary later.
+
+======================================================================
+2. FIRST PRESSURE TARGET: REAL MUSL USERSPACE
+======================================================================
+
+Begin with the smallest real external executable that exercises genuine musl startup semantics rather than a project-written assembly fixture.
+
+The first target may be static if that is the shortest honest way to establish real musl C-runtime pressure.
+
+However, a static-musl hello is only an intermediate frontier, not the final Batch 27 objective.
+
+Aim quickly toward the real dynamic-musl boundary.
+
+A useful staged sequence is:
+
+    real musl static/minimal program
+        -> prove real C runtime and syscall pressure
+
+    real musl dynamic hello
+        -> prove real PT_INTERP into the actual musl dynamic loader
+        -> prove actual loader startup
+        -> observe loader-driven filesystem/memory pressure
+
+    real dynamically linked BusyBox
+        -> inherit a large existing userspace surface
+
+Do not write a fake musl loader.
+
+Do not move ELF relocation into the kernel.
+
+Dynamic relocation, symbol resolution, TLS initialization, and shared-object policy belong to real userspace musl unless a genuine kernel mechanism is missing underneath them.
+
+======================================================================
+3. LET REAL MUSL DISCOVER THE NEXT MECHANISMS
+======================================================================
+
+The following are LIKELY pressure areas, not a mandatory implementation list:
+
+- brk / process heap growth;
+- close;
+- fstat/newfstatat/stat-family metadata;
+- lseek;
+- file-backed mmap;
+- additional mmap placement/flag behavior;
+- mprotect forms required by the loader;
+- munmap forms required by the loader;
+- readlinkat for executable/interpreter paths;
+- access/faccessat-style queries;
+- getrandom or deterministic entropy initialization path;
+- clock/time queries;
+- set_tid_address;
+- set_robust_list;
+- thread-pointer/TLS setup for RISC-V;
+- futex;
+- signal disposition/mask primitives;
+- ioctl for terminal discovery;
+- uname or process identity queries.
+
+Implement NONE of these solely because they appear in this paragraph.
+
+Run the real target first.
+
+For each failure, capture:
+
+    target phase
+    external operation
+    observed machine result
+    expected semantic need
+    current adapter path
+    proposed neutral mechanism or adapter-only repair
+
+Then implement only what moves the target forward correctly.
+
+======================================================================
+4. DYNAMIC LOADER BOUNDARY WIN
+======================================================================
+
+One major objective is to transfer dynamic-linking responsibility to the REAL musl loader.
+
+The desired relation is:
+
+    kernel/Morphic:
+        load main executable enough to honor PT_INTERP
+        resolve/map interpreter through normal file mechanisms
+        construct correct process-start state
+        provide filesystem/memory/syscall mechanisms
+        enter real musl interpreter
+
+    real musl loader:
+        parse dynamic metadata
+        locate/load required objects
+        perform relocations
+        resolve symbols
+        establish userspace runtime state
+        transfer to program entry
+
+Do not parse DT_NEEDED in the kernel merely to make the test pass if musl is supposed to own that work.
+
+Do not perform ELF relocations in the kernel.
+
+A successful real-musl loader transition is a Responsibility Transfer and should be recorded as such.
+
+======================================================================
+5. FILE-BACKED MEMORY, IF REAL PRESSURE REQUIRES IT
+======================================================================
+
+Batch 26 proved live anonymous mmap. A real loader may require file-backed mappings.
+
+If that becomes the first missing mechanism, implement it as a neutral composition rather than as a musl special case.
+
+A likely clean model is conceptually:
+
+    file/resource object
+        + offset/range
+        + mapping permissions
+        -> address-space mapping backed by object bytes/pages
+
+with Linux mmap flags translated in the compatibility adapter.
+
+Requirements if implemented:
+
+- offset alignment/bounds are explicit;
+- mapping identity derives from the actual fd-bound ResourceRef;
+- invalid fd/range/protection fails before partial mapping becomes visible;
+- W+X policy remains explicit;
+- user-visible contents come from the real mapped file bytes;
+- independent proof relates file artifact bytes to mapped user memory;
+- Linux MAP_* bits remain compatibility policy rather than Morphic ontology.
+
+Do not build demand paging or a page cache unless actual pressure requires them.
+
+An eager bounded file-backed mapping is acceptable if it is the smallest correct reusable mechanism for the current frontier.
+
+======================================================================
+6. BRK / HEAP, IF REAL PRESSURE REQUIRES IT
+======================================================================
+
+If musl requests brk, identify the underlying mechanism as bounded address-space growth for the current task/process image.
+
+Keep the Linux brk return convention in the adapter.
+
+The permanent mechanism should express something closer to:
+
+    query/change a designated growable userspace region within validated bounds
+
+rather than embedding the historical Linux syscall itself into Morphic.
+
+Prove:
+
+- growth is causal;
+- shrink behavior if required by the target;
+- collision rejection;
+- page permissions;
+- no corruption of executable/stack/other mappings;
+- correct Linux-facing result translation.
+
+======================================================================
+7. METADATA / FILE SEMANTICS, IF REAL PRESSURE REQUIRES THEM
+======================================================================
+
+If musl/BusyBox asks for stat-family metadata, seek, directory information, symlink resolution, or similar behavior, first decide what belongs in the neutral object/filesystem layer.
+
+Prefer reusable internal concepts such as:
+
+    object type
+    size
+    byte length
+    stable object identity where needed
+    permissions/capabilities where actually modeled
+    seekable position
+
+Then translate those into the exact Linux ABI structure in the adapter.
+
+Do not make a Linux struct stat the permanent internal filesystem record.
+
+======================================================================
+8. THREAD / TLS / FUTEX PRESSURE, IF IT ARRIVES THIS EARLY
+======================================================================
+
+Do not assume threads are required before the real target asks for them.
+
+If musl startup or BusyBox actually requires thread/TLS semantics during this campaign, preserve the cornerstone split:
+
+    neutral execution context / thread pointer / wait-wake mechanisms
+        -> Linux clone/TLS/futex adapter semantics
+
+For RISC-V, any thread-pointer/TLS work must be demonstrated by the actual target and verified from machine state where practical.
+
+Do not implement a fake always-success futex or set_tid_address merely to advance startup.
+
+A compatibility call that claims success without providing the semantic effect expected by userspace is a regression to asserted proof.
+
+======================================================================
+9. BUSYBOX PRESSURE
+======================================================================
+
+Once real musl execution and loader startup are sufficient, move immediately to a real RISC-V64 BusyBox artifact.
+
+Prefer a dynamically linked BusyBox when the real-musl dynamic boundary is available.
+
+Pressure sequence should favor deterministic low-surface actions first, for example:
+
+    busybox true
+    busybox echo batch27
+    busybox printf ...
+    busybox sh -c 'echo batch27'
+
+Use the first invocation that meaningfully exercises inherited BusyBox behavior without demanding unrelated interactive terminal complexity.
+
+Do not choose an applet merely because it is easy to fake.
+
+The proof must identify the exact real BusyBox ELF artifact and demonstrate that its own code reaches the observed user-visible behavior.
+
+If BusyBox startup fails on a new mechanism, return to the pressure loop and continue.
+
+======================================================================
+10. THE IDEAL BATCH 27 BOUNDARY WIN
+======================================================================
+
+The strongest intended outcome is:
+
+    exact real RV64 BusyBox ELF
+        -> PT_INTERP = real musl loader
+        -> real musl loader executes
+        -> real userspace relocation/runtime startup
+        -> BusyBox entry executes
+        -> deterministic BusyBox builtin or shell command executes
+        -> observable output derives from the external program
+        -> clean exit/terminal transition
+
+This should be independently verifiable from artifacts and machine observations.
+
+If a real Alpine rootfs shell becomes reachable naturally during the same work, continue into it rather than artificially stopping at the BusyBox boundary.
+
+That would be desirable Batch Collapse.
+
+======================================================================
+11. EXTERNAL-PRESSURE EVIDENCE / NECESSITY MAP
+======================================================================
+
+Batch 27 should begin turning compatibility work into architectural evidence.
+
+Use existing repository conventions if a machine-readable compatibility-pressure or Necessity Map path already exists.
+
+If no canonical machine-readable path exists, add the smallest non-invasive representation justified by this campaign, preferably under generated/ or docs/data/ according to repository policy, and document how it is produced.
+
+At minimum the report must record, for every newly implemented pressure-driven semantic:
+
+- target artifact and version/hash;
+- exact failure before repair;
+- external operation that exposed it;
+- classification: permanent mechanism vs compatibility adapter policy;
+- Morphic mechanism added/reused;
+- Linux ABI translation used;
+- focused regression/proof;
+- target progress after repair;
+- whether the same mechanism was already required by an earlier workload.
+
+Do not invent recurrence claims that have not been observed.
+
+The purpose is to make later Empirical Kernel Distillation possible.
+
+======================================================================
+12. CAUSAL PROOF REQUIREMENTS
+======================================================================
+
+Do not accept a new capability merely because the target advances once.
+
+For each permanent mechanism added during the campaign, add the smallest decisive focused regression.
+
+For each major frontier boundary, add independent evidence where practical.
+
+The verifier should prefer relationships such as:
+
+    exact external ELF hash
+        + decoded ELF metadata
+        + actual ECALL/PC or fault path
+        + actual resource/mapping state
+        + externally produced bytes/output
+
+rather than supervisor-written labels.
+
+If a new syscall result is essential to musl/BusyBox startup, mutation-test or otherwise independently falsify the decisive relationship whenever practical.
+
+Keep the Batch 26 causal-proof discipline.
+
+======================================================================
+13. PRESERVE HISTORICAL PROOFS
+======================================================================
+
+Do not break the existing Batch 26 verifier while chasing external software.
+
+At meaningful checkpoints rerun the inherited proof chain needed to demonstrate that new mechanisms did not regress:
+
+- resource/fd generation semantics;
+- user-copy correctness;
+- mmap/mprotect/munmap semantics;
+- exec PREPARE/COMMIT behavior;
+- failed-exec survival;
+- successful-exec non-return;
+- PT_INTERP/ET_DYN handoff;
+- W+X=0.
+
+Do not replace old proof fixtures with external software. External pressure is additive evidence, not a reason to erase focused regression tests.
+
+======================================================================
+14. REPORTING
+======================================================================
+
+Create and maintain:
+
+    docs/reports/AGENTIC_SNOWBALL_BATCH_27.md
+
+The report should be written as a pressure journal, not merely a final retrospective.
+
+For each pressure step record approximately:
+
+    TARGET
+    EXACT ARTIFACT
+    BEFORE
+    FIRST REAL FAILURE
+    CLASSIFICATION
+    SMALLEST REPAIR
+    FOCUSED PROOF
+    RETRY
+    AFTER / FRONTIER MOVEMENT
+
+Keep claims narrow and falsifiable.
+
+If the farthest achieved frontier is only real static-musl execution, say so.
+
+If dynamic musl loader executes but BusyBox does not, say so and identify the exact first BusyBox failure.
+
+If BusyBox shell works, record that as the Boundary Win.
+
+Do not call a synthetic fixture "musl support" or "BusyBox support."
+
+======================================================================
+15. REPOSITORY / GENERATED ARTIFACT DISCIPLINE
+======================================================================
+
+Use Zig 0.14.0 unless current canonical repository instructions explicitly change that requirement.
+
+Run the canonical bootstrap/doctor surfaces before major work.
+
+Use canonical generators/formatters for generated indexes, ports, evidence, and command references.
+
+Do not hand-edit generated artifacts when a generator exists.
+
+Keep third-party binaries/source acquisition consistent with repository binary policy.
+
+If exact external artifacts cannot be committed because of policy or size, make their acquisition reproducible and fail closed when hashes differ.
+
+======================================================================
+16. ACCEPTANCE LEVELS
+======================================================================
+
+Batch 27 has graduated acceptance levels. Continue upward while repairable frontier movement remains possible.
+
+LEVEL 0 — PRESSURE HARNESS
+
+- exact real external artifact acquired reproducibly;
+- hash/provenance recorded;
+- machine attempts to execute it;
+- first real incompatibility captured.
+
+This is necessary but is NOT a Batch 27 Boundary Win.
+
+LEVEL 1 — REAL MUSL EXECUTION
+
+- real musl-linked RV64 userspace code executes;
+- at least one externally compiled C program reaches its own deterministic behavior;
+- required kernel semantics are causal, not stubbed.
+
+LEVEL 2 — REAL MUSL DYNAMIC LOADER
+
+- exact real musl PT_INTERP target executes;
+- real loader owns dynamic userspace work;
+- required external dependencies are resolved through real filesystem/resource/memory mechanisms;
+- loader reaches the program rather than being replaced by a kernel imitation.
+
+LEVEL 3 — REAL DYNAMIC BUSYBOX
+
+- exact dynamically linked RV64 BusyBox reaches its own entry/runtime;
+- deterministic BusyBox applet behavior executes.
+
+LEVEL 4 — BUSYBOX SHELL BOUNDARY WIN
+
+- real BusyBox shell executes a deterministic non-interactive command such as:
+
+      busybox sh -c 'echo batch27'
+
+- output is causally produced by the external BusyBox/musl userspace;
+- clean terminal/exit semantics are observed;
+- independent proof ties execution to the exact external artifacts.
+
+LEVEL 5 — OPTIONAL BATCH COLLAPSE
+
+- if the same mechanisms naturally permit an Alpine rootfs shell or another clearly larger external boundary, continue and record it.
+
+Do not stop at a lower level merely because the roadmap named a higher level as a future batch.
+
+======================================================================
+17. REQUIRED VALIDATION
+======================================================================
+
+At the final implemented frontier, run the focused tests for every new mechanism plus the canonical inherited proof surfaces.
+
+At minimum, unless current repository tooling has renamed them, include:
+
+    python3 tools/python-environment.py --check
+    python3 tools/query-reference.py agent doctor
+
+    python3 tools/verify-freestanding-riscv64-linux-fd-lifecycle.py --self-test
+    python3 tools/verify-freestanding-riscv64-linux-fd-lifecycle.py
+
+    python3 tools/verify-freestanding-riscv64-file-memory-exec.py --self-test
+    python3 tools/verify-freestanding-riscv64-file-memory-exec.py
+
+    zig build check --summary all
+    zig build validate-repository --summary all
+    python3 tools/developer-command.py validate-repository
+    PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+    python3 tools/check-repository-policy.py
+
+Add and run the canonical Batch 27 external-pressure verifier/harness commands created by this task.
+
+If a new general module is added, integrate it fully with project conventions: code, focused tests, smoke, mastery/details/port contract where required, build registration, canonical indexes, validation evidence, and documentation.
+
+Do not claim the final frontier if any decisive verifier for that frontier fails.
+
+======================================================================
+18. CONTINUATION LAW
+======================================================================
+
+THIS IS AN IMPLEMENTATION CAMPAIGN.
+
+A failed musl start, loader fault, missing syscall, ENOSYS, EFAULT, bad ELF mapping, missing metadata operation, W+X rejection, file-backed mmap issue, BusyBox crash, verifier rejection, build failure, QEMU failure, stale generated artifact, or repository-validation failure is the next debugging task.
+
+Diagnose it.
+Implement the smallest correct repair.
+Prove the repair.
+Retry the SAME external target.
+Continue.
+
+Do not conclude the run with only a list of missing syscalls if repository work can still advance the target.
+
+Do not replace real target pressure with speculative architecture prose.
+
+Do not convert ordinary semantic failures into unconditional success stubs merely to move the program farther.
+
+Maintain coherent checkpoint commits when real Frontier Movement occurs.
+
+Push useful repository changes to the task branch as work progresses.
+
+If the execution environment lacks a required external tool or network artifact and no reproducible in-repository alternative exists, complete every repository-side improvement that is still possible, record the exact blocker and exact retry command, and preserve all work. Do not fabricate PASS.
+
+======================================================================
+19. WHAT SUCCESS CHANGES
+======================================================================
+
+The purpose of this campaign is not merely to add several Linux syscalls.
+
+Its purpose is to cross from:
+
+    project-written compatibility fixtures
+
+into:
+
+    external libc/runtime/application pressure.
+
+A dynamic BusyBox Boundary Win would mean that future compatibility work can increasingly be discovered by software we did not write.
+
+That is the beginning of Inheritance Escape Velocity.
+
+The next intended chain after a genuine Batch 27 Boundary Win is approximately:
+
+    BusyBox / musl
+        -> Alpine rootfs
+        -> apk
+        -> package inheritance
+        -> QEMU on musl / TCG
+        -> first guest
+        -> neutral Morphic VM/vCPU mechanisms
+        -> RISC-V H extension
+        -> smallest stock-QEMU-required /dev/kvm compatibility surface
+        -> KVM_RUN
+        -> QEMU/KVM on Alpz
+
+Do not insert glibc into this critical path unless real target pressure demonstrates that it buys more immediate leverage than the musl/QEMU path.
+
+======================================================================
+MINMAX + CORNERSTONE
+======================================================================
+
+Minimum permanent mechanism.
+Maximum inherited civilization.
+
+Inherit aggressively.
+Fossilize cautiously.
+
+Real software may reveal what is missing.
+Historical compatibility policy does not automatically define the permanent foundation.
+
+Compatibility belongs at the edges.
+Generative mechanisms belong at the center.
+
+Batches organize inheritance objectives. They are not quotas.
+
+If one mechanism crosses multiple planned boundaries, take the larger inheritance win.
+
+======================================================================
+FINAL HANDOFF EXPECTATION
+======================================================================
+
+Before the task concludes, report:
+
+- exact branch;
+- exact final SHA;
+- coherent commits created;
+- PR URL if opened;
+- exact musl artifact(s), version(s), provenance, and SHA-256;
+- exact BusyBox artifact, version, provenance, and SHA-256 if reached;
+- farthest acceptance level reached;
+- every real pressure failure encountered in order;
+- every new permanent Morphic mechanism introduced;
+- every Linux-specific adapter behavior introduced;
+- focused causal proof for each permanent mechanism;
+- exact external target command/invocation after each repair;
+- Batch 26 inherited verifier results;
+- complete repository validation results;
+- current first missing mechanism if the Boundary Win is not yet reached;
+- whether any planned later boundary collapsed into this campaign.
+
+The final handoff must make it possible for the next agent to resume from the actual inheritance frontier without repeating already-solved pressure work.
+
+The next real failure is the next engineering question.
