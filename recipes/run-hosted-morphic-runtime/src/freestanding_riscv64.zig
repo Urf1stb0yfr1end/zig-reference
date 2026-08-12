@@ -109,6 +109,12 @@ const MachineAllocator = frame_allocators.PhysicalPageFrameAllocator(physical_po
 const MachinePageOwner = RealPageOwner(MachineAllocator);
 const MachineBuilder = sv39_builders.Builder(MachinePageOwner);
 var batch26_builder: *MachineBuilder = undefined;
+const Batch26MaterializedImage = address_space.MaterializedImage(4);
+var batch26_main_image: Batch26MaterializedImage = .{};
+var batch26_interp_image: Batch26MaterializedImage = .{};
+var batch26_image_backing: [2]usize = .{ 0, 0 };
+var batch26_image_backing_count: usize = 0;
+var batch26_stack_image: initial_stack.StackPlan(512) = undefined;
 
 /// Fixed, allocation-free integer supervisor context. x0 is architectural zero;
 /// x2 is the interrupted sp. Floating-point/vector state and nested traps are
@@ -774,85 +780,87 @@ fn prepareBatch26Exec(frame: *TrapFrame) !void {
     batch26_exec_argc = try copyUserStringVector(frame.x[11], &batch26_exec_argv, &batch26_exec_argv_lens);
     batch26_exec_envc = try copyUserStringVector(frame.x[12], &batch26_exec_envp, &batch26_exec_env_lens);
     const main_object = batch26_fs.lookup(.root, batch26_exec_path[0..batch26_exec_path_len]) catch return error.NotFound;
-    const interp_object = batch26_fs.lookup(.root, "/lib/ld-batch26-rv64.so") catch shutdown();
     const main_file = batch26_fs.resolve(main_object) orelse shutdown();
-    const interp_file = batch26_fs.resolve(interp_object) orelse shutdown();
     const main_bytes = main_file.bytes[0..main_file.length];
-    const interp_bytes = interp_file.bytes[0..interp_file.length];
+    const initial_main = elf_load.planDynamic(2, 32, main_bytes) catch shutdown();
+    const interp_bytes: ?[]const u8 = if (initial_main.interpreterPath()) |path| blk: {
+        const interp_object = batch26_fs.lookup(.root, path) catch return error.NotFound;
+        const interp_file = batch26_fs.resolve(interp_object) orelse shutdown();
+        break :blk interp_file.bytes[0..interp_file.length];
+    } else null;
     const candidate = address_space.ExecPlan(2, 32).prepare(main_bytes, interp_bytes) catch shutdown();
     const main_plan = candidate.main;
-    const interp_plan = candidate.interpreter orelse shutdown();
-    if (!std.mem.eql(u8, candidate.interpreter_path[0..candidate.interpreter_path_len], "/lib/ld-batch26-rv64.so")) shutdown();
     const main_segment = main_plan.load.items()[0];
-    const interp_segment = interp_plan.load.items()[0];
-    _ = interp_segment;
+    const prepared_main = Batch26MaterializedImage.prepare(main_bytes, &main_plan.load, 0) catch return error.InvalidUser;
+    const prepared_interp = if (candidate.interpreter) |*interp_plan| blk: {
+        if (!std.mem.eql(u8, candidate.interpreter_path[0..candidate.interpreter_path_len], initial_main.interpreterPath().?)) shutdown();
+        break :blk Batch26MaterializedImage.prepare(interp_bytes.?, &interp_plan.load, batch26_interp_bias) catch return error.InvalidUser;
+    } else Batch26MaterializedImage{};
+    const prepared_page_count = prepared_main.items().len + prepared_interp.items().len;
+    if (prepared_page_count > batch26_image_backing.len) return error.InvalidUser;
     batch26_main_entry = candidate.main_entry;
     batch26_interp_raw_entry = candidate.entry;
-    batch26_interp_entry = candidate.entry + batch26_interp_bias;
+    batch26_interp_entry = candidate.entry + (if (candidate.interpreter != null) batch26_interp_bias else 0);
     batch26_at_phdr = main_segment.memory.start + 64;
     if (batch26_exec_argc != 1 or batch26_exec_envc != 1) return error.InvalidUser;
     const argv = [_][]const u8{batch26_exec_argv[0][0..batch26_exec_argv_lens[0]]};
     const envp = [_][]const u8{batch26_exec_envp[0][0..batch26_exec_env_lens[0]]};
-    const auxv = [_]initial_stack.AuxEntry{
-        .{ .type = 3, .value = .{ .immediate = batch26_at_phdr } },
-        .{ .type = 7, .value = .{ .immediate = batch26_interp_bias } },
-        .{ .type = 9, .value = .{ .immediate = batch26_main_entry } },
-    };
+    var auxv: [3]initial_stack.AuxEntry = undefined;
+    auxv[0] = .{ .type = 3, .value = .{ .immediate = batch26_at_phdr } };
+    var auxv_len: usize = 1;
+    if (candidate.interpreter != null) {
+        auxv[auxv_len] = .{ .type = 7, .value = .{ .immediate = batch26_interp_bias } };
+        auxv_len += 1;
+    }
+    auxv[auxv_len] = .{ .type = 9, .value = .{ .immediate = batch26_main_entry } };
+    auxv_len += 1;
     const stack_range = initial_stack.GuestStackRange.init(user_stack_va, user_stack_va + frames.PageSize) catch shutdown();
-    const stack = initial_stack.plan(512, 1, 1, 3, stack_range, &argv, &envp, &auxv) catch shutdown();
+    const stack = initial_stack.plan(512, 1, 1, 3, stack_range, &argv, &envp, auxv[0..auxv_len]) catch shutdown();
     const old_code = batch26_builder.query(user_code_va) catch shutdown();
     const old_data = batch26_builder.query(user_data_va) catch shutdown();
     const stack_leaf = batch26_builder.query(user_stack_va) catch shutdown();
     // PREPARE ends here: all userspace capture, lookup, ELF/stack planning,
     // capacity checks, and backing-page discovery completed with Program A live.
-    _ = old_code;
-    _ = old_data;
+    batch26_main_image = prepared_main;
+    batch26_interp_image = prepared_interp;
+    batch26_image_backing = .{ old_code.physical_address, old_data.physical_address };
+    batch26_image_backing_count = prepared_page_count;
+    batch26_stack_image = stack;
     _ = stack_leaf;
-    _ = stack;
 }
 
 fn commitPreparedBatch26Exec(frame: *TrapFrame) void {
-    const main_object = batch26_fs.lookup(.root, batch26_exec_path[0..batch26_exec_path_len]) catch unreachable;
-    const interp_object = batch26_fs.lookup(.root, "/lib/ld-batch26-rv64.so") catch unreachable;
-    const main_file = batch26_fs.resolve(main_object) orelse unreachable;
-    const interp_file = batch26_fs.resolve(interp_object) orelse unreachable;
-    const main_bytes = main_file.bytes[0..main_file.length];
-    const interp_bytes = interp_file.bytes[0..interp_file.length];
-    const candidate = address_space.ExecPlan(2, 32).prepare(main_bytes, interp_bytes) catch unreachable;
-    const main_segment = candidate.main.load.items()[0];
-    const interp_segment = (candidate.interpreter orelse unreachable).load.items()[0];
-    const argv = [_][]const u8{batch26_exec_argv[0][0..batch26_exec_argv_lens[0]]};
-    const envp = [_][]const u8{batch26_exec_envp[0][0..batch26_exec_env_lens[0]]};
-    const auxv = [_]initial_stack.AuxEntry{
-        .{ .type = 3, .value = .{ .immediate = batch26_at_phdr } },
-        .{ .type = 7, .value = .{ .immediate = batch26_interp_bias } },
-        .{ .type = 9, .value = .{ .immediate = batch26_main_entry } },
-    };
-    const stack_range = initial_stack.GuestStackRange.init(user_stack_va, user_stack_va + frames.PageSize) catch unreachable;
-    const stack = initial_stack.plan(512, 1, 1, 3, stack_range, &argv, &envp, &auxv) catch unreachable;
-    const old_code = batch26_builder.query(user_code_va) catch unreachable;
-    const old_data = batch26_builder.query(user_data_va) catch unreachable;
     const stack_leaf = batch26_builder.query(user_stack_va) catch unreachable;
     _ = batch26_builder.unmapPage(user_code_va, .page_4k) catch unreachable;
     _ = batch26_builder.unmapPage(user_data_va, .page_4k) catch unreachable;
     const stack_target: [*]volatile u8 = @ptrFromInt(stack_leaf.physical_address);
     for (0..frames.PageSize) |i| stack_target[i] = 0;
-    const stack_offset = stack.initial_sp.raw() - user_stack_va;
-    for (stack.bytes(), 0..) |b, i| stack_target[stack_offset + i] = b;
-    const main_target: [*]volatile u8 = @ptrFromInt(old_code.physical_address);
-    const interp_target: [*]volatile u8 = @ptrFromInt(old_data.physical_address);
-    for (0..frames.PageSize) |i| {
-        main_target[i] = 0;
-        interp_target[i] = 0;
+    const stack_offset = batch26_stack_image.initial_sp.raw() - user_stack_va;
+    for (batch26_stack_image.bytes(), 0..) |b, i| stack_target[stack_offset + i] = b;
+    var backing_index: usize = 0;
+    for ([_][]const address_space.ImagePage{ batch26_main_image.items(), batch26_interp_image.items() }) |image_pages| {
+        for (image_pages) |page| {
+            if (backing_index >= batch26_image_backing_count) shutdown();
+            const physical = batch26_image_backing[backing_index];
+            const target: [*]volatile u8 = @ptrFromInt(physical);
+            for (page.bytes, 0..) |byte, i| target[i] = byte;
+            const permissions = sv39_entries.Permissions{
+                .read = page.permissions.read,
+                .write = page.permissions.write,
+                .execute = page.permissions.execute,
+                .user = true,
+                .accessed = true,
+                .dirty = page.permissions.write,
+            };
+            if (permissions.write and permissions.execute) shutdown();
+            _ = batch26_builder.mapPage(page.virtual_start, physical, .page_4k, permissions) catch shutdown();
+            backing_index += 1;
+        }
     }
-    for (main_bytes[main_segment.source.start..main_segment.source.end], 0..) |b, i| main_target[i] = b;
-    for (interp_bytes[interp_segment.source.start..interp_segment.source.end], 0..) |b, i| interp_target[i] = b;
-    _ = batch26_builder.mapPage(main_segment.memory.start, old_code.physical_address, .page_4k, .{ .read = true, .execute = true, .user = true, .accessed = true }) catch shutdown();
-    const interp_runtime = interp_segment.memory.start + batch26_interp_bias;
-    _ = batch26_builder.mapPage(interp_runtime, old_data.physical_address, .page_4k, .{ .read = true, .execute = true, .user = true, .accessed = true }) catch shutdown();
+    if (backing_index != batch26_image_backing_count) shutdown();
     asm volatile ("sfence.vma; fence.i" ::: "memory");
     frame.sepc = batch26_interp_entry;
-    frame.x[2] = stack.initial_sp.raw();
+    frame.x[2] = batch26_stack_image.initial_sp.raw();
     batch26_initial_sp = frame.x[2];
     frame.sstatus &= ~@as(usize, 0x40122);
     asm volatile ("csrw sepc, %[pc]"

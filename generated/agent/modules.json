@@ -8937,7 +8937,9 @@
     {
       "change_impact": {
         "dependents": [],
-        "recipes": []
+        "recipes": [
+          "run-hosted-morphic-runtime"
+        ]
       },
       "dependency_build_order": [
         "aligned-address-and-size-helpers",
@@ -8976,7 +8978,9 @@
         "zig build smoke-bounded-address-space-exec-image"
       ],
       "id": "59",
-      "matching_recipes": [],
+      "matching_recipes": [
+        "run-hosted-morphic-runtime"
+      ],
       "module": "bounded-address-space-exec-image",
       "source": "projects/59-bounded-address-space-exec-image/src/bounded_address_space_exec_image.zig",
       "status": "partial",
