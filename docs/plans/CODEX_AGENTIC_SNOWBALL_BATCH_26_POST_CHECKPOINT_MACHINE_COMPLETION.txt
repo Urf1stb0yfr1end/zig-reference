@@ -1,0 +1,564 @@
+CODEX AGENTIC SNOWBALL — BATCH 26 POST-CHECKPOINT MACHINE COMPLETION
+REAL RV64 FILE + MEMORY + EXEC + PT_INTERP, THEN MUSL/BUSYBOX PRESSURE
+
+Repository:
+thanks-cohn/zig-reference
+
+Canonical request path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_26_POST_CHECKPOINT_MACHINE_COMPLETION.txt
+
+CURRENT AUTHORITATIVE BASELINE
+
+Start from current main.
+
+PR #55 was merged into main on 2026-08-12 as an explicitly PARTIAL, fail-closed checkpoint.
+Its merge commit is:
+
+    caa5de0ff084e0438e8c197b50ceea4bfd1ba591
+
+The merge was not the originally desired Batch 26 completion point. The intended stopping point was a real independently verified RV64 machine gate. The checkpoint was merged because the previous Codex task had exhausted its useful context and the recovery/branch history had become operationally harder to maintain than a single authoritative main. The repository was first returned to a coherent green state, the unsupported PASS claim was removed, and the Batch 26 verifier was made fail-closed so that simplifying the branch history would not weaken the technical standard.
+
+This means:
+
+- the checkpoint is intentional;
+- the useful substrate and scaffolding are preserved;
+- the rejected first machine proof is preserved as history, not as evidence;
+- Batch 26 is still PARTIAL;
+- `machine_batch26=NOT_PROVED` remains authoritative;
+- the current verifier intentionally fails closed;
+- inherited Batch 25B is still the last completed machine-level compatibility milestone;
+- this task must finish the real machine semantics rather than merely changing the report or removing the fail-closed guard.
+
+MISSION
+
+Finish Batch 26 from current main without restarting it.
+
+Turn the existing Batch 26 scaffolding into a real syscall-caused RV64 machine proof:
+
+    real openat
+        -> real mmap / mprotect / munmap
+        -> real protection and missing-mapping faults
+        -> real execve Program A -> Program B replacement
+        -> real PT_INTERP + ET_DYN interpreter handoff
+        -> independently reconstructed one-QEMU mutation proof
+        -> deterministic two-QEMU proof
+        -> repository-wide green validation
+        -> Batch 26 PASS
+
+After Batch 26 genuinely passes, use the remaining context only if substantial capacity remains to begin the next maximum-yield inheritance pressure: musl + BusyBox. Do not speculatively implement a broad syscall checklist. Let real target software expose the smallest missing mechanisms.
+
+The MinMax rule is binding:
+
+    Minimum permanent mechanism.
+    Maximum inherited civilization.
+
+======================================================================
+READ FIRST
+======================================================================
+
+Before changing code, read:
+
+1. `AGENTS.md`
+2. `docs/plans/CODEX_BATCH_26_RECOVERY_PROVENANCE_AND_MINMAX_HANDOFF.txt`
+3. `docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_26_MACHINE_GATE_COMPLETION.txt`
+4. `docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_26_FILE_MEMORY_EXEC_INHERITANCE_GATE.txt`
+5. `docs/reports/AGENTIC_SNOWBALL_BATCH_26.md`
+6. `docs/roadmaps/ALPZ_FAST_TRACK_ALPINE_TO_QEMU_HYPERVISOR_KVM.md`
+
+Then run:
+
+    python3 tools/query-reference.py agent bootstrap
+    python3 tools/query-reference.py agent doctor
+
+Use repository query/index tools before broad archaeology.
+
+Inspect the accepted Batch 25B fixture/kernel/verifier path as the machine-proof pattern, but do not mutate Batch 25B into an ambiguous mega-fixture.
+
+======================================================================
+DO NOT RESTART OR RECREATE ACCEPTED SUBSTRATE
+======================================================================
+
+The accepted substrate already exists and should be composed, not replaced:
+
+- project 53 bounded user-memory transfer machinery;
+- project 54 static ELF planning plus distinct dynamic/PT_INTERP planning;
+- project 55 RV64 Linux initial-stack planning;
+- project 57 generation-bearing ResourceRef and process-local binding semantics;
+- project 58 bounded filesystem;
+- project 59 bounded address-space / exec-image candidate state;
+- existing physical frame ownership;
+- existing Sv39 page-table construction, mapping, protection, unmapping, and invalidation;
+- inherited Batch 25B real Linux fd lifecycle and two-QEMU proof.
+
+Do not rebuild projects 54/58/59 merely because a parallel implementation is easier.
+
+Change accepted substrate only when real machine integration exposes a concrete root defect. If that happens, repair the smallest root cause and add decisive regression coverage.
+
+Do not move Linux syscall numbers, fd integers, negative errno, AT_FDCWD, mmap flags, auxv policy, PT_INTERP pathname convention, or register ABI identities into Linux-independent Morphic modules.
+
+======================================================================
+KNOWN REJECTED FIRST ATTEMPT — DO NOT REPEAT IT
+======================================================================
+
+The first PR #55 machine attempt was rejected because it produced expected-looking evidence without making the userspace operations causally responsible for that evidence.
+
+The rejected pattern included:
+
+1. `recordBatch26Syscall` recognized an expected syscall-number sequence and returned predetermined values by index.
+2. `openat` results such as fd 3, ENOENT, and EFAULT were returned without the actual ECALL arguments driving pathname copy, project 58 lookup, project 57 resource creation/binding, and Linux descriptor allocation.
+3. mmap-family work was partly prepared outside the live syscall path; live PTE protect/unmap operations occurred after the userspace ECALL sequence rather than being caused by those ECALLs.
+4. the fixture did not actually perform and observe the claimed post-mprotect write fault and post-munmap access fault.
+5. `execve` did not replace Program A with Program B; it redirected control to a supervisor continuation.
+6. `/bin/main` was placeholder bytes rather than a real executable ELF.
+7. PT_INTERP path, interpreter entry, load bias, auxv relationships, and related PASS fields were emitted as expected constants rather than derived from a real main/interpreter ELF handoff.
+8. the verifier substantially exact-matched kernel-emitted fields and mutations of those fields rather than independently reconstructing the machine facts.
+9. fixture hashing did not establish a meaningful independent frozen identity.
+
+The current repository intentionally records this state as PARTIAL and the Batch 26 verifier intentionally fails before its old acceptance path.
+
+DO NOT "fix" Batch 26 by deleting that fail-closed return and allowing the old parser to pass.
+
+The guard should be removed only after the underlying semantics and independent verifier have been replaced with real proof.
+
+======================================================================
+GATE A — REAL OPENAT / FILE RESOURCE PATH
+======================================================================
+
+Make the actual RV64 Linux `openat` ECALL cause the file operation.
+
+Required flow:
+
+    U-mode openat ECALL
+        -> decode actual RV64 syscall arguments
+        -> validate/copy pathname from userspace via accepted transfer machinery
+        -> resolve root/directory context
+        -> project 58 lookup
+        -> create/reuse the minimum real open-file state required by the proof
+        -> project 57 generation-bearing ResourceRef
+        -> process-local Linux fd binding
+        -> Linux-facing result / errno translation
+        -> return through exact sepc + 4
+
+Required proof cases:
+
+- successful `/etc/message` open;
+- file bytes subsequently read through the real descriptor/resource path, not from a supervisor-side pre-read;
+- missing pathname -> Linux ENOENT;
+- invalid userspace pointer/range -> Linux EFAULT;
+- failed copy/lookup must not leave partial descriptor/resource mutation;
+- resource generation/lifetime remains correct;
+- inherited Batch 25B generation semantics remain intact.
+
+Use actual syscall arguments. A changed pathname or invalid pointer must change behavior for the correct reason.
+
+Do not build a general VFS if this proof does not require it.
+
+======================================================================
+GATE B — REAL MMAP / MPROTECT / MUNMAP
+======================================================================
+
+Make the actual ECALLs cause live machine translation changes.
+
+Required `mmap` path:
+
+    U-mode mmap ECALL
+        -> decode/validate args
+        -> project 59 candidate/policy validation as useful
+        -> allocate/select owned physical frame(s)
+        -> live Sv39 map commit
+        -> required sfence.vma / fence sequencing
+        -> return actual mapped VA
+
+Required proof:
+
+- mapping does not exist before the syscall;
+- mmap creates the real user mapping;
+- userspace writes/reads through it successfully;
+- returned address corresponds to the actual mapping.
+
+Required `mprotect` path:
+
+    U-mode mprotect ECALL
+        -> validate target/range/protection
+        -> update project 59 state where appropriate
+        -> live PTE permission replacement
+        -> required invalidation
+        -> return success only after the real transition
+
+Then userspace must actually attempt a forbidden write.
+
+The machine must trap for the expected reason. Record independently useful evidence including fault cause, fault VA/stval, fault PC, expected operation phase, and the mapping/PTE state needed to prove the fault was permission-driven rather than synthetic.
+
+The kernel may deliberately recognize this expected proof fault and resume at a known continuation, but it must not fabricate a fault that never occurred.
+
+Required `munmap` path:
+
+    U-mode munmap ECALL
+        -> validate target/range
+        -> remove live PTE
+        -> update ownership/candidate state coherently
+        -> required invalidation
+        -> return success
+
+Then userspace must actually access the unmapped address and generate the expected real page fault.
+
+Again, record enough machine facts for the verifier to distinguish a genuine missing translation from a printed claim.
+
+Throughout Gate B:
+
+- W+X remains zero;
+- invalid ranges/overlaps fail without corruption;
+- mapping ownership remains coherent;
+- no pre-map/protect/unmap outside the ECALL path may substitute for the syscall-caused operation.
+
+======================================================================
+GATE C — REAL EXECVE PROGRAM A -> PROGRAM B
+======================================================================
+
+Make `execve` perform actual process-image replacement.
+
+Required flow:
+
+    Program A in U-mode
+        -> execve(path, argv, envp)
+        -> copy/validate pathname, argv, envp while old image is intact
+        -> resolve executable bytes through project 58
+        -> project 54 ELF planning
+        -> project 59 complete replacement candidate
+        -> project 55 initial stack
+        -> prepare replacement page-table/image state
+        -> validate complete candidate
+        -> atomic candidate-to-live commit
+        -> destroy/replace expected old image mappings
+        -> enter new image
+        -> Program B genuinely executes in U-mode
+
+Requirements:
+
+- filesystem executable content is a real ELF, not a marker string;
+- invalid pathname/argv/envp or malformed executable must fail without destroying Program A;
+- descriptor/resource inheritance is explicit and generation-correct;
+- successful execve does not return to Program A;
+- Program B must produce independently distinguishable machine evidence;
+- do not use `userServiceSupervisorResume` as a substitute for successful process-image replacement.
+
+The verifier must be able to tell that Program A stopped and Program B executed, rather than merely trusting `program_b=...` text.
+
+======================================================================
+GATE D — REAL PT_INTERP / ET_DYN HANDOFF
+======================================================================
+
+Use a real main executable ELF containing PT_INTERP and a real tiny deterministic interpreter ELF.
+
+Required flow:
+
+    main ELF from project 58
+        -> validate ELF
+        -> derive PT_INTERP from validated main bytes
+        -> copy/own interpreter pathname
+        -> resolve interpreter ELF through project 58
+        -> validate interpreter ELF
+        -> reject recursive or malformed interpreter case
+        -> choose deterministic non-overlapping mappings/load biases
+        -> map main
+        -> map interpreter
+        -> construct justified startup stack/auxv
+        -> transfer control to biased interpreter entry
+
+For ET_DYN:
+
+    observed interpreter entry = raw e_entry + selected interpreter load bias
+
+Do not enter raw ET_DYN `e_entry` without the bias.
+
+Do not perform userspace dynamic relocation in the kernel.
+
+Provide only startup facts required by the proof. Where justified, independently establish relationships for:
+
+- AT_ENTRY -> main program entry after its applicable bias;
+- AT_BASE -> interpreter load base;
+- AT_PHDR -> real main program-header address;
+- interpreter entry -> raw interpreter e_entry + load bias.
+
+The tiny interpreter may simply validate/observe the expected handoff and emit a unique U-mode completion marker. It does not need to be musl's full dynamic linker.
+
+The invariant being proved is correct kernel handoff.
+
+======================================================================
+FIXTURE DESIGN
+======================================================================
+
+Keep a distinct Batch 26 fixture family.
+
+The existing `userspace-elf-rv64-file-memory-exec` scaffolding may be repaired/expanded rather than discarded.
+
+Add separate deterministic Program B and interpreter artifacts when doing so makes the proof clearer.
+
+Prefer explicit symbols/sections that let the verifier independently locate:
+
+- each ECALL site;
+- the instruction following returning ECALLs;
+- the expected post-mprotect faulting store;
+- the expected post-munmap faulting access;
+- Program A identity;
+- Program B identity;
+- interpreter identity / entry marker.
+
+Do not make the fixture merely print the expected answers.
+
+======================================================================
+STRICT INDEPENDENT VERIFIER
+======================================================================
+
+Repair:
+
+    tools/verify-freestanding-riscv64-file-memory-exec.py
+
+The verifier must become an independent machine oracle rather than a PASS-string parser.
+
+It should independently inspect built artifacts and reconstruct as much as practical, including:
+
+- exact fixture ELF identity;
+- Program B ELF identity;
+- interpreter ELF identity;
+- ELF type/machine/entry/program headers;
+- main PT_INTERP bytes/path;
+- ECALL instruction sites and syscall numbers;
+- expected sepc+4 relationships for returning syscalls;
+- actual syscall arguments or stable fixture-derived expectations;
+- open/read result relationships;
+- real ENOENT and EFAULT transitions;
+- resource generation/lifetime evidence;
+- mmap address and live mapping evidence;
+- post-mprotect real fault cause, address, and PC;
+- post-munmap real fault cause, address, and PC;
+- Program A -> Program B terminal transition;
+- actual interpreter transfer;
+- ET_DYN raw-entry + bias relation;
+- AT_ENTRY / AT_BASE / AT_PHDR relations where present;
+- W+X=0;
+- inherited Batch 25B proof remains intact;
+- deterministic equality between two independent QEMU runs for all canonical evidence.
+
+Kernel output may carry raw observations, but the verifier must derive truth from relations among independently known artifact/machine facts instead of trusting words such as `PASS`.
+
+Fixture hashes must be meaningfully tied to the exact built artifacts. Merely checking that a digest string has 64 characters is insufficient.
+
+Mutation self-test should alter decisive semantic inputs/evidence and prove the independent reconstruction rejects them.
+
+Examples include mutations to:
+
+- an ECALL site/syscall identity;
+- path/descriptor expectation;
+- fault cause/address/PC;
+- PTE permission evidence;
+- main PT_INTERP path;
+- interpreter ELF identity;
+- raw entry/load-bias arithmetic;
+- auxv relationship;
+- Program B execution marker;
+- resource generation;
+- W+X count.
+
+Do not declare a mutation useful merely because an exact string comparison rejects it.
+
+======================================================================
+FAIL-CLOSED TRANSITION LAW
+======================================================================
+
+The current verifier intentionally fails closed because the old evidence was rejected.
+
+Keep that protection until the replacement proof is actually implemented.
+
+Near the end of the task:
+
+1. make the real semantics work;
+2. make the independent verifier work against them;
+3. run the inherited Batch 25B proof;
+4. run both new Batch 26 proof modes;
+5. only then remove/replace the temporary unconditional fail-closed path;
+6. rerun both Batch 26 modes after that change;
+7. rerun repository-wide validation;
+8. only then change the report from PARTIAL to PASS.
+
+A final state where the guard is gone but the verifier has not independently proved the machine path is unacceptable.
+
+======================================================================
+REQUIRED COMMANDS BEFORE BATCH 26 PASS
+======================================================================
+
+Use Zig 0.14.0.
+
+At minimum run:
+
+    python3 tools/python-environment.py --check
+    python3 tools/query-reference.py agent doctor
+
+    zig build test-bounded-elf64-load-plan test-bounded-address-space-exec-image
+    PYTHONDONTWRITEBYTECODE=1 python3 tools/check-bounded-filesystem-capacity.py
+
+    python3 tools/verify-freestanding-riscv64-linux-fd-lifecycle.py --self-test
+    python3 tools/verify-freestanding-riscv64-linux-fd-lifecycle.py
+
+    python3 tools/verify-freestanding-riscv64-file-memory-exec.py --self-test
+    python3 tools/verify-freestanding-riscv64-file-memory-exec.py
+
+    python3 tools/python-environment.py tools/record-validation.py
+    python3 tools/python-environment.py tools/record-validation.py --check
+
+    zig build check --summary all
+    zig build validate-repository --summary all
+    python3 tools/developer-command.py validate-repository
+    PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+    python3 tools/check-repository-policy.py
+
+Run any narrower focused tests needed while debugging rather than repeatedly paying the full repository cost after every edit.
+
+Do not hand-edit canonical generated artifacts when a generator exists.
+
+======================================================================
+REPORTING / COMMITS / DELIVERY
+======================================================================
+
+Maintain:
+
+    docs/reports/AGENTIC_SNOWBALL_BATCH_26.md
+
+throughout the task.
+
+Do not erase the rejected-attempt history. Append the real repair/completion facts so a future reader can distinguish:
+
+- accepted substrate;
+- rejected synthetic machine evidence;
+- partial fail-closed checkpoint;
+- real completed machine implementation.
+
+Make coherent commits at meaningful milestones. Suggested natural checkpoints are:
+
+1. real openat/resource path;
+2. real live mmap/protection/unmap plus fault proof;
+3. real exec A->B;
+4. real PT_INTERP/ET_DYN handoff;
+5. independent verifier + generated evidence + final report.
+
+These are suggestions, not mandatory artificial batch boundaries. Collapse checkpoints when one coherent mechanism naturally closes several gates.
+
+Do not stop because a repair takes longer than expected. A build failure, QEMU failure, unexpected trap, malformed fixture, wrong bias, stale generated file, verifier rejection, or test regression is the next debugging task.
+
+If a genuine external environment limitation blocks the final QEMU proof, preserve maximum coherent implementation and exact next commands, but keep Batch 26 PARTIAL.
+
+Do not claim PASS unless the required verifier modes and repository validation actually pass.
+
+======================================================================
+OPTIONAL CONTINUATION IF BATCH 26 FINISHES WITH CONTEXT REMAINING
+======================================================================
+
+After Batch 26 is genuinely PASS, begin the next inheritance campaign only if meaningful context remains.
+
+The next target is not "implement Batch 27 syscall list."
+
+The next target is:
+
+    get real musl / BusyBox pressure running against Alpz
+
+Use target software as the oracle:
+
+    attempt target
+        -> observe first missing reusable mechanism
+        -> implement smallest permanent mechanism
+        -> retry
+
+Likely pressure may include some combination of:
+
+- clone/thread creation;
+- TLS setup;
+- futex synchronization;
+- signal state/delivery;
+- clocks/timers;
+- pipes;
+- poll/epoll-like waiting;
+- tty/ioctl;
+- file metadata/seek/stat gaps;
+- brk or additional mapping behavior.
+
+Do not implement all of these merely because they are listed here.
+
+Prefer the smallest coherent set that creates the next inheritance gate:
+
+    dynamic musl + BusyBox shell
+
+Then the following campaign should pressure:
+
+    Alpine userspace
+        -> apk
+        -> Python / Node / Clang / Wasmtime inheritance
+
+The larger roadmap remains:
+
+    Batch 26 real file/memory/exec gate
+        -> musl + BusyBox pressure
+        -> dynamic BusyBox shell
+        -> Alpine + apk
+        -> Python / Node / Clang / Wasmtime
+        -> QEMU/TCG host pressure
+        -> first guest OS
+        -> RISC-V H-extension foundation
+        -> native Alpz hypervisor
+        -> minimum /dev/kvm compatibility needed by stock QEMU
+        -> QEMU/KVM on Alpz
+
+Do not let future roadmap breadth distract from closing the current Batch 26 machine proof first.
+
+======================================================================
+SUCCESS CONDITION
+======================================================================
+
+Batch 26 may be marked PASS only when all of the following are true:
+
+- real openat semantics are syscall-caused;
+- pathname copy/lookup/resource/fd/error behavior is proved;
+- real mmap creates the live mapping;
+- userspace really accesses that mapping;
+- real mprotect changes live permissions;
+- userspace really causes the expected post-protect fault;
+- real munmap removes the live mapping;
+- userspace really causes the expected post-unmap fault;
+- real execve atomically replaces Program A with Program B;
+- Program B genuinely executes in U-mode;
+- a real main ELF PT_INTERP is parsed/resolved through the filesystem;
+- a real interpreter ELF is mapped;
+- ET_DYN load bias is correctly applied to mappings and entry;
+- startup/auxv relationships used by the proof are justified;
+- kernel does no userspace dynamic relocation;
+- resource generations remain correct;
+- W+X remains zero;
+- the independent mutation/self-test verifier passes;
+- the independent two-QEMU verifier passes;
+- inherited Batch 25B proof passes;
+- generated evidence is synchronized;
+- repository-wide validation is green;
+- `docs/reports/AGENTIC_SNOWBALL_BATCH_26.md` accurately records PASS and exact evidence.
+
+Until then:
+
+    Batch 26 = PARTIAL
+
+======================================================================
+MINMAX CHECK BEFORE EVERY LARGE CHANGE
+======================================================================
+
+Before adding a mechanism ask:
+
+1. What existing software does this make reachable?
+2. Can a smaller permanent mechanism unlock the same software?
+3. Can the mechanism be shared by Linux, QuirkM, WASI, QEMU, or future VM/resource personalities?
+4. Is Linux historical policy being quarantined at the adapter edge?
+5. Are we implementing a reusable mechanism, or accidentally reimplementing an ecosystem that should be inherited?
+
+Canonical strategy:
+
+    Never ask "what feature should we implement next?" first.
+    Ask "what is the smallest missing surface whose implementation causes the largest existing software world to become ours?"
+
+Minimum permanent mechanism.
+Maximum inherited civilization.
