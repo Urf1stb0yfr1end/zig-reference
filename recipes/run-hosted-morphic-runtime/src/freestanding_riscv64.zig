@@ -780,34 +780,42 @@ fn prepareBatch26Exec(frame: *TrapFrame) !void {
     batch26_exec_argc = try copyUserStringVector(frame.x[11], &batch26_exec_argv, &batch26_exec_argv_lens);
     batch26_exec_envc = try copyUserStringVector(frame.x[12], &batch26_exec_envp, &batch26_exec_env_lens);
     const main_object = batch26_fs.lookup(.root, batch26_exec_path[0..batch26_exec_path_len]) catch return error.NotFound;
-    const interp_object = batch26_fs.lookup(.root, "/lib/ld-batch26-rv64.so") catch shutdown();
     const main_file = batch26_fs.resolve(main_object) orelse shutdown();
-    const interp_file = batch26_fs.resolve(interp_object) orelse shutdown();
     const main_bytes = main_file.bytes[0..main_file.length];
-    const interp_bytes = interp_file.bytes[0..interp_file.length];
+    const initial_main = elf_load.planDynamic(2, 32, main_bytes) catch shutdown();
+    const interp_bytes: ?[]const u8 = if (initial_main.interpreterPath()) |path| blk: {
+        const interp_object = batch26_fs.lookup(.root, path) catch return error.NotFound;
+        const interp_file = batch26_fs.resolve(interp_object) orelse shutdown();
+        break :blk interp_file.bytes[0..interp_file.length];
+    } else null;
     const candidate = address_space.ExecPlan(2, 32).prepare(main_bytes, interp_bytes) catch shutdown();
     const main_plan = candidate.main;
-    const interp_plan = candidate.interpreter orelse shutdown();
-    if (!std.mem.eql(u8, candidate.interpreter_path[0..candidate.interpreter_path_len], "/lib/ld-batch26-rv64.so")) shutdown();
     const main_segment = main_plan.load.items()[0];
     const prepared_main = Batch26MaterializedImage.prepare(main_bytes, &main_plan.load, 0) catch return error.InvalidUser;
-    const prepared_interp = Batch26MaterializedImage.prepare(interp_bytes, &interp_plan.load, batch26_interp_bias) catch return error.InvalidUser;
+    const prepared_interp = if (candidate.interpreter) |*interp_plan| blk: {
+        if (!std.mem.eql(u8, candidate.interpreter_path[0..candidate.interpreter_path_len], initial_main.interpreterPath().?)) shutdown();
+        break :blk Batch26MaterializedImage.prepare(interp_bytes.?, &interp_plan.load, batch26_interp_bias) catch return error.InvalidUser;
+    } else Batch26MaterializedImage{};
     const prepared_page_count = prepared_main.items().len + prepared_interp.items().len;
     if (prepared_page_count > batch26_image_backing.len) return error.InvalidUser;
     batch26_main_entry = candidate.main_entry;
     batch26_interp_raw_entry = candidate.entry;
-    batch26_interp_entry = candidate.entry + batch26_interp_bias;
+    batch26_interp_entry = candidate.entry + (if (candidate.interpreter != null) batch26_interp_bias else 0);
     batch26_at_phdr = main_segment.memory.start + 64;
     if (batch26_exec_argc != 1 or batch26_exec_envc != 1) return error.InvalidUser;
     const argv = [_][]const u8{batch26_exec_argv[0][0..batch26_exec_argv_lens[0]]};
     const envp = [_][]const u8{batch26_exec_envp[0][0..batch26_exec_env_lens[0]]};
-    const auxv = [_]initial_stack.AuxEntry{
-        .{ .type = 3, .value = .{ .immediate = batch26_at_phdr } },
-        .{ .type = 7, .value = .{ .immediate = batch26_interp_bias } },
-        .{ .type = 9, .value = .{ .immediate = batch26_main_entry } },
-    };
+    var auxv: [3]initial_stack.AuxEntry = undefined;
+    auxv[0] = .{ .type = 3, .value = .{ .immediate = batch26_at_phdr } };
+    var auxv_len: usize = 1;
+    if (candidate.interpreter != null) {
+        auxv[auxv_len] = .{ .type = 7, .value = .{ .immediate = batch26_interp_bias } };
+        auxv_len += 1;
+    }
+    auxv[auxv_len] = .{ .type = 9, .value = .{ .immediate = batch26_main_entry } };
+    auxv_len += 1;
     const stack_range = initial_stack.GuestStackRange.init(user_stack_va, user_stack_va + frames.PageSize) catch shutdown();
-    const stack = initial_stack.plan(512, 1, 1, 3, stack_range, &argv, &envp, &auxv) catch shutdown();
+    const stack = initial_stack.plan(512, 1, 1, 3, stack_range, &argv, &envp, auxv[0..auxv_len]) catch shutdown();
     const old_code = batch26_builder.query(user_code_va) catch shutdown();
     const old_data = batch26_builder.query(user_data_va) catch shutdown();
     const stack_leaf = batch26_builder.query(user_stack_va) catch shutdown();

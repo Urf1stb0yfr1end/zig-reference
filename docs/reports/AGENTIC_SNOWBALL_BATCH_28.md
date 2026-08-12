@@ -24,14 +24,23 @@ The exact pinned static musl artifact was rebuilt and hash-checked by
 `PT_LOAD` regions materialize three pages. The exact pinned BusyBox has 245
 materialized pages by its measured ELF geometry. Neither exact artifact was
 transported into the freestanding image in this checkpoint, and neither was
-executed by Morphic. The first remaining blocker is therefore the requested
-bounded external-artifact transport plus a general prepared backing reservation
-of at least three image frames (and any newly required Sv39 table frames), not
-ELF byte materialization or syscall policy.
+executed by Morphic. The audit also found that the inherited Batch 26 adapter
+unconditionally resolved and required a `PT_INTERP` image. That orchestration
+blocker is repaired here: a static image now prepares an empty interpreter image,
+omits `AT_BASE`, and enters its main entry without interpreter bias, while a
+dynamic image still resolves its exact declared interpreter and retains the
+existing interpreter preparation and entry behavior. The remaining observed
+blockers are bounded external-artifact transport and a general prepared backing
+reservation of at least three image frames (plus any newly required Sv39 table
+frames). No syscall blocker has yet been observed under Morphic because the exact
+static target has not reached U-mode there.
 
 ## Validation and nonclaims
 
-The freestanding payload compiles under Zig 0.14.0 after this integration.
-System-QEMU verification could not run because `qemu-system-riscv64` is absent
-from the environment. Static musl output, BusyBox applets, and the BusyBox shell
-remain unproved under Morphic and are explicitly not claimed.
+The freestanding payload compiles under Zig 0.14.0 after this integration. The
+inherited Batch 26 verifier passed its one-QEMU self-test with all 17 mutations
+rejected and its two-QEMU full mode with PREPARE/COMMIT, causal generation, and
+W+X=0 preserved. After regenerating the canonical agent and repository indexes,
+`zig build check` and `zig build validate-repository` both passed. Static musl
+output, BusyBox applets, and the BusyBox shell remain unproved under Morphic and
+are explicitly not claimed.

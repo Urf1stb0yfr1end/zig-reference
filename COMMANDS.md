@@ -451,8 +451,11 @@ The 2026-08-12 execve causality follow-up also passed `zig build check --summary
 `zig build install-freestanding-riscv64-morphic-runtime --prefix PATH` compiled
 successfully under Zig 0.14.0 after the Batch 26 exec path was changed to consume
 all prepared `MaterializedImage` pages with final Sv39 permissions. The inherited
-`python3 tools/verify-freestanding-riscv64-file-memory-exec.py --self-test` and
-full verifier remain the exact machine checks, but could not execute in this run
-because `qemu-system-riscv64` was unavailable. Exact external artifact identity
-was rechecked with `python3 tools/pressure-real-rv64-userspace.py --artifact-only`;
-that command does not claim Morphic execution.
+`python3 tools/verify-freestanding-riscv64-file-memory-exec.py --self-test`
+passed its one-QEMU proof and rejected all 17 mutations; the full command passed
+two deterministic QEMU runs with PREPARE/COMMIT, causal generation, and W+X=0.
+Exact external artifact identity was rechecked with `python3
+tools/pressure-real-rv64-userspace.py --artifact-only`; that command does not
+claim Morphic execution. Following the static no-`PT_INTERP` orchestration repair
+and canonical index regeneration, `zig build check` and `zig build
+validate-repository` both passed under Zig 0.14.0.
