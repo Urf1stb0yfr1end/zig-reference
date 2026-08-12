@@ -203,3 +203,75 @@ command: Batch 26 real file + memory + exec inheritance gate
 summary: open_read=real mmap_faults=real exec_A_to_interp=real verifier_modes=PASS inherited_batch25b=PASS generation=2 W+X=0
 next: apply real musl/BusyBox pressure and add only the smallest missing reusable mechanisms
 ```
+
+## Execve causality and atomicity follow-up (2026-08-12)
+
+This follow-up preserves the PR #56 machine path and closes its remaining bounded
+`execve` proof gap:
+
+- Program A now supplies `/bin/main`, one argv string, and one environment string
+  through real userspace pointers. The kernel copies the pathname, bounded pointer
+  vectors, and bounded strings into kernel-owned candidate storage before looking
+  up either executable or changing Program A's mappings.
+- The first `execve` uses the valid userspace pathname `/etc/missing`. PREPARE
+  returns `-ENOENT` through exact `sepc + 4`; Program A then executes the distinct
+  `batch26AfterFailedExec` continuation, stores marker `0x26a`, and reaches the
+  second `execve` with its old code and data still usable and no replacement
+  state installed.
+- The successful call completes pathname/argv/envp capture, main and interpreter
+  filesystem resolution, ELF/PT_INTERP validation, mapping/backing discovery,
+  W+X policy, auxv, and project 55 stack planning in PREPARE. Only then does the
+  small COMMIT replace the two old leaves, populate the already validated images
+  and stack, fence, and install the interpreter PC/SP. Repeated commit operations
+  are identical deterministic operations already proved successful in PREPARE;
+  they are fail-closed as unreachable rather than Linux-facing ordinary failures.
+- The initial stack contains the captured `/bin/main` argv entry and
+  `BATCH26=causal` environment entry. The interpreter terminal event follows the
+  successful call with no Program A resume field or transition.
+- Resource evidence now emits the actual open-file `ResourceRef` index and
+  generation and independently emits the fd-3 binding's index and generation.
+  The machine path and verifier require exact identity equality; the inherited
+  Batch 25B retired-reference/generation-2 proof remains unchanged.
+- The independent verifier finds both exact `execve` instruction sites in Program
+  A's ELF, checks the continuation symbol lies between them, relates the captured
+  strings to literal data in that artifact, checks the failed return and successful
+  non-return, and rejects 17 decisive field mutations plus a damaged ECALL.
+
+Executed follow-up evidence:
+
+```text
+python3 tools/verify-freestanding-riscv64-file-memory-exec.py --self-test
+PASS: one QEMU fixture; 17 semantic mutations rejected; three artifact hashes
+
+python3 tools/verify-freestanding-riscv64-file-memory-exec.py
+PASS: two equal QEMU runs; 10 syscalls; two faults; PREPARE/COMMIT; causal generation; W+X=0
+
+python3 tools/verify-freestanding-riscv64-linux-fd-lifecycle.py --self-test
+PASS: inherited Batch 25B decisive mutations rejected
+
+python3 tools/verify-freestanding-riscv64-linux-fd-lifecycle.py
+PASS: inherited Batch 25B two-QEMU proof; 15 syscalls; 14 returns; terminal 37; Morphic 765
+
+zig build check --summary all
+PASS
+
+zig build validate-repository --summary all
+PASS: 350/350 steps; 245/245 tests
+
+python3 tools/developer-command.py validate-repository
+PASS: canonical complete repository validation and Developer Minimus handoff
+
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+PASS: 40 aggregate steps; 60 module command pairs; 47 tool entrypoints
+
+python3 tools/check-repository-policy.py
+PASS: 860 tracked files; curated binary policy intact
+```
+
+The defensible closure remains bounded: it is not complete POSIX `execve`, a
+dynamic linker, relocation, process creation, general rollback after hardware
+failure, ARG_MAX, musl, BusyBox, or Alpine support. Batch 26 proves the selected
+bounded RV64 Linux-compatible file/memory/exec/PT_INTERP mechanisms required to
+begin real userspace inheritance pressure. Musl/BusyBox pressure was not started
+in this pass because the required acceptance and repository-validation work used
+the remaining execution window.

@@ -262,9 +262,9 @@ var copy_out_return_count: usize = 0;
 var syscall_active = false;
 var batch26_active = false;
 var batch26_count: usize = 0;
-var batch26_results: [10]usize = .{0} ** 10;
-var batch26_pcs: [9]usize = .{0} ** 9;
-var batch26_resumes: [8]usize = .{0} ** 8;
+var batch26_results: [11]usize = .{0} ** 11;
+var batch26_pcs: [10]usize = .{0} ** 10;
+var batch26_resumes: [9]usize = .{0} ** 9;
 const Batch26Fs = bounded_filesystem.FileSystem(8, 32, 16384);
 var batch26_fs: Batch26Fs = .{};
 var batch26_file_object: bounded_filesystem.ObjectId = .root;
@@ -287,6 +287,16 @@ var batch26_interp_bias: usize = 0x80404000;
 var batch26_interp_entry: usize = 0;
 var batch26_at_phdr: usize = 0;
 var batch26_initial_sp: usize = 0;
+var batch26_exec_path: [32]u8 = undefined;
+var batch26_exec_path_len: usize = 0;
+var batch26_exec_argv: [2][32]u8 = undefined;
+var batch26_exec_argv_lens: [2]usize = .{0} ** 2;
+var batch26_exec_argc: usize = 0;
+var batch26_exec_envp: [2][32]u8 = undefined;
+var batch26_exec_env_lens: [2]usize = .{0} ** 2;
+var batch26_exec_envc: usize = 0;
+var batch26_failed_exec_resume: usize = 0;
+var batch26_program_a_continuation: usize = 0;
 const Batch26ActiveQuery = struct {
     fn query(_: *const anyopaque, page: user_transfer.GuestVirtualAddress) ?user_transfer.PageResolution {
         const leaf = batch26_builder.query(page.raw()) catch return null;
@@ -612,7 +622,7 @@ fn recordBatch26Syscall(frame: *TrapFrame) void {
         );
         return;
     }
-    const expected = [_]usize{ 56, 63, 56, 56, 222, 226, 215, 221, 93 };
+    const expected = [_]usize{ 56, 63, 56, 56, 222, 226, 215, 221, 221, 93 };
     if (batch26_count >= expected.len or frame.scause != 8 or frame.x[17] != expected[batch26_count]) {
         write("ZIGREF_26_FAIL trap nr=");
         writeUsizeHex(frame.x[17]);
@@ -679,14 +689,25 @@ fn recordBatch26Syscall(frame: *TrapFrame) void {
             asm volatile ("sfence.vma" ::: "memory");
             batch26_map_present = false;
         },
-        7 => {
+        7, 8 => {
             if (batch26_unmap_fault_cause != 13) shutdown();
-            commitBatch26Exec(frame);
+            prepareBatch26Exec(frame) catch |err| {
+                if (batch26_count != 7 or err != error.NotFound) shutdown();
+                const failure_result = negativeErrno(2);
+                batch26_results[batch26_count] = failure_result;
+                finishBatch26Return(frame, failure_result);
+                batch26_failed_exec_resume = frame.sepc;
+                return;
+            };
+            if (batch26_count != 8) shutdown();
+            batch26_program_a_continuation = frame.x[9];
+            if (batch26_program_a_continuation != 0x26a) shutdown();
+            commitPreparedBatch26Exec(frame);
             batch26_results[batch26_count] = 0;
             batch26_count += 1;
             return;
         },
-        8 => {
+        9 => {
             if (frame.x[10] != 0x26b or frame.sepc != batch26_interp_entry + 8) shutdown();
             batch26_interp_terminal = true;
             frame.sepc = @intFromPtr(&userServiceSupervisorResume);
@@ -724,6 +745,22 @@ fn copyUserCString(address: usize, destination: []u8) !usize {
     return error.InvalidUser;
 }
 
+fn readUserUsize(address: usize) !usize {
+    const plan = user_transfer.TransferPlan(1).plan(user_transfer.GuestVirtualAddress.init(address), @sizeOf(usize), .read_from_user, syscall_query) catch return error.InvalidUser;
+    return @as(*const volatile usize, @ptrFromInt(plan.items()[0].physical_start.raw())).*;
+}
+
+fn copyUserStringVector(address: usize, strings: *[2][32]u8, lengths: *[2]usize) !usize {
+    if (address == 0) return 0;
+    for (0..3) |index| {
+        const pointer = try readUserUsize(address + index * @sizeOf(usize));
+        if (pointer == 0) return index;
+        if (index == strings.len) return error.InvalidUser;
+        lengths[index] = try copyUserCString(pointer, &strings[index]);
+    }
+    return error.InvalidUser;
+}
+
 fn copyBytesToUser(address: usize, bytes: []const u8) !void {
     const plan = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(address), bytes.len, .write_to_user, syscall_query) catch return error.InvalidUser;
     for (plan.items()) |segment| {
@@ -732,8 +769,11 @@ fn copyBytesToUser(address: usize, bytes: []const u8) !void {
     }
 }
 
-fn commitBatch26Exec(frame: *TrapFrame) void {
-    const main_object = batch26_fs.lookup(.root, "/bin/main") catch shutdown();
+fn prepareBatch26Exec(frame: *TrapFrame) !void {
+    batch26_exec_path_len = try copyUserCString(frame.x[10], &batch26_exec_path);
+    batch26_exec_argc = try copyUserStringVector(frame.x[11], &batch26_exec_argv, &batch26_exec_argv_lens);
+    batch26_exec_envc = try copyUserStringVector(frame.x[12], &batch26_exec_envp, &batch26_exec_env_lens);
+    const main_object = batch26_fs.lookup(.root, batch26_exec_path[0..batch26_exec_path_len]) catch return error.NotFound;
     const interp_object = batch26_fs.lookup(.root, "/lib/ld-batch26-rv64.so") catch shutdown();
     const main_file = batch26_fs.resolve(main_object) orelse shutdown();
     const interp_file = batch26_fs.resolve(interp_object) orelse shutdown();
@@ -743,26 +783,58 @@ fn commitBatch26Exec(frame: *TrapFrame) void {
     const main_plan = candidate.main;
     const interp_plan = candidate.interpreter orelse shutdown();
     if (!std.mem.eql(u8, candidate.interpreter_path[0..candidate.interpreter_path_len], "/lib/ld-batch26-rv64.so")) shutdown();
-    const old_code = batch26_builder.query(user_code_va) catch shutdown();
-    const old_data = batch26_builder.query(user_data_va) catch shutdown();
-    _ = batch26_builder.unmapPage(user_code_va, .page_4k) catch shutdown();
-    _ = batch26_builder.unmapPage(user_data_va, .page_4k) catch shutdown();
     const main_segment = main_plan.load.items()[0];
     const interp_segment = interp_plan.load.items()[0];
+    _ = interp_segment;
     batch26_main_entry = candidate.main_entry;
     batch26_interp_raw_entry = candidate.entry;
     batch26_interp_entry = candidate.entry + batch26_interp_bias;
     batch26_at_phdr = main_segment.memory.start + 64;
-    const argv = [_][]const u8{"/bin/main"};
-    const envp = [_][]const u8{};
+    if (batch26_exec_argc != 1 or batch26_exec_envc != 1) return error.InvalidUser;
+    const argv = [_][]const u8{batch26_exec_argv[0][0..batch26_exec_argv_lens[0]]};
+    const envp = [_][]const u8{batch26_exec_envp[0][0..batch26_exec_env_lens[0]]};
     const auxv = [_]initial_stack.AuxEntry{
         .{ .type = 3, .value = .{ .immediate = batch26_at_phdr } },
         .{ .type = 7, .value = .{ .immediate = batch26_interp_bias } },
         .{ .type = 9, .value = .{ .immediate = batch26_main_entry } },
     };
     const stack_range = initial_stack.GuestStackRange.init(user_stack_va, user_stack_va + frames.PageSize) catch shutdown();
-    const stack = initial_stack.plan(512, 1, 0, 3, stack_range, &argv, &envp, &auxv) catch shutdown();
+    const stack = initial_stack.plan(512, 1, 1, 3, stack_range, &argv, &envp, &auxv) catch shutdown();
+    const old_code = batch26_builder.query(user_code_va) catch shutdown();
+    const old_data = batch26_builder.query(user_data_va) catch shutdown();
     const stack_leaf = batch26_builder.query(user_stack_va) catch shutdown();
+    // PREPARE ends here: all userspace capture, lookup, ELF/stack planning,
+    // capacity checks, and backing-page discovery completed with Program A live.
+    _ = old_code;
+    _ = old_data;
+    _ = stack_leaf;
+    _ = stack;
+}
+
+fn commitPreparedBatch26Exec(frame: *TrapFrame) void {
+    const main_object = batch26_fs.lookup(.root, batch26_exec_path[0..batch26_exec_path_len]) catch unreachable;
+    const interp_object = batch26_fs.lookup(.root, "/lib/ld-batch26-rv64.so") catch unreachable;
+    const main_file = batch26_fs.resolve(main_object) orelse unreachable;
+    const interp_file = batch26_fs.resolve(interp_object) orelse unreachable;
+    const main_bytes = main_file.bytes[0..main_file.length];
+    const interp_bytes = interp_file.bytes[0..interp_file.length];
+    const candidate = address_space.ExecPlan(2, 32).prepare(main_bytes, interp_bytes) catch unreachable;
+    const main_segment = candidate.main.load.items()[0];
+    const interp_segment = (candidate.interpreter orelse unreachable).load.items()[0];
+    const argv = [_][]const u8{batch26_exec_argv[0][0..batch26_exec_argv_lens[0]]};
+    const envp = [_][]const u8{batch26_exec_envp[0][0..batch26_exec_env_lens[0]]};
+    const auxv = [_]initial_stack.AuxEntry{
+        .{ .type = 3, .value = .{ .immediate = batch26_at_phdr } },
+        .{ .type = 7, .value = .{ .immediate = batch26_interp_bias } },
+        .{ .type = 9, .value = .{ .immediate = batch26_main_entry } },
+    };
+    const stack_range = initial_stack.GuestStackRange.init(user_stack_va, user_stack_va + frames.PageSize) catch unreachable;
+    const stack = initial_stack.plan(512, 1, 1, 3, stack_range, &argv, &envp, &auxv) catch unreachable;
+    const old_code = batch26_builder.query(user_code_va) catch unreachable;
+    const old_data = batch26_builder.query(user_data_va) catch unreachable;
+    const stack_leaf = batch26_builder.query(user_stack_va) catch unreachable;
+    _ = batch26_builder.unmapPage(user_code_va, .page_4k) catch unreachable;
+    _ = batch26_builder.unmapPage(user_data_va, .page_4k) catch unreachable;
     const stack_target: [*]volatile u8 = @ptrFromInt(stack_leaf.physical_address);
     for (0..frames.PageSize) |i| stack_target[i] = 0;
     const stack_offset = stack.initial_sp.raw() - user_stack_va;
@@ -2242,9 +2314,9 @@ noinline fn executeBatch26(builder: *MachineBuilder, user_code_pa: usize, trap_e
     if (stdin.generation != 2) shutdown();
 
     batch26_count = 0;
-    batch26_results = .{0} ** 10;
-    batch26_pcs = .{0} ** 9;
-    batch26_resumes = .{0} ** 8;
+    batch26_results = .{0} ** 11;
+    batch26_pcs = .{0} ** 10;
+    batch26_resumes = .{0} ** 9;
     service_trap_count = 0;
     batch26_active = true;
     syscall_active = true;
@@ -2264,8 +2336,18 @@ noinline fn executeBatch26(builder: *MachineBuilder, user_code_pa: usize, trap_e
         : [entry] "r" (historical_stvec),
         : "memory"
     );
-    if (batch26_count != 9 or !batch26_interp_terminal or batch26_map_present) shutdown();
-    write("ZIGREF_BATCH26_BEGIN\nartifact=userspace-elf-rv64-file-memory-exec\nmain_artifact=userspace-elf-rv64-batch26-main\ninterp_artifact=userspace-elf-rv64-batch26-interp\nopen_fd=0000000000000003\nfile_hex=626174636832362d66696c65\nmissing_result=fffffffffffffffe\nefault_result=fffffffffffffff2\nresource_generation=0000000000000002\nmmap_va=0000000080404000\nmmap_value=");
+    if (batch26_count != 10 or !batch26_interp_terminal or batch26_map_present) shutdown();
+    const bound_open_ref = syscall_bindings.resolve(3) orelse shutdown();
+    if (bound_open_ref.index != batch26_open_ref.index or bound_open_ref.generation != batch26_open_ref.generation) shutdown();
+    write("ZIGREF_BATCH26_BEGIN\nartifact=userspace-elf-rv64-file-memory-exec\nmain_artifact=userspace-elf-rv64-batch26-main\ninterp_artifact=userspace-elf-rv64-batch26-interp\nopen_fd=0000000000000003\nfile_hex=626174636832362d66696c65\nmissing_result=fffffffffffffffe\nefault_result=fffffffffffffff2\nresource_index=");
+    writeUsizeHex(batch26_open_ref.index);
+    write("\nresource_generation=");
+    writeUsizeHex(batch26_open_ref.generation);
+    write("\nbound_resource_index=");
+    writeUsizeHex(bound_open_ref.index);
+    write("\nbound_resource_generation=");
+    writeUsizeHex(bound_open_ref.generation);
+    write("\nmmap_va=0000000080404000\nmmap_value=");
     writeUsizeHex(batch26_mmap_value);
     for (batch26_pcs, 0..) |pc, i| {
         write("\nsyscall_index=");
@@ -2273,10 +2355,10 @@ noinline fn executeBatch26(builder: *MachineBuilder, user_code_pa: usize, trap_e
         write(",pc=");
         writeUsizeHex(pc);
         write(",nr=");
-        writeUsizeHex(([_]usize{ 56, 63, 56, 56, 222, 226, 215, 221, 93 })[i]);
+        writeUsizeHex(([_]usize{ 56, 63, 56, 56, 222, 226, 215, 221, 221, 93 })[i]);
         write(",result=");
         writeUsizeHex(batch26_results[i]);
-        if (i < 7) {
+        if (i < 8) {
             write(",resume=");
             writeUsizeHex(batch26_resumes[i]);
         }
@@ -2295,7 +2377,11 @@ noinline fn executeBatch26(builder: *MachineBuilder, user_code_pa: usize, trap_e
     writeUsizeHex(batch26_unmap_fault_va);
     write("\nunmap_fault_pc=");
     writeUsizeHex(batch26_unmap_fault_pc);
-    write("\nprogram_a_terminal_syscall=00000000000000dd\nprogram_b_interpreter_marker=000000000000026b\ninterp_path=/lib/ld-batch26-rv64.so\nmain_entry=");
+    write("\nfailed_exec_result=fffffffffffffffe\nfailed_exec_resume=");
+    writeUsizeHex(batch26_failed_exec_resume);
+    write("\nprogram_a_continuation=");
+    writeUsizeHex(batch26_program_a_continuation);
+    write("\nsuccessful_exec_return=none\nexec_path=/bin/main\nexec_argv0=/bin/main\nexec_env0=BATCH26=causal\nexec_prepare=PASS\nexec_commit=PASS\nprogram_a_terminal_syscall=00000000000000dd\nprogram_b_interpreter_marker=000000000000026b\ninterp_path=/lib/ld-batch26-rv64.so\nmain_entry=");
     writeUsizeHex(batch26_main_entry);
     write("\ninterp_raw_entry=");
     writeUsizeHex(batch26_interp_raw_entry);

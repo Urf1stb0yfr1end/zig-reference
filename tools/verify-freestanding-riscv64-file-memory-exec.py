@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 COMMAND='python3 tools/verify-freestanding-riscv64-file-memory-exec.py'
 BEGIN=b'ZIGREF_BATCH26_BEGIN'; END=b'ZIGREF_BATCH26_END'; TIMEOUT=300
-EXPECTED_NRS=[56,63,56,56,222,226,215,221,93]
+EXPECTED_NRS=[56,63,56,56,222,226,215,221,221,93]
 
 def run(argv):
     return subprocess.run(argv,cwd=ROOT,check=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=TIMEOUT).stdout
@@ -32,6 +32,8 @@ def ecall_oracle(info):
     sites=[]; data=info['data']
     for off in range(4,len(data)-3,2):
         if data[off:off+4]!=b'\x73\x00\x00\x00': continue
+        executable=any(p['type']==1 and p['flags']&1 and p['off']<=off<p['off']+p['filesz'] for p in info['ph'])
+        if not executable: continue
         instruction=struct.unpack_from('<I',data,off-4)[0]
         if instruction&0x7f!=0x13 or (instruction>>7)&31!=17 or (instruction>>12)&7!=0 or (instruction>>15)&31!=0:
             raise RuntimeError('ECALL lacks adjacent li a7 immediate')
@@ -77,22 +79,29 @@ def verify(raw,fixture_path,main_path,interp_pathname, overrides=None):
     path=interp_path(main)
     if path!='/lib/ld-batch26-rv64.so' or d.get('interp_path')!=path: raise RuntimeError('PT_INTERP relationship')
     sites=ecall_oracle(f)
-    if len(events)!=9: raise RuntimeError('machine syscall event count')
-    for i,(event,(pc,nr)) in enumerate(zip(events[:8],sites)):
+    if len(events)!=10: raise RuntimeError('machine syscall event count')
+    for i,(event,(pc,nr)) in enumerate(zip(events[:9],sites)):
         if event['syscall_index']!=i or event['pc']!=pc or event['nr']!=nr: raise RuntimeError('ELF/machine syscall relationship')
-        if i<7 and event.get('resume')!=pc+4: raise RuntimeError('returning sepc+4 relationship')
+        if i<8 and event.get('resume')!=pc+4: raise RuntimeError('returning sepc+4 relationship')
+        if i==8 and 'resume' in event: raise RuntimeError('successful exec returned to Program A')
     syms=symbols(fixture_path)
-    for name in ('batch26ProtectedStore','batch26UnmappedLoad'):
+    for name in ('batch26ProtectedStore','batch26UnmappedLoad','batch26AfterFailedExec','path_exec','exec_arg0','exec_env0'):
         if name not in syms: raise RuntimeError('missing fixture proof symbol '+name)
     hx=lambda key:int(d[key],16)
     if hx('open_fd')!=3 or bytes.fromhex(d['file_hex'])!=b'batch26-file': raise RuntimeError('open/read relationship')
     if hx('missing_result')!=(1<<64)-2 or hx('efault_result')!=(1<<64)-14: raise RuntimeError('open errno relationship')
-    if hx('resource_generation')!=2: raise RuntimeError('resource generation')
+    if hx('resource_index')!=hx('bound_resource_index') or hx('resource_generation')!=hx('bound_resource_generation'): raise RuntimeError('causal ResourceRef/generation relationship')
     if hx('mmap_va')!=0x80404000 or hx('mmap_value')!=0x26: raise RuntimeError('live mmap access')
     if hx('protect_fault_cause')!=15 or hx('protect_fault_va')!=hx('mmap_va') or hx('protect_fault_pc')!=syms['batch26ProtectedStore']: raise RuntimeError('real protection fault')
     pte=hx('protected_pte')
     if pte&1==0 or pte&2==0 or pte&4 or pte&8 or pte&16==0: raise RuntimeError('protected PTE permissions')
     if hx('unmap_fault_cause')!=13 or hx('unmap_fault_va')!=hx('mmap_va') or hx('unmap_fault_pc')!=syms['batch26UnmappedLoad']: raise RuntimeError('real missing-mapping fault')
+    if hx('failed_exec_result')!=(1<<64)-2 or hx('failed_exec_resume')!=sites[7][0]+4 or events[7]['result']!=(1<<64)-2: raise RuntimeError('failed exec return relationship')
+    if not sites[7][0] < syms['batch26AfterFailedExec'] < sites[8][0] or hx('program_a_continuation')!=0x26a: raise RuntimeError('Program A continuation after failed exec')
+    if d.get('successful_exec_return')!='none' or events[8]['result']!=0: raise RuntimeError('successful exec no-return relationship')
+    for key,literal in (('exec_path',b'/bin/main\0'),('exec_argv0',b'/bin/main\0'),('exec_env0',b'BATCH26=causal\0')):
+        if d.get(key)!=literal[:-1].decode() or f['data'].count(literal)<1: raise RuntimeError('userspace exec input identity '+key)
+    if d.get('exec_prepare')!='PASS' or d.get('exec_commit')!='PASS': raise RuntimeError('exec PREPARE/COMMIT boundary')
     interp_entry=hx('interp_entry')
     if hx('main_entry')!=main['entry'] or hx('interp_raw_entry')!=interp['entry'] or interp_entry!=interp['entry']+hx('interp_bias'): raise RuntimeError('ET_DYN bias relationship')
     if hx('at_entry')!=main['entry'] or hx('at_base')!=hx('interp_bias') or hx('at_phdr')!=next(p['vaddr'] for p in main['ph'] if p['type']==1)+64: raise RuntimeError('auxv relationship')
@@ -100,7 +109,7 @@ def verify(raw,fixture_path,main_path,interp_pathname, overrides=None):
     if hx('program_a_terminal_syscall')!=221 or hx('program_b_interpreter_marker')!=0x26b: raise RuntimeError('A-to-interpreter terminal transition')
     interp_sites=[vaddr_for_offset(interp,i) for i in range(len(interp['data'])-3) if interp['data'][i:i+4]==b'\x73\x00\x00\x00']
     if interp_sites!=[interp['entry']+8]: raise RuntimeError('interpreter ECALL identity')
-    if events[8]['syscall_index']!=8 or events[8]['nr']!=93 or events[8]['pc']!=interp_sites[0]+hx('interp_bias'): raise RuntimeError('interpreter machine transition')
+    if events[9]['syscall_index']!=9 or events[9]['nr']!=93 or events[9]['pc']!=interp_sites[0]+hx('interp_bias'): raise RuntimeError('interpreter machine transition')
     if hx('wx_leaf_count')!=0 or d.get('complete')!='PASS': raise RuntimeError('completion/W+X')
     return {'fixture_hash':f['sha256'],'main_hash':main['sha256'],'interp_hash':interp['sha256'],'events':events,'fields':d}
 
@@ -127,17 +136,17 @@ def main():
     try:
         td,p,q,a=fixture(); first=verify(a,p/'userspace-elf-rv64-file-memory-exec',p/'userspace-elf-rv64-batch26-main',p/'userspace-elf-rv64-batch26-interp')
         if sys.argv[1:]:
-            mutations={'protect_fault_cause':'000000000000000d','protect_fault_pc':'0000000080404000','protected_pte':'00000000000000d7','unmap_fault_va':'0000000080405000','interp_path':'/bad','interp_entry':'0000000000001000','at_phdr':'0000000000000000','program_b_interpreter_marker':'0000000000000000','resource_generation':'0000000000000001','wx_leaf_count':'0000000000000001'}
+            mutations={'protect_fault_cause':'000000000000000d','protect_fault_pc':'0000000080404000','protected_pte':'00000000000000d7','unmap_fault_va':'0000000080405000','interp_path':'/bad','interp_entry':'0000000000001000','at_phdr':'0000000000000000','program_b_interpreter_marker':'0000000000000000','failed_exec_resume':'0000000080401000','program_a_continuation':'0000000000000000','successful_exec_return':'program-a','exec_path':'/bin/wrong','exec_argv0':'wrong','exec_env0':'wrong','bound_resource_generation':'0000000000000002','wx_leaf_count':'0000000000000001'}
             for key,value in mutations.items(): reject(a,p,key,value)
             damaged=bytearray((p/'userspace-elf-rv64-file-memory-exec').read_bytes()); off=damaged.find(b'\x73\x00\x00\x00'); damaged[off]=0
             try: ecall_oracle(elf(damaged))
             except RuntimeError: pass
             else: raise AssertionError('mutated ECALL accepted')
-            print('PASS: Batch 26 one-QEMU independent proof and 11 semantic mutations rejected'); summary='fixture=1 mutations=11 rejected hashes=3'
+            print('PASS: Batch 26 one-QEMU independent proof and 17 semantic mutations rejected'); summary='fixture=1 mutations=17 rejected hashes=3'
         else:
             b=run([q,'-machine','virt','-nographic','-bios','default','-kernel',str(p/'morphic-freestanding-riscv64')]); second=verify(b,p/'userspace-elf-rv64-file-memory-exec',p/'userspace-elf-rv64-batch26-main',p/'userspace-elf-rv64-batch26-interp')
             if first!=second: raise RuntimeError('two-machine evidence drift')
-            print('PASS: Batch 26 runs=2 real open/read mmap faults execve PT_INTERP ET_DYN generation=2 W+X=0'); summary='runs=2 syscalls=9 faults=2 exec=PT_INTERP hashes=3 generation=2 W+X=0'
+            print('PASS: Batch 26 runs=2 failed-exec atomic return successful-exec no-return PT_INTERP ET_DYN causal-generation W+X=0'); summary='runs=2 syscalls=10 faults=2 exec=PREPARE/COMMIT hashes=3 causal-generation W+X=0'
         td.cleanup()
     except Exception as exc:
         traceback.print_exc(); handoff('FAIL','Batch 26 verification failed',str(exc)); return getattr(exc,'returncode',1)
