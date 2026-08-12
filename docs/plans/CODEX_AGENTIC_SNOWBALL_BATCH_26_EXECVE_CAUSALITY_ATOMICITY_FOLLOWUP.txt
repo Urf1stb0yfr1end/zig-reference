@@ -1,0 +1,416 @@
+CODEX AGENTIC SNOWBALL — BATCH 26 EXECVE CAUSALITY / ATOMICITY FOLLOW-UP
+CLOSE THE LAST KNOWN MACHINE-SEMANTIC GAP, THEN APPLY MUSL/BUSYBOX PRESSURE
+
+Repository:
+thanks-cohn/zig-reference
+
+Canonical request path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_26_EXECVE_CAUSALITY_ATOMICITY_FOLLOWUP.txt
+
+======================================================================
+AUTHORITATIVE BASELINE
+======================================================================
+
+Start from current main.
+
+PR #56 was deliberately merged on 2026-08-12 after replacing the earlier supervisor-precomputed Batch 26 machine path with substantially real syscall-caused RV64 execution.
+
+PR #56 merge commit:
+
+    70d11b07d1ff912ca85ae94a0f38ab6ee82c1ac1
+
+Historical checkpoint tag:
+
+    batch-26-pr56-machine-path-exec-followup-2026-08-12
+
+Treat that tag as the authoritative historical explanation of the PR #56 checkpoint: what became real, what remained incomplete, and why the coherent green machine work was merged to main rather than left on another special branch.
+
+DO NOT restart Batch 26.
+DO NOT recreate projects 54, 58, or 59.
+DO NOT revert the real open/read/mmap/fault/PT_INTERP/ET_DYN work.
+DO NOT restore the rejected supervisor-precomputed evidence model.
+
+This task is a narrow semantic-completion pass from current main.
+
+======================================================================
+PRESERVE THE REAL PR #56 MACHINE WORK
+======================================================================
+
+The current main already contains and must preserve:
+
+- real RV64 openat ECALL pressure;
+- bounded userspace pathname copy for the tested open cases;
+- project 58 filesystem lookup in the live syscall path;
+- project 57 generation-bearing resource creation and Linux fd binding;
+- real read ECALL into userspace memory;
+- real ENOENT and EFAULT open behavior for the selected fixture;
+- real anonymous mmap causing a live Sv39 user mapping;
+- real userspace access through the mmap-created mapping;
+- real mprotect causing a live PTE permission change;
+- an actual U-mode store page fault with scause 15 after write permission is removed;
+- real munmap removing the live mapping;
+- an actual U-mode load page fault with scause 13 after unmap;
+- a real ET_EXEC main ELF with PT_INTERP;
+- a separate real ET_DYN interpreter ELF;
+- real filesystem-fed main/interpreter resolution;
+- project 54/59 execution planning;
+- project 55 initial-stack construction;
+- transfer to interpreter_raw_entry + interpreter_load_bias;
+- a distinguishable interpreter terminal ECALL;
+- an independent verifier that parses/hashes the ELF artifacts, reconstructs ECALL sites, checks exact returning sepc+4 transitions, checks fault symbols/PTE facts/PT_INTERP/ET_DYN/auxv relations, rejects semantic mutations, and compares two QEMU runs;
+- inherited Batch 25B evidence;
+- W+X=0;
+- green repository validation at the PR #56 checkpoint.
+
+Do not spend the task proving these again from scratch. Preserve them while repairing the remaining execve boundary.
+
+======================================================================
+MISSION
+======================================================================
+
+Close the remaining Batch 26 semantic gap by making execve inputs causal and replacement failure-atomic.
+
+The target flow is:
+
+    Program A
+        -> failing execve using real userspace input
+        -> bounded pathname/argv/envp capture while A is intact
+        -> failure returns through exact sepc+4
+        -> Program A demonstrably continues
+        -> successful execve using real userspace pathname/argv/envp
+        -> complete PREPARE phase
+        -> destructive COMMIT phase only after all ordinary failures are impossible
+        -> Program A is replaced
+        -> real PT_INTERP / ET_DYN interpreter entry
+        -> interpreter terminal machine event
+        -> no return to Program A
+
+Also strengthen Batch 26 resource-generation evidence so the emitted generation comes from the actual ResourceRef involved in the claimed operation rather than a literal expected value.
+
+======================================================================
+1. MAKE EXECVE PATHNAME AUTHORITATIVE
+======================================================================
+
+The current success path must stop hard-coding `/bin/main` as the authoritative executable lookup.
+
+Required flow:
+
+    frame.x[10]
+        -> validate/copy NUL-terminated pathname from Program A memory
+        -> store copied pathname in bounded kernel-owned candidate state
+        -> use that copied pathname for project 58 lookup
+        -> obtain executable bytes from that resolved object
+
+Requirements:
+
+- bound pathname length explicitly;
+- invalid pointer/range fails before any destructive image mutation;
+- missing executable returns the selected Linux-facing errno through the compatibility adapter;
+- after copy succeeds, later commit logic must not depend on dereferencing Program A pathname memory;
+- changing the fixture pathname must change lookup behavior for the correct reason.
+
+======================================================================
+2. COPY ARGV / ENVP BEFORE TEARDOWN
+======================================================================
+
+Add the smallest deterministic userspace argv/envp fixture needed to prove old-image capture.
+
+Requirements:
+
+- capture argv pointer vector from frame.x[11];
+- capture envp pointer vector from frame.x[12];
+- explicit bounded pointer counts;
+- explicit bounded string lengths / total payload suitable for this proof;
+- all pointer and string validation happens while Program A mappings still exist;
+- copied data becomes kernel-owned candidate input;
+- project 55 initial-stack construction uses the copied values rather than a kernel-hard-coded replacement argv;
+- malformed pointer/vector/string input fails without destroying Program A.
+
+Do not build a broad POSIX ARG_MAX subsystem unless real pressure requires it. The permanent mechanism needed here is bounded old-image capture before replacement.
+
+======================================================================
+3. SPLIT EXEC INTO PREPARE AND COMMIT
+======================================================================
+
+Make the failure boundary explicit.
+
+PREPARE must perform every operation that can ordinarily fail:
+
+    copy pathname
+    copy argv
+    copy envp
+    project 58 executable lookup
+    validate main ELF
+    derive PT_INTERP
+    project 58 interpreter lookup
+    validate interpreter ELF
+    choose/validate main mappings
+    choose/validate interpreter mappings/load bias
+    validate W+X policy
+    prepare project 55 initial stack bytes and SP
+    determine startup auxv values
+    determine descriptor/resource inheritance used by this proof
+    reserve/validate any physical backing or capacity needed by COMMIT
+    build one complete replacement candidate
+
+Only after PREPARE succeeds may COMMIT begin.
+
+COMMIT should be deliberately small and deterministic:
+
+    remove/replace old Program A mappings
+    populate/install prepared main/interpreter image pages
+    install prepared stack
+    install final page-table state
+    sfence.vma / fence.i as required
+    install userspace registers/SP/sepc
+    enter biased interpreter entry
+
+The key invariant:
+
+    ordinary validation / lookup / capacity / allocation failure
+    must not occur after Program A is irreversibly destroyed.
+
+If an operation can fail after the current teardown boundary, move it into PREPARE or make its commit behavior rollback-safe before claiming atomicity.
+
+======================================================================
+4. MACHINE-PROVE FAILED EXEC PRESERVES PROGRAM A
+======================================================================
+
+Add at least one real failing execve before the successful execve.
+
+Prefer a minimal decisive case such as:
+
+- invalid pathname pointer -> EFAULT; or
+- valid userspace pathname for a missing executable -> ENOENT; or
+- malformed executable -> justified executable-format errno if already supported cleanly.
+
+The fixture must prove:
+
+    failed execve
+        -> exact returning sepc + 4
+        -> Program A executes a distinct continuation marker afterward
+        -> Program A code/data required by the proof remain usable
+        -> no partial new image is visible
+        -> no partial replacement state survives
+
+Then the same Program A must perform the final successful execve.
+
+Successful execve must not return to Program A.
+
+======================================================================
+5. MAKE RESOURCE GENERATION EVIDENCE CAUSAL
+======================================================================
+
+The underlying project 57 generation behavior is real. Strengthen only the evidence path.
+
+Requirements:
+
+- emit generation from the actual ResourceRef whose identity/lifetime is being claimed;
+- preferably emit enough resource identity for the verifier to relate the Linux fd binding to that exact reference;
+- do not print `2` merely because generation 2 is expected;
+- retain stale-generation rejection semantics;
+- preserve inherited Batch 25B generation proof.
+
+The verifier must reject a mismatch between the actual emitted ResourceRef identity and the claimed generation.
+
+======================================================================
+6. EXTEND THE EXISTING BATCH 26 FIXTURE, DO NOT REPLACE IT
+======================================================================
+
+Keep the distinct Batch 26 machine fixture and extend it minimally.
+
+The final deterministic order should establish approximately:
+
+    openat("/etc/message")
+    read(fd, ...)
+    missing open -> ENOENT
+    bad-pointer open -> EFAULT
+    mmap
+    real mapped write/read
+    mprotect
+    actual protection fault
+    munmap
+    actual unmapped fault
+    failing execve
+    Program A continuation after failed exec
+    successful execve with real userspace pathname + argv/envp
+    real interpreter execution
+    terminal interpreter event
+
+Do not add unrelated syscalls for decoration.
+
+======================================================================
+7. EXTEND THE INDEPENDENT VERIFIER
+======================================================================
+
+Preserve the PR #56 verifier architecture. Do not regress to trusted PASS fields.
+
+Add independent checks for the new guarantees:
+
+- find both failing and successful execve ECALL instruction sites in the exact Program A ELF;
+- relate machine PCs to those artifact sites;
+- verify exact sepc+4 return for failed execve;
+- independently locate/verify the Program A continuation marker after failed exec;
+- verify successful execve has no Program A return transition;
+- verify the successful executable identity corresponds to the userspace-supplied pathname artifact data rather than a kernel-side literal;
+- verify argv/envp relationships from the exact fixture and resulting initial stack evidence where practical;
+- preserve PT_INTERP extraction from main ELF;
+- preserve main/interpreter ELF type checks;
+- preserve ET_DYN raw-entry + load-bias = runtime-entry relation;
+- preserve real protection and missing-mapping fault checks;
+- preserve protected PTE permission checks;
+- preserve exact artifact hashes;
+- verify causal ResourceRef/generation identity;
+- preserve W+X=0;
+- preserve deterministic equality between two independent QEMU runs.
+
+Mutation self-test must gain decisive mutations for the new contract, including at least:
+
+- failed-exec return PC;
+- Program A continuation marker;
+- successful-exec return-to-A mutation;
+- exec pathname identity;
+- argv/envp relationship;
+- ResourceRef/generation relationship.
+
+======================================================================
+8. REPORTING
+======================================================================
+
+Maintain:
+
+    docs/reports/AGENTIC_SNOWBALL_BATCH_26.md
+
+Do not erase the rejected PR #55 history.
+Do not erase the PR #56 checkpoint history.
+Do not imply complete POSIX execve or complete Linux compatibility.
+
+Append a dated follow-up section explaining exactly what this pass repaired.
+
+The defensible final claim is narrow:
+
+    Batch 26 proves the selected bounded RV64 Linux-compatible
+    file/memory/exec/PT_INTERP mechanisms required to begin
+    real userspace inheritance pressure.
+
+======================================================================
+9. REQUIRED ACCEPTANCE COMMANDS
+======================================================================
+
+Use Zig 0.14.0.
+
+At minimum run and pass:
+
+    python3 tools/python-environment.py --check
+    python3 tools/query-reference.py agent doctor
+
+    zig build test-bounded-elf64-load-plan
+    zig build test-bounded-address-space-exec-image
+    PYTHONDONTWRITEBYTECODE=1 python3 tools/check-bounded-filesystem-capacity.py
+
+    python3 tools/verify-freestanding-riscv64-linux-fd-lifecycle.py --self-test
+    python3 tools/verify-freestanding-riscv64-linux-fd-lifecycle.py
+
+    python3 tools/verify-freestanding-riscv64-file-memory-exec.py --self-test
+    python3 tools/verify-freestanding-riscv64-file-memory-exec.py
+
+    zig build check --summary all
+    zig build validate-repository --summary all
+    python3 tools/developer-command.py validate-repository
+    PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+    python3 tools/check-repository-policy.py
+
+Regenerate canonical validation evidence/indexes only through repository tooling when required. Do not hand-edit generated artifacts if a generator exists.
+
+Do not claim completion if either Batch 26 verifier mode fails.
+
+======================================================================
+10. CONTINUATION LAW
+======================================================================
+
+THIS IS AN IMPLEMENTATION / REPAIR RUN, NOT AN INSPECTION-ONLY RUN.
+
+A build failure, QEMU failure, verifier rejection, ELF-layout issue, pointer-copy bug, page-table bug, atomicity bug, or stale generated artifact is the next debugging task, not a reason to stop with prose.
+
+Maintain coherent commits at meaningful gates.
+Push useful completed work to the task branch.
+Keep the report truthful throughout.
+
+If a genuine external environment limitation blocks the final QEMU proof, complete all implementable code/tests/verifier/report work and record the exact remaining command. Do not fabricate PASS.
+
+======================================================================
+11. AFTER THIS FOLLOW-UP: REAL MUSL / BUSYBOX PRESSURE
+======================================================================
+
+Only after the execve semantic follow-up genuinely passes should the task move to the next inheritance campaign.
+
+Do not design a giant Linux syscall list first.
+
+Use this loop:
+
+    attempt real musl / BusyBox target
+        -> observe first missing mechanism
+        -> implement smallest reusable permanent mechanism
+        -> retry
+
+Likely future pressure may include some subset of:
+
+    file metadata / seek
+    more mmap forms / brk
+    clocks
+    pipes
+    poll
+    tty/ioctl
+    signals
+    clone/thread/TLS
+    futex
+
+but real target software decides the order.
+
+The intended inheritance chain remains:
+
+    completed Batch 26 semantic machine gate
+        -> musl pressure
+        -> BusyBox pressure
+        -> dynamic BusyBox shell
+        -> Alpine
+        -> apk
+        -> broader inherited software
+        -> QEMU/TCG pressure
+        -> first guest
+        -> RISC-V H-extension
+        -> smallest useful /dev/kvm compatibility surface
+
+======================================================================
+MINMAX
+======================================================================
+
+Minimum permanent mechanism.
+Maximum inherited civilization.
+
+Do not recreate an ecosystem when a small compatibility surface can inherit it.
+Do not implement a hundred hypothetical requirements when one real program can expose the next primitive.
+Use proof fixtures to establish mechanisms, then let real software become the pressure oracle.
+
+======================================================================
+FINAL HANDOFF EXPECTATION
+======================================================================
+
+Before finishing the task, report:
+
+- exact branch;
+- exact final SHA;
+- coherent commits created;
+- PR URL if opened;
+- Batch 26 self-test result;
+- Batch 26 two-QEMU result;
+- inherited Batch 25B results;
+- repository validation results;
+- exact execve failure case proved;
+- exact Program A survival evidence;
+- exact successful no-return transition evidence;
+- exact causal ResourceRef/generation evidence;
+- any remaining nonclaims;
+- whether musl/BusyBox pressure was started, and if so, the first real missing mechanism discovered.
+
+Do not describe Batch 26 as fully closed unless the repaired causal/failure-atomic execve proof is green.
