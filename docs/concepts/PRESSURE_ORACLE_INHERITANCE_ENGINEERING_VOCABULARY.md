@@ -833,6 +833,198 @@ The test is not that every future system is already implemented. The test is tha
 
 ---
 
+# Distillation Vocabulary
+
+The next vocabulary describes a longer-term research use of Morphic: use successful compatibility work to discover which mechanisms modern programs repeatedly depend on, then refine the foundation around that evidence.
+
+## 35. Empirical Minimality
+
+**Empirical Minimality** is the practice of deciding what belongs in a minimal long-lived foundation partly from repeated evidence gathered from real workloads, rather than only from an a priori theory of what a kernel ought to contain.
+
+It asks:
+
+> Across the modern programs we care about, which mechanisms repeatedly appear as necessary?
+
+Empirical Minimality does not replace architectural judgment. It gives that judgment evidence.
+
+A mechanism that recurs across unrelated workloads is a stronger candidate for the permanent basis than a historical rule exercised only by one compatibility personality.
+
+---
+
+## 36. Necessity Map
+
+A **Necessity Map** is a machine-readable record connecting real workloads to the underlying mechanisms they require.
+
+The desired chain is:
+
+```text
+workload
+    ↓
+external operation or failure
+    ↓
+compatibility translation
+    ↓
+Morphic mechanism exercised or missing
+    ↓
+causal proof
+```
+
+A mature Necessity Map should make it possible to ask which mechanisms recur across musl, BusyBox, `apk`, QEMU, compilers, browsers, databases, language runtimes, hypervisor frontends, and other important software classes.
+
+The map is architectural evidence, not a claim that frequency alone determines importance.
+
+---
+
+## 37. Compatibility Decomposition
+
+**Compatibility Decomposition** is the process of translating a historical external operation into the smaller semantic requirements that actually make the operation useful.
+
+Examples:
+
+```text
+futex ABI
+    ↓
+shared-state wait/wake requirement
+```
+
+```text
+epoll ABI
+    ↓
+subscription to readiness/completion from many waitable objects
+```
+
+```text
+KVM_CREATE_VCPU
+    ↓
+create an execution context belonging to a VM
+```
+
+Compatibility Decomposition allows the project to learn from Linux and KVM without assuming their surface syntax is the permanent architecture.
+
+---
+
+## 38. Cross-Workload Recurrence
+
+**Cross-Workload Recurrence** is the repeated appearance of the same underlying mechanism in unrelated real software.
+
+If musl, QEMU, a compiler, a browser, and a database independently require some form of mapping, wait/wake, event delivery, timer, task, or shared-object mechanism, that recurrence is evidence that the concept may belong in a general modern basis.
+
+Recurrence does not prove universality, but it is stronger evidence than a requirement observed only through one narrow fixture or one historical ABI quirk.
+
+---
+
+## 39. Dependency Residue
+
+**Dependency Residue** is the set of capabilities a workload still needs outside the current small general foundation.
+
+The key question is:
+
+> What do programmers and real programs consistently find themselves needing that the current foundation does not yet express cleanly?
+
+Early residue may be large. As the foundation improves, the desired trend is toward thinner compatibility translation and less unexplained residue.
+
+Residue that repeatedly appears across independent workloads may reveal a missing general mechanism. Residue isolated to one historical interface is evidence for keeping that behavior at the edge.
+
+---
+
+## 40. Kernel Distillation
+
+**Kernel Distillation** is the deliberate refinement of the permanent foundation using accumulated evidence about recurring mechanisms, dependency structure, and compatibility residue.
+
+The hypothesis is that many external operations may collapse onto a much smaller set of independent semantic mechanisms:
+
+```text
+many external APIs
+        ↓
+recurring compatibility behaviors
+        ↓
+semantic operations
+        ↓
+small orthogonal mechanism basis
+```
+
+Kernel Distillation is not an excuse for perpetual rewrites. It should occur only when evidence shows that a cleaner basis can preserve required behavior while reducing accidental coupling or conceptual duplication.
+
+---
+
+## 41. Modern Minimal Basis
+
+A **Modern Minimal Basis** is the smallest comprehensible set of orthogonal mechanisms, supported by broad empirical evidence, from which important classes of modern software can either run natively or be inherited through thin compatibility adapters.
+
+The word *modern* is important. The objective is not smallness obtained by ignoring contemporary workloads.
+
+The objective is smallness obtained after studying those workloads closely enough to distinguish recurring necessity from historical representation.
+
+```text
+small comprehensible core
+        +
+thin inheritance adapters
+        ↓
+large modern software reach
+```
+
+Whether such a basis can cover most modern computing while remaining fully understandable is a research hypothesis to be tested, not an achievement already claimed.
+
+---
+
+## 42. Second-Pass Architecture
+
+**Second-Pass Architecture** is the practice of allowing a later foundation revision to incorporate what the first broad compatibility system taught us.
+
+The first architecture is intentionally general and reversible, but it is not assumed perfect.
+
+```text
+first Morphic foundation
+        ↓
+real Linux / Alpine / QEMU / KVM pressure
+        ↓
+Necessity Map + Dependency Residue
+        ↓
+identify recurring mechanisms and weak abstractions
+        ↓
+refine the foundation
+        ↓
+reapply compatibility adapters
+```
+
+This is a controlled breakaway from accidental assumptions, not a rejection of inheritance. The goal is to preserve access to existing software while improving the center beneath it.
+
+---
+
+## 43. Conceptual Compression
+
+**Conceptual Compression** is the reduction of many externally visible behaviors to a smaller number of independently understandable internal mechanisms.
+
+It differs from code golf or mere line-count reduction.
+
+A system has useful Conceptual Compression when a programmer can learn fewer permanent concepts yet still explain and control a much larger range of observable behavior.
+
+The long-term hope is that compatibility surfaces expand outward while the set of concepts that must be understood at the permanent core converges.
+
+---
+
+## 44. Distillation Loop
+
+The **Distillation Loop** is the repeated research cycle:
+
+```text
+INHERIT
+    ↓
+MEASURE
+    ↓
+DISTILL
+    ↓
+RE-INHERIT
+    ↓
+BROADER PRESSURE
+```
+
+Inheritance supplies real software. Measurement records its actual requirements. Distillation improves the mechanism basis. Re-inheritance checks that the cleaner foundation retained practical access to the software world.
+
+The loop should terminate locally whenever new workloads mostly reuse existing mechanisms and no evidence justifies architectural churn.
+
+---
+
 # Distilled Principles
 
 The vocabulary above reduces to a small set of project principles.
@@ -950,6 +1142,52 @@ A successful MinMax design therefore minimizes permanent mechanism while preserv
 
 ---
 
+## Principle M — Measure Recurrence Before Declaring Necessity
+
+Do not infer that a mechanism is fundamental merely because one important program requires it.
+
+Record the requirement, broaden the workload set, and look for recurrence across independent software classes.
+
+A rare requirement may still be important, but its architectural status should be explicit rather than assumed.
+
+---
+
+## Principle N — Treat Compatibility as a Source of Architectural Evidence
+
+A successful port should leave behind more than working code.
+
+It should record which historical behavior was requested, which general mechanism satisfied it, and what proof demonstrated the relationship.
+
+Compatibility work should make the architecture easier to understand over time, not merely larger.
+
+---
+
+## Principle O — Let Persistent Residue Challenge the Core
+
+If unrelated programs repeatedly require substantial functionality outside the supposed general foundation, do not endlessly hide that fact in adapters.
+
+Persistent Dependency Residue is evidence that the Minimal Basis may be incomplete or incorrectly factored.
+
+---
+
+## Principle P — Distill Only With Evidence
+
+Do not redesign the foundation merely because a cleaner abstraction can be imagined.
+
+Distillation should be justified by accumulated pressure, repeated mechanism usage, compatibility tests, and a credible reduction in conceptual coupling.
+
+---
+
+## Principle Q — Re-Inherit After Refinement
+
+A cleaner second-pass foundation is not a success if it loses the software worlds that taught us what was necessary.
+
+After architectural refinement, rerun the inheritance boundaries and prove that compatibility still works.
+
+The ideal result is a smaller or clearer center with equal or greater external reach.
+
+---
+
 # The Pressure-Oracle Law
 
 The method can be compressed into one project law:
@@ -986,4 +1224,18 @@ The long-term design constraint is equally compact:
 
 > **Inherit aggressively. Keep the core general. Put compatibility at the edges. Prefer a small set of orthogonal, permanent mechanisms over target-shaped foundations.**
 
-This is the intended engineering method for moving quickly from musl to BusyBox to Alpine to `apk`, and then from QEMU/TCG to RISC-V H-extension virtualization and the smallest useful `/dev/kvm` surface, without sacrificing Morphic's usefulness as a general-purpose foundation.
+The longer research loop adds one more discipline:
+
+```text
+INHERIT
+  ↓
+MEASURE THE NECESSITY MAP
+  ↓
+OBSERVE RECURRENCE AND RESIDUE
+  ↓
+DISTILL ONLY WHEN EVIDENCE JUSTIFIES IT
+  ↓
+RE-INHERIT
+```
+
+This is the intended engineering method for moving quickly from musl to BusyBox to Alpine to `apk`, and then from QEMU/TCG to RISC-V H-extension virtualization and the smallest useful `/dev/kvm` surface, without sacrificing Morphic's usefulness as a general-purpose foundation. Over the longer term, the same compatibility work can become evidence for a smaller, empirically informed Modern Minimal Basis.
