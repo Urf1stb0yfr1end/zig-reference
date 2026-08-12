@@ -55,6 +55,8 @@ module.exports = {
     "publicSymbols": [
       "page_size",
       "Permissions",
+      "ImagePage",
+      "MaterializedImage",
       "Mapping",
       "Error",
       "AddressSpace",
@@ -72,6 +74,10 @@ module.exports = {
       {
         "name": "Error",
         "kind": "public declaration"
+      },
+      {
+        "name": "ImagePage",
+        "kind": "public declaration"
       }
     ],
     "publicFunctions": [
@@ -82,6 +88,10 @@ module.exports = {
       {
         "name": "ExecPlan",
         "signature": "ExecPlan(comptime segment_capacity: usize, comptime interp_capacity: usize) type"
+      },
+      {
+        "name": "MaterializedImage",
+        "signature": "MaterializedImage(comptime page_capacity: usize) type"
       }
     ],
     "publicMethods": [
@@ -104,6 +114,14 @@ module.exports = {
       {
         "name": "prepare",
         "signature": "prepare(main_bytes: []const u8, interp_bytes: ?[]const u8) Error!ExecPlan"
+      },
+      {
+        "name": "items",
+        "signature": "items(self: *const Self) []const ImagePage"
+      },
+      {
+        "name": "prepare",
+        "signature": "prepare(bytes: []const u8, load: anytype, bias: usize) Error!Self"
       }
     ],
     "publicConstants": [],
