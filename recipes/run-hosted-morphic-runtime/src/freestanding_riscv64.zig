@@ -22,6 +22,9 @@ const userspace_elf_linux_syscalls = @embedFile("userspace-elf-rv64-linux-syscal
 const userspace_elf_file_memory_exec = @embedFile("userspace-elf-rv64-file-memory-exec");
 const batch26_main_elf = @embedFile("userspace-elf-rv64-batch26-main");
 const batch26_interp_elf = @embedFile("userspace-elf-rv64-batch26-interp");
+/// Host transport only: build orchestration supplies hash-checked bytes. ELF
+/// planning and machine semantics remain independent of how those bytes arrived.
+pub export const external_rv64_artifact = @embedFile("external-rv64-artifact").*;
 
 const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
@@ -112,7 +115,11 @@ var batch26_builder: *MachineBuilder = undefined;
 const Batch26MaterializedImage = address_space.MaterializedImage(4);
 var batch26_main_image: Batch26MaterializedImage = .{};
 var batch26_interp_image: Batch26MaterializedImage = .{};
-var batch26_image_backing: [2]usize = .{ 0, 0 };
+// Machine-adapter policy, not Morphic semantics: this linker-owned region is a
+// bounded reservation for every page in the prepared candidate. Keeping it
+// distinct from the live image is what makes PREPARE failure atomic.
+var batch26_prepared_backing: [4][frames.PageSize]u8 align(frames.PageSize) = undefined;
+var batch26_image_backing: [4]usize = .{ 0, 0, 0, 0 };
 var batch26_image_backing_count: usize = 0;
 var batch26_stack_image: initial_stack.StackPlan(512) = undefined;
 
@@ -816,14 +823,14 @@ fn prepareBatch26Exec(frame: *TrapFrame) !void {
     auxv_len += 1;
     const stack_range = initial_stack.GuestStackRange.init(user_stack_va, user_stack_va + frames.PageSize) catch shutdown();
     const stack = initial_stack.plan(512, 1, 1, 3, stack_range, &argv, &envp, auxv[0..auxv_len]) catch shutdown();
-    const old_code = batch26_builder.query(user_code_va) catch shutdown();
-    const old_data = batch26_builder.query(user_data_va) catch shutdown();
     const stack_leaf = batch26_builder.query(user_stack_va) catch shutdown();
     // PREPARE ends here: all userspace capture, lookup, ELF/stack planning,
     // capacity checks, and backing-page discovery completed with Program A live.
     batch26_main_image = prepared_main;
     batch26_interp_image = prepared_interp;
-    batch26_image_backing = .{ old_code.physical_address, old_data.physical_address };
+    for (0..prepared_page_count) |index| {
+        batch26_image_backing[index] = @intFromPtr(&batch26_prepared_backing[index]);
+    }
     batch26_image_backing_count = prepared_page_count;
     batch26_stack_image = stack;
     _ = stack_leaf;
