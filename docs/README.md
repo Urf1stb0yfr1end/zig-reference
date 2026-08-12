@@ -16,6 +16,12 @@ This directory contains the long-form project record. The repository root is int
 - [`concepts/ARCHETYPES.md`](concepts/ARCHETYPES.md) — recurring systems-code contract shapes.
 - [`concepts/RECURSIVE_SUCCESSOR_QUALIFICATION_AND_KNOWLEDGE_TRANSFER.md`](concepts/RECURSIVE_SUCCESSOR_QUALIFICATION_AND_KNOWLEDGE_TRANSFER.md) — recursive successor and knowledge-transfer model, when present in the checked-out tree.
 
+## Research
+
+- [`research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md`](research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md) — proposal for making Morphic a small neutral substrate on which broad operating-system, runtime, virtualization, security, storage, networking, formal-methods, and agentic-systems research can be expressed and reproduced.
+
+`research/` contains durable research proposals, experimental frameworks, and research-program definitions. Research documents may motivate future work, but they are not evidence that the proposed capabilities already exist.
+
 ## Applications
 
 - [`applications/QUIRKM_CONTEXT_COMPLETE_BIOLOGICAL_ORGAN_CONTROL.md`](applications/QUIRKM_CONTEXT_COMPLETE_BIOLOGICAL_ORGAN_CONTROL.md) — application hypothesis for a context-complete QuirkM control/diagnostic substrate for future artificial or biohybrid organs, including a real-world-grounded ventricular-assist-pump scenario and explicit safety/nonclaim boundaries.
