@@ -1,0 +1,965 @@
+CODEX BATCH 26 — RECOVERY, PROVENANCE, AND MINMAX INHERITANCE HANDOFF
+
+Repository:
+thanks-cohn/zig-reference
+
+Purpose:
+This is the detailed continuity record for the Batch 26 interruption/recovery and the architectural handoff into the remaining machine gate. It exists so a future Codex run does not mistake the recovered checkpoint for an incomplete or suspicious patch, redo accepted substrate work, or fragment the Alpine/QEMU/hypervisor roadmap into low-leverage syscall-counting batches.
+
+Canonical machine-completion plan:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_26_MACHINE_GATE_COMPLETION.txt
+
+Original Batch 26 plan:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_26_FILE_MEMORY_EXEC_INHERITANCE_GATE.txt
+
+Current strategic rule:
+
+    MINIMUM PERMANENT MECHANISM
+    MAXIMUM INHERITED CIVILIZATION
+
+Do not optimize for batch count, syscall count, or visible code volume. Optimize for the smallest permanent semantic/mechanism surface that makes the largest existing software ecosystem reachable.
+
+======================================================================
+1. WHERE BATCH 26 STARTED
+======================================================================
+
+Batch 25B was already a real machine milestone, not a hosted simulation. It proved the Linux/RV64 syscall boundary over the Morphic semantic seam and the generation-bearing resource world. The inherited machine path had:
+
+- real RV64 U-mode ELF execution;
+- S→U→S ECALL/trap transitions;
+- exact returning sepc+4 behavior;
+- terminal exit/exit_group behavior;
+- active Sv39 translation;
+- W+X=0;
+- Linux fd 0/1/2 bindings;
+- dup/close alias lifetime;
+- EBADF/EFAULT/ENOSYS behavior;
+- project 57 generation-bearing ResourceRef identity;
+- stale-generation rejection;
+- deterministic stdin with the resource slot deliberately reused at generation 2;
+- two independent QEMU machine runs;
+- strict mutation rejection;
+- Morphic equality evidence.
+
+Batch 26 was intended to cross the next ecosystem threshold in one campaign:
+
+    Batch 25B resource/fd world
+          ↓
+    file + directory/path world
+          ↓
+    mmap/protection/unmap world
+          ↓
+    exec image replacement
+          ↓
+    PT_INTERP / dynamic-ELF handoff
+          ↓
+    enough process-image reality to pressure musl/BusyBox/Alpine next
+
+The intention was never to implement a complete POSIX kernel. The intention was to create the minimum permanent mechanisms needed to inherit the next large software surface.
+
+======================================================================
+2. WHAT THE FIRST BATCH 26 RUN ACTUALLY BUILT
+======================================================================
+
+The run did not finish the final real-machine integration. It did, however, build two new reusable substrate modules and extend the ELF planning boundary.
+
+---------------------------------------------------------------------
+2A. PROJECT 58 — BOUNDED FILESYSTEM
+---------------------------------------------------------------------
+
+Project 58 created a Linux-independent bounded filesystem object world with:
+
+- a mandatory root object;
+- directory objects;
+- file objects;
+- ObjectId identity;
+- bounded inline names;
+- bounded inline file content;
+- absolute-root traversal;
+- traversal relative to an explicit starting directory ObjectId;
+- deterministic lookup;
+- bounded offset reads;
+- validation-before-mutation behavior for failed creation/lookup paths.
+
+The important identity separation is intentional:
+
+    filesystem ObjectId
+          ≠
+    Morphic/project57 ResourceRef
+          ≠
+    Linux process-local fd integer
+
+Project 58 does not own Linux syscall numbers, Linux errno, Linux fd allocation, AT_FDCWD, Linux open flags, or register ABI identity. Those remain compatibility-edge responsibilities.
+
+This means the filesystem substrate can later be reused by QuirkM, WASI/resource adapters, Linux compatibility, or other personalities without importing Linux descriptor semantics into the permanent mechanism.
+
+---------------------------------------------------------------------
+2B. PROJECT 59 — BOUNDED ADDRESS SPACE / EXEC IMAGE CANDIDATE
+---------------------------------------------------------------------
+
+Project 59 created reusable candidate/policy state for:
+
+- page-aligned mappings;
+- non-overlap validation;
+- map;
+- protect;
+- unmap;
+- access queries;
+- deterministic fixed capacity;
+- validation-before-mutation;
+- unconditional W+X rejection;
+- staged executable-image candidate planning;
+- main-image entry tracking;
+- optional interpreter-image tracking;
+- copied interpreter pathname;
+- distinct main entry and eventual interpreter entry.
+
+Project 59 is deliberately NOT the physical page allocator and NOT the Sv39 page-table implementation.
+
+The intended composition is:
+
+    project 59 validated mapping/image candidate
+          ↓
+    existing physical ownership + project 49 Sv39 mapping/protection/unmap
+          ↓
+    project 48 invalidation where required
+          ↓
+    real machine state
+
+This preserves one source of truth for actual page-table mutation instead of creating a second virtual-memory implementation inside the candidate module.
+
+---------------------------------------------------------------------
+2C. PROJECT 54 — DYNAMIC ELF / PT_INTERP PRESSURE
+---------------------------------------------------------------------
+
+Project 54 originally had an intentionally narrow static planner:
+
+    plan(...)
+      -> RV64
+      -> little-endian
+      -> ET_EXEC
+      -> validated PT_LOAD segments
+      -> static executable acceptance surface
+
+That narrowness was a feature because earlier machine proofs depended on a strict static contract.
+
+The first Batch 26 design attempted to compose that static-only planner into the new dynamic ELF/PT_INTERP path. This was the first serious architecture defect found during review: the static planner intentionally rejected ET_DYN, PT_INTERP, PT_DYNAMIC, TLS, shared-library features, etc., so treating it as the dynamic handoff planner was contradictory.
+
+The repair did NOT weaken the static proof.
+
+Instead Project 54 gained a second adjacent surface:
+
+    plan(...)
+        strict static ET_EXEC contract
+        previous proof preserved
+
+    planDynamic(...)
+        RV64 ET_EXEC or ET_DYN
+        validated PT_LOAD segments
+        a bounded owned PT_INTERP pathname
+        PT_DYNAMIC represented as userspace-loader responsibility
+        no kernel relocation
+
+DynamicLoadPlan owns the interpreter pathname and the validated load plan, but it deliberately does not become a dynamic linker.
+
+The permanent rule is:
+
+    kernel maps and hands off
+    userspace loader relocates
+
+Do not move ELF relocation into the kernel merely to make the proof easier.
+
+======================================================================
+3. THE TWO REVIEW BLOCKERS THAT PREVENTED THE FIRST MERGE
+======================================================================
+
+PR #52 contained the new substrates but was NOT immediately mergeable after review.
+
+Two blockers were identified.
+
+---------------------------------------------------------------------
+3A. BLOCKER: STATIC-ONLY PROJECT 54 USED FOR DYNAMIC HANDOFF
+---------------------------------------------------------------------
+
+Project 59's original dynamic/interpreter design composed Project 54 while Project 54's only accepted planner was the narrow static ET_EXEC planner.
+
+That meant the architecture claimed representability for a dynamic/PT_INTERP handoff through a component whose contract explicitly rejected the required ELF forms.
+
+This was repaired by preserving static plan(...) and adding the distinct planDynamic(...) / DynamicLoadPlan boundary described above.
+
+---------------------------------------------------------------------
+3B. BLOCKER: INVALID FILESYSTEM CAPACITY
+---------------------------------------------------------------------
+
+Project 58 initialized:
+
+    count = 1
+
+because the root object always exists, but its generic constructor originally permitted:
+
+    FileSystem(0, ...)
+
+That allowed a type whose object array had zero slots while its logical state claimed one root object, making root initialization/indexing structurally invalid.
+
+The repaired FileSystem type now rejects at compile time:
+
+    object_capacity == 0
+
+and also rejects capacities larger than the complete u16 ObjectId namespace.
+
+Because ObjectId is enum(u16), the valid maximum object capacity is 65,536 slots (indices 0..65,535).
+
+Dedicated compile-fail fixtures require both invalid forms to be rejected with the intended diagnostic.
+
+======================================================================
+4. PR #53 — SUBSTANTIVE REPAIR CHECKPOINT
+======================================================================
+
+PR #53 was created on top of the PR #52 branch to repair those two findings.
+
+Substantive results:
+
+Project 58:
+- compile-time zero-capacity rejection;
+- compile-time ObjectId namespace upper-bound rejection;
+- dedicated compile-fail fixtures;
+- focused Python compile-fail checker.
+
+Project 54:
+- original static plan(...) acceptance contract preserved;
+- DynamicLoadPlan added;
+- planDynamic(...) added;
+- ET_DYN accepted in the dynamic surface;
+- one owned PT_INTERP pathname accepted;
+- PT_DYNAMIC tolerated as userspace-loader work;
+- malformed interpreter pathname rejected;
+- duplicate interpreter rejected;
+- no relocation introduced into the kernel.
+
+Project 59:
+- ExecPlan main/interpreter use DynamicLoadPlan;
+- prepare(main_bytes, interp_bytes) derives PT_INTERP from the main ELF rather than accepting an independent caller-supplied path;
+- interpreter bytes are required when the main image has PT_INTERP;
+- recursive PT_INTERP on the interpreter is rejected;
+- main_entry is retained;
+- interpreter entry becomes the staged handoff entry when an interpreter exists.
+
+A future real machine implementation must add ET_DYN load bias correctly. Raw ET_DYN e_entry is not a final runtime PC after relocation by a mapping bias.
+
+======================================================================
+5. THE FORMATTING FAILURE AND THE CODEX CONTINUATION MISHAP
+======================================================================
+
+Fresh CI on the initial PR #53 repair showed the substantive Zig implementation compiling/tests passing, but zig fmt --check failed because the two compile-fail fixture files were formatted as one-line comptime blocks.
+
+Those two tiny files were directly reformatted on the PR branch.
+
+That repository change itself was harmless and correct. However, it changed the remote PR branch outside the original Codex Cloud task that had created/owned the branch.
+
+The original Codex continuation then refused to continue updating that PR, reporting that the PR had been updated outside Codex and requesting a new PR.
+
+This was a workflow/continuation-state problem, not evidence of corrupted source code.
+
+The important lesson for future runs is:
+
+- start Codex from current main;
+- let its task own its generated work branch while the task is active;
+- do not manually patch that same task branch mid-run unless we intentionally abandon the Codex continuation relationship;
+- when external repair is necessary, preserve a branch/checkpoint first and treat the new state explicitly as the next authoritative baseline.
+
+======================================================================
+6. THE UNDELIVERED SYNCHRONIZATION WORK
+======================================================================
+
+After the substantive repairs, repository CI still required deterministic synchronization of generated/contract/evidence artifacts.
+
+The missing sync included:
+
+- generated/modules.json;
+- generated/public-symbols.json;
+- generated/endpoints.json;
+- generated/ports.json and related indexes;
+- Project 54 port.js public contract changes;
+- Project 59 port.js prepare signature changes;
+- validation evidence/source digest refresh;
+- generated agent/dependency views.
+
+Codex had performed this synchronization in its workspace and reported full repository success there, but that synchronized workspace state had not reached GitHub before the continuation relationship broke.
+
+A large pasted git-apply artifact was recovered from that workspace output.
+
+That artifact could NOT safely be applied wholesale because it also contained stale versions of files that had subsequently been fixed on GitHub, including the old unformatted compile-fail fixtures.
+
+Therefore the recovery strategy was intentionally selective rather than blindly replaying the whole patch.
+
+======================================================================
+7. THE SELECTIVE RECOVERY
+======================================================================
+
+A durable salvage branch was first preserved at the accepted remote PR #53 state.
+
+The synchronization artifact was filtered so only the derived/synchronization layer was recovered while the already-good substantive Project 54/58/59 source and formatted compile-fail fixtures were preserved.
+
+The selected recovery layer included:
+
+- COMMANDS.md synchronization note;
+- docs/reports/AGENTIC_SNOWBALL_BATCH_26.md synchronization note;
+- generated/endpoints.json;
+- generated/modules.json;
+- generated/ports.json;
+- generated/public-symbols.json;
+- generated/validation/modules.json;
+- projects/54-bounded-elf64-load-plan/port.js;
+- projects/59-bounded-address-space-exec-image/port.js.
+
+The two documentation files conflicted while applying because their local/remote history had moved. Those conflicts were deliberately resolved by preserving the current repository version and appending concise synchronization notes, rather than accepting stale full-file content from the recovered patch.
+
+The recovery was checked for real conflict markers and whitespace damage before commit.
+
+The recovered synchronization commit became:
+
+    332c35f
+    Synchronize Batch 26 PR53 repair artifacts
+
+This commit did not replace the substantive source repairs. It completed the repository's derived contract/index/evidence synchronization around them.
+
+======================================================================
+8. FRESH GITHUB CI AFTER RECOVERY
+======================================================================
+
+The recovered PR head was then evaluated by fresh GitHub Actions rather than trusting the recovered workspace claims.
+
+The fresh validation workflow completed successfully at the recovered head.
+
+It passed the repository checks including:
+
+- formatting;
+- zig build check;
+- deterministic repository index checks;
+- dependency-graph checks;
+- command-reference checks;
+- port-contract checks;
+- smoke;
+- recipes;
+- conformance;
+- property;
+- fuzz-smoke;
+- differential;
+- tests;
+- validate-repository;
+- repository policy;
+- secret-pattern checks.
+
+This established that the recovered tree was internally coherent on GitHub.
+
+======================================================================
+9. LOCAL FORENSIC VALIDATION — FIRST RUN
+======================================================================
+
+The user then independently validated the recovered tree on a local x86_64 Linux machine with:
+
+    Zig 0.14.0
+    qemu-system-riscv64 11.0.1
+
+The first audit proved the focused substantive repairs locally:
+
+- project 58 unit test PASS;
+- project 58 smoke PASS;
+- bounded filesystem capacity compile-fail PASS 2/2;
+- project 54 unit test PASS;
+- project 54 smoke PASS;
+- project 59 unit test PASS;
+- project 59 smoke PASS;
+- deterministic repository indexes PASS;
+- dependency graph views PASS and acyclic;
+- 60 static port contracts PASS;
+- command reference PASS.
+
+The full repository check initially failed for one environmental reason only:
+
+    repository .venv/bin/python was missing
+
+The Zig test body still showed 30/30 tests passing in the check path and 245/245 tests passing in the larger validation path before the Python-environment-dependent gates failed.
+
+The repository itself printed the exact repair:
+
+    python3 -m venv .venv
+    .venv/bin/python -m pip install -r tools/requirements.txt
+
+This was an environment setup failure, not a source failure.
+
+======================================================================
+10. LOCAL REAL-MACHINE REGRESSION PROOF
+======================================================================
+
+In the same first audit, the inherited Batch 25B machine verifier was executed locally under real qemu-system-riscv64.
+
+The one-QEMU mutation/self-test passed.
+
+The normal two-QEMU verifier passed with the expected machine summary:
+
+    runs=2
+    syscalls=15
+    returns=14
+    terminal=37
+    stdin_generation=2
+    U=3
+    W+X=0
+    Morphic=765
+
+This was important evidence that the Batch 26 substrate and recovery work did not regress the already-proved real machine path.
+
+======================================================================
+11. LOCAL FORENSIC VALIDATION — FINAL RUN
+======================================================================
+
+After creating the repository Python virtual environment and installing the declared requirements, the complete local validation was rerun at recovered commit 332c35f under Zig 0.14.0.
+
+Final local results:
+
+Python environment:
+    PASS
+
+Validation evidence:
+    60 deterministic module evidence records validated
+
+zig build check --summary all:
+    74/74 steps succeeded
+    30/30 tests passed
+    RC=0
+
+zig build validate-repository --summary all:
+    350/350 steps succeeded
+    245/245 tests passed
+    RC=0
+
+python3 tools/developer-command.py validate-repository:
+    PASS
+    350/350 validation path succeeded
+    245/245 tests passed
+
+Agent/index state:
+    58 full agent-readable contracts
+    2 partial modules
+    partial means not yet fully integrated/system-proven, not invalid
+
+Thus the recovered checkpoint is not truncated trash, fabricated generated data, or a merely textual reconstruction. Its source, tests, contracts, indexes, and repository-wide validation all execute successfully from the recovered tree.
+
+======================================================================
+12. WHAT BATCH 26 STILL DID NOT HAVE
+======================================================================
+
+The same local audit checked for the required final Batch 26 verifier:
+
+    tools/verify-freestanding-riscv64-file-memory-exec.py
+
+Result:
+
+    MISSING
+
+The Batch 26 report therefore correctly remained:
+
+    status: PARTIAL
+    file_substrate=PASS
+    mapping_candidate=PASS
+    exec_candidate=PARTIAL
+    pt_interp_candidate=PARTIAL
+    machine_batch26=NOT_PROVED
+    resource_generation=preserved
+    W+X=0
+    inherited_qemu=PASS
+
+This is the exact remaining boundary.
+
+What exists:
+
+    reusable filesystem substrate
+    dynamic ELF/PT_INTERP planner boundary
+    mapping candidate state
+    exec-image candidate state
+    previous generation-bearing resource machinery
+    previous real Sv39 machinery
+    previous real machine verifier discipline
+
+What does NOT yet exist as Batch 26 proof:
+
+    real RV64 openat through project 58/project57 binding
+    real RV64 mmap through actual page tables
+    real RV64 mprotect through actual page tables
+    real RV64 munmap through actual page tables
+    real execve A→B image replacement
+    real filesystem-fed PT_INTERP resolution
+    real main+interpreter mapping
+    correct runtime ET_DYN load-bias entry proof
+    required startup/auxv handoff proof
+    strict Batch 26 mutation verifier
+    two-QEMU Batch 26 acceptance verifier
+
+Therefore Batch 26 itself is not complete yet even though its accepted substrate checkpoint is fully validated.
+
+======================================================================
+13. MERGE INTO MAIN
+======================================================================
+
+The complete recovered checkpoint was subsequently fast-forwarded into main.
+
+The important history became:
+
+    f1a47eb  Add Batch 26 file memory exec inheritance gate plan
+        ↓
+    9f2e8e2  Add Batch 26 inheritance substrates
+        ↓
+    4232ad9  Repair Batch 26 capacity and dynamic ELF contracts
+        ↓
+    9a9d0f0  Format bounded filesystem compile-fail fixture
+        ↓
+    867bffc  Format zero-capacity compile-fail fixture
+        ↓
+    332c35f  Synchronize Batch 26 PR53 repair artifacts
+
+The user's local main and origin/main both reached 332c35f with a clean working tree.
+
+The dedicated Batch 26 machine-completion plan was then added on main:
+
+    6f4a686  Add Batch 26 machine gate completion plan
+
+Future Codex work must start from current main. Do not reset to PR #52, PR #53, a salvage branch, or the old workspace artifact.
+
+======================================================================
+14. ACCEPTED ARCHITECTURE AFTER RECOVERY
+======================================================================
+
+The current intended composition is:
+
+FILE WORLD
+
+    Linux openat/path/fd/errno adapter
+        ↓
+    validated user pathname copy (existing user-memory machinery)
+        ↓
+    explicit directory capability / project58 ObjectId
+        ↓
+    project58 bounded filesystem lookup
+        ↓
+    open-file state only where actual pressure requires it
+        ↓
+    project57 generation-bearing ResourceRef
+        ↓
+    process-local Linux fd alias
+
+MEMORY WORLD
+
+    Linux mmap/mprotect/munmap adapter
+        ↓
+    project59 mapping candidate / policy validation
+        ↓
+    existing physical frame ownership
+        ↓
+    project49 real Sv39 mutation
+        ↓
+    project48 invalidation as required
+
+EXEC WORLD
+
+    execve pathname/argv/envp in old image
+        ↓
+    validate/copy all required old-image inputs before teardown
+        ↓
+    project58 filesystem bytes
+        ↓
+    project54 main ELF planning
+        ↓
+    optional project54 dynamic/PT_INTERP plan
+        ↓
+    project59 staged replacement candidate
+        ↓
+    project55 Linux initial stack
+        ↓
+    build replacement real mappings/page tables
+        ↓
+    atomic image commit
+        ↓
+    main entry OR correctly biased interpreter entry
+
+DYNAMIC HANDOFF WORLD
+
+    main ELF PT_INTERP
+        ↓
+    filesystem interpreter lookup
+        ↓
+    interpreter ET_DYN plan
+        ↓
+    chosen load bias
+        ↓
+    biased interpreter runtime entry
+        ↓
+    justified Linux startup facts / auxv
+        ↓
+    userspace interpreter
+
+The kernel does not perform userspace relocation.
+
+======================================================================
+15. MINMAX ROADMAP — FEWEST LARGE INHERITANCE GATES
+======================================================================
+
+The old numbered roadmap remains useful as an internal checklist, but it must not force one campaign per number.
+
+The preferred strategic compression from current main is approximately FIVE large inheritance campaigns.
+
+The question at every boundary is:
+
+    What is the smallest missing permanent surface whose implementation causes the largest existing software world to become ours?
+
+Leverage metric:
+
+                    useful existing software newly reachable
+    LEVERAGE   =   ------------------------------------------
+                         permanent new kernel complexity
+
+---------------------------------------------------------------------
+CAMPAIGN 1 — FINISH BATCH 26 REAL PROCESS-IMAGE GATE
+---------------------------------------------------------------------
+
+Pressure target:
+real RV64 userspace file + mapping + exec + PT_INTERP path
+
+Required proof:
+
+    program A
+      -> openat deterministic file
+      -> read through real resource binding
+      -> mmap real userspace memory
+      -> mprotect real mapping
+      -> prove changed access/fault semantics
+      -> munmap
+      -> prove removal/fault semantics
+      -> execve program B
+      -> resolve main image from project58
+      -> derive PT_INTERP
+      -> resolve interpreter through project58
+      -> map main/interpreter
+      -> apply correct ET_DYN load bias
+      -> create justified initial stack/auxv
+      -> enter interpreter
+      -> deterministic terminal evidence
+
+Acceptance:
+
+    python3 tools/verify-freestanding-riscv64-file-memory-exec.py --self-test
+    python3 tools/verify-freestanding-riscv64-file-memory-exec.py
+
+Both PASS, including two independent QEMU runs.
+
+Do not expand this campaign into a complete POSIX implementation. Add only the mechanisms forced by the acceptance path.
+
+---------------------------------------------------------------------
+CAMPAIGN 2 — MUSL + BUSYBOX PRESSURE, NOT A SYSCALL CHECKLIST
+---------------------------------------------------------------------
+
+Do not create separate external batches merely named threads, signals, futex, poll, pipe, tty, time, etc. Use dynamic musl + BusyBox as the pressure oracle and implement the smallest coherent set it actually requires.
+
+Likely pressure may include:
+
+- process/thread creation;
+- TLS;
+- futex;
+- signal handling/masks/return;
+- pipes;
+- poll/ppoll and perhaps epoll only if actual pressure requires it;
+- clocks/timers/sleep;
+- brk/mmap refinements;
+- seek/stat metadata minimums;
+- tty/ioctl minimums;
+- sockets/DNS only when selected BusyBox/musl pressure reaches them.
+
+Likely does not mean pre-implement everything. Instrument actual musl/BusyBox failures and repair the first missing permanent mechanism.
+
+Acceptance target:
+
+    dynamic musl works
+        ↓
+    BusyBox runs
+        ↓
+    BusyBox /bin/sh works
+        ↓
+    representative real shell commands work
+
+One mechanism that unlocks multiple later surfaces counts as one permanent mechanism, not multiple batches.
+
+---------------------------------------------------------------------
+CAMPAIGN 3 — ALPINE + APK INHERITANCE GATE
+---------------------------------------------------------------------
+
+Once dynamic musl/BusyBox is viable, use a minimal Alpine userspace as the next oracle.
+
+Do not manually build Python/Node/Clang/Wasmtime support as separate kernel projects first.
+
+Target:
+
+    Alpine userspace
+        ↓
+    /bin/sh
+        ↓
+    required filesystem/process/network minimums
+        ↓
+    apk works
+        ↓
+    package ecosystem becomes reachable
+
+The pivotal gate is not merely printing an Alpine banner. It is package-manager capability:
+
+    download/configure/install/run
+
+Once apk works, pressure can come from existing packages rather than imagined ABI completeness.
+
+Inheritance examples after that gate may include Python, Node, Clang, Wasmtime and many other packages, subject to whatever packages and dependencies are actually available in the selected Alpine repository.
+
+This is the core MinMax multiplication step:
+
+    relatively small compatible kernel surface
+          ↓
+    apk
+          ↓
+    enormous existing software surface
+
+---------------------------------------------------------------------
+CAMPAIGN 4 — QEMU/TCG AS THE NEXT PRESSURE ORACLE
+---------------------------------------------------------------------
+
+After Alpine/package installation works, attempt real QEMU as software, not a hand-designed imitation of its requirements.
+
+Let QEMU expose the missing host ABI/mechanism surface.
+
+Likely pressure may include:
+
+- large mmap/protection lifecycles;
+- shared mappings;
+- mature threads/TLS/futex;
+- signals;
+- poll/epoll;
+- pipes/event-style descriptors;
+- clocks/timers;
+- sockets;
+- filesystem behavior;
+- ioctl/tty/device surfaces.
+
+Again, likely does not mean implement all of these in advance.
+
+Acceptance target:
+
+    QEMU executable runs on Alpz
+        ↓
+    TCG executes a guest machine
+        ↓
+    first guest OS boots
+
+This yields a huge inheritance jump before native hardware virtualization exists.
+
+---------------------------------------------------------------------
+CAMPAIGN 5 — NATIVE RISC-V H-EXTENSION + MINIMAL KVM COMPATIBILITY
+---------------------------------------------------------------------
+
+After QEMU/TCG works, implement the native RISC-V virtualization mechanisms required for a real Alpz hypervisor:
+
+- HS/VS state boundary;
+- guest CSR state;
+- hgatp;
+- stage-2 translation;
+- HFENCE behavior;
+- guest-memory ownership;
+- VM object;
+- vCPU object;
+- guest entry;
+- guest exit classification;
+- virtual interrupts;
+- virtual timers.
+
+Native hypervisor acceptance:
+
+    Alpz
+      -> create VM
+      -> create/configure vCPU
+      -> enter VS guest
+      -> guest executes
+      -> controlled exit
+      -> host resumes with correct state
+
+Then add the smallest /dev/kvm compatibility surface actually required by QEMU, rather than reproducing Linux KVM wholesale.
+
+Likely minimal pressure begins around:
+
+    /dev/kvm
+        ↓
+    KVM_CREATE_VM
+        ↓
+    guest-memory registration
+        ↓
+    KVM_CREATE_VCPU
+        ↓
+    vCPU shared run state
+        ↓
+    KVM_RUN
+
+Acceptance target:
+
+    QEMU already works as software on Alpz
+        +
+    Alpz native H-extension hypervisor works
+        +
+    minimal QEMU-required /dev/kvm compatibility works
+        ↓
+    QEMU/KVM ON ALPZ
+
+Do not implement Linux KVM ioctls that QEMU does not pressure merely for API-count completeness.
+
+======================================================================
+16. THE FIVE-CAMPAIGN COMPRESSED VIEW
+======================================================================
+
+    CURRENT MAIN
+    accepted Batch26 substrate + recovery
+            │
+            ▼
+    ┌─────────────────────────────────────┐
+    │ 1. REAL FILE+MMAP+EXEC+PT_INTERP   │
+    └─────────────────────────────────────┘
+            │
+            ▼
+    real process-image environment
+            │
+            ▼
+    ┌─────────────────────────────────────┐
+    │ 2. MUSL + BUSYBOX PRESSURE          │
+    └─────────────────────────────────────┘
+            │
+            ▼
+    dynamic BusyBox shell
+            │
+            ▼
+    ┌─────────────────────────────────────┐
+    │ 3. ALPINE + APK                     │
+    └─────────────────────────────────────┘
+            │
+            ├── existing language/tool packages
+            ├── existing utilities
+            └── future package pressure
+            │
+            ▼
+    ┌─────────────────────────────────────┐
+    │ 4. QEMU / TCG                       │
+    └─────────────────────────────────────┘
+            │
+            ▼
+    first guest OS under software emulation
+            │
+            ▼
+    ┌─────────────────────────────────────┐
+    │ 5. H-EXTENSION + MINIMAL /dev/kvm  │
+    └─────────────────────────────────────┘
+            │
+            ▼
+    QEMU/KVM ON ALPZ
+
+These are strategic campaigns, not promises that each must fit one Codex task. Internal commits/gates may be numerous. What must be minimized is permanent architecture and externally fragmented milestone churn, not necessary debugging or evidence.
+
+======================================================================
+17. MINMAX DECISION LAW FOR FUTURE CODEX RUNS
+======================================================================
+
+Before implementing a new permanent mechanism, ask in order:
+
+1. What real inheritance target is currently failing?
+2. What is the first missing semantic/mechanism fact that prevents that target from continuing?
+3. Does an existing module already solve most of it?
+4. Can the missing behavior be implemented once below multiple compatibility personalities?
+5. What Linux-specific quirks can remain quarantined in the Linux adapter?
+6. Can the same mechanism later serve QuirkM and/or WASI without inheriting Linux identity?
+7. Is there a smaller mechanism that unlocks the same target?
+8. Can an existing software ecosystem perform the rest of the work for us once this one gate exists?
+9. What decisive real-machine or real-software proof establishes that the inheritance boundary was actually crossed?
+
+Never substitute:
+
+    "Linux has syscall X, therefore implement X"
+
+for:
+
+    "our current inheritance target failed because semantic capability Y is missing; implement the smallest reusable Y."
+
+======================================================================
+18. WHAT FUTURE CODEX MUST NOT DO
+======================================================================
+
+Do not:
+
+- restart Batch 26 from the old PR branches;
+- distrust or replace the recovered source merely because the recovery history was complicated;
+- blindly replay the old pasted patch;
+- collapse ObjectId, ResourceRef, and Linux fd into one identity;
+- weaken project 54's preserved static planner to make dynamic ELF easier;
+- move ELF relocation into the kernel;
+- treat project 59 candidate state as proof of real page-table mutation;
+- claim machine mmap from a logical mapping table;
+- claim execve without program-A→program-B real execution;
+- claim PT_INTERP by merely parsing a pathname without real interpreter mapping/entry;
+- jump to raw ET_DYN e_entry after choosing a nonzero load bias;
+- trust a kernel-emitted PASS string as independent verification;
+- weaken W+X=0;
+- hard-code ResourceRef generation 1;
+- mark Batch 26 PASS without the new verifier;
+- turn the Alpine road into dozens of speculative compatibility batches;
+- implement a complete VFS, complete POSIX, complete KVM, or complete Linux subsystem merely because Linux contains one.
+
+======================================================================
+19. CURRENT CODEx HANDOFF
+======================================================================
+
+Start from current main.
+
+Read this recovery/provenance handoff first enough to understand what is accepted and what is missing, then execute:
+
+    docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_26_MACHINE_GATE_COMPLETION.txt
+
+Current mission:
+
+    finish real RV64 Batch 26 machine integration
+        ↓
+    prove it independently
+        ↓
+    preserve the recovered/validated substrate
+        ↓
+    make Batch 26 PASS only with real evidence
+
+After Batch 26 PASS, do not automatically create many numbered compatibility batches. Re-evaluate actual musl/BusyBox pressure and select the smallest next permanent mechanism with maximum inheritance yield.
+
+======================================================================
+20. FINAL CONTINUITY STATEMENT
+======================================================================
+
+The Batch 26 mishap was a delivery/continuation failure around a partially completed campaign, not a loss of the completed substrate work.
+
+What was recovered and validated is real:
+
+- bounded filesystem substrate;
+- corrected capacity invariants;
+- preserved static ELF planner;
+- distinct dynamic ELF/PT_INTERP planner;
+- staged mapping/exec candidate;
+- corrected project contracts;
+- synchronized deterministic indexes;
+- synchronized validation evidence;
+- fresh GitHub CI;
+- independent local Zig 0.14.0 repository validation;
+- independent local inherited two-QEMU regression proof.
+
+What remains is equally explicit:
+
+- real Batch 26 file/memory/exec/interpreter machine integration;
+- strict mutation proof;
+- two-QEMU Batch 26 verifier.
+
+Do not confuse a fully recovered and validated substrate checkpoint with a fully completed Batch 26 machine milestone.
+
+Minimum permanent mechanism.
+Maximum inherited civilization.
