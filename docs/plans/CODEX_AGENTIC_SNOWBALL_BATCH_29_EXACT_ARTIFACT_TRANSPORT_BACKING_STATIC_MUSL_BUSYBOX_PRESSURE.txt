@@ -1,0 +1,497 @@
+CODEX AGENTIC SNOWBALL — BATCH 29
+EXACT ARTIFACT TRANSPORT + GENERAL PREPARED BACKING → REAL STATIC MUSL → IMMEDIATE BUSYBOX PRESSURE
+
+Repository:
+thanks-cohn/zig-reference
+
+Canonical request path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_29_EXACT_ARTIFACT_TRANSPORT_BACKING_STATIC_MUSL_BUSYBOX_PRESSURE.txt
+
+======================================================================
+AUTHORITATIVE START
+======================================================================
+
+Start from CURRENT main. Do not reset to an older batch commit.
+
+At request creation, main was:
+
+    64b1900d6f108f4abaa77bd97a919d47510d1f72
+
+This SHA is a reference marker only. If main has advanced, inspect and use the
+new current main unless a real regression requires otherwise.
+
+PR #60 / Batch 28 is merged. It established:
+
+- project 59 MaterializedImage consumption in the real freestanding RV64 exec path;
+- full prepared-page COMMIT with final Sv39 permissions;
+- PREPARE/COMMIT preservation with no ordinary allocation after destructive unmap;
+- static no-PT_INTERP orchestration;
+- dynamic PT_INTERP behavior preserved;
+- one-QEMU Batch 26 self-test with all 17 mutations rejected;
+- two-QEMU Batch 26 proof with PREPARE/COMMIT, causal generation, and W+X=0;
+- green zig build check and validate-repository.
+
+It deliberately did NOT claim that the exact static musl or BusyBox artifacts
+execute under Morphic.
+
+Read before changing code:
+
+    AGENTS.md
+    COMMANDS.md
+    docs/reports/AGENTIC_SNOWBALL_BATCH_28.md
+    docs/reports/AGENTIC_SNOWBALL_BATCH_27.md
+    docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_28_MACHINE_MATERIALIZER_REAL_MUSL_BUSYBOX_EXECUTION.txt
+    docs/concepts/PRESSURE_ORACLE_INHERITANCE_ENGINEERING_VOCABULARY.md
+    docs/papers/EMPIRICAL_KERNEL_DISTILLATION.md
+    docs/roadmaps/ALPZ_TO_ALPINE_QEMU_KVM_AND_BEYOND.md
+    docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md
+
+Run the repository fast path first:
+
+    python3 tools/query-reference.py agent bootstrap
+    python3 tools/query-reference.py agent doctor
+
+Then use agent decide/card/compose/impact/preflight/diagnostic where useful.
+Query and reuse before inventing a new permanent module.
+
+======================================================================
+CURRENT FRONTIER — DO NOT REDO CLOSED WORK
+======================================================================
+
+The real machine adapter now consumes MaterializedImage pages generically.
+The remaining OBSERVED blockers for the exact static musl target are:
+
+1. bounded, reproducible transport of the exact external artifact into the
+   freestanding Morphic machine execution proof;
+2. general PREPARE-time reservation of enough physical image backing and any
+   newly required Sv39 page-table backing.
+
+Current historical fixture constraints include:
+
+    const physical_pool_pages = 8;
+    const Batch26MaterializedImage = address_space.MaterializedImage(4);
+    var batch26_image_backing: [2]usize = .{ 0, 0 };
+
+These are proof-fixture bounds, not architectural truths.
+
+Measured exact pressure:
+
+- static musl diagnostic: 3 materialized pages;
+- pinned Alpine busybox.static: 245 materialized pages.
+
+Do not reopen multi-PT_LOAD image construction unless a real failure proves it
+incorrect.
+Do not rebuild the old first-segment path.
+Do not make a BusyBox-specific loader.
+Do not pre-implement a Linux syscall checklist.
+
+======================================================================
+EXACT PRESSURE ARTIFACTS — SAME BYTES, NO SUBSTITUTES
+======================================================================
+
+1. Static RV64 musl diagnostic
+
+    source:
+        tools/fixtures/batch27-static-musl-diagnostic.c
+
+    build:
+        zig cc -target riscv64-linux-musl -static -Os -s
+
+    exact executable SHA-256:
+        ff9761d82b7ae05bc577ea46acd4bd9119e29a28e9b1ccb621514df11fd8b74d
+
+    golden output:
+        batch27-static-musl
+
+2. Alpine v3.22 RV64 busybox-static
+
+    package:
+        busybox-static-1.37.0-r20.apk
+
+    package SHA-256:
+        29072f0a72ff8f2ff19a8be703cf0e68d4722ea4dc0acf4830acc932f98cf31c
+
+    executable:
+        bin/busybox.static
+
+    exact executable SHA-256:
+        62831fb7c4a0da509481107a8aeb022244235c5dced18101e3d39131d303d704
+
+    golden shell invocation:
+        busybox.static sh -c 'echo batch27'
+
+    golden output:
+        batch27
+
+Do not recompile BusyBox.
+Do not patch, relink, truncate, rewrite, or translate either external binary.
+Do not commit external binaries to the repository.
+The Morphic proof and golden reference must identify the same exact bytes.
+
+======================================================================
+BATCH 29 PRIMARY MISSION
+======================================================================
+
+Cross the FIRST REAL MUSL EXECUTION boundary as quickly as architecture permits,
+then immediately pressure the exact static BusyBox artifact.
+
+Desired progression in ONE continuous Codex campaign:
+
+    PR #60 closed machine-integration frontier
+        ->
+    exact artifact transport into freestanding machine proof
+        ->
+    general bounded PREPARE-time image-backing reservation
+        ->
+    reserve any necessary page-table backing before destructive COMMIT
+        ->
+    exact 3-page static musl image reaches U-mode
+        ->
+    observe FIRST REAL runtime incompatibility
+        ->
+    classify it
+        ->
+    implement smallest correct neutral mechanism OR Linux-edge repair
+        ->
+    causal proof
+        ->
+    retry SAME exact musl artifact immediately
+        ->
+    exact output: batch27-static-musl
+        ->
+    STATIC MUSL BOUNDARY WIN
+        ->
+    immediately retry exact busybox.static
+        ->
+    busybox.static true
+        ->
+    busybox.static echo batch27
+        ->
+    busybox.static sh -c 'echo batch27'
+        ->
+    STATIC BUSYBOX / SH BOUNDARY WIN if naturally reachable
+
+Do NOT stop merely because artifact transport works.
+Do NOT stop merely because backing reservation works.
+Do NOT stop merely because the musl entry point is reached.
+Do NOT stop after musl PASS if BusyBox can be attempted in the same execution
+context.
+Do NOT stop after BusyBox true if echo or sh can be attempted.
+
+Continue while failures are repairable, causal, and within this campaign.
+Checkpoint only at genuine Frontier Movement or a genuine external/architectural
+boundary.
+
+======================================================================
+1. EXACT ARTIFACT TRANSPORT
+======================================================================
+
+Extend the existing pressure/build/run orchestration so the exact hash-checked
+external artifact can be supplied to the freestanding machine proof without
+vendoring it.
+
+Requirements:
+
+- acquisition remains reproducible and fail closed on SHA-256;
+- golden and Morphic worlds consume the same exact executable identity;
+- temporary/generated external bytes remain outside tracked source;
+- the transport path is explicit and rerunnable from a clean checkout;
+- transport plumbing stays outside ELF/materialization semantics;
+- no synthetic replacement fixture may stand in for the real artifact;
+- the independent verifier must be able to recover or recompute the exact
+  artifact identity used by the machine run.
+
+Prefer repository-native build/recipe conventions. Do not introduce a permanent
+kernel concept merely to move test bytes from host storage into a machine proof.
+
+======================================================================
+2. GENERAL PREPARED BACKING RESERVATION
+======================================================================
+
+Replace the historical two-image-frame assumption with the smallest correct
+general mechanism or machine-adapter composition that reserves backing for the
+prepared image BEFORE destructive COMMIT.
+
+Required semantics:
+
+- required image-frame count derives from prepared MaterializedImage pages;
+- page-table expansion requirements are accounted for before COMMIT when the
+  existing Sv39 builder may need additional tables;
+- every successfully reserved frame has explicit ownership;
+- PREPARE failure leaves the old executable image live;
+- failed reservation releases anything newly reserved before returning;
+- COMMIT performs no ordinary fallible frame allocation;
+- no frame is silently reused for two simultaneously live image pages;
+- no partial image is committed on reservation/capacity failure;
+- all final user mappings preserve the MaterializedImage permissions exactly;
+- W+X remains prohibited;
+- backing design is not encoded as "musl needs 3" or "BusyBox needs 245".
+
+The machine proof may remain explicitly bounded. BOUNDED is good. The bound must
+be an honest resource/capacity policy, not a historical two-frame assumption or
+a BusyBox-shaped magic number pretending to be architecture.
+
+If the smallest ASAP solution uses an explicitly sized linker/test-harness-owned
+physical region, keep that policy in the machine/test adapter and document it as
+such. Do not fossilize a fixture capacity into neutral Morphic semantics.
+
+Reuse the existing physical-memory-region-set, physical-page-frame-allocator,
+Sv39 page owner/builder, fixed-capacity storage, and resource-planning machinery
+when their responsibilities fit.
+
+======================================================================
+3. PRESERVE PREPARE / COMMIT ATOMICITY
+======================================================================
+
+Batch 26's exec atomicity remains non-negotiable.
+
+PREPARE must complete all ordinary failure-prone work needed for the candidate:
+
+- userspace path/argv/envp capture;
+- external artifact identity/availability as appropriate to orchestration;
+- ELF planning;
+- MaterializedImage preparation;
+- stack planning;
+- backing capacity calculation;
+- image-frame reservation;
+- any page-table resource budgeting/reservation required for deterministic COMMIT;
+- compatibility validation.
+
+Only after PREPARE succeeds may COMMIT destructively replace the old image.
+
+If the current Sv39 builder makes deterministic no-allocation COMMIT impossible
+without an additional reusable preparation surface, let the real failure expose
+that need and implement only the smallest correct capability. Do not disguise a
+COMMIT-time allocation failure with shutdown or an oversized accidental pool.
+
+======================================================================
+4. STATIC MUSL IS THE NEXT AUTHORITATIVE ORACLE
+======================================================================
+
+Once the exact musl image can truthfully enter U-mode, stop speculating.
+Run it.
+
+The first real runtime failure determines the next repair.
+
+Classify every failure as one of:
+
+A. neutral Morphic mechanism missing;
+B. Linux compatibility/personality behavior missing;
+C. machine-adapter/resource plumbing defect;
+D. verifier/orchestration defect;
+E. external environment impossibility.
+
+For A:
+keep the mechanism architecture-neutral and minimally generative.
+
+For B:
+keep Linux syscall numbers, errno, startup quirks, and historical policy at the
+compatibility edge.
+
+For C/D:
+repair the adapter/proof rather than polluting the foundation.
+
+No fake syscall success.
+No supervisor-side precomputed output.
+No special case "if this is musl" behavior.
+No broad syscall implementation in anticipation of later software.
+
+Success for static musl means the exact external binary itself executes under
+Morphic and produces the exact expected output through the real machine path.
+
+======================================================================
+5. IMMEDIATE BUSYBOX PRESSURE AFTER MUSL
+======================================================================
+
+As soon as static musl passes, use the exact pinned busybox.static artifact.
+
+Pressure sequence:
+
+    busybox.static true
+    busybox.static echo batch27
+    busybox.static sh -c 'echo batch27'
+
+For each first failure:
+
+    observe
+    -> identify first semantic divergence
+    -> reduce when useful
+    -> classify
+    -> smallest correct repair
+    -> causal proof
+    -> retry SAME exact BusyBox
+
+Do not implement shell features ourselves.
+Do not patch BusyBox around Morphic.
+Do not jump to dynamic musl until the static BusyBox frontier has either won or
+exposed a genuine bounded blocker that should be checkpointed separately.
+
+If the general backing design reaches a new capacity boundary at BusyBox's 245
+pages, treat that as real pressure. Do not blindly inflate one constant solely to
+make the number disappear. Make the smallest honest reusable capacity/backing
+repair and continue if feasible.
+
+======================================================================
+6. CAUSAL MACHINE PROOF
+======================================================================
+
+Extend or add an independent machine verifier appropriate to the exact external
+artifact path.
+
+It must not trust a printed PASS marker from Morphic.
+
+For the musl boundary, independently establish at minimum:
+
+- exact SHA-256 of the executed artifact;
+- ELF geometry / relevant PT_LOAD facts from the external bytes;
+- expected materialized page count and virtual geometry;
+- actual U-mode entry/execution attributable to those bytes;
+- exact expected stdout result;
+- clean/expected termination semantics;
+- no W+X user mapping;
+- PREPARE failure atomicity for decisive capacity/transport mutations;
+- no successful claim when artifact identity is mutated;
+- deterministic repeat execution where repository machine-proof convention
+  requires it.
+
+Preserve all inherited Batch 25B and Batch 26 machine proofs.
+
+If a new mechanism is added, give it a focused semantic proof and a causal
+mutation when practical. The external application result is the pressure oracle;
+the independent proof establishes why the claimed boundary is true.
+
+======================================================================
+7. CORNERSTONE NEUTRALITY / RESEARCH ADMISSION TEST
+======================================================================
+
+Before admitting any new permanent Morphic mechanism, answer explicitly in the
+report or implementation reasoning:
+
+1. Which exact observed real-software failure exposed it?
+2. Why can the need not remain entirely in a compatibility personality/adapter?
+3. Which non-Linux or future systems could naturally reuse the mechanism?
+4. Which historical representation/API details are deliberately excluded?
+5. What is the minimum semantic contract?
+6. What is the irreversibility cost if this abstraction is wrong?
+7. Which causal proof demonstrates necessity and correctness?
+
+Pressure discovers mechanisms. Pressure does not get to define them badly.
+
+======================================================================
+8. REPORTING / CHECKPOINT DISCIPLINE
+======================================================================
+
+Create/update the Batch 29 report under docs/reports/ and keep COMMANDS.md current.
+
+Record, in order:
+
+- exact starting frontier;
+- exact artifact identity;
+- first observed failure;
+- classification;
+- smallest repair;
+- causal proof;
+- retry result;
+- strongest boundary actually reached;
+- next first blocker if the campaign stops.
+
+Never write "musl works" because an ELF parsed or reached its entry.
+Never write "BusyBox works" because one special probe or golden qemu-riscv64 run
+succeeded.
+Never write "Alpine-ready" merely because BusyBox shell succeeds.
+
+A bounded honest frontier is better than an inflated claim.
+
+======================================================================
+9. VALIDATION — REQUIRED BEFORE CHECKPOINT / PR COMPLETION
+======================================================================
+
+Run focused tests for every changed module/recipe plus the full inherited checks.
+At minimum, where applicable:
+
+    python3 tools/pressure-real-rv64-userspace.py --artifact-only
+    python3 tools/verify-freestanding-riscv64-file-memory-exec.py --self-test
+    python3 tools/verify-freestanding-riscv64-file-memory-exec.py
+    zig build check
+    zig build validate-repository
+    PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+    python3 tools/check-repository-policy.py
+
+Also run the new exact-external-artifact Morphic verifier in self-test/mutation
+mode and full deterministic machine mode if introduced.
+
+If the environment lacks qemu-system-riscv64, do not call the machine boundary
+closed. Leave an honest checkpoint and provide the exact command needed in an
+environment where QEMU exists.
+
+Keep Zig baseline 0.14.0.
+Do not commit binaries, downloaded APKs, extracted external binaries, temporary
+outputs, caches, or generated opaque artifacts outside repository policy.
+Regenerate all canonical indexes/contracts/evidence affected by changed recipes
+or modules before final validation.
+
+======================================================================
+NON-GOALS FOR THIS CAMPAIGN
+======================================================================
+
+Do NOT pre-build:
+
+- full POSIX;
+- a speculative Linux syscall matrix;
+- dynamic musl before static BusyBox pressure justifies moving on;
+- Alpine rootfs/init;
+- apk;
+- XFCE;
+- Firefox;
+- QEMU/TCG;
+- KVM;
+- general DTB/RAM discovery unless the exact current pressure proves it is the
+  smallest correct machine-level repair;
+- demand paging, SMP, ASIDs, general production PMM/VMM work unless directly
+  required by the exact pressure target.
+
+The fastest path to Alpine is to close the real compatibility frontier in front
+of us, not to prebuild the future.
+
+======================================================================
+SUCCESS LADDER
+======================================================================
+
+Minimum acceptable Frontier Movement:
+
+    exact artifact transport + honest general backing reservation proven
+
+Strong Batch 29 boundary:
+
+    exact static musl diagnostic executes under Morphic
+    and prints exactly:
+
+        batch27-static-musl
+
+Stronger same-run boundary:
+
+    busybox.static true
+    -> busybox.static echo batch27
+    -> busybox.static sh -c 'echo batch27'
+
+If the BusyBox shell is reached, record it as a historical Boundary Win and make
+the next campaign dynamic musl / dynamic BusyBox on the shortest path to an
+unmodified Alpine minirootfs /bin/sh.
+
+======================================================================
+GOVERNING PRINCIPLES
+======================================================================
+
+Minimum permanent mechanism.
+Maximum inherited civilization.
+Maximum research possibility.
+Real software determines priority.
+Compatibility belongs at the edges.
+Generative mechanisms belong at the center.
+Inherit aggressively.
+Fossilize cautiously.
+PREPARE before COMMIT.
+Prove causally.
+Retry the same exact target immediately.
+Do not stop at an intermediate gate when the next multiplier is naturally
+reachable.
