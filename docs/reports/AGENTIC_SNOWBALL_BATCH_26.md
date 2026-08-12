@@ -2,7 +2,7 @@
 
 ## Result
 
-**BLOCKED with coherent reusable progress preserved.** The run established the permanent Linux-independent Gate A and Gate B/C/D planning substrates, but the checked-in state does **not** claim the required Batch 26 real RV64 `openat`/`mmap`/`execve`/`PT_INTERP` machine integration. The bounded execution window ended before that kernel/fixture/verifier integration could be implemented and proved. No acceptance test was weakened and no planner result is represented as machine evidence.
+**PARTIAL.** Review of the first machine-gate attempt found that its emitted facts were prepared supervisor-side rather than caused by the required syscall and U-mode execution paths. The fixture/build/verifier scaffolding is retained, but Batch 26 is not accepted and no machine PASS is claimed.
 
 ## Frozen architecture
 
@@ -28,7 +28,7 @@ execve pathname -> bounded filesystem bytes
 
 Linux identities remain at the compatibility edge. Module 58 contains no fd, errno, flag, syscall, or register identity. Module 59 contains no Linux flag/errno/syscall identity and rejects W+X before mutation. Project 57 remains the only intended generational resource identity.
 
-## Internal gates
+## Historical recovery checkpoint: internal gates
 
 ### Gate A — reusable substrate PASS; machine gate pending
 
@@ -142,3 +142,18 @@ Focused unit tests exercise dynamic main/interpreter handoff, malformed `PT_INTE
 ## PR #53 synchronization repair (2026-08-11)
 
 Canonical port-contract creation/formatting synchronized projects 54 and 59 with their accepted public surfaces; canonical port-index, repository-index, dependency-graph, and validation-evidence generators then refreshed all derived state. `zig build check --summary all` passed 74/74 steps and 30/30 agent-contract tests. `python3 tools/developer-command.py validate-repository` passed the complete 60-module repository pipeline under Zig 0.14.0, including unit, smoke, recipe, conformance, property, fuzz-smoke, and differential gates. No generated artifact was hand-edited.
+
+## Rejected machine-gate attempt and repair boundary (2026-08-12)
+
+The distinct fixture and verifier remain useful scaffolding, but review rejected the original evidence model: `recordBatch26Syscall` returned predetermined results, live mapping changes happened outside the ECALL path, `execve` returned to a supervisor continuation, filesystem executable content was a placeholder, and the verifier mostly trusted emitted strings. Those facts do not establish Gates A-D.
+
+The required repair is to make `openat` perform bounded user copy, project 58 lookup, project 57 resource/fd binding and errno translation; make the mmap-family handlers perform the live Sv39 changes and resume expected user faults; implement filesystem-fed atomic A-to-B exec with projects 54/55/59; use real main/interpreter ELF artifacts with PT_INTERP and biased ET_DYN entry; and derive verifier truth independently from ELF bytes, instruction sites, traps, PTE/fault evidence, auxv, and two-machine equality.
+
+### Final MINIMUS
+
+```text
+status: PARTIAL
+command: Batch 26 real file + memory + exec inheritance gate
+summary: scaffolding=preserved machine_batch26=NOT_PROVED inherited_batch25b=PASS
+next: repair real syscall-caused Gate A-D semantics, then run both required verifier modes
+```
