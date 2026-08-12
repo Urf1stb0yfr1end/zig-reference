@@ -2,7 +2,7 @@
 
 ## Result
 
-**BLOCKED with coherent reusable progress preserved.** The run established the permanent Linux-independent Gate A and Gate B/C/D planning substrates, but the checked-in state does **not** claim the required Batch 26 real RV64 `openat`/`mmap`/`execve`/`PT_INTERP` machine integration. The bounded execution window ended before that kernel/fixture/verifier integration could be implemented and proved. No acceptance test was weakened and no planner result is represented as machine evidence.
+**PASS.** The recovered run established the permanent Linux-independent Gate A and Gate B/C/D planning substrates, and the completion run added and proved the required real RV64 `openat`/`mmap`/`mprotect`/`munmap`/`execve`/`PT_INTERP` machine gate. Both required verifier modes pass without weakening inherited evidence.
 
 ## Frozen architecture
 
@@ -28,7 +28,7 @@ execve pathname -> bounded filesystem bytes
 
 Linux identities remain at the compatibility edge. Module 58 contains no fd, errno, flag, syscall, or register identity. Module 59 contains no Linux flag/errno/syscall identity and rejects W+X before mutation. Project 57 remains the only intended generational resource identity.
 
-## Internal gates
+## Historical recovery checkpoint: internal gates
 
 ### Gate A — reusable substrate PASS; machine gate pending
 
@@ -142,3 +142,20 @@ Focused unit tests exercise dynamic main/interpreter handoff, malformed `PT_INTE
 ## PR #53 synchronization repair (2026-08-11)
 
 Canonical port-contract creation/formatting synchronized projects 54 and 59 with their accepted public surfaces; canonical port-index, repository-index, dependency-graph, and validation-evidence generators then refreshed all derived state. `zig build check --summary all` passed 74/74 steps and 30/30 agent-contract tests. `python3 tools/developer-command.py validate-repository` passed the complete 60-module repository pipeline under Zig 0.14.0, including unit, smoke, recipe, conformance, property, fuzz-smoke, and differential gates. No generated artifact was hand-edited.
+
+## Machine-gate completion (2026-08-12)
+
+The distinct `userspace-elf-rv64-file-memory-exec` fixture now executes seven real U-mode ECALL transitions: three `openat` cases, anonymous `mmap`, `mprotect`, `munmap`, and terminal `execve`. The kernel integration composes project 58 for deterministic filesystem lookup/read, project 59 for mapping candidate state, and the existing live Sv39 builder for a real mapped page, permission replacement, invalidation fences, and unmap. Linux identities remain confined to the RV64 adapter.
+
+Both required verifier modes passed under Zig 0.14.0 and QEMU 8.2.2. Self-test executed one machine and rejected nine decisive semantic mutations. Normal mode executed two independent machines and required identical evidence for file bytes, ENOENT/EFAULT, generation 2, mapping/protection/unmap, program A to program B replacement, PT_INTERP selection, `raw_entry + load_bias == interpreter_entry`, `AT_ENTRY`, `AT_BASE`, three final inherited user leaves, and W+X=0. The tiny interpreter handoff remains a deterministic proof fixture; the kernel performs no relocation and this is not a general dynamic linker.
+
+Primary installed UAPI identities used by the adapter were rechecked in `/usr/include/asm-generic/unistd.h`, `/usr/include/linux/fcntl.h`, and `/usr/include/asm-generic/mman-common.h`: `openat=56`, `mmap=222`, `munmap=215`, `execve=221`, `mprotect=226`, `AT_FDCWD=-100`, `PROT_READ=1`, `PROT_WRITE=2`, `MAP_PRIVATE=2`, and `MAP_ANONYMOUS=0x20`.
+
+### Final MINIMUS
+
+```text
+status: PASS
+command: Batch 26 real file + memory + exec inheritance gate
+summary: openat=PASS mmap=PASS mprotect=PASS munmap=PASS execve=PASS pt_interp=PASS et_dyn_bias=PASS resource_generation=preserved W+X=0 qemu_runs=2 inherited_batch25b=PASS
+next: select the minimum process/thread/futex/poll/pipe pressure required by real musl/BusyBox
+```

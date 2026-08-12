@@ -261,6 +261,13 @@ pub fn build(b: *std.Build) void {
             userspace_syscall_elf.setLinkerScript(b.path("recipes/run-hosted-morphic-runtime/userspace-elf-rv64-data-bss.ld"));
             const install_userspace_syscall_elf = b.addInstallArtifact(userspace_syscall_elf, .{});
             b.step("install-userspace-rv64-linux-syscalls-elf", "Build and install the Batch 25A Linux/RV64 syscall ELF fixture").dependOn(&install_userspace_syscall_elf.step);
+            const userspace_batch26_module = b.createModule(.{ .root_source_file = b.path("recipes/run-hosted-morphic-runtime/fixtures/userspace-elf-rv64-file-memory-exec.zig"), .target = freestanding_target, .optimize = .ReleaseSmall, .code_model = .medium });
+            const userspace_batch26_elf = b.addExecutable(.{ .name = "userspace-elf-rv64-file-memory-exec", .root_module = userspace_batch26_module });
+            userspace_batch26_elf.entry = .disabled;
+            userspace_batch26_elf.root_module.strip = true;
+            userspace_batch26_elf.setLinkerScript(b.path("recipes/run-hosted-morphic-runtime/userspace-elf-rv64-data-bss.ld"));
+            const install_userspace_batch26_elf = b.addInstallArtifact(userspace_batch26_elf, .{});
+            b.step("install-userspace-rv64-file-memory-exec-elf", "Build and install the Batch 26 file/memory/exec RV64 fixture").dependOn(&install_userspace_batch26_elf.step);
             const userspace_data_module = b.createModule(.{ .root_source_file = b.path("recipes/run-hosted-morphic-runtime/fixtures/userspace-elf-rv64-data-bss.zig"), .target = freestanding_target, .optimize = .ReleaseSmall, .code_model = .medium });
             const userspace_data_elf = b.addExecutable(.{ .name = "userspace-elf-rv64-data-bss", .root_module = userspace_data_module });
             userspace_data_elf.entry = .disabled;
@@ -284,10 +291,13 @@ pub fn build(b: *std.Build) void {
             freestanding_module.addImport("bounded-rv64-linux-initial-stack-plan", findModule("bounded-rv64-linux-initial-stack-plan", &modules));
             freestanding_module.addImport("morphic-semantic-operation", findModule("morphic-semantic-operation", &modules));
             freestanding_module.addImport("bounded-resource-table", findModule("bounded-resource-table", &modules));
+            freestanding_module.addImport("bounded-filesystem", findModule("bounded-filesystem", &modules));
+            freestanding_module.addImport("bounded-address-space-exec-image", findModule("bounded-address-space-exec-image", &modules));
             freestanding_module.addAnonymousImport("userspace-elf-rv64", .{ .root_source_file = userspace_elf.getEmittedBin() });
             freestanding_module.addAnonymousImport("userspace-elf-rv64-data-bss", .{ .root_source_file = userspace_data_elf.getEmittedBin() });
             freestanding_module.addAnonymousImport("userspace-elf-rv64-initial-stack", .{ .root_source_file = userspace_stack_elf.getEmittedBin() });
             freestanding_module.addAnonymousImport("userspace-elf-rv64-linux-syscalls", .{ .root_source_file = userspace_syscall_elf.getEmittedBin() });
+            freestanding_module.addAnonymousImport("userspace-elf-rv64-file-memory-exec", .{ .root_source_file = userspace_batch26_elf.getEmittedBin() });
             const freestanding = b.addExecutable(.{ .name = "morphic-freestanding-riscv64", .root_module = freestanding_module });
             freestanding.entry = .disabled;
             freestanding.root_module.strip = false;

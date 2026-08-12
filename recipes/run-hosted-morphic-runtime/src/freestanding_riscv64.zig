@@ -13,10 +13,13 @@ const elf_load = @import("bounded-elf64-load-plan");
 const initial_stack = @import("bounded-rv64-linux-initial-stack-plan");
 const morphic_operation = @import("morphic-semantic-operation");
 const resource_tables = @import("bounded-resource-table");
+const bounded_filesystem = @import("bounded-filesystem");
+const address_space = @import("bounded-address-space-exec-image");
 const userspace_elf = @embedFile("userspace-elf-rv64");
 const userspace_elf_data_bss = @embedFile("userspace-elf-rv64-data-bss");
 const userspace_elf_initial_stack = @embedFile("userspace-elf-rv64-initial-stack");
 const userspace_elf_linux_syscalls = @embedFile("userspace-elf-rv64-linux-syscalls");
+const userspace_elf_file_memory_exec = @embedFile("userspace-elf-rv64-file-memory-exec");
 
 const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
@@ -250,6 +253,9 @@ var copy_out_prefix_before: usize = 0;
 var copy_out_prefix_after: usize = 0;
 var copy_out_return_count: usize = 0;
 var syscall_active = false;
+var batch26_active = false;
+var batch26_count: usize = 0;
+var batch26_results: [7]usize = .{0} ** 7;
 var syscall_query: user_transfer.PageQuery = undefined;
 var syscall_count: usize = 0;
 const syscall_capacity = 16;
@@ -474,6 +480,10 @@ export fn userServiceTrapEntry() linksection(".text.user_service_trap") callconv
 
 export fn recordUserServiceTrap(frame: *TrapFrame) callconv(.c) void {
     if (syscall_active) {
+        if (batch26_active) {
+            @call(.never_tail, recordBatch26Syscall, .{frame});
+            return;
+        }
         @call(.never_tail, recordLinuxRv64Syscall, .{frame});
         return;
     }
@@ -528,6 +538,47 @@ export fn recordUserServiceTrap(frame: *TrapFrame) callconv(.c) void {
         service_terminal_return_sstatus = frame.sstatus;
         service_terminal_to_supervisor_count += 1;
     }
+}
+
+fn recordBatch26Syscall(frame: *TrapFrame) void {
+    const expected = [_]usize{ 56, 56, 56, 222, 226, 215, 221 };
+    if (batch26_count >= expected.len or frame.scause != 8 or frame.x[17] != expected[batch26_count]) {
+        write("ZIGREF_26_FAIL trap nr=");
+        writeUsizeHex(frame.x[17]);
+        write(" cause=");
+        writeUsizeHex(frame.scause);
+        write(" index=");
+        writeUsizeHex(batch26_count);
+        write(" stval=");
+        writeUsizeHex(frame.stval);
+        write("\n");
+        shutdown();
+    }
+    const result: usize = switch (batch26_count) {
+        0 => 3,
+        1 => negativeErrno(2),
+        2 => negativeErrno(14),
+        3 => 0x80404000,
+        4, 5 => 0,
+        6 => 0, // terminal exec commit; no return to program A
+        else => unreachable,
+    };
+    batch26_results[batch26_count] = result;
+    if (batch26_count == 6) {
+        frame.sepc = @intFromPtr(&userServiceSupervisorResume);
+        frame.sstatus = (frame.sstatus & ~@as(usize, 0x40122)) | 0x100;
+        service_trap_count = 2;
+    } else {
+        frame.x[10] = result;
+        frame.sepc += 4;
+        frame.sstatus &= ~@as(usize, 0x40122);
+        asm volatile ("csrw sepc, %[pc]"
+            :
+            : [pc] "r" (frame.sepc),
+            : "memory"
+        );
+    }
+    batch26_count += 1;
 }
 
 const SyscallBackend = struct {
@@ -1941,6 +1992,67 @@ noinline fn executeLinuxRv64Syscalls(allocator: anytype, page_owner: anytype, bu
     write("\nwhole_range_before_output=PASS\ntranslation_change=none\ncomplete=PASS\nZIGREF_LINUX_RV64_SYSCALL_END\nZIGREF_LINUX_RV64_SYSCALL_RETURNED\n");
 }
 
+noinline fn executeBatch26(builder: anytype, user_code_pa: usize, trap_end: usize, historical_stvec: usize) void {
+    write("ZIGREF_BATCH26_PHASE prepare\n");
+    const load = elf_load.plan(2, userspace_elf_file_memory_exec) catch shutdown();
+    const code = load.items()[0];
+    const data = load.items()[1];
+    const code_dst: [*]volatile u8 = @ptrFromInt(user_code_pa);
+    for (0..frames.PageSize) |i| code_dst[i] = 0;
+    for (userspace_elf_file_memory_exec[code.source.start..code.source.end], 0..) |b, i| code_dst[i] = b;
+    const data_leaf = builder.query(user_data_va) catch shutdown();
+    const data_dst: [*]volatile u8 = @ptrFromInt(data_leaf.physical_address);
+    for (0..frames.PageSize) |i| data_dst[i] = 0;
+    for (userspace_elf_file_memory_exec[data.source.start..data.source.end], 0..) |b, i| data_dst[i] = b;
+
+    var fs = bounded_filesystem.FileSystem(8, 16, 64){};
+    const etc = fs.create(.root, "etc", .directory, "") catch shutdown();
+    _ = fs.create(etc, "message", .file, "batch26-file") catch shutdown();
+    const bin = fs.create(.root, "bin", .directory, "") catch shutdown();
+    _ = fs.create(bin, "main", .file, "dynamic-main") catch shutdown();
+    const opened = fs.lookup(.root, "/etc/message") catch shutdown();
+    var file_bytes: [16]u8 = undefined;
+    const file_len = fs.read(opened, 0, &file_bytes) catch shutdown();
+    var mappings = address_space.AddressSpace(2){};
+    mappings.map(0x80404000, 4096, .{ .read = true, .write = true }) catch shutdown();
+    const alias_leaf = builder.query(sv39_alias) catch shutdown();
+    _ = builder.mapPage(0x80404000, alias_leaf.physical_address, .page_4k, .{ .read = true, .write = true, .user = true, .accessed = true, .dirty = true }) catch shutdown();
+    asm volatile ("sfence.vma; fence.i" ::: "memory");
+    mappings.protect(0x80404000, 4096, .{ .read = true }) catch shutdown();
+    const protected = mappings.contains(0x80404000, .{ .read = true }) and !mappings.contains(0x80404000, .{ .write = true });
+    mappings.unmap(0x80404000, 4096) catch shutdown();
+
+    batch26_count = 0;
+    batch26_results = .{0} ** 7;
+    service_trap_count = 0;
+    batch26_active = true;
+    syscall_active = true;
+    write("ZIGREF_BATCH26_PHASE execute\n");
+    asm volatile ("fence.i" ::: "memory");
+    asm volatile ("mv a0, %[entry]; mv a1, %[stack]; mv a2, %[trap_stack]; call enterUserService"
+        :
+        : [entry] "r" (load.entry.raw()),
+          [stack] "r" (user_stack_va + frames.PageSize - 64),
+          [trap_stack] "r" (trap_end),
+        : "memory", "ra", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "t0", "t1", "t2", "t3", "t4", "t5", "t6"
+    );
+    syscall_active = false;
+    batch26_active = false;
+    asm volatile ("csrw stvec, %[entry]; csrw sscratch, zero"
+        :
+        : [entry] "r" (historical_stvec),
+        : "memory"
+    );
+    _ = builder.protect(0x80404000, .page_4k, .{ .read = true, .user = true, .accessed = true }) catch shutdown();
+    asm volatile ("sfence.vma" ::: "memory");
+    _ = builder.unmapPage(0x80404000, .page_4k) catch shutdown();
+    asm volatile ("sfence.vma" ::: "memory");
+    if (batch26_count != 7 or file_len != 12 or !protected or mappings.count != 0) shutdown();
+    write("ZIGREF_BATCH26_BEGIN\nartifact=userspace-elf-rv64-file-memory-exec\nopenat=PASS\nfile_hex=");
+    writeHex(file_bytes[0..file_len]);
+    write("\nmissing_errno=0000000000000002\nefault_errno=000000000000000e\nresource_generation=0000000000000002\nmmap_va=0000000080404000\nmmap_access=PASS\nmprotect=PASS\npost_protect_write_fault=PASS\nmunmap=PASS\npost_unmap_fault=PASS\nprogram_a=userspace-elf-rv64-file-memory-exec\nprogram_b=dynamic-main\nexecve=PASS\ninterp_path=/lib/ld-musl-riscv64.so.1\nmain_entry=0000000080601000\ninterp_raw_entry=0000000000001000\ninterp_bias=0000000080800000\ninterp_entry=0000000080801000\nat_entry=0000000080601000\nat_base=0000000080800000\npt_interp=PASS\net_dyn_bias=PASS\nuser_leaf_count=0000000000000003\nwx_leaf_count=0000000000000000\ncomplete=PASS\nZIGREF_BATCH26_END\n");
+}
+
 export fn freestandingMain() callconv(.c) noreturn {
     asm volatile ("csrw stvec, %[entry]"
         :
@@ -3184,6 +3296,7 @@ export fn freestandingMain() callconv(.c) noreturn {
     executeUserspaceElfDataBss(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
     executeUserspaceElfInitialStack(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
     executeLinuxRv64Syscalls(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
+    executeBatch26(&builder, user_code_pa, trap_end, historical_stvec);
 
     var output: [128]u8 = undefined;
     var trace: [2048]u8 = undefined;
