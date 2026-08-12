@@ -184,6 +184,12 @@
     },
     {
       "kind": "function",
+      "module": "bounded-address-space-exec-image",
+      "name": "MaterializedImage",
+      "signature": "MaterializedImage(comptime page_capacity: usize) type"
+    },
+    {
+      "kind": "function",
       "module": "nonzero-integer",
       "name": "NonZeroInteger",
       "signature": "NonZeroInteger(comptime T: type) type"
@@ -1459,6 +1465,12 @@
       "module": "validated-enum-decoder",
       "name": "isValidEnumValue",
       "signature": "isValidEnumValue(comptime E: type, raw: std.meta.Tag(E)) bool"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-address-space-exec-image",
+      "name": "items",
+      "signature": "items(self: *const Self) []const ImagePage"
     },
     {
       "kind": "function",

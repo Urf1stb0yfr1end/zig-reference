@@ -249,6 +249,10 @@
       "symbol": "HostVirtualAddress"
     },
     {
+      "module": "bounded-address-space-exec-image",
+      "symbol": "ImagePage"
+    },
+    {
       "module": "intrusive-doubly-linked-list",
       "symbol": "IntrusiveDoublyLinkedList"
     },
@@ -279,6 +283,10 @@
     {
       "module": "bounded-address-space-exec-image",
       "symbol": "Mapping"
+    },
+    {
+      "module": "bounded-address-space-exec-image",
+      "symbol": "MaterializedImage"
     },
     {
       "module": "riscv-sv39-page-table-builder",

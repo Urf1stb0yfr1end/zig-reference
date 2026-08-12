@@ -1080,7 +1080,7 @@
       "replacement_module": "",
       "source": "projects/59-bounded-address-space-exec-image/src/bounded_address_space_exec_image.zig",
       "status": "implemented",
-      "summary": "Failure-atomic bounded mappings and main/interpreter ELF replacement planning with W+X prohibited.",
+      "summary": "Failure-atomic bounded mappings, exec planning, and complete neutral page-image materialization with W+X prohibited.",
       "target_maturity_level": 4
     }
   ],

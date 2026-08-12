@@ -646,6 +646,135 @@
         "invalidates": [],
         "thread_safety": "caller synchronization required for shared mutable state",
         "examples": []
+      },
+      {
+        "name": "MaterializedImage",
+        "kind": "function",
+        "signature": "MaterializedImage(comptime page_capacity: usize) type",
+        "visibility": "public",
+        "summary": "Returns a bounded owned page-image type for failure-atomic preparation.",
+        "receiver": null,
+        "inputs": [
+          {
+            "name": "arguments",
+            "type": "signature-defined",
+            "role": "Explicit operation inputs.",
+            "ownership": "copied or borrowed as declared",
+            "borrowing": "signature-defined",
+            "mutability": "signature-defined",
+            "lifetime": "call duration unless copied",
+            "valid_range": "documented constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable",
+            "format": "Zig values",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "type",
+            "meaning": "A bounded materialized-image type with inline page ownership.",
+            "ownership": "type declaration; instances own inline page bytes",
+            "borrowed_from": "",
+            "lifetime": "type and instance lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The returned type has exactly page_capacity inline page slots and performs no hidden allocation."
+        ],
+        "failure_atomicity": "type construction has no runtime mutation",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "items",
+        "kind": "method",
+        "signature": "items(self: *const Self) []const ImagePage",
+        "visibility": "public",
+        "summary": "Borrows the initialized materialized pages in deterministic insertion order.",
+        "receiver": {
+          "name": "self",
+          "type": "*const Self",
+          "ownership": "borrowed",
+          "mutation": "none"
+        },
+        "inputs": [
+          {
+            "name": "arguments",
+            "type": "signature-defined",
+            "role": "Explicit operation inputs.",
+            "ownership": "copied or borrowed as declared",
+            "borrowing": "signature-defined",
+            "mutability": "signature-defined",
+            "lifetime": "call duration unless copied",
+            "valid_range": "documented constraints",
+            "alignment": "type-defined",
+            "endianness": "not applicable",
+            "format": "Zig values",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": false,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns a documented error"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "[]const ImagePage",
+            "meaning": "Borrowed initialized page prefix.",
+            "ownership": "borrowed",
+            "borrowed_from": "self.pages",
+            "lifetime": "until the materialized image is destroyed or mutably replaced",
+            "cleanup_required": false,
+            "cleanup_responsibility": "none",
+            "invalidation_conditions": [
+              "owner destruction or mutable replacement"
+            ],
+            "aliasing": "read-only borrow",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "invalid after mutable replacement",
+            "absence_meaning": "empty slice means no pages were materialized"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The slice length equals page_count and contains only initialized pages."
+        ],
+        "failure_atomicity": "read-only and infallible",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
       }
     ]
   },

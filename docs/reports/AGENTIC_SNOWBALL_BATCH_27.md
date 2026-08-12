@@ -76,3 +76,14 @@ the oracle. Temporary external artifacts are never committed.
   transport/machine mode, so no U-mode musl or BusyBox claim is made at this
   checkpoint. Wiring prepared pages to reserved frames without weakening Batch
   26 PREPARE/COMMIT remains the first machine-integration frontier.
+
+### PR #59 consistency repair
+
+Module 59's `port.js` public contract now matches `details.json`, and explicit
+endpoint contracts cover `MaterializedImage` and its borrowed `items` view. The
+canonical repository/agent/port indexes and all module validation evidence were
+regenerated rather than edited by hand. `zig build check`, `zig build
+validate-repository`, and the inherited Batch 25B and Batch 26 verifier
+self-tests passed. This consistency repair introduces no new execution scope:
+the exact static musl diagnostic and BusyBox remain golden-only pressure
+artifacts, not Morphic execution claims.
