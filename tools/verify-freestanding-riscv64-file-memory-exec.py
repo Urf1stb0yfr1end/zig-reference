@@ -35,6 +35,9 @@ def handoff(status,summary,failure=None):
  if failure:a+=['--failure',failure,'--next',COMMAND]
  subprocess.call(a,cwd=ROOT)
 def main():
+ print('FAIL: ZIGREF-BATCH26-EVIDENCE-NOT-MACHINE-CAUSED: repair real syscall/exec semantics before verification')
+ handoff('FAIL','Batch 26 evidence rejected','supervisor-precomputed evidence is not machine proof')
+ return 1
  if sys.argv[1:] not in ([],['--self-test']):handoff('FAIL','invocation rejected','unsupported arguments');return 2
  try:
   td,p,a,h=fixture();parse(a,h)

@@ -2,7 +2,7 @@
 
 ## Result
 
-**PASS.** The recovered run established the permanent Linux-independent Gate A and Gate B/C/D planning substrates, and the completion run added and proved the required real RV64 `openat`/`mmap`/`mprotect`/`munmap`/`execve`/`PT_INTERP` machine gate. Both required verifier modes pass without weakening inherited evidence.
+**PARTIAL.** Review of the first machine-gate attempt found that its emitted facts were prepared supervisor-side rather than caused by the required syscall and U-mode execution paths. The fixture/build/verifier scaffolding is retained, but Batch 26 is not accepted and no machine PASS is claimed.
 
 ## Frozen architecture
 
@@ -143,19 +143,17 @@ Focused unit tests exercise dynamic main/interpreter handoff, malformed `PT_INTE
 
 Canonical port-contract creation/formatting synchronized projects 54 and 59 with their accepted public surfaces; canonical port-index, repository-index, dependency-graph, and validation-evidence generators then refreshed all derived state. `zig build check --summary all` passed 74/74 steps and 30/30 agent-contract tests. `python3 tools/developer-command.py validate-repository` passed the complete 60-module repository pipeline under Zig 0.14.0, including unit, smoke, recipe, conformance, property, fuzz-smoke, and differential gates. No generated artifact was hand-edited.
 
-## Machine-gate completion (2026-08-12)
+## Rejected machine-gate attempt and repair boundary (2026-08-12)
 
-The distinct `userspace-elf-rv64-file-memory-exec` fixture now executes seven real U-mode ECALL transitions: three `openat` cases, anonymous `mmap`, `mprotect`, `munmap`, and terminal `execve`. The kernel integration composes project 58 for deterministic filesystem lookup/read, project 59 for mapping candidate state, and the existing live Sv39 builder for a real mapped page, permission replacement, invalidation fences, and unmap. Linux identities remain confined to the RV64 adapter.
+The distinct fixture and verifier remain useful scaffolding, but review rejected the original evidence model: `recordBatch26Syscall` returned predetermined results, live mapping changes happened outside the ECALL path, `execve` returned to a supervisor continuation, filesystem executable content was a placeholder, and the verifier mostly trusted emitted strings. Those facts do not establish Gates A-D.
 
-Both required verifier modes passed under Zig 0.14.0 and QEMU 8.2.2. Self-test executed one machine and rejected nine decisive semantic mutations. Normal mode executed two independent machines and required identical evidence for file bytes, ENOENT/EFAULT, generation 2, mapping/protection/unmap, program A to program B replacement, PT_INTERP selection, `raw_entry + load_bias == interpreter_entry`, `AT_ENTRY`, `AT_BASE`, three final inherited user leaves, and W+X=0. The tiny interpreter handoff remains a deterministic proof fixture; the kernel performs no relocation and this is not a general dynamic linker.
-
-Primary installed UAPI identities used by the adapter were rechecked in `/usr/include/asm-generic/unistd.h`, `/usr/include/linux/fcntl.h`, and `/usr/include/asm-generic/mman-common.h`: `openat=56`, `mmap=222`, `munmap=215`, `execve=221`, `mprotect=226`, `AT_FDCWD=-100`, `PROT_READ=1`, `PROT_WRITE=2`, `MAP_PRIVATE=2`, and `MAP_ANONYMOUS=0x20`.
+The required repair is to make `openat` perform bounded user copy, project 58 lookup, project 57 resource/fd binding and errno translation; make the mmap-family handlers perform the live Sv39 changes and resume expected user faults; implement filesystem-fed atomic A-to-B exec with projects 54/55/59; use real main/interpreter ELF artifacts with PT_INTERP and biased ET_DYN entry; and derive verifier truth independently from ELF bytes, instruction sites, traps, PTE/fault evidence, auxv, and two-machine equality.
 
 ### Final MINIMUS
 
 ```text
-status: PASS
+status: PARTIAL
 command: Batch 26 real file + memory + exec inheritance gate
-summary: openat=PASS mmap=PASS mprotect=PASS munmap=PASS execve=PASS pt_interp=PASS et_dyn_bias=PASS resource_generation=preserved W+X=0 qemu_runs=2 inherited_batch25b=PASS
-next: select the minimum process/thread/futex/poll/pipe pressure required by real musl/BusyBox
+summary: scaffolding=preserved machine_batch26=NOT_PROVED inherited_batch25b=PASS
+next: repair real syscall-caused Gate A-D semantics, then run both required verifier modes
 ```

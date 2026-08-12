@@ -435,4 +435,4 @@ Batch 26 PR #53 synchronization regenerated the two affected port contracts, all
 
 - `zig build install-userspace-rv64-file-memory-exec-elf --prefix PATH` builds and installs the distinct raw RV64 Batch 26 syscall-pressure fixture.
 - `python3 tools/verify-freestanding-riscv64-file-memory-exec.py --self-test` executes one real QEMU machine and mutation-rejects file/open, mapping, exec, interpreter, load-bias, generation, and W+X evidence.
-- `python3 tools/verify-freestanding-riscv64-file-memory-exec.py` executes two independent real QEMU machines and requires deterministic Batch 26 evidence. Both verifier modes passed under Zig 0.14.0 and QEMU 8.2.2 during the Batch 26 completion run.
+- `python3 tools/verify-freestanding-riscv64-file-memory-exec.py` executes two independent real QEMU machines and requires deterministic Batch 26 evidence. The command exists, but its first evidence model was rejected in review and is not accepted as a Batch 26 PASS.
