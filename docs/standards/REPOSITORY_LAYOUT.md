@@ -42,11 +42,14 @@ docs/concepts/     durable conceptual and architectural essays
 docs/plans/        bounded future implementation requests
 docs/porting/      version migration guidance
 docs/reports/      completed-run evidence and handoffs
+docs/research/     durable research proposals, experiment frameworks, and research programs
 docs/roadmaps/     longer dependency/destination planning
 docs/standards/    repository-wide engineering standards
 ```
 
 Create a new documentation category only when existing categories are semantically wrong for repeated material.
+
+Research documents define hypotheses, experimental frameworks, or long-running research programs. They may motivate plans and experiments, but they must not be treated as evidence that proposed mechanisms or results already exist.
 
 ## Plans versus reports
 
