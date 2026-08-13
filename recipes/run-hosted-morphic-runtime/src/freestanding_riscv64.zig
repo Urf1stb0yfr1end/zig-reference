@@ -947,11 +947,12 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
         &.{external_artifact_options.argv0};
     const envp = [_][]const u8{"BATCH29=exact"};
     const auxv = [_]initial_stack.AuxEntry{
+        .{ .type = 6, .value = .{ .immediate = frames.PageSize } },
         .{ .type = 3, .value = .{ .immediate = at_phdr } },
         .{ .type = 9, .value = .{ .immediate = candidate.main_entry } },
     };
     const stack_range = initial_stack.GuestStackRange.init(user_stack_va, user_stack_va + frames.PageSize) catch shutdown();
-    const stack = initial_stack.plan(512, 4, 1, 2, stack_range, argv, &envp, &auxv) catch shutdown();
+    const stack = initial_stack.plan(512, 4, 1, 3, stack_range, argv, &envp, &auxv) catch shutdown();
     write("ZIGREF_BATCH29_PREPARE stack\n");
 
     // PREPARE table-backing preflight. Each successful temporary leaf is
