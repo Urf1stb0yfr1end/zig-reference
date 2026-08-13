@@ -293,6 +293,9 @@ pub fn build(b: *std.Build) void {
             b.step("install-userspace-rv64-data-bss-elf", "Build and install the bounded writable RV64 userspace ELF fixture")
                 .dependOn(&install_userspace_data_elf.step);
             const freestanding_module = b.createModule(.{ .root_source_file = b.path("recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig"), .target = freestanding_target, .optimize = .ReleaseSmall, .code_model = .medium });
+            const external_options = b.addOptions();
+            external_options.addOption(bool, "enabled", external_rv64_artifact != null);
+            freestanding_module.addOptions("external-artifact-options", external_options);
             freestanding_module.addImport("morphic-core", recipe_module);
             freestanding_module.addImport("bounded-deterministic-scheduler", findModule("bounded-deterministic-scheduler", &modules));
             freestanding_module.addImport("distinct-memory-address-types", findModule("distinct-memory-address-types", &modules));
