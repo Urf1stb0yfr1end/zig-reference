@@ -1,0 +1,681 @@
+CODEX AGENTIC SNOWBALL — BATCH 30
+GREEN VALIDATION RECOVERY + GENERAL BUSYBOX-CAPABLE IMAGE BACKING -> REAL STATIC BUSYBOX SHELL
+
+Repository:
+thanks-cohn/zig-reference
+
+Canonical request path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_30_GREEN_RECOVERY_BUSYBOX_245PAGE_CAPACITY_STATIC_SHELL_PRESSURE.txt
+
+Request-creation main:
+1e6d4bbb9ba6346716a04bf54aef015faa7c300a
+
+Historical checkpoint tag immediately before this request:
+morphic-riscv-batch29-static-musl-proven-merged-red-ci-zigfmt-failure-busybox-245page-blocker-2026-08-13
+
+================================================================================
+0. READ THIS FIRST — THE STARTING COMMIT IS A DELIBERATE RED CHECKPOINT
+================================================================================
+
+Do NOT infer that main is fully validated merely because PR #61 was merged.
+
+Batch 29 was deliberately merged with a known GitHub Actions failure after two
+Codex follow-up attempts ended with an unknown task error and failed to push the
+small formatting repair.
+
+The historical tag above records this explicitly.
+
+Known merged CI defect:
+
+    zig fmt --check build.zig projects recipes conformance
+
+failed because:
+
+    recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig
+
+was not canonically formatted.
+
+Because formatting failed early in GitHub Actions, later CI stages were skipped.
+Therefore:
+
+    merge != green validation
+
+for this one historical checkpoint.
+
+FIRST ACTION OF BATCH 30:
+
+1. run Zig 0.14.0 canonical formatting on the affected source;
+2. inspect the resulting diff and ensure it is formatting-only;
+3. run the full repository validation surface;
+4. restore a genuinely green baseline before extending the BusyBox mechanism.
+
+Do not spend the whole campaign merely formatting. Once the inherited Batch 29
+behavior is preserved and validation is green, immediately continue to the real
+BusyBox pressure boundary described below.
+
+================================================================================
+1. BATCH 29 FUNCTIONAL TRUTH — PRESERVE IT
+================================================================================
+
+Batch 29 achieved a genuine external-software execution boundary.
+
+The exact pinned static RV64 musl diagnostic:
+
+    SHA-256
+    ff9761d82b7ae05bc577ea46acd4bd9119e29a28e9b1ccb621514df11fd8b74d
+
+was transported unchanged into the freestanding Morphic machine proof and then
+executed through the existing path:
+
+    exact external ELF bytes
+        -> ExecPlan
+        -> MaterializedImage
+        -> Linux initial stack
+        -> PREPARE / COMMIT
+        -> Sv39
+        -> U-mode
+        -> Linux compatibility edge
+
+It genuinely printed:
+
+    batch27-static-musl
+
+and exited with status 0.
+
+Observed calls for that diagnostic were exactly:
+
+    set_tid_address
+    write
+    exit_group
+
+The diagnostic tolerated ENOSYS for set_tid_address, so no speculative syscall
+was added.
+
+The proof also preserved:
+
+    PREPARE/COMMIT atomicity
+    W+X = 0
+    exact artifact identity
+    causal one-byte mutation rejection
+    inherited Batch 26 machine behavior
+
+DO NOT redo this architecture.
+DO NOT replace it with a second ELF loader.
+DO NOT create a BusyBox-specific exec path.
+DO NOT weaken the successful static-musl proof in order to make BusyBox easier.
+
+Treat static musl as inherited truth that Batch 30 must preserve.
+
+================================================================================
+2. THE OBSERVED NEXT PRESSURE ORACLE
+================================================================================
+
+Batch 29 immediately selected the exact pinned Alpine static BusyBox artifact:
+
+    Alpine v3.22
+    busybox-static-1.37.0-r20.apk
+
+Package SHA-256:
+
+    29072f0a72ff8f2ff19a8be703cf0e68d4722ea4dc0acf4830acc932f98cf31c
+
+Exact executable:
+
+    bin/busybox.static
+
+Executable SHA-256:
+
+    62831fb7c4a0da509481107a8aeb022244235c5dced18101e3d39131d303d704
+
+BusyBox passed the repaired ELF planning edge.
+
+Its image measures:
+
+    245 materialized pages
+
+The current external machine proof remains bounded around the historical small
+fixture, including a MaterializedImage capacity of 4 and a four-page prepared
+image backing region.
+
+Therefore BusyBox failed during PREPARE because the prepared-image capacity was
+insufficient.
+
+It failed BEFORE destructive COMMIT.
+
+That is the current first missing mechanism / policy boundary.
+
+No BusyBox command execution is currently claimed.
+No BusyBox syscall blocker has yet been demonstrated.
+No dynamic-loader blocker has yet been demonstrated by this target.
+
+The next job is NOT to invent Linux syscalls.
+The next job is NOT to rewrite ELF loading.
+The next job is to replace the tiny proof-fixture image-capacity assumption with
+the smallest correct general bounded machine-adapter backing policy that can
+honestly carry the measured BusyBox image through PREPARE and COMMIT.
+
+================================================================================
+3. GOVERNING ARCHITECTURE
+================================================================================
+
+Minimum permanent mechanism.
+Maximum inherited civilization.
+
+Inherit aggressively.
+Fossilize cautiously.
+
+Compatibility belongs at the edges.
+Generative mechanisms belong at the center.
+
+Pressure discovers mechanisms; pressure does not define them.
+
+The Linux ABI is a consumer of Morphic, not its architect.
+
+QuirkM native userspace, Linux ABI/personality userspace, and WebAssembly/WASI
+userspace are parallel software worlds above the Morphic foundation. Do not add
+BusyBox- or Linux-shaped ontology to the neutral center merely because this
+pressure source is Linux software.
+
+BAD:
+
+    Morphic image capacity = 245 pages because BusyBox needs 245 pages
+
+GOOD:
+
+    a bounded machine/test policy can reserve enough prepared image backing for
+    the selected executable, while neutral Morphic mechanisms remain expressed
+    in terms of pages, mappings, ownership, permissions, address spaces, and
+    prepared execution state.
+
+BAD:
+
+    new BusyBox loader
+
+GOOD:
+
+    existing ExecPlan + MaterializedImage + PREPARE/COMMIT machinery scales to
+    a larger real executable.
+
+BAD:
+
+    prebuild a syscall checklist for BusyBox
+
+GOOD:
+
+    execute exact BusyBox, observe its first real trap/syscall/divergence, repair
+    only the smallest demanded neutral mechanism or Linux-edge behavior, prove
+    causality, retry the SAME artifact immediately.
+
+================================================================================
+4. GREEN RECOVERY GATE
+================================================================================
+
+Before extending Batch 30, repair the known red checkpoint.
+
+Required minimum:
+
+    zig fmt recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig
+
+Then confirm:
+
+    zig fmt --check build.zig projects recipes conformance
+
+passes under Zig 0.14.0.
+
+Then run the repository validation surface used by CI, including at minimum:
+
+    python3 tools/python-environment.py --check
+    python3 tools/format-module-contracts.py --check
+    zig fmt --check build.zig projects recipes conformance
+    zig build check
+    python3 tools/build-repository-index.py --check
+    python3 tools/build-dependency-graphs.py --check
+    PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+    zig build smoke
+    zig build recipes
+    zig build conformance
+    zig build property
+    zig build fuzz-smoke
+    zig build differential
+    zig build test
+    zig build validate-repository
+    python3 tools/check-repository-policy.py
+
+Also rerun the inherited machine proofs relevant to Batch 29, including:
+
+    python3 tools/verify-freestanding-riscv64-file-memory-exec.py --self-test
+
+and the exact external-artifact verifier in its appropriate one-machine and/or
+full proof modes.
+
+If generated indexes/evidence are stale because the source revision changed,
+regenerate only the canonical generated artifacts required by repository policy.
+Do not hand-edit generated evidence to silence validation.
+
+A formatting-only repair must not be allowed to silently change the Batch 29
+functional result.
+
+Once green, proceed immediately.
+
+================================================================================
+5. GENERAL PREPARED-IMAGE CAPACITY / BACKING REPAIR
+================================================================================
+
+Observed pressure:
+
+    exact BusyBox image = 245 materialized pages
+    current proof capacity = 4 pages
+
+Treat 245 as MEASUREMENT, not architecture.
+
+The implementation should introduce the smallest correct bounded policy that
+supports the prepared image selected by the external pressure harness.
+
+Acceptable directions include, depending on the existing repository structure:
+
+A. A clearly machine-adapter/test-harness capacity chosen above the measured
+   target and documented as replaceable policy.
+
+B. A build-time bounded capacity parameter whose selected value is derived from
+   or validated against the external target, while the underlying mechanism
+   remains independent of BusyBox.
+
+C. Another simple bounded reservation design already natural to the repository's
+   fixed-capacity style.
+
+Do NOT turn 245 into a universal Morphic constant.
+Do NOT dynamically allocate after destructive COMMIT merely to avoid choosing a
+bounded proof capacity.
+Do NOT weaken PREPARE/COMMIT.
+
+The critical invariant remains:
+
+    all resources whose absence could make COMMIT fail
+    must be reserved/preflighted before destructive replacement begins.
+
+This includes:
+
+    prepared executable image backing pages
+    required Sv39 intermediate table backing
+    stack backing already demanded by the transition
+    any other newly observed resource required to install the prepared image
+
+No ordinary allocation should first occur after the old executable has been
+irreversibly destroyed.
+
+If the selected bounded reservation is large, keep it clearly in machine proof
+or linker-owned harness policy unless real pressure proves that a more general
+physical-memory mechanism is now required.
+
+Avoid solving a future allocator architecture merely because 245 pages looks
+large. First scale the existing proven mechanism in the smallest honest way.
+
+================================================================================
+6. EXACT BUSYBOX PRESSURE LADDER
+================================================================================
+
+After green recovery and capacity repair, use the SAME exact pinned
+busybox.static bytes.
+
+Fail closed on the committed SHA-256 identity.
+Do not vendor or mutate the binary.
+Do not patch, relink, truncate, or rebuild BusyBox to make it easier.
+
+Golden Linux-user behavior should be captured from the same bytes where useful.
+
+Then run under Morphic in this order:
+
+    busybox.static true
+
+Required:
+
+    reaches U-mode
+    exits status 0
+    no false stdout requirement
+
+Then:
+
+    busybox.static echo batch30
+
+Required stdout:
+
+    batch30
+
+and status 0.
+
+Then:
+
+    busybox.static sh -c 'echo batch30'
+
+Required stdout:
+
+    batch30
+
+and status 0.
+
+The third command is the Batch 30 boundary win:
+
+    FIRST REAL STATIC BUSYBOX SHELL COMMAND UNDER MORPHIC
+
+Do not claim a shell merely because BusyBox entry executes.
+Do not claim a shell if only `true` or direct `echo` passes.
+The shell path must genuinely parse and execute the `sh -c` command.
+
+================================================================================
+7. PRESSURE-ORACLE DEBUG LOOP
+================================================================================
+
+After image capacity is no longer the blocker, the first real BusyBox runtime
+failure becomes the next oracle.
+
+For EACH failure:
+
+1. observe the exact machine evidence;
+2. reduce/classify the failure;
+3. decide whether it is:
+
+       neutral Morphic mechanism
+       Linux ABI/personality behavior
+       machine-adapter proof policy
+       ELF/runtime metadata handling
+       harness/provenance defect
+
+4. implement the smallest correct repair;
+5. add a causal proof or mutation when appropriate;
+6. rerun the SAME BusyBox command immediately;
+7. advance to the next BusyBox command only after the current one passes.
+
+Do not batch-build a speculative list of Linux syscalls.
+
+If BusyBox calls a missing syscall:
+
+    first prove that exact call is the blocker.
+
+Then ask:
+
+    what semantic operation is actually required?
+
+If the need is Linux-specific representation, keep it at the Linux edge.
+If the need reveals a reusable mechanism, express the neutral mechanism first
+and let the Linux adapter consume it.
+
+Return ENOSYS when that is the truthful supported behavior and the application
+can continue. Implement behavior only when the real workload requires it.
+
+================================================================================
+8. CAUSAL PROOF REQUIREMENTS
+================================================================================
+
+Batch 30 should not merely produce `batch30` accidentally.
+
+The verifier/report should establish, as practical:
+
+    exact BusyBox SHA-256 identity
+    same exact bytes transported into the machine build
+    expected ELF/load geometry
+    prepared page count
+    capacity/preflight success before COMMIT
+    no W+X mapping
+    exact stdout for echo and shell cases
+    exact terminal status
+    exact observed syscall/trap sequence or bounded evidence sufficient to
+        distinguish genuine BusyBox execution from fixture output
+    inherited static-musl result still passes
+
+Add negative/mutation evidence where it proves the new mechanism causally.
+Examples:
+
+    deliberately insufficient prepared-image capacity must fail during PREPARE
+    and before COMMIT;
+
+    a one-byte artifact identity mutation must still be rejected;
+
+    a deliberately corrupted expected output/status/evidence should make the
+    independent verifier fail.
+
+Do not create expensive mutation machinery merely for ceremony. Prefer the
+smallest decisive causal proof.
+
+================================================================================
+9. DO NOT LOSE THE STATIC MUSL WIN
+================================================================================
+
+After enlarging or parameterizing the prepared image capacity, rerun the exact
+static musl proof.
+
+The small diagnostic must still:
+
+    print batch27-static-musl
+    exit status 0
+    preserve W+X=0
+    use the same existing exec architecture
+
+A large-image repair that breaks the 3-page case is not a Batch 30 success.
+
+================================================================================
+10. REPORTING
+================================================================================
+
+Create/update:
+
+    docs/reports/AGENTIC_SNOWBALL_BATCH_30.md
+
+The report must distinguish:
+
+A. inherited red checkpoint repair;
+B. exact green validation result after repair;
+C. the previous 4-page -> 245-page observed capacity pressure;
+D. the chosen general bounded capacity/backing policy and why it is machine
+   policy rather than permanent BusyBox-shaped architecture;
+E. every real BusyBox runtime failure encountered after capacity repair;
+F. every repair and its classification;
+G. exact final status of:
+
+       busybox.static true
+       busybox.static echo batch30
+       busybox.static sh -c 'echo batch30'
+
+H. nonclaims;
+I. next first blocker if the shell boundary is not reached.
+
+If public commands change, update COMMANDS.md.
+Regenerate canonical agent indexes/evidence required by repository policy.
+
+Do not overwrite the historical truth of Batch 29's red merge. Batch 30 should
+record that it repaired the red checkpoint and established the next genuinely
+green frontier.
+
+================================================================================
+11. STOP CONDITIONS
+================================================================================
+
+Do NOT stop merely because:
+
+    formatting is fixed;
+    CI is green;
+    BusyBox passes ELF planning;
+    BusyBox reaches U-mode;
+    `true` passes;
+    direct `echo` passes;
+    one syscall was implemented;
+    one new report was written.
+
+Continue while the next observed failure is repairable within the current
+campaign.
+
+Primary Batch 30 success condition:
+
+    exact pinned busybox.static sh -c 'echo batch30'
+
+executes under Morphic through the existing machine path, prints exactly:
+
+    batch30
+
+and exits status 0, with inherited safety/proof invariants preserved.
+
+Acceptable genuine boundary stop:
+
+Only stop before the static BusyBox shell passes when a distinct, nontrivial,
+evidence-backed mechanism boundary is reached that cannot be responsibly
+completed in the current campaign without speculative architecture or a major
+new subsystem.
+
+If that happens, document:
+
+    exact command
+    exact artifact identity
+    exact first failure
+    why it is not merely another small repair
+    what permanent/compatibility mechanism is actually missing
+    what is proven and what is not
+
+Do not call context exhaustion, agent caution, or an arbitrary batch boundary an
+architectural blocker.
+
+================================================================================
+12. OPTIONAL CONTINUATION IF STATIC BUSYBOX SHELL PASSES EARLY
+================================================================================
+
+If the full static BusyBox shell boundary passes and substantial execution
+budget remains, do not idle.
+
+Begin pressure toward the next critical-path target:
+
+    real dynamic musl / PT_INTERP execution
+
+but do so empirically.
+
+Do NOT prebuild an entire dynamic-loader compatibility checklist.
+Do NOT redesign existing PT_INTERP/ET_DYN planning that is already present.
+
+Choose a small reproducible real dynamic RV64 musl diagnostic, record exact
+provenance and SHA-256, establish a golden Linux-user result, then send the SAME
+bytes through the existing dynamic exec/interpreter path and stop at the first
+real divergence if it is nontrivial.
+
+Any dynamic work beyond the BusyBox shell should be clearly reported as the next
+pressure frontier, not conflated with the Batch 30 static BusyBox proof.
+
+================================================================================
+13. VALIDATION BEFORE PR HANDOFF
+================================================================================
+
+Before opening/updating the focused Batch 30 PR, require:
+
+    canonical Zig 0.14.0 formatting
+    full repository validation green
+    inherited Batch 26 machine proof green
+    inherited Batch 29 exact static-musl proof green
+    exact BusyBox identity proof
+    exact BusyBox pressure proof to the strongest reached boundary
+    repository policy green
+    generated/index drift resolved canonically
+
+Open/update ONE focused PR for Batch 30.
+
+Do not merge your own PR unless the repository/user workflow explicitly asks.
+
+The PR description must explicitly say whether:
+
+    static BusyBox true passed
+    static BusyBox echo passed
+    static BusyBox sh -c passed
+    full CI is green
+
+Do not rely on a merge state or vague wording as proof of those facts.
+
+================================================================================
+14. SUCCESS HIERARCHY
+================================================================================
+
+MANDATORY FIRST REPAIR:
+
+    historical red zig fmt checkpoint repaired
+    full validation genuinely green
+
+PRIMARY SUCCESS:
+
+    exact pinned static BusyBox scales through general prepared image backing
+    busybox.static true -> PASS
+    busybox.static echo batch30 -> PASS
+    busybox.static sh -c 'echo batch30' -> PASS
+    exact output/status causally proven
+    PREPARE/COMMIT preserved
+    W+X=0 preserved
+    static musl inherited proof preserved
+
+STRONGLY PREFERRED:
+
+    pressure-driven syscall/runtime repairs required by BusyBox completed in the
+    same campaign until static shell command passes
+
+BONUS IF BUDGET REMAINS:
+
+    first exact dynamic musl pressure artifact selected and first real dynamic
+    divergence measured
+
+UNACCEPTABLE FALSE SUCCESS:
+
+    only formatting fixed
+    only CI green
+    only capacity constant increased to literal 245 as Morphic architecture
+    only BusyBox ELF parsed
+    only BusyBox entry reached
+    only direct echo works while sh -c remains untested
+    BusyBox patched/rebuilt to avoid real pressure
+    new speculative syscall checklist with no exact workload evidence
+
+================================================================================
+15. THE CAMPAIGN IN ONE SCREEN
+================================================================================
+
+START FROM CURRENT MAIN
+    |
+    v
+ACKNOWLEDGE BATCH 29 WAS MERGED RED
+    |
+    v
+FIX zig fmt ONLY AS REQUIRED
+    |
+    v
+FULL VALIDATION -> GREEN
+    |
+    v
+REPROVE EXACT STATIC MUSL
+    |
+    v
+EXACT BUSYBOX (245 measured pages)
+    |
+    v
+GENERAL BOUNDED PREPARED-IMAGE/BACKING POLICY
+    |
+    v
+PREPARE ALL IMAGE + Sv39 RESOURCES BEFORE COMMIT
+    |
+    v
+busybox.static true
+    |
+    v
+busybox.static echo batch30
+    |
+    v
+busybox.static sh -c 'echo batch30'
+    |
+    v
+FIRST REAL STATIC BUSYBOX SHELL COMMAND
+    |
+    +--> if budget remains: exact dynamic musl pressure
+
+For every failure:
+
+    OBSERVE
+      -> CLASSIFY
+      -> SMALLEST CORRECT REPAIR
+      -> CAUSAL PROOF
+      -> RETRY SAME ARTIFACT IMMEDIATELY
+
+Minimum permanent mechanism.
+Maximum inherited civilization.
+Compatibility at the edges.
+Generative mechanisms at the center.
+Real software determines priority.
