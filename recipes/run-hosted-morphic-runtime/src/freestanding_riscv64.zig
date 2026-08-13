@@ -16,6 +16,7 @@ const resource_tables = @import("bounded-resource-table");
 const bounded_filesystem = @import("bounded-filesystem");
 const address_space = @import("bounded-address-space-exec-image");
 const external_artifact_options = @import("external-artifact-options");
+const runtime_mappings = @import("bounded_runtime_mappings.zig");
 const userspace_elf = @embedFile("userspace-elf-rv64");
 const userspace_elf_data_bss = @embedFile("userspace-elf-rv64-data-bss");
 const userspace_elf_initial_stack = @embedFile("userspace-elf-rv64-initial-stack");
@@ -156,6 +157,8 @@ var external_image: ExternalPreparedImage = .{};
 var external_stack_image: initial_stack.StackPlan(512) = undefined;
 var external_program_break: usize = 0;
 var external_next_backing: usize = 0;
+const ExternalRuntimeMappings = runtime_mappings.BoundedRuntimeMappings(8, frames.PageSize);
+var external_runtime_mappings: ExternalRuntimeMappings = .{};
 export var external_entry: usize = 0;
 export var external_initial_sp: usize = 0;
 export var external_trap_stack: usize = 0;
@@ -965,7 +968,9 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     external_stack_image = stack;
     external_program_break = 0;
     for (candidate.main.load.items()) |segment| external_program_break = @max(external_program_break, segment.memory.end);
+    external_program_break = (external_program_break + frames.PageSize - 1) & ~@as(usize, frames.PageSize - 1);
     external_next_backing = prepared.items().len;
+    external_runtime_mappings = .{};
     write("ZIGREF_BATCH29_PHASE commit\n");
     @memset(&external_prepared_stack, 0);
     const stack_offset = external_stack_image.initial_sp.raw() - user_stack_va;
@@ -1080,7 +1085,7 @@ const SyscallBackend = struct {
 fn negativeErrno(value: usize) usize {
     return 0 -% value;
 }
-const LinuxRequestKind = enum { duplicate, close, read, write, program_break, terminate, unsupported };
+const LinuxRequestKind = enum { duplicate, close, read, write, program_break, memory_map, terminate, unsupported };
 fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     return switch (number) {
         23 => .duplicate,
@@ -1088,12 +1093,18 @@ fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
         63 => .read,
         64 => .write,
         214 => .program_break,
+        222 => .memory_map,
         93, 94 => .terminate,
         else => .unsupported,
     };
 }
 comptime {
-    if (decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+    if (decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+}
+
+fn externalPageOccupied(_: void, page: usize) bool {
+    const leaf = batch26_builder.query(page) catch return false;
+    return leaf.raw_entry & 1 != 0 and leaf.raw_entry & 0xe != 0;
 }
 
 fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
@@ -1168,6 +1179,58 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                 if (page == end) external_program_break = requested;
             }
             frame.x[10] = external_program_break;
+        },
+        .memory_map => {
+            syscall_semantics[index] = 8;
+            const address = frame.x[10];
+            const length = frame.x[11];
+            const protection = frame.x[12];
+            const flags = frame.x[13];
+            const descriptor = frame.x[14];
+            const offset = frame.x[15];
+            // Linux/RV64 UAPI: MAP_PRIVATE | MAP_FIXED | MAP_ANONYMOUS.
+            // This observed minimum slice is an exact, page-aligned, no-access
+            // anonymous reservation. Linux values and errno remain here.
+            if (descriptor != std.math.maxInt(usize) or offset != 0 or length == 0) {
+                frame.x[10] = negativeErrno(22);
+            } else if (protection == 0 and flags == 0x32) {
+                external_runtime_mappings.reserve(address, length, .{}, true, {}, externalPageOccupied) catch {
+                    frame.x[10] = negativeErrno(12);
+                    return finishReturningSyscall(frame, index);
+                };
+                var page = address;
+                const end = address + length;
+                while (page < end) : (page += frames.PageSize) {
+                    if (externalPageOccupied({}, page))
+                        _ = batch26_builder.unmapPage(page, .page_4k) catch shutdown();
+                }
+                asm volatile ("sfence.vma" ::: "memory");
+                frame.x[10] = address;
+            } else if (address == 0 and protection == 3 and flags == 0x22 and length == frames.PageSize) {
+                if (external_next_backing == prepared_image_pages) {
+                    frame.x[10] = negativeErrno(12);
+                    return finishReturningSyscall(frame, index);
+                }
+                var candidate_address = external_program_break;
+                while (candidate_address < user_stack_va) : (candidate_address += frames.PageSize) {
+                    external_runtime_mappings.reserve(candidate_address, length, .{ .read = true, .write = true }, false, {}, externalPageOccupied) catch |err| switch (err) {
+                        error.Collision => continue,
+                        else => {
+                            frame.x[10] = negativeErrno(12);
+                            return finishReturningSyscall(frame, index);
+                        },
+                    };
+                    @memset(&external_prepared_backing[external_next_backing], 0);
+                    const physical = @intFromPtr(&external_prepared_backing[external_next_backing]);
+                    _ = batch26_builder.mapPage(candidate_address, physical, .page_4k, .{ .read = true, .write = true, .user = true, .accessed = true, .dirty = true }) catch shutdown();
+                    external_next_backing += 1;
+                    asm volatile ("sfence.vma" ::: "memory");
+                    frame.x[10] = candidate_address;
+                    break;
+                } else frame.x[10] = negativeErrno(12);
+            } else {
+                frame.x[10] = negativeErrno(22);
+            }
         },
         .terminate => blk: {
             syscall_semantics[index] = 3;
