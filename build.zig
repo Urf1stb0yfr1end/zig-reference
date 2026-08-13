@@ -239,6 +239,12 @@ pub fn build(b: *std.Build) void {
         recipe_step.dependOn(&run_recipe.step);
         recipes_step.dependOn(&run_recipe.step);
         if (std.mem.eql(u8, recipe.name, "run-hosted-morphic-runtime")) {
+            const runtime_mapping_tests = b.addTest(.{ .root_module = b.createModule(.{
+                .root_source_file = b.path("recipes/run-hosted-morphic-runtime/src/bounded_runtime_mappings.zig"),
+                .target = target,
+                .optimize = optimize,
+            }) });
+            recipe_step.dependOn(&b.addRunArtifact(runtime_mapping_tests).step);
             const executable = b.addExecutable(.{ .name = "run-hosted-morphic-runtime", .root_module = recipe_module });
             const install_riscv64 = b.addInstallArtifact(executable, .{});
             b.step("install-riscv64-morphic-runtime", "Cross-compile and install the Morphic executable selected by -Dtarget")
