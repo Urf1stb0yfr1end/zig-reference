@@ -1,0 +1,644 @@
+CODEX AGENTIC SNOWBALL — BATCH 31D
+OBSERVED ANONYMOUS MMAP -> BUSYBOX ECHO -> STATIC BUSYBOX SHELL
+WITH MANDATORY EARLY COMMIT / PR / 30-MINUTE HANDOFF
+
+Repository:
+thanks-cohn/zig-reference
+
+Canonical request path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_31D_ANONYMOUS_MMAP_BUSYBOX_ECHO_SHELL_30MIN_HANDOFF.txt
+
+Request-creation main:
+99da43c2d2f2c4ce4b09bb6f8522db1247c5cdab
+
+Read first:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_31.md
+docs/reports/AGENTIC_SNOWBALL_BATCH_31B.md
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_31C_QEMU_EXACT_STATIC_BUSYBOX_RUNTIME_30MIN_HANDOFF.txt
+COMMANDS.md
+
+================================================================================
+0. SINGLE PURPOSE OF THIS CAMPAIGN
+================================================================================
+
+Batch 31D begins from a REAL BusyBox runtime frontier.
+
+The exact pinned Alpine static BusyBox artifact already:
+
+    reaches PREPARE
+    reaches COMMIT
+    reaches U-mode
+    runs the `true` applet
+    makes 12 observed syscalls
+    exits status 0
+    preserves W+X=0
+
+The next exact pressure is:
+
+    busybox.static echo batch31d
+
+The first observed unsupported request is Linux/RV64 mmap syscall 222.
+
+The observed request at the current frontier is:
+
+    nr    = 222
+    addr  = 0x104000
+    len   = 4096
+    prot  = 0
+    flags = 0x32
+
+The previous run reports:
+
+    echo: out of memory
+    exit status 1
+
+because the mmap request is currently unsupported.
+
+THIS CAMPAIGN MUST START THERE.
+
+Required pressure ladder:
+
+    exact busybox.static echo batch31d
+        -> repair first observed mmap boundary
+        -> retry SAME exact artifact immediately
+        -> continue through each newly exposed real failure
+        -> exact busybox.static echo batch31d PASS
+        -> exact busybox.static sh -c 'echo batch31d'
+        -> continue through each newly exposed real failure
+        -> STATIC BUSYBOX SHELL PASS
+
+Strongest finish line:
+
+    busybox.static sh -c 'echo batch31d'
+
+prints exactly:
+
+    batch31d
+
+and exits status 0 under Morphic.
+
+Do NOT begin dynamic musl.
+Do NOT begin dynamic BusyBox.
+Do NOT begin Alpine minirootfs work.
+
+Static BusyBox shell completion is the entire required runtime mountain for
+this campaign.
+
+================================================================================
+1. INHERITED TRUTH — DO NOT REDISCOVER IT
+================================================================================
+
+Current main includes the green merge of PR #65.
+
+Treat these facts as inherited and already proven:
+
+1. Exact static-musl diagnostic identity and execution are proven.
+
+   SHA-256:
+
+       ff9761d82b7ae05bc577ea46acd4bd9119e29a28e9b1ccb621514df11fd8b74d
+
+   Output:
+
+       batch27-static-musl
+
+   Status:
+
+       0
+
+2. Exact pinned Alpine v3.22 static BusyBox identity is already proven.
+
+   Package:
+
+       busybox-static-1.37.0-r20.apk
+
+   Package SHA-256:
+
+       29072f0a72ff8f2ff19a8be703cf0e68d4722ea4dc0acf4830acc932f98cf31c
+
+   Executable:
+
+       bin/busybox.static
+
+   Executable SHA-256:
+
+       62831fb7c4a0da509481107a8aeb022244235c5dced18101e3d39131d303d704
+
+3. Exact BusyBox geometry is already measured:
+
+       244 unique PT_LOAD pages
+       0 W+X pages
+       + one separately prepared initial stack page
+
+4. The prepared-image capacity/layout problem is CLOSED as the current
+   blocker.
+
+   Caller-backed PreparedImage plus the distinct linker reservation already
+   exists. Do NOT redesign it without a newly observed causal reason.
+
+5. The old 0x8040_0000 collision has already been understood and repaired.
+   Do NOT reattempt giant inline backing arrays.
+
+6. The reservation integration regressions discovered in Batch 31C are
+   already repaired:
+
+       .sbss remains inside mapped ordinary BSS
+       prepared-table allocations no longer steal historical frames
+
+7. Generic external argv plumbing already exists.
+
+8. Bounded brk growth using unused prepared backing already exists and was
+   sufficient to advance the exact BusyBox echo pressure to mmap.
+
+9. Exact BusyBox `true` is a genuine runtime boundary win and MUST remain a
+   regression proof:
+
+       COMMIT reached
+       U-mode reached
+       12 observed syscalls
+       stdout empty
+       status 0
+       244 executable pages
+       W+X=0
+
+10. The first current runtime blocker is NOT capacity, ELF, argv, brk, or
+    PREPARE/COMMIT.
+
+    It is the observed mmap request above.
+
+================================================================================
+2. PRESSURE-ORACLE RULE
+================================================================================
+
+Do not implement a speculative Linux mmap subsystem.
+
+Do not create a checklist of mmap features from documentation and then build
+all of them.
+
+Start from the exact failing BusyBox request.
+
+For every failure:
+
+    SAME REAL ARTIFACT
+        -> OBSERVE
+        -> CLASSIFY
+        -> DETERMINE NEUTRAL MECHANISM VS LINUX EDGE POLICY
+        -> IMPLEMENT SMALLEST CORRECT REPAIR
+        -> ADD FOCUSED CAUSAL PROOF
+        -> RETRY SAME ARTIFACT IMMEDIATELY
+
+Only implement semantics demonstrated necessary by real pressure or required
+for correctness of the minimum mechanism exposed by that pressure.
+
+================================================================================
+3. MMAP ARCHITECTURAL RULE
+================================================================================
+
+The Linux syscall ABI belongs at the compatibility edge.
+
+Do NOT make:
+
+    Morphic mapping semantics = Linux mmap
+
+Prefer:
+
+    Linux mmap request
+        -> Linux personality validation/translation
+        -> neutral address-space reservation/mapping mechanism
+        -> bounded backing ownership
+        -> Sv39 leaves / mapping state
+
+The permanent center should express reusable concepts such as:
+
+    reserve address range
+    map anonymous backing
+    install permissions
+    replace mapping if explicitly allowed
+    unmap/release mapping
+    bounded ownership / failure
+
+Only add permanent mechanisms that are reusable beyond BusyBox/Linux.
+
+Linux-specific flag values, errno mapping, fixed-placement policy, and syscall
+number decoding remain at the Linux personality / machine-adapter edge.
+
+================================================================================
+4. FIRST REQUIRED TECHNICAL ACTION — CLASSIFY THE OBSERVED MMAP
+================================================================================
+
+Before coding the repair, inspect the actual Linux RISC-V UAPI values available
+in the environment or authoritative kernel headers already used by this
+repository.
+
+Confirm the meaning of the observed:
+
+    prot  = 0
+    flags = 0x32
+
+Do not rely on memory or guesswork for flag semantics.
+
+Record the exact decoded flags in the Batch 31D report.
+
+Then determine what BusyBox actually needs from this call.
+
+Questions to answer empirically:
+
+1. Is this request asking only to reserve an address range initially with no
+   access permissions?
+
+2. Does the exact requested address have fixed-placement semantics?
+
+3. Does a later syscall change permissions or otherwise consume the range?
+
+4. Does BusyBox expect a physical page immediately, or merely a successful
+   reserved virtual range?
+
+5. What errno/result does the Linux reference oracle produce for the exact
+   call sequence?
+
+Use the golden Linux/QEMU-user environment when useful to understand behavior,
+but do not copy Linux internals wholesale into Morphic.
+
+================================================================================
+5. MINIMUM CORRECT MMAP SLICE
+================================================================================
+
+Implement only the smallest general mechanism required by the observed call
+and its immediately following real pressure.
+
+The implementation MUST be bounded and must fail closed.
+
+At minimum consider and correctly handle, as demanded by the exact request:
+
+- zero length rejection if relevant;
+- page alignment / checked range arithmetic;
+- overflow rejection;
+- collision detection with existing executable, data, stack, brk, and other
+  active mappings;
+- fixed-address replacement semantics ONLY if the decoded Linux request truly
+  requires them;
+- anonymous backing ownership if actual accessible backing is required;
+- no-access reservation if that is the correct semantic meaning;
+- permission translation without introducing W+X;
+- return address semantics;
+- rollback if any preparation step fails;
+- no destructive partial mapping before all required bounded resources are
+  known to be available.
+
+Preserve the project rule:
+
+    PREPARE failure must leave the live userspace image intact.
+
+Do not steal backing currently owned by executable pages or stack pages.
+
+If runtime mappings consume the prepared reservation, make ownership explicit
+and bounded rather than relying on magic indexes.
+
+Do NOT make 0x104000, 4096, or 0x32 permanent architectural constants.
+They are pressure evidence, not architecture.
+
+================================================================================
+6. RETRY LADDER — DO NOT STOP AFTER MMAP
+================================================================================
+
+After the first mmap repair, immediately retry:
+
+    busybox.static echo batch31d
+
+Do NOT stop because mmap returned successfully.
+
+Do NOT stop because U-mode continued farther.
+
+Do NOT stop at the next syscall.
+
+If echo exposes another repairable failure, continue in THIS RUN:
+
+    observe
+    -> classify
+    -> smallest correct repair
+    -> focused proof
+    -> retry
+
+Continue until either:
+
+A. `busybox.static echo batch31d` prints exactly `batch31d\n` and exits 0, or
+
+B. a genuinely nontrivial new blocker is reached that cannot safely be solved
+   within the remaining campaign budget.
+
+If echo passes, immediately attack:
+
+    busybox.static sh -c 'echo batch31d'
+
+Again, every repairable real failure becomes the next task in THIS RUN.
+
+Do not stop after shell startup if the command does not complete.
+
+The static-shell finish line requires:
+
+    exact output: batch31d
+    exit status: 0
+    exact pinned BusyBox identity
+    W+X=0
+
+================================================================================
+7. REQUIRED REGRESSION PROOFS
+================================================================================
+
+Preserve and rerun focused proofs for:
+
+1. exact static-musl diagnostic;
+2. exact BusyBox `true` success;
+3. PREPARE/COMMIT atomicity where touched;
+4. W+X=0;
+5. exact BusyBox identity;
+6. new mmap semantics;
+7. insufficient runtime-mapping capacity fails safely;
+8. collision/overflow rejection for the new mapping mechanism;
+9. mapping permission behavior required by the observed request.
+
+If a new neutral mapping primitive is introduced, give it focused unit/smoke
+coverage independent of BusyBox.
+
+BusyBox is the oracle that discovered the mechanism, not the sole proof of the
+mechanism.
+
+================================================================================
+8. DO NOT REGRESS ARCHITECTURAL NEUTRALITY
+================================================================================
+
+BAD:
+
+    if artifact hash == BusyBox:
+        special mmap path
+
+BAD:
+
+    if addr == 0x104000:
+        return success
+
+BAD:
+
+    const BusyBoxMmapPages = ...
+
+BAD:
+
+    MorphicMapping.flags = linux_mmap_flags
+
+GOOD:
+
+    neutral bounded virtual-memory mapping operation
+        + Linux personality adapter
+        + exact BusyBox pressure proof
+
+Compatibility as consumer, not architect.
+
+Pressure discovers mechanisms; it does not define them.
+
+================================================================================
+9. HANDOFF / ANTI-WASTE PROTOCOL — MANDATORY
+================================================================================
+
+This section is a deliverable requirement, not a suggestion.
+
+A previous 40-minute campaign lost useful transient work because the task
+restored its worktree when the final finish line was not reached.
+
+DO NOT REPEAT THAT FAILURE MODE.
+
+The task must continuously make safe progress externally recoverable.
+
+RULE A — EARLY SAFE COMMIT
+
+As soon as the first coherent, safe, nontrivial advancement exists:
+
+    commit it
+    push it
+
+Do not wait for shell completion before preserving useful work.
+
+RULE B — OPEN A DRAFT PR EARLY
+
+Once there is a coherent reviewable change that passes its focused tests:
+
+    open a DRAFT pull request against current main
+
+Continue working on the SAME branch and SAME PR.
+
+A draft PR is a live handoff surface, not a signal to stop.
+
+RULE C — 20–25 MINUTE WARNING
+
+At roughly 20–25 minutes of substantive work, ensure that:
+
+    all safe progress is committed
+    branch is pushed
+    draft PR exists if GitHub permits it
+    PR body accurately states current runtime frontier
+
+Then continue only if the next experiment is appropriately bounded.
+
+RULE D — ~30 MINUTE HARD CHECKPOINT
+
+At roughly 30 minutes:
+
+    STOP beginning large speculative experiments.
+
+Ensure the task leaves AT LEAST ONE of:
+
+1. a mergeable PR with green focused/full validation;
+2. a draft PR containing safe incomplete progress plus exact blocker evidence;
+3. if PR creation fails externally, a pushed branch with commits plus a
+   complete handoff containing branch, SHA, diff stat, changed files, proposed
+   PR title/body, validation results, and exact next blocker.
+
+NEVER restore useful safe work to clean main merely because echo or shell did
+not finish.
+
+NEVER throw away a correct prerequisite because the final BusyBox command did
+not pass.
+
+RULE E — CHECKPOINT BEFORE EXPENSIVE FULL VALIDATION
+
+During iteration use focused tests and QEMU pressure.
+
+Do not spend the beginning of the campaign rerunning the entire repository
+validation surface.
+
+Run full CI-equivalent validation only after meaningful runtime movement is
+committed or before declaring a mergeable final checkpoint.
+
+If full validation itself is likely to consume the remaining time budget,
+first commit and push the runtime work so it cannot disappear.
+
+================================================================================
+10. PR / HANDOFF CONTENT
+================================================================================
+
+The PR must be honest and causal.
+
+Use a title matching the strongest achieved boundary, for example:
+
+    Add bounded anonymous mapping and advance exact BusyBox echo pressure
+
+or, only if actually achieved:
+
+    Complete exact static BusyBox shell under Morphic
+
+PR body structure:
+
+## Motivation
+
+## What changed
+
+## Exact inherited BusyBox frontier
+
+## mmap request classification
+
+## Runtime advancement
+
+## Causal proof
+
+## Validation
+
+## What this PR does NOT claim
+
+## First remaining blocker
+
+## Exact next step
+
+If shell completion is not reached, explicitly state the strongest exact
+command that passed and the first command/request that did not.
+
+Do not call Batch 31D complete unless the static shell finish line actually
+passes.
+
+================================================================================
+11. REPORT REQUIREMENT
+================================================================================
+
+Create or update:
+
+    docs/reports/AGENTIC_SNOWBALL_BATCH_31D.md
+
+Record:
+
+- exact main/base SHA;
+- exact BusyBox executable SHA-256;
+- QEMU version;
+- exact command lines used;
+- `true` regression result;
+- exact mmap request and decoded Linux flags;
+- neutral mechanism introduced or reused;
+- focused tests;
+- echo result;
+- shell result if attempted;
+- every newly observed syscall/failure relevant to the frontier;
+- W+X result;
+- PREPARE/COMMIT preservation evidence;
+- exact first remaining blocker if shell does not pass;
+- branch / commit / PR handoff state.
+
+================================================================================
+12. FULL VALIDATION BEFORE MERGEABLE COMPLETION
+================================================================================
+
+Before presenting a normal mergeable PR, run the repository's canonical full
+validation surface, including the equivalents of:
+
+    python3 tools/python-environment.py --check
+    python3 tools/format-module-contracts.py --check
+    zig fmt --check build.zig projects recipes conformance
+    zig build check
+    python3 tools/build-repository-index.py --check
+    python3 tools/build-dependency-graphs.py --check
+    PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+    zig build smoke
+    zig build recipes
+    zig build conformance
+    zig build property
+    zig build fuzz-smoke
+    zig build differential
+    zig build test
+    zig build validate-repository
+    python3 tools/check-repository-policy.py
+
+Regenerate canonical generated validation evidence if repository tooling says
+it is stale.
+
+Do not hand-edit generated evidence merely to silence checks.
+
+If full validation cannot finish before the handoff deadline, leave the PR as
+DRAFT and state exactly what has and has not run.
+
+================================================================================
+13. STOP CONDITIONS
+================================================================================
+
+SUCCESS CONDITION A — STRONGEST
+
+    busybox.static sh -c 'echo batch31d'
+
+prints exactly:
+
+    batch31d
+
+and exits 0 under Morphic, with exact artifact identity and W+X=0, and the
+checkpoint is committed/pushed/PR-surfaced.
+
+SUCCESS CONDITION B — SAFE PARTIAL CHECKPOINT
+
+If the shell cannot be completed within the bounded campaign, stop only after:
+
+    strongest safe mechanism is committed
+    branch is pushed
+    PR/handoff exists
+    exact runtime advancement is documented
+    first remaining blocker is causal and reproducible
+
+A safe partial PR is success as a HANDOFF, but it is NOT shell completion.
+
+================================================================================
+14. NEXT CAMPAIGN AFTER A REAL STATIC BUSYBOX SHELL WIN
+================================================================================
+
+Do not implement this now.
+
+After static BusyBox shell is genuinely proven, the next fresh campaign should
+be dynamic musl pressure:
+
+    real dynamic-musl diagnostic
+        -> PT_INTERP handoff
+        -> dynamic loader startup
+        -> first real dynamic program
+        -> dynamic BusyBox in a later/following campaign
+
+Then:
+
+    Alpine minirootfs
+        -> /bin/sh
+        -> first real Alpine userspace
+
+But Batch 31D must remain focused on the static BusyBox shell.
+
+================================================================================
+15. GOVERNING SENTENCES
+================================================================================
+
+Minimum permanent mechanism.
+Maximum inherited civilization.
+
+Inherit aggressively. Fossilize cautiously.
+
+Compatibility belongs at the edges.
+Generative mechanisms belong at the center.
+
+Real software determines priority.
+
+The same exact failing artifact must be retried immediately after each repair.
+
+Do not let useful work disappear merely because the strongest finish line was
+not reached.
+
+END OF BATCH 31D CANONICAL REQUEST
