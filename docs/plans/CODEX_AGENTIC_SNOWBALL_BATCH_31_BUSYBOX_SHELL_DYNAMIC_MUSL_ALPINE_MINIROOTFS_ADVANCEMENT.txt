@@ -1,5 +1,5 @@
 CODEX AGENTIC SNOWBALL — BATCH 31
-BUSYBOX SHELL -> DYNAMIC MUSL -> DYNAMIC BUSYBOX -> ALPINE MINIROOTFS ADVANCEMENT
+EXACT STATIC BUSYBOX SHELL COMPLETION
 
 Repository:
 thanks-cohn/zig-reference
@@ -7,704 +7,172 @@ thanks-cohn/zig-reference
 Canonical request path:
 docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_31_BUSYBOX_SHELL_DYNAMIC_MUSL_ALPINE_MINIROOTFS_ADVANCEMENT.txt
 
-Request-creation main:
-f205d5fdfc92cbe32fc5482cdf997c39b39909d9
+NOTE: the filename is retained for continuity, but the scope is intentionally
+narrowed. Batch 31 is ONLY the exact static BusyBox shell campaign. Dynamic musl,
+dynamic BusyBox, and Alpine minirootfs are deferred to fresh later runs.
 
-Historical checkpoint immediately before this request:
-morphic-riscv-batch30-green-recovery-static-musl-preserved-busybox-245page-unresolved-2026-08-13
+STARTING TRUTH
 
-================================================================================
-0. READ THIS FIRST — THIS RUN MUST PRODUCE NEW RUNTIME PROGRESS
-================================================================================
+- Main is green after Batch 30 recovery.
+- Exact pinned static musl is already proven under Morphic.
+- Do not redo formatting recovery or static-musl architecture.
+- Do not begin with the full repository validation suite.
+- Use focused tests while iterating, then full validation near the end.
 
-The repository is green again.
+EXACT PRESSURE ARTIFACT
 
-Do NOT spend this campaign redoing Batch 30 green recovery.
-Do NOT begin by running the entire repository validation surface again.
-Do NOT spend the campaign writing a report about known state.
-Do NOT stop after increasing a capacity bound.
-Do NOT stop merely because BusyBox reaches U-mode.
-Do NOT stop merely because the first new syscall/trap is observed.
-
-The first minutes of this run should be engineering against the current real
-pressure frontier, not archaeology and not ceremonial revalidation.
-
-Use focused tests while iterating. Run the complete repository/CI validation
-surface only after a new runtime boundary has been reached, or immediately
-before opening/updating the focused PR.
-
-A report is an end-of-run artifact, not a substitute for implementation.
-
-Unless a genuinely nontrivial external or architectural blocker prevents
-continued repair, this campaign MUST produce at least one NEW runtime boundary
-beyond the inherited exact static-musl success.
-
-Primary mandatory boundary:
-
-    exact pinned busybox.static sh -c 'echo batch31'
-
-must execute under Morphic, print exactly:
-
-    batch31
-
-and terminate with status 0.
-
-If that boundary is reached with meaningful task budget remaining, DO NOT STOP.
-Immediately continue into dynamic musl pressure, then dynamic BusyBox, then a
-real Alpine minirootfs /bin/sh if each next boundary is genuinely reachable.
-
-This is an ALPINE-DIRECTED pressure campaign.
-
-================================================================================
-1. INHERITED TRUTH — DO NOT REDO IT
-================================================================================
-
-Batch 29 proved the exact pinned static RV64 musl diagnostic genuinely executes
-under Morphic through the existing path:
-
-    exact ELF bytes
-        -> ExecPlan
-        -> MaterializedImage
-        -> Linux initial stack
-        -> PREPARE / COMMIT
-        -> Sv39
-        -> U-mode
-        -> Linux compatibility edge
-
-Exact static-musl SHA-256:
-
-    ff9761d82b7ae05bc577ea46acd4bd9119e29a28e9b1ccb621514df11fd8b74d
-
-Expected and already-proven output:
-
-    batch27-static-musl
-
-Already-proven terminal status:
-
-    0
-
-Already-observed calls for that diagnostic:
-
-    set_tid_address
-    write
-    exit_group
-
-The proof preserves:
-
-    exact artifact identity
-    PREPARE/COMMIT atomicity
-    W+X = 0
-    three materialized pages
-    one-byte identity mutation rejection
-    inherited Batch 26 execution behavior
-
-Batch 30 then repaired the historical Zig-formatting CI defect and restored the
-repository to green while reproving this static-musl result.
-
-Therefore:
-
-    formatting recovery = CLOSED
-    static-musl architecture = CLOSED
-    static-musl execution = CLOSED
-
-Do not redesign those mechanisms absent new causal evidence.
-
-================================================================================
-2. CURRENT FIRST PRESSURE ORACLE — EXACT STATIC BUSYBOX
-================================================================================
-
-Continue using the exact already-pinned Alpine v3.22 static BusyBox artifact.
-
-Package:
-
+Alpine v3.22 package:
     busybox-static-1.37.0-r20.apk
 
 Package SHA-256:
-
     29072f0a72ff8f2ff19a8be703cf0e68d4722ea4dc0acf4830acc932f98cf31c
 
 Executable:
-
     bin/busybox.static
 
 Executable SHA-256:
-
     62831fb7c4a0da509481107a8aeb022244235c5dced18101e3d39131d303d704
 
 Measured prepared image:
+    245 pages
 
-    245 materialized pages
+Use the SAME exact executable bytes for the golden reference and Morphic proof.
+Do not patch, relink, truncate, vendor, or substitute the artifact.
 
-The current machine proof still carries the small historical prepared-image
-fixture capacity around 4 pages.
+FIRST OBSERVED BLOCKER
 
-BusyBox already passed ELF planning after the Batch 29 metadata repairs.
-Its current first failure is therefore capacity during PREPARE, before
-destructive COMMIT.
+The exact BusyBox image already passes ELF planning. Its first current failure is
+PREPARE-time capacity: the machine proof still carries a historical tiny
+prepared-image capacity around 4 pages while BusyBox materializes to 245 pages.
+The failure occurs before destructive COMMIT.
 
-That is the first task.
+Repair this with the smallest correct GENERAL BOUNDED machine-adapter policy.
 
-================================================================================
-3. PHASE A — GENERAL PREPARED IMAGE/BACKING CAPACITY
-================================================================================
+245 is measured pressure, NOT a permanent Morphic architectural constant.
 
-Replace the tiny machine-fixture prepared-image/backing limit with the smallest
-correct GENERAL BOUNDED machine-adapter policy capable of carrying the observed
-BusyBox image.
+Requirements:
 
-The number 245 is pressure evidence, not architecture.
+- reuse the existing ExecPlan -> MaterializedImage -> PREPARE/COMMIT -> Sv39 -> U-mode path;
+- do not create a BusyBox-specific loader;
+- keep prepared image capacity as explicit replaceable proof/machine policy;
+- reserve required image backing before COMMIT;
+- reserve required Sv39 table backing before COMMIT;
+- perform no ordinary backing allocation after destructive COMMIT begins;
+- preserve exact final page permissions;
+- preserve W+X=0;
+- preserve the existing static-musl result;
+- add a focused insufficient-capacity proof showing failure occurs before COMMIT and leaves the live image intact.
 
-BAD:
+Then retry the SAME BusyBox immediately. Do not stop to write a report or run the
+entire repository suite after merely changing the capacity policy.
 
-    Morphic universal image capacity = 245
-    BusyBox-specific image loader
-    a special-case branch for this SHA
-    allocating pages after destructive COMMIT begins
+MANDATORY COMMAND LADDER
 
-GOOD:
+1. busybox.static true
+   Required: status 0
 
-    explicit replaceable machine/test capacity policy
-    bounded prepared backing proportional to the selected prepared image
-    capacity derived from a reviewable machine-proof bound
-    all image backing reserved before COMMIT
-    all required Sv39 table backing reserved before COMMIT
-    no ordinary allocation after destructive unmap begins
-    existing MaterializedImage semantics preserved
-    exact final per-page permissions preserved
-    W+X = 0 preserved
+2. busybox.static echo batch31
+   Required: exact output `batch31` and status 0
 
-If the current generic MaterializedImage compile-time capacity itself is still 4,
-raise/refactor that proof-fixture bound in the smallest general way necessary.
-Do not interpret a proof-harness bound as a permanent Morphic ontology.
+3. busybox.static sh -c 'echo batch31'
+   Required: exact output `batch31` and status 0
 
-Prove at least one negative capacity/atomicity property appropriate to the new
-policy: an intentionally insufficient bound must fail before destructive COMMIT
-and must leave the currently live image intact.
+Step 3 is the Batch 31 finish line.
 
-Then immediately retry the SAME exact BusyBox artifact.
+For every repairable runtime failure in this ladder:
 
-Do not pause to write the report.
+    observe first real failure
+        -> classify reusable Morphic mechanism vs Linux compatibility-edge behavior
+        -> implement the smallest correct repair
+        -> add focused causal proof
+        -> retry the SAME exact command immediately
 
-================================================================================
-4. PHASE B — REAL STATIC BUSYBOX COMMAND LADDER
-================================================================================
+Do not prebuild a guessed BusyBox syscall checklist. Let the exact artifact expose
+what is actually missing. Keep Linux-specific policy at the Linux personality
+edge and keep neutral reusable mechanisms in Morphic.
 
-After capacity no longer blocks PREPARE, execute the exact same unmodified
-busybox.static under Morphic in this order:
+DO NOT STOP AT INTERMEDIATE CHECKPOINTS
 
-    busybox.static true
+The following are NOT Batch 31 success:
 
-then:
+- capacity increased but BusyBox still does not run;
+- BusyBox reaches U-mode;
+- the first new runtime call is observed;
+- `true` passes but `echo` does not;
+- `echo` passes but `sh -c` does not;
+- a report says more work is needed.
 
-    busybox.static echo batch31
+If a failure is reasonably repairable in the run, repair it and continue.
+Only stop before shell success for a genuinely nontrivial blocker, with exact
+observed evidence and a clear explanation of why it could not reasonably be
+completed in the remaining run.
 
-then:
+SHELL SUCCESS MUST BE REAL
+
+The exact invocation must genuinely be:
 
     busybox.static sh -c 'echo batch31'
 
-The host/Linux golden output for echo and shell must be established using the
-SAME exact executable bytes.
+BusyBox must receive the intended argv and execute its shell path. Do not replace
+the shell command with a direct echo invocation or synthetic fixture and claim
+shell success.
 
-For each command:
+ARCHITECTURAL RULES
 
-    1. transport/identify the exact same artifact;
-    2. execute it through the existing Morphic path;
-    3. record the first real trap/syscall/divergence;
-    4. classify it;
-    5. implement the smallest correct repair;
-    6. add focused causal proof;
-    7. retry the SAME exact artifact immediately.
+Minimum permanent mechanism. Maximum inherited civilization.
 
-Do not prebuild a BusyBox syscall checklist.
+Morphic remains the neutral foundation. QuirkM native userspace, Linux
+ABI/personality userspace, and WebAssembly/WASI userspace are parallel software
+worlds above it. No one software civilization owns the center.
 
-When a syscall is demanded, ask:
+Pressure discovers missing capabilities; it does not define permanent API shape.
+Compatibility belongs at replaceable edges. Reusable generative mechanisms belong
+at the center.
 
-    Is this a reusable neutral Morphic mechanism?
+VALIDATION
 
-or:
+During iteration use focused tests and keep retry distance short.
 
-    Is this Linux personality/ABI policy at the compatibility edge?
+After the exact shell command succeeds, run the complete canonical repository
+validation surface, including formatting, build/check, repository validation,
+index/dependency checks, command-reference and repository-policy checks, inherited
+Batch 26 machine proof, inherited exact static-musl proof, and the new exact
+static-BusyBox proof.
 
-Keep Linux-specific numbering, errno behavior, fd conventions, process quirks,
-/proc assumptions, ioctl shapes, and similar historical residue at the Linux
-edge unless independent evidence justifies a neutral mechanism.
+Regenerate any canonical generated evidence using repository tooling rather than
+editing generated truth by hand.
 
-Do not let BusyBox become the architect of Morphic.
+REPORT
 
-MANDATORY BATCH 31 MINIMUM SUCCESS:
-
-    exact pinned busybox.static sh -c 'echo batch31'
-
-prints exactly:
-
-    batch31
-
-and exits status 0 under Morphic.
-
-A capacity-only patch is NOT Batch 31 success.
-A U-mode-entry-only patch is NOT Batch 31 success.
-A first-syscall observation is NOT Batch 31 success.
-A report saying the command is still unpassed is NOT Batch 31 success unless a
-new genuinely nontrivial blocker is demonstrated with exact causal evidence and
-cannot reasonably be repaired in the remaining run.
-
-================================================================================
-5. PHASE C — IMMEDIATELY BEGIN DYNAMIC MUSL AFTER STATIC BUSYBOX SHELL
-================================================================================
-
-If the mandatory static BusyBox shell boundary passes and meaningful task budget
-remains, continue immediately.
-
-Do not open a PR merely because static BusyBox shell passed if the next dynamic
-pressure can still be attacked safely in the same campaign.
-
-The next target is a REAL DYNAMIC RV64 musl-linked program.
-
-Prefer an extremely small diagnostic first, because it isolates dynamic-loader
-mechanism without turning the diagnostic itself into the milestone.
-
-Requirements for the dynamic artifact:
-
-    real RV64 ELF
-    dynamically linked against musl
-    real PT_INTERP
-    no vendored binary committed to the repository
-    exact reproducible acquisition/build instructions
-    SHA-256 recorded
-    SAME bytes used for Linux golden and Morphic execution
-
-A small diagnostic built reproducibly with the repository's Zig 0.14.0 toolchain
-is acceptable if it is genuinely dynamically linked and exercises the real musl
-interpreter. An exact official Alpine artifact is also acceptable if provenance
-is cleaner. Choose the smallest trustworthy pressure source, record why, and
-fail closed on identity.
-
-Expected pipeline:
-
-    dynamic main ELF
-        -> existing ExecPlan
-        -> PT_INTERP path
-        -> interpreter ELF
-        -> MaterializedImage(s)
-        -> Linux initial stack / auxv
-        -> PREPARE / COMMIT
-        -> Sv39
-        -> musl dynamic loader in U-mode
-
-Do NOT perform userspace relocations in the kernel.
-The musl loader owns userspace dynamic linking.
-
-Do NOT create a second dynamic loader in Morphic.
-
-Let the real interpreter expose what is missing.
-
-Likely pressure MAY include things such as:
-
-    mmap / mprotect
-    TLS setup
-    auxv details
-    file/path access
-    close/read/pread-like behavior
-    brk-like memory behavior
-    set_tid_address
-    signal/thread startup details
-
-These are examples, NOT a checklist to preimplement.
-Only implement what the exact execution demonstrates.
-
-Dynamic-musl success means the real dynamic program prints its exact expected
-output and exits 0 under Morphic through the real musl interpreter.
-
-================================================================================
-6. PHASE D — DYNAMIC BUSYBOX, IF DYNAMIC MUSL PASSES
-================================================================================
-
-If dynamic musl passes and there is meaningful task budget remaining, continue
-immediately to a real dynamically linked Alpine BusyBox.
-
-Use an exact Alpine v3.22 artifact from the same software civilization/release
-family where practical.
-
-Before claiming anything:
-
-    pin exact package/release provenance;
-    record package and executable SHA-256 identities;
-    identify the exact PT_INTERP/interpreter bytes;
-    use the SAME executable/interpreter bytes for golden Linux and Morphic;
-    do not vendor them permanently.
-
-Attack the same small ladder:
-
-    dynamic busybox true
-    dynamic busybox echo batch31-dynamic
-    dynamic busybox sh -c 'echo batch31-dynamic'
-
-Every repairable first failure becomes the next task in this run.
-
-Dynamic BusyBox success is a much stronger signal that the Linux personality and
-userspace loader are ready to meet a real Alpine filesystem.
-
-================================================================================
-7. PHASE E — REAL ALPINE MINIROOTFS PRESSURE, IF REACHABLE
-================================================================================
-
-If dynamic BusyBox shell passes and there is still meaningful task budget,
-do not invent another synthetic target.
-
-Move immediately to a real Alpine v3.22 riscv64 minirootfs or equivalent exact
-minimal root filesystem from the same release family.
-
-Pin exact provenance and SHA-256.
-Do not silently substitute a different Alpine release.
-Do not patch binaries to make them easier.
-Do not vendor the rootfs unless repository policy explicitly supports a generated
-fixture mechanism; prefer temporary/generated host plumbing with exact identity.
-
-FIRST ALPINE FINISH LINE IS NARROW:
-
-    real unmodified Alpine minirootfs
-        -> Morphic
-        -> /bin/sh -c 'echo alpine'
-        -> exact output: alpine
-        -> status 0
-
-This is NOT yet an OpenRC/service-manager/networking/desktop milestone.
-
-Do not require:
-
-    system services
-    networking
-    login manager
-    /proc completeness
-    /sys completeness
-    package manager
-    graphical stack
-
-unless the exact /bin/sh startup demonstrably requires some smaller piece.
-
-If Alpine /bin/sh fails, observe the first exact failure and continue the same
-Pressure Oracle loop.
-
-Likely classes of pressure may include pathname traversal, directories,
-filesystem metadata, cwd, process creation/waiting, pipes, terminal semantics,
-or additional loader/syscall behavior. Again: examples only, not a prebuild list.
-
-================================================================================
-8. ALPINE DIRECTION — WHAT COUNTS AS REAL PROGRESS
-================================================================================
-
-This campaign is successful if it materially shortens this path:
-
-    static musl                DONE
-        -> static BusyBox      CURRENT
-        -> static BusyBox sh
-        -> dynamic musl
-        -> dynamic BusyBox
-        -> Alpine /bin/sh
-        -> apk
-
-The minimum acceptable NEW runtime win is the static BusyBox shell.
-
-Stronger outcomes, in order:
-
-    A. busybox.static true passes
-    B. busybox.static echo passes
-    C. busybox.static sh -c passes              MANDATORY TARGET
-    D. real dynamic musl program passes
-    E. dynamic BusyBox shell passes
-    F. real Alpine minirootfs /bin/sh passes
-
-Do not artificially stop at C, D, or E if the next boundary remains safely and
-meaningfully attackable within this run.
-
-The point of the Agentic Snowball is frontier movement, not one named checkbox
-per PR.
-
-================================================================================
-9. DEVELOPMENT LOOP — KEEP RETRY DISTANCE SHORT
-================================================================================
-
-For every new runtime failure:
-
-    RUN EXACT TARGET
-        -> OBSERVE FIRST FAILURE
-        -> CLASSIFY
-        -> IMPLEMENT SMALLEST REPAIR
-        -> FOCUSED CAUSAL PROOF
-        -> RETRY SAME TARGET IMMEDIATELY
-
-Keep Retry Distance short.
-
-Do not respond to a syscall failure by running the full 300+ step repository
-validation suite before retrying the target.
-
-Use focused unit/smoke/machine tests while iterating.
-
-Only after a meaningful runtime frontier has moved should you run the complete
-validation surface.
-
-This is specifically intended to prevent spending the entire Codex campaign on
-verification of inherited behavior while producing no new compatibility result.
-
-================================================================================
-10. ARCHITECTURAL NEUTRALITY / CORNERSTONE RULES
-================================================================================
-
-Morphic is the neutral foundation.
-
-Parallel software worlds include:
-
-    QuirkM native userspace
-    Linux ABI/personality userspace
-    WebAssembly/WASI userspace
-
-No one software civilization owns the center.
-
-Use empirical kernel distillation across multiple software civilizations:
-recurring semantic needs are candidates for neutral Morphic mechanisms;
-civilization-specific residue remains at replaceable edges.
-
-Examples:
-
-BAD:
-
-    Morphic fd = Linux fd
-
-GOOD:
-
-    Morphic resource identity -> Linux fd adapter
-
-BAD:
-
-    Morphic process semantics = fork/clone/execve history
-
-GOOD:
-
-    neutral address spaces, execution contexts, resource bindings, image
-    replacement and task creation -> Linux personality composition
-
-BAD:
-
-    Morphic image architecture sized around this BusyBox
-
-GOOD:
-
-    general bounded machine-proof resource policy consuming neutral page/image
-    mechanisms
-
-Pressure discovers missing capabilities.
-Pressure does not define permanent API shape.
-
-================================================================================
-11. IRREVERSIBILITY BUDGET
-================================================================================
-
-Cheap/reversible changes may include:
-
-    proof-harness capacities
-    test fixtures
-    verifier presentation
-    Linux syscall adapters
-    exact artifact acquisition plumbing
-    API spelling local to compatibility edges
-
-Expensive/foundational changes include:
-
-    resource identity
-    ownership model
-    address-space semantics
-    task model
-    VM/vCPU model
-    interrupt model
-    concurrency primitives
-
-Apply design scrutiny in proportion to reversal cost.
-
-Do not fossilize a historical Linux behavior in the permanent center merely to
-save a few minutes in this campaign.
-
-================================================================================
-12. PROOF REQUIREMENTS
-================================================================================
-
-For each claimed boundary, proof must distinguish causality from coincidence.
-
-Static BusyBox proof should include, as appropriate:
-
-    exact executable SHA identity
-    exact command/argv identity
-    expected stdout
-    expected terminal status
-    prepared page count
-    W+X = 0
-    no post-destructive-COMMIT ordinary allocation
-    negative identity mutation
-    insufficient-capacity failure before COMMIT
-    inherited static-musl preservation
-
-Dynamic proof should additionally establish:
-
-    exact main ELF identity
-    exact interpreter identity
-    real PT_INTERP handoff
-    correct entry/handoff behavior
-    exact stdout/status
-    no kernel userspace relocation implementation
-
-Alpine rootfs proof should establish:
-
-    exact rootfs provenance/hash
-    exact /bin/sh identity or package provenance
-    exact command
-    exact stdout/status
-    first-failure evidence for any unresolved boundary
-
-Do not claim success based only on buildability or ELF parsing.
-
-================================================================================
-13. FULL VALIDATION — AFTER FRONTIER MOVEMENT
-================================================================================
-
-Once at least the mandatory static BusyBox shell boundary has moved, or once a
-genuine nontrivial blocker is reached after substantial implementation, run the
-full validation appropriate to the repository.
-
-At minimum preserve the repository's canonical equivalents of:
-
-    Zig 0.14.0 formatting
-    zig build check
-    repository index/dependency checks
-    command-reference drift checks
-    smoke/recipes/conformance/property/fuzz-smoke/differential/test surfaces
-    zig build validate-repository
-    repository policy
-    static secret checks
-    inherited Batch 26 machine verifier
-    inherited exact static-musl machine verifier
-
-Also run the new BusyBox/dynamic/Alpine focused verifier(s) created by this
-campaign.
-
-If full CI reveals a mechanical generated-index/evidence drift after the runtime
-boundary is already proven, repair that drift and rerun. Do not erase the runtime
-progress.
-
-================================================================================
-14. REPORTING
-================================================================================
-
-Only after implementation/proof work, write/update:
+Only after implementation, create/update:
 
     docs/reports/AGENTIC_SNOWBALL_BATCH_31.md
 
-The report must clearly separate:
+Record the exact artifact identities, 245-page pressure, capacity/backing repair,
+real runtime failures encountered in order, repairs, exact true/echo/sh results,
+proofs, and validation result.
 
-    PROVEN
-    ATTEMPTED BUT NOT PROVEN
-    FIRST CURRENT BLOCKER
+EXPLICIT NON-GOALS FOR THIS RUN
 
-Record exact artifact hashes and exact observed failures.
+Do not begin dynamic musl, dynamic BusyBox, Alpine minirootfs, apk, QEMU, KVM,
+Wayland/XFCE, or WebAssembly/WASI implementation in Batch 31.
 
-Do not create a rosy milestone statement if only capacity was changed.
-Do not claim dynamic musl if only PT_INTERP parsing succeeded.
-Do not claim Alpine if only a rootfs was downloaded.
+Expected next fresh campaigns after this one:
 
-If the mandatory static BusyBox shell target passes, state that explicitly.
-If dynamic musl passes, state it explicitly.
-If dynamic BusyBox passes, state it explicitly.
-If Alpine /bin/sh passes, state it explicitly.
+    Batch 32: real dynamic musl -> dynamic BusyBox shell
+    Batch 33: real Alpine minirootfs -> /bin/sh
+    later: Alpine usability -> apk -> QEMU pressure
 
-If something does not pass, say so.
+SUCCESS DEFINITION
 
-================================================================================
-15. PR / COMMIT DISCIPLINE
-================================================================================
+Batch 31 is complete only when the exact pinned busybox.static SHA-256
+62831fb7c4a0da509481107a8aeb022244235c5dced18101e3d39131d303d704
+passes all three under Morphic:
 
-Work in one focused Codex branch/PR for this campaign.
+    busybox.static true
+    busybox.static echo batch31
+    busybox.static sh -c 'echo batch31'
 
-Do not merge your own PR unless repository/user workflow explicitly asks.
-
-Do not create multiple ceremonial PRs for:
-
-    capacity only
-    then syscall one
-    then syscall two
-
-if the failures are repairable within the same campaign.
-
-Continue the Pressure Oracle loop until the strongest genuinely reachable
-boundary is achieved.
-
-A useful intermediate commit is fine; a premature campaign stop is not.
-
-================================================================================
-16. SUCCESS HIERARCHY
-================================================================================
-
-MANDATORY TARGET:
-
-    exact busybox.static sh -c 'echo batch31'
-        -> exact stdout batch31
-        -> exit 0
-
-STRONGLY PREFERRED CONTINUATION:
-
-    real dynamic musl program
-        -> real PT_INTERP/musl loader
-        -> exact expected stdout
-        -> exit 0
-
-NEXT:
-
-    real dynamic Alpine BusyBox shell
-        -> exact expected stdout
-        -> exit 0
-
-BEST CASE FOR THIS CAMPAIGN:
-
-    real Alpine v3.22 riscv64 minirootfs
-        -> /bin/sh -c 'echo alpine'
-        -> exact stdout alpine
-        -> exit 0
-
-ACCEPTABLE EARLY STOP:
-
-Only if a genuinely nontrivial blocker remains after focused implementation and
-cannot reasonably be repaired in the remaining campaign. The report must include
-exact pressure evidence and why it is not merely another repairable next step.
-
-UNACCEPTABLE EARLY STOPS:
-
-    "capacity increased"
-    "CI is green"
-    "BusyBox reaches U-mode"
-    "observed first syscall"
-    "dynamic ELF parses"
-    "downloaded Alpine"
-    "wrote report"
-
-================================================================================
-17. FINAL GOVERNING LAW
-================================================================================
-
-Run the most valuable real software that is almost reachable.
-Implement the first missing reusable mechanism it exposes.
-Prove the mechanism causally.
-Retry immediately.
-Stop implementing only when a genuine compatibility boundary transfers
-responsibility to inherited ecosystem or a nontrivial blocker cannot reasonably
-be repaired in the remaining campaign.
-
-For Batch 31, the direction is explicit:
-
-    exact static BusyBox shell
-        -> dynamic musl
-        -> dynamic BusyBox
-        -> real Alpine /bin/sh
-
-Minimum permanent mechanism.
-Maximum inherited civilization.
-Maximum frontier movement per campaign.
-Compatibility belongs at the edges.
-Generative mechanisms belong at the center.
-Real software determines priority.
+with expected status/output while preserving exact artifact identity,
+PREPARE/COMMIT atomicity, W+X=0, inherited static-musl success, and green final
+repository validation.
