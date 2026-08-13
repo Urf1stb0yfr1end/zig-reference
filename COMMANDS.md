@@ -455,6 +455,8 @@ Batch 31C's first real QEMU retry exposed two reservation-integration regression
 
 With explicit argv, the exact pinned BusyBox `true` applet reached COMMIT and U-mode, made 12 observed syscalls, produced no stdout, and exited status 0 with 244 executable pages and W+X=0. The next exact `echo batch31c` pressure repaired bounded `brk` growth through unused prepared backing, then honestly stopped at its first unsupported anonymous `mmap` request (`nr=222`, address `0x104000`, length 4096, protection 0, flags `0x32`); it still reports `echo: out of memory` and status 1. Batch 31C shell completion is not claimed.
 
+The PR #65 validation-only follow-up regenerated all 60 canonical unit/smoke evidence records after the shared `build.zig` digest changed, without changing the established runtime implementation or frontier.
+
 ## Batch 28 machine materializer checkpoint
 
 `zig build install-freestanding-riscv64-morphic-runtime --prefix PATH` compiled
