@@ -1,0 +1,580 @@
+CODEX AGENTIC SNOWBALL — BATCH 31B
+DISTINCT PREPARED-IMAGE RESERVATION -> BUSYBOX RETRY
+WITH MANDATORY EARLY PR/HANDOFF CHECKPOINTING
+
+Repository:
+thanks-cohn/zig-reference
+
+Canonical request path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_31B_DISTINCT_PREPARED_RESERVATION_BUSYBOX_RETRY_30MIN_HANDOFF.txt
+
+Request-creation main:
+e24fbd5ce22550e8dc6cf35f9d5eb8c252be90df
+
+Inherited report:
+docs/reports/AGENTIC_SNOWBALL_BATCH_31.md
+
+================================================================================
+0. OPERATING RULE — NEVER LET A LONG RUN DISAPPEAR WITHOUT A HANDOFF
+================================================================================
+
+This continuation exists because the previous Batch 31 engineering run spent
+roughly forty minutes discovering a real machine-layout constraint, then restored
+its worktree to clean because the final BusyBox shell target was not achieved.
+A salvage follow-up later recovered the knowledge into PR #63, but the original
+experimental implementation had already been discarded.
+
+DO NOT REPEAT THAT FAILURE MODE.
+
+For this task, preserving useful work is a first-class requirement equal to the
+runtime target.
+
+MANDATORY HANDOFF POLICY:
+
+1. Work on a normal task branch from current main.
+
+2. As soon as the first coherent, technically safe, nontrivial implementation or
+   focused regression exists, COMMIT IT. Do not wait for the final BusyBox shell.
+
+3. Push safe commits early. Once there is enough coherent work to review, open a
+   DRAFT pull request against main and continue the engineering campaign on that
+   same PR branch.
+
+4. Do not restore a useful worktree to clean merely because the ultimate finish
+   line is not reached. Unsafe experiments may be reverted, but safe prerequisites,
+   focused tests, diagnostics, and causal evidence must be preserved.
+
+5. Treat approximately 25 minutes of active task work as the HANDOFF WARNING.
+   At that point, if no PR exists yet, stop starting large new experiments and
+   package the strongest safe current progress into commits and a draft PR.
+
+6. Treat approximately 30 minutes of active task work as a HARD CHECKPOINT.
+   By then, prefer surfacing the accumulated work over beginning another long
+   debugging cycle. Ensure that everything safe and useful is immediately
+   available through one of the following, in priority order:
+
+       A. mergeable PR with green relevant validation;
+       B. draft PR containing safe incomplete prerequisite work;
+       C. pushed branch + commits + exact proposed PR body if PR creation is
+          externally impossible.
+
+7. If the final BusyBox shell succeeds before the checkpoint, excellent: finish
+   validation and make the PR mergeable. If it does not, DO NOT erase the run.
+   Preserve the strongest safe advancement and exact next blocker.
+
+8. A report is written LAST. Documentation is not a substitute for implementation.
+
+The required end-state of every substantial run is therefore:
+
+    engineering work
+        -> safe incremental commit(s)
+        -> push
+        -> PR/handoff exists
+        -> continue while budget remains
+
+NOT:
+
+    engineering work
+        -> final target misses
+        -> git restore / clean worktree
+        -> forty minutes vanish
+
+If wall-clock runtime is not directly visible, apply the same policy after one
+substantial implementation/debugging cycle and BEFORE launching another long
+machine-validation or exploratory cycle.
+
+================================================================================
+1. INHERITED TRUTH — DO NOT REDISCOVER IT
+================================================================================
+
+Current main already preserves the exact findings from PR #63.
+
+Exact Alpine v3.22 pressure package:
+
+    busybox-static-1.37.0-r20.apk
+
+Package SHA-256:
+
+    29072f0a72ff8f2ff19a8be703cf0e68d4722ea4dc0acf4830acc932f98cf31c
+
+Exact executable:
+
+    bin/busybox.static
+
+Executable SHA-256:
+
+    62831fb7c4a0da509481107a8aeb022244235c5dced18101e3d39131d303d704
+
+The committed inspector:
+
+    tools/inspect-elf-prepared-image.py
+
+measured:
+
+    244 unique 4 KiB PT_LOAD pages
+    0 W+X pages
+
+The separately prepared initial stack contributes one additional page, making:
+
+    244 load pages + 1 stack page = 245 complete machine-candidate pages
+
+This is DERIVED PRESSURE, not a Morphic architectural constant.
+
+Do not waste task time re-deriving this unless a focused regression requires it.
+
+================================================================================
+2. PREVIOUS FAILED APPROACH — DO NOT REPEAT IT
+================================================================================
+
+The previous Batch 31 experiment simply enlarged the historical inline
+MaterializedImage/backing arrays.
+
+That approach is NOT independently safe.
+
+Those arrays live in the ordinary kernel image. Enlarging them enough for the
+real BusyBox pressure expanded the kernel image into the inherited:
+
+    0x8040_0000
+
+fixture/test virtual-address range.
+
+Attempts to relocate the storage further exposed additional identity-mapping and
+Sv39 intermediate-table backing requirements.
+
+Therefore:
+
+BAD:
+
+    change [4] pages to [245] pages in ordinary kernel image
+
+BAD:
+
+    move a giant array somewhere else without proving mapping ownership/layout
+
+BAD:
+
+    hardcode 245 as Morphic architecture
+
+GOOD:
+
+    distinct bounded machine-adapter reservation/layout policy
+        -> outside ordinary kernel image growth pressure
+        -> outside inherited user fixture/test ranges
+        -> explicit ownership and bounds
+        -> candidate load-page backing reserved during PREPARE
+        -> initial-stack backing reserved during PREPARE
+        -> required Sv39 intermediate table backing reserved during PREPARE
+        -> no ordinary allocation after destructive COMMIT begins
+
+The current exact next step from the preserved Batch 31 report is authoritative:
+introduce this distinct bounded replaceable reservation policy, prove insufficient
+capacity fails before COMMIT and leaves the current live image intact, preserve
+static musl, then retry exact BusyBox beginning with `true`.
+
+================================================================================
+3. PRIMARY ENGINEERING TARGET — DISTINCT MACHINE RESERVATION
+================================================================================
+
+Implement the smallest correct GENERAL BOUNDED machine-adapter reservation that
+allows a prepared executable image substantially larger than the historical tiny
+fixture without inflating ordinary kernel-image storage into the user test range.
+
+Study the existing linker layout, machine physical-frame model, Sv39 builder,
+Batch 26/29 PREPARE/COMMIT path, prepared page storage, stack storage, and table
+reservation machinery before choosing the exact mechanism.
+
+The solution may require a linker-reserved region, a bounded physical reservation,
+a machine-owned backing arena, or another explicit replaceable machine-policy
+mechanism. Choose based on the existing architecture and causal evidence.
+
+Do not invent a new loader.
+Do not move Linux policy into Morphic.
+Do not add general-purpose dynamic allocation after COMMIT.
+Do not make the foundation depend on BusyBox identity.
+
+Required properties:
+
+- explicit finite bound;
+- bound belongs to replaceable machine/proof policy, not Morphic ontology;
+- candidate image pages can consume the reservation without residing as a giant
+  ordinary inline kernel array;
+- stack backing is included coherently;
+- all required physical/backing ownership is established during PREPARE;
+- all required Sv39 intermediate table capacity is established during PREPARE;
+- destructive COMMIT begins only after all fallible resource acquisition succeeds;
+- exact final page permissions are preserved;
+- W+X remains prohibited;
+- existing static-musl execution remains valid;
+- inherited Batch 26 behavior remains valid.
+
+If the best architecture requires a reusable helper/type rather than a one-off
+recipe-local edit, implement only the smallest semantically justified helper.
+
+================================================================================
+4. REQUIRED CAUSAL PROOFS
+================================================================================
+
+Before considering the reservation mechanism safe, add focused proof for the
+new boundary.
+
+At minimum prove:
+
+A. INSUFFICIENT RESERVATION
+
+An intentionally undersized candidate reservation fails during PREPARE, before
+any destructive COMMIT operation, and the currently live execution image remains
+intact.
+
+B. NON-COLLISION / LAYOUT
+
+The new reservation does not grow or overlap the inherited 0x8040_0000 fixture
+range in the unsafe way discovered previously. Express this as a deterministic
+layout assertion/check when feasible rather than relying only on visual linker
+inspection.
+
+C. TABLE PREFLIGHT
+
+The mapping plan cannot enter destructive COMMIT unless the required Sv39
+intermediate-table backing for the prepared candidate is already available.
+
+D. INHERITED STATIC MUSL
+
+The exact pinned static-musl machine proof continues to pass unchanged.
+
+Use focused tests during iteration. Do not run the full repository suite after
+every small edit.
+
+================================================================================
+5. IMMEDIATE REAL SOFTWARE RETRY
+================================================================================
+
+Once the general reservation/layout policy passes focused proofs, immediately
+retry the SAME exact pinned BusyBox artifact through the existing path:
+
+    exact ELF bytes
+        -> ExecPlan
+        -> MaterializedImage
+        -> prepared backing reservation
+        -> Linux initial stack
+        -> Sv39 table preflight
+        -> PREPARE / COMMIT
+        -> U-mode
+        -> Linux compatibility edge
+
+Do not create a second path.
+
+Command ladder:
+
+    1. busybox.static true
+       required success: status 0
+
+    2. busybox.static echo batch31b
+       required success: exact stdout `batch31b` and status 0
+
+    3. busybox.static sh -c 'echo batch31b'
+       required success: exact stdout `batch31b` and status 0
+
+For every first real failure after capacity/layout is solved:
+
+    run exact target
+        -> observe first failure
+        -> classify
+        -> smallest correct repair
+        -> focused causal proof
+        -> retry SAME target immediately
+
+Do not prebuild a syscall checklist.
+Do not implement speculative Linux behavior.
+
+If a demanded behavior is Linux historical policy, keep it at the Linux
+personality/compatibility edge. If it reveals a genuinely reusable neutral
+mechanism, implement the minimum generative mechanism in Morphic.
+
+================================================================================
+6. BATCH 31B SUCCESS LEVELS
+================================================================================
+
+Strongest desired outcome:
+
+    busybox.static sh -c 'echo batch31b'
+        -> prints exactly batch31b
+        -> exits status 0
+
+Intermediate real runtime wins, if the shell is not reached before the handoff
+checkpoint:
+
+    Level 1: distinct reservation passes focused proofs
+    Level 2: exact BusyBox passes PREPARE and COMMIT
+    Level 3: exact BusyBox reaches U-mode past prior capacity/layout blocker
+    Level 4: busybox.static true exits 0
+    Level 5: busybox.static echo batch31b prints/exits correctly
+    Level 6: busybox.static sh -c 'echo batch31b' passes
+
+A safe lower level is worth preserving in a PR.
+
+DO NOT interpret this ladder as permission to stop early while substantial task
+budget remains. Continue toward the strongest level until the handoff checkpoint
+or a genuinely difficult blocker appears.
+
+But equally:
+
+DO NOT erase Level 1-5 merely because Level 6 is not reached.
+
+================================================================================
+7. CONTINUOUS PR / HANDOFF DISCIPLINE
+================================================================================
+
+This section is mandatory.
+
+After FIRST SAFE NONTRIVIAL ADVANCEMENT:
+
+    git diff / inspect changes
+    focused validation
+    commit
+    push
+
+If the change is coherent enough to review:
+
+    open DRAFT PR against main
+
+Continue implementing on the same branch and update that PR.
+
+Suggested PR state transitions:
+
+    safe prerequisite only        -> DRAFT PR
+    runtime frontier moved        -> DRAFT or normal PR depending validation
+    target passes + full green    -> normal mergeable PR
+
+Never claim more than observed.
+
+PR title must name the strongest real achievement. Examples:
+
+    Add bounded prepared-image reservation outside kernel fixture ranges
+
+    Add prepared-image reservation and advance exact BusyBox to U-mode
+
+    Execute exact static BusyBox true under Morphic
+
+    Execute exact static BusyBox shell under Morphic
+
+Do NOT call it "BusyBox completion" unless the shell command actually passes.
+
+Required PR body:
+
+## Motivation
+
+## What changed
+
+## Runtime frontier reached
+
+## Exact BusyBox evidence
+
+## Causal proofs / focused tests
+
+## Architectural reasoning
+
+## What this PR does NOT claim
+
+## Remaining blocker
+
+## Exact next step
+
+## Validation
+
+================================================================================
+8. APPROXIMATELY 25-MINUTE HANDOFF WARNING
+================================================================================
+
+At approximately 25 minutes of active work, ask:
+
+    Is all safe useful progress already committed and pushed?
+    Does a draft/normal PR exist?
+    If this task vanished now, could a fresh agent continue without rediscovery?
+
+If any answer is NO:
+
+STOP starting new large experiments.
+
+Package the current safe state immediately:
+
+    clean temporary/debug junk
+    preserve safe code
+    preserve tests
+    preserve exact measurements
+    preserve causal blocker evidence
+    focused validation
+    commit
+    push
+    open/update PR
+
+Only after the handoff exists may remaining time be spent on another focused
+runtime repair.
+
+================================================================================
+9. APPROXIMATELY 30-MINUTE HARD CHECKPOINT
+================================================================================
+
+At approximately 30 minutes, prioritize OUTPUT over another speculative cycle.
+
+If final shell passes:
+
+    run required validation
+    update report/COMMANDS only as justified
+    commit/push
+    make PR mergeable
+
+If final shell does NOT pass but safe progress exists:
+
+    DO NOT restore to clean main
+    DO NOT discard the safe prerequisite
+
+Instead:
+
+    commit/push strongest safe state
+    open/update DRAFT PR
+    state exact strongest level achieved
+    state exact first remaining blocker
+    include exact reproduction command/evidence
+
+If no code change proved safe but a new causal fact was discovered:
+
+    encode it in the smallest useful regression/test/tool if technically justified;
+    otherwise preserve it in the existing task branch report/handoff;
+    push the branch and provide a complete proposed PR/handoff package.
+
+External inability to create a PR is the only acceptable reason not to surface a
+PR when safe commit(s) exist.
+
+If PR creation fails externally, output ALL of:
+
+    branch name
+    commit SHA(s)
+    changed filenames
+    git diff main...HEAD --stat
+    focused validation commands/results
+    exact strongest runtime level reached
+    exact first remaining blocker
+    complete proposed PR title
+    complete proposed PR body
+    concise starter prompt for a fresh agent
+
+The point is that no substantial Codex run may end with useful technical work
+hidden only in transient context.
+
+================================================================================
+10. ARCHITECTURAL CONSTRAINTS
+================================================================================
+
+Minimum permanent mechanism.
+Maximum inherited civilization.
+
+Inherit aggressively.
+Fossilize cautiously.
+
+Pressure discovers mechanisms; pressure does not define them.
+Compatibility is a consumer, not the architect.
+
+Morphic remains the neutral center beneath parallel software worlds including:
+
+    QuirkM native userspace
+    Linux ABI/personality userspace
+    WebAssembly/WASI userspace
+
+The exact BusyBox artifact is a Pressure Oracle. Its 244 load pages and 245-page
+complete candidate pressure tell us what must be supported by this machine proof;
+they do not define permanent kernel ontology.
+
+Keep historical Linux syscall numbering, errno rules, fd conventions, process
+quirks, pathname residue, and similar compatibility policy at the Linux edge.
+
+Apply the Irreversibility Budget:
+
+Cheap/reversible:
+    machine proof capacities
+    linker/test layout
+    verifier tooling
+    Linux adapters
+    artifact plumbing
+
+Expensive/foundational:
+    resource identity
+    ownership semantics
+    address-space model
+    task model
+    VM/vCPU model
+    concurrency primitives
+
+Do not fossilize a high-irreversibility design merely to satisfy BusyBox faster.
+
+================================================================================
+11. VALIDATION STRATEGY
+================================================================================
+
+ITERATION:
+
+Use the narrowest relevant checks while moving the frontier.
+Retry exact BusyBox immediately after each causal repair.
+Keep Retry Distance short.
+
+HANDOFF CHECKPOINT:
+
+Before committing a safe partial prerequisite, run enough focused validation to
+make the commit reviewable and non-broken.
+
+FINAL / MERGEABLE PR:
+
+Run the repository's canonical validation surface appropriate to the modified
+areas, including Zig 0.14.0 formatting/checks and the inherited machine proofs.
+If full validation is too expensive before the 30-minute hard checkpoint, first
+surface the safe draft PR, then continue validation on that same branch/PR.
+
+A draft PR with explicit incomplete status is preferable to losing a validated
+25-minute prerequisite while chasing another 15-minute experiment.
+
+================================================================================
+12. REQUIRED FINAL OUTPUT
+================================================================================
+
+Before ending the task, print a compact handoff containing:
+
+    strongest success level reached (1-6)
+    exact BusyBox command last attempted
+    exact observed result/failure
+    branch name
+    commit SHA(s)
+    PR number/URL, if created
+    changed filenames
+    concise diffstat
+    focused validation status
+    full validation status
+    exact next action
+
+If a PR exists, ensure its body contains the same truth.
+
+Never claim:
+
+    BusyBox true passed unless observed
+    BusyBox echo passed unless observed
+    BusyBox shell passed unless observed
+    Batch 31 completed unless shell command passed
+    full validation passed unless actually run and green
+
+================================================================================
+13. FINISH LINE
+================================================================================
+
+Primary runtime finish line:
+
+    exact pinned busybox.static sh -c 'echo batch31b'
+        -> exact output `batch31b`
+        -> status 0 under Morphic
+
+Primary process finish line, regardless of runtime level:
+
+    ALL SAFE USEFUL WORK IS COMMITTED, PUSHED, AND IMMEDIATELY HANDOFF-READY
+    BY THE APPROXIMATELY 30-MINUTE CHECKPOINT.
+
+The task must advance the frontier OR preserve the strongest safe prerequisite
+needed to advance it next time.
+
+No more disappearing forty-minute runs.
