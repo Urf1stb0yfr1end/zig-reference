@@ -987,10 +987,7 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     external_entry = candidate.main_entry;
     external_initial_sp = external_stack_image.initial_sp.raw();
     external_trap_stack = trap_end;
-    asm volatile (
-        "la t0, external_entry; ld a0, 0(t0); la t0, external_initial_sp; ld a1, 0(t0); la t0, external_trap_stack; ld a2, 0(t0); call enterUserService"
-        ::: "memory", "ra", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "t0", "t1", "t2", "t3", "t4", "t5", "t6"
-    );
+    asm volatile ("la t0, external_entry; ld a0, 0(t0); la t0, external_initial_sp; ld a1, 0(t0); la t0, external_trap_stack; ld a2, 0(t0); call enterUserService" ::: "memory", "ra", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "t0", "t1", "t2", "t3", "t4", "t5", "t6");
     syscall_active = false;
     asm volatile ("csrw stvec, %[entry]; csrw sscratch, zero"
         :
