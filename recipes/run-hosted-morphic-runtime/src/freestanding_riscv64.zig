@@ -31,7 +31,10 @@ const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
 const physical_pool_pages = 8;
 const prepared_table_pages = 4;
-var prepared_table_backing: [prepared_table_pages][frames.PageSize]u8 align(frames.PageSize) = undefined;
+const prepared_image_pages = 256;
+var prepared_table_backing: [prepared_table_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
+var external_prepared_backing: [prepared_image_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
+var external_prepared_stack: [frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
 
 fn fnv1a64(bytes: []const u8) u64 {
     var value: u64 = 0xcbf29ce484222325;
@@ -52,6 +55,8 @@ extern var __writable_domain_end: u8;
 extern var __supervisor_stack_top: u8;
 extern var __user_trap_stack_begin: u8;
 extern var __user_trap_stack_end: u8;
+extern var __prepared_image_reservation_begin: u8;
+extern var __prepared_image_reservation_end: u8;
 
 const sv39_alias: usize = 0x8040_0000;
 const user_code_va: usize = 0x8040_1000;
@@ -143,7 +148,8 @@ var batch26_prepared_backing: [4][frames.PageSize]u8 align(frames.PageSize) = un
 var batch26_image_backing: [4]usize = .{ 0, 0, 0, 0 };
 var batch26_image_backing_count: usize = 0;
 var batch26_stack_image: initial_stack.StackPlan(512) = undefined;
-var external_image: Batch26MaterializedImage = .{};
+const ExternalPreparedImage = address_space.PreparedImage(prepared_image_pages);
+var external_image: ExternalPreparedImage = .{};
 var external_stack_image: initial_stack.StackPlan(512) = undefined;
 export var external_entry: usize = 0;
 export var external_initial_sp: usize = 0;
@@ -919,9 +925,8 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     };
     write("ZIGREF_BATCH29_PREPARE elf\n");
     if (candidate.interpreter != null) shutdown();
-    const prepared = Batch26MaterializedImage.prepare(bytes, &candidate.main.load, 0) catch shutdown();
+    const prepared = ExternalPreparedImage.prepare(bytes, &candidate.main.load, 0, &external_prepared_backing) catch shutdown();
     write("ZIGREF_BATCH29_PREPARE image\n");
-    if (prepared.items().len > batch26_prepared_backing.len) shutdown();
     const main_segment = candidate.main.load.items()[0];
     const at_phdr = main_segment.memory.start + 64;
     const argv = [_][]const u8{"/bin/batch27-static-musl"};
@@ -938,7 +943,8 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     // removed immediately; the builder-owned intermediate tables remain ready.
     for (prepared.items(), 0..) |page, index| {
         write("ZIGREF_BATCH29_PREPARE table\n");
-        const physical = @intFromPtr(&batch26_prepared_backing[index]);
+        if (page.backing_index != index) shutdown();
+        const physical = @intFromPtr(&external_prepared_backing[page.backing_index]);
         const permissions = sv39_entries.Permissions{ .read = true, .user = true, .accessed = true };
         _ = builder.mapPage(page.virtual_start, physical, .page_4k, permissions) catch shutdown();
         _ = builder.unmapPage(page.virtual_start, .page_4k) catch shutdown();
@@ -946,15 +952,14 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     external_image = prepared;
     external_stack_image = stack;
     write("ZIGREF_BATCH29_PHASE commit\n");
-    const stack_leaf = builder.query(user_stack_va) catch shutdown();
-    const stack_target: [*]volatile u8 = @ptrFromInt(stack_leaf.physical_address);
-    for (0..frames.PageSize) |i| stack_target[i] = 0;
+    @memset(&external_prepared_stack, 0);
     const stack_offset = external_stack_image.initial_sp.raw() - user_stack_va;
-    for (external_stack_image.bytes(), 0..) |byte, i| stack_target[stack_offset + i] = byte;
+    for (external_stack_image.bytes(), 0..) |byte, i| external_prepared_stack[stack_offset + i] = byte;
+    _ = builder.unmapPage(user_stack_va, .page_4k) catch unreachable;
+    _ = builder.mapPage(user_stack_va, @intFromPtr(&external_prepared_stack), .page_4k, .{ .read = true, .write = true, .user = true, .accessed = true, .dirty = true }) catch shutdown();
     for (external_image.items(), 0..) |page, index| {
-        const physical = @intFromPtr(&batch26_prepared_backing[index]);
-        const target: [*]volatile u8 = @ptrFromInt(physical);
-        for (page.bytes, 0..) |byte, i| target[i] = byte;
+        if (page.backing_index != index) shutdown();
+        const physical = @intFromPtr(&external_prepared_backing[page.backing_index]);
         const permissions = sv39_entries.Permissions{
             .read = page.permissions.read,
             .write = page.permissions.write,
@@ -2832,6 +2837,9 @@ export fn freestandingMain() callconv(.c) noreturn {
     };
     const image_begin = @intFromPtr(&__image_begin);
     const image_end = @intFromPtr(&__image_end);
+    const reservation_begin = @intFromPtr(&__prepared_image_reservation_begin);
+    const reservation_end = @intFromPtr(&__prepared_image_reservation_end);
+    if (image_end > sv39_alias or reservation_begin < user_data_va + frames.PageSize or reservation_end <= reservation_begin) shutdown();
     const mapped_begin = image_begin & ~@as(usize, frames.PageSize - 1);
     const mapped_end = (image_end + frames.PageSize - 1) & ~@as(usize, frames.PageSize - 1);
     const permissions = sv39_entries.Permissions{ .read = true, .write = true, .execute = true, .accessed = true, .dirty = true };
@@ -2841,6 +2849,10 @@ export fn freestandingMain() callconv(.c) noreturn {
             write("ZIGREF_SV39_ACTIVE_FAILURE\n");
             shutdown();
         };
+    }
+    address = reservation_begin;
+    while (address < reservation_end) : (address += frames.PageSize) {
+        _ = builder.mapPage(address, address, .page_4k, .{ .read = true, .write = true, .accessed = true, .dirty = true }) catch shutdown();
     }
     _ = builder.mapPage(sv39_alias, alias_physical, .page_4k, .{ .read = true, .write = true, .accessed = true, .dirty = true }) catch {
         write("ZIGREF_SV39_ACTIVE_FAILURE\n");

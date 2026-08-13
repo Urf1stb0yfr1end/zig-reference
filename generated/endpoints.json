@@ -250,6 +250,12 @@
     },
     {
       "kind": "function",
+      "module": "bounded-address-space-exec-image",
+      "name": "PreparedImage",
+      "signature": "PreparedImage(comptime page_capacity: usize) type"
+    },
+    {
+      "kind": "function",
       "module": "unit-safe-quantity",
       "name": "Quantity",
       "signature": "Quantity(comptime Unit: type, comptime Scalar: type) type"
