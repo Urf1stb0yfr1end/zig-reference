@@ -401,6 +401,14 @@
       "symbol": "PostSealAllocation"
     },
     {
+      "module": "bounded-address-space-exec-image",
+      "symbol": "PreparedImage"
+    },
+    {
+      "module": "bounded-address-space-exec-image",
+      "symbol": "PreparedPage"
+    },
+    {
       "module": "unit-safe-quantity",
       "symbol": "Quantity"
     },

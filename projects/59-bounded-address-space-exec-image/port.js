@@ -98,7 +98,7 @@ module.exports = {
       {
         "name": "MaterializedImage",
         "signature": "MaterializedImage(comptime page_capacity: usize) type"
-      ,
+      },
       {
         "name": "PreparedImage",
         "signature": "PreparedImage(comptime page_capacity: usize) type"
@@ -132,7 +132,7 @@ module.exports = {
       {
         "name": "prepare",
         "signature": "prepare(bytes: []const u8, load: anytype, bias: usize) Error!Self"
-      ,
+      },
       {
         "name": "items",
         "signature": "items(self: *const Self) []const PreparedPage"
