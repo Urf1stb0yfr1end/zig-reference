@@ -1,0 +1,71 @@
+# Agent / Framework Failure Ledger
+
+## Purpose
+
+This ledger records failures in agentic engineering work without hiding attribution.
+
+The goal is to distinguish:
+
+- **framework failure** — the request, architecture, process, or handoff contract was materially insufficient, contradictory, unsafe, or impossible to execute as written;
+- **agent execution failure** — the request was actionable and the agent failed to perform or persist the required work;
+- **platform/tooling failure** — the agent was prevented from completing the work by an external task/runtime/tool failure;
+- **mixed failure** — more than one category materially contributed;
+- **unknown** — evidence is insufficient to attribute confidently.
+
+This distinction is important because a framework should not absorb blame for an agent that ignored an explicit finish condition, and an agent should not absorb blame for a broken or impossible framework request.
+
+## Attribution rule
+
+For every failed or partially failed campaign, record:
+
+1. exact request / plan identity;
+2. agent and execution environment when known;
+3. intended finish condition;
+4. observed result;
+5. whether the request was executable as written;
+6. whether the agent satisfied the explicit persistence / handoff contract;
+7. whether an external platform or tool error prevented completion;
+8. attribution category;
+9. confidence;
+10. corrective action.
+
+Attribution must follow evidence, not convenience.
+
+A failed campaign is a **framework failure** only when the framework itself materially caused the failure. A failed campaign is an **agent execution failure** when the request was actionable and the agent failed to perform an explicit required action despite having a viable path to do so. A **platform/tooling failure** is reserved for externally observable execution failures such as task crashes, unavailable tools, permission failures, or infrastructure errors.
+
+## Metrics
+
+Track at minimum:
+
+- total campaigns;
+- successful campaigns;
+- partial campaigns with preserved handoff;
+- agent execution failures;
+- framework failures;
+- platform/tooling failures;
+- mixed/unknown failures;
+- campaigns that ended with no externally preserved output;
+- campaigns where an explicit commit/push/PR requirement was ignored;
+- campaigns recovered by a later salvage/handoff run.
+
+Do not collapse all failures into one number. The point is to learn whether the bottleneck is architecture, prompting, agent execution, or platform reliability.
+
+## Entry 2026-08-13 — Batch 31D PR #66 validation-follow-up persistence failure
+
+**Context:** PR #66 (`Introduce bounded anonymous mapping primitive and handle Linux RV64 mmap(222) pressure`) produced real runtime progress: static musl remained proven, `busybox.static true` remained successful, the first fixed no-access anonymous `mmap(222)` advanced to success, and the next runtime frontier became the zero-length non-fixed RW anonymous mmap argument divergence.
+
+**Known repository state:** GitHub Actions remained red because canonical validation evidence had a stale source digest. The implementation and focused tests were otherwise useful and intentionally preserved as a frontier checkpoint.
+
+**Follow-up request:** the Codex run was explicitly instructed to regenerate the stale canonical validation evidence, commit all required regenerated files, push to the existing PR #66 branch, and make the existing PR visibly change. The request explicitly said that merely running validation locally was not completion.
+
+**Observed result:** PR #66 remained on the same head commit `55d5bd620727b07b8efc91fa10a26007938ddb5f`; no new commit was pushed, the PR still contained one commit, and the stale validation-evidence failure remained unresolved.
+
+**Attribution:** **agent execution failure**.
+
+**Confidence:** high.
+
+**Why:** the follow-up finish condition was concrete, externally verifiable, and technically routine: regenerate repository-owned derived evidence, commit it, push it to the already-existing branch, and verify the PR head changed. No evidence currently shows that the framework request was contradictory or impossible. No external tool/platform failure was surfaced for this specific follow-up. Therefore the failure should be attributed to the Codex run failing to persist the requested cleanup, not to Morphic's engineering framework.
+
+**Checkpoint decision:** PR #66 was intentionally merged red as an explicitly annotated frontier so useful runtime work was not discarded. The merge does **not** imply green CI or Batch 31D completion.
+
+**Corrective action:** future agentic plans must keep the existing handoff discipline: commit/push safe progress early, make persistence an explicit finish condition, and record whether a failure is framework, agent, platform, mixed, or unknown. Fresh follow-up work from main must first close known red validation debt before claiming a new green frontier.
