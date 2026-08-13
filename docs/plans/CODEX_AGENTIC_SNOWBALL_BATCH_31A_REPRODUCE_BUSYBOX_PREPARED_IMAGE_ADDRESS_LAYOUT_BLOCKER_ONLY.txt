@@ -1,0 +1,580 @@
+CODEX AGENTIC SNOWBALL — BATCH 31A
+REPRODUCE THE BUSYBOX PREPARED-IMAGE / ADDRESS-LAYOUT BLOCKER ONLY
+
+Repository:
+thanks-cohn/zig-reference
+
+Canonical request path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_31A_REPRODUCE_BUSYBOX_PREPARED_IMAGE_ADDRESS_LAYOUT_BLOCKER_ONLY.txt
+
+Request-creation main:
+cde8ee19961e52b66883907ca511e85302073ddb
+
+Related Batch 31 request:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_31_BUSYBOX_SHELL_DYNAMIC_MUSL_ALPINE_MINIROOTFS_ADVANCEMENT.txt
+
+Historical checkpoint immediately before Batch 31:
+morphic-riscv-batch30-green-recovery-static-musl-preserved-busybox-245page-unresolved-2026-08-13
+
+================================================================================
+0. PURPOSE — REPRODUCE, CRYSTALLIZE, STOP
+================================================================================
+
+This is NOT a BusyBox-completion campaign.
+
+This is NOT a capacity-repair campaign.
+
+This is NOT a syscall campaign.
+
+This is NOT a dynamic-musl campaign.
+
+This is NOT an Alpine campaign.
+
+The sole purpose of this task is to reproduce, measure, and preserve in a safe
+mergeable pull request the exact blocker observed by the previous ~40-minute
+Codex Batch 31 attempt.
+
+The previous attempt ended with a clean worktree and no PR because its
+experimental capacity expansion was judged unsafe. However, it discovered an
+important machine-layout constraint that must not be lost or rediscovered from
+scratch by the next implementation run.
+
+YOUR JOB IS TO TURN THAT DISCOVERY INTO A REPRODUCIBLE, REVIEWABLE, GREEN
+CHECKPOINT AND NOTHING MORE.
+
+Do not solve the blocker in this task.
+Do not continue beyond the blocker after reproducing it.
+Do not attempt the BusyBox command ladder after the blocker is reproduced.
+Do not redesign the machine layout.
+Do not invent a permanent capacity policy.
+Do not add speculative Linux syscalls.
+Do not begin dynamic userspace.
+
+REPRODUCE -> MEASURE -> ENCODE THE REPRODUCTION -> VALIDATE -> OPEN PR -> STOP.
+
+================================================================================
+1. INHERITED TRUTH — DO NOT RE-LITIGATE IT
+================================================================================
+
+Main is green after Batch 30 recovery.
+
+Exact static musl is already proven under Morphic.
+
+The existing execution architecture is already established:
+
+    exact ELF bytes
+        -> ExecPlan
+        -> MaterializedImage
+        -> Linux initial stack
+        -> PREPARE / COMMIT
+        -> Sv39
+        -> U-mode
+        -> Linux compatibility edge
+
+Preserve:
+
+    PREPARE/COMMIT atomicity
+    W+X = 0
+    exact static-musl identity/proof
+    inherited Batch 26 behavior
+
+Do not redesign or redo those proofs unless the narrow reproduction requires a
+focused sanity check near the end.
+
+Do not begin this task by running the complete repository validation suite.
+Use focused inspection and reproduction first.
+
+================================================================================
+2. EXACT BUSYBOX PRESSURE ARTIFACT
+================================================================================
+
+Use the exact already-pinned Alpine v3.22 static BusyBox artifact.
+
+Package:
+
+    busybox-static-1.37.0-r20.apk
+
+Source family:
+
+    Alpine v3.22 main / riscv64
+
+Package SHA-256:
+
+    29072f0a72ff8f2ff19a8be703cf0e68d4722ea4dc0acf4830acc932f98cf31c
+
+Executable inside package:
+
+    bin/busybox.static
+
+Executable SHA-256:
+
+    62831fb7c4a0da509481107a8aeb022244235c5dced18101e3d39131d303d704
+
+Measured prepared image:
+
+    245 materialized pages
+
+The artifact already passed the relevant ELF planning edge after the Batch 29
+ELF metadata repairs.
+
+Use the SAME exact artifact identity in the reproduction.
+Do not vendor it permanently.
+Do not patch it.
+Do not relink it.
+Do not substitute another BusyBox build or Alpine release.
+
+Fail closed if the package or executable hash differs.
+
+================================================================================
+3. WHAT THE PREVIOUS CODEX RUN OBSERVED
+================================================================================
+
+The prior Batch 31 attempt reported the following sequence:
+
+1. The exact BusyBox package and executable were acquired and hash-verified.
+
+2. The existing external-artifact Morphic build path was exercised.
+
+3. The obvious first experiment was to enlarge the tiny inline prepared-image
+   and backing arrays sufficiently to carry the measured 245-page image.
+
+4. That experiment did NOT safely solve the problem.
+
+5. Enlarging those inline arrays expanded the freestanding kernel image into the
+   inherited historical machine-test address region beginning around:
+
+       0x8040_0000
+
+6. Therefore the problem is not merely:
+
+       MaterializedImage(4) -> MaterializedImage(245)
+
+   or:
+
+       backing[4] -> backing[245]
+
+7. Attempts to relocate/reserve the larger backing elsewhere introduced
+   additional Sv39 mapping complications during the BusyBox PREPARE path.
+
+8. The experimental machine execution stalled/timed out during BusyBox Sv39
+   PREPARE table preflight and did NOT reach the BusyBox command ladder.
+
+9. The previous agent concluded that relocating the inherited test range or
+   otherwise changing the address layout required broader changes than it could
+   safely validate in that run.
+
+10. It restored the worktree to the original clean state rather than commit a
+    knowingly unsafe implementation.
+
+This task exists so the next engineering run does NOT have to rediscover these
+facts from scratch.
+
+================================================================================
+4. THE ONLY QUESTION THIS TASK MUST ANSWER
+================================================================================
+
+Can we deterministically reproduce and precisely measure the statement:
+
+    "Naively scaling the current inline prepared-image/backing proof fixture from
+     its historical tiny capacity toward the exact 245-page BusyBox requirement
+     collides with the inherited freestanding machine address layout around
+     0x8040_0000 and/or exposes additional Sv39 PREPARE mapping constraints,
+     before BusyBox command execution can begin."
+
+The output must tell a future engineer EXACTLY where and why the naive expansion
+fails.
+
+Do not answer the next question:
+
+    "What is the final correct architecture for fixing it?"
+
+That belongs to a fresh implementation campaign AFTER this reproduction PR is
+merged.
+
+================================================================================
+5. REPRODUCTION METHOD
+================================================================================
+
+First inspect the current freestanding machine layout and identify the exact
+objects/constants/regions involved in:
+
+    kernel image start/end
+    linker-defined sections
+    prepared-image backing
+    prepared page-table backing
+    trap stack(s)
+    physical frame pool(s)
+    historical test/user virtual ranges
+    the 0x8040_0000 region
+    Sv39 root/table backing used by the external-artifact path
+
+Record concrete symbol names and source locations.
+
+Then reproduce the naive capacity expansion in the safest possible TEMPORARY or
+FOCUSED manner.
+
+Preferred approaches, in order:
+
+A. If the repository can compute/layout-check the relevant regions without
+   modifying the permanent runtime, add a focused diagnostic/check that models
+   the current layout plus a BusyBox-scale proof-fixture reservation.
+
+B. If actual compilation/linking is necessary to prove the overlap, make a
+   temporary experimental change, capture the resulting map/symbol/layout
+   evidence, then revert the unsafe change before final commit.
+
+C. If a test-only compile-time configuration can safely express the larger
+   reservation without changing production/default behavior, use that as a
+   reproducer.
+
+Do NOT leave an unsafe 245-page production reservation enabled merely to make
+reproduction convenient.
+
+Do NOT hardcode 245 as permanent Morphic architecture. It is acceptable to use
+245 in a TEST/REPRODUCER as the exact measured pressure input, clearly labeled as
+artifact evidence rather than an architectural constant.
+
+================================================================================
+6. REQUIRED MEASUREMENTS
+================================================================================
+
+The reproduction must capture as many of these exact facts as the current code
+allows, with no invented values:
+
+- current tiny prepared-image capacity;
+- current tiny prepared backing byte/page size;
+- exact BusyBox materialized page count;
+- byte size implied by 245 x 4096 if relevant to the exact implementation;
+- current freestanding kernel/linker image end before the experiment;
+- kernel/linker image end after the naive enlarged inline reservation;
+- start/end of the inherited 0x8040_0000 machine-test range;
+- whether the expanded image overlaps/touches/passes that range;
+- exact symbol/section responsible for growth;
+- exact Sv39 preflight operation reached by the experimental larger reservation;
+- exact last deterministic machine trace marker before timeout/stall;
+- whether destructive COMMIT had begun;
+- whether BusyBox U-mode entry had occurred;
+- whether any BusyBox syscall had occurred;
+- whether true/echo/sh command execution was reached.
+
+If a fact cannot be established, say "not established" rather than infer it.
+
+================================================================================
+7. REQUIRED NEGATIVE CLAIMS
+================================================================================
+
+The final PR/report MUST explicitly state:
+
+    BusyBox true: NOT CLAIMED
+    BusyBox echo: NOT CLAIMED
+    BusyBox sh: NOT CLAIMED
+    Batch 31 completion: NOT CLAIMED
+    dynamic musl: NOT ATTEMPTED
+    dynamic BusyBox: NOT ATTEMPTED
+    Alpine minirootfs: NOT ATTEMPTED
+
+The reproduction is successful even though BusyBox does not run.
+
+The success criterion here is KNOWLEDGE PRESERVATION, not runtime advancement.
+
+================================================================================
+8. MERGEABLE ARTIFACT — WHAT SHOULD BE COMMITTED
+================================================================================
+
+Produce the smallest SAFE, GREEN, MERGEABLE change set that prevents this
+40-minute discovery from being lost.
+
+Strong preferred deliverables:
+
+1. A focused deterministic layout/capacity reproducer, verifier, regression
+   test, or diagnostic tool that encodes the discovered collision/constraint
+   without changing normal runtime semantics.
+
+2. A concise report such as:
+
+       docs/reports/AGENTIC_SNOWBALL_BATCH_31A_BUSYBOX_ADDRESS_LAYOUT_REPRODUCTION.md
+
+   containing exact measured evidence and the reproduction command(s).
+
+3. If appropriate, a COMMANDS.md entry for the focused reproducer ONLY if that
+   matches repository conventions.
+
+4. Any tiny test-only build plumbing strictly necessary to make the reproducer
+   deterministic.
+
+Do NOT commit:
+
+- the unsafe naive enlarged backing implementation;
+- a speculative final layout redesign;
+- BusyBox-specific production logic;
+- new syscalls unrelated to reproduction;
+- dynamic-loader work;
+- Alpine work;
+- unrelated cleanup/refactors.
+
+The committed delta should be intentionally boring and reviewable.
+
+================================================================================
+9. IF A CODE TEST CAN ENCODE THE DISCOVERY
+================================================================================
+
+Prefer executable knowledge over prose when it is safe and small.
+
+A useful regression/check might establish something like:
+
+    current machine proof layout + naive BusyBox-scale inline reservation
+        -> would cross reserved/inherited layout boundary
+        -> FAIL with explicit diagnostic before building/running unsafe image
+
+or:
+
+    current linker symbols/section map
+        + measured reservation request
+        -> deterministic overlap relation
+
+The exact shape should follow repository conventions and existing abstractions.
+
+Do NOT create a fake assertion that simply says "245 is too large."
+The proof must derive the conflict from real layout quantities or compile/link
+truth, not from a magic expected boolean.
+
+If executable proof is not safely possible without redesign, a report plus a
+small deterministic inspection tool is acceptable.
+
+================================================================================
+10. SV39 PREPARE REPRODUCTION
+================================================================================
+
+If the address-layout overlap alone fully explains why the naive inline approach
+is unsafe, record it precisely.
+
+If the previous stall can also be reproduced safely, capture it separately.
+
+The prior attempt reported a timeout/stall during BusyBox Sv39 PREPARE table
+preflight after trying alternative reservation placement.
+
+If reproducing this requires an unsafe permanent change, do it only in temporary
+experimental state and revert it before commit.
+
+Capture:
+
+    exact experimental configuration
+    exact QEMU invocation
+    timeout duration used
+    last trace marker
+    relevant page/table/mapping request
+    whether COMMIT had begun
+
+Do not spend the whole task debugging why Sv39 stalls.
+
+ONCE THE SAME STALL/CONSTRAINT IS REPRODUCED AND RECORDED, STOP INVESTIGATING.
+
+This task is not allowed to become the fix campaign.
+
+================================================================================
+11. ARCHITECTURAL INTERPRETATION — LIMITED TO WHAT EVIDENCE SUPPORTS
+================================================================================
+
+The report may conclude only what the reproduction establishes.
+
+Expected likely conclusion, if confirmed:
+
+    The machine-adapter capacity problem is coupled to proof-fixture placement
+    and address-layout policy. Therefore the correct later repair cannot be a
+    blind enlargement of an inline array. A later engineering task must choose a
+    general replaceable placement/backing policy that preserves the inherited
+    machine address-space invariants and PREPARE/COMMIT semantics.
+
+Do NOT choose that later policy here.
+
+Do NOT promote Linux/BusyBox-specific geometry into Morphic foundation.
+
+Do NOT redesign the neutral address-space model here.
+
+================================================================================
+12. VALIDATION STRATEGY
+================================================================================
+
+Keep the task small.
+
+During reproduction, run only focused commands needed to establish the evidence.
+
+Before opening the PR, ensure the COMMITTED final tree is safe and green.
+
+At minimum:
+
+- canonical Zig formatting for touched Zig files;
+- focused test/reproducer PASS;
+- any directly affected module tests;
+- static-musl focused sanity proof if touched code could affect it;
+- repository check/validation required by the normal PR gate for the final
+  committed delta.
+
+Important distinction:
+
+The TEMPORARY unsafe experiment may intentionally fail, overlap, or time out.
+The FINAL COMMITTED TREE must not.
+
+The PR must clearly separate:
+
+    experimental reproduction evidence
+
+from:
+
+    committed safe state
+
+================================================================================
+13. REQUIRED REPORT FORMAT
+================================================================================
+
+The committed report should contain:
+
+# Agentic Snowball Batch 31A — BusyBox Address-Layout Blocker Reproduction
+
+## Scope
+State that this task intentionally reproduces only the prior blocker.
+
+## Exact pressure artifact
+Record package/executable identities and 245-page measurement.
+
+## Current baseline
+Record current small proof-fixture capacity and relevant layout.
+
+## Reproduction
+Give exact commands/steps.
+
+## Measured address-layout result
+Show exact before/after addresses and overlap relation.
+
+## Sv39 PREPARE observation
+Record only what was reproduced.
+
+## Causal interpretation
+Explain what the evidence proves and what it does not prove.
+
+## What was deliberately NOT attempted
+List BusyBox command completion, dynamic musl, dynamic BusyBox, Alpine.
+
+## Validation
+Record focused and final validation truth.
+
+## Next task boundary
+One paragraph only: the next fresh task may design the general safe
+prepared-image/backing placement policy. Do not propose/implement that policy in
+this task.
+
+================================================================================
+14. REQUIRED PR FORMAT
+================================================================================
+
+Open a normal pull request against current main if the final committed tree is
+green and safe.
+
+Use a title similar to:
+
+    Reproduce BusyBox-scale prepared-image address-layout blocker (Batch 31A)
+
+The PR body MUST use:
+
+## Motivation
+Preserve the exact expensive discovery from the previous Batch 31 attempt.
+
+## What changed
+Only the reproducer/test/report/build plumbing actually committed.
+
+## Reproduction result
+Exact measured evidence.
+
+## What this PR proves
+Only the blocker/reproduction claims supported by evidence.
+
+## What this PR does NOT claim
+BusyBox execution, Batch 31 completion, final architecture, dynamic userspace,
+Alpine.
+
+## Validation
+Exact commands and outcomes.
+
+## Next boundary
+State that a fresh task may now design the fix using this reproduction as the
+oracle.
+
+================================================================================
+15. HARD STOP RULE
+================================================================================
+
+This is the most important rule in this request.
+
+Once you have:
+
+    exact artifact identity
+        +
+    deterministic reproduction of the naive capacity/address-layout conflict
+        +
+    any safely reproducible Sv39 PREPARE stall evidence available
+        +
+    a safe committed reproducer/report
+        +
+    green validation
+        +
+    pull request
+
+STOP.
+
+DO NOT FIX THE BLOCKER.
+
+DO NOT RUN BUSYBOX TRUE.
+DO NOT RUN BUSYBOX ECHO.
+DO NOT RUN BUSYBOX SH.
+DO NOT ADD DYNAMIC MUSL.
+DO NOT TOUCH ALPINE MINIROOTFS.
+
+The next engineering task needs a fresh context and this preserved oracle.
+
+================================================================================
+16. FINAL RESPONSE REQUIREMENTS
+================================================================================
+
+At the end, print:
+
+    branch name
+    commit SHA
+    PR number/URL
+    changed filenames
+    git diff main...HEAD --stat
+    exact BusyBox package SHA-256
+    exact BusyBox executable SHA-256
+    exact measured image page count
+    exact current proof-fixture capacity
+    exact relevant address-layout before/after measurements
+    exact reproduced last PREPARE/Sv39 marker if available
+    whether COMMIT began
+    whether U-mode BusyBox entry occurred
+    focused validation results
+    full/final validation result
+
+Then print exactly one short next-boundary statement:
+
+    "Batch 31A reproduced and preserved the blocker only. The next fresh task may design the general safe prepared-image/backing placement repair."
+
+================================================================================
+17. GOVERNING LAW
+================================================================================
+
+This task is deliberately an exception to normal frontier-pushing behavior.
+
+The previous run spent substantial time acquiring expensive causal knowledge and
+then restored the worktree rather than commit unsafe code.
+
+The highest-leverage next move is therefore:
+
+    PRESERVE THE ORACLE BEFORE TRYING TO MOVE THE FRONTIER AGAIN.
+
+Do not solve what you were asked only to reproduce.
+
+Reproduce.
+Measure.
+Encode.
+Validate.
+PR.
+Stop.
