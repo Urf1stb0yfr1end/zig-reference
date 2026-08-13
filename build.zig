@@ -117,6 +117,10 @@ const recipe_specs = [_]RecipeSpec{
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const external_rv64_artifact = b.option([]const u8, "external-rv64-artifact", "Verified external RV64 ELF to embed in the freestanding machine proof");
+    const external_rv64_argv0 = b.option([]const u8, "external-rv64-argv0", "External RV64 artifact argv[0]") orelse "/bin/batch27-static-musl";
+    const external_rv64_argv1 = b.option([]const u8, "external-rv64-argv1", "External RV64 artifact argv[1]") orelse "";
+    const external_rv64_argv2 = b.option([]const u8, "external-rv64-argv2", "External RV64 artifact argv[2]") orelse "";
+    const external_rv64_argv3 = b.option([]const u8, "external-rv64-argv3", "External RV64 artifact argv[3]") orelse "";
     const optimize = b.standardOptimizeOption(.{});
     const check_command = b.addSystemCommand(&.{ "python3", "tools/python-environment.py", "tools/module-contract-consistency-checker.py" });
     const check_step = b.step("check-module-contracts", "Validate schema, formatting, paths, public surfaces, dependencies, catalog, and build registrations");
@@ -295,6 +299,10 @@ pub fn build(b: *std.Build) void {
             const freestanding_module = b.createModule(.{ .root_source_file = b.path("recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig"), .target = freestanding_target, .optimize = .ReleaseSmall, .code_model = .medium });
             const external_options = b.addOptions();
             external_options.addOption(bool, "enabled", external_rv64_artifact != null);
+            external_options.addOption([]const u8, "argv0", external_rv64_argv0);
+            external_options.addOption([]const u8, "argv1", external_rv64_argv1);
+            external_options.addOption([]const u8, "argv2", external_rv64_argv2);
+            external_options.addOption([]const u8, "argv3", external_rv64_argv3);
             freestanding_module.addOptions("external-artifact-options", external_options);
             freestanding_module.addImport("morphic-core", recipe_module);
             freestanding_module.addImport("bounded-deterministic-scheduler", findModule("bounded-deterministic-scheduler", &modules));

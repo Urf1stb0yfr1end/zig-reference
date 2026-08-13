@@ -33,7 +33,10 @@ SECTIONS {
   __writable_domain_begin = .;
   .data : { *(.data .data.*) } :data
   .bss (NOLOAD) : {
-    *(.bss .bss.* COMMON)
+    /* Keep small-data BSS in the ordinary identity-mapped kernel image.
+       Otherwise the orphan .sbss section follows the distant prepared-image
+       reservation and is not covered by the reservation's explicit mapping. */
+    *(.bss .bss.* .sbss .sbss.* COMMON)
     . = ALIGN(16);
     __stack_bottom = .;
     . += 60K;
