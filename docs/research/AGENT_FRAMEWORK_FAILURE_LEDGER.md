@@ -79,3 +79,13 @@ Do not collapse all failures into one number. The point is to learn whether the 
 **Attribution:** **platform/tooling failure** (high confidence). The plan was actionable, and the agent performed the available persistence and focused implementation work; externally required Git and machine-emulation surfaces were absent.
 
 **Corrective action:** supply the repository remote, Node.js, and both RISC-V QEMU executables; rerun the aggregate gate, push the preserved commits, verify the remote SHA, open the draft PR, and immediately execute the exact echo then shell ladder.
+
+## Entry 2026-08-13 — Batch 31G golden oracle and remote persistence surfaces
+
+**Context:** Batch 31G required a Linux-user golden differential, then early commit/push/remote verification/draft PR while pursuing the first exact static BusyBox shell under Morphic.
+
+**Observed result:** QEMU packages could be installed and QEMU system emulation completed the exact shell with output `batch31g`, status 0, and W+X=0. However, QEMU user-mode 8.2.2 exited status 1 with no trace or diagnostic for both the exact `-strace` command and a plain BusyBox invocation, so the golden differential was unavailable. The checkout has no configured Git remote, and the environment exposes no PR-creation tool; push, remote-head verification, and draft PR creation cannot be performed. The implementation, report, and local commit survive.
+
+**Attribution:** **platform/tooling failure** (high confidence) limited to golden-oracle certainty and external persistence. The runtime goal itself succeeded, and no framework or agent-execution failure caused these missing external surfaces.
+
+**Corrective action:** provide a functioning RISC-V QEMU user-mode runtime, configure the repository remote, and expose the required PR creation surface; rerun the golden trace, push the preserved commit, verify its remote SHA, and open the completed (not draft) PR.
