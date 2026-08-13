@@ -56,7 +56,9 @@ module.exports = {
       "page_size",
       "Permissions",
       "ImagePage",
+      "PreparedPage",
       "MaterializedImage",
+      "PreparedImage",
       "Mapping",
       "Error",
       "AddressSpace",
@@ -78,6 +80,10 @@ module.exports = {
       {
         "name": "ImagePage",
         "kind": "public declaration"
+      },
+      {
+        "name": "PreparedPage",
+        "kind": "public declaration"
       }
     ],
     "publicFunctions": [
@@ -92,6 +98,10 @@ module.exports = {
       {
         "name": "MaterializedImage",
         "signature": "MaterializedImage(comptime page_capacity: usize) type"
+      ,
+      {
+        "name": "PreparedImage",
+        "signature": "PreparedImage(comptime page_capacity: usize) type"
       }
     ],
     "publicMethods": [
@@ -122,6 +132,14 @@ module.exports = {
       {
         "name": "prepare",
         "signature": "prepare(bytes: []const u8, load: anytype, bias: usize) Error!Self"
+      ,
+      {
+        "name": "items",
+        "signature": "items(self: *const Self) []const PreparedPage"
+      },
+      {
+        "name": "prepare",
+        "signature": "prepare(bytes: []const u8, load: anytype, bias: usize, backing: [][page_size]u8) Error!Self"
       }
     ],
     "publicConstants": [],

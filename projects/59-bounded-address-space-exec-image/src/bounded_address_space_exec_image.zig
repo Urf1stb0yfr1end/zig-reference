@@ -12,6 +12,71 @@ pub const ImagePage = struct {
     bytes: [page_size]u8,
 };
 
+pub const PreparedPage = struct {
+    virtual_start: usize,
+    permissions: Permissions,
+    backing_index: usize,
+};
+
+/// Materializes a candidate into caller-owned page backing. This keeps large
+/// machine reservations out of the value returned by PREPARE while retaining
+/// bounded metadata and the same complete-page/W+X guarantees.
+pub fn PreparedImage(comptime page_capacity: usize) type {
+    return struct {
+        const Self = @This();
+        pages: [page_capacity]PreparedPage = undefined,
+        page_count: usize = 0,
+
+        pub fn items(self: *const Self) []const PreparedPage {
+            return self.pages[0..self.page_count];
+        }
+
+        pub fn prepare(bytes: []const u8, load: anytype, bias: usize, backing: [][page_size]u8) Error!Self {
+            var result = Self{};
+            for (load.items()) |segment| {
+                if (segment.source.end > bytes.len) return error.SourceOutOfBounds;
+                const memory_start = std.math.add(usize, segment.memory.start, bias) catch return error.AddressOverflow;
+                const memory_end = std.math.add(usize, segment.memory.end, bias) catch return error.AddressOverflow;
+                var page_start = memory_start - memory_start % page_size;
+                const rounded_end = std.math.add(usize, memory_end, page_size - 1) catch return error.AddressOverflow;
+                const page_end = rounded_end - rounded_end % page_size;
+                while (page_start < page_end) : (page_start = std.math.add(usize, page_start, page_size) catch return error.AddressOverflow) {
+                    const page = try result.getOrAdd(page_start, .{
+                        .read = segment.permissions.read,
+                        .write = segment.permissions.write,
+                        .execute = segment.permissions.execute,
+                    }, backing);
+                    const contribution_start = @max(page_start, memory_start);
+                    const contribution_end = @min(page_start + page_size, memory_end);
+                    for (contribution_start..contribution_end) |address| {
+                        const segment_offset = address - memory_start;
+                        backing[page.backing_index][address - page_start] = if (segment_offset < segment.file_byte_count)
+                            bytes[segment.source.start + segment_offset]
+                        else
+                            0;
+                    }
+                }
+            }
+            return result;
+        }
+
+        fn getOrAdd(self: *Self, virtual_start: usize, permissions: Permissions, backing: [][page_size]u8) Error!*PreparedPage {
+            for (self.pages[0..self.page_count]) |*page| if (page.virtual_start == virtual_start) {
+                const merged = Permissions{ .read = page.permissions.read or permissions.read, .write = page.permissions.write or permissions.write, .execute = page.permissions.execute or permissions.execute };
+                if (merged.write and merged.execute) return error.WriteExecute;
+                page.permissions = merged;
+                return page;
+            };
+            if (permissions.write and permissions.execute) return error.WriteExecute;
+            if (self.page_count == page_capacity or self.page_count == backing.len) return error.CapacityExceeded;
+            @memset(&backing[self.page_count], 0);
+            self.pages[self.page_count] = .{ .virtual_start = virtual_start, .permissions = permissions, .backing_index = self.page_count };
+            self.page_count += 1;
+            return &self.pages[self.page_count - 1];
+        }
+    };
+}
+
 /// Owns a complete, bounded, neutral page image prepared from validated segment
 /// ranges. No physical frame or live address-space state is touched while this
 /// value is built, so every ordinary failure precedes commit.
@@ -258,4 +323,14 @@ test "materializes every page and segment with offsets BSS and final permissions
     try std.testing.expectEqual(@as(u8, 0), image.items()[3].bytes[0x83]);
     try std.testing.expect(image.items()[3].permissions.write and !image.items()[3].permissions.execute);
     try std.testing.expectError(error.CapacityExceeded, MaterializedImage(3).prepare(&bytes, &load, 0));
+
+    var backing: [4][page_size]u8 = undefined;
+    const prepared = try PreparedImage(4).prepare(&bytes, &load, 0, &backing);
+    try std.testing.expectEqual(@as(usize, 4), prepared.items().len);
+    try std.testing.expectEqual(@as(usize, 0x1000), prepared.items()[0].virtual_start);
+    try std.testing.expectEqual(bytes[0x100], backing[prepared.items()[0].backing_index][0x100]);
+    try std.testing.expectEqual(@as(u8, 0xaa), backing[prepared.items()[3].backing_index][0x80]);
+    try std.testing.expectEqual(@as(u8, 0), backing[prepared.items()[3].backing_index][0x83]);
+    var short_backing: [3][page_size]u8 = undefined;
+    try std.testing.expectError(error.CapacityExceeded, PreparedImage(4).prepare(&bytes, &load, 0, &short_backing));
 }

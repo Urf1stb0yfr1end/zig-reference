@@ -1,6 +1,13 @@
 OUTPUT_ARCH(riscv)
 ENTRY(_start)
 
+PHDRS {
+  text PT_LOAD FLAGS(5);
+  rodata PT_LOAD FLAGS(4);
+  data PT_LOAD FLAGS(6);
+  reservation PT_LOAD FLAGS(6);
+}
+
 SECTIONS {
   . = 0x80200000;
   __image_begin = .;
@@ -16,15 +23,15 @@ SECTIONS {
     . = ALIGN(4);
     *(.text.trap)
     *(.text .text.*)
-  }
+  } :text
   . = ALIGN(4096);
   __text_domain_end = .;
   __rodata_domain_begin = .;
-  .rodata : { *(.rodata .rodata.*) }
+  .rodata : { *(.rodata .rodata.*) } :rodata
   . = ALIGN(4096);
   __rodata_domain_end = .;
   __writable_domain_begin = .;
-  .data : { *(.data .data.*) }
+  .data : { *(.data .data.*) } :data
   .bss (NOLOAD) : {
     *(.bss .bss.* COMMON)
     . = ALIGN(16);
@@ -39,12 +46,21 @@ SECTIONS {
     __user_trap_stack_end = .;
     __user_trap_stack_top = .;
     __stack_top = .;
-  }
+  } :data
   .physical_page_pool (NOLOAD) : ALIGN(4096) {
     __physical_page_pool_begin = .;
     . += 8 * 4096;
     __physical_page_pool_end = .;
-  }
+  } :data
   __writable_domain_end = .;
   __image_end = .;
+
+  /* Replaceable machine-policy storage, deliberately outside the ordinary
+     kernel image and the inherited 0x80400000 fixture window. */
+  . = 0x80600000;
+  .prepared_image_reservation (NOLOAD) : ALIGN(4096) {
+    __prepared_image_reservation_begin = .;
+    *(.prepared_image_reservation)
+    __prepared_image_reservation_end = .;
+  } :reservation
 }
