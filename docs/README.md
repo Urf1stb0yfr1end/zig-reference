@@ -20,6 +20,7 @@ This directory contains the long-form project record. The repository root is int
 
 - [`research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md`](research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md) — proposal for making Morphic a small neutral substrate on which broad operating-system, runtime, virtualization, security, storage, networking, formal-methods, and agentic-systems research can be expressed and reproduced.
 - [`research/FRESH_AGENT_ADVANCEMENT_AND_INHERITABLE_TECHNICAL_KNOWLEDGE.md`](research/FRESH_AGENT_ADVANCEMENT_AND_INHERITABLE_TECHNICAL_KNOWLEDGE.md) — research note defining Fresh-Agent Advancement, Inheritable Technical Knowledge, the Inheritance Delta, Agentic Compounding, anti-gaming controls, and a benchmark protocol for asking whether equally capable fresh agents can reach farther as repository knowledge accumulates.
+- [`research/fresh-agent-advancement.json`](research/fresh-agent-advancement.json) — compact machine-readable companion containing the canonical question, vocabulary, benchmark measurements, controls, inheritance artifacts, and anti-claim for agent consumption.
 
 `research/` contains durable research proposals, experimental frameworks, and research-program definitions. Research documents may motivate future work, but they are not evidence that the proposed capabilities already exist.
 
