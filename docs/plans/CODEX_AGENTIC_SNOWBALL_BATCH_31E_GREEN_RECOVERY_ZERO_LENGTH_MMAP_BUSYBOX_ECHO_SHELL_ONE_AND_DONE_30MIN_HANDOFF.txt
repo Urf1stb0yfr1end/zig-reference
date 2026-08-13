@@ -1,0 +1,297 @@
+CODEX AGENTIC SNOWBALL — BATCH 31E
+ONE-AND-DONE: GREEN RECOVERY -> MMAP ARGUMENT DIVERGENCE -> BUSYBOX ECHO -> STATIC BUSYBOX SHELL
+
+Repository: thanks-cohn/zig-reference
+Canonical request path: docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_31E_GREEN_RECOVERY_ZERO_LENGTH_MMAP_BUSYBOX_ECHO_SHELL_ONE_AND_DONE_30MIN_HANDOFF.txt
+Request-creation main: 37abe4f14efdf0c1be206de66528a1302dbc9204
+Intentional-red PR #66 merge: b922b7f662561a4ec65a56e3f1e0c427b40018f4
+
+READ FIRST
+- docs/reports/AGENTIC_SNOWBALL_BATCH_31D.md
+- docs/research/AGENT_FRAMEWORK_FAILURE_LEDGER.md
+- docs/research/agent-framework-failure-ledger.jsonl
+- COMMANDS.md
+
+================================================================================
+0. CAMPAIGN PURPOSE
+================================================================================
+
+Run this as one continuous campaign.
+
+Phase 1: restore canonical repository validation to green and PERSIST the repair.
+Phase 2: immediately resume exact BusyBox pressure at the current zero-length mmap divergence.
+Phase 3: make exact BusyBox echo pass, then immediately attempt the static BusyBox shell.
+
+Do not begin dynamic musl, dynamic BusyBox, or Alpine minirootfs in this run.
+
+Strongest finish line:
+
+    busybox.static sh -c 'echo batch31e'
+
+must print exactly `batch31e` and exit 0 under Morphic with W+X=0.
+
+================================================================================
+1. INHERITED TRUTH — DO NOT REDISCOVER
+================================================================================
+
+Treat these as established unless a focused regression disproves them:
+
+- exact static-musl diagnostic passes;
+- exact Alpine v3.22 busybox.static SHA-256 is
+  62831fb7c4a0da509481107a8aeb022244235c5dced18101e3d39131d303d704;
+- BusyBox geometry is 244 unique PT_LOAD pages with zero W+X pages;
+- caller-backed PreparedImage and distinct prepared reservation are already solved;
+- generic argv plumbing exists;
+- bounded brk growth exists;
+- exact `busybox.static true` reaches COMMIT/U-mode and exits 0;
+- Batch 31D introduced neutral BoundedRuntimeMappings plus focused tests;
+- Linux/RV64 syscall 222 is decoded at the compatibility edge;
+- the first fixed anonymous no-access mmap now succeeds:
+
+    mmap(0x104000, 4096, PROT_NONE,
+         MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0)
+    -> 0x104000
+
+The current runtime blocker is NOT ELF, capacity, argv, brk, or the first mmap.
+
+================================================================================
+2. PHASE 1 — GREEN RECOVERY MUST ACTUALLY LAND
+================================================================================
+
+PR #66 was intentionally merged red because canonical validation evidence was stale.
+The prior Codex follow-up was told to regenerate, commit, push, and verify the PR head changed, but no new pushed commit appeared. That event is already logged as an agent-execution failure unless contrary evidence later proves a platform/tool failure.
+
+On this fresh branch:
+
+1. Inspect current main and canonical repository tooling.
+2. Regenerate validation evidence using the supported generator.
+3. Regenerate other derived files only when canonical tooling reports them stale.
+4. Do not hand-edit generated evidence merely to silence validation.
+5. Run at minimum:
+
+       zig fmt --check build.zig projects recipes conformance
+       zig build check
+
+6. As soon as the repair is coherent:
+
+       git status
+       inspect diff
+       commit
+       push
+       VERIFY the remote branch/head SHA changed
+
+Running commands locally is not completion.
+
+Then continue immediately to Phase 2. Do not voluntarily stop after green recovery.
+
+================================================================================
+3. CURRENT EXACT RUNTIME DIVERGENCE
+================================================================================
+
+Golden Linux/qemu-riscv64 reaches this request:
+
+    mmap(NULL, 4096,
+         PROT_READ|PROT_WRITE,
+         MAP_PRIVATE|MAP_ANONYMOUS,
+         -1, 0)
+
+At the corresponding point Morphic currently receives:
+
+    nr    = 222
+    addr  = 0
+    len   = 0
+    prot  = 3
+    flags = 0x22
+
+and correctly rejects length zero.
+
+Do NOT patch this symptom by converting zero to 4096 at the syscall edge.
+Do NOT add a BusyBox-specific exception.
+
+Find WHY the exact same BusyBox binary computes/presents zero under Morphic.
+
+================================================================================
+4. CAUSAL DIVERGENCE METHOD
+================================================================================
+
+Use golden Linux execution as an executable oracle and locate the earliest state divergence around:
+
+    brk(NULL)
+    brk growth
+    fixed PROT_NONE mmap at 0x104000
+    next RW anonymous mmap
+
+Compare only as much state as necessary, in increasing cost order:
+
+- syscall sequence;
+- all six syscall arguments;
+- syscall return values;
+- PC/sepc around the calls;
+- relevant general registers after returns;
+- allocator/brk-adjacent userspace memory touched between the fixed mmap and next mmap;
+- page presence/permissions around 0x104000..0x106000;
+- brk bookkeeping versus actual live mappings;
+- semantics of replacing a brk-backed page with a no-access reservation.
+
+Find the FIRST observable difference that causally explains why len becomes zero.
+Repair that earlier semantic difference, not the later x11 symptom.
+
+================================================================================
+5. ARCHITECTURAL RULE
+================================================================================
+
+Linux ABI policy stays at the Linux edge.
+Morphic keeps neutral mapping/address-space mechanisms.
+
+Never hardcode BusyBox hashes, PCs, addresses, lengths, or Linux flags into permanent Morphic semantics.
+
+Pressure discovers the missing reusable mechanism; it does not define the architecture.
+
+================================================================================
+6. RETRY LADDER
+================================================================================
+
+After each repair, retry the SAME exact artifact immediately.
+
+First finish line:
+
+    busybox.static echo batch31e
+
+Required:
+
+    output exactly `batch31e\n`
+    exit status 0
+    exact artifact identity
+    W+X=0
+
+Do not stop merely because mmap now receives 4096 or because the mapping succeeds.
+If echo exposes another repairable failure, continue:
+
+    observe -> classify -> smallest correct repair -> focused proof -> retry
+
+Once echo passes, immediately run:
+
+    busybox.static sh -c 'echo batch31e'
+
+Continue the same loop. Static shell completion is the strongest target for this run.
+
+================================================================================
+7. REGRESSION PROOFS
+================================================================================
+
+Preserve/rerun focused proofs for:
+
+- exact static musl;
+- exact busybox.static true;
+- fixed no-access mmap;
+- BoundedRuntimeMappings tests;
+- PREPARE/COMMIT where touched;
+- W+X=0;
+- exact BusyBox identity;
+- any new neutral mechanism;
+- echo path;
+- shell path if reached.
+
+When practical, add focused mechanism tests independent of BusyBox.
+
+================================================================================
+8. MANDATORY PERSISTENCE / 30-MINUTE HANDOFF
+================================================================================
+
+As soon as safe nontrivial progress exists: COMMIT and PUSH it.
+Once coherent reviewable work exists: open a DRAFT PR against current main and continue on the SAME branch/PR.
+
+At roughly 20–25 minutes verify:
+
+- safe progress is committed;
+- branch is pushed;
+- remote head SHA actually changed;
+- draft PR exists if GitHub permits;
+- PR body honestly states the exact frontier.
+
+At roughly 30 minutes stop beginning large experiments and leave one of:
+
+1. mergeable PR with green validation;
+2. draft PR with safe progress and exact blocker;
+3. pushed branch plus complete handoff if PR creation fails.
+
+Never erase safe work because echo or shell did not finish.
+
+================================================================================
+9. FAILURE ATTRIBUTION IS REQUIRED
+================================================================================
+
+The project now tracks campaign failures in:
+
+    docs/research/AGENT_FRAMEWORK_FAILURE_LEDGER.md
+    docs/research/agent-framework-failure-ledger.jsonl
+
+If a MATERIAL agent/process/platform failure occurs, classify from evidence as one of:
+
+    framework_failure
+    agent_execution_failure
+    platform_tooling_failure
+    mixed
+    unknown
+
+Do not automatically blame the framework.
+Do not automatically blame Codex.
+Do not hide failures.
+
+A legitimate new missing kernel mechanism exposed by BusyBox is NOT itself a framework/agent failure.
+
+If a material failure occurs, append an honest ledger record when safe, including evidence, expected behavior, actual behavior, whether work survived, confidence, and corrective action.
+
+================================================================================
+10. FULL VALIDATION
+================================================================================
+
+Before presenting a normal mergeable PR, run the repository's canonical CI-equivalent surface, including:
+
+    python3 tools/python-environment.py --check
+    python3 tools/format-module-contracts.py --check
+    zig fmt --check build.zig projects recipes conformance
+    zig build check
+    python3 tools/build-repository-index.py --check
+    python3 tools/build-dependency-graphs.py --check
+    PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+    zig build smoke
+    zig build recipes
+    zig build conformance
+    zig build property
+    zig build fuzz-smoke
+    zig build differential
+    zig build test
+    zig build validate-repository
+    python3 tools/check-repository-policy.py
+
+If full validation cannot finish before handoff, leave the PR draft and state exactly what did and did not run.
+
+================================================================================
+11. REPORT
+================================================================================
+
+Create:
+
+    docs/reports/AGENTIC_SNOWBALL_BATCH_31E.md
+
+Record exact base SHA, artifact hashes, QEMU versions, green-recovery commands/files, pushed recovery commit SHA, static-musl result, BusyBox true result, fixed mmap result, golden-vs-Morphic divergence evidence, first causal divergence, neutral repair, focused tests, echo result, shell result, W+X result, full-validation result, branch/PR/head SHA, any failure-ledger event, and the exact first remaining blocker.
+
+================================================================================
+12. STOP CONDITIONS
+================================================================================
+
+A. STRONGEST SUCCESS:
+`busybox.static sh -c 'echo batch31e'` prints batch31e and exits 0, with W+X=0, green validation, pushed commits, verified remote head, and PR surfaced.
+
+B. ECHO BOUNDARY WIN:
+`busybox.static echo batch31e` prints batch31e and exits 0; continue to shell in the same run if time remains.
+
+C. SAFE PARTIAL HANDOFF:
+green recovery and strongest safe runtime progress are committed/pushed, remote head verified, PR/handoff exists, and the next blocker is causal and reproducible.
+
+FINAL RULE:
+
+    GREEN -> PUSH -> VERIFY REMOTE -> FIND FIRST DIVERGENCE -> SMALLEST GENERAL REPAIR -> RETRY -> ECHO -> SHELL
+
+One run. One honest frontier. No lost work.
