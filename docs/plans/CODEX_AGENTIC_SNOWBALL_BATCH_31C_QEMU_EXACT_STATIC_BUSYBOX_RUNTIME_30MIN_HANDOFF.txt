@@ -1,0 +1,649 @@
+CODEX AGENTIC SNOWBALL — BATCH 31C
+EXACT STATIC BUSYBOX RUNTIME: QEMU -> TRUE -> ECHO -> SHELL
+WITH MANDATORY EARLY COMMIT / PR / 30-MINUTE HANDOFF
+
+Repository:
+thanks-cohn/zig-reference
+
+Canonical request path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_31C_QEMU_EXACT_STATIC_BUSYBOX_RUNTIME_30MIN_HANDOFF.txt
+
+Request-creation main:
+2f45bb50f8b0ec3ea41495054df1bcaf217e2f5c
+
+Inherited reports/plans to read first:
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_31.md
+docs/reports/AGENTIC_SNOWBALL_BATCH_31B.md
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_31B_DISTINCT_PREPARED_RESERVATION_BUSYBOX_RETRY_30MIN_HANDOFF.txt
+
+================================================================================
+0. SINGLE PURPOSE OF THIS CAMPAIGN
+================================================================================
+
+Batch 31C exists to convert the newly merged prepared-image reservation into
+REAL EXECUTION PRESSURE from the exact pinned Alpine static BusyBox artifact.
+
+The required command ladder is:
+
+    exact busybox.static true
+        -> exact busybox.static echo batch31c
+        -> exact busybox.static sh -c 'echo batch31c'
+
+The strongest required finish line is:
+
+    exact pinned busybox.static sh -c 'echo batch31c'
+
+running under Morphic, printing exactly:
+
+    batch31c
+
+and terminating with status 0.
+
+Do NOT begin dynamic musl in this campaign.
+Do NOT begin dynamic BusyBox.
+Do NOT begin Alpine minirootfs work.
+
+Those deserve fresh contexts after static BusyBox shell is genuinely proven.
+
+This campaign is runtime pressure, not another capacity-design exercise.
+
+================================================================================
+1. INHERITED TRUTH — DO NOT REDISCOVER OR REDESIGN IT
+================================================================================
+
+Current main includes the green merge of PR #64.
+
+The following are inherited facts:
+
+1. Exact static-musl diagnostic execution has already been proven under Morphic.
+
+   Exact static-musl SHA-256:
+
+       ff9761d82b7ae05bc577ea46acd4bd9119e29a28e9b1ccb621514df11fd8b74d
+
+   Already proven output:
+
+       batch27-static-musl
+
+   Already proven status:
+
+       0
+
+2. Exact Alpine v3.22 BusyBox pressure artifact is already pinned.
+
+   Package:
+
+       busybox-static-1.37.0-r20.apk
+
+   Package SHA-256:
+
+       29072f0a72ff8f2ff19a8be703cf0e68d4722ea4dc0acf4830acc932f98cf31c
+
+   Executable:
+
+       bin/busybox.static
+
+   Executable SHA-256:
+
+       62831fb7c4a0da509481107a8aeb022244235c5dced18101e3d39131d303d704
+
+3. The exact BusyBox ELF has already been measured:
+
+       244 unique 4 KiB PT_LOAD pages
+       0 W+X pages
+       + 1 separately prepared initial stack page
+       = 245 complete candidate pages
+
+4. The failed naive approach is CLOSED:
+
+       DO NOT simply enlarge inline kernel MaterializedImage/backing arrays.
+
+   That previously grew the ordinary kernel image into the inherited
+   0x8040_0000 fixture range.
+
+5. PR #64 introduced the reusable repair:
+
+       PreparedImage(page_capacity)
+           -> caller-owned backing
+           -> bounded metadata
+           -> no hidden allocation
+
+   and machine-policy reservation storage beginning at:
+
+       0x8060_0000
+
+   outside the ordinary kernel image and inherited fixture window.
+
+6. PR #64 also introduced/prepared:
+
+       256 candidate-page reservation
+       1 prepared stack page
+       PREPARE-time Sv39 table backing
+       separate linker PT_LOAD reservation
+       capacity failure before live mapping mutation
+       preserved W+X=0
+
+7. The repository validation surface was repaired and green before merge.
+
+8. The missing proof is REAL QEMU runtime execution of the new path.
+
+Do not spend the beginning of this campaign debating whether the reservation
+should exist. It exists, is merged, and is the inherited starting point.
+
+================================================================================
+2. FIRST FIVE MINUTES — ESTABLISH THE RUNTIME ORACLE
+================================================================================
+
+Immediately determine whether this task environment can execute:
+
+    qemu-system-riscv64
+
+Do this before large code changes.
+
+If it is present:
+
+    proceed immediately to the inherited static-musl runtime verifier.
+
+If it is absent:
+
+    spend only a small bounded amount of time determining whether the task
+    environment provides a safe, ordinary, repository-compatible way to make
+    the required QEMU executable available.
+
+Examples include an already-supported package/environment setup or another
+repository-supported QEMU path. Discover the environment rather than assuming
+one exact package-manager command.
+
+Do NOT spend twenty or thirty minutes fighting an externally unavailable tool.
+
+If system QEMU remains genuinely unavailable after a bounded attempt:
+
+    - record that fact precisely;
+    - do not claim runtime success;
+    - use the remaining campaign to make the QEMU handoff maximally executable
+      on a capable host, but only through useful code/test/verifier improvements;
+    - commit/push/open a PR for any safe reusable advancement;
+    - provide the exact one-command local continuation needed on a host where
+      qemu-system-riscv64 exists.
+
+Environment failure is never permission to erase useful work or end with an
+empty task.
+
+================================================================================
+3. PHASE A — REPROVE THE INHERITED STATIC-MUSL MACHINE PATH ONCE
+================================================================================
+
+Before blaming BusyBox-specific runtime pressure, run the existing exact external
+artifact verifier against the already-proven static-musl artifact:
+
+    python3 tools/verify-freestanding-riscv64-external-artifact-transport.py --self-test
+
+Use the repository's canonical artifact acquisition/build flow as needed.
+
+Purpose:
+
+    prove that the merged caller-backed/linker-reservation changes did not break
+    the already-demonstrated exact static-musl execution path.
+
+This is a regression gate, NOT the milestone of this campaign.
+
+If it passes:
+
+    move immediately to BusyBox.
+
+If it fails:
+
+    capture the first exact divergence;
+    classify whether PR #64 caused it;
+    make the smallest correct repair;
+    add focused causal proof;
+    rerun the same static-musl verifier;
+    then continue to BusyBox.
+
+Do not spend the campaign repeatedly re-proving musl after it passes once.
+
+================================================================================
+4. PHASE B — MAKE THE EXACT BUSYBOX COMMAND IDENTITY EXPRESSIBLE
+================================================================================
+
+The same exact BusyBox executable must be used for all commands.
+
+The machine/verifier path may currently carry historical argv assumptions from
+the static-musl diagnostic, such as a fixed argv[0].
+
+If so, make only the smallest GENERAL test/machine-adapter improvement required
+to express exact argv for a transported external artifact.
+
+Acceptable shape:
+
+    external artifact bytes
+        + explicit bounded argv/envp test policy
+        -> existing ExecPlan
+        -> existing PreparedImage
+        -> existing Linux initial stack
+        -> existing PREPARE/COMMIT
+        -> Sv39
+        -> U-mode
+
+Do NOT create a BusyBox-specific loader.
+Do NOT add BusyBox semantics to Morphic.
+Do NOT patch the executable.
+Do NOT produce three different executables.
+
+The same SHA-256 bytes must be used for:
+
+    true
+    echo batch31c
+    sh -c 'echo batch31c'
+
+The Linux compatibility/test edge may choose argv appropriately.
+
+Establish a golden reference using the SAME exact bytes.
+
+================================================================================
+5. PHASE C — EXACT BUSYBOX TRUE
+================================================================================
+
+Run the exact artifact as:
+
+    busybox.static true
+
+Required success:
+
+    status 0
+
+No stdout is expected unless the exact golden oracle demonstrates otherwise.
+
+If it fails, preserve the FIRST real failure.
+
+Examples of classifications include:
+
+    PREPARE reservation/table failure
+    page mapping/protection failure
+    U-mode instruction/data fault
+    initial-stack/argv divergence
+    Linux syscall/errno mismatch
+    fd/resource mismatch
+    process/lifecycle mismatch
+
+These are classification examples, NOT a speculative implementation checklist.
+
+For the observed first failure:
+
+    OBSERVE
+        -> CLASSIFY
+        -> SMALLEST CORRECT REPAIR
+        -> FOCUSED CAUSAL PROOF
+        -> RETRY THE SAME EXACT busybox.static true
+
+Do not jump ahead and implement a list of Linux syscalls from documentation.
+Real BusyBox execution determines priority.
+
+Once true returns 0, continue immediately.
+
+================================================================================
+6. PHASE D — EXACT BUSYBOX ECHO
+================================================================================
+
+Run the same executable as:
+
+    busybox.static echo batch31c
+
+Required exact stdout:
+
+    batch31c
+
+with the expected newline according to the golden reference, and status 0.
+
+Again:
+
+    first failure
+        -> classify
+        -> smallest repair
+        -> focused proof
+        -> immediate retry
+
+Do not stop merely because true passes.
+Do not stop merely because echo reaches a new syscall.
+
+Once echo passes, continue immediately.
+
+================================================================================
+7. PHASE E — EXACT BUSYBOX SHELL
+================================================================================
+
+Run the same executable as:
+
+    busybox.static sh -c 'echo batch31c'
+
+Required exact stdout:
+
+    batch31c
+
+with the golden newline behavior and status 0.
+
+This is the Batch 31C runtime finish line.
+
+The shell may expose new process, memory, signal, file, or syscall pressure.
+Implement only what the exact execution causally demands.
+
+Keep historical Linux ABI policy at the Linux personality/test edge.
+Promote only reusable semantics into neutral Morphic mechanism.
+
+Do not let BusyBox dictate permanent Morphic ontology.
+
+================================================================================
+8. PRESSURE-ORACLE CLASSIFICATION RULE
+================================================================================
+
+For every missing behavior, ask:
+
+    Is this a reusable neutral mechanism?
+
+or:
+
+    Is this Linux historical ABI/personality policy?
+
+Examples:
+
+GOOD CENTER CANDIDATES:
+
+    neutral page mapping/protection
+    neutral address-space replacement
+    neutral task/execution-context mechanism
+    neutral resource identity/bindings
+    neutral bounded memory reservation
+
+LINUX EDGE RESIDUE:
+
+    syscall numbers
+    Linux errno conventions
+    fd numbering conventions
+    Linux argv/process historical details
+    Linux-specific ioctl shapes
+    Linux-specific pseudo-filesystem assumptions
+
+Compatibility is a consumer, not the architect.
+Pressure discovers missing capability, not permanent API shape.
+
+================================================================================
+9. PREPARE / COMMIT AND SAFETY INVARIANTS
+================================================================================
+
+Never weaken these to make BusyBox pass:
+
+    PREPARE validates/reserves all fallible resources first.
+    Destructive replacement begins only at COMMIT.
+    No ordinary backing allocation after destructive COMMIT begins.
+    Insufficient capacity fails before live-image destruction.
+    W+X remains unrepresentable/rejected.
+    Exact final per-page permissions are preserved.
+    Exact artifact identity remains fail-closed.
+
+The newly merged caller-backed reservation is machine policy, not a new universal
+Morphic image-size constant.
+
+The observed 245-page candidate is pressure evidence, not architecture.
+
+================================================================================
+10. MANDATORY HANDOFF DISCIPLINE — NO MORE VANISHING 40-MINUTE RUNS
+================================================================================
+
+This section is as important as the runtime goal.
+
+Every substantial campaign must leave immediately usable output.
+
+DO NOT wait until the final shell passes before preserving work.
+
+A. FIRST SAFE NONTRIVIAL ADVANCEMENT
+
+As soon as you have a coherent safe implementation, regression, verifier
+improvement, or causal repair that should survive even if later experiments
+fail:
+
+    commit it.
+
+Do not keep all useful work only in an uncommitted worktree.
+
+B. PUSH EARLY
+
+Push safe commits to the task branch once they form a coherent checkpoint.
+
+C. OPEN A DRAFT PR EARLY
+
+Once the branch contains reviewable useful progress, open a DRAFT PR against
+main and continue working on that same PR branch.
+
+The PR is a live handoff surface, not a declaration that the campaign is done.
+
+D. 20–25 MINUTE WARNING
+
+At roughly 20–25 minutes of substantial work, ensure:
+
+    - useful safe code is committed;
+    - branch is pushed;
+    - a PR exists if there is reviewable code;
+    - PR body says exactly what passes and what remains open.
+
+If wall-clock time is unavailable, apply this warning BEFORE beginning a second
+large exploratory/debugging cycle.
+
+E. 30-MINUTE HARD CHECKPOINT
+
+At roughly 30 minutes:
+
+    STOP beginning large new experiments.
+
+Before doing anything else, make all accumulated safe work immediately available.
+
+Required output priority:
+
+    1. mergeable PR with relevant validation green; OR
+    2. draft PR with safe incomplete progress; OR
+    3. pushed branch + coherent commits + complete proposed PR title/body when
+       PR creation is externally impossible; OR
+    4. if absolutely no code change is justified, a precise final handoff with
+       exact commands, outputs, first blocker, and a paste-ready next-run prompt.
+
+An empty clean worktree after thirty minutes of useful investigation is a TASK
+FAILURE unless every explored change was genuinely unsafe and all resulting
+knowledge is already permanently represented elsewhere.
+
+Never run git restore merely to make the task look clean if safe useful progress
+exists.
+
+Unsafe experiments should be reverted.
+Safe prerequisites and proofs should be preserved.
+
+================================================================================
+11. PR / HANDOFF CONTENT REQUIREMENTS
+================================================================================
+
+Every PR or final handoff must say exactly where the frontier ended.
+
+Use this structure:
+
+    ## Motivation
+
+    ## Inherited starting point
+
+    ## What changed
+
+    ## Exact runtime pressure attempted
+
+    ## Strongest runtime boundary reached
+
+    ## Causal failures repaired
+
+    ## Validation
+
+    ## What this does NOT claim
+
+    ## First remaining blocker
+
+    ## Exact next command
+
+If BusyBox shell does not pass, do not call Batch 31C complete.
+
+If only `true` passes, say so.
+If `echo` passes but shell does not, say so.
+If BusyBox only reaches U-mode, say so.
+If QEMU is externally unavailable, say so.
+
+Never substitute buildability for runtime execution.
+
+================================================================================
+12. FOCUSED TESTING DURING ITERATION
+================================================================================
+
+Keep retry distance short.
+
+During active debugging, prefer:
+
+    exact target run
+    focused module test
+    focused verifier mutation
+    exact target retry
+
+Do NOT run the entire repository validation surface after every small repair.
+
+Once meaningful runtime movement is achieved, or before finalizing a mergeable
+PR, run the full repository validation surface appropriate to main.
+
+At minimum preserve the canonical equivalents of:
+
+    Zig 0.14.0 formatting
+    zig build check
+    repository indexes
+    dependency graph checks
+    command-reference checks
+    smoke
+    recipes
+    conformance
+    property
+    fuzz-smoke
+    differential
+    tests
+    validate-repository
+    repository policy
+
+If a tool is externally unavailable, distinguish that clearly from a test
+failure.
+
+================================================================================
+13. REQUIRED PROOF EVIDENCE
+================================================================================
+
+For every claimed runtime level record, as applicable:
+
+    exact external executable SHA-256
+    exact argv
+    expected/golden stdout
+    observed stdout
+    expected status
+    observed status
+    candidate page count
+    W+X count/status
+    PREPARE/COMMIT phase reached
+    first trap/syscall/divergence if failed
+
+For any implementation repair, add a focused negative/causal proof when feasible.
+
+Do not rely only on a happy-path print statement.
+
+================================================================================
+14. SUCCESS LEVELS — USEFUL FOR REPORTING, NOT STOPPING
+================================================================================
+
+Level 0:
+    inherited code builds/validates
+
+Level 1:
+    exact static-musl verifier still passes after PR #64
+
+Level 2:
+    exact BusyBox passes PREPARE with caller-backed reservation
+
+Level 3:
+    exact BusyBox reaches U-mode and first genuine runtime pressure
+
+Level 4:
+    busybox.static true exits 0
+
+Level 5:
+    busybox.static echo batch31c prints exact output and exits 0
+
+Level 6:
+    busybox.static sh -c 'echo batch31c' prints exact output and exits 0
+
+Level 6 is the desired Batch 31C completion boundary.
+
+Do not voluntarily stop at Levels 2–5 while repairable budget remains.
+
+But preserve Levels 2–5 in commits/PR immediately rather than risking their loss.
+
+================================================================================
+15. NON-GOALS
+================================================================================
+
+Do NOT in this campaign:
+
+    implement dynamic musl
+    implement dynamic BusyBox
+    mount or boot Alpine minirootfs
+    implement apk
+    implement a speculative syscall catalog
+    make 245 a permanent Morphic constant
+    create a BusyBox-specific loader
+    patch/relink the pinned BusyBox executable
+    weaken PREPARE/COMMIT
+    weaken W+X=0
+    redesign the already-merged reservation absent causal runtime evidence
+
+================================================================================
+16. FINAL CAMPAIGN RULE
+================================================================================
+
+The engineering loop is:
+
+    RUN REAL SOFTWARE
+        -> OBSERVE FIRST FAILURE
+        -> CLASSIFY
+        -> SMALLEST CORRECT REPAIR
+        -> FOCUSED CAUSAL PROOF
+        -> COMMIT SAFE ADVANCEMENT
+        -> RETRY SAME REAL SOFTWARE
+
+The preservation loop runs in parallel:
+
+    SAFE PROGRESS
+        -> COMMIT
+        -> PUSH
+        -> DRAFT PR / HANDOFF
+        -> CONTINUE
+
+The campaign should therefore never again end like:
+
+    40 minutes of useful discovery
+        -> final target misses
+        -> useful work disappears
+
+Instead:
+
+    useful discovery
+        -> permanent checkpoint immediately
+        -> continued pressure
+        -> strongest honest frontier survives regardless of timeout
+
+Primary target:
+
+    busybox.static sh -c 'echo batch31c'
+        -> exact output batch31c
+        -> status 0
+
+Minimum acceptable campaign behavior:
+
+    materially advance the exact BusyBox runtime frontier AND preserve every
+    safe useful advancement in an immediately reviewable handoff before the task
+    budget expires.
