@@ -1,0 +1,70 @@
+{
+  "id": "fresh-agent-advancement",
+  "status": "research_direction",
+  "canonical_paper": "docs/research/FRESH_AGENT_ADVANCEMENT_AND_INHERITABLE_TECHNICAL_KNOWLEDGE.md",
+  "canonical_question": "How much farther can a fresh agent get today than an equally capable fresh agent could get yesterday?",
+  "governing_principle": "Build systems so intelligence inherits understanding, not just source code.",
+  "objective": "Measure whether accumulated repository knowledge increases the effective engineering capability of an equally capable zero-context agent without relying on hidden conversational history.",
+  "terms": {
+    "fresh_agent": "An agent beginning an evaluation without private project-specific conversational history beyond the declared benchmark input and repository state.",
+    "fresh_agent_advancement": "The increase in useful engineering distance an equally capable fresh agent can travel with a later repository revision under comparable conditions.",
+    "inheritable_technical_knowledge": "Engineering knowledge preserved so a new human or agent can discover, interpret, verify, and use it without reconstructing private reasoning.",
+    "inheritance_delta": "The measurable difference between comparable fresh-agent runs attributable to the repository revision supplied.",
+    "frontier_reach": "The latest genuine engineering boundary reached under a bounded task and budget.",
+    "knowledge_recurrence": "The degree to which preserved knowledge benefits later distinct tasks rather than only the run that produced it.",
+    "agentic_compounding": "A repeated pattern in which completed work leaves reusable knowledge that lowers the cost of later work and lets subsequent agents reach genuinely new problems sooner.",
+    "knowledge_escape": "A failure of inheritance where previously discovered project knowledge must be reconstructed, found externally, or manually supplied because it was not preserved usefully.",
+    "fresh_agent_advancement_benchmark": "A controlled comparison using equally capable fresh agents, comparable goals and budgets, and different immutable repository revisions."
+  },
+  "example_measurements": [
+    "frontier_reached",
+    "time_to_first_correct_action",
+    "time_to_validated_completion",
+    "tokens_or_bytes_read",
+    "files_inspected",
+    "tool_calls",
+    "build_or_test_iterations",
+    "wrong_architectural_starts",
+    "human_interventions",
+    "known_knowledge_rediscovered",
+    "new_reusable_knowledge_returned"
+  ],
+  "benchmark_controls": [
+    "comparable_agent_configuration",
+    "declared_external_context",
+    "immutable_repository_snapshots",
+    "same_or_equivalent_real_goal",
+    "comparable_resource_budget",
+    "no_hidden_conversational_inheritance",
+    "causal_success_required",
+    "honest_bounded_failures_preserved",
+    "prefer_real_or_held_out_pressure",
+    "separate_existing_capability_from_inheritance_effect",
+    "prefer_recurrent_knowledge_over_benchmark_specific_instructions"
+  ],
+  "high_value_inheritance_artifacts": [
+    "explicit_contracts_and_invariants",
+    "machine_readable_dependencies_and_ownership",
+    "exact_workload_provenance",
+    "causal_failure_evidence",
+    "reduced_reproductions",
+    "rejected_alternatives_and_reasons",
+    "stable_diagnostics_and_repairs",
+    "compatibility_vs_neutral_mechanism_classification",
+    "known_limitations",
+    "focused_validation_commands",
+    "next_observed_frontier"
+  ],
+  "related_project_principles": [
+    "Pressure Oracle",
+    "Failure Frontier",
+    "Cornerstone Neutrality",
+    "Causal Evidence",
+    "Empirical Kernel Distillation",
+    "Experimental Substitutability",
+    "Agentic Snowball",
+    "Reconstructive Snowball"
+  ],
+  "anti_claim": "This record defines a research direction and benchmark vocabulary. It does not claim that Morphic already demonstrates autonomous self-development or measurable agentic compounding.",
+  "portable_hypothesis": "If a project makes technical knowledge inheritable by fresh agents, preserves causal evidence, and lets each new agent start farther ahead, the method can potentially be reused outside this repository."
+}
