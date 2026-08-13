@@ -30,6 +30,7 @@ pub export const external_rv64_artifact = @embedFile("external-rv64-artifact").*
 const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
 const physical_pool_pages = 8;
+const ordinary_table_pages = 4;
 const prepared_table_pages = 4;
 const prepared_image_pages = 256;
 var prepared_table_backing: [prepared_table_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
@@ -78,17 +79,19 @@ fn RealPageOwner(comptime Allocator: type) type {
 
         pub fn allocate(self: *Self) !u64 {
             if (self.page_count == self.pages.len) return error.Exhausted;
-            const address = if (self.allocator.allocate()) |frame|
+            // The historical address space consumes four allocator-owned table
+            // pages.  Distant prepared-image mappings must consume their
+            // dedicated table reservation instead of stealing the data frames
+            // retained for the later user-image proofs.
+            const address = if (self.page_count >= ordinary_table_pages) blk: {
+                if (self.prepared_count == prepared_table_pages) return error.Exhausted;
+                const reserved = @intFromPtr(&prepared_table_backing[self.prepared_count]);
+                self.prepared_count += 1;
+                break :blk reserved;
+            } else if (self.allocator.allocate()) |frame|
                 (frame.toAddress() catch unreachable).raw()
-            else |err| switch (err) {
-                error.Exhausted => blk: {
-                    if (self.prepared_count == prepared_table_pages) return error.Exhausted;
-                    const reserved = @intFromPtr(&prepared_table_backing[self.prepared_count]);
-                    self.prepared_count += 1;
-                    break :blk reserved;
-                },
-                else => return err,
-            };
+            else |err|
+                return err;
             const page: *volatile [frames.PageSize]u8 = @ptrFromInt(address);
             for (0..frames.PageSize) |index| page[index] = 0;
             self.pages[self.page_count] = address;
@@ -151,6 +154,8 @@ var batch26_stack_image: initial_stack.StackPlan(512) = undefined;
 const ExternalPreparedImage = address_space.PreparedImage(prepared_image_pages);
 var external_image: ExternalPreparedImage = .{};
 var external_stack_image: initial_stack.StackPlan(512) = undefined;
+var external_program_break: usize = 0;
+var external_next_backing: usize = 0;
 export var external_entry: usize = 0;
 export var external_initial_sp: usize = 0;
 export var external_trap_stack: usize = 0;
@@ -353,12 +358,12 @@ const Batch26ActiveQuery = struct {
 var batch26_query_context: u8 = 0;
 var syscall_query: user_transfer.PageQuery = undefined;
 var syscall_count: usize = 0;
-const syscall_capacity = 16;
+const syscall_capacity = 64;
 var syscall_numbers: [syscall_capacity]usize = .{0} ** syscall_capacity;
 var syscall_pcs: [syscall_capacity]usize = .{0} ** syscall_capacity;
 var syscall_sstatus: [syscall_capacity]usize = .{0} ** syscall_capacity;
 var syscall_resume_pcs: [syscall_capacity]usize = .{0} ** syscall_capacity;
-var syscall_args: [syscall_capacity][3]usize = .{.{0} ** 3} ** syscall_capacity;
+var syscall_args: [syscall_capacity][6]usize = .{.{0} ** 6} ** syscall_capacity;
 var syscall_results: [syscall_capacity]usize = .{0} ** syscall_capacity;
 var syscall_semantics: [syscall_capacity]u8 = .{0} ** syscall_capacity;
 var syscall_terminal_status: usize = 0;
@@ -929,14 +934,21 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     write("ZIGREF_BATCH29_PREPARE image\n");
     const main_segment = candidate.main.load.items()[0];
     const at_phdr = main_segment.memory.start + 64;
-    const argv = [_][]const u8{"/bin/batch27-static-musl"};
+    const argv: []const []const u8 = if (external_artifact_options.argv3.len != 0)
+        &.{ external_artifact_options.argv0, external_artifact_options.argv1, external_artifact_options.argv2, external_artifact_options.argv3 }
+    else if (external_artifact_options.argv2.len != 0)
+        &.{ external_artifact_options.argv0, external_artifact_options.argv1, external_artifact_options.argv2 }
+    else if (external_artifact_options.argv1.len != 0)
+        &.{ external_artifact_options.argv0, external_artifact_options.argv1 }
+    else
+        &.{external_artifact_options.argv0};
     const envp = [_][]const u8{"BATCH29=exact"};
     const auxv = [_]initial_stack.AuxEntry{
         .{ .type = 3, .value = .{ .immediate = at_phdr } },
         .{ .type = 9, .value = .{ .immediate = candidate.main_entry } },
     };
     const stack_range = initial_stack.GuestStackRange.init(user_stack_va, user_stack_va + frames.PageSize) catch shutdown();
-    const stack = initial_stack.plan(512, 1, 1, 2, stack_range, &argv, &envp, &auxv) catch shutdown();
+    const stack = initial_stack.plan(512, 4, 1, 2, stack_range, argv, &envp, &auxv) catch shutdown();
     write("ZIGREF_BATCH29_PREPARE stack\n");
 
     // PREPARE table-backing preflight. Each successful temporary leaf is
@@ -951,6 +963,9 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     }
     external_image = prepared;
     external_stack_image = stack;
+    external_program_break = 0;
+    for (candidate.main.load.items()) |segment| external_program_break = @max(external_program_break, segment.memory.end);
+    external_next_backing = prepared.items().len;
     write("ZIGREF_BATCH29_PHASE commit\n");
     @memset(&external_prepared_stack, 0);
     const stack_offset = external_stack_image.initial_sp.raw() - user_stack_va;
@@ -1008,6 +1023,23 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     write(" pages=");
     writeUsizeHex(external_image.items().len);
     write(" wx=0000000000000000\n");
+    for (0..syscall_count) |index| {
+        write("ZIGREF_BATCH29_SYSCALL index=");
+        writeUsizeHex(index);
+        write(" nr=");
+        writeUsizeHex(syscall_numbers[index]);
+        write(" result=");
+        writeUsizeHex(syscall_results[index]);
+        write(" arg0=");
+        writeUsizeHex(syscall_args[index][0]);
+        write(" arg1=");
+        writeUsizeHex(syscall_args[index][1]);
+        write(" arg2=");
+        writeUsizeHex(syscall_args[index][2]);
+        write(" arg3=");
+        writeUsizeHex(syscall_args[index][3]);
+        write("\n");
+    }
 }
 
 const SyscallBackend = struct {
@@ -1048,19 +1080,20 @@ const SyscallBackend = struct {
 fn negativeErrno(value: usize) usize {
     return 0 -% value;
 }
-const LinuxRequestKind = enum { duplicate, close, read, write, terminate, unsupported };
+const LinuxRequestKind = enum { duplicate, close, read, write, program_break, terminate, unsupported };
 fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     return switch (number) {
         23 => .duplicate,
         57 => .close,
         63 => .read,
         64 => .write,
+        214 => .program_break,
         93, 94 => .terminate,
         else => .unsupported,
     };
 }
 comptime {
-    if (decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+    if (decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
 }
 
 fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
@@ -1078,7 +1111,7 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
     syscall_numbers[index] = frame.x[17];
     syscall_pcs[index] = frame.sepc;
     syscall_sstatus[index] = frame.sstatus;
-    syscall_args[index] = .{ frame.x[10], frame.x[11], frame.x[12] };
+    syscall_args[index] = .{ frame.x[10], frame.x[11], frame.x[12], frame.x[13], frame.x[14], frame.x[15] };
     syscall_count += 1;
     var request: ?morphic_operation.Request = null;
     switch (decodeLinuxRequestKind(frame.x[17])) {
@@ -1118,6 +1151,23 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                 break :blk;
             };
             request = .{ .write_bytes = .{ .destination = resource_tables.semanticIdentity(reference), .source = @enumFromInt(@as(u64, frame.x[11])), .byte_count = frame.x[12] } };
+        },
+        .program_break => {
+            syscall_semantics[index] = 7;
+            const requested = frame.x[10];
+            if (requested != 0 and requested >= external_program_break and requested < user_stack_va) {
+                var page = (external_program_break + frames.PageSize - 1) & ~@as(usize, frames.PageSize - 1);
+                const end = (requested + frames.PageSize - 1) & ~@as(usize, frames.PageSize - 1);
+                while (page < end) : (page += frames.PageSize) {
+                    if (external_next_backing == prepared_image_pages) break;
+                    @memset(&external_prepared_backing[external_next_backing], 0);
+                    const physical = @intFromPtr(&external_prepared_backing[external_next_backing]);
+                    _ = batch26_builder.mapPage(page, physical, .page_4k, .{ .read = true, .write = true, .user = true, .accessed = true, .dirty = true }) catch break;
+                    external_next_backing += 1;
+                }
+                if (page == end) external_program_break = requested;
+            }
+            frame.x[10] = external_program_break;
         },
         .terminate => blk: {
             syscall_semantics[index] = 3;
@@ -2309,7 +2359,7 @@ noinline fn executeLinuxRv64Syscalls(allocator: anytype, page_owner: anytype, bu
     syscall_pcs = .{0} ** syscall_capacity;
     syscall_sstatus = .{0} ** syscall_capacity;
     syscall_resume_pcs = .{0} ** syscall_capacity;
-    syscall_args = .{.{0} ** 3} ** syscall_capacity;
+    syscall_args = .{.{0} ** 6} ** syscall_capacity;
     syscall_results = .{0} ** syscall_capacity;
     syscall_semantics = .{0} ** syscall_capacity;
     syscall_resources = .{};
