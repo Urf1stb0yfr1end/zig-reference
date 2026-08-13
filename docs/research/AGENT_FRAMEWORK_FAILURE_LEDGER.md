@@ -69,3 +69,13 @@ Do not collapse all failures into one number. The point is to learn whether the 
 **Checkpoint decision:** PR #66 was intentionally merged red as an explicitly annotated frontier so useful runtime work was not discarded. The merge does **not** imply green CI or Batch 31D completion.
 
 **Corrective action:** future agentic plans must keep the existing handoff discipline: commit/push safe progress early, make persistence an explicit finish condition, and record whether a failure is framework, agent, platform, mixed, or unknown. Fresh follow-up work from main must first close known red validation debt before claiming a new green frontier.
+
+## Entry 2026-08-13 — Batch 31E checkout lacks remote and QEMU tooling
+
+**Context:** Batch 31E required green recovery to be committed, pushed, remote-head verified, and followed immediately by exact BusyBox echo and shell pressure.
+
+**Observed result:** the recovery was regenerated and committed locally as `471d280403b0a87effaf8dfb2d015c28ed1c38e8`. The checkout had no configured `origin`, so push and remote-head verification failed. Node.js was absent, preventing the Node-backed portion of `zig build check`; neither `qemu-system-riscv64` nor `qemu-riscv64` was installed, so the exact runtime retries could not execute. Local commits and the worktree survived.
+
+**Attribution:** **platform/tooling failure** (high confidence). The plan was actionable, and the agent performed the available persistence and focused implementation work; externally required Git and machine-emulation surfaces were absent.
+
+**Corrective action:** supply the repository remote, Node.js, and both RISC-V QEMU executables; rerun the aggregate gate, push the preserved commits, verify the remote SHA, open the draft PR, and immediately execute the exact echo then shell ladder.
