@@ -17,7 +17,7 @@ pub const Permissions = flag_module.ValidatedBitFlags(Permission);
 pub const SegmentType = union(enum) {
     known: Known,
     unknown: u32,
-    pub const Known = enum(u32) { null = 0, load = 1, dynamic = 2, interpreter = 3, note = 4, shared_library = 5, program_header = 6, tls = 7 };
+    pub const Known = enum(u32) { null = 0, load = 1, dynamic = 2, interpreter = 3, note = 4, shared_library = 5, program_header = 6, tls = 7, gnu_stack = 0x6474_e551, gnu_relro = 0x6474_e552, riscv_attributes = 0x7000_0003 };
 };
 pub const Segment = struct { segment_type: SegmentType, permissions: Permissions, file_range: ranges.CheckedRange, virtual_range: ranges.CheckedRange, physical_address: addresses.PhysicalAddress, alignment: u64 };
 pub const ParseError = error{ UnexpectedEnd, UnknownPermissionBits, OutOfRange, FileSizeExceedsMemorySize, InvalidAlignment, InvalidTableEntrySize, TableOutOfBounds, Full };
@@ -42,7 +42,9 @@ pub fn parseOne(reader: *bounded.BoundedReader, endian: elf.ElfEndian) ParseErro
     const file_size = try read(u64, reader, endian);
     const memory_size = try read(u64, reader, endian);
     const segment_alignment = try read(u64, reader, endian);
-    if (file_size > memory_size) return error.FileSizeExceedsMemorySize;
+    // ELF constrains p_filesz <= p_memsz for PT_LOAD. Metadata segments such
+    // as PT_RISCV_ATTRIBUTES describe file bytes without a memory image.
+    if (raw_type == 1 and file_size > memory_size) return error.FileSizeExceedsMemorySize;
     if (segment_alignment != 0 and (segment_alignment > std.math.maxInt(usize) or !alignment.isPowerOfTwo(@intCast(segment_alignment)))) return error.InvalidAlignment;
     const o = cast.checkedIntegerCast(usize, offset) catch return error.OutOfRange;
     const fs = cast.checkedIntegerCast(usize, file_size) catch return error.OutOfRange;
@@ -58,6 +60,9 @@ pub fn parseOne(reader: *bounded.BoundedReader, endian: elf.ElfEndian) ParseErro
         5 => .{ .known = .shared_library },
         6 => .{ .known = .program_header },
         7 => .{ .known = .tls },
+        0x6474_e551 => .{ .known = .gnu_stack },
+        0x6474_e552 => .{ .known = .gnu_relro },
+        0x7000_0003 => .{ .known = .riscv_attributes },
         else => .{ .unknown = raw_type },
     };
     return .{ .segment_type = st, .permissions = Permissions.fromRaw(raw_flags) catch return error.UnknownPermissionBits, .file_range = ranges.CheckedRange.fromStartAndLength(o, fs) catch return error.OutOfRange, .virtual_range = ranges.CheckedRange.fromStartAndLength(v, ms) catch return error.OutOfRange, .physical_address = addresses.PhysicalAddress.init(p), .alignment = segment_alignment };
@@ -88,4 +93,11 @@ test "validates one segment and rejects filesz greater than memsz" {
     var ok = bounded.BoundedReader.init(&bytes);
     const s = try parseOne(&ok, .little);
     try std.testing.expect(s.permissions.contains(.read));
+
+    std.mem.writeInt(u32, bytes[0..4], 0x7000_0003, .little);
+    bytes[32] = 2;
+    bytes[40] = 0;
+    var metadata = bounded.BoundedReader.init(&bytes);
+    const attributes = try parseOne(&metadata, .little);
+    try std.testing.expectEqual(SegmentType{ .known = .riscv_attributes }, attributes.segment_type);
 }

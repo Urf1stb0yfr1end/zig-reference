@@ -99,7 +99,7 @@ pub fn planDynamic(comptime capacity: usize, comptime interpreter_capacity: usiz
                 @memcpy(result.interpreter_path[0..path.len], path);
                 result.interpreter_path_len = path.len;
             },
-            .dynamic, .program_header, .note => {},
+            .dynamic, .program_header, .note, .gnu_stack, .gnu_relro, .riscv_attributes => {},
             .null => {},
             .tls, .shared_library => return error.UnsupportedFeature,
         },

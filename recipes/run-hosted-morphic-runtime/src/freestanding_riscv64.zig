@@ -15,6 +15,7 @@ const morphic_operation = @import("morphic-semantic-operation");
 const resource_tables = @import("bounded-resource-table");
 const bounded_filesystem = @import("bounded-filesystem");
 const address_space = @import("bounded-address-space-exec-image");
+const external_artifact_options = @import("external-artifact-options");
 const userspace_elf = @embedFile("userspace-elf-rv64");
 const userspace_elf_data_bss = @embedFile("userspace-elf-rv64-data-bss");
 const userspace_elf_initial_stack = @embedFile("userspace-elf-rv64-initial-stack");
@@ -22,10 +23,15 @@ const userspace_elf_linux_syscalls = @embedFile("userspace-elf-rv64-linux-syscal
 const userspace_elf_file_memory_exec = @embedFile("userspace-elf-rv64-file-memory-exec");
 const batch26_main_elf = @embedFile("userspace-elf-rv64-batch26-main");
 const batch26_interp_elf = @embedFile("userspace-elf-rv64-batch26-interp");
+/// Host transport only: build orchestration supplies hash-checked bytes. ELF
+/// planning and machine semantics remain independent of how those bytes arrived.
+pub export const external_rv64_artifact = @embedFile("external-rv64-artifact").*;
 
 const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
 const physical_pool_pages = 8;
+const prepared_table_pages = 4;
+var prepared_table_backing: [prepared_table_pages][frames.PageSize]u8 align(frames.PageSize) = undefined;
 
 fn fnv1a64(bytes: []const u8) u64 {
     var value: u64 = 0xcbf29ce484222325;
@@ -61,13 +67,23 @@ fn RealPageOwner(comptime Allocator: type) type {
     return struct {
         const Self = @This();
         allocator: *Allocator,
-        pages: [physical_pool_pages]usize = [_]usize{0} ** physical_pool_pages,
+        pages: [physical_pool_pages + prepared_table_pages]usize = [_]usize{0} ** (physical_pool_pages + prepared_table_pages),
         page_count: usize = 0,
+        prepared_count: usize = 0,
 
         pub fn allocate(self: *Self) !u64 {
             if (self.page_count == self.pages.len) return error.Exhausted;
-            const frame = try self.allocator.allocate();
-            const address = (frame.toAddress() catch unreachable).raw();
+            const address = if (self.allocator.allocate()) |frame|
+                (frame.toAddress() catch unreachable).raw()
+            else |err| switch (err) {
+                error.Exhausted => blk: {
+                    if (self.prepared_count == prepared_table_pages) return error.Exhausted;
+                    const reserved = @intFromPtr(&prepared_table_backing[self.prepared_count]);
+                    self.prepared_count += 1;
+                    break :blk reserved;
+                },
+                else => return err,
+            };
             const page: *volatile [frames.PageSize]u8 = @ptrFromInt(address);
             for (0..frames.PageSize) |index| page[index] = 0;
             self.pages[self.page_count] = address;
@@ -79,8 +95,16 @@ fn RealPageOwner(comptime Allocator: type) type {
             var index: usize = 0;
             while (index < self.page_count and self.pages[index] != address) : (index += 1) {}
             if (index == self.page_count) return error.ForeignFrame;
-            const frame = frames.PhysicalPageFrameNumber.fromAddress(addresses.PhysicalAddress.init(address)) catch return error.ForeignFrame;
-            try self.allocator.release(frame);
+            const reserved_begin = @intFromPtr(&prepared_table_backing[0]);
+            const reserved_end = reserved_begin + @sizeOf(@TypeOf(prepared_table_backing));
+            if (address >= reserved_begin and address < reserved_end) {
+                // Builder rollback is LIFO, matching reserved table ownership.
+                if (self.prepared_count == 0 or address != @intFromPtr(&prepared_table_backing[self.prepared_count - 1])) return error.ForeignFrame;
+                self.prepared_count -= 1;
+            } else {
+                const frame = frames.PhysicalPageFrameNumber.fromAddress(addresses.PhysicalAddress.init(address)) catch return error.ForeignFrame;
+                try self.allocator.release(frame);
+            }
             self.page_count -= 1;
             self.pages[index] = self.pages[self.page_count];
             self.pages[self.page_count] = 0;
@@ -112,9 +136,18 @@ var batch26_builder: *MachineBuilder = undefined;
 const Batch26MaterializedImage = address_space.MaterializedImage(4);
 var batch26_main_image: Batch26MaterializedImage = .{};
 var batch26_interp_image: Batch26MaterializedImage = .{};
-var batch26_image_backing: [2]usize = .{ 0, 0 };
+// Machine-adapter policy, not Morphic semantics: this linker-owned region is a
+// bounded reservation for every page in the prepared candidate. Keeping it
+// distinct from the live image is what makes PREPARE failure atomic.
+var batch26_prepared_backing: [4][frames.PageSize]u8 align(frames.PageSize) = undefined;
+var batch26_image_backing: [4]usize = .{ 0, 0, 0, 0 };
 var batch26_image_backing_count: usize = 0;
 var batch26_stack_image: initial_stack.StackPlan(512) = undefined;
+var external_image: Batch26MaterializedImage = .{};
+var external_stack_image: initial_stack.StackPlan(512) = undefined;
+export var external_entry: usize = 0;
+export var external_initial_sp: usize = 0;
+export var external_trap_stack: usize = 0;
 
 /// Fixed, allocation-free integer supervisor context. x0 is architectural zero;
 /// x2 is the interrupted sp. Floating-point/vector state and nested traps are
@@ -816,14 +849,14 @@ fn prepareBatch26Exec(frame: *TrapFrame) !void {
     auxv_len += 1;
     const stack_range = initial_stack.GuestStackRange.init(user_stack_va, user_stack_va + frames.PageSize) catch shutdown();
     const stack = initial_stack.plan(512, 1, 1, 3, stack_range, &argv, &envp, auxv[0..auxv_len]) catch shutdown();
-    const old_code = batch26_builder.query(user_code_va) catch shutdown();
-    const old_data = batch26_builder.query(user_data_va) catch shutdown();
     const stack_leaf = batch26_builder.query(user_stack_va) catch shutdown();
     // PREPARE ends here: all userspace capture, lookup, ELF/stack planning,
     // capacity checks, and backing-page discovery completed with Program A live.
     batch26_main_image = prepared_main;
     batch26_interp_image = prepared_interp;
-    batch26_image_backing = .{ old_code.physical_address, old_data.physical_address };
+    for (0..prepared_page_count) |index| {
+        batch26_image_backing[index] = @intFromPtr(&batch26_prepared_backing[index]);
+    }
     batch26_image_backing_count = prepared_page_count;
     batch26_stack_image = stack;
     _ = stack_leaf;
@@ -868,6 +901,111 @@ fn commitPreparedBatch26Exec(frame: *TrapFrame) void {
         : [pc] "r" (frame.sepc),
         : "memory"
     );
+}
+
+/// Exercise the transported bytes through the same planners, materializer,
+/// backing, Sv39 builder, stack planner, and U-mode transition as exec. The
+/// map/unmap preflight forces every required table allocation before COMMIT;
+/// COMMIT itself can therefore only install leaves into existing tables.
+fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical_stvec: usize) void {
+    batch26_builder = builder;
+    write("ZIGREF_BATCH29_PHASE prepare\n");
+    const bytes: []const u8 = &external_rv64_artifact;
+    const candidate = address_space.ExecPlan(4, 32).prepare(bytes, null) catch |err| {
+        write("ZIGREF_BATCH29_PREPARE_FAIL exec-plan=");
+        write(@errorName(err));
+        write("\n");
+        shutdown();
+    };
+    write("ZIGREF_BATCH29_PREPARE elf\n");
+    if (candidate.interpreter != null) shutdown();
+    const prepared = Batch26MaterializedImage.prepare(bytes, &candidate.main.load, 0) catch shutdown();
+    write("ZIGREF_BATCH29_PREPARE image\n");
+    if (prepared.items().len > batch26_prepared_backing.len) shutdown();
+    const main_segment = candidate.main.load.items()[0];
+    const at_phdr = main_segment.memory.start + 64;
+    const argv = [_][]const u8{"/bin/batch27-static-musl"};
+    const envp = [_][]const u8{"BATCH29=exact"};
+    const auxv = [_]initial_stack.AuxEntry{
+        .{ .type = 3, .value = .{ .immediate = at_phdr } },
+        .{ .type = 9, .value = .{ .immediate = candidate.main_entry } },
+    };
+    const stack_range = initial_stack.GuestStackRange.init(user_stack_va, user_stack_va + frames.PageSize) catch shutdown();
+    const stack = initial_stack.plan(512, 1, 1, 2, stack_range, &argv, &envp, &auxv) catch shutdown();
+    write("ZIGREF_BATCH29_PREPARE stack\n");
+
+    // PREPARE table-backing preflight. Each successful temporary leaf is
+    // removed immediately; the builder-owned intermediate tables remain ready.
+    for (prepared.items(), 0..) |page, index| {
+        write("ZIGREF_BATCH29_PREPARE table\n");
+        const physical = @intFromPtr(&batch26_prepared_backing[index]);
+        const permissions = sv39_entries.Permissions{ .read = true, .user = true, .accessed = true };
+        _ = builder.mapPage(page.virtual_start, physical, .page_4k, permissions) catch shutdown();
+        _ = builder.unmapPage(page.virtual_start, .page_4k) catch shutdown();
+    }
+    external_image = prepared;
+    external_stack_image = stack;
+    write("ZIGREF_BATCH29_PHASE commit\n");
+    const stack_leaf = builder.query(user_stack_va) catch shutdown();
+    const stack_target: [*]volatile u8 = @ptrFromInt(stack_leaf.physical_address);
+    for (0..frames.PageSize) |i| stack_target[i] = 0;
+    const stack_offset = external_stack_image.initial_sp.raw() - user_stack_va;
+    for (external_stack_image.bytes(), 0..) |byte, i| stack_target[stack_offset + i] = byte;
+    for (external_image.items(), 0..) |page, index| {
+        const physical = @intFromPtr(&batch26_prepared_backing[index]);
+        const target: [*]volatile u8 = @ptrFromInt(physical);
+        for (page.bytes, 0..) |byte, i| target[i] = byte;
+        const permissions = sv39_entries.Permissions{
+            .read = page.permissions.read,
+            .write = page.permissions.write,
+            .execute = page.permissions.execute,
+            .user = true,
+            .accessed = true,
+            .dirty = page.permissions.write,
+        };
+        if (permissions.write and permissions.execute) shutdown();
+        _ = builder.mapPage(page.virtual_start, physical, .page_4k, permissions) catch shutdown();
+    }
+    asm volatile ("sfence.vma; fence.i" ::: "memory");
+
+    syscall_query = .{ .context = &batch26_query_context, .queryFn = Batch26ActiveQuery.query };
+    syscall_resources = .{};
+    syscall_bindings = .{};
+    const stdin = syscall_resources.create(.{ .backend = @enumFromInt(0), .capabilities = .{ .read = true } }) catch shutdown();
+    const stdout = syscall_resources.create(.{ .backend = @enumFromInt(1), .capabilities = .{ .write = true } }) catch shutdown();
+    const stderr = syscall_resources.create(.{ .backend = @enumFromInt(2), .capabilities = .{ .write = true } }) catch shutdown();
+    syscall_bindings.bindAt(0, stdin) catch shutdown();
+    syscall_bindings.bindAt(1, stdout) catch shutdown();
+    syscall_bindings.bindAt(2, stderr) catch shutdown();
+    syscall_count = 0;
+    syscall_output_len = 0;
+    syscall_terminal_status = 0;
+    service_trap_count = 0;
+    batch26_active = false;
+    syscall_active = true;
+    write("ZIGREF_BATCH29_PHASE execute\n");
+    external_entry = candidate.main_entry;
+    external_initial_sp = external_stack_image.initial_sp.raw();
+    external_trap_stack = trap_end;
+    asm volatile (
+        "la t0, external_entry; ld a0, 0(t0); la t0, external_initial_sp; ld a1, 0(t0); la t0, external_trap_stack; ld a2, 0(t0); call enterUserService"
+        ::: "memory", "ra", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "t0", "t1", "t2", "t3", "t4", "t5", "t6"
+    );
+    syscall_active = false;
+    asm volatile ("csrw stvec, %[entry]; csrw sscratch, zero"
+        :
+        : [entry] "r" (historical_stvec),
+        : "memory"
+    );
+    write("\nZIGREF_BATCH29_RESULT syscalls=");
+    writeUsizeHex(syscall_count);
+    write(" status=");
+    writeUsizeHex(syscall_terminal_status);
+    write(" output_hex=");
+    writeHex(syscall_output[0..syscall_output_len]);
+    write(" pages=");
+    writeUsizeHex(external_image.items().len);
+    write(" wx=0000000000000000\n");
 }
 
 const SyscallBackend = struct {
@@ -925,7 +1063,16 @@ comptime {
 
 fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
     const index = syscall_count;
-    if (index >= syscall_capacity or frame.scause != 8 or frame.sstatus & (0x100 | 0x40000) != 0) shutdown();
+    if (index >= syscall_capacity or frame.scause != 8 or frame.sstatus & (0x100 | 0x40000) != 0) {
+        write("ZIGREF_LINUX_EDGE_TRAP cause=");
+        writeUsizeHex(frame.scause);
+        write(" sepc=");
+        writeUsizeHex(frame.sepc);
+        write(" stval=");
+        writeUsizeHex(frame.stval);
+        write("\n");
+        shutdown();
+    }
     syscall_numbers[index] = frame.x[17];
     syscall_pcs[index] = frame.sepc;
     syscall_sstatus[index] = frame.sstatus;
@@ -3651,6 +3798,7 @@ export fn freestandingMain() callconv(.c) noreturn {
     executeUserspaceElfDataBss(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
     executeUserspaceElfInitialStack(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
     executeLinuxRv64Syscalls(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
+    if (external_artifact_options.enabled) executeExternalArtifact(&builder, trap_end, historical_stvec);
     executeBatch26(&builder, user_code_pa, trap_end, historical_stvec);
 
     var output: [128]u8 = undefined;

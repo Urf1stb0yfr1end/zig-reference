@@ -116,6 +116,7 @@ const recipe_specs = [_]RecipeSpec{
 
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
+    const external_rv64_artifact = b.option([]const u8, "external-rv64-artifact", "Verified external RV64 ELF to embed in the freestanding machine proof");
     const optimize = b.standardOptimizeOption(.{});
     const check_command = b.addSystemCommand(&.{ "python3", "tools/python-environment.py", "tools/module-contract-consistency-checker.py" });
     const check_step = b.step("check-module-contracts", "Validate schema, formatting, paths, public surfaces, dependencies, catalog, and build registrations");
@@ -292,6 +293,9 @@ pub fn build(b: *std.Build) void {
             b.step("install-userspace-rv64-data-bss-elf", "Build and install the bounded writable RV64 userspace ELF fixture")
                 .dependOn(&install_userspace_data_elf.step);
             const freestanding_module = b.createModule(.{ .root_source_file = b.path("recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig"), .target = freestanding_target, .optimize = .ReleaseSmall, .code_model = .medium });
+            const external_options = b.addOptions();
+            external_options.addOption(bool, "enabled", external_rv64_artifact != null);
+            freestanding_module.addOptions("external-artifact-options", external_options);
             freestanding_module.addImport("morphic-core", recipe_module);
             freestanding_module.addImport("bounded-deterministic-scheduler", findModule("bounded-deterministic-scheduler", &modules));
             freestanding_module.addImport("distinct-memory-address-types", findModule("distinct-memory-address-types", &modules));
@@ -315,6 +319,11 @@ pub fn build(b: *std.Build) void {
             freestanding_module.addAnonymousImport("userspace-elf-rv64-file-memory-exec", .{ .root_source_file = userspace_batch26_elf.getEmittedBin() });
             freestanding_module.addAnonymousImport("userspace-elf-rv64-batch26-main", .{ .root_source_file = batch26_main_elf.getEmittedBin() });
             freestanding_module.addAnonymousImport("userspace-elf-rv64-batch26-interp", .{ .root_source_file = batch26_interp_elf.getEmittedBin() });
+            if (external_rv64_artifact) |path| {
+                freestanding_module.addAnonymousImport("external-rv64-artifact", .{ .root_source_file = .{ .cwd_relative = path } });
+            } else {
+                freestanding_module.addAnonymousImport("external-rv64-artifact", .{ .root_source_file = batch26_main_elf.getEmittedBin() });
+            }
             const freestanding = b.addExecutable(.{ .name = "morphic-freestanding-riscv64", .root_module = freestanding_module });
             freestanding.entry = .disabled;
             freestanding.root_module.strip = false;

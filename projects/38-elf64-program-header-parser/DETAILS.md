@@ -21,6 +21,8 @@ Value results are copied. Slices and pointers borrow their documented input or o
 ## State and invariants
 No cursor escapes its extent; ranges are half-open and overflow checked; capacities are never exceeded; handles include generations; address domains remain typed; owned length never exceeds capacity.
 
+`PT_GNU_STACK`, `PT_GNU_RELRO`, and `PT_RISCV_ATTRIBUTES` have stable typed identities rather than falling into the unknown-type policy. The ELF `p_filesz <= p_memsz` rule is enforced for `PT_LOAD`; file-only metadata segments may truthfully have no memory image.
+
 ## Failure behavior
 Errors are enumerated in `details.json`. Parsing and failed insertion/allocation are failure atomic. Cleanup is required only for successfully initialized owned storage.
 

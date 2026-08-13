@@ -24,6 +24,7 @@ def require_hash(path: pathlib.Path, expected: str) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--artifact-only", action="store_true", help="acquire, identify, and hash artifacts without executing the golden baseline")
+    parser.add_argument("--output-dir", type=pathlib.Path, help="copy the verified executable bytes here for an explicit downstream machine build")
     args = parser.parse_args()
     with tempfile.TemporaryDirectory(prefix="zigref-batch27-") as raw:
         work = pathlib.Path(raw)
@@ -38,6 +39,13 @@ def main() -> int:
             archive.extract(member, work, filter="data")
         busybox = work / "bin/busybox.static"
         require_hash(busybox, BUSYBOX_ELF_SHA256)
+        if args.output_dir:
+            args.output_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(diagnostic, args.output_dir / "batch27-static-musl")
+            shutil.copyfile(busybox, args.output_dir / "busybox.static")
+            require_hash(args.output_dir / "batch27-static-musl", DIAGNOSTIC_SHA256)
+            require_hash(args.output_dir / "busybox.static", BUSYBOX_ELF_SHA256)
+            print(f"artifact_output_dir={args.output_dir.resolve()}")
         print(f"static_musl_diagnostic_sha256={digest(diagnostic)}")
         print(f"static_busybox_sha256={digest(busybox)}")
         print("static_busybox_identity=Alpine v3.22 busybox-static 1.37.0-r20 riscv64")
