@@ -1,0 +1,635 @@
+CODEX AGENTIC SNOWBALL — BATCH 31G
+STATIC BUSYBOX SHELL: GOLDEN DIFFERENTIAL -> MULTI-PAGE ANONYMOUS MMAP -> GETPID ONLY IF ACTUALLY REQUIRED
+ONE-AND-DONE WITH EARLY PERSISTENCE / 30-MINUTE HANDOFF
+
+Repository:
+thanks-cohn/zig-reference
+
+Canonical request path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_31G_STATIC_BUSYBOX_SHELL_MULTIPAGE_ANON_MMAP_GETPID_ONE_AND_DONE_30MIN_HANDOFF.txt
+
+Request-creation main:
+de4e7d03e00cae1f0ab32cd4a531e35e4525e40a
+
+Historical frontier tag:
+morphic-riscv-batch31f-static-busybox-echo-proven-at-pagesz-divergence-closed-multiple-anon-mmaps-shell-reaches-getpid-and-8192byte-mmap-frontier-2026-08-13
+
+READ FIRST:
+- docs/reports/AGENTIC_SNOWBALL_BATCH_31D.md
+- docs/reports/AGENTIC_SNOWBALL_BATCH_31E.md
+- docs/research/AGENT_FRAMEWORK_FAILURE_LEDGER.md
+- docs/research/agent-framework-failure-ledger.jsonl
+- COMMANDS.md
+- recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig
+- recipes/run-hosted-morphic-runtime/src/bounded_runtime_mappings.zig
+
+================================================================================
+0. SINGLE PURPOSE OF THIS CAMPAIGN
+================================================================================
+
+Reach the first exact static BusyBox shell completion under Morphic without
+contaminating the permanent foundation with BusyBox- or Linux-history-specific
+mechanism.
+
+Exact target:
+
+    busybox.static sh -c 'echo batch31g'
+
+Strongest finish line:
+
+    stdout exactly: batch31g\n
+    exit status: 0
+    exact pinned BusyBox identity preserved
+    W+X pages: 0
+
+This campaign begins from a locally machine-proven Batch 31F frontier.
+Do NOT restart from generic ELF/userspace work.
+Do NOT reopen the AT_PAGESZ issue.
+Do NOT broaden mmap speculatively.
+Do NOT begin dynamic musl or Alpine minirootfs work before this shell boundary
+is actually closed and persisted.
+
+================================================================================
+1. INHERITED / LOCALLY PROVEN TRUTH — DO NOT REDISCOVER WITHOUT CAUSE
+================================================================================
+
+Current main includes PR #67 and the AT_PAGESZ repair.
+
+Exact pinned Alpine v3.22 static BusyBox executable:
+
+    package: busybox-static-1.37.0-r20 riscv64
+    executable: busybox.static
+    SHA-256:
+    62831fb7c4a0da509481107a8aeb022244235c5dced18101e3d39131d303d704
+
+Exact static-musl diagnostic SHA-256:
+
+    ff9761d82b7ae05bc577ea46acd4bd9119e29a28e9b1ccb621514df11fd8b74d
+
+Locally proven under qemu-system-riscv64 on current main:
+
+1. Static musl artifact identity is correct.
+2. BusyBox `true` remains an inherited successful runtime boundary.
+3. Missing AT_PAGESZ was the causal source of the previous zero-length mmap
+   divergence.
+4. The external Linux process-start stack now provides AT_PAGESZ=4096.
+5. Exact:
+
+       busybox.static echo batch31f
+
+   prints exactly:
+
+       batch31f
+
+   and exits status 0.
+6. Echo runtime proof records:
+
+       fixed PROT_NONE MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS mmap: success
+       non-fixed RW anonymous mmap length: 4096
+       RW anonymous mapping: success at 0x106000
+       executable pages: 244
+       W+X: 0
+
+7. Exact shell pressure:
+
+       busybox.static sh -c 'echo batch31f'
+
+   now advances beyond the old divergence and performs sensible requests.
+
+Observed shell sequence near the current frontier:
+
+    brk(NULL)                         -> 0x104000
+    brk(0x106000)                    -> 0x106000
+    mmap(0x104000,4096,PROT_NONE,
+         MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS,...) -> 0x104000
+
+    mmap(NULL,4096,RW,PRIVATE|ANON,...) -> 0x106000
+    mmap(NULL,4096,RW,PRIVATE|ANON,...) -> 0x107000
+
+    syscall 172 / getpid             -> currently -ENOSYS
+
+    mmap(NULL,8192,RW,PRIVATE|ANON,...) -> currently -EINVAL
+
+    shell output:
+        sh: out of memory
+
+    shell status:
+        1
+
+    W+X:
+        0
+
+The 8192-byte mmap is the first demonstrated fatal runtime boundary in this
+trace. The shell continued after getpid returned -ENOSYS, so DO NOT assume
+getpid is the blocker merely because it is unsupported.
+
+================================================================================
+2. PRESSURE-ORACLE RULE
+================================================================================
+
+Use the exact same pinned BusyBox artifact as the oracle.
+
+For every failure:
+
+    REAL ARTIFACT
+      -> OBSERVE
+      -> COMPARE WITH GOLDEN WHEN AVAILABLE
+      -> CLASSIFY FIRST CAUSAL MISSING SEMANTIC
+      -> PLACE IT AT NEUTRAL CENTER OR LINUX EDGE CORRECTLY
+      -> IMPLEMENT SMALLEST SUFFICIENT REPAIR
+      -> FOCUSED CAUSAL PROOF
+      -> RETRY SAME ARTIFACT IMMEDIATELY
+
+Do not implement Linux syscall checklists.
+Do not implement hypothetical future shell requirements.
+Do not add compatibility semantics to Morphic merely because Linux names them.
+
+Pressure discovers mechanism. It does not define architecture.
+
+================================================================================
+3. FIRST ACTION — GOLDEN DIFFERENTIAL AROUND THE CURRENT SHELL FRONTIER
+================================================================================
+
+If qemu-riscv64 is available, run the exact pinned BusyBox under the Linux
+user-mode oracle with strace equivalent:
+
+    qemu-riscv64 -strace busybox.static sh -c 'echo batch31g'
+
+Capture the syscall sequence and results around:
+
+    brk
+    fixed PROT_NONE mmap
+    first 4096-byte RW anonymous mmap
+    second 4096-byte RW anonymous mmap
+    getpid
+    first 8192-byte RW anonymous mmap
+    immediately following calls
+
+Answer empirically:
+
+1. Does Linux return a real PID for getpid at this point?
+2. Does shell correctness actually depend on that value before the 8192-byte
+   mapping?
+3. Does Linux accept the exact 8192-byte anonymous mapping request?
+4. Does Linux return one contiguous 8192-byte virtual range?
+5. What immediately follows the successful 8192-byte allocation?
+
+If qemu-riscv64 is NOT available in the supplied environment:
+
+- record that as platform/tooling evidence;
+- do NOT invent golden results;
+- use the exact already-observed Morphic trace above as pressure evidence;
+- inspect the existing one-page implementation and implement only a general
+  bounded extension that is logically required to support the observed
+  two-page request;
+- preserve the inability to perform the golden differential in the report and
+  failure ledger if it materially blocks certainty.
+
+Do not stop solely because the golden oracle executable is absent if the
+neutral multi-page mechanism can be implemented and causally unit-tested from
+existing exact pressure.
+
+================================================================================
+4. PRIMARY EXPECTED MECHANISM — BOUNDED MULTI-PAGE ANONYMOUS MAPPING
+================================================================================
+
+The current implementation already supports the demonstrated one-page
+non-fixed RW anonymous mapping slice.
+
+Generalize only as required to support a checked, bounded request spanning
+multiple pages.
+
+The permanent mechanism must remain Linux-neutral.
+
+BAD:
+
+    if length == 8192 and artifact == BusyBox: allow it
+
+BAD:
+
+    const BusyBoxShellPages = 2
+
+BAD:
+
+    Morphic mapping flags = Linux mmap flags
+
+GOOD:
+
+    Linux mmap adapter
+      -> validates/translates Linux request
+      -> neutral checked page-count/range request
+      -> bounded virtual-range reservation
+      -> bounded backing ownership for N pages
+      -> map N pages with requested neutral permissions
+      -> rollback atomically on any failure
+      -> return neutral mapping base
+
+Requirements for the neutral multi-page mechanism, insofar as the observed
+request demands them:
+
+- checked length-to-page-count conversion;
+- reject zero length;
+- reject arithmetic overflow;
+- page-aligned virtual placement;
+- contiguous virtual range reservation for N pages;
+- explicit bounded backing-page ownership for N pages;
+- collision detection against image, stack, brk, prior runtime mappings, and
+  reserved regions;
+- no partial live mapping if backing/reservation/page-table preparation fails;
+- zero anonymous accessible backing before exposure to userspace;
+- install only the requested R/W/X-neutral permissions;
+- preserve W+X prohibition;
+- deterministic bounded failure when capacity is insufficient;
+- release/rollback all newly claimed backing on failure;
+- preserve existing one-page behavior.
+
+Do not assume physical contiguity is required merely because virtual
+contiguity is required. Use the smallest existing neutral backing model that
+can correctly map the requested virtual pages.
+
+Do not hardcode the current returned addresses 0x106000 or 0x107000 into the
+architecture.
+
+================================================================================
+5. GETPID POLICY — IMPLEMENT ONLY IF REAL PRESSURE REQUIRES IT
+================================================================================
+
+Linux/RV64 syscall 172 is getpid.
+
+The observed shell continued after Morphic returned -ENOSYS, then failed on the
+8192-byte mmap. Therefore getpid is currently an unsupported request, but it is
+NOT yet proven to be the fatal blocker.
+
+First repair the earliest demonstrated fatal boundary.
+
+After multi-page mmap succeeds, retry the exact shell immediately.
+
+Only implement getpid in this campaign if one of the following becomes true:
+
+A. golden differential plus control-flow evidence proves the returned PID is
+   semantically consumed in a way required for shell completion; or
+
+B. after the mmap repair, exact shell pressure demonstrates getpid itself is
+   now the first causal blocker.
+
+If required, keep Linux syscall-number/errno semantics at the Linux edge and
+back them with a neutral Morphic task/process identity concept. Do NOT make
+Morphic process identity equal Linux pid_t unless existing architecture has
+already intentionally established that equivalence.
+
+If a stable neutral task identity already exists, adapt it. Do not invent a
+second identity system merely to satisfy getpid.
+
+================================================================================
+6. RETRY LADDER — DO NOT STOP AFTER 8192-BYTE MMAP
+================================================================================
+
+After the smallest safe multi-page repair, immediately run:
+
+    busybox.static sh -c 'echo batch31g'
+
+If the 8192-byte mmap succeeds and another real failure appears:
+
+    observe
+      -> classify
+      -> smallest reusable repair
+      -> focused proof
+      -> retry exact shell
+
+Continue within the same run while the next repair is bounded and
+architecturally clear.
+
+Do NOT stop merely because:
+
+- the 8192-byte mmap returns success;
+- getpid is implemented;
+- shell executes farther;
+- a new syscall appears.
+
+Stop as a runtime success only when:
+
+    stdout == "batch31g\n"
+    status == 0
+    exact artifact hash is preserved
+    W+X == 0
+
+If a genuinely nontrivial new mechanism appears too late in the campaign,
+leave an externally persisted handoff with the exact first blocker.
+
+================================================================================
+7. REQUIRED FOCUSED PROOFS
+================================================================================
+
+At minimum preserve or add focused proof for:
+
+1. one-page anonymous mapping still succeeds;
+2. two-page anonymous mapping succeeds as one contiguous virtual range;
+3. all pages in the successful mapping are writable/readable as required;
+4. anonymous pages are zeroed before userspace access;
+5. insufficient backing capacity fails without partial live mapping;
+6. insufficient mapping-record capacity fails without partial live mapping;
+7. collision across any page of an N-page range rejects safely;
+8. checked overflow rejects safely;
+9. zero length rejects safely;
+10. W+X remains prohibited;
+11. rollback restores all claimed resources after a mid-prepare failure;
+12. existing fixed no-access mmap behavior remains correct;
+13. exact BusyBox echo remains a regression success where machine execution is
+    available.
+
+If getpid is implemented, add an independent focused proof of the neutral
+identity source and Linux adapter behavior.
+
+BusyBox is the discovery oracle, not the only proof of a permanent mechanism.
+
+================================================================================
+8. ARCHITECTURAL ADMISSION TEST
+================================================================================
+
+For every permanent mechanism added, explicitly answer in the Batch 31G
+report:
+
+1. What real pressure exposed it?
+2. Why can it not remain entirely in a Linux personality/adapter?
+3. Which at least two plausible non-BusyBox/non-Linux consumers could reuse
+   the neutral mechanism?
+4. Which Linux historical details are deliberately excluded?
+5. What is the smallest semantic contract?
+6. How difficult would this choice be to reverse?
+7. What focused causal proof establishes necessity/correctness?
+
+Remember:
+
+    inherit aggressively
+    fossilize cautiously
+
+================================================================================
+9. PRESERVE THE BATCH 31F HISTORICAL PROOF
+================================================================================
+
+Do not regress or rewrite away the established lesson:
+
+The earlier len=0 mmap divergence was NOT repaired by forcing mmap length to
+4096. The causal repair was the missing Linux process-start fact AT_PAGESZ.
+That repair restored sensible allocator behavior and exact BusyBox echo
+completion.
+
+Preserve:
+
+    static musl                  PASS
+    BusyBox true                 PASS
+    AT_PAGESZ                    present
+    fixed no-access mmap         PASS
+    one-page RW anon mmap        PASS
+    multiple one-page mappings  PASS
+    BusyBox echo                 PASS
+    W+X                          0
+
+Do not trade away those proofs to make the shell pass.
+
+================================================================================
+10. AGENT / FRAMEWORK / PLATFORM FAILURE ATTRIBUTION
+================================================================================
+
+The repository now maintains an explicit failure ledger.
+
+If this campaign fails to finish, classify the material cause from evidence:
+
+- framework_failure
+- agent_execution_failure
+- platform_tooling_failure
+- mixed_failure
+- unknown_failure
+
+Do NOT automatically blame the framework.
+Do NOT automatically blame Codex.
+Do NOT hide platform absence as an implementation failure.
+
+Examples:
+
+- request is contradictory or architecture/process directs work into a dead
+  end -> framework evidence;
+- actionable required persistence is ignored despite available tools -> agent
+  execution evidence;
+- QEMU/Git remote/toolchain genuinely absent -> platform/tooling evidence;
+- several causes materially contribute -> mixed;
+- evidence insufficient -> unknown.
+
+If a material failure occurs, update BOTH:
+
+    docs/research/AGENT_FRAMEWORK_FAILURE_LEDGER.md
+    docs/research/agent-framework-failure-ledger.jsonl
+
+with evidence and confidence.
+
+Do not add a failure entry merely because a normal real runtime blocker was
+successfully discovered. A pressure-discovered missing mechanism is not itself
+an agent/framework failure.
+
+================================================================================
+11. HANDOFF / ANTI-WASTE PROTOCOL — MANDATORY
+================================================================================
+
+This is a ONE-AND-DONE campaign, but safe partial progress must survive.
+
+RULE A — BRANCH FROM CURRENT MAIN
+
+Start from current main and record exact base SHA.
+Do not work from stale PR branches.
+
+RULE B — EARLY SAFE COMMIT + PUSH
+
+As soon as a coherent nontrivial safe repair exists and focused tests pass:
+
+    git status
+    git diff
+    commit
+    push
+    verify remote head changed
+
+Do not merely commit locally if a remote is available.
+
+RULE C — DRAFT PR EARLY
+
+Once the first coherent mechanism is pushed, open a draft PR against main.
+Continue on the SAME branch and SAME PR.
+
+RULE D — 20–25 MINUTE CHECKPOINT
+
+By roughly 20–25 minutes of substantive work ensure:
+
+- safe progress committed;
+- branch pushed if remote available;
+- remote SHA verified if remote available;
+- draft PR exists if GitHub permits;
+- PR body says exactly what passed and what remains.
+
+RULE E — ~30 MINUTE HANDOFF
+
+At roughly 30 minutes, stop beginning large speculative experiments.
+Leave one of:
+
+1. mergeable green PR at the strongest proven frontier;
+2. draft PR with safe partial progress and exact blocker;
+3. if remote/PR tooling is unavailable, local commits plus a complete handoff
+   containing branch, SHAs, diff stat, changed files, validation, exact next
+   command, and platform-failure attribution.
+
+NEVER restore/delete correct safe work merely because static shell did not
+finish.
+
+================================================================================
+12. VALIDATION STRATEGY
+================================================================================
+
+During iteration:
+
+- use focused unit/recipe tests;
+- use exact QEMU pressure when available;
+- avoid repeatedly spending the whole campaign on aggregate validation.
+
+Before declaring a normal mergeable PR, run the canonical full validation
+surface, including equivalents of:
+
+    python3 tools/python-environment.py --check
+    python3 tools/format-module-contracts.py --check
+    zig fmt --check build.zig projects recipes conformance
+    zig build check
+    python3 tools/build-repository-index.py --check
+    python3 tools/build-dependency-graphs.py --check
+    PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+    zig build smoke
+    zig build recipes
+    zig build conformance
+    zig build property
+    zig build fuzz-smoke
+    zig build differential
+    zig build test
+    zig build validate-repository
+    python3 tools/check-repository-policy.py
+
+If canonical generated evidence is stale, regenerate it with repository tooling
+and commit the generated result. Do not hand-edit generated hashes.
+
+If full validation cannot finish before handoff, leave the PR draft and state
+exactly what remains.
+
+================================================================================
+13. REPORT REQUIREMENT
+================================================================================
+
+Create:
+
+    docs/reports/AGENTIC_SNOWBALL_BATCH_31G.md
+
+Record at minimum:
+
+- exact base SHA;
+- exact BusyBox SHA-256;
+- Zig version;
+- QEMU versions if available;
+- exact golden shell command and trace excerpt if available;
+- exact Morphic shell command;
+- inherited Batch 31F proof summary;
+- getpid golden/Morphic behavior and whether it was actually required;
+- exact 8192-byte mmap request;
+- neutral multi-page mechanism introduced/reused;
+- page-count/range/backing/rollback semantics;
+- focused tests and negative tests;
+- shell retries in causal order;
+- exact strongest stdout/status reached;
+- W+X result;
+- exact first remaining blocker if shell still does not pass;
+- branch, commit SHA, remote verification, PR state;
+- any agent/framework/platform failure attribution, if applicable.
+
+Do not claim locally unexecuted evidence as newly executed by this run.
+Inherited local Batch 31F proof may be cited as inherited truth, not relabeled.
+
+================================================================================
+14. PR CONTENT
+================================================================================
+
+PR title must match the strongest achieved boundary.
+
+If shell completes, appropriate title:
+
+    Complete exact static BusyBox shell under Morphic
+
+If only multi-page mapping is achieved:
+
+    Add bounded multi-page anonymous mapping and advance static BusyBox shell
+
+PR body:
+
+## Motivation
+## Inherited Batch 31F frontier
+## Golden differential
+## What changed
+## Neutral mechanism vs Linux edge
+## Exact shell advancement
+## Causal proof
+## Validation
+## Failure attribution, if any
+## What this PR does NOT claim
+## First remaining blocker
+## Exact next step
+
+Never call the static shell complete unless exact output/status prove it.
+
+================================================================================
+15. SUCCESS / STOP CONDITIONS
+================================================================================
+
+SUCCESS A — HISTORICAL STATIC SHELL BOUNDARY
+
+    busybox.static sh -c 'echo batch31g'
+
+prints exactly:
+
+    batch31g
+
+with newline, exits status 0, exact artifact identity preserved, and W+X=0.
+
+Commit, push, verify remote head, update report, and present the PR.
+
+Do NOT begin dynamic musl in this campaign after achieving this milestone.
+Preserve the static-shell boundary as a clean independently reviewable
+checkpoint.
+
+SUCCESS B — SAFE PARTIAL FRONTIER
+
+If shell cannot finish within the bounded campaign:
+
+- strongest correct mechanism is committed;
+- pushed and remotely verified where tooling permits;
+- draft PR/handoff exists;
+- exact runtime advancement is documented;
+- exact first remaining blocker is reproduced;
+- failure attribution is recorded only if an agent/framework/platform failure
+  actually occurred.
+
+A safe partial frontier is a successful handoff, NOT static-shell completion.
+
+================================================================================
+16. FINAL OPERATING LAW
+================================================================================
+
+Run the most valuable real software that is almost reachable.
+Implement the first missing reusable mechanism it exposes.
+Prove the mechanism causally.
+Retry immediately.
+Stop implementing when a compatibility boundary transfers responsibility to
+inherited software.
+
+For Batch 31G:
+
+    exact static shell
+      -> golden differential
+      -> first fatal boundary = observed 8192-byte anon mapping
+      -> bounded neutral multi-page repair
+      -> retry exact shell
+      -> getpid only if pressure proves necessary
+      -> continue bounded pressure/repair/retry
+      -> exact batch31g output + status 0 + W+X0
+      -> STATIC BUSYBOX SHELL MILESTONE
