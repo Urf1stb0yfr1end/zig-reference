@@ -1,61 +1,66 @@
 # Agentic Snowball Batch 32D handoff
 
-## State and implementation
+## State and regression-floor classification
 
-- Inherited working-tree SHA: `0783083ee010f55211afdff96c869eb06acb1da1` (the plan's inherited main frontier remains `7e9d55db4d30312d11d0e21e4943237adc4481ff`).
-- `ResourceTable.Description` now carries backend-owned scalar state. `setState` advances it only through a generation-checked resource reference, so aliases share one stream position while independently created resources do not share a global cursor.
-- The deterministic stdin fixture now reads and advances its resource's state. Its bytes and expected nine-byte cursor boundary are unchanged.
-- The explicit `-Dexternal-rv64-live-console-input=true` build/runtime selection binds external-process fd 0 to a live platform backend independently of its argument vector. That backend blocks on SBI legacy console getchar and performs a one-byte checked copy to user memory. fd 1/fd 2 already use SBI legacy console putchar; writes now continue after the bounded diagnostic capture fills.
-- Linux syscall numbers, descriptors, errno translation, Alpine paths, and RISC-V register decoding remain outside the neutral resource table. SBI details remain in the freestanding platform backend.
+- Inherited main SHA: `302761105e0efa70e5eadb18cb005a5793fd4153`; this continuation branch also retains the later documentation commits through `69f79d12ce2b344a088d7edb458dfcf6579cd4dc`.
+- Environment: Zig 0.14.0 and `qemu-system-riscv64` 8.2.2 (`1:8.2.2+ds-0ubuntu1.18`).
+- The first current Batch 25B run reached the literal guest output `stdin-25b` and then shut down before its evidence frame. This was a real Batch 32D regression: after the guest's final close retired stdin, the new final proof attempted to resolve the stale `stdin_ref` in order to read its resource-owned state.
+- The repair keeps backend state resource-owned and derives the retired fixture's completed-read boundary from its two retained successful read completions. It does not restore a global input cursor or keep a resource alive after its final close.
+- After that repair the machine emits the Batch 25B evidence, but the inherited verifier next rejects the current active-Sv39 evidence because six caller-artifact page-table frames are outside its historical eight-page owned-pool interval. The machine explicitly reports ten page tables, with the first four inside `0x802b1000..0x802b9000` and six reserved tables at `0x80700000..0x80706000`. This is a verifier/evidence-model mismatch independent of the repaired process-I/O lifecycle, not evidence of a QEMU-version failure. The verifier was not broadly relaxed in this handoff.
 
-## Measured validation and Alpine retry
+## Exact Alpine live-console pressure
 
-- `zig build test-bounded-resource-table`: PASS under Zig 0.14.0, including the new alias/shared-state proof.
-- `zig build install-freestanding-riscv64-morphic-runtime --prefix /tmp/zigref32d`: PASS under Zig 0.14.0.
-- `python3 tools/verify-freestanding-riscv64-linux-fd-lifecycle.py`: FAIL under the installed system QEMU 8.2.2; see the PR #75 continuation result below.
-- `zig fmt --check build.zig projects recipes conformance`: PASS.
-- `zig build check`: PASS after provisioning the declared Python and Node dependencies.
-- `PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check`: PASS (executed by the aggregate before its environment failures).
-- Exact Alpine `/bin/sh` interactive retry: NOT RUN because the inherited deterministic QEMU regression floor did not validate. No prompt, banner, shell output, ioctl, or unsupported syscall result is claimed.
-- PREPARE/COMMIT and W+X=0 were not weakened by these changes; Batch 32C evidence is preserved, but runtime re-verification requires QEMU.
+The hash-pinned Alpine v3.22.0 RV64 minirootfs was freshly acquired by the canonical pressure tool. It verified 517 objects, 7,069,903 regular-file bytes, `/bin/sh -> /bin/busybox`, BusyBox SHA-256 `4567ce8a67afd045a9be46745236cf6fca0347f70871a2492c94c166eada856e`, PT_INTERP `/lib/ld-musl-riscv64.so.1`, interpreter SHA-256 `f65dfa1e845af4d8c57f5274a8abac7a8c150372b014fb413e44f4cc70050de1`, and namespace-data SHA-256 `7672a8c49fbd75071a6390a55e227927254afe1eabdad969315414332e5b989b`.
 
-## PR #75 review continuation
+The exact build succeeded:
 
-- Removed the argument-vector coupling: `external-rv64-live-console-input` is an explicit boolean option, defaults to the deterministic fixture, and is passed independently into the freestanding runtime.
-- Added `setState` to the bounded-resource-table Zig port contract and regenerated the affected endpoint index.
-- Regenerated all 60 canonical unit/smoke validation records using `python3 tools/python-environment.py tools/record-validation.py --level all`; no evidence was edited manually.
-- Regenerated the port, repository, agent-facing, and dependency-graph textual views with their canonical generators.
-- `zig build check`: PASS.
-- `python3 tools/developer-command.py validate-repository`: PASS, 350/350 steps and 248/248 tests under Zig 0.14.0.
-- After installing system QEMU 8.2.2, the Batch 25B verifier did not complete: the current machine stopped after `stdin-25b`, while an isolated inherited commit also failed earlier at its page-table owned-pool assertion. This environment-specific real-QEMU result is not reported as a Batch 32C or interactive-shell regression pass.
+```text
+zig build install-freestanding-riscv64-morphic-runtime \
+  -Dexternal-rv64-namespace-manifest=/tmp/batch32d-ns/namespace.json \
+  -Dexternal-rv64-namespace-data=/tmp/batch32d-ns/namespace.data \
+  -Dexternal-rv64-argv0=/bin/sh \
+  -Dexternal-rv64-live-console-input=true \
+  --prefix /tmp/batch32d-machine
+```
 
-## Causal handoff
+The resulting machine was run with system QEMU using `-machine virt -nographic -bios default -kernel`. It preserved interpreter-first preparation, reached COMMIT and execute, and reported W+X=0. The unchanged real shell did **not** become interactive: it exited with status 127, no captured command output, after 41 syscalls. The trace includes unsupported Linux/RISC-V compatibility calls, notably syscall 29 (`ioctl`) with request `0x5413` (`TIOCGWINSZ`), as well as startup/metadata calls. Input sent as `echo morphic` and `pwd` therefore produced no shell round trip. No synthetic prompt, banner, or success marker was added.
 
-The process-I/O resource and live console path compile, but the inherited real-QEMU regression floor is not yet measurable as passing in this environment. The **one next causal blocker** is: determine why the Batch 25B verifier stops after `stdin-25b` under system QEMU 8.2.2 before retrying the explicitly live-console-backed exact Alpine `/bin/sh`.
+## Validation
+
+- `PYTHONDONTWRITEBYTECODE=1 python3 tools/pressure-real-rv64-alpine-minirootfs.py --artifact-only --namespace-output-dir /tmp/batch32d-ns`: PASS.
+- Exact live-console machine build: PASS.
+- Exact QEMU run: FAIL to reach a persistent shell; machine proof reached execute and terminated status 127.
+- `python3 tools/verify-freestanding-riscv64-linux-fd-lifecycle.py --self-test`: PARTIAL after the lifecycle repair; Batch 25B evidence now completes, then the inherited active-Sv39 parser rejects reserved caller-artifact table frames outside its historical pool.
+
+## One next causal blocker
+
+**Add bounded diagnostic classification for the exact Alpine status-127 path so the first fatal startup syscall is distinguished from tolerated ENOSYS calls; begin with the observed RV64 `ioctl(fd=0, request=TIOCGWINSZ/0x5413, argp)` and implement it only if the unchanged shell proves it causal.**
 
 ## Final status
 
 | Result | Status |
 |---|---|
 | Batch 32C real Alpine regression | NOT RUN |
-| exact namespace identity | NOT RUN (preserved implementation) |
-| process I/O resource | PASS |
-| fixture/live backend separation | PASS |
-| deterministic fixture regression | FAIL (system-QEMU verifier incomplete) |
-| live QEMU console input | NOT RUN |
-| fd0 live input | NOT RUN |
+| Batch 25B QEMU floor classified | PASS |
+| deterministic fixture regression | FAIL (verifier/evidence-model mismatch after repaired lifecycle completion) |
+| resource-owned process I/O | PASS |
+| explicit live-console selection | PASS |
+| live fd0 input | NOT RUN |
 | fd1/fd2 console output | NOT RUN |
-| real Alpine `/bin/sh` entered | NOT RUN |
-| real musl interpreter-first | NOT RUN |
-| PREPARE/COMMIT | NOT RUN (preserved implementation) |
-| W+X=0 | NOT RUN (preserved implementation) |
-| persistent interactive shell | NOT RUN |
-| `echo morphic` round-trip | NOT RUN |
+| exact Alpine namespace | PASS |
+| real Alpine `/bin/sh` entered | PASS (execute reached; shell then exited 127) |
+| real musl interpreter-first | PASS |
+| PREPARE/COMMIT | PASS |
+| W+X=0 | PASS |
+| persistent interactive shell | FAIL |
+| `echo morphic` round-trip | FAIL |
+| second interactive command | NOT RUN |
 | `pwd` | NOT RUN |
 | `ls /` | NOT RUN |
 | `cat /etc/alpine-release` | NOT RUN |
 | writable `/tmp` | NOT RUN |
 | redirection | NOT RUN |
 | pipe | NOT RUN |
-| repository validation | PASS (350/350 steps, 248/248 tests) |
-| remote persistence | BLOCKED (GitHub credentials unavailable; HTTPS push cannot prompt) |
+| PLAYABLE ALPINE | NOT REACHED |
+| repository validation | NOT RUN at this early handoff |
+| remote persistence | BLOCKED (origin configured; HTTPS credentials unavailable in this non-interactive checkout) |
