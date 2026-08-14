@@ -1,0 +1,597 @@
+CODEX AGENTIC SNOWBALL — BATCH 32E
+CLONE(220) -> LS / -> READ-ONLY -> WRITABLE -> PIPES -> PLAYABLE ALPINE
+BOUNDED LEAPS / MAXIMUM USEFUL IMPLEMENTATION / MANDATORY 30-MINUTE HANDOFF
+
+Repository: thanks-cohn/zig-reference
+Canonical request:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32E_CLONE220_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt
+
+START
+
+Start from current main.
+Authoring main:
+3415202cc00d92442533a80def560cdd907309c7
+
+Do not assume this SHA is still current when the run starts. Fetch/switch/pull current main first and record the inherited SHA.
+
+PRIMARY GOAL
+
+Reach PLAYABLE ALPINE as far as physically possible within the implementation window.
+
+This is not a one-syscall task and not a one-fix task.
+
+Use the exact real Alpine shell as the pressure source. Work through the bounded leap ladder below. Within a leap, repair as many directly exposed causal blockers as necessary and reasonably achievable. When a command passes, immediately continue to the next command or next leap while time remains.
+
+Do not stop because one syscall was implemented.
+Do not stop because one test passed.
+Do not stop because a milestone was reached if there is still implementation time.
+
+The 30-minute limit is a persistence/handoff boundary, NOT an implementation throttle.
+
+The run MUST hand off at approximately 30 minutes even if PLAYABLE ALPINE is incomplete.
+
+======================================================================
+CURRENT PROVEN FRONTIER
+======================================================================
+
+Preserve all inherited milestones:
+
+- exact Alpine v3.22.0 RV64 minirootfs namespace;
+- 517 namespace objects;
+- 7,069,903 regular-file bytes;
+- /bin/sh -> /bin/busybox;
+- real /lib/ld-musl-riscv64.so.1;
+- real musl interpreter-first execution;
+- PREPARE -> COMMIT -> execute;
+- W+X=0;
+- resource-owned process stdin/stdout/stderr;
+- explicit live console backend;
+- persistent interactive Alpine shell;
+- real live keyboard input;
+- `echo morphic` -> `morphic`;
+- `pwd` -> `/` from prior proof;
+- PATH/newfstatat lookup for external commands;
+- /bin/ls resolves through the exact real Alpine namespace.
+
+Local exact `ls /` pressure now proves the next blocker precisely:
+
+  ZIGREF_LINUX_NEWFSTATAT path=/sbin/ls
+  ZIGREF_LINUX_NEWFSTATAT path=/usr/sbin/ls
+  ZIGREF_LINUX_NEWFSTATAT path=/bin/ls
+  /bin/sh: can't fork: Function not implemented
+
+The trace identifies Linux/RV64 syscall 220 decimal (0xdc, clone):
+
+  nr=00000000000000dc
+  result=ffffffffffffffda
+
+`ffffffffffffffda` is -ENOSYS.
+
+The unchanged exact run completed with 47 traced syscalls and status 2, so the immediate `ls /` blocker is NOT trace-capacity exhaustion. It is the real process-creation boundary exposed by ash.
+
+Exactly one starting causal blocker:
+
+  Linux/RV64 clone(220) required by the real Alpine ash `ls /` path.
+
+Do not re-investigate whether fork is the blocker. It is proven.
+Do not spend the opening minutes reproducing old status-127 or TTY hypotheses.
+Go directly to the clone/process-creation path.
+
+======================================================================
+OPERATING RULE — OBSERVE -> REPAIR -> PROVE -> RETRY
+======================================================================
+
+For every blocker:
+
+1. observe the exact first causal failure from the unchanged real Alpine command;
+2. classify the missing semantic at the correct layer;
+3. implement the minimum GENERAL repair that advances the real command;
+4. add focused proof where practical;
+5. rerun the exact same Alpine command immediately;
+6. if it advances to another blocker, continue immediately;
+7. cross as many causally connected blockers as needed to finish the leap.
+
+Do not turn one missing syscall into a speculative POSIX checklist.
+Do not implement Linux behavior because it exists in Linux; implement behavior because the exact Alpine artifact proved it necessary.
+
+Linux ABI numbers/flags/layouts belong at the Linux compatibility edge.
+Reusable process/resource/address-space mechanisms belong in neutral Morphic abstractions.
+Alpine/BusyBox/ash is a client of the mechanism, not its owner.
+
+======================================================================
+LEAP 2A — CLONE(220) -> REAL CHILD PROCESS -> `ls /`
+======================================================================
+
+Starting command:
+
+  ls /
+
+Starting proven failure:
+
+  ash resolves /bin/ls -> /bin/busybox
+  -> clone(220)
+  -> -ENOSYS
+  -> `/bin/sh: can't fork: Function not implemented`
+
+Goal:
+
+  same real interactive Alpine shell
+      -> executes `ls /`
+      -> creates the required child/process context
+      -> child reaches the real /bin/ls path
+      -> directory listing is produced
+      -> parent shell remains usable afterward
+
+Implementation guidance:
+
+- Begin with the exact clone flags/arguments observed on the real path. Trace them if needed.
+- Implement only the process-creation semantics proven necessary by this path, but make them general enough to be reusable.
+- Preserve distinct ownership of address space, resource bindings, process state, and execution state.
+- Do not fake fork by directly executing ls inside the parent.
+- Do not special-case /bin/ls, BusyBox, ash, Alpine paths, or expected listing output.
+- Do not hard-code a successful clone return without creating the process/lifetime semantics the shell actually depends on.
+- If clone immediately exposes child return-value, register state, address-space duplication/sharing, fd inheritance, exec, wait, exit, signal, or scheduler requirements, continue through those requirements while they remain bounded and causal to `ls /`.
+
+Acceptance gate:
+
+  `ls /` produces a real directory listing from the exact namespace;
+  the shell remains alive and accepts another command afterward.
+
+Do not stop after clone itself returns a non-error value. `ls /` is the gate.
+
+When `ls /` passes, immediately begin Leap 2B.
+
+======================================================================
+LEAP 2B — COMPLETE READ-ONLY PLAYABILITY
+======================================================================
+
+Through the SAME real Alpine shell run:
+
+  pwd
+  ls /
+  cat /etc/alpine-release
+  echo still-alive
+
+`pwd` and earlier interactive echo behavior are inherited proof but rerun as useful regression checks when cheap.
+
+Push through all directly exposed blockers required for `cat /etc/alpine-release` and continued shell liveness.
+
+Possible pressure may include:
+- child exec/lifetime;
+- open/read/close semantics;
+- fd inheritance;
+- wait/exit status;
+- namespace reads;
+- resource lifetime;
+- scheduler/process transitions.
+
+The real command determines the order.
+
+Acceptance gate:
+
+  pwd                          PASS
+  ls /                         PASS
+  cat /etc/alpine-release      PASS
+  echo still-alive             PASS
+
+When complete, immediately begin Leap 3.
+
+======================================================================
+LEAP 3 — WRITABLE /tmp + SHELL REDIRECTION
+======================================================================
+
+Through the same shell run, in order:
+
+  cd /tmp
+  echo hello > /tmp/hello
+  cat /tmp/hello
+  echo still-alive
+
+Goal:
+
+Move from read-only namespace execution to the minimum real writable runtime state required by ordinary shell use.
+
+Likely pressure may include:
+- cwd state;
+- open/create;
+- writable object creation;
+- truncate;
+- write;
+- fd offsets;
+- descriptor replacement/redirection;
+- close/lifetime;
+- overlay/runtime mutation distinct from immutable Alpine artifact identity.
+
+Do not mutate or rewrite the serialized Alpine source artifact as the implementation shortcut. Runtime writable state should be an explicit mechanism.
+
+Acceptance gate:
+
+  cd /tmp                       PASS
+  /tmp/hello created            PASS
+  redirection writes `hello`    PASS
+  cat /tmp/hello -> hello       PASS
+  shell still alive             PASS
+
+When complete, immediately begin Leap 4.
+
+======================================================================
+LEAP 4 — PIPES + PROCESS/FD LIFETIME -> PLAYABLE ALPINE
+======================================================================
+
+Run:
+
+  echo hello | cat
+  echo still-alive
+
+Push through the complete bounded set of mechanisms directly exposed by this one real pipeline.
+
+Possible pressure includes:
+- pipe creation;
+- read and write endpoints;
+- fd inheritance;
+- dup/descriptor replacement;
+- close semantics;
+- EOF;
+- child execution;
+- concurrent or scheduled process progress;
+- wait/lifetime;
+- exit status propagation.
+
+Do not build a speculative full Unix IPC/process subsystem.
+But do not stop after the first pipe primitive if several directly related mechanisms are required for this exact pipeline.
+
+Acceptance gate:
+
+  `echo hello | cat` outputs `hello`;
+  shell remains alive;
+  `echo still-alive` succeeds afterward.
+
+When all previous gates remain true, record:
+
+  ★ PLAYABLE ALPINE UNDER MORPHIC ★
+
+======================================================================
+PLAYABLE ALPINE — EARNED ACCEPTANCE
+======================================================================
+
+PLAYABLE ALPINE is earned only when the SAME real Alpine shell successfully completes:
+
+  echo morphic
+  echo second
+  pwd
+  ls /
+  cat /etc/alpine-release
+  cd /tmp
+  echo hello > /tmp/hello
+  cat /tmp/hello
+  echo hello | cat
+  echo still-alive
+
+and still preserves:
+
+- exact Alpine v3.22 namespace identity;
+- real /bin/sh -> /bin/busybox;
+- real musl interpreter-first execution;
+- PREPARE -> COMMIT;
+- W+X=0;
+- no application-specific fake behavior in Morphic;
+- Linux ABI translation at the compatibility boundary.
+
+Do NOT begin apk, networking, DNS, TLS, package installation, GUI, SMP, performance work, hypervisor work, or unrelated QuirkM work before this acceptance gate is genuinely achieved.
+
+======================================================================
+LIVE CONSOLE / LINE ENDINGS — DO NOT DETOUR
+======================================================================
+
+Current manual local reproduction has demonstrated that Ctrl-J supplies the line-feed byte ash expects, while ordinary Enter may introduce carriage-return behavior because a complete TTY/line-discipline layer is not yet present.
+
+This is known.
+
+Do not spend this run polishing terminal behavior unless it becomes directly causal to the automated/exact Alpine pressure path.
+Do not make normal Enter-key behavior a prerequisite for PLAYABLE ALPINE in this batch.
+Do not fake terminal output or prompts.
+
+The primary pressure target remains real commands and real process/filesystem/pipe semantics.
+
+======================================================================
+64-SYSCALL TRACE CAPACITY — EVIDENCE MUST NOT KILL PROGRESS
+======================================================================
+
+A separate local diagnostic proved the historical syscall evidence array can reach 64/64 and currently terminate an otherwise-valid userspace syscall path.
+
+However, the clean exact `ls /` reproduction used only 47 syscalls, so this is NOT the starting blocker for Batch 32E.
+
+Rules:
+
+- Do not spend the opening implementation window redesigning tracing.
+- Start with clone(220).
+- If the exact advancing Alpine path later reaches the trace ceiling, make the smallest general repair that prevents bounded evidence storage from terminating valid execution.
+- Prefer a saturating or bounded-ring evidence recorder plus total/dropped counters over unbounded storage.
+- Preserve useful failure evidence.
+- Evidence machinery must not become the semantic limit of the OS.
+- Once repaired enough to unblock the exact Alpine path, immediately return to the leap ladder.
+
+Principle:
+
+  Evidence exists to protect Morphic progress.
+  Morphic does not exist to satisfy stale evidence machinery.
+
+======================================================================
+ARCHITECTURAL CONSTRAINTS
+======================================================================
+
+Do NOT:
+
+- special-case Alpine, BusyBox, ash, /bin/sh, /bin/ls, `cat`, expected output, hashes, or command strings in neutral mechanisms;
+- fake process creation by running the child command inline in the parent;
+- bypass the real Alpine namespace;
+- bypass the real musl interpreter;
+- add a kernel dynamic relocator;
+- weaken PREPARE/COMMIT atomicity;
+- weaken W+X=0;
+- reintroduce global stdin cursor state;
+- place Linux clone numbers/flags/layouts in neutral Morphic APIs;
+- turn Morphic-native contracts into Linux-shaped contracts merely to satisfy compatibility;
+- implement a broad syscall checklist speculatively;
+- perform a grand rewrite while the exact pressure loop is advancing;
+- spend the run on historical QEMU/verifier regressions unrelated to the exact current Alpine command;
+- stop after a single successful syscall handler when the leap gate still fails.
+
+Prefer:
+
+- neutral process identity/state mechanisms;
+- explicit ownership;
+- generation-safe resource references;
+- bounded data structures with explicit overflow behavior;
+- compatibility translation at the Linux edge;
+- exact-artifact retries after every causal repair;
+- focused tests during active work;
+- stronger validation at coherent checkpoints.
+
+======================================================================
+REGRESSION FLOOR
+======================================================================
+
+Preserve:
+
+- Batch 31G static BusyBox shell;
+- Batch 32A real dynamic musl;
+- Batch 32B dynamic BusyBox shell;
+- Batch 32C FIRST REAL ALPINE;
+- Batch 32D resource-owned process I/O;
+- explicit live console input;
+- FIRST PERSISTENT INTERACTIVE ALPINE SHELL;
+- getcwd support;
+- writev support;
+- newfstatat compatibility-edge support;
+- exact namespace identities;
+- interpreter-first execution;
+- PREPARE/COMMIT;
+- W+X=0;
+- deterministic regression fixtures;
+- repository contract/evidence rules.
+
+Historical verifier/evidence-model issues are diagnostic tools only. Do not let them displace the real Alpine pressure target unless the exact current failure depends on them.
+
+======================================================================
+VALIDATION STRATEGY — FAST FEEDBACK FIRST
+======================================================================
+
+During implementation:
+
+- run focused tests for the mechanism just changed;
+- rerun the exact Alpine command that exposed the blocker immediately;
+- do not repeatedly burn minutes on the full repository validation between tiny edits;
+- when one blocker is fixed and the same command advances, keep going.
+
+At coherent checkpoints, run stronger relevant checks.
+
+Before final handoff, prioritize the strongest checks that fit the remaining time, such as:
+
+  zig fmt --check build.zig projects recipes conformance
+  zig build check
+  zig build test-recipe-run-hosted-morphic-runtime
+  PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+  python3 tools/developer-command.py validate-repository
+
+Regenerate canonical evidence/indexes when required by source changes.
+Do not hand-edit generated evidence if a canonical generator exists.
+
+======================================================================
+MANDATORY 30-MINUTE EXECUTION / PERSISTENCE / HANDOFF PROTOCOL
+======================================================================
+
+THIS SECTION IS MANDATORY.
+
+The purpose is to maximize implementation while guaranteeing that a 30-minute agent run does not disappear into uncommitted experiments or return with no usable result.
+
+The run may finish earlier ONLY if PLAYABLE ALPINE is achieved and the implementation, proof, validation, commits, push, PR, and handoff are all complete.
+
+Otherwise use the full useful implementation window, then MUST hand off.
+
+0–20 MINUTES — AGGRESSIVE IMPLEMENTATION
+
+- immediately attack clone(220) through the exact `ls /` pressure path;
+- diagnose only enough to identify causal repairs;
+- implement, test, retry exact command;
+- cross multiple syscall/mechanism boundaries when they are causally connected to the current leap;
+- continue into later leaps if earlier ones pass;
+- make coherent commits whenever a meaningful reusable repair or leap is reached;
+- do NOT begin final-report writing while there is still high-value implementation work and persistence is safe.
+
+BY ~20–22 MINUTES — FIRST MANDATORY PERSISTENCE CHECKPOINT
+
+At this point Codex MUST ensure useful work cannot be lost:
+
+- commit the strongest coherent implementation achieved so far;
+- push the branch if credentials/remote permit;
+- open or update a draft PR if the branch is reviewable;
+- record exact test/proof state in tracked files when appropriate;
+- verify the commit SHA and remote branch state.
+
+After this checkpoint, DO NOT stop if there is more bounded work available.
+Immediately continue toward the next leap.
+
+22–26 MINUTES — KEEP IMPLEMENTING
+
+- continue exact Alpine pressure;
+- continue through the current leap or next leap;
+- prefer another causal repair/retry over cosmetic cleanup;
+- additional coherent commits are encouraged;
+- if trace capacity becomes causal, repair it narrowly and return to Alpine immediately;
+- do not start an obviously multi-hour rewrite.
+
+AT ~26 MINUTES — HANDOFF MODE BECOMES MANDATORY
+
+Codex MUST stop beginning new large implementation experiments.
+
+From here:
+
+- preserve current code;
+- finish only a small already-in-flight change if it is clearly bounded;
+- run the most important focused/aggregate validations that fit;
+- update the canonical Batch 32E report/handoff with exact evidence;
+- commit all coherent useful changes;
+- push again;
+- open/update the PR;
+- verify branch, commit, and PR state.
+
+AT ~29 MINUTES — IMPLEMENTATION FREEZE
+
+No new implementation experiments.
+No new speculative diagnostics.
+No new refactors.
+
+Only:
+
+- save;
+- validate what can still finish;
+- commit;
+- push;
+- update PR/report;
+- state exact frontier.
+
+AT ~30 MINUTES — HARD MANDATORY HANDOFF
+
+The run MUST hand off.
+
+Even if PLAYABLE ALPINE is incomplete:
+
+- do not continue experimenting;
+- do not leave useful work only in terminal scrollback;
+- do not leave coherent useful work uncommitted;
+- do not return merely saying time expired;
+- do not return with a vague list of possible next steps.
+
+The final state MUST contain, to the maximum extent credentials/environment permit:
+
+1. all coherent useful implementation committed;
+2. branch pushed;
+3. PR opened or updated;
+4. exact inherited main SHA;
+5. exact final branch/head SHA;
+6. highest completed bounded leap;
+7. partial progress in the current leap;
+8. exact unchanged Alpine command last attempted;
+9. exact first causal blocker if incomplete;
+10. focused tests run and their results;
+11. stronger validations run and their results;
+12. PREPARE/COMMIT status;
+13. W+X status;
+14. trace-capacity status if relevant;
+15. exactly ONE recommended next pressure target.
+
+If remote credentials are unavailable, local commits are still mandatory and remote persistence must be reported BLOCKED with the exact reason.
+
+A partial leap with real committed implementation and an exact next blocker is a successful handoff.
+A run with many experiments but no persisted implementation is not.
+
+======================================================================
+REPORTING
+======================================================================
+
+Create or update:
+
+  docs/reports/AGENTIC_SNOWBALL_BATCH_32E.md
+
+Record:
+
+- inherited main SHA;
+- branch name;
+- exact Alpine namespace/artifact identities;
+- clean starting proof: `ls /` -> clone(220) -> -ENOSYS;
+- every major causal blocker encountered;
+- each reusable repair implemented;
+- exact same-command retry after each repair;
+- highest completed leap;
+- partial state inside current leap;
+- each playability command result;
+- process creation/lifetime semantics actually implemented;
+- trace-capacity behavior if encountered;
+- PREPARE/COMMIT;
+- W+X=0;
+- focused test results;
+- aggregate validation results;
+- commit SHAs;
+- push state;
+- PR URL/state;
+- exactly one next causal blocker if incomplete.
+
+Update COMMANDS.md only when a durable reproduction command changes.
+Update README.md only for a genuine new milestone.
+Do not spend implementation time polishing prose beyond what is necessary for an exact handoff.
+
+======================================================================
+FINAL STATUS TABLE
+======================================================================
+
+Report at handoff:
+
+  inherited main SHA                              <sha>
+  final branch/head SHA                           <sha>
+  remote persistence                              PASS/BLOCKED
+  PR                                               <url/state or BLOCKED>
+
+  exact Alpine namespace                          PASS/FAIL
+  real /bin/sh -> /bin/busybox                    PASS/FAIL
+  real musl interpreter-first                     PASS/FAIL
+  PREPARE/COMMIT                                  PASS/FAIL
+  W+X=0                                           PASS/FAIL
+
+  LEAP 1 persistent interactive shell             PASS/FAIL
+  echo morphic                                    PASS/FAIL/NOT RUN
+  pwd                                             PASS/FAIL/NOT RUN
+
+  LEAP 2A clone/process creation -> ls /           PASS/PARTIAL/FAIL
+  clone(220)                                      PASS/PARTIAL/FAIL
+  real child execution                            PASS/PARTIAL/FAIL/NOT RUN
+  ls /                                            PASS/FAIL/NOT RUN
+  shell alive after ls                            PASS/FAIL/NOT RUN
+
+  LEAP 2B read-only playability                   PASS/PARTIAL/FAIL/NOT RUN
+  cat /etc/alpine-release                         PASS/FAIL/NOT RUN
+  echo still-alive                                PASS/FAIL/NOT RUN
+
+  LEAP 3 writable /tmp + redirection              PASS/PARTIAL/FAIL/NOT RUN
+  cd /tmp                                         PASS/FAIL/NOT RUN
+  echo hello > /tmp/hello                         PASS/FAIL/NOT RUN
+  cat /tmp/hello                                  PASS/FAIL/NOT RUN
+
+  LEAP 4 pipe/process semantics                   PASS/PARTIAL/FAIL/NOT RUN
+  echo hello | cat                                PASS/FAIL/NOT RUN
+  shell alive afterward                           PASS/FAIL/NOT RUN
+
+  trace capacity non-fatal if encountered         PASS/FAIL/NOT NEEDED
+  PLAYABLE ALPINE                                 PASS/FAIL
+  focused validation                              PASS/PARTIAL/FAIL
+  repository validation                           PASS/PARTIAL/FAIL/NOT RUN
+
+If PLAYABLE ALPINE is incomplete, end with exactly:
+
+  HIGHEST COMPLETED LEAP: ...
+  CURRENT PARTIAL LEAP: ...
+  EXACT LAST COMMAND: ...
+  EXACT NEXT CAUSAL BLOCKER: ...
+  NEXT PRESSURE TARGET: ...
+
+Do not give a broad wishlist in place of one exact pressure target.
