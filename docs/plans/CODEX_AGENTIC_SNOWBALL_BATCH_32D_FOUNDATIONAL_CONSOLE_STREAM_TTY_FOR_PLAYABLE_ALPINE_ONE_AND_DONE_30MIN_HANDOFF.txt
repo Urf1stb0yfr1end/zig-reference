@@ -1,0 +1,549 @@
+CODEX AGENTIC SNOWBALL — BATCH 32D
+FOUNDATIONAL CONSOLE STREAM / TTY EDGE FOR PLAYABLE ALPINE
+BUILD ONCE, USE FOREVER
+ONE-AND-DONE / CAUSAL PRESSURE / EARLY PERSISTENCE / 30-MINUTE HANDOFF
+
+Repository: thanks-cohn/zig-reference
+Canonical path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32D_FOUNDATIONAL_CONSOLE_STREAM_TTY_FOR_PLAYABLE_ALPINE_ONE_AND_DONE_30MIN_HANDOFF.txt
+
+Inherited main frontier:
+7e9d55db4d30312d11d0e21e4943237adc4481ff
+
+This is Batch 32D. It begins immediately after:
+
+  ★ FIRST REAL ALPINE UNDER MORPHIC ★
+
+READ FIRST
+- AGENTS.md
+- AGE_OF_AGENTS.md
+- README.md
+- COMMANDS.md
+- docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md
+- docs/papers/COMPATIBILITY_AS_MIGRATION_SCAFFOLD.md
+- recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig
+- recipes/run-hosted-morphic-runtime/src/bounded_runtime_mappings.zig
+- tools/pressure-real-rv64-alpine-minirootfs.py
+
+======================================================================
+0. PURPOSE
+======================================================================
+
+Build the permanent interactive-I/O foundation that moves Morphic toward
+PLAYABLE ALPINE without creating an Alpine-shaped kernel.
+
+The priority is NOT to make `/ #` appear as quickly as possible.
+The priority is:
+
+  build once -> reuse forever
+
+The mechanism produced here should remain useful for:
+- real Alpine /bin/sh now;
+- later Alpine processes, pipes, redirection, and apk;
+- other Linux-compatibility programs;
+- QuirkM native userspace;
+- deterministic tests;
+- QEMU today;
+- future real hardware console backends.
+
+If the correct reusable design takes longer than a shell-specific shortcut,
+choose the reusable design.
+
+North star:
+
+  minimum permanent mechanism, maximum inherited civilization
+
+======================================================================
+1. INHERITED TRUTH — DO NOT REDO
+======================================================================
+
+Batch 32C already proves:
+- exact Alpine v3.22.0 RV64 minirootfs identity;
+- complete deterministic serialized namespace transport;
+- all namespace object/range accounting checked;
+- runtime `/bin/sh -> /bin/busybox` lookup from that namespace;
+- BusyBox real PT_INTERP `/lib/ld-musl-riscv64.so.1`;
+- interpreter resolution from the SAME namespace backing;
+- real musl enters U-mode first;
+- no kernel dynamic relocator;
+- no direct-main shortcut;
+- PREPARE -> COMMIT -> execute preserved;
+- exact `/bin/sh -c 'echo alpine'` output `alpine\n`;
+- status 0;
+- W+X=0.
+
+Preserve all of this.
+
+Do not reacquire a different Alpine rootfs or substitute another BusyBox or musl
+build merely because it is easier to make interactive.
+
+======================================================================
+2. OBSERVED BATCH 32D PRESSURE — CURRENT CAUSAL FRONTIER
+======================================================================
+
+A real Alpine `/bin/sh` run with NO `-c` reached the Batch 32C namespace path,
+PREPARE, COMMIT, and execution, but exited instead of becoming interactive.
+
+The important discovered architectural fact is that the current external-process
+stdin backend is still the deterministic fixture:
+
+  const syscall_stdin = "stdin-25b-proof";
+
+and Linux read(fd=0, ...) is served from that fixed memory buffer.
+
+The no-`-c` shell pressure consumed the remaining fixture bytes and then saw EOF.
+Therefore the previous run did NOT test live keyboard input.
+
+This is the first causal boundary.
+
+Do not hide it with a scripted stdin injection and call that interactive.
+Do not special-case `/bin/sh`.
+Do not special-case BusyBox.
+
+======================================================================
+3. ARCHITECTURAL TARGET — NEUTRAL MORPHIC BYTE STREAM
+======================================================================
+
+Create or extend a neutral Morphic mechanism for byte-oriented process I/O.
+
+Desired conceptual shape:
+
+  producer / device / fixture
+           |
+           v
+   neutral Morphic byte stream/resource
+           |
+           +---- deterministic fixture backend
+           |
+           +---- live QEMU console backend
+           |
+           +---- future real-hardware backend
+           |
+           v
+   process resource binding
+           |
+           v
+   Linux ABI adapter (read/write/ioctl as required)
+           |
+           v
+   unchanged Alpine userspace
+
+The neutral mechanism must NOT contain:
+- Linux syscall numbers;
+- Linux errno values;
+- BusyBox names or hashes;
+- Alpine paths;
+- RISC-V register conventions;
+- terminal ioctl command numbers;
+- QEMU-only assumptions in the semantic core.
+
+Platform-specific console acquisition belongs in a platform/backend layer.
+Linux-specific behavior belongs in the Linux compatibility edge.
+
+The core should express only reusable concepts such as:
+- readable byte source / writable byte sink;
+- bounded transfer;
+- resource identity/lifetime;
+- blocking/not-ready/end-of-stream semantics if real pressure requires them;
+- explicit capability checks;
+- deterministic failure.
+
+Prefer composition with the existing Morphic semantic operation/resource model
+rather than inventing a parallel I/O universe.
+
+======================================================================
+4. REQUIRED BACKEND SEPARATION
+======================================================================
+
+The deterministic fixture and live console must be separate backends behind the
+same neutral interface.
+
+Regression fixture:
+- remains deterministic;
+- keeps existing tests reproducible;
+- does not share cursor/state accidentally with external Alpine execution;
+- can still serve synthetic syscall probes.
+
+Live console:
+- receives real host/QEMU keyboard input;
+- sends real process output to the existing machine console path;
+- is selected explicitly for the external interactive process;
+- does not require Alpine-specific code.
+
+Do not globally replace the fixture with live UART input. Tests must remain
+hermetic.
+
+Do not make one global mutable stdin cursor the process-I/O architecture.
+Ownership/state should follow the resource/backend instance.
+
+======================================================================
+5. LIVE CONSOLE IMPLEMENTATION RULE
+======================================================================
+
+Inspect the existing freestanding platform I/O path before choosing a transport.
+Use the smallest correct existing QEMU/firmware mechanism that can support
+receiving bytes without polluting the semantic core.
+
+Candidate implementation details may include SBI debug-console/legacy input or
+the QEMU virt UART, but do NOT assume one in advance if the repository already
+has a better abstraction.
+
+Whatever backend is chosen, isolate it so that a future real-hardware console
+backend can implement the same neutral stream contract without changing process
+or Linux-compatibility semantics.
+
+Avoid an unbounded busy-spin if a correct bounded wait/read model is already
+available or naturally required by the machine architecture. If blocking input
+requires a new wait/readiness concept, implement the smallest reusable semantic
+mechanism and document why it belongs in Morphic rather than in Linux glue.
+
+======================================================================
+6. FIRST PROOF — NEUTRAL I/O BEFORE ALPINE CLAIMS
+======================================================================
+
+Before claiming shell progress, prove the mechanism independently enough to
+show that it is not a BusyBox trick.
+
+At minimum prove:
+- deterministic fixture backend still passes existing regression behavior;
+- separate backend instances have independent state;
+- read capability is enforced;
+- write capability is enforced;
+- bounded user-memory transfer remains checked;
+- live console backend can deliver a human-entered byte sequence to a generic
+  userspace consumer under QEMU;
+- generic userspace output can return through the same resource model;
+- no new W+X mapping is introduced.
+
+A tiny generic userspace echo/read probe is acceptable as a focused proof, but
+it must be a proof of the general mechanism, not the final milestone.
+
+Immediately after the focused proof, retry the SAME exact Alpine `/bin/sh`.
+
+======================================================================
+7. EXACT ALPINE PRESSURE LOOP
+======================================================================
+
+Use the already-proven complete Alpine namespace and invoke exactly:
+
+  /bin/sh
+
+No `-c`.
+No fake shell.
+No injected success banner.
+
+For each failure:
+
+  exact Alpine /bin/sh
+    -> observe first causal blocker
+    -> classify it
+    -> decide whether it belongs in:
+         a) neutral Morphic mechanism
+         b) platform backend
+         c) Linux compatibility edge
+    -> implement the smallest GENERAL repair
+    -> focused proof
+    -> retry SAME exact /bin/sh
+
+Continue through multiple causal blockers in this Batch if they are small,
+well-understood consequences of interactive-console support.
+
+Do not stop after fixing stdin merely because one task is complete.
+Do stop before speculative unrelated subsystems.
+
+======================================================================
+8. TTY / IOCTL POLICY
+======================================================================
+
+An interactive shell may probe terminal state using Linux ioctl/termios calls.
+Do not pre-implement a broad terminal subsystem from a checklist.
+
+If unchanged Alpine pressure proves a specific terminal semantic is blocking:
+- record the exact observed syscall and arguments;
+- identify the user-visible semantic BusyBox actually depends on;
+- express reusable terminal/console state neutrally where appropriate;
+- translate Linux ioctl command/struct encoding only at the Linux edge;
+- implement only the minimum real semantic required;
+- retry unchanged `/bin/sh` immediately.
+
+Examples of acceptable native concepts if pressure proves them necessary:
+- is-terminal / terminal capabilities;
+- input mode state;
+- output mode state;
+- window dimensions;
+- foreground/session relationships only if genuinely required.
+
+Do NOT put Linux ioctl numbers into Morphic core types.
+Do NOT return fake success for arbitrary ioctl calls merely to get a prompt.
+An unsupported ioctl tolerated by BusyBox is not a blocker and should remain
+unsupported.
+
+======================================================================
+9. OTHER OBSERVED SYSCALL PRESSURE
+======================================================================
+
+The first no-`-c` pressure trace also contained unsupported Linux calls beyond
+basic read/write. Treat those as observations, not a checklist.
+
+If one becomes the first causal blocker after live input is fixed:
+- determine its exact Linux meaning from authoritative UAPI definitions;
+- identify the underlying semantic need;
+- implement the neutral capability first when one exists;
+- keep Linux numbering/errno/layout at the compatibility edge;
+- prove the same behavior with focused tests;
+- retry real `/bin/sh`.
+
+Do not implement a syscall merely because it appeared in the trace.
+
+======================================================================
+10. PRIMARY FINISH LINE
+======================================================================
+
+The strongest desired Batch 32D result is:
+
+  exact real Alpine namespace              PASS
+  runtime /bin/sh -> /bin/busybox          PASS
+  same-backing real musl PT_INTERP          PASS
+  interpreter-first U-mode                  PASS
+  PREPARE -> COMMIT -> execute              PASS
+  W+X=0                                     PASS
+  deterministic fixture backend preserved  PASS
+  neutral console/stream resource           PASS
+  live QEMU input -> fd 0                   PASS
+  process stdout/stderr -> console           PASS
+  shell remains alive for human input        PASS
+  human types `echo morphic`                 PASS
+  exact visible `morphic`                    PASS
+  shell returns to prompt                    PASS
+
+Then claim:
+
+  ★ FIRST INTERACTIVE ALPINE SHELL UNDER MORPHIC ★
+
+Do not claim PLAYABLE ALPINE merely from one prompt/echo unless the broader
+playability checks below also pass.
+
+======================================================================
+11. OPTIONAL PLAYABILITY PRESSURE — ONLY AFTER INTERACTIVE SHELL
+======================================================================
+
+If the foundational console/TTY work finishes early and the shell is stable,
+continue using the SAME real shell to discover the next true boundaries.
+
+Try, in order, without pre-implementing their requirements:
+
+  pwd
+  ls /
+  cat /etc/alpine-release
+  cd /tmp
+  echo hello > /tmp/hello
+  cat /tmp/hello
+  echo hello | cat
+
+For each command:
+- observe;
+- classify;
+- implement only the minimum general mechanism;
+- prove;
+- retry.
+
+These commands intentionally pressure:
+- cwd/path semantics;
+- directory enumeration/metadata;
+- namespace reads;
+- writable filesystem behavior;
+- exec/process lifetime;
+- FD inheritance/redirection;
+- pipes.
+
+If these all work reliably and the prompt remains alive, the evidence may
+justify:
+
+  ★ PLAYABLE ALPINE UNDER MORPHIC ★
+
+Otherwise record exactly which step is the next frontier.
+
+Do NOT jump to apk in this Batch unless PLAYABLE ALPINE is genuinely established
+and there is abundant time after persistence. apk is a later campaign.
+
+======================================================================
+12. DO NOT DO
+======================================================================
+
+Do NOT:
+- print `ALPINE` from the kernel as a success gimmick;
+- fake `/ #` output;
+- feed a scripted string and call it human-interactive;
+- special-case BusyBox, ash, `/bin/sh`, hashes, paths, or expected output;
+- turn Morphic into the dynamic linker;
+- add kernel dynamic relocations;
+- weaken PREPARE/COMMIT;
+- weaken W+X policy;
+- make deterministic tests depend on keyboard timing;
+- make live console state share the synthetic fixture cursor;
+- put Linux ioctl numbers or termios structs into the neutral core;
+- implement a broad Linux syscall list speculatively;
+- implement a broad VFS/process/TTY subsystem without exact causal pressure;
+- begin networking/TLS/apk before the shell foundation is real;
+- accept a flashy prompt at the cost of a disposable architecture.
+
+======================================================================
+13. REGRESSION FLOOR
+======================================================================
+
+Preserve at minimum:
+- Batch 31G static BusyBox shell proof;
+- Batch 32A real dynamic musl proof;
+- Batch 32B dynamic BusyBox shell proof;
+- Batch 32C FIRST REAL ALPINE proof;
+- exact Alpine namespace identities;
+- deterministic syscall-fixture tests;
+- generated validation evidence discipline;
+- repository policy;
+- W+X=0.
+
+If shared runtime, resource, transfer, or mapping code changes, run the strongest
+relevant existing verifiers before persistence.
+
+======================================================================
+14. VALIDATION
+======================================================================
+
+During iteration:
+- use focused unit/smoke tests;
+- use a generic live-console userspace probe if useful;
+- retry the exact Alpine `/bin/sh` immediately after every causal repair;
+- preserve raw QEMU transcripts for meaningful frontiers.
+
+Near persistence/finish run the strongest applicable checks, including:
+
+  zig fmt --check build.zig projects recipes conformance
+  zig build check
+  zig build test-recipe-run-hosted-morphic-runtime
+  PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+  python3 tools/developer-command.py validate-repository
+
+Run canonical evidence/index recorders if shared source digests change.
+Never edit generated validation evidence by hand.
+
+======================================================================
+15. PERSISTENCE / PR
+======================================================================
+
+As soon as a coherent reusable mechanism exists:
+- git status
+- git diff
+- focused proof
+- commit
+- push
+- verify remote head moved
+- open a DRAFT PR if reviewable
+
+Do not wait for `/ #` before preserving a good foundational console abstraction.
+
+At ~20-25 minutes ensure useful work is committed and remotely visible.
+At ~30 minutes stop starting large experiments and leave a clean pushed handoff.
+
+If the strongest result is only a safe frontier, say so explicitly. A reusable
+console foundation without a prompt is more valuable than a prompt produced by
+a shell-specific hack.
+
+======================================================================
+16. REPORT
+======================================================================
+
+Create/update:
+
+  docs/reports/AGENTIC_SNOWBALL_BATCH_32D.md
+
+Record:
+- exact inherited main SHA;
+- exact Alpine artifact/namespace inherited identities;
+- the fixed-fixture stdin discovery;
+- architecture chosen for neutral byte-stream/process I/O;
+- backend separation design;
+- live QEMU console mechanism;
+- why the mechanism is reusable beyond Alpine/QEMU;
+- focused positive/negative proofs;
+- every exact Alpine failure -> classification -> repair -> retry transition;
+- terminal/ioctl semantics admitted, if any;
+- deliberately unsupported semantics;
+- prompt/input/output evidence if reached;
+- basic playability command results individually;
+- W+X and PREPARE/COMMIT facts;
+- regression results;
+- commit/branch/PR state;
+- exactly ONE next causal frontier if incomplete.
+
+Update COMMANDS.md only for durable command surface.
+Update README only if a real named milestone is reached.
+
+======================================================================
+17. FINAL HANDOFF TABLE
+======================================================================
+
+End with:
+
+  Batch 32C real Alpine regression             PASS/FAIL
+  exact namespace identity                     PASS/FAIL
+  neutral stream/resource mechanism            PASS/FAIL
+  fixture/live backend separation              PASS/FAIL
+  deterministic fixture regression             PASS/FAIL
+  live QEMU console input                      PASS/FAIL
+  process fd0 live input                       PASS/FAIL
+  stdout/stderr console output                 PASS/FAIL
+  real Alpine /bin/sh entered                  PASS/FAIL
+  real musl interpreter-first                  PASS/FAIL
+  PREPARE/COMMIT                               PASS/FAIL
+  W+X=0                                        PASS/FAIL
+  persistent interactive prompt                PASS/FAIL
+  `echo morphic` round-trip                    PASS/FAIL
+  prompt returned after command                PASS/FAIL
+  pwd                                           PASS/FAIL/NOT RUN
+  ls /                                          PASS/FAIL/NOT RUN
+  cat /etc/alpine-release                       PASS/FAIL/NOT RUN
+  writable /tmp                                 PASS/FAIL/NOT RUN
+  redirection                                   PASS/FAIL/NOT RUN
+  pipe                                          PASS/FAIL/NOT RUN
+  repository validation                        PASS/FAIL/NOT RUN
+  remote persistence                           PASS/BLOCKED
+
+Then state exactly ONE next causal boundary.
+
+======================================================================
+18. NORTH STAR
+======================================================================
+
+Build once. Use forever.
+
+Do not optimize the architecture around the first application that pressures it.
+Let Alpine reveal the missing capability; put the reusable capability in
+Morphic; quarantine Linux-specific encoding at the compatibility edge; then
+retry Alpine unchanged.
+
+Sequence:
+
+  ★ FIRST REAL ALPINE ★                  DONE
+          |
+          v
+  permanent console/stream foundation   THIS BATCH
+          |
+          v
+  ★ FIRST INTERACTIVE ALPINE SHELL ★
+          |
+          v
+  filesystem/process/pipe pressure
+          |
+          v
+  ★ PLAYABLE ALPINE ★
+          |
+          v
+  apk local database / local install
+          |
+          v
+  networking + DNS + TLS
+          |
+          v
+  apk update / apk add
+
+END OF BATCH 32D REQUEST
