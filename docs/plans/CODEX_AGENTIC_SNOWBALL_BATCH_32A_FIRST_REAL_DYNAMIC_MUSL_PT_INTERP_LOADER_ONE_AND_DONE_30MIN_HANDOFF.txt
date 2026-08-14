@@ -1,0 +1,426 @@
+CODEX AGENTIC SNOWBALL — BATCH 32A
+FIRST REAL DYNAMIC MUSL VIA EXISTING PT_INTERP HANDOFF
+ONE-AND-DONE / EARLY PERSISTENCE / 30-MINUTE HANDOFF
+
+Repository: thanks-cohn/zig-reference
+Canonical path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32A_FIRST_REAL_DYNAMIC_MUSL_PT_INTERP_LOADER_ONE_AND_DONE_30MIN_HANDOFF.txt
+
+Inherited frontier commit:
+91d3c7ac04142a5ee14a365900356f5e39fb7d63
+
+Historical time baseline:
+time-till-first-static-busybox-shell-229.48-hours-from-repository-start-2026-08-13
+
+READ FIRST
+- docs/reports/AGENTIC_SNOWBALL_BATCH_31G.md
+- docs/papers/COMPATIBILITY_AS_MIGRATION_SCAFFOLD.md
+- docs/research/AGENT_FRAMEWORK_FAILURE_LEDGER.md
+- docs/research/agent-framework-failure-ledger.jsonl
+- COMMANDS.md
+- projects/54-bounded-elf64-load-plan/
+- projects/59-bounded-address-space-exec-image/
+- recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig
+- recipes/run-hosted-morphic-runtime/src/bounded_runtime_mappings.zig
+- tools/verify-freestanding-riscv64-file-memory-exec.py
+- tools/pressure-real-rv64-userspace.py
+
+======================================================================
+0. SINGLE PURPOSE
+======================================================================
+
+Cross the first REAL dynamic-musl userspace boundary under Morphic.
+
+Strongest finish line:
+
+  exact tiny dynamically linked RV64 musl program
+    -> existing Morphic PT_INTERP path
+    -> exact real ld-musl-riscv64.so.1 / musl interpreter
+    -> real userspace dynamic-loader execution
+    -> main program executes
+    -> stdout exactly: batch32a-dynamic-musl\n
+    -> status 0
+    -> W+X=0
+
+Do NOT count any of these as success:
+- parsing PT_INTERP only;
+- a synthetic interpreter;
+- a statically linked fixture;
+- jumping directly to the main entry;
+- kernel-side musl relocations.
+
+Do NOT begin Alpine minirootfs in this campaign.
+Do NOT begin a broad dynamic-BusyBox campaign before the primary target is
+proven and persisted.
+
+======================================================================
+1. INHERITED TRUTH
+======================================================================
+
+PR #68 / Batch 31G already proves:
+- static musl diagnostic;
+- exact Alpine static BusyBox true;
+- BusyBox echo;
+- static BusyBox sh -c 'echo batch31g';
+- bounded brk;
+- fixed anonymous mmap;
+- AT_PAGESZ=4096;
+- one-page and multi-page anonymous mmap;
+- two-page external process stack;
+- status 0 and W+X=0.
+
+Do not reopen those mechanisms without a demonstrated regression.
+
+Batch 26 already proves the architecture to reuse:
+- distinct ET_DYN / PT_INTERP handling;
+- interpreter path ownership;
+- separate main and interpreter images;
+- ET_DYN bias;
+- startup auxv;
+- PREPARE/COMMIT;
+- U-mode interpreter entry;
+- W+X truth;
+- NO kernel-side userspace relocation.
+
+Batch 32A replaces the synthetic interpreter pressure with REAL musl.
+
+======================================================================
+2. ARCHITECTURAL RULE
+======================================================================
+
+Morphic is NOT the dynamic linker.
+
+Correct boundary:
+
+  dynamic main ELF
+      -> Morphic maps main + interpreter and builds correct process facts
+      -> real musl interpreter executes in U-mode
+      -> musl resolves/maps/relocates its userspace image
+      -> main executes
+
+Keep Linux ABI conventions at the compatibility edge.
+Keep neutral mapping, filesystem, process-start, resource and address-space
+mechanisms at the Morphic center.
+
+No artifact-name checks, no hardcoded musl addresses, no symbol-name patches,
+no direct-main-entry bypass.
+
+======================================================================
+3. EXACT REPRODUCIBLE ARTIFACTS FIRST
+======================================================================
+
+Before implementation pressure, establish fail-closed identities for:
+A. the real RV64 musl interpreter;
+B. a tiny genuinely dynamically linked RV64 musl executable;
+C. any shared object actually required by that executable.
+
+Prefer the existing pressure-real-rv64-userspace.py philosophy:
+- explicit package/source identity;
+- RISC-V architecture;
+- SHA-256 verification;
+- temporary/generated storage, not vendored binaries;
+- artifact-only acquisition when useful.
+
+Verify and record:
+- ELF type;
+- RISC-V machine identity;
+- exact PT_INTERP string;
+- PT_LOAD geometry;
+- DT_NEEDED entries when present;
+- SHA-256 for every external binary in the proof.
+
+The main executable MUST genuinely contain PT_INTERP.
+Do not silently use an arbitrary host libc/loader.
+
+======================================================================
+4. GOLDEN ORACLE
+======================================================================
+
+When qemu-riscv64 is usable, run the exact dynamic fixture in its matching musl
+runtime first and capture a user-mode trace when possible.
+
+Golden target:
+  batch32a-dynamic-musl\n
+  status 0
+
+If qemu-riscv64 is unavailable or unusable:
+- record the platform/tooling limitation;
+- do not invent golden results;
+- continue where exact artifact identity plus system-QEMU Morphic pressure is
+  sufficient for causal engineering.
+
+======================================================================
+5. FIRST MORPHIC RETRY
+======================================================================
+
+Use the EXISTING dynamic exec path. Do not create a second loader path.
+
+Required chain:
+  ELF planning
+    -> prepared/materialized image
+    -> PT_INTERP ownership
+    -> interpreter ET_DYN bias
+    -> PREPARE
+    -> COMMIT
+    -> Sv39
+    -> U-mode REAL musl interpreter entry
+
+Prove the first userspace instructions belong to the real musl interpreter,
+not the main executable and not the historical Batch 26 fixture.
+
+The first retry may fail. Its purpose is to reveal the first real dynamic-musl
+pressure boundary.
+
+======================================================================
+6. PRESSURE-ORACLE LOOP
+======================================================================
+
+For each failure:
+  exact real artifact
+    -> observe
+    -> compare with golden when available
+    -> classify first causal missing semantic
+    -> place it at neutral center or Linux edge correctly
+    -> smallest sufficient repair
+    -> focused proof
+    -> retry SAME artifact immediately
+
+Do not implement syscall checklists.
+Do not assume every unsupported call is causal.
+
+Possible pressure domains are classification aids only:
+- auxv process facts;
+- interpreter/main load-bias truth;
+- bounded path/file access;
+- anonymous or file-backed mapping;
+- protection changes;
+- brk;
+- TLS/process-start state;
+- minimal startup syscalls.
+
+Only real pressure authorizes work.
+
+======================================================================
+7. AUXV DISCIPLINE
+======================================================================
+
+Any added/repaired auxv value must be derived from actual planner/image truth.
+
+Examples if pressure proves them necessary:
+- AT_BASE = actual interpreter base/load bias;
+- AT_ENTRY = actual main entry;
+- AT_PHDR/AT_PHNUM/AT_PHENT = actual main ELF program-header truth;
+- AT_PAGESZ remains the already-proven 4096 process fact.
+
+Do not insert magic constants merely to satisfy musl.
+
+======================================================================
+8. FILE / MEMORY DISCIPLINE
+======================================================================
+
+If the real loader needs additional runtime files, expose them through a bounded,
+general caller-supplied runtime file set or equivalent reusable filesystem
+mechanism. Do not special-case musl filenames in the neutral core.
+
+If real pressure requires new mapping behavior, preserve:
+- bounded capacity;
+- alignment and overflow checks;
+- collision rejection;
+- deterministic backing;
+- failure-atomic mapping changes;
+- W+X=0;
+- PREPARE/COMMIT semantics.
+
+Do not weaken W+X to make the loader run.
+
+======================================================================
+9. REQUIRED PROOF
+======================================================================
+
+Primary success requires evidence for ALL of:
+1. exact dynamic-main SHA-256;
+2. exact real-musl-interpreter SHA-256;
+3. exact PT_INTERP path;
+4. main is genuinely dynamic;
+5. Morphic enters real musl interpreter first;
+6. interpreter executes in U-mode;
+7. real loader work occurs in userspace;
+8. main eventually executes;
+9. stdout exactly batch32a-dynamic-musl\n;
+10. status 0;
+11. W+X=0;
+12. PREPARE/COMMIT preserved;
+13. no kernel-side dynamic relocator added;
+14. no direct-main-entry bypass added.
+
+Include at least one causal evidence point that distinguishes real loader startup
+from simply jumping to the main entry.
+
+======================================================================
+10. TESTING
+======================================================================
+
+During iteration use focused tests and exact runtime retries.
+Near the finish line run the strongest applicable dynamic-machine proof plus:
+
+  zig fmt --check build.zig projects recipes conformance
+  zig build check
+  zig build test-recipe-run-hosted-morphic-runtime
+  zig build validate-repository
+
+Also rerun the canonical Batch 26 dynamic/file-memory-exec verifier if affected.
+Use canonical generators for generated indexes/contracts/evidence.
+
+Do not spend the beginning of the campaign running every aggregate test before
+moving the real runtime boundary.
+
+======================================================================
+11. SUCCESS LADDER
+======================================================================
+
+Track honestly:
+A exact dynamic artifacts pinned
+B golden execution proven / unavailable
+C main + real interpreter transported
+D real musl interpreter enters U-mode
+E first causal loader pressure observed
+F minimum repair admitted
+G loader advances
+H loader startup completes
+I main executes
+J exact output
+K status 0
+L W+X=0
+M repository validation green
+
+Only J+K+L with genuine real-interpreter execution closes the milestone.
+
+======================================================================
+12. OPTIONAL CONTINUATION AFTER PRIMARY SUCCESS ONLY
+======================================================================
+
+Only after primary success is committed, pushed, remote-verified, and visible in
+a PR, choose at most ONE:
+- second tiny dynamic fixture using argv/envp;
+- deterministic second-machine dynamic proof;
+- inspect exact Alpine dynamic BusyBox and record its first pressure boundary
+  WITHOUT beginning a broad repair campaign.
+
+Do not start Alpine minirootfs.
+
+======================================================================
+13. EARLY PERSISTENCE / 30-MINUTE HARD HANDOFF
+======================================================================
+
+As soon as safe nontrivial progress exists:
+  git status
+  git diff
+  focused tests
+  git add <coherent paths>
+  git commit
+  git push
+
+Once reviewable work exists, open a DRAFT PR and keep using the same branch.
+Do not wait for total success before persistence.
+
+At ~20-25 minutes verify:
+- useful work committed;
+- pushed if remote exists;
+- remote head visibly changed;
+- draft PR exists if reviewable;
+- another agent can continue from repository state alone.
+
+At ~30 minutes stop starting large experiments.
+Leave one of:
+1. mergeable success PR;
+2. draft PR with exact frontier;
+3. pushed branch + handoff;
+4. local commit + explicit tooling blocker when remote surfaces truly do not
+   exist.
+
+Never discard safe useful work because the final milestone was not reached.
+
+======================================================================
+14. FAILURE ATTRIBUTION
+======================================================================
+
+Use the existing failure ledger and classify evidence as:
+- framework_failure
+- agent_execution_failure
+- platform_tooling_failure
+- mixed
+- unknown
+
+Do not blame the framework for an ordinary Morphic runtime bug.
+Do not blame the agent for a genuinely missing emulator/remote surface.
+Do not blame tooling when an explicit viable push requirement was simply ignored.
+
+======================================================================
+15. REQUIRED REPORT
+======================================================================
+
+Create/update:
+  docs/reports/AGENTIC_SNOWBALL_BATCH_32A.md
+
+Record:
+- inherited Batch 31G frontier;
+- exact artifact provenance/hashes;
+- PT_INTERP identity;
+- golden result or honest absence;
+- first Morphic attempt;
+- each failure -> repair -> retry transition;
+- real interpreter-entry evidence;
+- main output/status if reached;
+- W+X and PREPARE/COMMIT results;
+- deliberately unimplemented semantics;
+- persistence commit/branch/PR state;
+- failure attribution if relevant.
+
+Update COMMANDS.md only for genuinely durable command surface.
+
+======================================================================
+16. FINAL HANDOFF TABLE
+======================================================================
+
+End with:
+
+  static BusyBox shell                         inherited PASS
+  dynamic main identity                       PASS/FAIL/BLOCKED
+  real musl interpreter identity              PASS/FAIL/BLOCKED
+  PT_INTERP exact                             PASS/FAIL/BLOCKED
+  golden dynamic Linux-user run               PASS/UNAVAILABLE
+  real interpreter entered U-mode             PASS/FAIL
+  first causal loader pressure                <exact result>
+  real musl loader startup complete           PASS/FAIL
+  dynamic main executed                       PASS/FAIL
+  batch32a-dynamic-musl output                PASS/FAIL
+  status 0                                    PASS/FAIL
+  W+X=0                                       PASS/FAIL
+  PREPARE/COMMIT                              PASS/FAIL
+  repository validation                       PASS/FAIL/NOT RUN
+  remote persistence                          PASS/BLOCKED
+
+State exactly ONE next pressure boundary.
+
+If primary success is reached, the next major campaign is DYNAMIC BUSYBOX.
+
+======================================================================
+17. NORTH STAR
+======================================================================
+
+Minimum permanent mechanism. Maximum inherited civilization.
+
+Do not teach Morphic how musl works internally.
+Give the real musl loader enough correct neutral kernel mechanism to work for
+itself.
+
+Progression:
+  static musl                     DONE
+  static BusyBox shell            DONE
+  real dynamic musl               THIS BATCH
+  dynamic BusyBox                 NEXT
+  Alpine minirootfs               AFTER THAT
+  first real Alpine /bin/sh
+  playable Alpine
+
+END OF BATCH 32A CANONICAL REQUEST
