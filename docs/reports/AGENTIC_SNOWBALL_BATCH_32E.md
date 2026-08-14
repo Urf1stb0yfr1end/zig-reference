@@ -4,9 +4,9 @@
 
 - Inherited authoring-main SHA: `3415202cc00d92442533a80def560cdd907309c7`.
 - Inherited worktree HEAD: `6342abe4b6ccf87728054fa4c480192bc037d0dc` (the authoritative Batch 32E request commit).
-- Branch: `work`.
-- Remote persistence: blocked because this checkout has no configured Git remote.
-- PR: blocked because no `make_pr` integration or Git remote is available in this environment.
+- Original restricted authoring environment: branch `work`; remote persistence and PR creation were unavailable there.
+- Current persisted branch: `codex/implement-alpine-shell-to-resolve-syscall-issue`.
+- Current review: [PR #78](https://github.com/thanks-cohn/zig-reference/pull/78). The original restriction remains historical context, not the current persistence state.
 
 ## Exact pressure and repairs
 
@@ -16,7 +16,11 @@ The first retry confirmed ash's exact clone request as RV64 syscall 220 with fla
 
 The exact retry advanced through clone into the real child. The child then failed its next unsupported Linux operation, ash printed `/bin/sh: ls: Function not implemented`, the parent was restored, and the same shell successfully printed `still-alive`. Thus process creation and parent survival advanced, but Leap 2A remains partial because child exec and the real directory listing have not passed.
 
-That advancing path also reached the historical 64-entry syscall evidence ceiling. Evidence recording is now saturating: semantic execution continues, retained capacity stays bounded, and total/dropped counters expose overflow instead of terminating the OS path. The retry after this repair proved `still-alive` rather than `ZIGREF_LINUX_EDGE_TRAP` at the ceiling.
+That advancing path also reached the historical 64-entry syscall evidence ceiling. Evidence recording is now explicitly first-window saturating: semantic execution continues, the first 64 records are retained unchanged, later records use an unreported scratch slot, and saturating total/dropped counters expose overflow instead of terminating the OS path. Focused tests prove both first-window preservation and counter non-wrapping. The retry after this repair proved `still-alive` rather than `ZIGREF_LINUX_EDGE_TRAP` at the ceiling.
+
+## PR #78 validation repair
+
+GitHub Actions run `31827060727` failed in `zig build check` because `tools/check-port-contracts.js` rejected the tracked root-level `THE_QUIRKM_MISSION.md` as unapproved root documentation. Local reproduction produced the exact message `THE_QUIRKM_MISSION.md: unapproved root documentation; move it under docs/`. The document now lives at `docs/vision/THE_QUIRKM_MISSION.md`; this is the smallest policy-compliant repair and does not alter its content. Because the build/test wiring and source digest changed, all validation evidence was regenerated through `python3 tools/python-environment.py tools/record-validation.py --level all`.
 
 ## Proof state
 
@@ -41,7 +45,7 @@ That advancing path also reached the historical 64-entry syscall evidence ceilin
 | trace capacity non-fatal | PASS |
 | PLAYABLE ALPINE | FAIL |
 
-Focused validation passed with `zig build test-recipe-run-hosted-morphic-runtime`. The exact namespace was regenerated and hash-verified with `PYTHONDONTWRITEBYTECODE=1 python3 tools/pressure-real-rv64-alpine-minirootfs.py --artifact-only --namespace-output-dir /tmp/b32e-ns`. The exact freestanding payload compiled with the documented live-console command. QEMU retries used `qemu-system-riscv64 -machine virt -nographic -bios default -kernel /tmp/b32e-machine/bin/morphic-freestanding-riscv64` and injected the unchanged `ls /`, followed by `echo still-alive` only to prove parent liveness.
+PR #78 repair validation passed `zig build test-recipe-run-hosted-morphic-runtime`, `zig build check` (74/74 steps; 30/30 tests), and `python3 tools/developer-command.py validate-repository` (350/350 steps; 248/248 tests). The all-level evidence generator recorded unit and smoke evidence for all 60 modules, and its subsequent `--check` passed. Command-reference and formatting checks also passed. The exact namespace was regenerated and hash-verified with `PYTHONDONTWRITEBYTECODE=1 python3 tools/pressure-real-rv64-alpine-minirootfs.py --artifact-only --namespace-output-dir /tmp/b32e-ns`. The exact freestanding payload compiled with the documented live-console command. QEMU retries used `qemu-system-riscv64 -machine virt -nographic -bios default -kernel /tmp/b32e-machine/bin/morphic-freestanding-riscv64` and injected the unchanged `ls /`, followed by `echo still-alive` only to prove parent liveness.
 
 HIGHEST COMPLETED LEAP: Leap 1 persistent interactive Alpine shell.
 CURRENT PARTIAL LEAP: Leap 2A; bounded clone and real child execution pass, but `ls /` does not.

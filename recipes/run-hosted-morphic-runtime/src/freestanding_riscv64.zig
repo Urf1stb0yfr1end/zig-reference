@@ -16,6 +16,8 @@ const resource_tables = @import("bounded-resource-table");
 const bounded_filesystem = @import("bounded-filesystem");
 const address_space = @import("bounded-address-space-exec-image");
 const external_artifact_options = @import("external-artifact-options");
+const bounded_syscall_evidence = @import("bounded_syscall_evidence.zig");
+const linux_rv64_clone_request = @import("linux_rv64_clone_request.zig");
 const runtime_mappings = @import("bounded_runtime_mappings.zig");
 const userspace_elf = @embedFile("userspace-elf-rv64");
 const userspace_elf_data_bss = @embedFile("userspace-elf-rv64-data-bss");
@@ -477,13 +479,13 @@ var syscall_count: usize = 0;
 var syscall_total_count: usize = 0;
 var syscall_dropped_count: usize = 0;
 const syscall_capacity = 64;
-var syscall_numbers: [syscall_capacity]usize = .{0} ** syscall_capacity;
-var syscall_pcs: [syscall_capacity]usize = .{0} ** syscall_capacity;
-var syscall_sstatus: [syscall_capacity]usize = .{0} ** syscall_capacity;
-var syscall_resume_pcs: [syscall_capacity]usize = .{0} ** syscall_capacity;
-var syscall_args: [syscall_capacity][6]usize = .{.{0} ** 6} ** syscall_capacity;
-var syscall_results: [syscall_capacity]usize = .{0} ** syscall_capacity;
-var syscall_semantics: [syscall_capacity]u8 = .{0} ** syscall_capacity;
+var syscall_numbers: [syscall_capacity + 1]usize = .{0} ** (syscall_capacity + 1);
+var syscall_pcs: [syscall_capacity + 1]usize = .{0} ** (syscall_capacity + 1);
+var syscall_sstatus: [syscall_capacity + 1]usize = .{0} ** (syscall_capacity + 1);
+var syscall_resume_pcs: [syscall_capacity + 1]usize = .{0} ** (syscall_capacity + 1);
+var syscall_args: [syscall_capacity + 1][6]usize = .{.{0} ** 6} ** (syscall_capacity + 1);
+var syscall_results: [syscall_capacity + 1]usize = .{0} ** (syscall_capacity + 1);
+var syscall_semantics: [syscall_capacity + 1]u8 = .{0} ** (syscall_capacity + 1);
 var syscall_terminal_status: usize = 0;
 var external_fork_parent: ?TrapFrame = null;
 const external_child_pid: usize = 2;
@@ -1380,14 +1382,14 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
         write("\n");
         shutdown();
     }
-    const index = if (syscall_count < syscall_capacity) syscall_count else syscall_capacity - 1;
-    syscall_total_count +%= 1;
-    if (syscall_count == syscall_capacity) syscall_dropped_count +%= 1;
+    // Slot `syscall_capacity` is scratch for semantic dispatch after the
+    // evidence window fills. It is never reported, so the first 64 retained
+    // records remain immutable while total/dropped accounting continues.
+    const index = bounded_syscall_evidence.observe(syscall_capacity, &syscall_count, &syscall_total_count, &syscall_dropped_count) orelse syscall_capacity;
     syscall_numbers[index] = frame.x[17];
     syscall_pcs[index] = frame.sepc;
     syscall_sstatus[index] = frame.sstatus;
     syscall_args[index] = .{ frame.x[10], frame.x[11], frame.x[12], frame.x[13], frame.x[14], frame.x[15] };
-    if (syscall_count < syscall_capacity) syscall_count += 1;
     var request: ?morphic_operation.Request = null;
     switch (decodeLinuxRequestKind(frame.x[17])) {
         .get_current_directory => {
@@ -1510,9 +1512,7 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
             // emits: a SIGCHLD child with a copied process image. The child
             // runs first while the bounded parent snapshot is held.
             const flags = frame.x[10];
-            const signal = flags & 0xff;
-            const unsupported_flags = flags & ~@as(usize, 0xff);
-            if (external_fork_parent != null or signal != 17 or unsupported_flags != 0 or frame.x[11] != 0) {
+            if (!linux_rv64_clone_request.supported(flags, frame.x[11], external_fork_parent != null)) {
                 frame.x[10] = negativeErrno(22);
             } else {
                 var parent = frame.*;
@@ -2823,13 +2823,13 @@ noinline fn executeLinuxRv64Syscalls(allocator: anytype, page_owner: anytype, bu
     syscall_output_len = 0;
     syscall_terminal_status = 0;
     service_trap_count = 0;
-    syscall_numbers = .{0} ** syscall_capacity;
-    syscall_pcs = .{0} ** syscall_capacity;
-    syscall_sstatus = .{0} ** syscall_capacity;
-    syscall_resume_pcs = .{0} ** syscall_capacity;
-    syscall_args = .{.{0} ** 6} ** syscall_capacity;
-    syscall_results = .{0} ** syscall_capacity;
-    syscall_semantics = .{0} ** syscall_capacity;
+    syscall_numbers = .{0} ** (syscall_capacity + 1);
+    syscall_pcs = .{0} ** (syscall_capacity + 1);
+    syscall_sstatus = .{0} ** (syscall_capacity + 1);
+    syscall_resume_pcs = .{0} ** (syscall_capacity + 1);
+    syscall_args = .{.{0} ** 6} ** (syscall_capacity + 1);
+    syscall_results = .{0} ** (syscall_capacity + 1);
+    syscall_semantics = .{0} ** (syscall_capacity + 1);
     syscall_resources = .{};
     syscall_bindings = .{};
     // Force the real machine I/O path through a reused slot. Any conversion

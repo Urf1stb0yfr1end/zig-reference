@@ -249,6 +249,18 @@ pub fn build(b: *std.Build) void {
                 .optimize = optimize,
             }) });
             recipe_step.dependOn(&b.addRunArtifact(runtime_mapping_tests).step);
+            const syscall_evidence_tests = b.addTest(.{ .root_module = b.createModule(.{
+                .root_source_file = b.path("recipes/run-hosted-morphic-runtime/src/bounded_syscall_evidence.zig"),
+                .target = target,
+                .optimize = optimize,
+            }) });
+            recipe_step.dependOn(&b.addRunArtifact(syscall_evidence_tests).step);
+            const clone_request_tests = b.addTest(.{ .root_module = b.createModule(.{
+                .root_source_file = b.path("recipes/run-hosted-morphic-runtime/src/linux_rv64_clone_request.zig"),
+                .target = target,
+                .optimize = optimize,
+            }) });
+            recipe_step.dependOn(&b.addRunArtifact(clone_request_tests).step);
             const executable = b.addExecutable(.{ .name = "run-hosted-morphic-runtime", .root_module = recipe_module });
             const install_riscv64 = b.addInstallArtifact(executable, .{});
             b.step("install-riscv64-morphic-runtime", "Cross-compile and install the Morphic executable selected by -Dtarget")
