@@ -48,6 +48,6 @@ No kernel dynamic relocator, musl filename test, direct-main bypass, shared-libr
 | W+X=0 | PASS |
 | PREPARE/COMMIT | PASS |
 | repository validation | PASS (`zig build check` 74/74; complete validation 350/350, 247/247 tests) |
-| remote persistence | BLOCKED: committed locally on the PR #69 branch; HTTPS push has no GitHub credentials in this environment |
+| remote persistence | PASS: Batch 32A work is persisted on PR #69's remote branch |
 
 Exactly one next pressure boundary: after persistence and merge, begin the separately authorized dynamic BusyBox campaign.
