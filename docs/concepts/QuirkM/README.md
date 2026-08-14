@@ -7,6 +7,7 @@ This directory is the canonical home for QuirkM documentation.
 ## Canonical documents
 
 - `QUIRKM_AS_A_SUCCESSOR_KERNEL_SUBSTRATE.md` — defines Morphic as reusable successor-kernel substrate, official QuirkM as the opinionated reference composition, and a conformance-driven path for future derivatives to inherit mature software civilization without being forced to preserve every QuirkM policy forever.
+- `FUTURE_RESEARCHER_FREEDOM_PRINCIPLE.md` — preserves the explicit rule that Morphic must prevent future researchers from becoming trapped in QuirkM's own accumulated baggage while still allowing them to inherit proven mechanisms, compatibility knowledge, and software civilization.
 - `OS_CAPABILITY_CARTRIDGES_AND_ADAPTER_LABORATORY_PROPOSAL.md` — proposes treating whole operating systems as installable VM-backed capability providers and executable reference oracles, with bounded adapters that let Morphic borrow OS-specific capabilities, stress-test candidate kernel mechanisms against real implementations, and progressively subsume proven behavior into cleaner native QuirkM providers without inheriting the whole foreign architecture.
 - `QUIRKM_NATIVE_API_AND_LINUX_QUIRK_QUARANTINE_PROPOSAL.md` — architecture, quirk quarantine, native/Linux dual personality, agentic migration, and design laws.
 - `100_PARAMOUNT_LINUX_COMPATIBILITY_DEBTS.md` — Q-0001 through Q-0100, the highest-priority inherited Linux compatibility debts QuirkM should study first.
