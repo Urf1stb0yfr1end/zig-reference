@@ -18,16 +18,18 @@ pub fn referenceFromIdentity(comptime ResourceRef: type, identity: semantic.Reso
 pub fn ResourceTable(comptime capacity: usize) type {
     return struct {
         const Self = @This();
-        const Entry = struct { backend: BackendId, capabilities: Capabilities, references: usize = 1 };
+        const Entry = struct { backend: BackendId, capabilities: Capabilities, state: usize, references: usize = 1 };
         const Storage = handles.HandleTable(Entry, capacity);
         pub const ResourceRef = Storage.Handle;
-        pub const Description = struct { backend: BackendId, capabilities: Capabilities };
+        /// Backend-owned scalar state travels with the resource rather than with
+        /// a process binding. Aliases therefore observe one stream position.
+        pub const Description = struct { backend: BackendId, capabilities: Capabilities, state: usize = 0 };
         pub const Error = error{ Full, InvalidReference, ReferenceOverflow };
 
         storage: Storage = .{},
 
         pub fn create(self: *Self, description: Description) Error!ResourceRef {
-            return self.storage.insert(.{ .backend = description.backend, .capabilities = description.capabilities }) catch error.Full;
+            return self.storage.insert(.{ .backend = description.backend, .capabilities = description.capabilities, .state = description.state }) catch error.Full;
         }
         pub fn retain(self: *Self, reference: ResourceRef) Error!void {
             const entry = self.storage.get(reference) orelse return error.InvalidReference;
@@ -45,7 +47,11 @@ pub fn ResourceTable(comptime capacity: usize) type {
         }
         pub fn resolve(self: *const Self, reference: ResourceRef) ?Description {
             const entry = self.storage.getConst(reference) orelse return null;
-            return .{ .backend = entry.backend, .capabilities = entry.capabilities };
+            return .{ .backend = entry.backend, .capabilities = entry.capabilities, .state = entry.state };
+        }
+        pub fn setState(self: *Self, reference: ResourceRef, state: usize) Error!void {
+            const entry = self.storage.get(reference) orelse return error.InvalidReference;
+            entry.state = state;
         }
         pub fn referenceCount(self: *const Self, reference: ResourceRef) ?usize {
             return if (self.storage.getConst(reference)) |entry| entry.references else null;
@@ -113,4 +119,14 @@ test "bounds and failed mutations are explicit" {
     try std.testing.expectError(error.Full, bindings.duplicateLowest(0));
     try std.testing.expectError(error.InvalidBinding, bindings.unbind(1));
     try std.testing.expect(bindings.resolve(0) != null);
+}
+
+test "backend state belongs to the resource and is shared by aliases" {
+    var resources = ResourceTable(1){};
+    const stream = try resources.create(.{ .backend = @enumFromInt(9), .capabilities = .{ .read = true }, .state = 3 });
+    var bindings = BindingTable(@TypeOf(stream), 2){};
+    try bindings.bindAt(0, stream);
+    _ = try bindings.duplicateLowest(0);
+    try resources.setState(bindings.resolve(1).?, 8);
+    try std.testing.expectEqual(@as(usize, 8), resources.resolve(bindings.resolve(0).?).?.state);
 }

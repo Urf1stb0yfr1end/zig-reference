@@ -4,4 +4,6 @@ Import `bounded-resource-table`. Create a `ResourceTable(capacity)`, then `creat
 
 For semantic I/O, call `semanticIdentity(reference)` and carry that complete value in `Request.read_bytes` or `Request.write_bytes`. A backend uses `referenceFromIdentity` before `ResourceTable.resolve`. Both slot and generation survive this round trip, so a fresh generation-2-or-later resource works after slot reuse while the stale prior generation fails. Never convert a `ResourceRef` to its index alone or reconstruct generation 1.
 
+`Description.state` is a backend-owned scalar initialized with the resource. Read it through `resolve` and advance it with `setState` only after a successful effect. Because aliases retain the same resource reference, they share this state; independent resources never share a fixture cursor or stream position.
+
 All storage is inline and compile-time bounded. Operations allocate nothing and are not synchronized. Failed create, retain, release, bind, duplicate, or unbind operations leave state unchanged. Generation wrap has the bounded limitation inherited from project 08.

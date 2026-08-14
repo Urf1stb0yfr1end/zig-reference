@@ -161,6 +161,10 @@
         "signature": "resolve(self: *const Self, reference_or_slot: anytype) optional result"
       },
       {
+        "name": "setState",
+        "signature": "setState(self: *Self, reference: ResourceRef, state: usize) Error!void"
+      },
+      {
         "name": "referenceCount",
         "signature": "referenceCount(self: *const Self, reference: ResourceRef) ?usize"
       },
@@ -576,6 +580,98 @@
             "name": "result",
             "type": "optional result",
             "meaning": "Result of resolve.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The count contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "setState",
+        "kind": "method",
+        "signature": "setState(self: *Self, reference: ResourceRef, state: usize) Error!void",
+        "visibility": "public",
+        "summary": "Updates backend-owned scalar state after a successful resource effect.",
+        "receiver": {
+          "name": "self",
+          "type": "*const Self",
+          "ownership": "borrowed immutable",
+          "mutation": "none"
+        },
+        "inputs": [
+          {
+            "name": "reference",
+            "type": "ResourceRef",
+            "role": "Generation-checked resource identity.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "immutable input",
+            "lifetime": "for the duration of the call unless the output contract says it is stored",
+            "valid_range": "a currently live reference",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [
+              "reference resolves to a live resource"
+            ],
+            "validation_performed": [
+              "slot and generation are validated"
+            ],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns InvalidReference"
+          },
+          {
+            "name": "state",
+            "type": "usize",
+            "role": "Replacement backend-owned scalar state.",
+            "ownership": "copied scalar/value or borrowed according to the Zig type",
+            "borrowing": "explicit in the Zig type",
+            "mutability": "immutable input",
+            "lifetime": "stored with the resource",
+            "valid_range": "all usize values",
+            "alignment": "type-defined",
+            "endianness": "not applicable unless stated by the operation",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [],
+            "accepts_untrusted_input": true,
+            "stored": true,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "not applicable"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error!void",
+            "meaning": "Successful state update or InvalidReference.",
             "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
             "borrowed_from": "receiver or input when represented by a pointer or slice",
             "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
