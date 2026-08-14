@@ -490,7 +490,6 @@ const ResourceRef = ResourceStore.ResourceRef;
 const ProcessBindings = resource_tables.BindingTable(ResourceRef, 8);
 var syscall_resources: ResourceStore = .{};
 var syscall_bindings: ProcessBindings = .{};
-var syscall_stdin_cursor: usize = 0;
 const syscall_stdin = "stdin-25b-proof";
 const copy_out_payload = "kernel-to-user!!";
 
@@ -1237,15 +1236,24 @@ const SyscallBackend = struct {
     pub fn readBytes(_: @This(), operation: morphic_operation.ReadBytes) morphic_operation.Completion {
         const resource = syscall_resources.resolve(resource_tables.referenceFromIdentity(ResourceRef, operation.source)) orelse return .{ .failure = .invalid_resource };
         if (!resource.capabilities.read) return .{ .failure = .operation_not_supported };
-        const available = syscall_stdin.len - syscall_stdin_cursor;
+        if (resource.backend == @as(resource_tables.BackendId, @enumFromInt(3))) {
+            if (operation.byte_count == 0) return .{ .success = 0 };
+            const plan = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(@intFromEnum(operation.destination)), 1, .write_to_user, syscall_query) catch return .{ .failure = .invalid_user_memory };
+            var byte: usize = std.math.maxInt(usize);
+            while (byte == std.math.maxInt(usize)) byte = sbiCall(0x2, 0, 0, 0); // SBI legacy console getchar.
+            const destination: [*]volatile u8 = @ptrFromInt(plan.items()[0].physical_start.raw());
+            destination[0] = @truncate(byte);
+            return .{ .success = 1 };
+        }
+        const available = syscall_stdin.len - resource.state;
         const amount = @min(operation.byte_count, available);
         if (amount == 0) return .{ .success = 0 };
         const plan = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(@intFromEnum(operation.destination)), amount, .write_to_user, syscall_query) catch return .{ .failure = .invalid_user_memory };
         for (plan.items()) |segment| {
             const destination: [*]volatile u8 = @ptrFromInt(segment.physical_start.raw());
-            for (0..segment.byte_count) |i| destination[i] = syscall_stdin[syscall_stdin_cursor + segment.request_offset + i];
+            for (0..segment.byte_count) |i| destination[i] = syscall_stdin[resource.state + segment.request_offset + i];
         }
-        syscall_stdin_cursor += amount;
+        syscall_resources.setState(resource_tables.referenceFromIdentity(ResourceRef, operation.source), resource.state + amount) catch return .{ .failure = .invalid_resource };
         return .{ .success = amount };
     }
     pub fn writeBytes(_: @This(), operation: morphic_operation.WriteBytes) morphic_operation.Completion {
@@ -1253,14 +1261,16 @@ const SyscallBackend = struct {
         if (!resource.capabilities.write) return .{ .failure = .operation_not_supported };
         if (operation.byte_count == 0) return .{ .success = 0 };
         const plan = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(@intFromEnum(operation.source)), operation.byte_count, .read_from_user, syscall_query) catch return .{ .failure = .invalid_user_memory };
-        if (operation.byte_count > syscall_output.len - syscall_output_len) return .{ .failure = .invalid_user_memory };
         for (plan.items()) |segment| {
             const source: [*]const volatile u8 = @ptrFromInt(segment.physical_start.raw());
-            for (0..segment.byte_count) |i| syscall_output[syscall_output_len + segment.request_offset + i] = source[i];
+            for (0..segment.byte_count) |i| {
+                const byte = source[i];
+                if (syscall_output_len + segment.request_offset + i < syscall_output.len)
+                    syscall_output[syscall_output_len + segment.request_offset + i] = byte;
+                write(&.{byte});
+            }
         }
-        const start = syscall_output_len;
-        syscall_output_len += operation.byte_count;
-        write(syscall_output[start..syscall_output_len]);
+        syscall_output_len = @min(syscall_output.len, syscall_output_len + operation.byte_count);
         return .{ .success = operation.byte_count };
     }
     pub fn terminate(_: @This(), status: u8) morphic_operation.Completion {
@@ -2638,7 +2648,6 @@ noinline fn executeLinuxRv64Syscalls(allocator: anytype, page_owner: anytype, bu
     syscall_semantics = .{0} ** syscall_capacity;
     syscall_resources = .{};
     syscall_bindings = .{};
-    syscall_stdin_cursor = 0;
     // Force the real machine I/O path through a reused slot. Any conversion
     // that drops the generation or reconstructs generation 1 now fails before
     // the first successful read.
@@ -2679,7 +2688,8 @@ noinline fn executeLinuxRv64Syscalls(allocator: anytype, page_owner: anytype, bu
     const data_leaf = builder.query(user_data_va) catch shutdown();
     const expected_numbers = [_]usize{ 0x7fff, 63, 23, 57, 63, 63, 63, 64, 57, 63, 57, 64, 64, 63, 94 };
     const expected_results = [_]usize{ negativeErrno(38), 5, 3, 0, negativeErrno(9), negativeErrno(14), 4, 9, 0, negativeErrno(9), negativeErrno(9), negativeErrno(9), negativeErrno(14), negativeErrno(9) };
-    if (syscall_count != 15 or !std.mem.eql(usize, syscall_numbers[0..15], &expected_numbers) or !std.mem.eql(usize, syscall_results[0..14], &expected_results) or syscall_terminal_status != 37 or syscall_output_len != 9 or !std.mem.eql(u8, syscall_output[0..9], "stdin-25b") or syscall_stdin_cursor != 9 or syscall_resources.count() != 2 or allocated_before != allocator.allocatedCount() or tables_before != page_owner.page_count or satp_before != satp_after or code_leaf.raw_entry & 0x1e != 0x1a or stack_leaf.raw_entry & 0x1e != 0x16 or data_leaf.raw_entry & 0x1e != 0x16) {
+    const stdin_state = (syscall_resources.resolve(stdin_ref) orelse shutdown()).state;
+    if (syscall_count != 15 or !std.mem.eql(usize, syscall_numbers[0..15], &expected_numbers) or !std.mem.eql(usize, syscall_results[0..14], &expected_results) or syscall_terminal_status != 37 or syscall_output_len != 9 or !std.mem.eql(u8, syscall_output[0..9], "stdin-25b") or stdin_state != 9 or syscall_resources.count() != 2 or allocated_before != allocator.allocatedCount() or tables_before != page_owner.page_count or satp_before != satp_after or code_leaf.raw_entry & 0x1e != 0x1a or stack_leaf.raw_entry & 0x1e != 0x16 or data_leaf.raw_entry & 0x1e != 0x16) {
         write("ZIGREF_25B_FAIL final-relations\n");
         shutdown();
     }
@@ -2720,7 +2730,7 @@ noinline fn executeLinuxRv64Syscalls(allocator: anytype, page_owner: anytype, bu
     write("\noutput_hex=");
     writeHex(syscall_output[0..syscall_output_len]);
     write("\nstdin_cursor=");
-    writeUsizeHex(syscall_stdin_cursor);
+    writeUsizeHex(stdin_state);
     write("\nresource_count=");
     writeUsizeHex(syscall_resources.count());
     write("\nstdin_generation=");
@@ -2786,7 +2796,7 @@ noinline fn executeBatch26(builder: *MachineBuilder, user_code_pa: usize, trap_e
     syscall_bindings = .{};
     const retired = syscall_resources.create(.{ .backend = @enumFromInt(9), .capabilities = .{} }) catch shutdown();
     if (!(syscall_resources.release(retired) catch shutdown())) shutdown();
-    const stdin = syscall_resources.create(.{ .backend = @enumFromInt(0), .capabilities = .{ .read = true } }) catch shutdown();
+    const stdin = syscall_resources.create(.{ .backend = @enumFromInt(if (external_artifact_options.live_console_input) 3 else 0), .capabilities = .{ .read = true } }) catch shutdown();
     const stdout = syscall_resources.create(.{ .backend = @enumFromInt(1), .capabilities = .{ .write = true } }) catch shutdown();
     const stderr = syscall_resources.create(.{ .backend = @enumFromInt(2), .capabilities = .{ .write = true } }) catch shutdown();
     syscall_bindings.bindAt(0, stdin) catch shutdown();

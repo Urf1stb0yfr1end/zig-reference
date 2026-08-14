@@ -2,7 +2,7 @@
 
 Keep four identities separate: a compatibility-visible descriptor, a process-local binding slot, a generational `ResourceRef`, and a backend identity. Aliases copy only the `ResourceRef`; `retain` makes their shared lifetime explicit. Closing an adapter binding means unbind then release, not destruction by descriptor fiat.
 
-A future QuirkM typed handle can wrap `ResourceRef`, and a future Wasm adapter can store it in its own table. Both can call `resolve` directly without Linux integers or errno. The backend still owns device-specific state such as a deterministic input cursor.
+A future QuirkM typed handle can wrap `ResourceRef`, and a future Wasm adapter can store it in its own table. Both can call `resolve` directly without Linux integers or errno. The resource stores backend-specific scalar state such as a deterministic input cursor, so aliases share a position without a global cursor.
 
 Exercises: prove a stale handle fails after slot reuse; fill every binding; close one of two aliases; decide where synchronization belongs for a future concurrent process.
 

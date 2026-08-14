@@ -2188,6 +2188,12 @@
     },
     {
       "kind": "method",
+      "module": "bounded-resource-table",
+      "name": "setState",
+      "signature": "setState(self: *Self, reference: ResourceRef, state: usize) Error!void"
+    },
+    {
+      "kind": "method",
       "module": "bounded-byte-reader",
       "name": "skip",
       "signature": "skip(self: *BoundedReader, count: usize) Error!void"

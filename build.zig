@@ -124,6 +124,7 @@ pub fn build(b: *std.Build) void {
     const external_rv64_argv1 = b.option([]const u8, "external-rv64-argv1", "External RV64 artifact argv[1]") orelse "";
     const external_rv64_argv2 = b.option([]const u8, "external-rv64-argv2", "External RV64 artifact argv[2]") orelse "";
     const external_rv64_argv3 = b.option([]const u8, "external-rv64-argv3", "External RV64 artifact argv[3]") orelse "";
+    const external_rv64_live_console_input = b.option(bool, "external-rv64-live-console-input", "Bind external process stdin to the live machine console") orelse false;
     const optimize = b.standardOptimizeOption(.{});
     const check_command = b.addSystemCommand(&.{ "python3", "tools/python-environment.py", "tools/module-contract-consistency-checker.py" });
     const check_step = b.step("check-module-contracts", "Validate schema, formatting, paths, public surfaces, dependencies, catalog, and build registrations");
@@ -314,6 +315,7 @@ pub fn build(b: *std.Build) void {
             external_options.addOption([]const u8, "argv1", external_rv64_argv1);
             external_options.addOption([]const u8, "argv2", external_rv64_argv2);
             external_options.addOption([]const u8, "argv3", external_rv64_argv3);
+            external_options.addOption(bool, "live_console_input", external_rv64_live_console_input);
             freestanding_module.addOptions("external-artifact-options", external_options);
             freestanding_module.addImport("morphic-core", recipe_module);
             freestanding_module.addImport("bounded-deterministic-scheduler", findModule("bounded-deterministic-scheduler", &modules));
