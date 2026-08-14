@@ -508,4 +508,14 @@ interpreter identities and PT_INTERP relationship, and runs the exact Linux-user
 the two rootfs-resolved ELF objects for diagnostic retries. Exporting those two
 objects is explicitly not a rootfs representation and does not establish FIRST
 REAL ALPINE under Morphic; Batch 32C records bounded namespace transport/runtime
-lookup as the remaining causal boundary.
+lookup as the remaining causal boundary. `--namespace-output-dir PATH` instead
+writes the complete deterministic `zig-reference-bounded-namespace-v1`
+`namespace.json` plus its distinct immutable `namespace.data` backing. The
+generator accounts for all 517 archive objects and 7,069,903 regular-file bytes,
+validates every relationship and checked byte range, and proves `/bin/sh` and the
+interpreter hashes by resolving through the serialized representation. The
+focused command `PYTHONDONTWRITEBYTECODE=1 python3
+tools/test-alpine-rootfs-namespace.py` covers construction, byte accounting,
+missing paths, absolute symlinks, bounded loop rejection, root escapes, and
+duplicate conflicts. This transport proof still does not claim Morphic consumed
+the representation.

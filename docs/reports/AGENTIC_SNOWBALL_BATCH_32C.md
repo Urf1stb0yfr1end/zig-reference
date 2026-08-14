@@ -70,3 +70,39 @@ Exactly one remaining blocker: introduce and prove the minimum general bounded
 rootfs namespace transport/runtime lookup, then retry the same pinned rootfs and
 the same `/bin/sh -c 'echo alpine'` command without substituting the selected pair
 for the namespace.
+
+## Continuation: complete neutral namespace serialization
+
+The continuation adds a coherent first half of that blocker without overclaiming
+kernel integration. After verifying the same archive, the pressure tool now emits
+`zig-reference-bounded-namespace-v1` as deterministic JSON metadata plus a
+distinct immutable data backing. It represents all 517 archive objects (the root,
+98 directories total, 84 regular files, and 335 symbolic links) and accounts for
+all 7,069,903 regular-file bytes as contiguous, checked, non-overlapping ranges.
+It rejects duplicate canonical paths, missing/out-of-order parents, root escapes,
+unsupported kinds, malformed links, invalid ranges, inconsistent counts, and data
+digest mismatch. Capacities remain caller policy rather than Alpine-shaped Morphic
+constants, and no tar parsing moved into the kernel.
+
+Neutral lookup over the serialized representation—not the extracted host tree—
+resolves `/bin/sh`, follows `/bin/sh -> /bin/busybox` with a bounded traversal,
+and selects bytes hashing to
+`4567ce8a67afd045a9be46745236cf6fca0347f70871a2492c94c166eada856e`.
+The same representation resolves `/lib/ld-musl-riscv64.so.1` to bytes hashing to
+`f65dfa1e845af4d8c57f5274a8abac7a8c150372b014fb413e44f4cc70050de1`.
+The complete immutable data backing SHA-256 is
+`7672a8c49fbd75071a6390a55e227927254afe1eabdad969315414332e5b989b`.
+
+Focused validation passed with:
+
+```text
+PYTHONDONTWRITEBYTECODE=1 python3 tools/test-alpine-rootfs-namespace.py
+PYTHONDONTWRITEBYTECODE=1 python3 tools/pressure-real-rv64-alpine-minirootfs.py --archive /tmp/alpine-minirootfs-3.22.0-riscv64.tar.gz --artifact-only --namespace-output-dir /tmp/zigref-namespace
+```
+
+This is a **safe frontier**, not FIRST REAL ALPINE. The exact first remaining
+blocker is to place the emitted manifest and data in a checked caller-owned
+Morphic transport region, make the freestanding runtime consume its metadata for
+`/bin/sh` and PT_INTERP lookup, and retry the unchanged command. PREPARE/COMMIT,
+stdout, status, and W+X results remain inherited regression evidence until that
+runtime consumption occurs.
