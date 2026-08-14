@@ -47,7 +47,7 @@ No kernel dynamic relocator, direct BusyBox entry, BusyBox-specific core branch,
 | W+X=0 | FAIL (not reached) |
 | PREPARE/COMMIT | FAIL (not reached) |
 | Batch 32A regression | PASS |
-| repository validation | NOT RUN |
-| remote persistence | BLOCKED: checkout has no configured Git remote or PR surface |
+| repository validation | NOT RUN in the original Codex checkout; GitHub CI is authoritative for the persisted PR |
+| remote persistence | PASS: Batch 32B frontier work is persisted on PR #70's remote branch |
 
 Exactly one next major pressure boundary: make large immutable caller-artifact transport explicitly mapped and non-overlapping, then retry the same exact dynamic BusyBox `true` command.
