@@ -69,7 +69,11 @@ zig-reference / Z-Ref
    YOUR SYSTEM MAY BEGIN
 ```
 
-Legal reuse terms should be made explicit through repository licensing; this section describes the project's research and collaboration intent.
+**This repository is MIT-licensed. Anyone may use, copy, modify, merge, publish, distribute, sublicense, sell, fork, extend, or build on this work under the terms of the MIT License.** No additional permission from this project is required beyond compliance with that license.
+
+If you want to build a bigger system than QuirkM, replace parts of Morphic, turn Alpz into something we never planned, build a commercial product, or use this work as the foundation of a completely different operating system, you are welcome to do so.
+
+See [`LICENSE.md`](LICENSE.md).
 
 ## Core architectural rule
 
