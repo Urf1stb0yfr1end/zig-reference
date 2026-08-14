@@ -319,11 +319,11 @@ The goal is not the smallest kernel at any cost. It is the smallest coherent fou
 
 ## Current machine milestone
 
-# ★ FIRST REAL ALPINE UNDER MORPHIC ★
+# ★ PERSISTENT INTERACTIVE REAL ALPINE SHELL ★
 
-**Batch 32C is complete. Morphic now consumes a complete deterministic representation of the exact Alpine v3.22.0 RV64 minirootfs and executes its real `/bin/sh`.**
+**Batches 32C through 32E are complete. Morphic now boots the exact Alpine v3.22.0 RV64 namespace, enters the real musl interpreter and BusyBox `/bin/sh`, accepts live keyboard input, preserves an interactive shell across commands, and creates a bounded fork-shaped child for external-command pressure.**
 
-The success path no longer selects BusyBox and musl as two host-picked ELF files. The caller supplies the complete bounded Alpine namespace as a manifest plus immutable backing; Morphic itself resolves the real `/bin/sh -> /bin/busybox` relationship and obtains BusyBox's real `PT_INTERP=/lib/ld-musl-riscv64.so.1` from that same namespace before execution.
+The current proof frontier is no longer shell startup or `clone(220)`. The real child reaches Linux/RV64 `execve(221)` for `/bin/ls`; that syscall is the exact next unsupported boundary.
 
 ```text
 exact Alpine v3.22.0 RV64 minirootfs       PASS
@@ -333,20 +333,41 @@ runtime /bin/sh -> /bin/busybox lookup     PASS
 same-namespace real musl PT_INTERP lookup  PASS
 real ld-musl interpreter-first             PASS
 PREPARE -> COMMIT -> execute               PASS
-exact stdout: alpine\n                     PASS
-exit status 0                              PASS
 W+X=0                                      PASS
+
+live keyboard input                        PASS
+real interactive BusyBox /bin/sh           PASS
+echo morphic                               PASS
+persistent second command                  PASS
+pwd -> /                                   PASS
+PATH lookup for ls                         PASS
+/bin/ls -> /bin/busybox resolution         PASS
+
+clone(220), flags 0x11, null child stack   PASS
+real child execution                       PASS
+bounded parent snapshot/restoration        PASS
+parent shell after child failure           PASS: still-alive
+non-fatal saturating syscall evidence      PASS
+
+execve(221) replacement                    CURRENT BLOCKER
+ls /                                       PENDING
+cat /etc/alpine-release                    PENDING
+writable /tmp and redirection              PENDING
+pipes and multi-process lifetime           PENDING
+★ PLAYABLE ALPINE ★                         PENDING
 ```
 
-There is still no kernel dynamic relocator and no direct-to-BusyBox shortcut. The real musl interpreter enters U-mode first and performs userspace loader startup.
+The bounded `clone(220)` path does not fake a PID or execute child work inline in the parent. It snapshots the parent, runs a real child first, and restores the isolated parent state after child termination. When the child encountered unsupported `execve(221)`, ash reported `/bin/sh: ls: Function not implemented`; the restored shell then successfully printed `still-alive`.
 
-Repository validation for the merged milestone is green, including `zig build check`, smoke, recipes, conformance, property, fuzz-smoke, differential, tests, `validate-repository`, repository policy, and the secret-pattern gate.
+The historical 64-entry syscall-evidence ceiling is also non-fatal now: the first window is retained, total/dropped counters expose saturation, and valid semantic execution continues.
 
-See [`docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md).
+This is **interactive Alpine**, but not yet **playable Alpine**. External programs still require bounded namespace-backed execution-image replacement and the later filesystem, descriptor, redirection, pipe, wait, and lifetime semantics proven necessary by unchanged Alpine commands.
+
+See [`docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md), [`docs/reports/AGENTIC_SNOWBALL_BATCH_32D.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32D.md), and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32E.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32E.md).
 
 ## Try the real Alpine proof in your own console
 
-You can reproduce the current milestone from a fresh clone. This is **not yet an interactive Alpine prompt**; it runs the real Alpine `/bin/sh -c 'echo alpine'` path under Morphic and shows the proven userspace output.
+You can reproduce the foundational Batch 32C milestone from a fresh clone. This command runs the real Alpine `/bin/sh -c 'echo alpine'` path under Morphic and shows the proven userspace output. Batches 32D and 32E have since advanced the machine to the persistent interactive and bounded-child frontier summarized above.
 
 Prerequisites:
 
@@ -428,8 +449,8 @@ You do **not** have to accept the current architecture as sacred. A strong resul
 
 Some of the next concrete questions are:
 
-- What is the minimum filesystem mechanism required to turn today's one-shot real Alpine shell execution into a useful persistent shell environment?
-- What process, FD-inheritance, pipe, redirection, TTY, and signal semantics does real Alpine pressure actually demand?
+- What is the minimum general execution-image replacement required for the cloned Alpine child to complete its real `execve(221)` request?
+- After real `/bin/ls` executes, what directory, wait, FD-inheritance, pipe, redirection, TTY, and signal semantics does unchanged Alpine pressure actually demand?
 - Which Linux behaviors belong at the compatibility edge, and which reveal reusable Morphic mechanisms?
 - How far can the privileged core remain small and understandable while the capability surface grows?
 - Can the same substrate support a cleaner native QuirkM userspace, stronger isolation models, Wasm, or virtualization without inheriting every historical Unix assumption?
@@ -462,59 +483,61 @@ Future major milestones should accumulate the same chronology line by line. The 
 
 ## Active frontier
 
-**First real Alpine is complete. The active climb is from one-shot Alpine execution to a playable Alpine environment, then to Alpine's own package manager.**
+**First real Alpine, persistent interaction, root `pwd`, `/bin/ls` resolution, bounded `clone(220)`, real child entry, parent restoration, and non-fatal trace saturation are complete. The exact active blocker is Linux/RV64 `execve(221)` in the child created for unchanged `ls /`.**
 
 ```text
-FIRST STATIC BUSYBOX SHELL         complete
+FIRST STATIC BUSYBOX SHELL                complete
         |
         v
-FIRST REAL DYNAMIC MUSL            complete
+FIRST REAL DYNAMIC MUSL                   complete
         |
         v
-DYNAMIC BUSYBOX SHELL              complete
+DYNAMIC BUSYBOX SHELL                     complete
         |
         v
-REAL ALPINE NAMESPACE              complete
+REAL ALPINE NAMESPACE                     complete
         |
         v
-★ FIRST REAL ALPINE ★              complete  <-- current proven milestone
+★ FIRST REAL ALPINE ★                     complete
         |
         v
-FILESYSTEM REALITY
-pwd / directories / stat / getdents / writable /tmp
+PERSISTENT INTERACTIVE ALPINE SHELL       complete
+echo morphic / second command / pwd
         |
         v
-PROCESS REALITY
-spawn/exec/wait + sane inherited resources
+PATH + /bin/ls RESOLUTION                 complete
         |
         v
-PIPES + REDIRECTION
-pipe + dup + stdin/stdout/stderr behavior
+BOUNDED clone(220) + REAL CHILD           complete
+parent restoration + still-alive
         |
         v
-CONSOLE / TTY
-persistent keyboard input + shell prompt
+execve(221)                               <-- exact current blocker
         |
         v
-SIGNALS / CTRL-C
-foreground interruption without killing the shell
+REAL ls / + DIRECTORY ENUMERATION         pending
+        |
+        v
+READ-ONLY PLAYABILITY
+cat /etc/alpine-release
+        |
+        v
+WRITABLE /tmp + REDIRECTION
+        |
+        v
+PIPES + PROCESS / FD LIFETIME
         |
         v
 ★ PLAYABLE ALPINE ★
         |
         v
 APK LOCAL DATABASE
-apk --version / apk info
         |
         v
 LOCAL .APK INSTALL
-filesystem mutation + package DB + scripts
         |
         v
 NETWORKING / DNS / TLS
-        |
-        v
-apk update
         |
         v
 ★ apk add FROM REAL ALPINE REPOSITORIES ★
@@ -545,6 +568,12 @@ Completed reports:
 
 - [`docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md)
 - [`docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md)
+- [`docs/reports/AGENTIC_SNOWBALL_BATCH_32D.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32D.md)
+- [`docs/reports/AGENTIC_SNOWBALL_BATCH_32E.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32E.md)
+
+Current execution plan:
+
+- [`docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32F_EXECVE221_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt`](docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32F_EXECVE221_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt)
 
 ## Engineering model
 
@@ -582,6 +611,6 @@ Research that proves an existing Morphic or QuirkM idea wrong is useful too. Pre
 
 Alpz is **not Linux**, QuirkM is **not a completed native operating environment**, and Morphic is **not presented as a production kernel platform**.
 
-The project now has real static-musl execution, a proven static Alpine BusyBox shell, successful real dynamic-musl execution through the real userspace interpreter, a proven dynamic Alpine BusyBox shell, and **first real Alpine under Morphic through a complete serialized Alpine v3.22.0 RV64 namespace**. It does **not yet claim** an interactive/playable Alpine environment, general Linux compatibility, working `apk add`, production security, production readiness, or completed virtualization.
+The project now has real static-musl execution, a proven static Alpine BusyBox shell, successful real dynamic-musl execution through the real userspace interpreter, a proven dynamic Alpine BusyBox shell, **first real Alpine through a complete serialized Alpine v3.22.0 RV64 namespace**, a persistent interactive shell, root `pwd`, real `/bin/ls` resolution, and bounded `clone(220)` child/parent-restoration semantics. It does **not yet claim** playable Alpine, successful external-command `execve(221)`, general Linux compatibility, working `apk add`, production security, production readiness, or completed virtualization.
 
 Proof records, exact artifacts, machine traces, validation gates, and current code define what has actually been achieved.
