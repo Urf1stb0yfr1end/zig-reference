@@ -474,6 +474,8 @@ const Batch26ActiveQuery = struct {
 var batch26_query_context: u8 = 0;
 var syscall_query: user_transfer.PageQuery = undefined;
 var syscall_count: usize = 0;
+var syscall_total_count: usize = 0;
+var syscall_dropped_count: usize = 0;
 const syscall_capacity = 64;
 var syscall_numbers: [syscall_capacity]usize = .{0} ** syscall_capacity;
 var syscall_pcs: [syscall_capacity]usize = .{0} ** syscall_capacity;
@@ -483,6 +485,16 @@ var syscall_args: [syscall_capacity][6]usize = .{.{0} ** 6} ** syscall_capacity;
 var syscall_results: [syscall_capacity]usize = .{0} ** syscall_capacity;
 var syscall_semantics: [syscall_capacity]u8 = .{0} ** syscall_capacity;
 var syscall_terminal_status: usize = 0;
+var external_fork_parent: ?TrapFrame = null;
+const external_child_pid: usize = 2;
+var external_fork_main_snapshot: [prepared_image_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
+var external_fork_interpreter_snapshot: [prepared_image_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
+var external_fork_stack_snapshot: [external_stack_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
+var external_fork_resources: ResourceStore = undefined;
+var external_fork_bindings: ProcessBindings = undefined;
+var external_fork_mappings: ExternalRuntimeMappings = undefined;
+var external_fork_program_break: usize = 0;
+var external_fork_next_backing: usize = 0;
 var syscall_output: [64]u8 = .{0} ** 64;
 var syscall_output_len: usize = 0;
 const ResourceStore = resource_tables.ResourceTable(4);
@@ -1168,8 +1180,11 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     syscall_bindings.bindAt(1, stdout) catch shutdown();
     syscall_bindings.bindAt(2, stderr) catch shutdown();
     syscall_count = 0;
+    syscall_total_count = 0;
+    syscall_dropped_count = 0;
     syscall_output_len = 0;
     syscall_terminal_status = 0;
+    external_fork_parent = null;
     service_trap_count = 0;
     batch26_active = false;
     syscall_active = true;
@@ -1186,6 +1201,10 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     );
     write("\nZIGREF_BATCH29_RESULT syscalls=");
     writeUsizeHex(syscall_count);
+    write(" total=");
+    writeUsizeHex(syscall_total_count);
+    write(" dropped=");
+    writeUsizeHex(syscall_dropped_count);
     write(" status=");
     writeUsizeHex(syscall_terminal_status);
     write(" output_hex=");
@@ -1281,7 +1300,7 @@ const SyscallBackend = struct {
 fn negativeErrno(value: usize) usize {
     return 0 -% value;
 }
-const LinuxRequestKind = enum { get_current_directory, duplicate, close, read, write, write_vector, new_fstatat, program_break, memory_map, terminate, unsupported };
+const LinuxRequestKind = enum { get_current_directory, duplicate, close, read, write, write_vector, new_fstatat, program_break, clone, memory_map, terminate, unsupported };
 fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     return switch (number) {
         17 => .get_current_directory,
@@ -1292,13 +1311,14 @@ fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
         66 => .write_vector,
         79 => .new_fstatat,
         214 => .program_break,
+        220 => .clone,
         222 => .memory_map,
         93, 94 => .terminate,
         else => .unsupported,
     };
 }
 comptime {
-    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(220) != .clone or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
 }
 
 fn externalNamespaceStat(path_address: usize, destination: usize, flags: usize) usize {
@@ -1350,8 +1370,7 @@ fn externalPageOccupied(_: void, page: usize) bool {
 }
 
 fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
-    const index = syscall_count;
-    if (index >= syscall_capacity or frame.scause != 8 or frame.sstatus & (0x100 | 0x40000) != 0) {
+    if (frame.scause != 8 or frame.sstatus & (0x100 | 0x40000) != 0) {
         write("ZIGREF_LINUX_EDGE_TRAP cause=");
         writeUsizeHex(frame.scause);
         write(" sepc=");
@@ -1361,11 +1380,14 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
         write("\n");
         shutdown();
     }
+    const index = if (syscall_count < syscall_capacity) syscall_count else syscall_capacity - 1;
+    syscall_total_count +%= 1;
+    if (syscall_count == syscall_capacity) syscall_dropped_count +%= 1;
     syscall_numbers[index] = frame.x[17];
     syscall_pcs[index] = frame.sepc;
     syscall_sstatus[index] = frame.sstatus;
     syscall_args[index] = .{ frame.x[10], frame.x[11], frame.x[12], frame.x[13], frame.x[14], frame.x[15] };
-    syscall_count += 1;
+    if (syscall_count < syscall_capacity) syscall_count += 1;
     var request: ?morphic_operation.Request = null;
     switch (decodeLinuxRequestKind(frame.x[17])) {
         .get_current_directory => {
@@ -1474,6 +1496,40 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
             }
             frame.x[10] = external_program_break;
         },
+        .clone => {
+            syscall_semantics[index] = 12;
+            if (external_artifact_options.live_console_input) {
+                write("ZIGREF_LINUX_CLONE flags=");
+                writeUsizeHex(frame.x[10]);
+                write(" child_stack=");
+                writeUsizeHex(frame.x[11]);
+                write("\n");
+            }
+            // Linux clone flags remain at this compatibility edge.  The
+            // bounded runtime currently supports the fork-shaped request ash
+            // emits: a SIGCHLD child with a copied process image. The child
+            // runs first while the bounded parent snapshot is held.
+            const flags = frame.x[10];
+            const signal = flags & 0xff;
+            const unsupported_flags = flags & ~@as(usize, 0xff);
+            if (external_fork_parent != null or signal != 17 or unsupported_flags != 0 or frame.x[11] != 0) {
+                frame.x[10] = negativeErrno(22);
+            } else {
+                var parent = frame.*;
+                parent.sepc += 4;
+                parent.x[10] = external_child_pid;
+                external_fork_parent = parent;
+                external_fork_main_snapshot = external_prepared_backing;
+                external_fork_interpreter_snapshot = external_interpreter_backing;
+                external_fork_stack_snapshot = external_prepared_stack;
+                external_fork_resources = syscall_resources;
+                external_fork_bindings = syscall_bindings;
+                external_fork_mappings = external_runtime_mappings;
+                external_fork_program_break = external_program_break;
+                external_fork_next_backing = external_next_backing;
+                frame.x[10] = 0;
+            }
+        },
         .memory_map => {
             syscall_semantics[index] = 8;
             const address = frame.x[10];
@@ -1553,10 +1609,38 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
         },
         .terminate => blk: {
             syscall_semantics[index] = 3;
+            if (external_fork_parent) |parent| {
+                external_prepared_backing = external_fork_main_snapshot;
+                external_interpreter_backing = external_fork_interpreter_snapshot;
+                external_prepared_stack = external_fork_stack_snapshot;
+                syscall_resources = external_fork_resources;
+                syscall_bindings = external_fork_bindings;
+                external_runtime_mappings = external_fork_mappings;
+                external_program_break = external_fork_program_break;
+                external_next_backing = external_fork_next_backing;
+                frame.* = parent;
+                external_fork_parent = null;
+                syscall_results[index] = frame.x[10];
+                syscall_resume_pcs[index] = frame.sepc;
+                frame.sstatus &= ~@as(usize, 0x40122);
+                asm volatile ("csrw sepc, %[pc]"
+                    :
+                    : [pc] "r" (frame.sepc),
+                    : "memory"
+                );
+                return;
+            }
             request = .{ .terminate = @truncate(frame.x[10]) };
             break :blk;
         },
-        .unsupported => syscall_semantics[index] = 1,
+        .unsupported => {
+            syscall_semantics[index] = 1;
+            if (external_artifact_options.live_console_input and external_fork_parent != null) {
+                write("ZIGREF_LINUX_UNSUPPORTED nr=");
+                writeUsizeHex(frame.x[17]);
+                write("\n");
+            }
+        },
     }
     if (request == null and syscall_semantics[index] == 1) {
         syscall_semantics[index] = 1;
@@ -2734,6 +2818,8 @@ noinline fn executeLinuxRv64Syscalls(allocator: anytype, page_owner: anytype, bu
     const active_query = ActiveQuery{ .active = &builder };
     syscall_query = .{ .context = &active_query, .queryFn = ActiveQuery.query };
     syscall_count = 0;
+    syscall_total_count = 0;
+    syscall_dropped_count = 0;
     syscall_output_len = 0;
     syscall_terminal_status = 0;
     service_trap_count = 0;
