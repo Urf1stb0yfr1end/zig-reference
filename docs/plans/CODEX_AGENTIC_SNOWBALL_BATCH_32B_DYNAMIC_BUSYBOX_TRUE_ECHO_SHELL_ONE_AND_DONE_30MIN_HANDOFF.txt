@@ -1,0 +1,532 @@
+CODEX AGENTIC SNOWBALL — BATCH 32B
+DYNAMIC ALPINE BUSYBOX: TRUE -> ECHO -> SHELL
+ONE-AND-DONE / EARLY PERSISTENCE / 30-MINUTE HANDOFF
+
+Repository: thanks-cohn/zig-reference
+Canonical path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32B_DYNAMIC_BUSYBOX_TRUE_ECHO_SHELL_ONE_AND_DONE_30MIN_HANDOFF.txt
+
+Current main at plan creation:
+d45c87bad5b6aaadf92b8df3f0b13d35f9221b82
+
+Inherited historic Batch 32A merge:
+316779627636bea950053bbbbc995e36d0ebdc29
+
+Inherited engineering tag:
+morphic-riscv-first-real-dynamic-musl-ld-musl-u-mode-loader-main-status0-wx0-2026-08-13
+
+READ FIRST
+- docs/reports/AGENTIC_SNOWBALL_BATCH_32A.md
+- docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32A_FIRST_REAL_DYNAMIC_MUSL_PT_INTERP_LOADER_ONE_AND_DONE_30MIN_HANDOFF.txt
+- docs/reports/AGENTIC_SNOWBALL_BATCH_31G.md
+- docs/papers/COMPATIBILITY_AS_MIGRATION_SCAFFOLD.md
+- docs/research/AGENT_FRAMEWORK_FAILURE_LEDGER.md
+- docs/research/agent-framework-failure-ledger.jsonl
+- COMMANDS.md
+- recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig
+- recipes/run-hosted-morphic-runtime/src/bounded_runtime_mappings.zig
+- tools/pressure-real-rv64-dynamic-musl.py
+- tools/verify-freestanding-riscv64-dynamic-musl.py
+- tools/pressure-real-rv64-userspace.py
+
+======================================================================
+0. SINGLE PURPOSE
+======================================================================
+
+Cross the next real userspace boundary after Batch 32A:
+
+  exact Alpine v3.22 RV64 DYNAMIC BusyBox
+      -> real PT_INTERP musl interpreter
+      -> existing Morphic ExecPlan / PREPARE / COMMIT path
+      -> busybox true
+      -> busybox echo batch32b
+      -> busybox sh -c 'echo batch32b'
+      -> exact stdout batch32b\n
+      -> status 0
+      -> W+X=0
+
+The strongest finish line for THIS campaign is:
+
+  ★ FIRST PROVEN DYNAMIC BUSYBOX SHELL UNDER MORPHIC ★
+
+Do not call the milestone complete at artifact acquisition, true, or echo alone.
+Do not begin the Alpine minirootfs campaign in this batch.
+
+======================================================================
+1. INHERITED TRUTH — DO NOT REIMPLEMENT
+======================================================================
+
+Batch 31G already proves the STATIC path:
+- exact Alpine v3.22 static BusyBox;
+- busybox.static true status 0;
+- busybox.static echo exact output;
+- busybox.static sh -c 'echo batch31g' exact output;
+- bounded brk and anonymous mappings;
+- AT_PAGESZ=4096;
+- bounded two-page external process stack;
+- W+X=0.
+
+Batch 32A already proves the REAL DYNAMIC path:
+- exact dynamic RV64 main and real ld-musl-riscv64.so.1 identities;
+- exact PT_INTERP;
+- ET_EXEC main + ET_DYN interpreter transport;
+- real interpreter entered U-mode FIRST;
+- real loader startup executed in userspace;
+- dynamic main executed;
+- exact stdout batch32a-dynamic-musl\n;
+- status 0 and W+X=0;
+- PREPARE before COMMIT before execution;
+- no kernel-side dynamic relocator;
+- no direct-main-entry bypass;
+- typed PT_GNU_EH_FRAME acceptance at the dynamic handoff;
+- six-page bounded PREPARE page-table backing where real pressure proved it necessary.
+
+Do not reopen these mechanisms without a demonstrated regression from the exact
+Batch 32B artifact.
+
+Batch 32B is not another dynamic-loader-design campaign. It is pressure from a
+substantial real dynamically linked Alpine program.
+
+======================================================================
+2. ARCHITECTURAL RULE
+======================================================================
+
+Morphic remains NOT the dynamic linker.
+
+Correct boundary:
+
+  exact dynamic BusyBox
+      -> Morphic supplies executable + real interpreter + process facts
+      -> real musl interpreter runs in U-mode
+      -> userspace loader performs loader work
+      -> BusyBox runs
+
+Keep Linux conventions at the compatibility edge. Keep neutral mapping,
+filesystem, process-start, resource, address-space and object mechanisms in
+Morphic.
+
+Do not add BusyBox filename/hash behavior to the neutral core, applet-specific
+returns, hardcoded BusyBox addresses, direct-main entry, kernel-applied dynamic
+relocations, precomputed output, weakened W+X, or speculative broad compatibility
+work.
+
+======================================================================
+3. EXACT DYNAMIC BUSYBOX ARTIFACT FIRST
+======================================================================
+
+Acquire and pin the exact Alpine v3.22 riscv64 DYNAMIC BusyBox package/artifact.
+Do not use busybox-static.
+
+Use the fail-closed artifact philosophy already established by the Batch 32A and
+static-userspace pressure tools.
+
+Record and verify:
+- Alpine repository/release identity;
+- package filename/version/revision;
+- package SHA-256;
+- extracted BusyBox executable SHA-256;
+- ELF machine = RISC-V;
+- ELF type;
+- PT_INTERP exact string;
+- PT_LOAD geometry;
+- PT_DYNAMIC presence;
+- DT_NEEDED entries;
+- real interpreter SHA-256 actually paired with this executable;
+- any additional ELF/runtime object proven necessary by the golden oracle.
+
+Do not silently substitute a host loader or different BusyBox build. Prefer
+deterministic temporary artifact acquisition over vendoring external binaries.
+
+======================================================================
+4. GOLDEN LINUX ORACLE
+======================================================================
+
+Before Morphic mutation, run the exact dynamic BusyBox with its matching musl
+runtime under qemu-riscv64 when available.
+
+Run and record separately:
+A. busybox true
+B. busybox echo batch32b
+C. busybox sh -c 'echo batch32b'
+
+Capture stdout, stderr, status, and useful qemu-user trace when available.
+Strong golden shell result:
+  stdout exactly batch32b\n
+  status 0
+
+A trace is evidence, not a syscall requirement list.
+
+If qemu-riscv64 is unavailable, record the platform/tooling limitation honestly
+and continue with exact artifact facts plus system-QEMU Morphic pressure when
+sufficient. Never invent golden results.
+
+======================================================================
+5. REUSE BATCH 32A TRANSPORT
+======================================================================
+
+Do not create a parallel dynamic-exec path.
+
+Reuse:
+  external dynamic main + external real interpreter
+      -> ExecPlan
+      -> independent image planning/materialization
+      -> actual auxv/process facts
+      -> PREPARE
+      -> COMMIT
+      -> interpreter-first U-mode entry
+      -> userspace loader
+      -> BusyBox
+
+Keep the Batch 32A canonical proof passing whenever shared dynamic machinery is
+changed.
+
+If BusyBox needs runtime files beyond the paired interpreter, do not special-case
+their names inside the kernel. Admit the smallest bounded reusable runtime-file
+or filesystem mechanism proved necessary by the exact failure.
+
+======================================================================
+6. PRESSURE LADDER — SAME ARTIFACT THROUGHOUT
+======================================================================
+
+Stage A — TRUE
+  busybox true
+Goal: real interpreter first, BusyBox reached, status 0, W+X=0.
+
+Stage B — ECHO
+Only after true succeeds:
+  busybox echo batch32b
+Goal: exact stdout batch32b\n, status 0, W+X=0.
+
+Stage C — SHELL
+Only after echo succeeds:
+  busybox sh -c 'echo batch32b'
+Goal: dynamic BusyBox shell parses/executes the command, exact stdout batch32b\n,
+status 0, W+X=0.
+
+Stage C is the Batch 32B finish line.
+
+Do not replace the artifact between stages merely to make progress easier.
+
+======================================================================
+7. PRESSURE-ORACLE LOOP
+======================================================================
+
+For every divergence:
+  exact dynamic BusyBox command
+    -> observe first failure
+    -> compare exact Linux oracle when available
+    -> identify first causal missing semantic
+    -> classify Morphic center vs Linux edge
+    -> implement smallest reusable repair
+    -> add focused causal proof
+    -> retry SAME command immediately
+
+Do not implement a call because it appears in a trace, because Linux has it, or
+because it may be useful later. Real causal pressure authorizes work.
+
+Preserve negative results. A call returning -ENOSYS while BusyBox continues is
+evidence not to implement it for this milestone.
+
+Batch 31G already proved getpid could remain unsupported for the static shell.
+Batch 32B may re-authorize it only if the dynamic shell proves it causal.
+
+======================================================================
+8. CLASSIFICATION AIDS — NOT A CHECKLIST
+======================================================================
+
+Possible pressure domains include:
+- additional auxv facts;
+- runtime file lookup/open/read;
+- shared-object identity/transport;
+- brk;
+- mmap/mprotect/munmap;
+- TLS/process-start details;
+- process identity calls;
+- signal defaults;
+- stat/fstat metadata;
+- cwd/environment facts;
+- close/dup behavior;
+- ioctl/TTY behavior.
+
+Do not pre-implement any of them.
+
+======================================================================
+9. MEMORY / FILE / PROCESS DISCIPLINE
+======================================================================
+
+Any mapping repair must preserve bounded capacity, alignment/overflow checks,
+full-range collision rejection, deterministic backing ownership, rollback on
+partial failure, W+X rejection, and PREPARE/COMMIT failure atomicity.
+
+Do not introduce an unbounded Linux VMA clone. If a capacity is raised, prove
+causally why and keep it explicit/bounded.
+
+If a named runtime object is required, prefer a bounded caller-supplied runtime
+file set or existing bounded filesystem composition over filename hacks.
+
+Do not start a broad fork/clone/process-tree campaign unless the exact shell
+command proves it is the first causal blocker and the repair is still small. The
+chosen shell command intentionally uses builtin echo so a broad process model may
+not be necessary. If shell success occurs without process creation, record that
+negative boundary and stop.
+
+If a large process subsystem becomes unavoidable, preserve the exact frontier
+and hand off rather than rushing speculative work.
+
+======================================================================
+10. REQUIRED PRIMARY PROOF
+======================================================================
+
+Batch 32B success requires evidence for ALL of:
+1. exact dynamic BusyBox package provenance;
+2. exact dynamic BusyBox executable SHA-256;
+3. exact real interpreter SHA-256;
+4. exact PT_INTERP path;
+5. BusyBox genuinely dynamic;
+6. Linux golden true/echo/shell when tooling is available;
+7. Morphic enters the real interpreter before BusyBox;
+8. real loader work occurs in userspace;
+9. busybox true status 0;
+10. busybox echo batch32b exact stdout/status 0;
+11. busybox sh -c 'echo batch32b' exact stdout;
+12. shell status 0;
+13. W+X=0;
+14. PREPARE/COMMIT preserved;
+15. no kernel dynamic relocator;
+16. no direct BusyBox main-entry bypass;
+17. no BusyBox-specific neutral-core branch;
+18. Batch 32A dynamic-musl regression proof remains green;
+19. repository validation green.
+
+Include runtime evidence distinguishing real interpreter execution, BusyBox main
+execution, and shell-command output. Do not rely only on seeing the expected
+string if a fixture/kernel path could have emitted it.
+
+======================================================================
+11. CANONICAL VERIFIER
+======================================================================
+
+Prefer one strict Batch 32B verifier that:
+- reconstructs/acquires exact hash-pinned dynamic BusyBox and interpreter;
+- verifies ELF identities before build;
+- builds the Morphic freestanding machine;
+- runs system-QEMU;
+- drives true/echo/shell pressure deterministically;
+- checks PREPARE before COMMIT before execution;
+- proves early PCs belong to the real interpreter where trace evidence supports it;
+- proves output is userspace-derived where practical;
+- requires status 0 and W+X=0;
+- fails closed on unexpected hashes, geometry, or output.
+
+Do not weaken the Batch 32A verifier.
+
+======================================================================
+12. TESTING
+======================================================================
+
+During iteration use exact artifact inspection, exact golden command, focused
+parser/planner/runtime tests, exact system-QEMU retry, and the Batch 32A verifier
+when shared dynamic machinery changes.
+
+Near the finish line run the repository's canonical commands, including:
+  zig fmt --check build.zig projects recipes conformance
+  zig build check
+  zig build test-recipe-run-hosted-morphic-runtime
+  zig build validate-repository
+
+Also run the strongest complete validation path documented in COMMANDS.md.
+Regenerate canonical indexes/contracts/evidence with repository generators when
+shared source digests change. Do not hand-edit generated evidence. Do not weaken
+CI gates.
+
+======================================================================
+13. SUCCESS LADDER
+======================================================================
+
+A exact dynamic BusyBox package pinned
+B exact BusyBox executable hash pinned
+C exact real interpreter paired
+D PT_INTERP/DT_NEEDED verified
+E Linux golden true
+F Linux golden echo
+G Linux golden shell
+H Morphic interpreter-first execution
+I dynamic BusyBox true status 0
+J dynamic BusyBox echo exact output/status 0
+K first shell pressure observed
+L minimum causal repair(s) admitted
+M dynamic BusyBox shell exact output
+N shell status 0
+O W+X=0
+P PREPARE/COMMIT preserved
+Q Batch 32A regression green
+R repository validation green
+S remote persistence green
+
+Only M+N+O with genuine real-interpreter execution closes Batch 32B.
+
+======================================================================
+14. DELIBERATE NON-GOALS
+======================================================================
+
+Do NOT begin:
+- Alpine minirootfs integration;
+- a general root filesystem campaign;
+- interactive TTY input;
+- Ctrl-C/signals as a broad subsystem;
+- apk;
+- networking/DNS/TLS;
+- desktop/graphics/audio;
+- general Linux syscall parity;
+- a kernel dynamic relocator;
+- a Linux VMA clone.
+
+Do not claim FIRST REAL ALPINE or PLAYABLE ALPINE in this campaign.
+
+======================================================================
+15. OPTIONAL CONTINUATION AFTER SUCCESS ONLY
+======================================================================
+
+Only after the dynamic BusyBox shell milestone is proven, committed, pushed,
+remote-head verified, visible in a PR, and documented, perform at most ONE
+low-risk observation-only continuation:
+
+Inspect exact Alpine v3.22 riscv64 minirootfs layout and record the intended next
+command `/bin/sh -c 'echo alpine'` WITHOUT modifying Morphic for minirootfs
+pressure in Batch 32B.
+
+======================================================================
+16. EARLY PERSISTENCE / REMOTE TRUTH
+======================================================================
+
+As soon as safe nontrivial progress exists:
+  git status
+  git diff
+  focused tests
+  git add <coherent paths>
+  git commit
+  git push
+
+Open a DRAFT PR on the same branch as soon as work is reviewable. Do not wait for
+full shell success.
+
+After each requested persistence phase verify remote truth: remote branch head,
+PR head SHA, and commit visibility. A local commit or a statement that work was
+pushed is not remote persistence.
+
+Never discard safe useful work because the final milestone was not reached.
+
+======================================================================
+17. 20–25 MIN WARNING / 30-MIN HARD HANDOFF
+======================================================================
+
+At ~20–25 minutes inspect remaining size, commit safe progress, push, verify the
+remote head, ensure a draft PR exists if reviewable, and update the report with
+the exact frontier.
+
+At ~30 minutes STOP beginning large experiments. Leave one of:
+1. mergeable success PR;
+2. draft PR with exact causal frontier;
+3. pushed branch with exact handoff;
+4. local commit only if a real tooling blocker prevents remote persistence, with
+   that blocker explicitly classified.
+
+Do not spend the end of the run on speculative broad compatibility work.
+
+======================================================================
+18. FAILURE ATTRIBUTION
+======================================================================
+
+Use the existing failure ledger and classify evidence as:
+- framework_failure
+- agent_execution_failure
+- platform_tooling_failure
+- mixed
+- unknown
+
+Ordinary Morphic/runtime pressure is not framework failure. Missing QEMU after a
+reasonable install attempt may be tooling. Ignoring an explicit working
+commit/push requirement is agent execution failure. Do not manufacture ledger
+entries merely because real software initially fails.
+
+======================================================================
+19. REQUIRED REPORT
+======================================================================
+
+Create/update:
+  docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md
+
+Record:
+- inherited Batch 32A merge/tag;
+- exact dynamic BusyBox package/executable provenance and hashes;
+- exact interpreter hash;
+- PT_INTERP and DT_NEEDED;
+- golden true/echo/shell results or honest absence;
+- first Morphic true attempt;
+- each important failure -> classification -> repair -> retry;
+- true/echo/shell success or exact frontier;
+- interpreter-first proof;
+- W+X and PREPARE/COMMIT;
+- Batch 32A regression result;
+- unsupported calls proven non-causal;
+- deliberately unimplemented semantics;
+- validation results;
+- persistence commit/branch/PR head;
+- failure attribution if relevant.
+
+Update COMMANDS.md only for durable canonical command surface.
+
+======================================================================
+20. FINAL HANDOFF TABLE
+======================================================================
+
+End with:
+  static BusyBox shell                         inherited PASS
+  real dynamic musl                            inherited PASS
+  dynamic BusyBox package identity             PASS/FAIL/BLOCKED
+  dynamic BusyBox executable identity          PASS/FAIL/BLOCKED
+  real interpreter identity                    PASS/FAIL/BLOCKED
+  PT_INTERP exact                              PASS/FAIL/BLOCKED
+  Linux golden true                            PASS/UNAVAILABLE/FAIL
+  Linux golden echo                            PASS/UNAVAILABLE/FAIL
+  Linux golden shell                           PASS/UNAVAILABLE/FAIL
+  real interpreter entered U-mode              PASS/FAIL
+  dynamic BusyBox true                         PASS/FAIL
+  dynamic BusyBox echo                         PASS/FAIL
+  first shell causal frontier                  <exact result>
+  dynamic BusyBox shell                        PASS/FAIL
+  exact batch32b stdout                        PASS/FAIL
+  shell status 0                               PASS/FAIL
+  W+X=0                                        PASS/FAIL
+  PREPARE/COMMIT                               PASS/FAIL
+  Batch 32A regression                         PASS/FAIL/NOT RUN
+  repository validation                        PASS/FAIL/NOT RUN
+  remote persistence                           PASS/BLOCKED
+
+State exactly ONE next major pressure boundary.
+
+If success is reached, next campaign:
+  REAL ALPINE MINIROOTFS
+    -> /bin/sh -c 'echo alpine'
+    -> FIRST REAL ALPINE
+
+======================================================================
+21. NORTH STAR
+======================================================================
+
+Minimum permanent mechanism. Maximum inherited civilization.
+
+  static musl                              DONE
+  static BusyBox shell                     DONE
+  real dynamic musl                        DONE
+  dynamic BusyBox true/echo/shell          THIS BATCH
+  real Alpine minirootfs                   NEXT
+  first real Alpine /bin/sh
+  filesystem/process/pipe/TTY pressure
+  playable Alpine
+  apk/networking only later as real pressure demands
+
+Make BusyBox pressure reveal general mechanism. Do not make BusyBox part of
+Morphic's identity.
+
+END OF BATCH 32B CANONICAL REQUEST
