@@ -1,0 +1,334 @@
+CODEX AGENTIC SNOWBALL — BATCH 32C
+FIRST REAL ALPINE MINIROOTFS / REAL /bin/sh / ONE-AND-DONE 30-MINUTE HANDOFF
+
+STATUS
+
+Batch 32B is complete.
+
+Inherited proven boundary:
+- exact Alpine v3.22 RV64 dynamic BusyBox artifact: PASS
+- real /lib/ld-musl-riscv64.so.1 interpreter-first execution: PASS
+- /bin/busybox true under Morphic: PASS
+- /bin/busybox echo batch32b under Morphic: PASS
+- /bin/busybox sh -c 'echo batch32b' under Morphic: PASS
+- exact batch32b\n: PASS
+- status 0: PASS
+- PREPARE -> COMMIT -> execute: PASS
+- W+X=0: PASS
+- bounded caller-artifact transport: PASS
+- repository validation at Batch 32B: PASS
+
+Do not redo Batch 32A or Batch 32B unless needed to prove a regression.
+
+PRIMARY HISTORICAL GOAL
+
+Cross the first real Alpine root-filesystem boundary under Morphic.
+
+Use an exact, fail-closed, hash-pinned Alpine v3.22 RISC-V minirootfs as the pressure source.
+
+The target command is:
+
+    /bin/sh -c 'echo alpine'
+
+The successful command MUST resolve /bin/sh from the Alpine minirootfs namespace and use the real files and symlinks supplied by that exact rootfs.
+
+Required finish line:
+
+    exact stdout: alpine\n
+    exit status: 0
+    W+X pages: 0
+    real musl interpreter-first execution preserved
+    PREPARE/COMMIT preserved
+
+If all of those are proven from the exact minirootfs, Batch 32C may claim:
+
+    FIRST REAL ALPINE UNDER MORPHIC
+
+This campaign does NOT target an interactive shell yet.
+
+NON-NEGOTIABLE TRUTHFULNESS RULE
+
+Do not claim FIRST REAL ALPINE merely by taking the already-proven isolated dynamic BusyBox/interpreter pair and changing argv to say /bin/sh.
+
+The shell must be obtained through a real rootfs lookup path rooted in the exact Alpine minirootfs artifact.
+
+Do not fabricate a synthetic /bin/sh, /bin/busybox, or /lib/ld-musl-riscv64.so.1 if those objects already exist in the rootfs.
+
+Do not silently replace the minirootfs with a hand-curated three-file pseudo-root and call it Alpine.
+
+If the entire exact rootfs cannot yet be represented because of a genuine bounded-capacity or transport limitation, stop at that exact causal frontier, preserve the evidence, and do not overclaim.
+
+ARTIFACT ACQUISITION AND GOLDEN ORACLE
+
+Before changing Morphic semantics:
+
+1. Acquire one exact Alpine v3.22 RISC-V minirootfs artifact from the official Alpine release source.
+2. Record the exact URL/name/version and SHA-256.
+3. Fail closed on any hash mismatch.
+4. Extract it outside the kernel.
+5. Record the exact rootfs facts needed for the pressure campaign, including at minimum:
+   - /bin/sh object type and symlink target if applicable
+   - /bin/busybox identity and SHA-256
+   - /lib/ld-musl-riscv64.so.1 identity and SHA-256
+   - relevant symlink relationships
+   - any DT_NEEDED / PT_INTERP facts needed by the executable path
+6. Establish a Linux-user golden oracle for the SAME rootfs files and SAME target command when the environment permits, for example by using qemu-riscv64 with the extracted rootfs as its library/root prefix.
+7. Record exact stdout and status.
+
+Do not download an arbitrary newer Alpine release merely because it is convenient. Batch 32C is the v3.22 continuation unless the repository explicitly changes that policy.
+
+KERNEL / ROOTFS ARCHITECTURE RULE
+
+Do NOT make the Morphic kernel parse tar archives.
+
+Archive acquisition, decompression, and verification belong in host-side tooling.
+
+The kernel-facing representation should be bounded, deterministic, and general.
+
+Prefer reusing or extending existing neutral repository mechanisms, especially the Linux-independent bounded filesystem object tree in projects/58-bounded-filesystem and the already-proven Morphic resource/file/exec architecture.
+
+The desired conceptual boundary is:
+
+    exact Alpine minirootfs archive
+            |
+            | host-side verify/extract
+            v
+    bounded deterministic rootfs representation
+            |
+            v
+    neutral Morphic filesystem/resource mechanisms
+            |
+            v
+    Linux compatibility edge
+            |
+            v
+    real pathname /bin/sh
+            |
+            v
+    existing ELF + PT_INTERP + PREPARE/COMMIT machinery
+
+Do not add an Alpine-specific VFS branch to the neutral core.
+Do not add a BusyBox-specific path resolver.
+Do not teach the kernel that /bin/sh means /bin/busybox as a hardcoded rule.
+Symlinks, if required, must be represented as a general filesystem/path mechanism or surfaced as the next exact causal frontier.
+
+FIRST PRESSURE RUN
+
+After exact artifact/rootfs identity is established, attempt the smallest honest Morphic run of:
+
+    /bin/sh -c 'echo alpine'
+
+where /bin/sh is resolved from the minirootfs.
+
+Do not first implement a speculative Linux filesystem checklist.
+
+Observe the first exact failure.
+
+Classify it.
+
+Examples of legitimate first causal boundaries may include, but are not limited to:
+- bounded rootfs transport capacity
+- root-directory capability setup
+- pathname component traversal
+- symlink resolution
+- openat/open/read/close compatibility semantics
+- file metadata facts demanded by the real loader or shell
+- interpreter lookup through /lib
+- executable lookup through /bin
+- a process-start fact genuinely demanded only when rootfs lookup becomes real
+
+Do not assume which one will happen.
+
+PRESSURE-ORACLE LOOP
+
+Always continue using:
+
+    exact rootfs + exact command
+        -> observe first causal failure
+        -> classify
+        -> implement the smallest GENERAL repair
+        -> focused proof/regression
+        -> retry the SAME exact rootfs + SAME command immediately
+
+Do not broaden the mechanism merely because Linux offers a larger API.
+
+FILESYSTEM DESIGN CONSTRAINTS
+
+Preserve the research architecture:
+
+- bounded capacities
+- explicit failure on overflow
+- deterministic object identity
+- no hidden allocation if the inherited mechanism is allocation-free
+- no unchecked pathname arithmetic
+- fail closed on malformed/cyclic/out-of-range relationships
+- preserve existing ResourceRef/generation semantics where applicable
+- keep Linux errno/syscall policy at the compatibility edge rather than in the neutral filesystem object tree
+
+If Project 58 requires a small general extension to represent the exact minirootfs pressure, make that extension reusable and independently tested.
+
+Do not enlarge capacities blindly until the archive happens to fit.
+Measure exact object/data pressure and justify any bound change.
+
+EXECUTION CONSTRAINTS
+
+Preserve all inherited execution guarantees:
+
+- real userspace ld-musl performs dynamic loader work
+- no kernel dynamic relocator
+- no direct jump around PT_INTERP
+- PREPARE before COMMIT
+- COMMIT before execute
+- W+X=0
+- caller-artifact transport remains bounded
+- no executable mapping becomes writable merely to simplify loading
+
+Do not regress the exact Batch 32A dynamic-musl verifier or Batch 32B dynamic BusyBox shell proof.
+
+SCOPE CONTROL
+
+IN SCOPE:
+- exact Alpine v3.22 RISC-V minirootfs acquisition/provenance
+- host-side rootfs verification/extraction tooling
+- deterministic bounded rootfs transport/representation
+- real /bin/sh pathname resolution from that rootfs
+- only the minimum general filesystem/compatibility mechanism required by the observed pressure
+- exact /bin/sh -c 'echo alpine' machine proof
+- focused tests and repository validation
+- report/COMMANDS documentation
+
+OUT OF SCOPE unless the exact target command causally requires it:
+- interactive TTY
+- login/getty
+- networking
+- DNS
+- apk
+- package installation
+- procfs/sysfs
+- writable persistent disk filesystem
+- fork/clone/vfork as speculative work
+- pipes/redirection beyond what the target command actually requires
+- signal completeness
+- job control
+- full Linux VFS semantics
+- full POSIX filesystem semantics
+- init systems
+- boot services
+- Alpine package management
+
+Do not begin the playable-Alpine campaign in this batch.
+
+SUCCESS EVIDENCE
+
+A completed Batch 32C should record enough evidence to make the claim falsifiable.
+
+At minimum record:
+- exact minirootfs artifact name/version/URL/SHA-256
+- exact /bin/sh relationship from the rootfs
+- exact /bin/busybox SHA-256 if /bin/sh resolves to it
+- exact real musl interpreter SHA-256
+- rootfs/path lookup evidence proving /bin/sh came from the rootfs namespace
+- PREPARE marker
+- real interpreter PREPARE/entry fact
+- COMMIT marker
+- execute marker
+- early interpreter PCs proving interpreter-first execution
+- exact stdout bytes/hex for alpine\n
+- exit status 0
+- W+X=0
+- no kernel dynamic relocation
+- no direct-main bypass
+- Batch 32A verifier PASS
+- Batch 32B dynamic BusyBox regression PASS
+- focused filesystem/rootfs tests PASS
+- zig build check PASS
+- canonical repository validation PASS
+
+If the environment supports both Linux-user and system-QEMU oracles, preserve both.
+
+REPORTING
+
+Create/update:
+
+    docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md
+
+Update COMMANDS.md with the exact acquisition/proof command surface.
+
+If a new host-side pressure/acquisition tool is useful, prefer a clear name such as:
+
+    tools/pressure-real-rv64-alpine-minirootfs.py
+
+The tool should be fail-closed, reproducible, and able to export verified artifacts for retries.
+
+Do not vendor the whole Alpine rootfs into Git merely to make the proof convenient.
+
+MILESTONE CLAIM
+
+Only if the exact target succeeds may the report say:
+
+    FIRST REAL ALPINE UNDER MORPHIC
+
+The intended exact finish line is:
+
+    /bin/sh -c 'echo alpine'
+
+    stdout = alpine\n
+    status = 0
+    W+X = 0
+
+with /bin/sh genuinely resolved from the exact Alpine minirootfs namespace.
+
+If the run stops earlier, name the exact achieved frontier instead.
+
+PERSISTENCE / 30-MINUTE HANDOFF POLICY
+
+Do not spend 30-40 minutes and leave useful work only in ephemeral context.
+
+Persist coherent safe progress early.
+
+As soon as there is a reviewable unit:
+- commit it
+- push the branch
+- verify the remote head moved
+- open a draft PR if the milestone is not yet complete
+- use a normal PR if the included work is complete and validation is green
+
+At approximately 25-30 minutes:
+- stop beginning broad new experiments
+- finish the current bounded observation/repair if reasonable
+- run the strongest focused validation available
+- update the Batch 32C report with exact evidence
+- commit all safe useful work
+- push it
+- verify remote persistence
+- leave the exact first remaining causal blocker
+
+Never throw away a failed attempt that taught a reusable fact. If an implementation was unsafe, do not preserve the unsafe code; preserve the regression, measurement, report, or neutral prerequisite that captures what was learned.
+
+PR TITLE / CLAIM DISCIPLINE
+
+If successful, a suitable PR title is conceptually:
+
+    Batch 32C: run real Alpine minirootfs /bin/sh under Morphic
+
+If incomplete, title the PR after the actual prerequisite/frontier achieved, not after FIRST REAL ALPINE.
+
+Before finishing print:
+- branch name
+- commit SHA
+- changed filenames
+- git diff main...HEAD --stat
+- PR number/URL if available
+- exact minirootfs identity
+- exact result for /bin/sh -c 'echo alpine'
+- exact first remaining blocker, if any
+
+FINAL RULE
+
+Batch 32C is not a race to imitate Linux.
+
+It is a controlled experiment asking:
+
+    What is the smallest general filesystem/resource capability that lets an exact Alpine root filesystem supply its own real shell under Morphic?
+
+Let the exact minirootfs answer that question.
