@@ -100,28 +100,102 @@ The goal is not the smallest kernel at any cost. It is the smallest coherent fou
 
 ## Current machine milestone
 
-**Batch 32B is complete: Morphic now runs the exact Alpine v3.22 RV64 dynamically linked BusyBox shell through the real musl interpreter.**
+# ★ FIRST REAL ALPINE UNDER MORPHIC ★
 
-The same hash-pinned dynamic BusyBox artifact crossed the full ladder under Morphic:
+**Batch 32C is complete. Morphic now consumes a complete deterministic representation of the exact Alpine v3.22.0 RV64 minirootfs and executes its real `/bin/sh`.**
+
+The success path no longer selects BusyBox and musl as two host-picked ELF files. The caller supplies the complete bounded Alpine namespace as a manifest plus immutable backing; Morphic itself resolves the real `/bin/sh -> /bin/busybox` relationship and obtains BusyBox's real `PT_INTERP=/lib/ld-musl-riscv64.so.1` from that same namespace before execution.
 
 ```text
-/bin/busybox true                       PASS
-/bin/busybox echo batch32b              PASS
-/bin/busybox sh -c 'echo batch32b'      PASS
-exact stdout: batch32b\n                PASS
-exit status 0                           PASS
-real ld-musl interpreter-first          PASS
-PREPARE -> COMMIT -> execute            PASS
-W+X=0                                   PASS
+exact Alpine v3.22.0 RV64 minirootfs       PASS
+complete namespace: 517 objects            PASS
+regular-file backing: 7,069,903 bytes      PASS
+runtime /bin/sh -> /bin/busybox lookup     PASS
+same-namespace real musl PT_INTERP lookup  PASS
+real ld-musl interpreter-first             PASS
+PREPARE -> COMMIT -> execute               PASS
+exact stdout: alpine\n                     PASS
+exit status 0                              PASS
+W+X=0                                      PASS
 ```
 
-This is not a synthetic shell and it is not a kernel-side dynamic-linking shortcut. The real `/lib/ld-musl-riscv64.so.1` enters U-mode first, performs userspace loader startup, and transfers execution into the exact dynamic BusyBox image. The kernel still does not perform dynamic relocations for musl or BusyBox.
+There is still no kernel dynamic relocator and no direct-to-BusyBox shortcut. The real musl interpreter enters U-mode first and performs userspace loader startup.
 
-The blocker immediately before this milestone was also closed generally rather than with a BusyBox special case: large caller-supplied artifacts now travel through a bounded, page-aligned, supervisor-readable, read-only transport region separated from the ordinary kernel image, fixture window, and prepared-image reservations.
+Repository validation for the merged milestone is green, including `zig build check`, smoke, recipes, conformance, property, fuzz-smoke, differential, tests, `validate-repository`, repository policy, and the secret-pattern gate.
 
-Repository validation at the milestone passed all **350/350 steps and 247/247 tests**, and GitHub CI passed.
+See [`docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md).
 
-See [`docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md).
+## Try the real Alpine proof in your own console
+
+You can reproduce the current milestone from a fresh clone. This is **not yet an interactive Alpine prompt**; it runs the real Alpine `/bin/sh -c 'echo alpine'` path under Morphic and shows the proven userspace output.
+
+Prerequisites:
+
+- Git
+- Python 3
+- Zig **0.14.0**
+- `qemu-system-riscv64`
+- Internet access for the hash-pinned Alpine v3.22.0 RV64 minirootfs download
+
+Clone and enter the repository:
+
+```sh
+git clone https://github.com/thanks-cohn/zig-reference.git
+cd zig-reference
+git switch main
+git pull --ff-only
+```
+
+Confirm the important host tools:
+
+```sh
+zig version
+qemu-system-riscv64 --version
+python3 --version
+```
+
+`zig version` should report `0.14.0`.
+
+Generate the complete verified Alpine namespace. The acquisition tool downloads the exact pinned Alpine archive, verifies its SHA-256, rejects unsafe archive relationships, verifies `/bin/sh -> /bin/busybox`, verifies the real musl interpreter and PT_INTERP relationship, and emits the complete deterministic namespace:
+
+```sh
+rm -rf /tmp/zigref-namespace /tmp/alpine-machine
+python3 tools/pressure-real-rv64-alpine-minirootfs.py \
+  --artifact-only \
+  --namespace-output-dir /tmp/zigref-namespace
+```
+
+Build the Morphic RV64 machine with that complete namespace:
+
+```sh
+zig build install-freestanding-riscv64-morphic-runtime \
+  -Dexternal-rv64-namespace-manifest=/tmp/zigref-namespace/namespace.json \
+  -Dexternal-rv64-namespace-data=/tmp/zigref-namespace/namespace.data \
+  -Dexternal-rv64-argv0=/bin/sh \
+  -Dexternal-rv64-argv1=-c \
+  '-Dexternal-rv64-argv2=echo alpine' \
+  --prefix /tmp/alpine-machine
+```
+
+Run it on the QEMU RISC-V `virt` machine:
+
+```sh
+qemu-system-riscv64 \
+  -machine virt \
+  -nographic \
+  -bios default \
+  -kernel /tmp/alpine-machine/bin/morphic-freestanding-riscv64
+```
+
+The machine emits Morphic proof/evidence output, and the decisive Alpine userspace output is:
+
+```text
+alpine
+```
+
+The Batch 32C proof additionally establishes status `0`, real-musl interpreter-first execution, PREPARE -> COMMIT -> execute, and `W+X=0`.
+
+The canonical command record lives in [`COMMANDS.md`](COMMANDS.md).
 
 ## Come attack the next boundary
 
@@ -135,8 +209,8 @@ You do **not** have to accept the current architecture as sacred. A strong resul
 
 Some of the next concrete questions are:
 
-- Can an exact Alpine RISC-V minirootfs supply its own real `/bin/sh` under Morphic without turning the kernel into Linux internally?
-- What is the minimum filesystem mechanism real Alpine pressure actually demands first?
+- What is the minimum filesystem mechanism required to turn today's one-shot real Alpine shell execution into a useful persistent shell environment?
+- What process, FD-inheritance, pipe, redirection, TTY, and signal semantics does real Alpine pressure actually demand?
 - Which Linux behaviors belong at the compatibility edge, and which reveal reusable Morphic mechanisms?
 - How far can the privileged core remain small and understandable while the capability surface grows?
 - Can the same substrate support a cleaner native QuirkM userspace, stronger isolation models, Wasm, or virtualization without inheriting every historical Unix assumption?
@@ -165,56 +239,93 @@ Chronology tag:
 
 `time-till-first-static-busybox-shell-229.48-hours-from-repository-start-2026-08-13`
 
-Future major milestones should accumulate the same chronology line by line. The real dynamic-musl and dynamic-BusyBox-shell milestones are now complete and should each receive their own accumulated `time-till` chronology entries.
+Future major milestones should accumulate the same chronology line by line. The real dynamic-musl, dynamic-BusyBox-shell, and first-real-Alpine milestones are complete and can each receive their own accumulated `time-till` chronology entries.
 
 ## Active frontier
 
-**The dynamic BusyBox mountain is complete. The next pressure campaign is the first real Alpine root filesystem.**
+**First real Alpine is complete. The active climb is from one-shot Alpine execution to a playable Alpine environment, then to Alpine's own package manager.**
 
 ```text
-FIRST STATIC BUSYBOX SHELL      complete
+FIRST STATIC BUSYBOX SHELL         complete
         |
         v
-FIRST REAL DYNAMIC MUSL         complete
+FIRST REAL DYNAMIC MUSL            complete
         |
         v
-DYNAMIC BUSYBOX SHELL           complete
+DYNAMIC BUSYBOX SHELL              complete
         |
         v
-REAL ALPINE MINIROOTFS          <-- next
+REAL ALPINE NAMESPACE              complete
         |
         v
-REAL /bin/sh -c 'echo alpine'
+★ FIRST REAL ALPINE ★              complete  <-- current proven milestone
         |
         v
-FIRST REAL ALPINE
+FILESYSTEM REALITY
+pwd / directories / stat / getdents / writable /tmp
         |
         v
-FILESYSTEM + PROCESS PRESSURE
+PROCESS REALITY
+spawn/exec/wait + sane inherited resources
         |
         v
-CONSOLE / TTY / SIGNALS
+PIPES + REDIRECTION
+pipe + dup + stdin/stdout/stderr behavior
         |
         v
-PLAYABLE ALPINE
+CONSOLE / TTY
+persistent keyboard input + shell prompt
+        |
+        v
+SIGNALS / CTRL-C
+foreground interruption without killing the shell
+        |
+        v
+★ PLAYABLE ALPINE ★
+        |
+        v
+APK LOCAL DATABASE
+apk --version / apk info
+        |
+        v
+LOCAL .APK INSTALL
+filesystem mutation + package DB + scripts
+        |
+        v
+NETWORKING / DNS / TLS
+        |
+        v
+apk update
+        |
+        v
+★ apk add FROM REAL ALPINE REPOSITORIES ★
 ```
 
-The next clean historical target is intentionally narrow:
+A concrete playable-Alpine target looks like:
 
 ```text
-exact Alpine v3.22 RISC-V minirootfs
-        -> real /bin/sh from that filesystem
-        -> /bin/sh -c 'echo alpine'
-        -> exact alpine\n
-        -> status 0
-        -> W+X=0
-        -> FIRST REAL ALPINE UNDER MORPHIC
+Alpine Linux
+/ # pwd
+/
+/ # ls /
+bin dev etc lib sbin tmp usr var
+/ # cat /etc/alpine-release
+3.22...
+/ # cd /tmp
+/tmp # echo morphic > hello
+/tmp # cat hello
+morphic
+/tmp # echo hello | cat
+hello
+/tmp #
 ```
 
-Only real pressure should decide what filesystem, pathname, metadata, process, or compatibility mechanisms are admitted next. The kernel should not grow a speculative Linux subsystem merely because Linux has one.
+Only real pressure should decide what filesystem, pathname, metadata, process, terminal, networking, or compatibility mechanisms are admitted next. The kernel should not grow a speculative Linux subsystem merely because Linux has one.
 
-Completed Batch 32B report:
-[`docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md)
+Completed reports:
+
+- [`docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md)
+- [`docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md)
 
 ## Engineering model
 
@@ -232,7 +343,7 @@ observe real failure
 
 ## Documentation
 
-Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md).
+Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md).
 
 ## Validation
 
@@ -252,6 +363,6 @@ Research that proves an existing Morphic or QuirkM idea wrong is useful too. Pre
 
 Alpz is **not Linux**, QuirkM is **not a completed native operating environment**, and Morphic is **not presented as a production kernel platform**.
 
-The project now has real static-musl execution, a proven static Alpine BusyBox shell, successful real dynamic-musl execution through the real userspace interpreter, and a proven dynamic Alpine BusyBox shell under Morphic. It does **not yet claim** an Alpine minirootfs, first-real-Alpine completion, interactive/playable Alpine, general Linux compatibility, production security, production readiness, or completed virtualization.
+The project now has real static-musl execution, a proven static Alpine BusyBox shell, successful real dynamic-musl execution through the real userspace interpreter, a proven dynamic Alpine BusyBox shell, and **first real Alpine under Morphic through a complete serialized Alpine v3.22.0 RV64 namespace**. It does **not yet claim** an interactive/playable Alpine environment, general Linux compatibility, working `apk add`, production security, production readiness, or completed virtualization.
 
 Proof records, exact artifacts, machine traces, validation gates, and current code define what has actually been achieved.
