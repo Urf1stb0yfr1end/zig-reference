@@ -1,0 +1,264 @@
+CODEX AGENTIC SNOWBALL — BATCH 32D CONTINUATION
+QEMU REGRESSION FLOOR -> INTERACTIVE / PLAYABLE ALPINE
+
+Repository: thanks-cohn/zig-reference
+Canonical path:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32D_CONTINUATION_QEMU_REGRESSION_FLOOR_INTERACTIVE_PLAYABLE_ALPINE_ONE_AND_DONE_30MIN_HANDOFF.txt
+
+Start from current main.
+Inherited merged frontier:
+302761105e0efa70e5eadb18cb005a5793fd4153
+
+This is a continuation of Batch 32D. Do not rename the work Batch 32E unless the Batch 32D interactive/playable milestone is actually completed and a later campaign is being started.
+
+OBJECTIVE
+
+Advance the exact existing Alpine v3.22.0 RV64 environment from the merged Batch 32D process-I/O foundation to a real interactive shell and, if the shell remains stable, continue directly through the established playability pressure commands.
+
+Work from measured failures. Preserve working mechanisms. Do not add application-specific shortcuts.
+
+MERGED BASELINE
+
+PR #75 is merged.
+The repository now has:
+- resource-owned backend state for process I/O;
+- deterministic stdin state owned by the resource rather than a global cursor;
+- explicit external-process live-console selection through:
+
+  -Dexternal-rv64-live-console-input=true
+
+- live SBI legacy-console getchar input backend;
+- SBI console output for fd 1/fd 2;
+- live-console selection independent of argv;
+- updated bounded-resource-table contract and generated evidence;
+- green GitHub validation at the merged PR head.
+
+Preserve these properties.
+
+CURRENT CAUSAL BLOCKER
+
+The Batch 32D report records that the inherited real-QEMU Batch 25B verifier did not complete under the Codex environment. It stopped after `stdin-25b`. An isolated inherited revision also failed earlier in that environment at a page-table owned-pool assertion.
+
+The exact Alpine interactive retry was therefore not executed in that run.
+
+FIRST TASK — CLASSIFY THE QEMU REGRESSION FLOOR
+
+Run the relevant inherited deterministic QEMU verifier from current main and determine whether the failure is:
+
+1. a real regression introduced by the Batch 32D changes;
+2. an existing repository/QEMU-version issue independent of Batch 32D;
+3. a verifier/environment issue;
+4. another concrete failure category supported by evidence.
+
+Use comparison against the smallest appropriate inherited revision or known-good proof when needed.
+
+Do not broadly rewrite the verifier or runtime just to make the test green.
+
+If Batch 32D caused the regression:
+- identify the causal change;
+- make the smallest general repair;
+- add or update focused proof;
+- rerun the same verifier.
+
+If the failure is proven independent of Batch 32D:
+- record the evidence precisely;
+- do not block the entire campaign on unrelated repair;
+- proceed to the exact Alpine live-console pressure while keeping the unrelated issue documented.
+
+SECOND TASK — EXACT INTERACTIVE ALPINE RETRY
+
+Use the existing exact Alpine namespace and real `/bin/sh`.
+Do not use `-c`.
+Use the explicit live-console option.
+
+The build surface should remain equivalent to:
+
+  zig build install-freestanding-riscv64-morphic-runtime \
+    -Dexternal-rv64-namespace-manifest=PATH/namespace.json \
+    -Dexternal-rv64-namespace-data=PATH/namespace.data \
+    -Dexternal-rv64-argv0=/bin/sh \
+    -Dexternal-rv64-live-console-input=true \
+    --prefix PATH
+
+Run the resulting machine with system QEMU using the repository's established RISC-V invocation.
+
+Required proof target:
+- exact namespace identity remains valid;
+- real `/bin/sh -> /bin/busybox` lookup;
+- real musl PT_INTERP from the same Alpine namespace;
+- interpreter-first execution;
+- PREPARE -> COMMIT -> execute;
+- W+X=0;
+- live human input reaches fd 0;
+- fd 1/fd 2 reach the console;
+- shell remains alive for more than one command;
+- type `echo morphic`;
+- observe exactly `morphic` as command output;
+- issue another command successfully afterward.
+
+Do not print a synthetic shell prompt, Alpine banner, or success marker from the kernel.
+
+PRESSURE LOOP
+
+For each exact failure from unchanged `/bin/sh`:
+1. capture the first causal failure;
+2. identify the missing semantic;
+3. assign it to the correct layer;
+4. implement the smallest reusable mechanism;
+5. add focused proof;
+6. rerun the same exact shell.
+
+Do not implement unsupported syscalls only because they appear in a trace.
+Do not special-case BusyBox, ash, `/bin/sh`, Alpine paths, or expected output in neutral mechanisms.
+
+TTY / IOCTL
+
+If the shell causally requires ioctl/termios behavior:
+- identify the exact Linux/RISC-V request and argument form;
+- implement only the semantics required by the observed shell pressure;
+- keep Linux ioctl numbers and structure encodings at the Linux compatibility edge;
+- keep reusable terminal state/capabilities in neutral mechanisms only when justified;
+- return a real error for unsupported requests rather than unconditional success.
+
+PLAYABILITY PRESSURE
+
+Once a persistent interactive shell is proven, continue in the SAME campaign while time remains:
+
+  pwd
+  ls /
+  cat /etc/alpine-release
+  cd /tmp
+  echo hello > /tmp/hello
+  cat /tmp/hello
+  echo hello | cat
+
+For each failure, use the same causal loop.
+
+These commands may expose:
+- cwd/path handling;
+- directory enumeration and metadata;
+- namespace reads;
+- writable filesystem state;
+- fd creation/inheritance/redirection;
+- process execution/lifetime;
+- pipes.
+
+Implement only what the exact command proves necessary.
+
+PLAYABLE ALPINE may be claimed only if the listed commands work through the real interactive shell and the shell remains usable afterward.
+
+Do not begin apk, networking, DNS, or TLS in this continuation unless PLAYABLE ALPINE is already fully proven and there is clearly remaining time for a separate coherent next step. Prefer ending with a clean playable-Alpine proof and handoff.
+
+REGRESSION FLOOR
+
+Preserve:
+- Batch 31G static BusyBox shell;
+- Batch 32A real dynamic musl;
+- Batch 32B dynamic BusyBox shell;
+- Batch 32C first real Alpine `/bin/sh -c 'echo alpine'`;
+- Batch 32D resource-owned process I/O;
+- fixture/live backend separation;
+- explicit live-console selection independent of argv;
+- exact Alpine namespace identity;
+- real musl interpreter-first execution;
+- PREPARE/COMMIT;
+- W+X=0;
+- deterministic fixture behavior;
+- repository contract/evidence rules.
+
+VALIDATION
+
+Use focused tests while implementing.
+Before final handoff, run the strongest applicable repository checks, including at minimum where applicable:
+
+  zig fmt --check build.zig projects recipes conformance
+  zig build check
+  zig build test-recipe-run-hosted-morphic-runtime
+  PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+  python3 tools/developer-command.py validate-repository
+
+Run the relevant real-QEMU verifier(s) and record exact versions/results.
+Regenerate canonical evidence/indexes when required. Do not hand-edit generated evidence when a canonical generator exists.
+
+PERSISTENCE
+
+Persist coherent progress early.
+Commit and push reviewable work as it becomes coherent.
+Open or update a draft PR once useful implementation or diagnostic work is reviewable.
+Verify the remote branch contains the pushed commit.
+
+30-MINUTE HANDOFF
+
+This run has an explicit early handoff requirement.
+
+By approximately 20–25 minutes:
+- commit coherent useful progress;
+- push the branch;
+- verify the remote commit;
+- open or update a draft PR if reviewable;
+- make sure useful diagnostics or repairs are not left only in the working tree.
+
+At approximately 30 minutes:
+- stop starting new large experiments;
+- commit the current coherent state;
+- push all useful work;
+- update `docs/reports/AGENTIC_SNOWBALL_BATCH_32D.md`;
+- record verifier results, exact Alpine retries, tests, and validation;
+- leave the branch/PR reviewable;
+- if incomplete, state exactly one next causal blocker.
+
+Do not allow one unbounded experiment to consume the handoff window and leave no persisted result.
+
+REPORTING
+
+Update:
+
+  docs/reports/AGENTIC_SNOWBALL_BATCH_32D.md
+
+Record:
+- inherited main SHA;
+- QEMU version;
+- regression-floor classification and evidence;
+- implementation changes;
+- focused tests;
+- exact Alpine live-console command/run;
+- each causal failure and repair;
+- interactive-shell result;
+- playability command results;
+- PREPARE/COMMIT status;
+- W+X status;
+- repository validation;
+- commit/branch/PR state;
+- one next causal blocker if incomplete.
+
+Update COMMANDS.md only for durable commands.
+Update README.md only if FIRST INTERACTIVE ALPINE or PLAYABLE ALPINE is genuinely proven and the wording states the exact scope.
+
+FINAL STATUS TABLE
+
+  Batch 32C real Alpine regression             PASS/FAIL/NOT RUN
+  Batch 25B QEMU floor classified              PASS/FAIL
+  deterministic fixture regression             PASS/FAIL/ENVIRONMENTAL
+  resource-owned process I/O                   PASS/FAIL
+  explicit live-console selection              PASS/FAIL
+  live fd0 input                               PASS/FAIL/NOT RUN
+  fd1/fd2 console output                       PASS/FAIL/NOT RUN
+  exact Alpine namespace                       PASS/FAIL/NOT RUN
+  real Alpine /bin/sh entered                  PASS/FAIL/NOT RUN
+  real musl interpreter-first                  PASS/FAIL/NOT RUN
+  PREPARE/COMMIT                               PASS/FAIL/NOT RUN
+  W+X=0                                        PASS/FAIL/NOT RUN
+  persistent interactive shell                 PASS/FAIL/NOT RUN
+  echo morphic round-trip                      PASS/FAIL/NOT RUN
+  second interactive command                   PASS/FAIL/NOT RUN
+  pwd                                           PASS/FAIL/NOT RUN
+  ls /                                          PASS/FAIL/NOT RUN
+  cat /etc/alpine-release                       PASS/FAIL/NOT RUN
+  writable /tmp                                 PASS/FAIL/NOT RUN
+  redirection                                   PASS/FAIL/NOT RUN
+  pipe                                          PASS/FAIL/NOT RUN
+  PLAYABLE ALPINE                               PASS/NOT REACHED
+  repository validation                        PASS/FAIL/NOT RUN
+  remote persistence                           PASS/BLOCKED
+
+If incomplete, state one next causal blocker precisely.
