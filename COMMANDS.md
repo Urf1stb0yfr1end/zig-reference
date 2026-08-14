@@ -551,3 +551,14 @@ reaches namespace-backed `newfstatat("/")` and stops at unsupported
 Linux/RV64 `openat(56)`; the exact evidence and validation state are recorded
 in `docs/reports/AGENTIC_SNOWBALL_BATCH_32F.md`. No new runnable command was
 introduced.
+
+PR #82's execve atomicity repair factors the initial-execution mapping
+preflight into the bounded helper also used by `externalExecve()`. Candidate
+main and interpreter leaves now prove existing table paths or temporarily
+map/unmap absent paths before COMMIT; capacity failure returns while the live
+image and process state remain unchanged. The focused Morphic recipe test
+includes the insufficient-table-capacity regression and the parent restore
+path now keeps fixed no-access reservations unbacked. The existing live-console
+build and QEMU commands re-proved the unchanged `ls /` frontier through real
+BusyBox/musl and `newfstatat("/")` to unsupported `openat(56)`. This repair
+introduces no new runnable command.

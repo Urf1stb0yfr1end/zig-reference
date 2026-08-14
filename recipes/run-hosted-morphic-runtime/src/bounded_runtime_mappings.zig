@@ -33,6 +33,12 @@ pub fn BoundedRuntimeMappings(comptime capacity: usize, comptime page_size: usiz
             return length / page_size;
         }
 
+        /// A reservation with no access permissions intentionally owns virtual
+        /// address space without consuming or installing data-page backing.
+        pub fn hasBacking(mapping: Mapping) bool {
+            return mapping.permissions.read or mapping.permissions.write or mapping.permissions.execute;
+        }
+
         /// Reserves an aligned half-open range. `pageOccupied` lets the caller
         /// include executable, stack, brk, and page-table truth without copying
         /// those mappings into this table. Failure never changes the table.
@@ -133,4 +139,10 @@ test "collision on the second page rejects the whole range" {
     var table: Table = .{};
     try std.testing.expectError(error.Collision, table.reserve(0x6000, 8192, .{}, false, {}, occupied));
     try std.testing.expectEqual(@as(usize, 0), table.count);
+}
+
+test "no-access reservations remain unbacked while accessible mappings require backing" {
+    const Table = BoundedRuntimeMappings(2, 4096);
+    try std.testing.expect(!Table.hasBacking(.{ .start = 0x1000, .end = 0x2000, .permissions = .{} }));
+    try std.testing.expect(Table.hasBacking(.{ .start = 0x2000, .end = 0x3000, .permissions = .{ .read = true } }));
 }

@@ -17,6 +17,7 @@ const bounded_filesystem = @import("bounded-filesystem");
 const address_space = @import("bounded-address-space-exec-image");
 const external_artifact_options = @import("external-artifact-options");
 const bounded_syscall_evidence = @import("bounded_syscall_evidence.zig");
+const bounded_mapping_preflight = @import("bounded_mapping_preflight.zig");
 const linux_rv64_clone_request = @import("linux_rv64_clone_request.zig");
 const runtime_mappings = @import("bounded_runtime_mappings.zig");
 const userspace_elf = @embedFile("userspace-elf-rv64");
@@ -1127,23 +1128,12 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
 
     // PREPARE table-backing preflight. Each successful temporary leaf is
     // removed immediately; the builder-owned intermediate tables remain ready.
-    for (prepared.items(), 0..) |page, index| {
-        write("ZIGREF_BATCH29_PREPARE table\n");
-        if (page.backing_index != index) shutdown();
-        const physical = @intFromPtr(&external_prepared_backing[page.backing_index]);
-        const permissions = sv39_entries.Permissions{ .read = true, .user = true, .accessed = true };
-        _ = builder.mapPage(page.virtual_start, physical, .page_4k, permissions) catch shutdown();
-        _ = builder.unmapPage(page.virtual_start, .page_4k) catch shutdown();
-    }
+    write("ZIGREF_BATCH29_PREPARE tables\n");
+    preflightExternalImage(builder, &prepared, &external_prepared_backing) catch shutdown();
     write("ZIGREF_BATCH32A_PREPARE interpreter-tables pages=");
     writeUsizeHex(prepared_interpreter.items().len);
     write("\n");
-    for (prepared_interpreter.items(), 0..) |page, index| {
-        if (page.backing_index != index) shutdown();
-        const physical = @intFromPtr(&external_interpreter_backing[page.backing_index]);
-        _ = builder.mapPage(page.virtual_start, physical, .page_4k, .{ .read = true, .user = true, .accessed = true }) catch shutdown();
-        _ = builder.unmapPage(page.virtual_start, .page_4k) catch shutdown();
-    }
+    preflightExternalImage(builder, &prepared_interpreter, &external_interpreter_backing) catch shutdown();
     external_image = prepared;
     external_interpreter_image = prepared_interpreter;
     external_stack_image = stack;
@@ -1368,6 +1358,46 @@ fn installExternalImage(image: *const ExternalPreparedImage, backing: *[prepared
     }
 }
 
+const ExternalMappingPreflight = struct {
+    builder: *MachineBuilder,
+    backing: *[prepared_image_pages][frames.PageSize]u8,
+
+    pub fn occupied(self: *@This(), virtual_start: usize) bool {
+        _ = self.builder.query(virtual_start) catch return false;
+        return true;
+    }
+
+    pub fn replaceable(_: *@This(), virtual_start: usize) bool {
+        for (external_image.items()) |page|
+            if (page.virtual_start == virtual_start) return true;
+        for (external_interpreter_image.items()) |page|
+            if (page.virtual_start == virtual_start) return true;
+        if (virtual_start >= imageBreakStart(&external_image) and virtual_start < external_program_break)
+            return true;
+        for (external_runtime_mappings.entries[0..external_runtime_mappings.count]) |mapping|
+            if (virtual_start >= mapping.start and virtual_start < mapping.end) return true;
+        return false;
+    }
+
+    pub fn map(self: *@This(), virtual_start: usize, backing_index: usize) !void {
+        _ = try self.builder.mapPage(
+            virtual_start,
+            @intFromPtr(&self.backing[backing_index]),
+            .page_4k,
+            .{ .read = true, .user = true, .accessed = true },
+        );
+    }
+
+    pub fn unmap(self: *@This(), virtual_start: usize) !void {
+        _ = try self.builder.unmapPage(virtual_start, .page_4k);
+    }
+};
+
+fn preflightExternalImage(builder: *MachineBuilder, image: *const ExternalPreparedImage, backing: *[prepared_image_pages][frames.PageSize]u8) !void {
+    var context = ExternalMappingPreflight{ .builder = builder, .backing = backing };
+    try bounded_mapping_preflight.preflight(image.items(), backing.len, &context);
+}
+
 fn imageBreakStart(image: *const ExternalPreparedImage) usize {
     var end: usize = 0;
     for (image.items()) |page| end = @max(end, page.virtual_start + frames.PageSize);
@@ -1424,6 +1454,13 @@ fn externalExecve(frame: *TrapFrame) usize {
     const external_stack_base = user_stack_va + frames.PageSize - external_stack_pages * frames.PageSize;
     const stack_range = initial_stack.GuestStackRange.init(external_stack_base, user_stack_va + frames.PageSize) catch return negativeErrno(12);
     const stack = initial_stack.plan(external_stack_plan_capacity, exec_vector_capacity, exec_vector_capacity, auxv.len, stack_range, argv, envp, &auxv) catch return negativeErrno(7);
+
+    // Complete the same bounded table-backing preflight used by initial
+    // external execution while every live child leaf and process field remains
+    // untouched. Existing live leaves prove their table path; new paths are
+    // allocated by temporary map/unmap probes. A failure returns from PREPARE.
+    preflightExternalImage(batch26_builder, &external_exec_image_candidate, &external_exec_main_candidate) catch return negativeErrno(12);
+    preflightExternalImage(batch26_builder, &external_exec_interpreter_image_candidate, &external_exec_interpreter_candidate) catch return negativeErrno(12);
 
     // COMMIT: no fallible guest-derived work remains. Resource bindings and
     // the retained parent snapshot deliberately survive image replacement.
@@ -1831,6 +1868,10 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                     restored_backing_index += 1;
                 }
                 for (external_runtime_mappings.entries[0..external_runtime_mappings.count]) |mapping| {
+                    // Fixed PROT_NONE reservations own virtual range but have
+                    // neither a leaf nor backing. Preserve them only in the
+                    // neutral mapping table and do not consume a backing slot.
+                    if (!ExternalRuntimeMappings.hasBacking(mapping)) continue;
                     var page = mapping.start;
                     while (page < mapping.end) : (page += frames.PageSize) {
                         const physical = @intFromPtr(&external_prepared_backing[restored_backing_index]);

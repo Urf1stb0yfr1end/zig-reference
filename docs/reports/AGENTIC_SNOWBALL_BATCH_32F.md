@@ -123,3 +123,63 @@ EXACT NEXT ACTION: introduce the minimum neutral bounded namespace object/open
 descriptor mechanism required by this observed directory request, translate
 Linux/RV64 `openat(56)` at the compatibility edge, and immediately retry the
 same `ls /` command.
+
+## PR #82 PREPARE/COMMIT atomicity repair
+
+Review identified that `externalExecve()` materialized candidate state but did
+not reserve every required Sv39 table path until its destructive COMMIT. The
+repair factors the already-proven initial external-execution preflight into
+`bounded_mapping_preflight.zig` and calls the same helper for candidate main
+and interpreter images before any live image, brk, mapping, register, resource,
+or binding state is changed. Existing leaves prove their table path; absent
+leaves are temporarily mapped and immediately unmapped, forcing the bounded
+page-table owner to supply required intermediate tables. Metadata and W+X
+failures are also rejected before temporary mapping.
+
+The focused insufficient-capacity regression drives PREPARE across an active
+leaf, one available new table path, and then a candidate path that cannot be
+allocated. It proves the active execution address/physical identity and process
+state remain byte-for-byte unchanged and no temporary leaf remains. A second
+focused regression proves metadata failure occurs before temporary mapping.
+
+The other PR #82 inline review finding is also repaired: fixed no-access
+runtime reservations are explicitly classified as unbacked. Parent restoration
+now retains those ranges in the neutral mapping table without attempting to
+install an invalid all-false leaf or consuming a backing index. A focused test
+distinguishes unbacked no-access reservations from accessible mappings.
+
+The exact live Alpine `ls /` pressure was rerun under QEMU 8.2.2. It again
+proved `clone(220)`, `ZIGREF_LINUX_EXECVE_COMMIT path=/bin/ls`, real
+BusyBox/musl startup, and namespace-backed `newfstatat("/")`; Linux/RV64
+`openat(56)` remained the next unsupported operation and BusyBox printed
+`ls: can't open '/': Function not implemented`. The repair therefore preserves
+the exact established frontier without implementing `openat(56)`.
+
+Repair validation passed:
+
+- `zig build test-recipe-run-hosted-morphic-runtime`, including both mapping
+  preflight regressions and the no-access reservation regression;
+- the exact namespace-backed freestanding installation command;
+- `zig fmt --check build.zig projects recipes conformance`;
+- `PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check`;
+- regenerated unit and smoke evidence for all 60 modules through
+  `python3 tools/python-environment.py tools/record-validation.py --level all`;
+- regenerated 14 deterministic textual indexes;
+- `zig build check`; and
+- `python3 tools/developer-command.py validate-repository` at 350/350 steps and
+  248/248 tests.
+
+The first post-build-wiring `zig build check` correctly failed closed on stale
+validation evidence before the canonical evidence regeneration; the subsequent
+check passed. QEMU pressure used the exact namespace-backed machine installed
+at `/tmp/b32f-preflight-machine` and its captured trace is intentionally not a
+committed binary or log artifact.
+
+The coherent PR #82 repair commit is
+`64ccb1cc290902ecf9c4ed525c4f65f79a7ee05f`. The existing branch is
+`codex/implement-playable-alpine-under-morphic`. Remote persistence was
+attempted with `git push origin codex/implement-playable-alpine-under-morphic`
+but remained BLOCKED because this environment has neither HTTPS credentials
+nor an authenticated GitHub CLI (`could not read Username for
+'https://github.com'`). PR #82 consequently remains open at its prior remote
+head until a credentialed environment pushes these local commits.
