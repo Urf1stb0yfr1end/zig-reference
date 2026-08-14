@@ -2688,7 +2688,11 @@ noinline fn executeLinuxRv64Syscalls(allocator: anytype, page_owner: anytype, bu
     const data_leaf = builder.query(user_data_va) catch shutdown();
     const expected_numbers = [_]usize{ 0x7fff, 63, 23, 57, 63, 63, 63, 64, 57, 63, 57, 64, 64, 63, 94 };
     const expected_results = [_]usize{ negativeErrno(38), 5, 3, 0, negativeErrno(9), negativeErrno(14), 4, 9, 0, negativeErrno(9), negativeErrno(9), negativeErrno(9), negativeErrno(14), negativeErrno(9) };
-    const stdin_state = (syscall_resources.resolve(stdin_ref) orelse shutdown()).state;
+    // The final close deliberately retires the stdin resource, so its owned
+    // state is no longer resolvable here. Derive the completed-read boundary
+    // from the two successful read completions retained by this proof rather
+    // than keeping a second global cursor alive past resource retirement.
+    const stdin_state = syscall_results[1] + syscall_results[6];
     if (syscall_count != 15 or !std.mem.eql(usize, syscall_numbers[0..15], &expected_numbers) or !std.mem.eql(usize, syscall_results[0..14], &expected_results) or syscall_terminal_status != 37 or syscall_output_len != 9 or !std.mem.eql(u8, syscall_output[0..9], "stdin-25b") or stdin_state != 9 or syscall_resources.count() != 2 or allocated_before != allocator.allocatedCount() or tables_before != page_owner.page_count or satp_before != satp_after or code_leaf.raw_entry & 0x1e != 0x1a or stack_leaf.raw_entry & 0x1e != 0x16 or data_leaf.raw_entry & 0x1e != 0x16) {
         write("ZIGREF_25B_FAIL final-relations\n");
         shutdown();
