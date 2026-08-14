@@ -100,15 +100,13 @@ The goal is not the smallest kernel at any cost. It is the smallest coherent fou
 
 ## Current machine milestone
 
-The current completed external-userspace milestone is **Batch 31G: the first proven static Alpine BusyBox shell under Morphic**.
+The current completed external-userspace milestone is **Batch 32A: the first proven real dynamically linked RV64 musl program under Morphic**.
 
-The exact pinned Alpine v3.22 static BusyBox RISC-V artifact successfully completed the shell command that prints `batch31g`, exited with status 0, retained 244 executable image pages, and preserved W+X=0.
+The exact hash-pinned dynamic main was entered through the real `/lib/ld-musl-riscv64.so.1` interpreter. System-QEMU evidence shows real interpreter startup syscalls, loader completion, transfer into the mapped main image, exact stdout `batch32a-dynamic-musl\n`, exit status 0, and W+X=0. PREPARE/COMMIT ordering remained intact, with no kernel-side dynamic relocator and no direct-main-entry bypass.
 
-The proven ladder now includes real S-mode and U-mode execution, active Sv39, real ELF execution, Linux-style process startup, bounded file/memory/exec behavior, PT_INTERP/ET_DYN handoff machinery, exact static musl, BusyBox `true`, BusyBox `echo`, bounded anonymous mappings, a two-page external process stack, and finally the static BusyBox shell.
+The proven ladder now includes real S-mode and U-mode execution, active Sv39, real ELF execution, Linux-style process startup, bounded file/memory/exec behavior, exact static musl, the static Alpine BusyBox shell, caller-supplied real PT_INTERP transport, and successful real dynamic-musl loader startup and main execution.
 
-An important negative result was preserved: `getpid` remained unsupported at this boundary, but the shell still completed. It was therefore not added merely because it appeared in the trace.
-
-See [`docs/reports/AGENTIC_SNOWBALL_BATCH_31G.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_31G.md).
+See [`docs/reports/AGENTIC_SNOWBALL_BATCH_32A.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32A.md).
 
 ## Time to milestone
 
@@ -129,20 +127,20 @@ Chronology tag:
 
 `time-till-first-static-busybox-shell-229.48-hours-from-repository-start-2026-08-13`
 
-Future major milestones should accumulate the same chronology line by line.
+Future major milestones should accumulate the same chronology line by line. The Batch 32A dynamic-musl milestone is now complete and ready for its own engineering and `time-till` tags.
 
 ## Active frontier
 
-Batch 32A targets the first **real dynamically linked RV64 musl program under Morphic** through the existing PT_INTERP path and the real musl interpreter.
+The next pressure campaign is **dynamic BusyBox**.
 
 ```text
 FIRST STATIC BUSYBOX SHELL      complete
         |
         v
-FIRST REAL DYNAMIC MUSL         current frontier
+FIRST REAL DYNAMIC MUSL         complete
         |
         v
-DYNAMIC BUSYBOX
+DYNAMIC BUSYBOX                 next
         |
         v
 DYNAMIC BUSYBOX SHELL
@@ -152,11 +150,14 @@ REAL ALPINE MINIROOTFS
         |
         v
 FIRST REAL ALPINE
+        |
+        v
+PLAYABLE ALPINE
 ```
 
-A central constraint is that the Morphic kernel should not become the dynamic linker. The real userspace interpreter should perform userspace loader work; Morphic should provide the general mechanisms and compatibility-edge semantics demanded by real pressure.
+A central constraint remains that the Morphic kernel should not become the dynamic linker. Real userspace interpreters should perform userspace loader work; Morphic should provide the general mechanisms and compatibility-edge semantics demanded by real pressure.
 
-Authoritative plan:
+Completed Batch 32A plan:
 [`docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32A_FIRST_REAL_DYNAMIC_MUSL_PT_INTERP_LOADER_ONE_AND_DONE_30MIN_HANDOFF.txt`](docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32A_FIRST_REAL_DYNAMIC_MUSL_PT_INTERP_LOADER_ONE_AND_DONE_30MIN_HANDOFF.txt)
 
 ## Engineering model
@@ -175,7 +176,7 @@ observe real failure
 
 ## Documentation
 
-Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), and [`docs/reports/AGENTIC_SNOWBALL_BATCH_31G.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_31G.md).
+Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32A.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32A.md).
 
 ## Validation
 
@@ -193,6 +194,6 @@ Research that proves an existing Morphic or QuirkM idea wrong is useful too. Pre
 
 Alpz is **not Linux**, QuirkM is **not a completed native operating environment**, and Morphic is **not presented as a production kernel platform**.
 
-The project now has real static-musl execution and a proven static Alpine BusyBox shell boundary. It does **not yet claim** successful real dynamic-musl completion under Morphic, dynamic BusyBox, an Alpine minirootfs, general Linux compatibility, production security, production readiness, or completed virtualization.
+The project now has real static-musl execution, a proven static Alpine BusyBox shell boundary, and successful real dynamic-musl execution through the real userspace interpreter. It does **not yet claim** dynamic BusyBox, a dynamic BusyBox shell, an Alpine minirootfs, general Linux compatibility, production security, production readiness, or completed virtualization.
 
 Proof records, exact artifacts, machine traces, validation gates, and current code define what has actually been achieved.
