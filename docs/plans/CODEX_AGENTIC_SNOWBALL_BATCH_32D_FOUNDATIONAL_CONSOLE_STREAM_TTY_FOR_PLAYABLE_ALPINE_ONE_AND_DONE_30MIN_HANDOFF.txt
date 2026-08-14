@@ -191,6 +191,26 @@ PERSISTENCE
 
 Commit and push coherent working progress. Open a draft PR when the branch contains reviewable progress. Do not wait for the final playable-Alpine milestone before preserving a valid reusable mechanism.
 
+30-MINUTE HANDOFF
+
+This run is time-boxed for an early useful handoff.
+
+By approximately 20-25 minutes:
+- ensure coherent implementation progress is committed;
+- push the branch;
+- verify the remote branch contains the commit;
+- open or update a draft PR if the work is reviewable.
+
+At approximately 30 minutes:
+- stop starting new large implementation experiments;
+- preserve the current coherent state in commits;
+- push all useful work;
+- update the Batch 32D report with completed work, tests, Alpine retry results, and the current blocker;
+- leave the PR/branch in a reviewable state;
+- state exactly one next causal blocker if the milestone is incomplete.
+
+Do not spend the handoff window on an unbounded experiment that leaves no committed result.
+
 REPORT
 
 Create/update:
