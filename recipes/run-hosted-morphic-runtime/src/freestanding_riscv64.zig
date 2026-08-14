@@ -17,6 +17,7 @@ const bounded_filesystem = @import("bounded-filesystem");
 const address_space = @import("bounded-address-space-exec-image");
 const external_artifact_options = @import("external-artifact-options");
 const bounded_syscall_evidence = @import("bounded_syscall_evidence.zig");
+const bounded_mapping_preflight = @import("bounded_mapping_preflight.zig");
 const linux_rv64_clone_request = @import("linux_rv64_clone_request.zig");
 const runtime_mappings = @import("bounded_runtime_mappings.zig");
 const userspace_elf = @embedFile("userspace-elf-rv64");
@@ -143,12 +144,20 @@ const ordinary_table_pages = 4;
 // One dedicated table page covers the separately placed caller-artifact
 // transport; the remaining bound preserves the prepared execution mappings.
 const prepared_table_pages = 16;
-const prepared_image_pages = 256;
+// The exact BusyBox image occupies 244 pages; exec starts a fresh dynamic
+// loader and therefore needs bounded post-image brk/mmap headroom rather than
+// inheriting the original shell's already-established allocator state.
+const prepared_image_pages = 320;
 const external_stack_pages = 2;
 var prepared_table_backing: [prepared_table_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
 var external_prepared_backing: [prepared_image_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
 var external_interpreter_backing: [prepared_image_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
 var external_prepared_stack: [external_stack_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
+// execve PREPARE must not overwrite the live child image. These caller-owned
+// candidate pages remain private until every lookup, ELF, argv/envp, stack, and
+// capacity check has succeeded; COMMIT then replaces the active backing.
+var external_exec_main_candidate: [prepared_image_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
+var external_exec_interpreter_candidate: [prepared_image_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
 
 fn fnv1a64(bytes: []const u8) u64 {
     var value: u64 = 0xcbf29ce484222325;
@@ -269,7 +278,10 @@ var batch26_stack_image: initial_stack.StackPlan(512) = undefined;
 const ExternalPreparedImage = address_space.PreparedImage(prepared_image_pages);
 var external_image: ExternalPreparedImage = .{};
 var external_interpreter_image: ExternalPreparedImage = .{};
-var external_stack_image: initial_stack.StackPlan(512) = undefined;
+var external_exec_image_candidate: ExternalPreparedImage = .{};
+var external_exec_interpreter_image_candidate: ExternalPreparedImage = .{};
+const external_stack_plan_capacity = external_stack_pages * frames.PageSize;
+var external_stack_image: initial_stack.StackPlan(external_stack_plan_capacity) = undefined;
 var external_program_break: usize = 0;
 var external_next_backing: usize = 0;
 const ExternalRuntimeMappings = runtime_mappings.BoundedRuntimeMappings(8, frames.PageSize);
@@ -492,6 +504,9 @@ const external_child_pid: usize = 2;
 var external_fork_main_snapshot: [prepared_image_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
 var external_fork_interpreter_snapshot: [prepared_image_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
 var external_fork_stack_snapshot: [external_stack_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
+var external_fork_image_snapshot: ExternalPreparedImage = .{};
+var external_fork_interpreter_image_snapshot: ExternalPreparedImage = .{};
+var external_fork_stack_image_snapshot: initial_stack.StackPlan(external_stack_plan_capacity) = undefined;
 var external_fork_resources: ResourceStore = undefined;
 var external_fork_bindings: ProcessBindings = undefined;
 var external_fork_mappings: ExternalRuntimeMappings = undefined;
@@ -1108,28 +1123,17 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     // larger stack reservation a permanent replacement.
     const displaced_stack_leaf = builder.query(external_stack_base) catch shutdown();
     const stack_range = initial_stack.GuestStackRange.init(external_stack_base, user_stack_va + frames.PageSize) catch shutdown();
-    const stack = initial_stack.plan(512, 4, 1, auxv.len, stack_range, argv, &envp, &auxv) catch shutdown();
+    const stack = initial_stack.plan(external_stack_plan_capacity, 4, 1, auxv.len, stack_range, argv, &envp, &auxv) catch shutdown();
     write("ZIGREF_BATCH29_PREPARE stack\n");
 
     // PREPARE table-backing preflight. Each successful temporary leaf is
     // removed immediately; the builder-owned intermediate tables remain ready.
-    for (prepared.items(), 0..) |page, index| {
-        write("ZIGREF_BATCH29_PREPARE table\n");
-        if (page.backing_index != index) shutdown();
-        const physical = @intFromPtr(&external_prepared_backing[page.backing_index]);
-        const permissions = sv39_entries.Permissions{ .read = true, .user = true, .accessed = true };
-        _ = builder.mapPage(page.virtual_start, physical, .page_4k, permissions) catch shutdown();
-        _ = builder.unmapPage(page.virtual_start, .page_4k) catch shutdown();
-    }
+    write("ZIGREF_BATCH29_PREPARE tables\n");
+    preflightExternalImage(builder, &prepared, &external_prepared_backing) catch shutdown();
     write("ZIGREF_BATCH32A_PREPARE interpreter-tables pages=");
     writeUsizeHex(prepared_interpreter.items().len);
     write("\n");
-    for (prepared_interpreter.items(), 0..) |page, index| {
-        if (page.backing_index != index) shutdown();
-        const physical = @intFromPtr(&external_interpreter_backing[page.backing_index]);
-        _ = builder.mapPage(page.virtual_start, physical, .page_4k, .{ .read = true, .user = true, .accessed = true }) catch shutdown();
-        _ = builder.unmapPage(page.virtual_start, .page_4k) catch shutdown();
-    }
+    preflightExternalImage(builder, &prepared_interpreter, &external_interpreter_backing) catch shutdown();
     external_image = prepared;
     external_interpreter_image = prepared_interpreter;
     external_stack_image = stack;
@@ -1302,7 +1306,215 @@ const SyscallBackend = struct {
 fn negativeErrno(value: usize) usize {
     return 0 -% value;
 }
-const LinuxRequestKind = enum { get_current_directory, duplicate, close, read, write, write_vector, new_fstatat, program_break, clone, memory_map, terminate, unsupported };
+
+const exec_vector_capacity = 16;
+const exec_string_capacity = 256;
+const ExecStringVector = struct {
+    storage: [exec_vector_capacity][exec_string_capacity]u8 = undefined,
+    lengths: [exec_vector_capacity]usize = .{0} ** exec_vector_capacity,
+    count: usize = 0,
+
+    fn capture(address: usize) !ExecStringVector {
+        var result: ExecStringVector = .{};
+        if (address == 0) return result;
+        while (result.count < exec_vector_capacity) : (result.count += 1) {
+            const pointer = try readUserUsize(address + result.count * @sizeOf(usize));
+            if (pointer == 0) return result;
+            result.lengths[result.count] = try copyUserCString(pointer, &result.storage[result.count]);
+        }
+        // Distinguish exactly-full from an unterminated/oversized vector.
+        if (try readUserUsize(address + exec_vector_capacity * @sizeOf(usize)) != 0)
+            return error.InvalidUser;
+        return result;
+    }
+
+    fn slices(self: *const ExecStringVector, output: *[exec_vector_capacity][]const u8) []const []const u8 {
+        for (0..self.count) |index|
+            output[index] = self.storage[index][0..self.lengths[index]];
+        return output[0..self.count];
+    }
+};
+
+fn unmapExternalImage(image: *const ExternalPreparedImage) void {
+    for (image.items()) |page| {
+        if (externalPageOccupied({}, page.virtual_start)) {
+            _ = batch26_builder.unmapPage(page.virtual_start, .page_4k) catch shutdown();
+        }
+    }
+}
+
+fn installExternalImage(image: *const ExternalPreparedImage, backing: *[prepared_image_pages][frames.PageSize]u8) void {
+    for (image.items()) |page| {
+        const permissions = sv39_entries.Permissions{
+            .read = page.permissions.read,
+            .write = page.permissions.write,
+            .execute = page.permissions.execute,
+            .user = true,
+            .accessed = true,
+            .dirty = page.permissions.write,
+        };
+        if (permissions.write and permissions.execute) shutdown();
+        _ = batch26_builder.mapPage(page.virtual_start, @intFromPtr(&backing[page.backing_index]), .page_4k, permissions) catch shutdown();
+    }
+}
+
+const ExternalMappingPreflight = struct {
+    builder: *MachineBuilder,
+    backing: *[prepared_image_pages][frames.PageSize]u8,
+
+    pub fn occupied(self: *@This(), virtual_start: usize) bool {
+        _ = self.builder.query(virtual_start) catch return false;
+        return true;
+    }
+
+    pub fn replaceable(_: *@This(), virtual_start: usize) bool {
+        for (external_image.items()) |page|
+            if (page.virtual_start == virtual_start) return true;
+        for (external_interpreter_image.items()) |page|
+            if (page.virtual_start == virtual_start) return true;
+        if (virtual_start >= imageBreakStart(&external_image) and virtual_start < external_program_break)
+            return true;
+        for (external_runtime_mappings.entries[0..external_runtime_mappings.count]) |mapping|
+            if (virtual_start >= mapping.start and virtual_start < mapping.end) return true;
+        return false;
+    }
+
+    pub fn map(self: *@This(), virtual_start: usize, backing_index: usize) !void {
+        _ = try self.builder.mapPage(
+            virtual_start,
+            @intFromPtr(&self.backing[backing_index]),
+            .page_4k,
+            .{ .read = true, .user = true, .accessed = true },
+        );
+    }
+
+    pub fn unmap(self: *@This(), virtual_start: usize) !void {
+        _ = try self.builder.unmapPage(virtual_start, .page_4k);
+    }
+};
+
+fn preflightExternalImage(builder: *MachineBuilder, image: *const ExternalPreparedImage, backing: *[prepared_image_pages][frames.PageSize]u8) !void {
+    var context = ExternalMappingPreflight{ .builder = builder, .backing = backing };
+    try bounded_mapping_preflight.preflight(image.items(), backing.len, &context);
+}
+
+fn imageBreakStart(image: *const ExternalPreparedImage) usize {
+    var end: usize = 0;
+    for (image.items()) |page| end = @max(end, page.virtual_start + frames.PageSize);
+    return end;
+}
+
+fn unmapExternalBreak(image: *const ExternalPreparedImage, current_break: usize) void {
+    var page = imageBreakStart(image);
+    const end = (current_break + frames.PageSize - 1) & ~@as(usize, frames.PageSize - 1);
+    while (page < end) : (page += frames.PageSize) {
+        if (externalPageOccupied({}, page))
+            _ = batch26_builder.unmapPage(page, .page_4k) catch shutdown();
+    }
+}
+
+fn externalExecve(frame: *TrapFrame) usize {
+    if (!external_artifact_options.namespace_enabled) return negativeErrno(38);
+    var path_buffer: [exec_string_capacity]u8 = undefined;
+    const path_len = copyUserCString(frame.x[10], &path_buffer) catch return negativeErrno(14);
+    const path = path_buffer[0..path_len];
+    if (!validAbsolutePath(path)) return negativeErrno(2);
+    const argv_vector = ExecStringVector.capture(frame.x[11]) catch return negativeErrno(14);
+    const env_vector = ExecStringVector.capture(frame.x[12]) catch return negativeErrno(14);
+    if (argv_vector.count == 0) return negativeErrno(22);
+
+    const manifest: []const u8 = &external_rv64_namespace_manifest;
+    const data: []const u8 = &external_rv64_namespace_data;
+    const main_file = namespaceLookup(manifest, path, data) orelse return negativeErrno(2);
+    const inspection = elf_load.planDynamic(4, 32, main_file.bytes) catch return negativeErrno(8);
+    const interpreter_bytes: ?[]const u8 = if (inspection.interpreterPath()) |interpreter_path| blk: {
+        const interpreter = namespaceLookup(manifest, interpreter_path, data) orelse return negativeErrno(2);
+        break :blk interpreter.bytes;
+    } else null;
+    const candidate = address_space.ExecPlan(4, 32).prepare(main_file.bytes, interpreter_bytes) catch return negativeErrno(8);
+    external_exec_image_candidate = ExternalPreparedImage.prepare(main_file.bytes, &candidate.main.load, 0, &external_exec_main_candidate) catch return negativeErrno(12);
+    external_exec_interpreter_image_candidate = if (candidate.interpreter) |*interpreter|
+        ExternalPreparedImage.prepare(interpreter_bytes.?, &interpreter.load, 0x40000000, &external_exec_interpreter_candidate) catch return negativeErrno(12)
+    else
+        ExternalPreparedImage{};
+
+    var argv_slices: [exec_vector_capacity][]const u8 = undefined;
+    var env_slices: [exec_vector_capacity][]const u8 = undefined;
+    const argv = argv_vector.slices(&argv_slices);
+    const envp = env_vector.slices(&env_slices);
+    const main_segment = candidate.main.load.items()[0];
+    const auxv = [_]initial_stack.AuxEntry{
+        .{ .type = 6, .value = .{ .immediate = frames.PageSize } },
+        .{ .type = 3, .value = .{ .immediate = main_segment.memory.start + 64 } },
+        .{ .type = 4, .value = .{ .immediate = 56 } },
+        .{ .type = 5, .value = .{ .immediate = @as(usize, main_file.bytes[56]) | (@as(usize, main_file.bytes[57]) << 8) } },
+        .{ .type = 7, .value = .{ .immediate = if (candidate.interpreter != null) 0x40000000 else 0 } },
+        .{ .type = 9, .value = .{ .immediate = candidate.main_entry } },
+    };
+    const external_stack_base = user_stack_va + frames.PageSize - external_stack_pages * frames.PageSize;
+    const stack_range = initial_stack.GuestStackRange.init(external_stack_base, user_stack_va + frames.PageSize) catch return negativeErrno(12);
+    const stack = initial_stack.plan(external_stack_plan_capacity, exec_vector_capacity, exec_vector_capacity, auxv.len, stack_range, argv, envp, &auxv) catch return negativeErrno(7);
+
+    // Complete the same bounded table-backing preflight used by initial
+    // external execution while every live child leaf and process field remains
+    // untouched. Existing live leaves prove their table path; new paths are
+    // allocated by temporary map/unmap probes. A failure returns from PREPARE.
+    preflightExternalImage(batch26_builder, &external_exec_image_candidate, &external_exec_main_candidate) catch return negativeErrno(12);
+    preflightExternalImage(batch26_builder, &external_exec_interpreter_image_candidate, &external_exec_interpreter_candidate) catch return negativeErrno(12);
+
+    // COMMIT: no fallible guest-derived work remains. Resource bindings and
+    // the retained parent snapshot deliberately survive image replacement.
+    unmapExternalImage(&external_image);
+    unmapExternalImage(&external_interpreter_image);
+    unmapExternalBreak(&external_image, external_program_break);
+    for (external_runtime_mappings.entries[0..external_runtime_mappings.count]) |mapping| {
+        var page = mapping.start;
+        while (page < mapping.end) : (page += frames.PageSize) {
+            if (externalPageOccupied({}, page)) {
+                _ = batch26_builder.unmapPage(page, .page_4k) catch shutdown();
+            }
+        }
+    }
+    external_prepared_backing = external_exec_main_candidate;
+    external_interpreter_backing = external_exec_interpreter_candidate;
+    external_image = external_exec_image_candidate;
+    external_interpreter_image = external_exec_interpreter_image_candidate;
+    external_stack_image = stack;
+    external_runtime_mappings = .{};
+    external_program_break = 0;
+    for (candidate.main.load.items()) |segment| external_program_break = @max(external_program_break, segment.memory.end);
+    external_program_break = (external_program_break + frames.PageSize - 1) & ~@as(usize, frames.PageSize - 1);
+    external_next_backing = external_image.items().len;
+    for (&external_prepared_stack) |*backing| @memset(backing, 0);
+    const stack_offset = stack.initial_sp.raw() - external_stack_base;
+    const stack_bytes: [*]u8 = @ptrCast(&external_prepared_stack);
+    for (stack.bytes(), 0..) |byte, index| stack_bytes[stack_offset + index] = byte;
+    installExternalImage(&external_image, &external_prepared_backing);
+    installExternalImage(&external_interpreter_image, &external_interpreter_backing);
+    asm volatile ("sfence.vma; fence.i" ::: "memory");
+    const retained_sstatus = frame.sstatus;
+    const retained_thread_pointer = frame.x[4];
+    frame.x = .{0} ** 32;
+    frame.x[2] = stack.initial_sp.raw();
+    // exec replaces the image, not the calling task's architecture thread
+    // register. The dynamic loader establishes its new TLS from this state.
+    frame.x[4] = retained_thread_pointer;
+    frame.sepc = candidate.entry + (if (candidate.interpreter != null) @as(usize, 0x40000000) else 0);
+    frame.sstatus = retained_sstatus & ~@as(usize, 0x40122);
+    asm volatile ("csrw sepc, %[pc]"
+        :
+        : [pc] "r" (frame.sepc),
+        : "memory"
+    );
+    if (external_artifact_options.live_console_input) {
+        write("ZIGREF_LINUX_EXECVE_COMMIT path=");
+        write(path);
+        write("\n");
+    }
+    return 0;
+}
+
+const LinuxRequestKind = enum { get_current_directory, duplicate, close, read, write, write_vector, new_fstatat, program_break, clone, execve, memory_map, terminate, unsupported };
 fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     return switch (number) {
         17 => .get_current_directory,
@@ -1314,13 +1526,14 @@ fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
         79 => .new_fstatat,
         214 => .program_break,
         220 => .clone,
+        221 => .execve,
         222 => .memory_map,
         93, 94 => .terminate,
         else => .unsupported,
     };
 }
 comptime {
-    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(220) != .clone or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(220) != .clone or decodeLinuxRequestKind(221) != .execve or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
 }
 
 fn externalNamespaceStat(path_address: usize, destination: usize, flags: usize) usize {
@@ -1336,7 +1549,7 @@ fn externalNamespaceStat(path_address: usize, destination: usize, flags: usize) 
         write(path);
         write("\n");
     }
-    if (!validAbsolutePath(path)) return negativeErrno(2);
+    if (!std.mem.eql(u8, path, "/") and !validAbsolutePath(path)) return negativeErrno(2);
     const manifest: []const u8 = &external_rv64_namespace_manifest;
     var cursor: usize = 0;
     while (std.mem.indexOfPos(u8, manifest, cursor, "\"path\":\"")) |at| {
@@ -1522,6 +1735,9 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                 external_fork_main_snapshot = external_prepared_backing;
                 external_fork_interpreter_snapshot = external_interpreter_backing;
                 external_fork_stack_snapshot = external_prepared_stack;
+                external_fork_image_snapshot = external_image;
+                external_fork_interpreter_image_snapshot = external_interpreter_image;
+                external_fork_stack_image_snapshot = external_stack_image;
                 external_fork_resources = syscall_resources;
                 external_fork_bindings = syscall_bindings;
                 external_fork_mappings = external_runtime_mappings;
@@ -1529,6 +1745,16 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                 external_fork_next_backing = external_next_backing;
                 frame.x[10] = 0;
             }
+        },
+        .execve => {
+            syscall_semantics[index] = 13;
+            const result = externalExecve(frame);
+            if (result == 0) {
+                syscall_results[index] = 0;
+                syscall_resume_pcs[index] = frame.sepc;
+                return;
+            }
+            frame.x[10] = result;
         },
         .memory_map => {
             syscall_semantics[index] = 8;
@@ -1610,14 +1836,50 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
         .terminate => blk: {
             syscall_semantics[index] = 3;
             if (external_fork_parent) |parent| {
+                unmapExternalImage(&external_image);
+                unmapExternalImage(&external_interpreter_image);
+                unmapExternalBreak(&external_image, external_program_break);
+                for (external_runtime_mappings.entries[0..external_runtime_mappings.count]) |mapping| {
+                    var page = mapping.start;
+                    while (page < mapping.end) : (page += frames.PageSize) {
+                        if (externalPageOccupied({}, page)) {
+                            _ = batch26_builder.unmapPage(page, .page_4k) catch shutdown();
+                        }
+                    }
+                }
                 external_prepared_backing = external_fork_main_snapshot;
                 external_interpreter_backing = external_fork_interpreter_snapshot;
                 external_prepared_stack = external_fork_stack_snapshot;
+                external_image = external_fork_image_snapshot;
+                external_interpreter_image = external_fork_interpreter_image_snapshot;
+                external_stack_image = external_fork_stack_image_snapshot;
                 syscall_resources = external_fork_resources;
                 syscall_bindings = external_fork_bindings;
                 external_runtime_mappings = external_fork_mappings;
                 external_program_break = external_fork_program_break;
                 external_next_backing = external_fork_next_backing;
+                installExternalImage(&external_image, &external_prepared_backing);
+                installExternalImage(&external_interpreter_image, &external_interpreter_backing);
+                var restored_backing_index = external_image.items().len;
+                var restored_break_page = imageBreakStart(&external_image);
+                const restored_break_end = (external_program_break + frames.PageSize - 1) & ~@as(usize, frames.PageSize - 1);
+                while (restored_break_page < restored_break_end) : (restored_break_page += frames.PageSize) {
+                    _ = batch26_builder.mapPage(restored_break_page, @intFromPtr(&external_prepared_backing[restored_backing_index]), .page_4k, .{ .read = true, .write = true, .user = true, .accessed = true, .dirty = true }) catch shutdown();
+                    restored_backing_index += 1;
+                }
+                for (external_runtime_mappings.entries[0..external_runtime_mappings.count]) |mapping| {
+                    // Fixed PROT_NONE reservations own virtual range but have
+                    // neither a leaf nor backing. Preserve them only in the
+                    // neutral mapping table and do not consume a backing slot.
+                    if (!ExternalRuntimeMappings.hasBacking(mapping)) continue;
+                    var page = mapping.start;
+                    while (page < mapping.end) : (page += frames.PageSize) {
+                        const physical = @intFromPtr(&external_prepared_backing[restored_backing_index]);
+                        _ = batch26_builder.mapPage(page, physical, .page_4k, .{ .read = mapping.permissions.read, .write = mapping.permissions.write, .execute = mapping.permissions.execute, .user = true, .accessed = true, .dirty = mapping.permissions.write }) catch shutdown();
+                        restored_backing_index += 1;
+                    }
+                }
+                asm volatile ("sfence.vma; fence.i" ::: "memory");
                 frame.* = parent;
                 external_fork_parent = null;
                 syscall_results[index] = frame.x[10];

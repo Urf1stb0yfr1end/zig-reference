@@ -541,3 +541,24 @@ PR #78's validation repair reproduced `zig build check` and identified the exact
 ## Batch 32F authoritative next-pressure plan
 
 `docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32F_EXECVE221_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt` records the next zero-context Codex run from merged PR #78 and the proven Linux/RV64 `execve(221)` child boundary. It binds the real Alpine `ls /` retry, continued read-only, writable `/tmp`, redirection, pipe, and process-lifetime pressure, plus the mandatory approximately 30-minute persistence and handoff protocol. The timing language requires handoff production and delivery as mandatory work before task completion, including tracked reporting, coherent commits, remote persistence attempt, PR state, exact proofs, and one next blocker when incomplete. This planning revision introduces no new runnable command and claims no Batch 32F runtime execution.
+
+Batch 32F used the existing live-console build and QEMU commands to cross the
+real cloned child's Linux/RV64 `execve(221)` boundary. The namespace-backed
+replacement captures bounded path/argv/envp, resolves `/bin/ls -> /bin/busybox`
+and real musl, completes ELF/stack/backing PREPARE before COMMIT, preserves the
+parent snapshot and descriptors, and reports W+X=0. The unchanged `ls /` now
+reaches namespace-backed `newfstatat("/")` and stops at unsupported
+Linux/RV64 `openat(56)`; the exact evidence and validation state are recorded
+in `docs/reports/AGENTIC_SNOWBALL_BATCH_32F.md`. No new runnable command was
+introduced.
+
+PR #82's execve atomicity repair factors the initial-execution mapping
+preflight into the bounded helper also used by `externalExecve()`. Candidate
+main and interpreter leaves now prove existing table paths or temporarily
+map/unmap absent paths before COMMIT; capacity failure returns while the live
+image and process state remain unchanged. The focused Morphic recipe test
+includes the insufficient-table-capacity regression and the parent restore
+path now keeps fixed no-access reservations unbacked. The existing live-console
+build and QEMU commands re-proved the unchanged `ls /` frontier through real
+BusyBox/musl and `newfstatat("/")` to unsupported `openat(56)`. This repair
+introduces no new runnable command.
