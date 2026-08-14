@@ -100,13 +100,51 @@ The goal is not the smallest kernel at any cost. It is the smallest coherent fou
 
 ## Current machine milestone
 
-The current completed external-userspace milestone is **Batch 32A: the first proven real dynamically linked RV64 musl program under Morphic**.
+**Batch 32B is complete: Morphic now runs the exact Alpine v3.22 RV64 dynamically linked BusyBox shell through the real musl interpreter.**
 
-The exact hash-pinned dynamic main was entered through the real `/lib/ld-musl-riscv64.so.1` interpreter. System-QEMU evidence shows real interpreter startup syscalls, loader completion, transfer into the mapped main image, exact stdout `batch32a-dynamic-musl\n`, exit status 0, and W+X=0. PREPARE/COMMIT ordering remained intact, with no kernel-side dynamic relocator and no direct-main-entry bypass.
+The same hash-pinned dynamic BusyBox artifact crossed the full ladder under Morphic:
 
-The proven ladder now includes real S-mode and U-mode execution, active Sv39, real ELF execution, Linux-style process startup, bounded file/memory/exec behavior, exact static musl, the static Alpine BusyBox shell, caller-supplied real PT_INTERP transport, and successful real dynamic-musl loader startup and main execution.
+```text
+/bin/busybox true                       PASS
+/bin/busybox echo batch32b              PASS
+/bin/busybox sh -c 'echo batch32b'      PASS
+exact stdout: batch32b\n                PASS
+exit status 0                           PASS
+real ld-musl interpreter-first          PASS
+PREPARE -> COMMIT -> execute            PASS
+W+X=0                                   PASS
+```
 
-See [`docs/reports/AGENTIC_SNOWBALL_BATCH_32A.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32A.md).
+This is not a synthetic shell and it is not a kernel-side dynamic-linking shortcut. The real `/lib/ld-musl-riscv64.so.1` enters U-mode first, performs userspace loader startup, and transfers execution into the exact dynamic BusyBox image. The kernel still does not perform dynamic relocations for musl or BusyBox.
+
+The blocker immediately before this milestone was also closed generally rather than with a BusyBox special case: large caller-supplied artifacts now travel through a bounded, page-aligned, supervisor-readable, read-only transport region separated from the ordinary kernel image, fixture window, and prepared-image reservations.
+
+Repository validation at the milestone passed all **350/350 steps and 247/247 tests**, and GitHub CI passed.
+
+See [`docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md).
+
+## Come attack the next boundary
+
+This is a good time to join the project.
+
+The interesting problems are no longer hypothetical kernel checklists. Real software is running far enough to expose precise boundaries, and each boundary can be attacked as a falsifiable systems problem.
+
+If you work on kernels, Zig, RISC-V, ELF, linkers/loaders, filesystems, process models, verification, virtualization, capability systems, compatibility layers, reproducible systems research, or agent-assisted engineering, there is useful work here now.
+
+You do **not** have to accept the current architecture as sacred. A strong result that proves a Morphic or QuirkM idea wrong is valuable. A smaller mechanism, a cleaner proof, a better abstraction, a stronger negative result, or an entirely better system built from these pieces is welcome.
+
+Some of the next concrete questions are:
+
+- Can an exact Alpine RISC-V minirootfs supply its own real `/bin/sh` under Morphic without turning the kernel into Linux internally?
+- What is the minimum filesystem mechanism real Alpine pressure actually demands first?
+- Which Linux behaviors belong at the compatibility edge, and which reveal reusable Morphic mechanisms?
+- How far can the privileged core remain small and understandable while the capability surface grows?
+- Can the same substrate support a cleaner native QuirkM userspace, stronger isolation models, Wasm, or virtualization without inheriting every historical Unix assumption?
+- Which current design decisions fail under stronger proofs, more hostile workloads, or alternative architectures?
+
+Bring a counterexample. Bring a trace. Bring a weird ELF. Bring a cleaner abstraction. Bring a PR that deletes more complexity than it adds.
+
+**The goal is not to protect the current design. The goal is to discover the best system we can build.**
 
 ## Time to milestone
 
@@ -127,11 +165,11 @@ Chronology tag:
 
 `time-till-first-static-busybox-shell-229.48-hours-from-repository-start-2026-08-13`
 
-Future major milestones should accumulate the same chronology line by line. The Batch 32A dynamic-musl milestone is now complete and ready for its own engineering and `time-till` tags.
+Future major milestones should accumulate the same chronology line by line. The real dynamic-musl and dynamic-BusyBox-shell milestones are now complete and should each receive their own accumulated `time-till` chronology entries.
 
 ## Active frontier
 
-The next pressure campaign is **dynamic BusyBox**.
+**The dynamic BusyBox mountain is complete. The next pressure campaign is the first real Alpine root filesystem.**
 
 ```text
 FIRST STATIC BUSYBOX SHELL      complete
@@ -140,25 +178,43 @@ FIRST STATIC BUSYBOX SHELL      complete
 FIRST REAL DYNAMIC MUSL         complete
         |
         v
-DYNAMIC BUSYBOX                 next
+DYNAMIC BUSYBOX SHELL           complete
         |
         v
-DYNAMIC BUSYBOX SHELL
+REAL ALPINE MINIROOTFS          <-- next
         |
         v
-REAL ALPINE MINIROOTFS
+REAL /bin/sh -c 'echo alpine'
         |
         v
 FIRST REAL ALPINE
         |
         v
+FILESYSTEM + PROCESS PRESSURE
+        |
+        v
+CONSOLE / TTY / SIGNALS
+        |
+        v
 PLAYABLE ALPINE
 ```
 
-A central constraint remains that the Morphic kernel should not become the dynamic linker. Real userspace interpreters should perform userspace loader work; Morphic should provide the general mechanisms and compatibility-edge semantics demanded by real pressure.
+The next clean historical target is intentionally narrow:
 
-Completed Batch 32A plan:
-[`docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32A_FIRST_REAL_DYNAMIC_MUSL_PT_INTERP_LOADER_ONE_AND_DONE_30MIN_HANDOFF.txt`](docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32A_FIRST_REAL_DYNAMIC_MUSL_PT_INTERP_LOADER_ONE_AND_DONE_30MIN_HANDOFF.txt)
+```text
+exact Alpine v3.22 RISC-V minirootfs
+        -> real /bin/sh from that filesystem
+        -> /bin/sh -c 'echo alpine'
+        -> exact alpine\n
+        -> status 0
+        -> W+X=0
+        -> FIRST REAL ALPINE UNDER MORPHIC
+```
+
+Only real pressure should decide what filesystem, pathname, metadata, process, or compatibility mechanisms are admitted next. The kernel should not grow a speculative Linux subsystem merely because Linux has one.
+
+Completed Batch 32B report:
+[`docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md)
 
 ## Engineering model
 
@@ -176,7 +232,7 @@ observe real failure
 
 ## Documentation
 
-Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32A.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32A.md).
+Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md).
 
 ## Validation
 
@@ -190,10 +246,12 @@ Contribution guidance lives in [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.
 
 Research that proves an existing Morphic or QuirkM idea wrong is useful too. Prefer falsifiable evidence over protecting a favored architecture.
 
+**If this problem space sounds fun, you are invited.** You do not need to wait for the project to become mature, and you do not need permission to explore a different direction. Fork it, test it, break an assumption, improve a mechanism, propose a competing design, or build something larger on top of it.
+
 ## Scope and nonclaims
 
 Alpz is **not Linux**, QuirkM is **not a completed native operating environment**, and Morphic is **not presented as a production kernel platform**.
 
-The project now has real static-musl execution, a proven static Alpine BusyBox shell boundary, and successful real dynamic-musl execution through the real userspace interpreter. It does **not yet claim** dynamic BusyBox, a dynamic BusyBox shell, an Alpine minirootfs, general Linux compatibility, production security, production readiness, or completed virtualization.
+The project now has real static-musl execution, a proven static Alpine BusyBox shell, successful real dynamic-musl execution through the real userspace interpreter, and a proven dynamic Alpine BusyBox shell under Morphic. It does **not yet claim** an Alpine minirootfs, first-real-Alpine completion, interactive/playable Alpine, general Linux compatibility, production security, production readiness, or completed virtualization.
 
 Proof records, exact artifacts, machine traces, validation gates, and current code define what has actually been achieved.
