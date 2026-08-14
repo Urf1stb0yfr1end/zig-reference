@@ -73,7 +73,7 @@ zig-reference / Z-Ref
 
 If you want to build a bigger system than QuirkM, replace parts of Morphic, turn Alpz into something we never planned, build a commercial product, or use this work as the foundation of a completely different operating system, you are welcome to do so.
 
-See [`LICENSE.md`](LICENSE.md).
+See [`LICENSE`](LICENSE).
 
 ## Core architectural rule
 
@@ -175,7 +175,7 @@ observe real failure
 
 ## Documentation
 
-Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), and [`docs/reports/AGENTIC_SNOWBALL_BATCH_31G.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_31G.md).
+Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), and [`docs/reports/AGENTIC_SNOWBALL_BATCH_31G.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_31G.md).
 
 ## Validation
 
