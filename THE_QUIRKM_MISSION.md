@@ -103,14 +103,18 @@ The first serious audience should be builders:
 - engineers;
 - students;
 - programmers;
+- artists;
+- designers;
+- video and audio creators;
+- game developers;
 - technical creators;
 - people who want to understand and modify their machine.
 
 These users benefit directly from a system whose mechanisms are unusually inspectable and whose development environment is excellent.
 
-A QuirkM workstation should eventually make tools such as Python, R, Julia, Jupyter, LaTeX, Git, SSH, C, Zig, numerical tools, scientific libraries, editors, debuggers, terminals, and reproducible development workflows feel native to daily life.
+A QuirkM workstation should eventually make tools such as Python, R, Julia, Jupyter, LaTeX, Git, SSH, C, Zig, numerical tools, scientific libraries, editors, debuggers, terminals, creative suites, graphics tools, media tools, and reproducible development workflows feel native to daily life.
 
-The platform should become a place where doing technical work is easier, not merely possible.
+The platform should become a place where doing technical and creative work is easier, not merely possible.
 
 ---
 
@@ -189,13 +193,74 @@ QFiles should be an excellent file manager, not a placeholder.
 
 QNotes should be an excellent notes application, not a sample project.
 
-The terminal, settings application, browser experience, editor/development tools, package center, media applications, and research workflows should each make a case for using QuirkM itself.
+QArt should represent the same ambition for visual creation: not a novelty paint program, but a serious native creative application whose existence helps define what QuirkM can become.
+
+The terminal, settings application, browser experience, editor/development tools, package center, media applications, creative tools, and research workflows should each make a case for using QuirkM itself.
+
+When a category matters enough and no existing application meets the QuirkM standard, the project should be willing to build a first-class native alternative rather than permanently waiting for an incumbent vendor.
 
 A user should eventually encounter first-party software and think:
 
 > "They actually thought about this."
 
 That reaction matters more than novelty.
+
+---
+
+## Creator workstation: foreground work is sovereign
+
+QuirkM should become one of the best computing environments in the world for creators and other users whose work can consume an entire machine.
+
+The platform should ship, package, or make effortless to install the strongest legally redistributable free and open creative software available. That includes serious graphics, 3D, video, audio, game-development, publishing, imaging, and media tools rather than a token collection of desktop applications.
+
+Where excellent existing software is available, QuirkM should embrace it.
+
+Where compatibility is required, QuirkM should provide it.
+
+Where no available program is good enough and the category matters strategically, QuirkM should be willing to create its own native software.
+
+The goal is not dependence on any particular vendor. The goal is that a creator can choose QuirkM without giving up the ability to create.
+
+The operating-system design should support a second principle:
+
+> **Foreground work is sovereign.**
+
+CPU time, RAM, GPU capacity, storage bandwidth, latency budget, and power should primarily serve the work the owner is actively doing.
+
+Background software must justify consuming those resources.
+
+This does not mean forcing every application into one process or removing useful isolation. Modern creative applications may legitimately use many threads, helper processes, codecs, render workers, plugins, GPU queues, and sandboxed components.
+
+The target is unnecessary background machinery: idle update agents, launchers, telemetry, indexing, duplicate helpers, sync processes, decorative services, and unrelated applications should not quietly compete with a render, simulation, compile, recording session, or large creative document.
+
+QuirkM should therefore pursue mechanisms such as:
+
+- explicit foreground workload identity;
+- resource ownership that can be inspected and measured;
+- demand-driven background services where practical;
+- aggressive suspension or throttling of nonessential background work under pressure;
+- workload-aware CPU scheduling;
+- explicit memory-pressure priorities;
+- GPU and compute prioritization where hardware permits;
+- low-latency paths for audio and interactive graphics;
+- predictable storage and I/O behavior;
+- clear user control over what is allowed to consume machine resources.
+
+This should become measurable rather than rhetorical.
+
+For example, a 16 GB QuirkM workstation should be evaluated by how much RAM, CPU capacity, GPU capacity, and I/O budget remain genuinely available to Blender, QArt, GIMP, Krita, Godot, a video editor, a DAW, a scientific simulation, or another foreground workload after the required operating-system services are running.
+
+QuirkM should not chase a tiny idle-memory number merely for screenshots. It should minimize overhead that does not contribute to the user's work and maximize useful resources available when the workload actually needs them.
+
+The desired experience is simple:
+
+> **You open the thing you are working on. The computer works for that thing.**
+
+A creator should not need a workstation with twice the memory merely to survive operating-system overhead and unrelated background activity.
+
+A smaller machine should feel larger because less of it is being spent on things the owner did not ask to run.
+
+This creator-workstation principle should influence the scheduler, resource model, compositor, package policies, service architecture, GPU work, first-party applications, and performance benchmarking from the beginning rather than being added later as a marketing mode.
 
 ---
 
@@ -247,11 +312,13 @@ Shift increasing engineering attention toward the native environment.
 
 Use ratified RISC-V virtualization where available to host complete foreign systems and strengthen the migration path.
 
-### 6. QuirkM research workstation
+### 6. QuirkM creator and research workstation
 
-Reach the point where a technical user can spend an entire day in QuirkM and prefer doing so.
+Reach the point where a creator or technical user can spend an entire day in QuirkM and prefer doing so.
 
-That means real development, research, writing, browsing, media, communication, scientific software, native applications, compatibility, and virtual machines living together as one coherent machine.
+That means real development, research, graphics, 3D, audio, video, game development, writing, browsing, communication, scientific software, native applications, compatibility, and virtual machines living together as one coherent machine.
+
+It also means demonstrating that the operating system gives the active workload an unusually high share of the machine's useful CPU, RAM, GPU, I/O, and latency budget.
 
 ---
 
@@ -268,6 +335,8 @@ It must not become a native-only platform that makes users abandon necessary sof
 It must not become a compatibility laboratory that endlessly implements obscure behavior while QuirkM itself remains unfinished.
 
 It must not become a collection of demonstrations that cannot support someone's ordinary working day.
+
+It must not become a desktop that burns significant machine resources on background machinery while asking creators to buy more hardware to compensate.
 
 It must not confuse architectural elegance with adoption.
 
@@ -318,9 +387,11 @@ Success is not merely reaching a desktop.
 
 Success is not merely having a clever hypervisor or a small kernel.
 
+Success is not merely opening a creative application while most of the machine is consumed by unrelated operating-system machinery.
+
 The long-term success condition is much more demanding:
 
-> A person can choose a RISC-V QuirkM machine for real work, inherit the software they already need, build better native software when they want to, understand substantially more of the machine beneath them, and prefer the experience enough to stay.
+> A person can choose a RISC-V QuirkM machine for real work, inherit the software they already need, create with excellent packaged or native tools, build better native software when they want to, understand substantially more of the machine beneath them, receive an unusually large share of the machine's useful resources for the work they are actually doing, and prefer the experience enough to stay.
 
 If that happens, Morphic will have done more than host foreign software.
 
