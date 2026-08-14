@@ -34,9 +34,10 @@ const physical_pool_pages = 8;
 const ordinary_table_pages = 4;
 const prepared_table_pages = 4;
 const prepared_image_pages = 256;
+const external_stack_pages = 2;
 var prepared_table_backing: [prepared_table_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
 var external_prepared_backing: [prepared_image_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
-var external_prepared_stack: [frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
+var external_prepared_stack: [external_stack_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
 
 fn fnv1a64(bytes: []const u8) u64 {
     var value: u64 = 0xcbf29ce484222325;
@@ -951,7 +952,12 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
         .{ .type = 3, .value = .{ .immediate = at_phdr } },
         .{ .type = 9, .value = .{ .immediate = candidate.main_entry } },
     };
-    const stack_range = initial_stack.GuestStackRange.init(user_stack_va, user_stack_va + frames.PageSize) catch shutdown();
+    const external_stack_base = user_stack_va + frames.PageSize - external_stack_pages * frames.PageSize;
+    // The cumulative machine lab already owns this fixture VA. Preserve its
+    // leaf across the bounded external-process lifetime rather than making the
+    // larger stack reservation a permanent replacement.
+    const displaced_stack_leaf = builder.query(external_stack_base) catch shutdown();
+    const stack_range = initial_stack.GuestStackRange.init(external_stack_base, user_stack_va + frames.PageSize) catch shutdown();
     const stack = initial_stack.plan(512, 4, 1, 3, stack_range, argv, &envp, &auxv) catch shutdown();
     write("ZIGREF_BATCH29_PREPARE stack\n");
 
@@ -973,11 +979,17 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     external_next_backing = prepared.items().len;
     external_runtime_mappings = .{};
     write("ZIGREF_BATCH29_PHASE commit\n");
-    @memset(&external_prepared_stack, 0);
-    const stack_offset = external_stack_image.initial_sp.raw() - user_stack_va;
-    for (external_stack_image.bytes(), 0..) |byte, i| external_prepared_stack[stack_offset + i] = byte;
-    _ = builder.unmapPage(user_stack_va, .page_4k) catch unreachable;
-    _ = builder.mapPage(user_stack_va, @intFromPtr(&external_prepared_stack), .page_4k, .{ .read = true, .write = true, .user = true, .accessed = true, .dirty = true }) catch shutdown();
+    for (&external_prepared_stack) |*backing| @memset(backing, 0);
+    const stack_offset = external_stack_image.initial_sp.raw() - external_stack_base;
+    const stack_bytes: [*]u8 = @ptrCast(&external_prepared_stack);
+    for (external_stack_image.bytes(), 0..) |byte, i| stack_bytes[stack_offset + i] = byte;
+    var stack_page: usize = 0;
+    while (stack_page < external_stack_pages) : (stack_page += 1) {
+        const virtual = external_stack_base + stack_page * frames.PageSize;
+        if (externalPageOccupied({}, virtual))
+            _ = builder.unmapPage(virtual, .page_4k) catch shutdown();
+        _ = builder.mapPage(virtual, @intFromPtr(&external_prepared_stack[stack_page]), .page_4k, .{ .read = true, .write = true, .user = true, .accessed = true, .dirty = true }) catch shutdown();
+    }
     for (external_image.items(), 0..) |page, index| {
         if (page.backing_index != index) shutdown();
         const physical = @intFromPtr(&external_prepared_backing[page.backing_index]);
@@ -1046,6 +1058,18 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
         writeUsizeHex(syscall_args[index][3]);
         write("\n");
     }
+    _ = builder.unmapPage(external_stack_base, .page_4k) catch shutdown();
+    const displaced_flags = displaced_stack_leaf.raw_entry;
+    _ = builder.mapPage(external_stack_base, displaced_stack_leaf.physical_address, .page_4k, .{
+        .read = displaced_flags & 0x2 != 0,
+        .write = displaced_flags & 0x4 != 0,
+        .execute = displaced_flags & 0x8 != 0,
+        .user = displaced_flags & 0x10 != 0,
+        .global = displaced_flags & 0x20 != 0,
+        .accessed = displaced_flags & 0x40 != 0,
+        .dirty = displaced_flags & 0x80 != 0,
+    }) catch shutdown();
+    asm volatile ("sfence.vma; fence.i" ::: "memory");
 }
 
 const SyscallBackend = struct {
@@ -1207,8 +1231,16 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                 }
                 asm volatile ("sfence.vma" ::: "memory");
                 frame.x[10] = address;
-            } else if (address == 0 and protection == 3 and flags == 0x22 and length == frames.PageSize) {
-                if (external_next_backing == prepared_image_pages) {
+            } else if (address == 0 and protection == 3 and flags == 0x22) {
+                const page_count = ExternalRuntimeMappings.pageCount(length) catch {
+                    frame.x[10] = negativeErrno(22);
+                    return finishReturningSyscall(frame, index);
+                };
+                const backing_end = std.math.add(usize, external_next_backing, page_count) catch {
+                    frame.x[10] = negativeErrno(12);
+                    return finishReturningSyscall(frame, index);
+                };
+                if (backing_end > prepared_image_pages) {
                     frame.x[10] = negativeErrno(12);
                     return finishReturningSyscall(frame, index);
                 }
@@ -1221,10 +1253,27 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                             return finishReturningSyscall(frame, index);
                         },
                     };
-                    @memset(&external_prepared_backing[external_next_backing], 0);
-                    const physical = @intFromPtr(&external_prepared_backing[external_next_backing]);
-                    _ = batch26_builder.mapPage(candidate_address, physical, .page_4k, .{ .read = true, .write = true, .user = true, .accessed = true, .dirty = true }) catch shutdown();
-                    external_next_backing += 1;
+                    // Prepare every anonymous page before exposing any leaf.
+                    // Backing ownership and the reservation commit only after
+                    // every page maps; a mid-map failure removes installed
+                    // leaves and releases the last reservation atomically.
+                    for (external_prepared_backing[external_next_backing..backing_end]) |*backing|
+                        @memset(backing, 0);
+                    var mapped_pages: usize = 0;
+                    while (mapped_pages < page_count) : (mapped_pages += 1) {
+                        const virtual = candidate_address + mapped_pages * frames.PageSize;
+                        const physical = @intFromPtr(&external_prepared_backing[external_next_backing + mapped_pages]);
+                        _ = batch26_builder.mapPage(virtual, physical, .page_4k, .{ .read = true, .write = true, .user = true, .accessed = true, .dirty = true }) catch {
+                            var rollback_page: usize = 0;
+                            while (rollback_page < mapped_pages) : (rollback_page += 1)
+                                _ = batch26_builder.unmapPage(candidate_address + rollback_page * frames.PageSize, .page_4k) catch shutdown();
+                            external_runtime_mappings.cancelLast(candidate_address, length);
+                            asm volatile ("sfence.vma" ::: "memory");
+                            frame.x[10] = negativeErrno(12);
+                            return finishReturningSyscall(frame, index);
+                        };
+                    }
+                    external_next_backing = backing_end;
                     asm volatile ("sfence.vma" ::: "memory");
                     frame.x[10] = candidate_address;
                     break;
