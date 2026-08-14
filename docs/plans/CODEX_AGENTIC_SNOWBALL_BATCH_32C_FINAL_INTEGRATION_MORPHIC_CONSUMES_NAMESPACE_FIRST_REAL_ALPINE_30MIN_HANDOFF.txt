@@ -1,0 +1,359 @@
+CODEX AGENTIC SNOWBALL — BATCH 32C FINAL INTEGRATION
+MORPHIC CONSUMES THE COMPLETE SERIALIZED ALPINE ROOTFS NAMESPACE
+RUNTIME /bin/sh + PT_INTERP LOOKUP → FIRST REAL ALPINE
+ONE-AND-DONE 30-MINUTE HANDOFF
+
+STATUS
+
+This is the final continuation of Batch 32C, not a new batch.
+
+Start from current main.
+
+Read first:
+- docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md
+- docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32C_CONTINUATION_FULL_ROOTFS_NAMESPACE_RUNTIME_BIN_SH_FIRST_REAL_ALPINE_30MIN_HANDOFF.txt
+- tools/pressure-real-rv64-alpine-minirootfs.py
+- tools/test-alpine-rootfs-namespace.py
+- projects/58-bounded-filesystem/README.md
+- projects/58-bounded-filesystem/DETAILS.md
+- projects/58-bounded-filesystem/MASTERY.md
+
+Treat THIS file as authoritative where it narrows the next step.
+
+======================================================================
+INHERITED PROVEN BOUNDARY — DO NOT REDISCOVER IT
+======================================================================
+
+The following are already proven and should only be rerun as focused regression checks when needed:
+
+- official Alpine v3.22.0 RISC-V minirootfs identity: PASS
+- archive name: alpine-minirootfs-3.22.0-riscv64.tar.gz
+- archive SHA-256: ae050812fadcde048e9553004d0d037b2b9c0ec6be09f303db95768a2e35551b
+- fail-closed archive verification: PASS
+- host extraction outside the kernel: PASS
+- exact archive namespace: 517 objects
+- 98 directories total
+- 84 regular files
+- 335 symbolic links
+- 7,069,903 regular-file bytes
+- real /bin/sh -> /bin/busybox relationship: PASS
+- exact BusyBox SHA-256: 4567ce8a67afd045a9be46745236cf6fca0347f70871a2492c94c166eada856e
+- exact rootfs musl interpreter SHA-256: f65dfa1e845af4d8c57f5274a8abac7a8c150372b014fb413e44f4cc70050de1
+- exact PT_INTERP=/lib/ld-musl-riscv64.so.1: PASS
+- Linux-user golden /bin/sh -c 'echo alpine': PASS, exact alpine\n, status 0
+- rootfs-derived BusyBox/interpreter pair under Morphic: PASS, exact alpine\n, status 0, interpreter-first, PREPARE/COMMIT, W+X=0
+- deterministic namespace format zig-reference-bounded-namespace-v1: PASS
+- complete namespace serialization: PASS
+- namespace.json generation: PASS
+- namespace.data immutable backing generation: PASS
+- namespace.data SHA-256: 7672a8c49fbd75071a6390a55e227927254afe1eabdad969315414332e5b989b
+- serialized-namespace /bin/sh lookup: PASS
+- serialized-namespace /bin/sh -> /bin/busybox symlink traversal: PASS
+- serialized-namespace BusyBox byte identity: PASS
+- serialized-namespace /lib/ld-musl-riscv64.so.1 lookup: PASS
+- serialized-namespace interpreter byte identity: PASS
+- malformed namespace / duplicate / escape / loop / range / accounting rejection: PASS
+
+Do NOT invent a second namespace format.
+Do NOT replace the proven serializer unless an exact runtime integration failure proves a necessary general change.
+Do NOT return to the host-selected two-ELF proof and call it success.
+
+======================================================================
+PRIMARY HISTORICAL GOAL
+======================================================================
+
+Make the freestanding Morphic runtime consume the SAME complete serialized Alpine namespace and obtain BOTH the shell executable and the dynamic interpreter through runtime namespace lookup.
+
+The exact command remains:
+
+    /bin/sh -c 'echo alpine'
+
+The successful proof path MUST be:
+
+    exact pinned Alpine v3.22.0 minirootfs
+            ↓
+    zig-reference-bounded-namespace-v1
+            ↓
+    complete namespace manifest + immutable data backing
+            ↓
+    checked caller-owned Morphic transport
+            ↓
+    Morphic/freestanding runtime validates/consumes namespace metadata
+            ↓
+    runtime lookup "/bin/sh"
+            ↓
+    runtime follows real symlink /bin/sh -> /bin/busybox
+            ↓
+    runtime obtains BusyBox bytes from namespace.data
+            ↓
+    existing ELF inspection discovers PT_INTERP
+            ↓
+    runtime lookup "/lib/ld-musl-riscv64.so.1" in SAME namespace
+            ↓
+    runtime obtains interpreter bytes from SAME namespace.data
+            ↓
+    existing PREPARE path
+            ↓
+    COMMIT
+            ↓
+    real ld-musl enters U-mode first
+            ↓
+    BusyBox shell executes
+            ↓
+    exact stdout: alpine\n
+    status: 0
+    W+X pages: 0
+
+If and ONLY if that entire causal chain is proven, Batch 32C may claim:
+
+    ★ FIRST REAL ALPINE UNDER MORPHIC ★
+
+======================================================================
+ANTI-CHEATING / TRUTHFULNESS RULE
+======================================================================
+
+The milestone is NOT satisfied if the host still selects /bin/busybox or ld-musl and passes them as the successful runtime input.
+
+The milestone is NOT satisfied if only a hand-curated subset of the rootfs is transported.
+
+The milestone is NOT satisfied if /bin/sh or /bin/busybox is special-cased by path, hash, applet name, or output.
+
+The milestone is NOT satisfied if the interpreter path is satisfied by a separately supplied external interpreter rather than by runtime lookup in the SAME transported namespace.
+
+The milestone is NOT satisfied by merely proving that namespace.json/namespace.data can be parsed on the host.
+
+The successful machine must have the complete bounded namespace available as its caller-owned rootfs input and must derive the executable/interpreter pair from that representation at runtime.
+
+======================================================================
+MINIMUM GENERAL REPAIR RULE
+======================================================================
+
+Do not build a Linux VFS.
+Do not parse tar or gzip in the kernel.
+Do not add Alpine-specific kernel semantics.
+Do not add a dynamic linker to Morphic.
+Do not bypass PREPARE/COMMIT.
+Do not add direct-main entry.
+Do not weaken W+X=0.
+Do not preimplement unrelated filesystem or process syscalls.
+
+Prefer the smallest reusable mechanisms needed to:
+
+1. transport a bounded immutable namespace manifest + data backing,
+2. validate enough structure fail-closed before use,
+3. perform bounded absolute-path component lookup,
+4. follow bounded symlink traversal,
+5. return a read-only byte slice for a regular-file object,
+6. pass those bytes into the already-proven ELF/PT_INTERP execution path.
+
+Reuse/generalize neutral bounded-filesystem/resource concepts where they fit.
+Keep Linux pathname/syscall policy at the compatibility edge.
+
+======================================================================
+TRANSPORT REQUIREMENTS
+======================================================================
+
+The complete namespace is approximately 7 MiB of regular-file data plus metadata.
+Do not blindly enlarge the existing 2 MiB caller-artifact transport.
+
+First classify the exact placement/capacity pressure produced by the SAME complete namespace.
+
+Any new transport must be:
+- explicitly bounded,
+- caller-owned or clearly caller-supplied,
+- read-only to the runtime unless mutation is causally required later,
+- non-overlapping with kernel, fixture, prepared-image, stack, and other reserved ranges,
+- explicitly mapped where supervisor/runtime access requires it,
+- checked for arithmetic overflow and alignment,
+- fail-closed on capacity exhaustion,
+- artifact-neutral.
+
+Do not encode Alpine paths, hashes, object counts, or sizes as Morphic architectural constants merely to pass this milestone.
+Capacities may be explicit policy values informed by the measured pressure, but must remain general bounds with rejection behavior.
+
+======================================================================
+RUNTIME NAMESPACE REQUIREMENTS
+======================================================================
+
+The runtime lookup implementation must prove, from the transported representation itself:
+
+- namespace identity/format is accepted only when structurally valid,
+- object/range accounting cannot escape the supplied buffers,
+- /bin/sh resolves by namespace traversal,
+- /bin/sh is observed as the real symlink to /bin/busybox,
+- symlink traversal has a finite explicit bound,
+- root escapes are rejected,
+- nonexistent paths fail closed,
+- regular-file byte slices are bounds-checked,
+- interpreter lookup occurs through the same namespace.
+
+Do not require a full mutable filesystem for this batch.
+Read-only rootfs namespace consumption is sufficient for FIRST REAL ALPINE if the exact command succeeds through it.
+
+======================================================================
+PRESSURE-ORACLE LOOP
+======================================================================
+
+Use this exact loop:
+
+    SAME complete serialized rootfs
+        → attempt runtime transport/lookup
+        → observe first causal failure
+        → classify mechanism vs compatibility-edge policy
+        → minimum general repair
+        → focused proof
+        → retry the SAME complete serialized rootfs
+        → retry the SAME command
+
+Do not broaden from one failure into a Linux syscall checklist.
+Unsupported optional probes that real musl/BusyBox tolerate may remain explicit -ENOSYS.
+
+======================================================================
+FOCUSED PROOF EXPECTATIONS
+======================================================================
+
+Add focused deterministic tests for any new neutral transport or namespace-consumption mechanism.
+At minimum test the causal properties introduced by the repair, such as:
+
+- exact-capacity acceptance,
+- over-capacity rejection,
+- malformed offsets/ranges rejection,
+- overlap rejection,
+- bad format/count rejection,
+- root escape rejection,
+- symlink-loop bound,
+- missing path rejection,
+- /bin/sh resolution,
+- same-namespace interpreter resolution,
+- no mutation on failed PREPARE where applicable,
+- W+X rejection remains intact.
+
+Then rerun the canonical inherited proofs that the changed shared machinery could affect.
+
+======================================================================
+MACHINE FINISH LINE
+======================================================================
+
+A successful Batch 32C completion report must contain machine evidence sufficient to establish all of the following:
+
+- complete pinned namespace was the runtime rootfs input: PASS
+- runtime /bin/sh lookup from transported namespace: PASS
+- runtime observed /bin/sh -> /bin/busybox: PASS
+- BusyBox bytes came from transported namespace backing: PASS
+- PT_INTERP came from that BusyBox: PASS
+- interpreter bytes came from SAME transported namespace backing: PASS
+- PREPARE occurred before COMMIT: PASS
+- COMMIT occurred before execute: PASS
+- real interpreter entered U-mode before BusyBox main: PASS
+- exact stdout hex 616c70696e650a: PASS
+- exact stdout alpine\n: PASS
+- exit status 0: PASS
+- W+X=0: PASS
+- no kernel-side dynamic relocator: PASS
+- no direct-main bypass: PASS
+
+Only then write prominently:
+
+    ★ FIRST REAL ALPINE UNDER MORPHIC ★
+
+======================================================================
+VALIDATION
+======================================================================
+
+Before declaring completion, run the strongest available focused and repository validation, including when available:
+
+- focused new namespace/runtime tests
+- PYTHONDONTWRITEBYTECODE=1 python3 tools/test-alpine-rootfs-namespace.py
+- canonical Batch 32A real-dynamic-musl verifier
+- Batch 32B dynamic BusyBox regression
+- zig fmt --check on changed Zig sources
+- zig build check
+- python3 tools/developer-command.py validate-repository
+
+GitHub CI is authoritative for persisted PR validation when the Codex environment lacks required developer dependencies.
+Never claim a blocked local gate passed.
+
+======================================================================
+PERSISTENCE / 30-MINUTE HANDOFF
+======================================================================
+
+Useful work must survive the Codex window.
+
+Commit a coherent safe unit early.
+Push the branch early.
+Verify the remote branch head.
+Open a draft PR once a coherent reviewable unit exists.
+Update the PR body with exact evidence and exact remaining blocker.
+
+At approximately 20–25 minutes:
+- stop expanding scope,
+- assess whether the historical finish line is realistically reachable,
+- make sure useful work is committed and pushed.
+
+At approximately 30 minutes:
+- do not begin another broad experiment,
+- either leave a complete FIRST REAL ALPINE candidate PR,
+- or leave a clean safe-frontier PR with the exact next causal blocker.
+
+Never leave the useful result only in an unpushed working tree.
+Never call a safe frontier the milestone if Morphic has not consumed the namespace itself.
+
+======================================================================
+REPORT / PR REQUIREMENTS
+======================================================================
+
+Update docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md rather than creating a misleading new batch report.
+
+Record:
+- exact starting main SHA,
+- exact rootfs identity,
+- exact namespace format and data digest,
+- transport layout and bounds,
+- runtime namespace lookup evidence,
+- exact first failure and each causal repair,
+- exact machine output/status/W+X evidence,
+- regressions run,
+- repository validation result,
+- remote persistence status.
+
+If FIRST REAL ALPINE is reached, explicitly distinguish it from the earlier host-selected pair proof and explain why runtime namespace provenance now closes the anti-pseudo-root requirement.
+
+If not reached, end with exactly one next major causal blocker.
+
+======================================================================
+DO NOT START YET
+======================================================================
+
+Do NOT begin the later PLAYABLE ALPINE campaign in this batch.
+
+Specifically do not broaden into:
+- writable filesystem life,
+- general cwd/chdir/ls/cat usability,
+- process trees,
+- fork/clone/vfork completeness,
+- pipes/redirection,
+- TTY/console input,
+- signals/Ctrl-C,
+- networking,
+- apk.
+
+Those are post-FIRST-REAL-ALPINE campaigns.
+
+======================================================================
+SUCCESSOR FRONTIER AFTER COMPLETION
+======================================================================
+
+If FIRST REAL ALPINE is reached, stop Batch 32C cleanly.
+
+The next separately authorized campaign should begin the road to PLAYABLE ALPINE using exact real commands from the same rootfs, likely starting with read-only filesystem life such as:
+
+    pwd
+    ls /
+    cat /etc/alpine-release
+
+Then let exact pressure determine the minimum next filesystem/process mechanisms.
+
+FINAL RULE
+
+The project wins this batch only when Morphic no longer receives 'the Alpine shell files'.
+It receives the Alpine namespace, finds the shell itself, finds the interpreter itself, and runs the unchanged command successfully.
