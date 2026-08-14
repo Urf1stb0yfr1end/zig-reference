@@ -142,8 +142,10 @@ ELF slices through namespace lookup. This closes the anti-pseudo-root boundary.
 
 Focused namespace tests, Zig formatting, command-reference drift, and `zig build
 check` passed after installing the declared local Python/Node prerequisites.
-`python3 tools/developer-command.py validate-repository` ran 247/247 tests and
-345/350 build steps successfully but honestly failed the pre-existing validation
-evidence gate: `fixed-capacity-vector` has a stale source digest unrelated to
-this Morphic change. The supplied checkout has no configured Git remote, so no
-remote head could be pushed or verified from this environment.
+`python3 tools/developer-command.py validate-repository` initially ran 247/247
+tests and 345/350 build steps successfully, then correctly rejected validation
+evidence made stale because every module digest includes the changed `build.zig`.
+The canonical all-module recorder was subsequently run and refreshed all 60 unit
+and smoke evidence records against this Batch 32C revision. The supplied checkout
+has no configured Git remote, so no remote head could be pushed or verified from
+this environment.
