@@ -15,4 +15,4 @@ The mechanism is deterministic, allocation-free, endian-aware, and usable hosted
 
 ## Dynamic interpreter handoff
 
-`planDynamic` is a separate, explicit policy surface for RV64 `ET_EXEC`/`ET_DYN` images. It owns and validates a single NUL-terminated `PT_INTERP` pathname and tolerates `PT_DYNAMIC` as interpreter work plus GNU-stack, GNU-RELRO, and RISC-V-attributes metadata; it never relocates bytes. The original `plan` contract remains the narrow static `ET_EXEC` proof and continues to reject `PT_INTERP`, `PT_DYNAMIC`, and non-executable object types.
+`planDynamic` is a separate, explicit policy surface for RV64 `ET_EXEC`/`ET_DYN` images. It owns and validates a single NUL-terminated `PT_INTERP` pathname and tolerates `PT_DYNAMIC` as interpreter work plus GNU-EH-frame, GNU-stack, GNU-RELRO, and RISC-V-attributes metadata; it never relocates bytes. The original `plan` contract remains the narrow static `ET_EXEC` proof and continues to reject `PT_INTERP`, `PT_DYNAMIC`, and non-executable object types.

@@ -17,7 +17,7 @@ pub const Permissions = flag_module.ValidatedBitFlags(Permission);
 pub const SegmentType = union(enum) {
     known: Known,
     unknown: u32,
-    pub const Known = enum(u32) { null = 0, load = 1, dynamic = 2, interpreter = 3, note = 4, shared_library = 5, program_header = 6, tls = 7, gnu_stack = 0x6474_e551, gnu_relro = 0x6474_e552, riscv_attributes = 0x7000_0003 };
+    pub const Known = enum(u32) { null = 0, load = 1, dynamic = 2, interpreter = 3, note = 4, shared_library = 5, program_header = 6, tls = 7, gnu_eh_frame = 0x6474_e550, gnu_stack = 0x6474_e551, gnu_relro = 0x6474_e552, riscv_attributes = 0x7000_0003 };
 };
 pub const Segment = struct { segment_type: SegmentType, permissions: Permissions, file_range: ranges.CheckedRange, virtual_range: ranges.CheckedRange, physical_address: addresses.PhysicalAddress, alignment: u64 };
 pub const ParseError = error{ UnexpectedEnd, UnknownPermissionBits, OutOfRange, FileSizeExceedsMemorySize, InvalidAlignment, InvalidTableEntrySize, TableOutOfBounds, Full };
@@ -60,6 +60,7 @@ pub fn parseOne(reader: *bounded.BoundedReader, endian: elf.ElfEndian) ParseErro
         5 => .{ .known = .shared_library },
         6 => .{ .known = .program_header },
         7 => .{ .known = .tls },
+        0x6474_e550 => .{ .known = .gnu_eh_frame },
         0x6474_e551 => .{ .known = .gnu_stack },
         0x6474_e552 => .{ .known = .gnu_relro },
         0x7000_0003 => .{ .known = .riscv_attributes },
@@ -100,4 +101,9 @@ test "validates one segment and rejects filesz greater than memsz" {
     var metadata = bounded.BoundedReader.init(&bytes);
     const attributes = try parseOne(&metadata, .little);
     try std.testing.expectEqual(SegmentType{ .known = .riscv_attributes }, attributes.segment_type);
+
+    std.mem.writeInt(u32, bytes[0..4], 0x6474_e550, .little);
+    var unwind_metadata = bounded.BoundedReader.init(&bytes);
+    const gnu_eh_frame = try parseOne(&unwind_metadata, .little);
+    try std.testing.expectEqual(SegmentType{ .known = .gnu_eh_frame }, gnu_eh_frame.segment_type);
 }

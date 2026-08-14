@@ -27,16 +27,18 @@ const batch26_interp_elf = @embedFile("userspace-elf-rv64-batch26-interp");
 /// Host transport only: build orchestration supplies hash-checked bytes. ELF
 /// planning and machine semantics remain independent of how those bytes arrived.
 pub export const external_rv64_artifact = @embedFile("external-rv64-artifact").*;
+pub export const external_rv64_interpreter = @embedFile("external-rv64-interpreter").*;
 
 const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
 const physical_pool_pages = 8;
 const ordinary_table_pages = 4;
-const prepared_table_pages = 4;
+const prepared_table_pages = 6;
 const prepared_image_pages = 256;
 const external_stack_pages = 2;
 var prepared_table_backing: [prepared_table_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
 var external_prepared_backing: [prepared_image_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
+var external_interpreter_backing: [prepared_image_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
 var external_prepared_stack: [external_stack_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
 
 fn fnv1a64(bytes: []const u8) u64 {
@@ -155,6 +157,7 @@ var batch26_image_backing_count: usize = 0;
 var batch26_stack_image: initial_stack.StackPlan(512) = undefined;
 const ExternalPreparedImage = address_space.PreparedImage(prepared_image_pages);
 var external_image: ExternalPreparedImage = .{};
+var external_interpreter_image: ExternalPreparedImage = .{};
 var external_stack_image: initial_stack.StackPlan(512) = undefined;
 var external_program_break: usize = 0;
 var external_next_backing: usize = 0;
@@ -926,15 +929,19 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     batch26_builder = builder;
     write("ZIGREF_BATCH29_PHASE prepare\n");
     const bytes: []const u8 = &external_rv64_artifact;
-    const candidate = address_space.ExecPlan(4, 32).prepare(bytes, null) catch |err| {
+    const interpreter_bytes: ?[]const u8 = if (external_artifact_options.interpreter_enabled) &external_rv64_interpreter else null;
+    const candidate = address_space.ExecPlan(4, 32).prepare(bytes, interpreter_bytes) catch |err| {
         write("ZIGREF_BATCH29_PREPARE_FAIL exec-plan=");
         write(@errorName(err));
         write("\n");
         shutdown();
     };
     write("ZIGREF_BATCH29_PREPARE elf\n");
-    if (candidate.interpreter != null) shutdown();
     const prepared = ExternalPreparedImage.prepare(bytes, &candidate.main.load, 0, &external_prepared_backing) catch shutdown();
+    const prepared_interpreter = if (candidate.interpreter) |*interpreter|
+        ExternalPreparedImage.prepare(interpreter_bytes.?, &interpreter.load, 0x40000000, &external_interpreter_backing) catch shutdown()
+    else
+        ExternalPreparedImage{};
     write("ZIGREF_BATCH29_PREPARE image\n");
     const main_segment = candidate.main.load.items()[0];
     const at_phdr = main_segment.memory.start + 64;
@@ -950,6 +957,9 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     const auxv = [_]initial_stack.AuxEntry{
         .{ .type = 6, .value = .{ .immediate = frames.PageSize } },
         .{ .type = 3, .value = .{ .immediate = at_phdr } },
+        .{ .type = 4, .value = .{ .immediate = 56 } },
+        .{ .type = 5, .value = .{ .immediate = @as(usize, bytes[56]) | (@as(usize, bytes[57]) << 8) } },
+        .{ .type = 7, .value = .{ .immediate = if (candidate.interpreter != null) 0x40000000 else 0 } },
         .{ .type = 9, .value = .{ .immediate = candidate.main_entry } },
     };
     const external_stack_base = user_stack_va + frames.PageSize - external_stack_pages * frames.PageSize;
@@ -958,7 +968,7 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     // larger stack reservation a permanent replacement.
     const displaced_stack_leaf = builder.query(external_stack_base) catch shutdown();
     const stack_range = initial_stack.GuestStackRange.init(external_stack_base, user_stack_va + frames.PageSize) catch shutdown();
-    const stack = initial_stack.plan(512, 4, 1, 3, stack_range, argv, &envp, &auxv) catch shutdown();
+    const stack = initial_stack.plan(512, 4, 1, auxv.len, stack_range, argv, &envp, &auxv) catch shutdown();
     write("ZIGREF_BATCH29_PREPARE stack\n");
 
     // PREPARE table-backing preflight. Each successful temporary leaf is
@@ -971,7 +981,17 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
         _ = builder.mapPage(page.virtual_start, physical, .page_4k, permissions) catch shutdown();
         _ = builder.unmapPage(page.virtual_start, .page_4k) catch shutdown();
     }
+    write("ZIGREF_BATCH32A_PREPARE interpreter-tables pages=");
+    writeUsizeHex(prepared_interpreter.items().len);
+    write("\n");
+    for (prepared_interpreter.items(), 0..) |page, index| {
+        if (page.backing_index != index) shutdown();
+        const physical = @intFromPtr(&external_interpreter_backing[page.backing_index]);
+        _ = builder.mapPage(page.virtual_start, physical, .page_4k, .{ .read = true, .user = true, .accessed = true }) catch shutdown();
+        _ = builder.unmapPage(page.virtual_start, .page_4k) catch shutdown();
+    }
     external_image = prepared;
+    external_interpreter_image = prepared_interpreter;
     external_stack_image = stack;
     external_program_break = 0;
     for (candidate.main.load.items()) |segment| external_program_break = @max(external_program_break, segment.memory.end);
@@ -1004,6 +1024,12 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
         if (permissions.write and permissions.execute) shutdown();
         _ = builder.mapPage(page.virtual_start, physical, .page_4k, permissions) catch shutdown();
     }
+    for (external_interpreter_image.items(), 0..) |page, index| {
+        if (page.backing_index != index) shutdown();
+        const permissions = sv39_entries.Permissions{ .read = page.permissions.read, .write = page.permissions.write, .execute = page.permissions.execute, .user = true, .accessed = true, .dirty = page.permissions.write };
+        if (permissions.write and permissions.execute) shutdown();
+        _ = builder.mapPage(page.virtual_start, @intFromPtr(&external_interpreter_backing[page.backing_index]), .page_4k, permissions) catch shutdown();
+    }
     asm volatile ("sfence.vma; fence.i" ::: "memory");
 
     syscall_query = .{ .context = &batch26_query_context, .queryFn = Batch26ActiveQuery.query };
@@ -1022,7 +1048,7 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     batch26_active = false;
     syscall_active = true;
     write("ZIGREF_BATCH29_PHASE execute\n");
-    external_entry = candidate.main_entry;
+    external_entry = candidate.entry + (if (candidate.interpreter != null) @as(usize, 0x40000000) else 0);
     external_initial_sp = external_stack_image.initial_sp.raw();
     external_trap_stack = trap_end;
     asm volatile ("la t0, external_entry; ld a0, 0(t0); la t0, external_initial_sp; ld a1, 0(t0); la t0, external_trap_stack; ld a2, 0(t0); call enterUserService" ::: "memory", "ra", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "t0", "t1", "t2", "t3", "t4", "t5", "t6");
@@ -1040,12 +1066,20 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     writeHex(syscall_output[0..syscall_output_len]);
     write(" pages=");
     writeUsizeHex(external_image.items().len);
+    write(" interpreter_pages=");
+    writeUsizeHex(external_interpreter_image.items().len);
+    write(" main_entry=");
+    writeUsizeHex(candidate.main_entry);
+    write(" interpreter_entry=");
+    writeUsizeHex(candidate.entry + (if (candidate.interpreter != null) @as(usize, 0x40000000) else 0));
     write(" wx=0000000000000000\n");
     for (0..syscall_count) |index| {
         write("ZIGREF_BATCH29_SYSCALL index=");
         writeUsizeHex(index);
         write(" nr=");
         writeUsizeHex(syscall_numbers[index]);
+        write(" pc=");
+        writeUsizeHex(syscall_pcs[index]);
         write(" result=");
         writeUsizeHex(syscall_results[index]);
         write(" arg0=");
