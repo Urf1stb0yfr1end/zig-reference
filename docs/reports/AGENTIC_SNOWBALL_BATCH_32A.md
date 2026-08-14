@@ -14,13 +14,17 @@ The artifact command pins Alpine v3.22 RV64 `musl-1.2.5-r12.apk` (`6814d9cbaad92
 - main: RV64 ET_EXEC with four PT_LOAD segments, PT_DYNAMIC, and `DT_NEEDED=libc.musl-riscv64.so.1`;
 - interpreter: RV64 ET_DYN with two PT_LOAD segments.
 
-The artifact-only acquisition passed. `qemu-riscv64` is absent in this environment, so the golden Linux-user run is honestly unavailable.
+The artifact-only acquisition passed. After installing QEMU 8.2.2, the exact pair also passed the Linux-user golden oracle with exact stdout `batch32a-dynamic-musl\n` and status 0.
 
 ## First Morphic attempt and minimum transport repair
 
 The inherited external-artifact pressure path rejected every PT_INTERP executable before materialization. The minimum general repair adds a caller-supplied interpreter build input, passes the main and interpreter together through the existing `ExecPlan`, materializes both independently, derives the interpreter entry and `AT_BASE` from the selected ET_DYN bias, supplies actual ELF program-header count/size facts, and maps both through the same PREPARE then COMMIT sequence. No relocation parsing or application was added to the kernel and entry remains the interpreter entry, not the main entry.
 
-The exact pair now compiles into the freestanding Morphic machine. The first system-QEMU retry is blocked because `qemu-system-riscv64` is absent. Consequently this run does **not** claim real interpreter instruction execution, loader completion, main execution, output, status, or runtime W+X evidence.
+The first system-QEMU retry failed during `ExecPlan` with `InvalidElf`. Inspection classified the exact first cause as the real interpreter's standard `PT_GNU_EH_FRAME` metadata row falling into the unknown-program-header policy. The minimum general repair gives that ELF metadata row a typed identity and lets only the dynamic handoff ignore it; a focused parser test and load-planner test preserve rejection of genuinely unknown rows.
+
+The immediate identical retry completed ELF and image preparation but stopped while preflighting the interpreter's first page-table leaf. The distinct interpreter bias crosses an additional Sv39 table boundary, so the inherited four-page PREPARE table reservation was insufficient. The minimum neutral repair raises that explicit bounded reservation to six pages and emits one bounded interpreter-page preflight fact. No mapping is committed before every main, interpreter, and stack preflight succeeds.
+
+The next identical retry completed the milestone. The first six syscalls have PCs in the executable PT_LOAD of the exact real interpreter at bias `0x40000000`; they include interpreter startup/brk/unmap activity before output. The sole write consumes the exact 22-byte message from a mapped main-image address, distinguishing main execution from an interpreter-only exit. Machine evidence reports 153 interpreter pages, four main pages, main entry `0x11408`, interpreter entry `0x40056cd2`, exact output hex `62617463683332612d64796e616d69632d6d75736c0a`, status 0, and W+X=0. The strict verifier reconstructs the exact artifacts, reruns the machine, checks PREPARE before COMMIT before execution, relates syscall PCs to ELF executable ranges, and relates the exact output buffer to the main image.
 
 ## Deliberately unimplemented
 
@@ -34,16 +38,16 @@ No kernel dynamic relocator, musl filename test, direct-main bypass, shared-libr
 | dynamic main identity | PASS |
 | real musl interpreter identity | PASS |
 | PT_INTERP exact | PASS |
-| golden dynamic Linux-user run | UNAVAILABLE |
-| real interpreter entered U-mode | FAIL (not executed) |
-| first causal loader pressure | system-QEMU execution unavailable after exact pair compiled into machine |
-| real musl loader startup complete | FAIL (not executed) |
-| dynamic main executed | FAIL (not executed) |
-| `batch32a-dynamic-musl` output | FAIL (not executed) |
-| status 0 | FAIL (not executed) |
-| W+X=0 | FAIL (not runtime-proven) |
-| PREPARE/COMMIT | PASS (transport path preserved; runtime not executed) |
-| repository validation | NOT RUN |
-| remote persistence | BLOCKED (no Git remote configured) |
+| golden dynamic Linux-user run | PASS |
+| real interpreter entered U-mode | PASS |
+| first causal loader pressure | `PT_GNU_EH_FRAME` classification, then bounded Sv39 PREPARE table backing |
+| real musl loader startup complete | PASS |
+| dynamic main executed | PASS |
+| `batch32a-dynamic-musl` output | PASS |
+| status 0 | PASS |
+| W+X=0 | PASS |
+| PREPARE/COMMIT | PASS |
+| repository validation | PASS (`zig build check` 74/74; complete validation 350/350, 247/247 tests) |
+| remote persistence | BLOCKED: committed locally on the PR #69 branch; HTTPS push has no GitHub credentials in this environment |
 
-Exactly one next pressure boundary: run the exact compiled Morphic machine under `qemu-system-riscv64` and classify its first U-mode trap from the real interpreter.
+Exactly one next pressure boundary: after persistence and merge, begin the separately authorized dynamic BusyBox campaign.

@@ -99,7 +99,7 @@ pub fn planDynamic(comptime capacity: usize, comptime interpreter_capacity: usiz
                 @memcpy(result.interpreter_path[0..path.len], path);
                 result.interpreter_path_len = path.len;
             },
-            .dynamic, .program_header, .note, .gnu_stack, .gnu_relro, .riscv_attributes => {},
+            .dynamic, .program_header, .note, .gnu_eh_frame, .gnu_stack, .gnu_relro, .riscv_attributes => {},
             .null => {},
             .tls, .shared_library => return error.UnsupportedFeature,
         },
@@ -345,6 +345,19 @@ test "dynamic handoff owns PT_INTERP and leaves PT_DYNAMIC to userspace" {
     try std.testing.expectEqualStrings("/ld.so", result.interpreterPath().?);
     try std.testing.expectEqual(@as(usize, 1), result.load.items().len);
     try std.testing.expectError(error.UnsupportedObjectType, plan(2, &bytes));
+}
+
+test "dynamic handoff retains load truth while ignoring GNU unwind metadata" {
+    var bytes = fixture(2);
+    put(u16, &bytes, 16, 3);
+    writeSegment(&bytes, 0, 5, 0x180, 0x1000, 2, 2, 1);
+    put(u32, &bytes, 64 + 56, 0x6474_e550);
+    put(u64, &bytes, 64 + 56 + 8, 0x190);
+    put(u64, &bytes, 64 + 56 + 32, 4);
+    put(u64, &bytes, 64 + 56 + 40, 4);
+    const result = try planDynamic(2, 16, &bytes);
+    try std.testing.expectEqual(@as(usize, 1), result.load.items().len);
+    try std.testing.expectEqual(@as(usize, 0x1001), result.load.entry.raw());
 }
 
 test "dynamic handoff decisively rejects malformed PT_INTERP" {

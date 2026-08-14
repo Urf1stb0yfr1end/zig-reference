@@ -33,7 +33,7 @@ const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
 const physical_pool_pages = 8;
 const ordinary_table_pages = 4;
-const prepared_table_pages = 4;
+const prepared_table_pages = 6;
 const prepared_image_pages = 256;
 const external_stack_pages = 2;
 var prepared_table_backing: [prepared_table_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
@@ -981,6 +981,9 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
         _ = builder.mapPage(page.virtual_start, physical, .page_4k, permissions) catch shutdown();
         _ = builder.unmapPage(page.virtual_start, .page_4k) catch shutdown();
     }
+    write("ZIGREF_BATCH32A_PREPARE interpreter-tables pages=");
+    writeUsizeHex(prepared_interpreter.items().len);
+    write("\n");
     for (prepared_interpreter.items(), 0..) |page, index| {
         if (page.backing_index != index) shutdown();
         const physical = @intFromPtr(&external_interpreter_backing[page.backing_index]);
@@ -1063,12 +1066,20 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     writeHex(syscall_output[0..syscall_output_len]);
     write(" pages=");
     writeUsizeHex(external_image.items().len);
+    write(" interpreter_pages=");
+    writeUsizeHex(external_interpreter_image.items().len);
+    write(" main_entry=");
+    writeUsizeHex(candidate.main_entry);
+    write(" interpreter_entry=");
+    writeUsizeHex(candidate.entry + (if (candidate.interpreter != null) @as(usize, 0x40000000) else 0));
     write(" wx=0000000000000000\n");
     for (0..syscall_count) |index| {
         write("ZIGREF_BATCH29_SYSCALL index=");
         writeUsizeHex(index);
         write(" nr=");
         writeUsizeHex(syscall_numbers[index]);
+        write(" pc=");
+        writeUsizeHex(syscall_pcs[index]);
         write(" result=");
         writeUsizeHex(syscall_results[index]);
         write(" arg0=");
