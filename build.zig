@@ -118,6 +118,8 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const external_rv64_artifact = b.option([]const u8, "external-rv64-artifact", "Verified external RV64 ELF to embed in the freestanding machine proof");
     const external_rv64_interpreter = b.option([]const u8, "external-rv64-interpreter", "Verified PT_INTERP ELF paired with the external RV64 artifact");
+    const external_rv64_namespace_manifest = b.option([]const u8, "external-rv64-namespace-manifest", "Complete bounded namespace v1 JSON manifest");
+    const external_rv64_namespace_data = b.option([]const u8, "external-rv64-namespace-data", "Immutable regular-file backing for the bounded namespace");
     const external_rv64_argv0 = b.option([]const u8, "external-rv64-argv0", "External RV64 artifact argv[0]") orelse "/bin/batch27-static-musl";
     const external_rv64_argv1 = b.option([]const u8, "external-rv64-argv1", "External RV64 artifact argv[1]") orelse "";
     const external_rv64_argv2 = b.option([]const u8, "external-rv64-argv2", "External RV64 artifact argv[2]") orelse "";
@@ -305,8 +307,9 @@ pub fn build(b: *std.Build) void {
                 .dependOn(&install_userspace_data_elf.step);
             const freestanding_module = b.createModule(.{ .root_source_file = b.path("recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig"), .target = freestanding_target, .optimize = .ReleaseSmall, .code_model = .medium });
             const external_options = b.addOptions();
-            external_options.addOption(bool, "enabled", external_rv64_artifact != null);
+            external_options.addOption(bool, "enabled", external_rv64_artifact != null or (external_rv64_namespace_manifest != null and external_rv64_namespace_data != null));
             external_options.addOption(bool, "interpreter_enabled", external_rv64_interpreter != null);
+            external_options.addOption(bool, "namespace_enabled", external_rv64_namespace_manifest != null and external_rv64_namespace_data != null);
             external_options.addOption([]const u8, "argv0", external_rv64_argv0);
             external_options.addOption([]const u8, "argv1", external_rv64_argv1);
             external_options.addOption([]const u8, "argv2", external_rv64_argv2);
@@ -344,6 +347,16 @@ pub fn build(b: *std.Build) void {
                 freestanding_module.addAnonymousImport("external-rv64-interpreter", .{ .root_source_file = .{ .cwd_relative = path } });
             } else {
                 freestanding_module.addAnonymousImport("external-rv64-interpreter", .{ .root_source_file = batch26_interp_elf.getEmittedBin() });
+            }
+            if (external_rv64_namespace_manifest) |path| {
+                freestanding_module.addAnonymousImport("external-rv64-namespace-manifest", .{ .root_source_file = .{ .cwd_relative = path } });
+            } else {
+                freestanding_module.addAnonymousImport("external-rv64-namespace-manifest", .{ .root_source_file = b.path("recipes/run-hosted-morphic-runtime/empty-namespace") });
+            }
+            if (external_rv64_namespace_data) |path| {
+                freestanding_module.addAnonymousImport("external-rv64-namespace-data", .{ .root_source_file = .{ .cwd_relative = path } });
+            } else {
+                freestanding_module.addAnonymousImport("external-rv64-namespace-data", .{ .root_source_file = b.path("recipes/run-hosted-morphic-runtime/empty-namespace") });
             }
             const freestanding = b.addExecutable(.{ .name = "morphic-freestanding-riscv64", .root_module = freestanding_module });
             freestanding.entry = .disabled;

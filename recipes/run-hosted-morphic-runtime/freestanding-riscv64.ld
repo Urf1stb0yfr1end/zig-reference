@@ -77,6 +77,6 @@ SECTIONS {
     . = ALIGN(4096);
     __caller_artifact_end = .;
   } :caller_artifact
-  ASSERT(SIZEOF(.caller_artifact) <= 2M, "caller artifact transport capacity exceeded")
+  ASSERT(SIZEOF(.caller_artifact) <= 8M, "caller artifact transport capacity exceeded")
   ASSERT(__caller_artifact_begin >= __prepared_image_reservation_end, "caller artifact overlaps prepared image reservation")
 }
