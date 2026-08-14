@@ -106,3 +106,44 @@ Morphic transport region, make the freestanding runtime consume its metadata for
 `/bin/sh` and PT_INTERP lookup, and retry the unchanged command. PREPARE/COMMIT,
 stdout, status, and W+X results remain inherited regression evidence until that
 runtime consumption occurs.
+
+## Final integration: ★ FIRST REAL ALPINE UNDER MORPHIC ★
+
+Starting from `93b910a0eb202d385191bb20862113830f5c400e`, the final continuation
+connected the already-proven `zig-reference-bounded-namespace-v1` manifest and
+immutable backing directly to the freestanding runtime. The caller-owned,
+supervisor-read-only transport is a distinct 8 MiB maximum linker region at
+`0x81000000`; its actual complete pinned input occupied `0x6d4000` bytes and did
+not overlap the kernel or prepared-image reservation. Arithmetic, manifest
+identity/count/accounting, and every regular-file range are checked before
+lookup. Runtime absolute-path lookup follows at most 16 symlinks and returns only
+a checked read-only regular-file slice.
+
+The exact first retry stopped during external-image table preflight after the
+first page: mapping the complete 7 MiB read-only transport consumed more of the
+existing bounded page-table reserve than the former two-ELF transport. The
+minimum general repair expanded the dedicated, caller-supplied/prepared mapping
+table bound from 7 to 16 pages; it did not change user image capacity or bypass
+PREPARE/COMMIT. Retrying the same namespace and same command then passed.
+
+Machine evidence from QEMU 8.2.2 establishes that runtime validation consumed
+all 517 objects and all 7,069,903 regular-file bytes, runtime lookup followed the
+real `/bin/sh -> /bin/busybox`, and the BusyBox bytes exposed their real
+`PT_INTERP=/lib/ld-musl-riscv64.so.1`, which runtime lookup obtained from the same
+`namespace.data`. Only after those lookups did the existing ELF PREPARE complete,
+followed by COMMIT and execute. The real musl entry `0x40056d00` ran before
+BusyBox main; exact output was hex `616c70696e650a` (`alpine\n`), exit status was
+0, and the final report recorded 203 main pages, 152 interpreter pages, and
+`wx=0`. There is no kernel dynamic relocator and no direct-main path.
+
+The host-selected executable-pair proof is no longer the success path: the build
+receives the complete manifest and backing, while Morphic itself derives both
+ELF slices through namespace lookup. This closes the anti-pseudo-root boundary.
+
+Focused namespace tests, Zig formatting, command-reference drift, and `zig build
+check` passed after installing the declared local Python/Node prerequisites.
+`python3 tools/developer-command.py validate-repository` ran 247/247 tests and
+345/350 build steps successfully but honestly failed the pre-existing validation
+evidence gate: `fixed-capacity-vector` has a stale source digest unrelated to
+this Morphic change. The supplied checkout has no configured Git remote, so no
+remote head could be pushed or verified from this environment.

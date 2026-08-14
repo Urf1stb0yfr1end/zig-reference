@@ -28,6 +28,111 @@ const batch26_interp_elf = @embedFile("userspace-elf-rv64-batch26-interp");
 /// planning and machine semantics remain independent of how those bytes arrived.
 pub export const external_rv64_artifact align(frames.PageSize) linksection(".caller_artifact") = @embedFile("external-rv64-artifact").*;
 pub export const external_rv64_interpreter align(frames.PageSize) linksection(".caller_artifact") = @embedFile("external-rv64-interpreter").*;
+pub export const external_rv64_namespace_manifest align(frames.PageSize) linksection(".caller_artifact") = @embedFile("external-rv64-namespace-manifest").*;
+pub export const external_rv64_namespace_data align(frames.PageSize) linksection(".caller_artifact") = @embedFile("external-rv64-namespace-data").*;
+
+const NamespaceFile = struct { bytes: []const u8, symlink: ?[]const u8 = null, traversals: usize = 0 };
+
+fn jsonUnsignedAfter(source: []const u8, start: usize, key: []const u8) ?usize {
+    const relative = std.mem.indexOfPos(u8, source, start, key) orelse return null;
+    var cursor = relative + key.len;
+    if (cursor == source.len or source[cursor] < '0' or source[cursor] > '9') return null;
+    var value: usize = 0;
+    while (cursor < source.len and source[cursor] >= '0' and source[cursor] <= '9') : (cursor += 1)
+        value = std.math.add(usize, std.math.mul(usize, value, 10) catch return null, source[cursor] - '0') catch return null;
+    return value;
+}
+
+fn jsonStringAfter(source: []const u8, start: usize, key: []const u8) ?[]const u8 {
+    const relative = std.mem.indexOfPos(u8, source, start, key) orelse return null;
+    const begin = relative + key.len;
+    const end = std.mem.indexOfScalarPos(u8, source, begin, '"') orelse return null;
+    if (std.mem.indexOfScalar(u8, source[begin..end], '\\') != null) return null;
+    return source[begin..end];
+}
+
+fn namespaceObject(manifest: []const u8, path: []const u8, data: []const u8) ?NamespaceFile {
+    var cursor: usize = 0;
+    while (std.mem.indexOfPos(u8, manifest, cursor, "\"path\":\"")) |at| {
+        const object_end = std.mem.indexOfScalarPos(u8, manifest, at, '}') orelse return null;
+        const found = jsonStringAfter(manifest, at, "\"path\":\"") orelse return null;
+        if (std.mem.eql(u8, found, path)) {
+            const object_begin = std.mem.lastIndexOfScalar(u8, manifest[0..at], '{') orelse return null;
+            const row = manifest[object_begin .. object_end + 1];
+            const kind = jsonStringAfter(row, 0, "\"kind\":\"") orelse return null;
+            if (std.mem.eql(u8, kind, "symlink")) return .{ .bytes = &.{}, .symlink = jsonStringAfter(row, 0, "\"target\":\"") orelse return null };
+            if (!std.mem.eql(u8, kind, "regular")) return null;
+            const offset = jsonUnsignedAfter(row, 0, "\"data_offset\":") orelse return null;
+            const length = jsonUnsignedAfter(row, 0, "\"data_length\":") orelse return null;
+            if (offset > data.len or length > data.len - offset) return null;
+            return .{ .bytes = data[offset .. offset + length] };
+        }
+        cursor = object_end + 1;
+    }
+    return null;
+}
+
+fn validAbsolutePath(path: []const u8) bool {
+    if (path.len < 2 or path[0] != '/' or path[path.len - 1] == '/') return false;
+    var components = std.mem.splitScalar(u8, path[1..], '/');
+    while (components.next()) |component|
+        if (component.len == 0 or std.mem.eql(u8, component, ".") or std.mem.eql(u8, component, "..")) return false;
+    return true;
+}
+
+fn namespaceLookup(manifest: []const u8, guest_path: []const u8, data: []const u8) ?NamespaceFile {
+    if (!validAbsolutePath(guest_path)) return null;
+    var path = guest_path;
+    var traversals: usize = 0;
+    while (true) {
+        const object = namespaceObject(manifest, path, data) orelse return null;
+        const target = object.symlink orelse {
+            var result = object;
+            result.traversals = traversals;
+            return result;
+        };
+        traversals += 1;
+        if (traversals > 16 or !validAbsolutePath(target)) return null;
+        path = target;
+    }
+}
+
+fn namespaceValidate(manifest: []const u8, data: []const u8) bool {
+    if (std.mem.indexOf(u8, manifest, "\"format\":\"zig-reference-bounded-namespace-v1\"") == null) return false;
+    const count = jsonUnsignedAfter(manifest, 0, "\"object_count\":") orelse return false;
+    const bytes = jsonUnsignedAfter(manifest, 0, "\"regular_file_bytes\":") orelse return false;
+    if (bytes != data.len) return false;
+    var cursor: usize = 0;
+    var observed: usize = 0;
+    var accounted: usize = 0;
+    while (std.mem.indexOfPos(u8, manifest, cursor, "\"path\":\"")) |at| {
+        const object_end = std.mem.indexOfScalarPos(u8, manifest, at, '}') orelse return false;
+        const object_begin = std.mem.lastIndexOfScalar(u8, manifest[0..at], '{') orelse return false;
+        const row = manifest[object_begin .. object_end + 1];
+        const path = jsonStringAfter(row, 0, "\"path\":\"") orelse return false;
+        const kind = jsonStringAfter(row, 0, "\"kind\":\"") orelse return false;
+        if (path.len == 0 or path[0] != '/') return false;
+        var prior_cursor: usize = 0;
+        while (std.mem.indexOfPos(u8, manifest, prior_cursor, "\"path\":\"")) |prior_at| {
+            if (prior_at >= at) break;
+            const prior_path = jsonStringAfter(manifest, prior_at, "\"path\":\"") orelse return false;
+            if (std.mem.eql(u8, prior_path, path)) return false;
+            prior_cursor = prior_at + 8;
+        }
+        if (std.mem.eql(u8, kind, "regular")) {
+            const offset = jsonUnsignedAfter(row, 0, "\"data_offset\":") orelse return false;
+            const length = jsonUnsignedAfter(row, 0, "\"data_length\":") orelse return false;
+            if (offset != accounted or offset > data.len or length > data.len - offset) return false;
+            accounted += length;
+        } else if (std.mem.eql(u8, kind, "symlink")) {
+            const target = jsonStringAfter(row, 0, "\"target\":\"") orelse return false;
+            if (target.len == 0) return false;
+        } else if (!std.mem.eql(u8, kind, "directory")) return false;
+        observed += 1;
+        cursor = object_end + 1;
+    }
+    return observed == count and accounted == data.len;
+}
 
 const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
@@ -35,7 +140,7 @@ const physical_pool_pages = 8;
 const ordinary_table_pages = 4;
 // One dedicated table page covers the separately placed caller-artifact
 // transport; the remaining bound preserves the prepared execution mappings.
-const prepared_table_pages = 7;
+const prepared_table_pages = 16;
 const prepared_image_pages = 256;
 const external_stack_pages = 2;
 var prepared_table_backing: [prepared_table_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
@@ -932,8 +1037,26 @@ fn commitPreparedBatch26Exec(frame: *TrapFrame) void {
 fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical_stvec: usize) void {
     batch26_builder = builder;
     write("ZIGREF_BATCH29_PHASE prepare\n");
-    const bytes: []const u8 = &external_rv64_artifact;
-    const interpreter_bytes: ?[]const u8 = if (external_artifact_options.interpreter_enabled) &external_rv64_interpreter else null;
+    var bytes: []const u8 = &external_rv64_artifact;
+    var interpreter_bytes: ?[]const u8 = if (external_artifact_options.interpreter_enabled) &external_rv64_interpreter else null;
+    if (external_artifact_options.namespace_enabled) {
+        const manifest: []const u8 = &external_rv64_namespace_manifest;
+        const data: []const u8 = &external_rv64_namespace_data;
+        if (!namespaceValidate(manifest, data)) shutdown();
+        const shell = namespaceLookup(manifest, external_artifact_options.argv0, data) orelse shutdown();
+        if (shell.symlink != null or shell.traversals == 0) shutdown();
+        bytes = shell.bytes;
+        const inspection = elf_load.planDynamic(4, 32, bytes) catch shutdown();
+        const interp_path = inspection.interpreterPath() orelse shutdown();
+        const interp = namespaceLookup(manifest, interp_path, data) orelse shutdown();
+        if (interp.symlink != null) shutdown();
+        interpreter_bytes = interp.bytes;
+        write("ZIGREF_BATCH32C_NAMESPACE format=PASS objects=PASS ranges=PASS shell_lookup=PASS symlink_traversals=");
+        writeUsizeHex(shell.traversals);
+        write(" interp=");
+        write(interp_path);
+        write(" same_backing=PASS\n");
+    }
     const candidate = address_space.ExecPlan(4, 32).prepare(bytes, interpreter_bytes) catch |err| {
         write("ZIGREF_BATCH29_PREPARE_FAIL exec-plan=");
         write(@errorName(err));

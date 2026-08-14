@@ -519,3 +519,7 @@ tools/test-alpine-rootfs-namespace.py` covers construction, byte accounting,
 missing paths, absolute symlinks, bounded loop rejection, root escapes, and
 duplicate conflicts. This transport proof still does not claim Morphic consumed
 the representation.
+
+## Batch 32C complete Alpine namespace runtime proof
+
+`zig build install-freestanding-riscv64-morphic-runtime -Dexternal-rv64-namespace-manifest=PATH/namespace.json -Dexternal-rv64-namespace-data=PATH/namespace.data -Dexternal-rv64-argv0=/bin/sh -Dexternal-rv64-argv1=-c '-Dexternal-rv64-argv2=echo alpine' --prefix PATH` builds the freestanding Morphic machine with the complete caller-owned bounded namespace. Generate the two inputs from the pinned archive with `PYTHONDONTWRITEBYTECODE=1 python3 tools/pressure-real-rv64-alpine-minirootfs.py --archive PATH/alpine-minirootfs-3.22.0-riscv64.tar.gz --artifact-only --namespace-output-dir PATH`. Batch 32C executed the resulting machine with `qemu-system-riscv64 -machine virt -nographic -bios default -kernel PATH/bin/morphic-freestanding-riscv64` under QEMU 8.2.2 and proved runtime `/bin/sh` symlink lookup, same-backing PT_INTERP lookup, PREPARE/COMMIT, exact `alpine\n`, status 0, and W+X=0.
