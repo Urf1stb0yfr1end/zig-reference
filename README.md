@@ -8,7 +8,226 @@
 
 **Everything in this repository is research.** The kernel work, Morphic substrate, Alpz machine work, QuirkM, Linux personality, agent tooling, compatibility experiments, and future virtualization work are research artifacts unless a narrower proof establishes more.
 
-This repository is not presented as production-ready infrastructure.
+This repository is not presented as production-ready infrastructure. Its larger purpose is to make operating-system construction itself observable enough that the project can answer questions about kernels, compatibility, software inheritance, AI-assisted engineering, and the cost of building new systems.
+
+### Where Morphic sits in the AI-assisted OS landscape
+
+AI-assisted operating-system projects are now interesting enough that the question **“can AI help build a substantial operating system?”** no longer has to remain hypothetical.
+
+[SlopOS](https://github.com/SlopLabs/slopos) and [VibeOS](https://github.com/kaansenol5/VibeOS) are neighboring experiments that we respect. They demonstrate different, valuable parts of the emerging landscape. Morphic, Alpz, and QuirkM do not need those projects to be lesser in order for this project to ask a different class of questions.
+
+**While SlopOS establishes that an AI-heavy development process can contribute to a remarkably substantial from-scratch Rust operating system that boots on real hardware, runs its own desktop and drivers, carries a large QEMU test suite, and applies machine-checked verification to important invariants, we aim to ask what such success can teach us about the structure underneath an operating system.** How much mechanism is actually fundamental? How much is historical representation? How much can remain replaceable? How much of a modern software world can be inherited without importing the architecture of the system that world originally grew up on?
+
+**While VibeOS demonstrates that a Claude-assisted, from-scratch ARM64 operating system can advance through a graphical desktop, networking, a browser, development tools, MicroPython, TCC, and real Raspberry Pi hardware across documented development sessions, we choose to treat comparable increases in capability as experimental pressure as well as engineering milestones.** When a new workload starts working, Morphic wants to know exactly which new semantic requirement made that possible, which layer owns it, whether unrelated workloads reuse it, and whether the permanent substrate had to grow at all.
+
+Those projects help establish that AI-assisted kernel and OS development can produce consequential artifacts. **Our intended contribution is to use the same historical moment to investigate deeper systems questions that are not answered merely by reaching a shell, a working desktop, an attractive display, a browser, or a long feature list.** Those achievements matter. We simply want the project to remain useful after they are achieved, because the system itself can then become experimental apparatus.
+
+This is not a claim that Morphic is superior to SlopOS, VibeOS, Linux, or any other system. It is a statement of research direction. Different projects can be excellent answers to different questions.
+
+### The central Morphic question
+
+The project is organized around a question that can be tested rather than merely advertised:
+
+> **What is the smallest durable operating-system substrate capable of inheriting a modern software civilization without permanently inheriting the architecture of the operating system that civilization grew up on?**
+
+A closely related hypothesis is the **Morphic Convergence Hypothesis**:
+
+> **As a neutral operating-system substrate acquires the genuinely general semantics demanded by diverse real workloads, the rate at which additional inherited software requires new permanent substrate mechanisms approaches zero.**
+
+In short: **does the kernel converge?**
+
+If the answer is yes, increasingly large software ecosystems should eventually run while the neutral permanent substrate changes less and less. If the answer is no, that negative result is equally valuable: Morphic can show where semantic growth refuses to compress and why.
+
+See [`docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md`](docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md).
+
+### Questions this project is unusually positioned to investigate
+
+Morphic is being built so that each compatibility frontier leaves behind machine evidence, causal failures, explicit semantic repairs, and a record of where each mechanism lives. That makes the repository suitable for questions that are difficult to isolate in a mature monolithic system.
+
+#### What does a modern operating system actually need to provide?
+
+Not everything Linux has accumulated. Not everything POSIX names. What does diverse real software *causally require* beneath those interfaces?
+
+#### Does the permanent kernel semantic surface converge?
+
+As we move from static programs to BusyBox, musl, real Alpine, `apk`, language runtimes, databases, browsers, graphical environments, scientific software, servers, and other workload families, does the rate of new permanent Morphic semantics fall?
+
+#### How much historical API surface is representation rather than fundamental mechanism?
+
+Can many Linux syscalls, ioctls, errno conventions, descriptor behaviors, and ABI structures be translated onto a smaller number of neutral operations? If so, how much semantic compression is possible without lying about behavior?
+
+#### Can compatibility be migration scaffolding rather than permanent architecture?
+
+Can Linux compatibility become broad and useful while Linux-specific meaning remains at a replaceable edge? Can another personality later reuse the same substrate without forcing a redesign?
+
+#### Can one substrate support mutually incompatible systems ideas?
+
+Can alternative schedulers, allocators, IPC models, filesystems, security models, task models, networking designs, deterministic execution models, VM mechanisms, or native APIs be evaluated against a shared substrate and shared workload corpus rather than each experiment reconstructing an entire operating system?
+
+#### Can kernel experiments inherit a software civilization without first rebuilding one?
+
+A new kernel idea often pays a huge bootstrap cost before the actual research begins. Morphic asks whether a researcher can reuse proven executable loading, compatibility translation, resource semantics, machine evidence, test workloads, and other neutral mechanisms, then replace the component they actually want to study.
+
+#### Can a common proving ground reduce the marginal cost of kernel development?
+
+This is a major long-term question for the repository.
+
+Suppose a researcher wants to test a scheduler, memory manager, capability system, IPC design, filesystem, VM mechanism, or security policy. Today that idea may require months of unrelated bootstrapping before it encounters serious software.
+
+Morphic aims to investigate whether the path can become closer to:
+
+```text
+new kernel/system hypothesis
+        |
+        v
+reuse proven neutral mechanisms
+        |
+        v
+insert or replace the mechanism under study
+        |
+        v
+run the same workload-pressure corpus
+        |
+        v
+compare behavior, evidence, failures, and semantic cost
+```
+
+The ambitious future is a **kernel and systems testing ground** where researchers can reach consequential workloads sooner because solved boundaries remain reusable.
+
+“If it runs through Morphic, it will run everywhere” would be an unjustified claim, and this project will not make it. The research question is narrower and more useful: **can a shared substrate, compatibility corpus, and proof record substantially reduce the amount of unrelated work a new kernel experiment must repeat before its central hypothesis can be tested?**
+
+#### Can cross-architecture work distinguish semantics from machinery?
+
+RISC-V is the current proving architecture. A future second architecture can test which mechanisms are truly semantic, which belong to the platform backend, and how much of the system survives a hardware transition unchanged.
+
+#### Can a second ABI personality expose hidden Linux assumptions?
+
+Linux is currently the strongest compatibility pressure source. A future second personality would be a powerful falsification test. If apparently neutral Morphic mechanisms must be redesigned around assumptions inherited from Linux, we learn that the neutrality claim was weaker than believed.
+
+#### Which workloads exert the highest semantic pressure?
+
+Does a package manager change the substrate more than a language runtime? Does a database introduce more fundamental mechanism than a graphical desktop? Does a browser? A JIT? A scientific workload? A hypervisor? Morphic can measure the answer rather than guess.
+
+#### Which mechanisms provide the highest software-unlock value?
+
+For each admitted mechanism, how much unrelated software becomes possible afterward? Which mechanisms are repeatedly reused, and which were accidental one-workload residue?
+
+#### How small can the trusted and permanent surface remain while capability explodes above it?
+
+Total userspace may become enormous. The research target is not a tiny repository. It is understanding how much code and state must remain privileged, trusted, semantically permanent, or architecture-defining as the inherited world expands.
+
+#### Can AI-assisted development produce better experimental history, not merely more code?
+
+This repository records agent contracts, causal failures, machine evidence, validation artifacts, handoffs, and exact workload frontiers. We want to investigate whether AI-assisted development can produce a systems history that is unusually inspectable and reproducible, rather than merely increasing coding speed.
+
+#### Can failure itself become reusable engineering knowledge?
+
+A failed ELF load, missing syscall semantic, incorrect page permission, ABI mismatch, or process-lifetime bug should not disappear into chat history. Can those failures become indexed artifacts that prevent future kernels, ports, and agents from paying the same discovery cost again?
+
+### The Morphic Semantic Atlas
+
+A central future research artifact is the **Morphic Semantic Atlas**: a versioned, preferably machine-readable mapping from real workload frontiers to the neutral semantics they actually required.
+
+Conceptually:
+
+```text
+WORKLOAD                       NEW NEUTRAL SEMANTICS       CUMULATIVE FRONTIER
+----------------------------   -------------------------   -------------------
+static userspace               measured                    measured
+static BusyBox                 measured                    measured
+static shell                   measured                    measured
+dynamic musl                   measured                    measured
+dynamic BusyBox                measured                    measured
+real Alpine                    measured                    measured
+interactive Alpine             future                      future
+playable Alpine                future                      future
+apk                            future                      future
+Python                         future                      future
+Git                            future                      future
+SQLite                         future                      future
+SSH                            future                      future
+scientific stack               future                      future
+browser engine                 future                      future
+desktop                        future                      future
+second ABI personality         future                      future
+second hardware architecture   future                      future
+```
+
+The numbers must come from evidence, not from promotional estimates.
+
+A mature atlas could support comparative work on semantic compression, trusted-surface growth, compatibility cost, mechanism reuse, workload pressure, cross-architecture stability, and convergence.
+
+### Morphic as a future research launching dock
+
+The long-term aim is broader than making one kernel implementation impressive.
+
+We would like Morphic to become a **launching dock for systems inquiry**: a place where researchers, students, engineers, and agents can introduce a hypothesis without first recreating every unrelated solved boundary.
+
+Possible future experiments include:
+
+- replace the scheduler and run identical workload pressure;
+- substitute a capability or object-security model;
+- compare IPC designs under the same userspace;
+- test alternative address-space and page-management policies;
+- compare filesystem semantics without replacing the entire execution environment;
+- study deterministic execution or record/replay;
+- insert a new networking model;
+- compare native QuirkM APIs with Linux compatibility over the same Morphic capabilities;
+- introduce a second compatibility personality;
+- move the substrate to another architecture;
+- study VM/vCPU and hypervisor mechanisms;
+- compare agent-generated kernel components using identical validation and workload evidence;
+- measure which changes actually increase the admissible hypothesis space.
+
+The ideal result is that future researchers spend more time testing the mechanism they care about and less time rebuilding boot code, loaders, test harnesses, compatibility plumbing, or userspace merely to reach the experiment.
+
+See [`docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md`](docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md).
+
+### We invite examination, including hostile examination
+
+We want this repository studied, compared, reproduced, criticized, extended, and contradicted.
+
+Useful future work includes questions such as:
+
+```text
+Does the Morphic convergence curve actually flatten?
+
+Which Linux interfaces refuse semantic compression?
+
+Does a database workload falsify mechanisms that looked general under Alpine?
+
+Does a browser force permanent complexity back into the core?
+
+Can a second personality reuse Morphic without Linux contamination?
+
+Can another architecture preserve the same semantic decomposition?
+
+Does a replacement scheduler inherit the same software frontier?
+
+Can Morphic shorten time-to-experiment for a new kernel design?
+
+Which Morphic abstractions are wrong?
+
+Which can be deleted?
+
+Which are missing?
+```
+
+A result that disproves a favored Morphic idea is not an attack on the project. It is research progress.
+
+### Research launching points
+
+If you want to study the project rather than merely boot it, begin here:
+
+- [`docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md`](docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md) — the convergence thesis, Semantic Atlas, measurements, and falsifiability requirements.
+- [`docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md`](docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md) — Morphic as a shared substrate for many classes of systems experiments.
+- [`docs/papers/COMPATIBILITY_AS_MIGRATION_SCAFFOLD.md`](docs/papers/COMPATIBILITY_AS_MIGRATION_SCAFFOLD.md) — compatibility as an edge and migration instrument rather than permanent ontology.
+- [`docs/research/FRESH_AGENT_ADVANCEMENT_AND_INHERITABLE_TECHNICAL_KNOWLEDGE.md`](docs/research/FRESH_AGENT_ADVANCEMENT_AND_INHERITABLE_TECHNICAL_KNOWLEDGE.md) — whether fresh agents can inherit enough explicit knowledge to advance systems work.
+- [`docs/research/AGENT_FRAMEWORK_FAILURE_LEDGER.md`](docs/research/AGENT_FRAMEWORK_FAILURE_LEDGER.md) — preserved failures as research evidence.
+- [`docs/reports/`](docs/reports/) — concrete implementation frontiers and machine evidence.
+- [`COMMANDS.md`](COMMANDS.md) — durable reproduction commands.
+
+The aspiration is not merely to join the genre of AI-assisted operating systems. **It is to help turn that genre into something researchers can measure.** SlopOS, VibeOS, Morphic, and future projects can then be more than impressive demonstrations in isolation: together they can become evidence about how AI changes systems construction, which architectures survive real workloads, what complexity is actually necessary, and how much development effort future kernels might inherit instead of repeat.
 
 ## What the names mean
 
@@ -343,7 +562,7 @@ observe real failure
 
 ## Documentation
 
-Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md).
+Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md`](docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md), [`docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md`](docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md).
 
 ## Validation
 
