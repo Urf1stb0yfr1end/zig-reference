@@ -52,15 +52,17 @@ After every repair, retry the exact same Alpine command immediately. When a
 command passes, continue immediately to the next command or leap while time
 remains.
 
-Do not stop because execve was decoded.
-Do not stop because the child entered a new image.
-Do not stop because one test passed.
-Do not stop at `ls /` if later PLAYABLE ALPINE gates remain and useful
-implementation time remains.
+Decoding execve does not satisfy completion or handoff.
+Entering a new child image does not satisfy completion or handoff.
+One passing test does not satisfy completion or handoff.
+Passing `ls /` does not satisfy completion while later PLAYABLE ALPINE gates
+remain and useful implementation time remains.
 
 The 30-minute limit is a persistence/handoff boundary, not an implementation
-throttle. The run MUST stop implementation and hand off at approximately 30
-minutes unless PLAYABLE ALPINE and the complete persisted handoff finish earlier.
+throttle. At approximately 30 minutes the run MUST produce and deliver the
+complete persisted handoff below, even if PLAYABLE ALPINE remains incomplete.
+The task is not complete until the handoff artifacts and final handoff message
+exist. PLAYABLE ALPINE plus the complete handoff may satisfy completion earlier.
 
 ======================================================================
 CURRENT PROVEN FRONTIER
@@ -288,9 +290,9 @@ one real pipeline. Possible causal pressure includes pipe creation, endpoints,
 fd inheritance, descriptor replacement, close semantics, EOF, multiple child
 progress, scheduling, wait/lifetime, and exit status propagation.
 
-Do not build a speculative full Unix IPC/process subsystem. Do not stop after
-the first pipe primitive if several directly related mechanisms are required by
-this exact pipeline.
+Do not build a speculative full Unix IPC/process subsystem. The first pipe
+primitive does not satisfy completion if several directly related mechanisms
+remain required by this exact pipeline.
 
 Acceptance gate:
 
@@ -385,7 +387,8 @@ Do NOT:
   compatibility;
 - implement a broad syscall checklist speculatively;
 - perform a grand rewrite while the exact pressure loop is advancing;
-- stop after a single handler succeeds while the current leap gate still fails;
+- treat a single successful handler as completion while the current leap gate
+  still fails;
 - leave stale generated indexes, evidence, paths, or command documentation.
 
 Prefer:
@@ -457,7 +460,8 @@ The clock starts at the first repository command after the request is accepted.
 The run may finish earlier only if PLAYABLE ALPINE, implementation, proof,
 validation, commits, push, PR, and handoff are all complete.
 
-Otherwise use the full useful implementation window, then stop and hand off.
+Otherwise use the full useful implementation window, then produce and deliver
+the complete persisted handoff.
 
 0–20 MINUTES — AGGRESSIVE CAUSAL IMPLEMENTATION
 
@@ -481,7 +485,7 @@ Codex MUST ensure useful work cannot be lost:
 - record exact proof state in tracked files where appropriate;
 - verify commit SHA, remote branch, and PR state.
 
-After this checkpoint, do not stop if more bounded work is available. Continue.
+After this checkpoint, continue while more bounded work is available.
 
 22–26 MINUTES — KEEP IMPLEMENTING
 
@@ -490,9 +494,9 @@ After this checkpoint, do not stop if more bounded work is available. Continue.
 - create additional coherent commits as useful;
 - do not begin an obviously multi-hour rewrite.
 
-AT ~26 MINUTES — HANDOFF MODE IS MANDATORY
+AT ~26 MINUTES — HANDOFF PRODUCTION IS MANDATORY
 
-Stop beginning new large experiments. From here:
+Begin no new large experiments. Handoff production is now the primary task:
 
 - preserve current code;
 - finish only a small already-in-flight bounded change;
@@ -504,16 +508,19 @@ Stop beginning new large experiments. From here:
 - open or update the PR;
 - verify branch, commit, and PR state.
 
-AT ~29 MINUTES — IMPLEMENTATION FREEZE
+AT ~29 MINUTES — FINAL HANDOFF ASSEMBLY
 
 No new implementation experiments, speculative diagnostics, or refactors.
 
-Only save, validate what can still finish, update report/commands, commit, push,
-update the PR, and state the exact frontier.
+Produce the complete handoff: save, validate what can still finish, update the
+report and COMMANDS.md, commit, push, update the PR, verify persistence, and
+state the exact frontier.
 
-AT ~30 MINUTES — HARD MANDATORY HANDOFF
+AT ~30 MINUTES — HANDOFF DELIVERY DEADLINE
 
-The run MUST stop implementation and hand off.
+The run MUST produce and deliver the complete handoff now. Do not terminate the
+task before the tracked report, coherent commits, remote persistence attempt,
+PR state, exact proofs, and final handoff message exist.
 
 Even if PLAYABLE ALPINE is incomplete:
 
@@ -587,11 +594,12 @@ Morphic mechanism and Linux compatibility translation required by the exact
 failure, retry the unchanged command, and continue aggressively through every
 causally exposed blocker toward PLAYABLE ALPINE.
 
-Do not stop at one syscall, one repair, one test, or one leap while useful
-implementation time remains.
+One syscall, one repair, one test, or one leap never satisfies completion while
+useful implementation time and later gates remain.
 
-At approximately 30 minutes, stop implementation and persist the strongest
-coherent state: report, COMMANDS.md, commits, push, PR, exact proofs, and exactly
-one next blocker if incomplete.
+At approximately 30 minutes, immediately produce and deliver the strongest
+coherent handoff: report, COMMANDS.md, commits, push, PR, exact proofs, and
+exactly one next blocker if incomplete. The handoff itself is mandatory work,
+not an optional epilogue.
 
 Do not finish with useful work only in terminal scrollback or uncommitted files.
