@@ -6,6 +6,7 @@ PHDRS {
   rodata PT_LOAD FLAGS(4);
   data PT_LOAD FLAGS(6);
   reservation PT_LOAD FLAGS(6);
+  caller_artifact PT_LOAD FLAGS(4);
 }
 
 SECTIONS {
@@ -27,7 +28,7 @@ SECTIONS {
   . = ALIGN(4096);
   __text_domain_end = .;
   __rodata_domain_begin = .;
-  .rodata : { *(.rodata .rodata.*) } :rodata
+  .rodata : { *(.rodata .rodata.* .srodata .srodata.*) } :rodata
   . = ALIGN(4096);
   __rodata_domain_end = .;
   __writable_domain_begin = .;
@@ -66,4 +67,16 @@ SECTIONS {
     *(.prepared_image_reservation)
     __prepared_image_reservation_end = .;
   } :reservation
+
+  /* Caller-provided ELF bytes are transport input, not part of the ordinary
+     kernel image. The fixed reservation is bounded and mapped supervisor-RO. */
+  . = 0x81000000;
+  .caller_artifact : ALIGN(4096) {
+    __caller_artifact_begin = .;
+    KEEP(*(.caller_artifact))
+    . = ALIGN(4096);
+    __caller_artifact_end = .;
+  } :caller_artifact
+  ASSERT(SIZEOF(.caller_artifact) <= 2M, "caller artifact transport capacity exceeded")
+  ASSERT(__caller_artifact_begin >= __prepared_image_reservation_end, "caller artifact overlaps prepared image reservation")
 }

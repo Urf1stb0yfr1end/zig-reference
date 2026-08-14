@@ -26,14 +26,16 @@ const batch26_main_elf = @embedFile("userspace-elf-rv64-batch26-main");
 const batch26_interp_elf = @embedFile("userspace-elf-rv64-batch26-interp");
 /// Host transport only: build orchestration supplies hash-checked bytes. ELF
 /// planning and machine semantics remain independent of how those bytes arrived.
-pub export const external_rv64_artifact = @embedFile("external-rv64-artifact").*;
-pub export const external_rv64_interpreter = @embedFile("external-rv64-interpreter").*;
+pub export const external_rv64_artifact align(frames.PageSize) linksection(".caller_artifact") = @embedFile("external-rv64-artifact").*;
+pub export const external_rv64_interpreter align(frames.PageSize) linksection(".caller_artifact") = @embedFile("external-rv64-interpreter").*;
 
 const begin_marker = "\nZIGREF_MORPHIC_BEGIN\n";
 const end_marker = "ZIGREF_MORPHIC_END\n";
 const physical_pool_pages = 8;
 const ordinary_table_pages = 4;
-const prepared_table_pages = 6;
+// One dedicated table page covers the separately placed caller-artifact
+// transport; the remaining bound preserves the prepared execution mappings.
+const prepared_table_pages = 7;
 const prepared_image_pages = 256;
 const external_stack_pages = 2;
 var prepared_table_backing: [prepared_table_pages][frames.PageSize]u8 align(frames.PageSize) linksection(".prepared_image_reservation") = undefined;
@@ -62,6 +64,8 @@ extern var __user_trap_stack_begin: u8;
 extern var __user_trap_stack_end: u8;
 extern var __prepared_image_reservation_begin: u8;
 extern var __prepared_image_reservation_end: u8;
+extern var __caller_artifact_begin: u8;
+extern var __caller_artifact_end: u8;
 
 const sv39_alias: usize = 0x8040_0000;
 const user_code_va: usize = 0x8040_1000;
@@ -3036,7 +3040,11 @@ export fn freestandingMain() callconv(.c) noreturn {
     const image_end = @intFromPtr(&__image_end);
     const reservation_begin = @intFromPtr(&__prepared_image_reservation_begin);
     const reservation_end = @intFromPtr(&__prepared_image_reservation_end);
-    if (image_end > sv39_alias or reservation_begin < user_data_va + frames.PageSize or reservation_end <= reservation_begin) shutdown();
+    const caller_artifact_begin = @intFromPtr(&__caller_artifact_begin);
+    const caller_artifact_end = @intFromPtr(&__caller_artifact_end);
+    if (image_end > sv39_alias or reservation_begin < user_data_va + frames.PageSize or reservation_end <= reservation_begin or
+        caller_artifact_end <= caller_artifact_begin or caller_artifact_begin < reservation_end)
+        shutdown();
     const mapped_begin = image_begin & ~@as(usize, frames.PageSize - 1);
     const mapped_end = (image_end + frames.PageSize - 1) & ~@as(usize, frames.PageSize - 1);
     const permissions = sv39_entries.Permissions{ .read = true, .write = true, .execute = true, .accessed = true, .dirty = true };
@@ -3050,6 +3058,10 @@ export fn freestandingMain() callconv(.c) noreturn {
     address = reservation_begin;
     while (address < reservation_end) : (address += frames.PageSize) {
         _ = builder.mapPage(address, address, .page_4k, .{ .read = true, .write = true, .accessed = true, .dirty = true }) catch shutdown();
+    }
+    address = caller_artifact_begin;
+    while (address < caller_artifact_end) : (address += frames.PageSize) {
+        _ = builder.mapPage(address, address, .page_4k, .{ .read = true, .accessed = true }) catch shutdown();
     }
     _ = builder.mapPage(sv39_alias, alias_physical, .page_4k, .{ .read = true, .write = true, .accessed = true, .dirty = true }) catch {
         write("ZIGREF_SV39_ACTIVE_FAILURE\n");
