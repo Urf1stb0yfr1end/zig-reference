@@ -1,66 +1,63 @@
 # Agentic Snowball Batch 32D handoff
 
-## State and regression-floor classification
+## State and exact Alpine identity
 
-- Inherited main SHA: `302761105e0efa70e5eadb18cb005a5793fd4153`; this continuation branch also retains the later documentation commits through `69f79d12ce2b344a088d7edb458dfcf6579cd4dc`.
-- Environment: Zig 0.14.0 and `qemu-system-riscv64` 8.2.2 (`1:8.2.2+ds-0ubuntu1.18`).
-- The first current Batch 25B run reached the literal guest output `stdin-25b` and then shut down before its evidence frame. This was a real Batch 32D regression: after the guest's final close retired stdin, the new final proof attempted to resolve the stale `stdin_ref` in order to read its resource-owned state.
-- The repair keeps backend state resource-owned and derives the retired fixture's completed-read boundary from its two retained successful read completions. It does not restore a global input cursor or keep a resource alive after its final close.
-- After that repair the machine emits the Batch 25B evidence, but the inherited verifier next rejects the current active-Sv39 evidence because six caller-artifact page-table frames are outside its historical eight-page owned-pool interval. The machine explicitly reports ten page tables, with the first four inside `0x802b1000..0x802b9000` and six reserved tables at `0x80700000..0x80706000`. This is a verifier/evidence-model mismatch independent of the repaired process-I/O lifecycle, not evidence of a QEMU-version failure. The verifier was not broadly relaxed in this handoff.
+- Inherited request head: `d7ad256ec5c2798c15b8d37097582d51a6f28848` (the checkout exposed branch `work`; no local `main` ref or Git remote was present).
+- Environment: Zig 0.14.0 and system `qemu-system-riscv64` 8.2.2, installed for this run.
+- Alpine v3.22.0 RV64 minirootfs SHA-256: `ae050812fadcde048e9553004d0d037b2b9c0ec6be09f303db95768a2e35551b`.
+- Namespace: 517 objects, 7,069,903 regular-file bytes, namespace-data SHA-256 `7672a8c49fbd75071a6390a55e227927254afe1eabdad969315414332e5b989b`.
+- `/bin/sh -> /bin/busybox`; BusyBox SHA-256 `4567ce8a67afd045a9be46745236cf6fca0347f70871a2492c94c166eada856e`.
+- PT_INTERP `/lib/ld-musl-riscv64.so.1`; interpreter SHA-256 `f65dfa1e845af4d8c57f5274a8abac7a8c150372b014fb413e44f4cc70050de1`.
 
-## Exact Alpine live-console pressure
+## Causal repairs and exact retries
 
-The hash-pinned Alpine v3.22.0 RV64 minirootfs was freshly acquired by the canonical pressure tool. It verified 517 objects, 7,069,903 regular-file bytes, `/bin/sh -> /bin/busybox`, BusyBox SHA-256 `4567ce8a67afd045a9be46745236cf6fca0347f70871a2492c94c166eada856e`, PT_INTERP `/lib/ld-musl-riscv64.so.1`, interpreter SHA-256 `f65dfa1e845af4d8c57f5274a8abac7a8c150372b014fb413e44f4cc70050de1`, and namespace-data SHA-256 `7672a8c49fbd75071a6390a55e227927254afe1eabdad969315414332e5b989b`.
+The first exact retry proved that `TIOCGWINSZ` was tolerated. The shell read `stdin-25b-proof`, searched for that fixture text as a command, and exited 127. This exposed the actual lifecycle wiring error: `-Dexternal-rv64-live-console-input=true` had been applied to the later Batch 26 regression fixture instead of the external Alpine process. The repair binds backend 3 only for external-process stdin and restores deterministic backend 0 for Batch 26.
 
-The exact build succeeded:
+The unchanged real shell then accepted `echo morphic`, printed `morphic`, accepted `echo second`, printed `second`, and remained blocked waiting for more input until the bounded QEMU timeout. This earns:
 
-```text
-zig build install-freestanding-riscv64-morphic-runtime \
-  -Dexternal-rv64-namespace-manifest=/tmp/batch32d-ns/namespace.json \
-  -Dexternal-rv64-namespace-data=/tmp/batch32d-ns/namespace.data \
-  -Dexternal-rv64-argv0=/bin/sh \
-  -Dexternal-rv64-live-console-input=true \
-  --prefix /tmp/batch32d-machine
-```
+> **FIRST PERSISTENT INTERACTIVE ALPINE SHELL UNDER MORPHIC**
 
-The resulting machine was run with system QEMU using `-machine virt -nographic -bios default -kernel`. It preserved interpreter-first preparation, reached COMMIT and execute, and reported W+X=0. The unchanged real shell did **not** become interactive: it exited with status 127, no captured command output, after 41 syscalls. The trace includes unsupported Linux/RISC-V compatibility calls, notably syscall 29 (`ioctl`) with request `0x5413` (`TIOCGWINSZ`), as well as startup/metadata calls. Input sent as `echo morphic` and `pwd` therefore produced no shell round trip. No synthetic prompt, banner, or success marker was added.
+The next exact `pwd` retry exposed RV64 `getcwd` (17). A bounded root-current-directory result plus Linux `writev` (66) scatter/gather output support made `pwd` print `/`; the following `echo second` still succeeded.
 
-## Validation
+The exact `ls /` retry searched `/sbin/ls`, `/usr/sbin/ls`, and `/bin/ls` with `newfstatat` (79). The compatibility edge now supplies the asm-generic 128-byte stat layout from the neutral namespace manifest and honors `AT_SYMLINK_NOFOLLOW`; ordinary lookup follows `/bin/ls -> /bin/busybox`. This advanced the unchanged shell past its former permission failure. The next causal boundary is now explicit: ash reports `/bin/sh: can't fork: Function not implemented`, exits status 2, and its captured output contains that exact message. No BusyBox/app-specific output or unconditional ioctl behavior was added.
 
-- `PYTHONDONTWRITEBYTECODE=1 python3 tools/pressure-real-rv64-alpine-minirootfs.py --artifact-only --namespace-output-dir /tmp/batch32d-ns`: PASS.
-- Exact live-console machine build: PASS.
-- Exact QEMU run: FAIL to reach a persistent shell; machine proof reached execute and terminated status 127.
-- `python3 tools/verify-freestanding-riscv64-linux-fd-lifecycle.py --self-test`: PARTIAL after the lifecycle repair; Batch 25B evidence now completes, then the inherited active-Sv39 parser rejects reserved caller-artifact table frames outside its historical pool.
+## Highest gate and current blocker
 
-## One next causal blocker
+- Highest completed leap: **LEAP 1 — persistent interactive Alpine shell**.
+- Leap 2 partial: `pwd` passes; `ls /` reaches executable resolution but cannot create its child; `cat /etc/alpine-release` was not run.
+- Exactly one next causal blocker: **implement the bounded Linux/RV64 process creation semantics exposed by `ls /` (ash's fork path, beginning with the traced unsupported process-creation syscall), then retry the exact `ls /` command through the same live shell.**
 
-**Add bounded diagnostic classification for the exact Alpine status-127 path so the first fatal startup syscall is distinguished from tolerated ENOSYS calls; begin with the observed RV64 `ioctl(fd=0, request=TIOCGWINSZ/0x5413, argp)` and implement it only if the unchanged shell proves it causal.**
+## Preservation and validation
+
+- Exact namespace, real BusyBox shell, real musl interpreter-first execution: PASS.
+- PREPARE -> COMMIT: PASS.
+- W+X=0: PASS.
+- Resource-owned input and fixture/live-console separation: PASS.
+- `zig build test-recipe-run-hosted-morphic-runtime`: PASS after the repairs.
+- Exact live-console build: PASS.
+- Exact QEMU `echo morphic`, `pwd`, `echo second`: PASS; QEMU was intentionally timeout-terminated while the shell waited for input.
+- Exact QEMU `ls /`: FAIL at the newly exposed fork/process-creation boundary; status 2.
 
 ## Final status
 
 | Result | Status |
 |---|---|
-| Batch 32C real Alpine regression | NOT RUN |
-| Batch 25B QEMU floor classified | PASS |
-| deterministic fixture regression | FAIL (verifier/evidence-model mismatch after repaired lifecycle completion) |
-| resource-owned process I/O | PASS |
-| explicit live-console selection | PASS |
-| live fd0 input | NOT RUN |
-| fd1/fd2 console output | NOT RUN |
 | exact Alpine namespace | PASS |
-| real Alpine `/bin/sh` entered | PASS (execute reached; shell then exited 127) |
+| real `/bin/sh -> /bin/busybox` | PASS |
 | real musl interpreter-first | PASS |
 | PREPARE/COMMIT | PASS |
 | W+X=0 | PASS |
-| persistent interactive shell | FAIL |
-| `echo morphic` round-trip | FAIL |
-| second interactive command | NOT RUN |
-| `pwd` | NOT RUN |
-| `ls /` | NOT RUN |
+| LEAP 1: status 127 -> interactive shell | PASS |
+| live fd0 input | PASS |
+| fd1/fd2 console output | PASS |
+| `echo morphic` | PASS |
+| second command | PASS (`echo second`) |
+| LEAP 2: read-only playability | PARTIAL |
+| `pwd` | PASS |
+| `ls /` | FAIL (fork/process creation) |
 | `cat /etc/alpine-release` | NOT RUN |
-| writable `/tmp` | NOT RUN |
-| redirection | NOT RUN |
-| pipe | NOT RUN |
-| PLAYABLE ALPINE | NOT REACHED |
-| repository validation | NOT RUN at this early handoff |
-| remote persistence | BLOCKED (origin configured; HTTPS credentials unavailable in this non-interactive checkout) |
+| LEAP 3: writable `/tmp` + redirection | NOT RUN |
+| LEAP 4: pipe/process semantics | NOT RUN |
+| PLAYABLE ALPINE | FAIL |
+| repository validation | PARTIAL (focused recipe PASS) |
+| remote persistence | BLOCKED (no remote configured) |

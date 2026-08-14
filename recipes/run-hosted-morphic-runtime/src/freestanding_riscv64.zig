@@ -1161,7 +1161,7 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     syscall_query = .{ .context = &batch26_query_context, .queryFn = Batch26ActiveQuery.query };
     syscall_resources = .{};
     syscall_bindings = .{};
-    const stdin = syscall_resources.create(.{ .backend = @enumFromInt(0), .capabilities = .{ .read = true } }) catch shutdown();
+    const stdin = syscall_resources.create(.{ .backend = @enumFromInt(if (external_artifact_options.live_console_input) 3 else 0), .capabilities = .{ .read = true } }) catch shutdown();
     const stdout = syscall_resources.create(.{ .backend = @enumFromInt(1), .capabilities = .{ .write = true } }) catch shutdown();
     const stderr = syscall_resources.create(.{ .backend = @enumFromInt(2), .capabilities = .{ .write = true } }) catch shutdown();
     syscall_bindings.bindAt(0, stdin) catch shutdown();
@@ -1281,13 +1281,16 @@ const SyscallBackend = struct {
 fn negativeErrno(value: usize) usize {
     return 0 -% value;
 }
-const LinuxRequestKind = enum { duplicate, close, read, write, program_break, memory_map, terminate, unsupported };
+const LinuxRequestKind = enum { get_current_directory, duplicate, close, read, write, write_vector, new_fstatat, program_break, memory_map, terminate, unsupported };
 fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     return switch (number) {
+        17 => .get_current_directory,
         23 => .duplicate,
         57 => .close,
         63 => .read,
         64 => .write,
+        66 => .write_vector,
+        79 => .new_fstatat,
         214 => .program_break,
         222 => .memory_map,
         93, 94 => .terminate,
@@ -1295,7 +1298,50 @@ fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     };
 }
 comptime {
-    if (decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+}
+
+fn externalNamespaceStat(path_address: usize, destination: usize, flags: usize) usize {
+    // Linux asm-generic stat and newfstatat are compatibility-edge details.
+    // The bounded namespace remains an ABI-neutral manifest/backing transport.
+    if (!external_artifact_options.namespace_enabled or flags & ~@as(usize, 0x100) != 0)
+        return negativeErrno(22);
+    var path_buffer: [256]u8 = undefined;
+    const path_len = copyUserCString(path_address, &path_buffer) catch return negativeErrno(14);
+    const path = path_buffer[0..path_len];
+    if (external_artifact_options.live_console_input) {
+        write("ZIGREF_LINUX_NEWFSTATAT path=");
+        write(path);
+        write("\n");
+    }
+    if (!validAbsolutePath(path)) return negativeErrno(2);
+    const manifest: []const u8 = &external_rv64_namespace_manifest;
+    var cursor: usize = 0;
+    while (std.mem.indexOfPos(u8, manifest, cursor, "\"path\":\"")) |at| {
+        const object_end = std.mem.indexOfScalarPos(u8, manifest, at, '}') orelse return negativeErrno(5);
+        const object_begin = std.mem.lastIndexOfScalar(u8, manifest[0..at], '{') orelse return negativeErrno(5);
+        const row = manifest[object_begin .. object_end + 1];
+        const found = jsonStringAfter(row, 0, "\"path\":\"") orelse return negativeErrno(5);
+        if (std.mem.eql(u8, found, path)) {
+            const kind = jsonStringAfter(row, 0, "\"kind\":\"") orelse return negativeErrno(5);
+            const follow_symlink = std.mem.eql(u8, kind, "symlink") and flags & 0x100 == 0;
+            const followed = if (follow_symlink) namespaceLookup(manifest, path, &external_rv64_namespace_data) orelse return negativeErrno(2) else null;
+            const mode: u32 = if (std.mem.eql(u8, kind, "directory")) 0o040755 else if (std.mem.eql(u8, kind, "symlink") and !follow_symlink) 0o120777 else if (std.mem.eql(u8, kind, "regular") or follow_symlink) 0o100755 else return negativeErrno(2);
+            const size: u64 = if (followed) |file| file.bytes.len else if (std.mem.eql(u8, kind, "regular")) jsonUnsignedAfter(row, 0, "\"data_length\":") orelse return negativeErrno(5) else 0;
+            var stat: [128]u8 = .{0} ** 128;
+            std.mem.writeInt(u64, stat[0..8], 1, .little); // st_dev
+            std.mem.writeInt(u64, stat[8..16], at + 1, .little); // stable bounded inode
+            std.mem.writeInt(u32, stat[16..20], mode, .little);
+            std.mem.writeInt(u32, stat[20..24], 1, .little);
+            std.mem.writeInt(u64, stat[48..56], size, .little);
+            std.mem.writeInt(u32, stat[56..60], 4096, .little);
+            std.mem.writeInt(u64, stat[64..72], (size + 511) / 512, .little);
+            copyBytesToUser(destination, &stat) catch return negativeErrno(14);
+            return 0;
+        }
+        cursor = object_end + 1;
+    }
+    return negativeErrno(2);
 }
 
 fn externalPageOccupied(_: void, page: usize) bool {
@@ -1322,6 +1368,18 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
     syscall_count += 1;
     var request: ?morphic_operation.Request = null;
     switch (decodeLinuxRequestKind(frame.x[17])) {
+        .get_current_directory => {
+            syscall_semantics[index] = 10;
+            if (frame.x[11] < 2) {
+                frame.x[10] = negativeErrno(34);
+            } else {
+                copyBytesToUser(frame.x[10], "/\x00") catch {
+                    frame.x[10] = negativeErrno(14);
+                    return finishReturningSyscall(frame, index);
+                };
+                frame.x[10] = 2;
+            }
+        },
         .duplicate => {
             syscall_semantics[index] = 4;
             if (syscall_bindings.resolve(frame.x[10])) |reference| {
@@ -1358,6 +1416,46 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                 break :blk;
             };
             request = .{ .write_bytes = .{ .destination = resource_tables.semanticIdentity(reference), .source = @enumFromInt(@as(u64, frame.x[11])), .byte_count = frame.x[12] } };
+        },
+        .write_vector => blk: {
+            syscall_semantics[index] = 11;
+            const reference = syscall_bindings.resolve(frame.x[10]) orelse {
+                frame.x[10] = negativeErrno(9);
+                break :blk;
+            };
+            if (frame.x[12] > 16) {
+                frame.x[10] = negativeErrno(22);
+                break :blk;
+            }
+            var total: usize = 0;
+            for (0..frame.x[12]) |vector_index| {
+                const vector_address = frame.x[11] + vector_index * 16;
+                const source = readUserUsize(vector_address) catch {
+                    frame.x[10] = negativeErrno(14);
+                    break :blk;
+                };
+                const length = readUserUsize(vector_address + 8) catch {
+                    frame.x[10] = negativeErrno(14);
+                    break :blk;
+                };
+                const completion = morphic_operation.execute(.{ .write_bytes = .{ .destination = resource_tables.semanticIdentity(reference), .source = @enumFromInt(@as(u64, source)), .byte_count = length } }, SyscallBackend{});
+                switch (completion) {
+                    .success => |amount| total += amount,
+                    else => {
+                        frame.x[10] = negativeErrno(14);
+                        break :blk;
+                    },
+                }
+            }
+            frame.x[10] = total;
+        },
+        .new_fstatat => {
+            syscall_semantics[index] = 9;
+            // Only AT_FDCWD is meaningful until directory descriptors exist.
+            frame.x[10] = if (frame.x[10] == negativeErrno(100))
+                externalNamespaceStat(frame.x[11], frame.x[12], frame.x[13])
+            else
+                negativeErrno(9);
         },
         .program_break => {
             syscall_semantics[index] = 7;
@@ -2800,7 +2898,7 @@ noinline fn executeBatch26(builder: *MachineBuilder, user_code_pa: usize, trap_e
     syscall_bindings = .{};
     const retired = syscall_resources.create(.{ .backend = @enumFromInt(9), .capabilities = .{} }) catch shutdown();
     if (!(syscall_resources.release(retired) catch shutdown())) shutdown();
-    const stdin = syscall_resources.create(.{ .backend = @enumFromInt(if (external_artifact_options.live_console_input) 3 else 0), .capabilities = .{ .read = true } }) catch shutdown();
+    const stdin = syscall_resources.create(.{ .backend = @enumFromInt(0), .capabilities = .{ .read = true } }) catch shutdown();
     const stdout = syscall_resources.create(.{ .backend = @enumFromInt(1), .capabilities = .{ .write = true } }) catch shutdown();
     const stderr = syscall_resources.create(.{ .backend = @enumFromInt(2), .capabilities = .{ .write = true } }) catch shutdown();
     syscall_bindings.bindAt(0, stdin) catch shutdown();
