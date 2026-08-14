@@ -14,7 +14,7 @@ The project should aim beyond being an interesting kernel, an impressive compati
 
 The target is a computer a person can live in.
 
-A scientist should be able to research in it. A programmer should be able to build in it. A student should be able to learn in it. An engineer should be able to inspect it. A creator should be able to use it every day.
+A scientist should be able to research in it. A programmer should be able to build in it. A student should be able to learn in it. An engineer should be able to inspect it. A creator should be able to use it every day. A player should be able to launch a demanding game and feel that the machine is working for the game rather than against it.
 
 The long-term objective is not merely to run on RISC-V.
 
@@ -96,7 +96,7 @@ No user should be asked to sacrifice useful work in order to prove loyalty to th
 
 ## The first people we should serve
 
-The first serious audience should be builders:
+The first serious audience should be builders and people who push computers hard:
 
 - scientists;
 - researchers;
@@ -107,12 +107,13 @@ The first serious audience should be builders:
 - designers;
 - video and audio creators;
 - game developers;
+- gamers;
 - technical creators;
 - people who want to understand and modify their machine.
 
 These users benefit directly from a system whose mechanisms are unusually inspectable and whose development environment is excellent.
 
-A QuirkM workstation should eventually make tools such as Python, R, Julia, Jupyter, LaTeX, Git, SSH, C, Zig, numerical tools, scientific libraries, editors, debuggers, terminals, creative suites, graphics tools, media tools, and reproducible development workflows feel native to daily life.
+A QuirkM workstation should eventually make tools such as Python, R, Julia, Jupyter, LaTeX, Git, SSH, C, Zig, numerical tools, scientific libraries, editors, debuggers, terminals, creative suites, graphics tools, media tools, game engines, and reproducible development workflows feel native to daily life.
 
 The platform should become a place where doing technical and creative work is easier, not merely possible.
 
@@ -231,7 +232,7 @@ Background software must justify consuming those resources.
 
 This does not mean forcing every application into one process or removing useful isolation. Modern creative applications may legitimately use many threads, helper processes, codecs, render workers, plugins, GPU queues, and sandboxed components.
 
-The target is unnecessary background machinery: idle update agents, launchers, telemetry, indexing, duplicate helpers, sync processes, decorative services, and unrelated applications should not quietly compete with a render, simulation, compile, recording session, or large creative document.
+The target is unnecessary background machinery: idle update agents, launchers, telemetry, indexing, duplicate helpers, sync processes, decorative services, and unrelated applications should not quietly compete with a render, simulation, compile, recording session, large creative document, or game.
 
 QuirkM should therefore pursue mechanisms such as:
 
@@ -248,7 +249,7 @@ QuirkM should therefore pursue mechanisms such as:
 
 This should become measurable rather than rhetorical.
 
-For example, a 16 GB QuirkM workstation should be evaluated by how much RAM, CPU capacity, GPU capacity, and I/O budget remain genuinely available to Blender, QArt, GIMP, Krita, Godot, a video editor, a DAW, a scientific simulation, or another foreground workload after the required operating-system services are running.
+For example, a 16 GB QuirkM workstation should be evaluated by how much RAM, CPU capacity, GPU capacity, and I/O budget remain genuinely available to Blender, QArt, GIMP, Krita, Godot, a video editor, a DAW, a scientific simulation, a demanding game, or another foreground workload after the required operating-system services are running.
 
 QuirkM should not chase a tiny idle-memory number merely for screenshots. It should minimize overhead that does not contribute to the user's work and maximize useful resources available when the workload actually needs them.
 
@@ -261,6 +262,63 @@ A creator should not need a workstation with twice the memory merely to survive 
 A smaller machine should feel larger because less of it is being spent on things the owner did not ask to run.
 
 This creator-workstation principle should influence the scheduler, resource model, compositor, package policies, service architecture, GPU work, first-party applications, and performance benchmarking from the beginning rather than being added later as a marketing mode.
+
+---
+
+## Gaming: build the machine to get out of the game's way
+
+Gaming should be treated as a first-class stress test of the QuirkM resource philosophy.
+
+A modern game may legitimately want large amounts of RAM, many CPU cores, GPU queues, shader compilation, asset streaming, audio processing, networking, input, storage bandwidth, and helper processes. QuirkM should not artificially constrain that architecture merely to achieve a small process count.
+
+Instead, QuirkM should make everything outside the active game earn its right to consume resources.
+
+The benefit of building the system from scratch is that this policy can influence the architecture from the beginning rather than being added later as a compatibility mode on top of a desktop full of permanent background assumptions.
+
+When a game becomes the foreground workload, QuirkM should eventually be capable of:
+
+- suspending or heavily throttling nonessential background applications;
+- deferring indexing, updates, sync, maintenance, and other unrelated work;
+- giving the game explicit CPU and memory priority;
+- protecting a useful reserve for the kernel, drivers, compositor, networking, audio, and recovery while making the rest available to the game;
+- prioritizing GPU queues and frame-critical work where the hardware and drivers permit it;
+- minimizing avoidable context switching, wakeups, memory pressure, and I/O contention;
+- making the exact resource cost of the operating system visible and benchmarkable;
+- restoring suspended work predictably when the game exits.
+
+On a 16 GB machine, the goal is not the impossible claim that a game receives every one of the 16 GB. The machine still needs memory to remain a machine.
+
+The goal is stronger and measurable:
+
+> **Give the game as much of those 16 GB as can safely and usefully be given to it, and make the remaining operating-system cost unusually small, explicit, and justified.**
+
+That may allow some marginal workloads to remain usable on QuirkM where the same hardware would struggle under a heavier background environment. Such claims must be proven game by game and machine by machine rather than assumed.
+
+QuirkM should eventually benchmark this directly:
+
+- usable RAM available immediately before launch;
+- peak game-available memory before pressure;
+- background CPU wakeups while gaming;
+- frame-time variance and 1% lows;
+- shader/build latency;
+- storage contention;
+- GPU utilization available to the foreground workload;
+- time to suspend and restore background work;
+- total operating-system memory and CPU cost during gameplay.
+
+The ambition is not simply "games run on QuirkM."
+
+It is:
+
+> **QuirkM should become a place where demanding games and creative workloads get an unusually large share of the computer they are running on.**
+
+If compatibility eventually allows an existing game to run, QuirkM should give it this benefit.
+
+If native QuirkM games appear, the platform APIs should let developers design for this model directly.
+
+If a future workload is barely too large for a conventional 16 GB environment but fits because QuirkM spends substantially less memory and compute on unrelated machinery, that is exactly the kind of practical advantage the architecture should be capable of producing and proving.
+
+This is not a late optimization project. It is one of the reasons to build the system from the ground up.
 
 ---
 
@@ -312,11 +370,11 @@ Shift increasing engineering attention toward the native environment.
 
 Use ratified RISC-V virtualization where available to host complete foreign systems and strengthen the migration path.
 
-### 6. QuirkM creator and research workstation
+### 6. QuirkM creator, gaming, and research workstation
 
-Reach the point where a creator or technical user can spend an entire day in QuirkM and prefer doing so.
+Reach the point where a creator, player, or technical user can spend an entire day in QuirkM and prefer doing so.
 
-That means real development, research, graphics, 3D, audio, video, game development, writing, browsing, communication, scientific software, native applications, compatibility, and virtual machines living together as one coherent machine.
+That means real development, research, graphics, 3D, audio, video, game development, gaming, writing, browsing, communication, scientific software, native applications, compatibility, and virtual machines living together as one coherent machine.
 
 It also means demonstrating that the operating system gives the active workload an unusually high share of the machine's useful CPU, RAM, GPU, I/O, and latency budget.
 
@@ -336,7 +394,7 @@ It must not become a compatibility laboratory that endlessly implements obscure 
 
 It must not become a collection of demonstrations that cannot support someone's ordinary working day.
 
-It must not become a desktop that burns significant machine resources on background machinery while asking creators to buy more hardware to compensate.
+It must not become a desktop that burns significant machine resources on background machinery while asking creators or gamers to buy more hardware to compensate.
 
 It must not confuse architectural elegance with adoption.
 
@@ -387,11 +445,11 @@ Success is not merely reaching a desktop.
 
 Success is not merely having a clever hypervisor or a small kernel.
 
-Success is not merely opening a creative application while most of the machine is consumed by unrelated operating-system machinery.
+Success is not merely opening a creative application or game while most of the machine is consumed by unrelated operating-system machinery.
 
 The long-term success condition is much more demanding:
 
-> A person can choose a RISC-V QuirkM machine for real work, inherit the software they already need, create with excellent packaged or native tools, build better native software when they want to, understand substantially more of the machine beneath them, receive an unusually large share of the machine's useful resources for the work they are actually doing, and prefer the experience enough to stay.
+> A person can choose a RISC-V QuirkM machine for real work and play, inherit the software they already need, create with excellent packaged or native tools, run demanding games with an unusually large share of the machine available to them, build better native software when they want to, understand substantially more of the machine beneath them, and prefer the experience enough to stay.
 
 If that happens, Morphic will have done more than host foreign software.
 
