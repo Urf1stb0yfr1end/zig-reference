@@ -10,6 +10,7 @@ This directory is the canonical home for QuirkM documentation.
 - `QUIRKM_NATIVE_API_AND_LINUX_QUIRK_QUARANTINE_PROPOSAL.md` — architecture, quirk quarantine, native/Linux dual personality, agentic migration, and design laws.
 - `100_PARAMOUNT_LINUX_COMPATIBILITY_DEBTS.md` — Q-0001 through Q-0100, the highest-priority inherited Linux compatibility debts QuirkM should study first.
 - `ANOTHER_400_LINUX_ISSUES.md` — Q-0101 through Q-0500, the broader research backlog of Linux pitfalls, sharp edges, legacy surfaces, and design pressures.
+- `NON_INHERITANCE_PROOF_TEMPLATE.md` — canonical promotion/proof format for demonstrating that Morphic preserves required Linux behavior while native QuirkM does not inherit the historical property.
 
 ## Core rule
 
@@ -29,6 +30,8 @@ native counter-proof
 Linux compatibility proof
 agent migration rule, if one can be made safe and reusable
 ```
+
+For the compact two-sided evidence format used to promote a candidate into a demonstrated non-inheritance result, use `NON_INHERITANCE_PROOF_TEMPLATE.md`.
 
 The Quirk Ledger is therefore not a list of insults aimed at Linux. It is a design and migration corpus.
 
