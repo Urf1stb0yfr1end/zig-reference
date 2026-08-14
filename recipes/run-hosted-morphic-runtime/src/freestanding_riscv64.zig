@@ -2796,8 +2796,7 @@ noinline fn executeBatch26(builder: *MachineBuilder, user_code_pa: usize, trap_e
     syscall_bindings = .{};
     const retired = syscall_resources.create(.{ .backend = @enumFromInt(9), .capabilities = .{} }) catch shutdown();
     if (!(syscall_resources.release(retired) catch shutdown())) shutdown();
-    const live_console = external_artifact_options.namespace_enabled and external_artifact_options.argv1.len == 0;
-    const stdin = syscall_resources.create(.{ .backend = @enumFromInt(if (live_console) 3 else 0), .capabilities = .{ .read = true } }) catch shutdown();
+    const stdin = syscall_resources.create(.{ .backend = @enumFromInt(if (external_artifact_options.live_console_input) 3 else 0), .capabilities = .{ .read = true } }) catch shutdown();
     const stdout = syscall_resources.create(.{ .backend = @enumFromInt(1), .capabilities = .{ .write = true } }) catch shutdown();
     const stderr = syscall_resources.create(.{ .backend = @enumFromInt(2), .capabilities = .{ .write = true } }) catch shutdown();
     syscall_bindings.bindAt(0, stdin) catch shutdown();

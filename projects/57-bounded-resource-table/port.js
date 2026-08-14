@@ -114,6 +114,10 @@ module.exports = {
         "signature": "resolve(self: *const Self, reference_or_slot: anytype) optional result"
       },
       {
+        "name": "setState",
+        "signature": "setState(self: *Self, reference: ResourceRef, state: usize) Error!void"
+      },
+      {
         "name": "referenceCount",
         "signature": "referenceCount(self: *const Self, reference: ResourceRef) ?usize"
       },
