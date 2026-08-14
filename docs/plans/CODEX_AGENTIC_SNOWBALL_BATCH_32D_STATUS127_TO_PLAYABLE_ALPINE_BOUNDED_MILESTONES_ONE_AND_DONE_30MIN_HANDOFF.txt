@@ -1,28 +1,38 @@
 CODEX AGENTIC SNOWBALL — BATCH 32D CONTINUATION
 STATUS 127 -> INTERACTIVE SHELL -> PLAYABLE ALPINE
-BOUNDED MILESTONES / ONE-AND-DONE / 30-MINUTE HANDOFF
+BOUNDED LEAPS / MAXIMUM USEFUL PROGRESS / 30-MINUTE HANDOFF
 
 Repository: thanks-cohn/zig-reference
 Canonical path:
 docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32D_STATUS127_TO_PLAYABLE_ALPINE_BOUNDED_MILESTONES_ONE_AND_DONE_30MIN_HANDOFF.txt
 
 Start from current main.
-Inherited frontier at authoring time:
+Authoring frontier:
 ec09015d94fbd19ecaa6737108c2b412b900d7bd
 
 PRIMARY GOAL
 
-Reach PLAYABLE ALPINE from the current exact Alpine v3.22.0 RV64 /bin/sh status-127 frontier.
+Reach PLAYABLE ALPINE as far as the 30-minute implementation window permits.
 
-The campaign is Alpine-first. QEMU is only the current execution vehicle. Do not spend this run on unrelated historical verifier work unless the exact current Alpine failure directly requires it.
+This is an Alpine-first campaign. QEMU is only the current execution vehicle. Historical verifier work, general QEMU investigation, cleanup, documentation polish, or unrelated repository repair must not consume the run unless the exact current Alpine path directly requires it.
 
-Use the unchanged real Alpine /bin/sh as the pressure source. After every repair, retry the same shell immediately.
+MAXIMUM USEFUL PROGRESS RULE
+
+Do not treat this as a one-syscall or one-fix task.
+
+Work in bounded LEAPS. Each leap has a concrete acceptance gate. Within a leap, fix as many causally exposed blockers as are needed and reasonably achievable. After each repair, rerun the exact Alpine shell or exact failing command and keep advancing.
+
+Do not stop after the first successful repair if the next blocker is already exposed and there is time to continue.
+Do not spend excessive time perfecting one diagnostic when a bounded experiment can classify the failure.
+Do not stop merely because a milestone was reached; immediately begin the next leap while time remains.
+
+The objective is the maximum amount of real, reusable progress toward PLAYABLE ALPINE, with useful work safely persisted before the 30-minute cutoff.
 
 CURRENT PROVEN STATE
 
-Preserve all of the following:
+Preserve:
 - exact Alpine v3.22.0 RV64 namespace identity;
-- /bin/sh -> /bin/busybox from the real namespace;
+- real /bin/sh -> /bin/busybox lookup;
 - real /lib/ld-musl-riscv64.so.1 from the same namespace;
 - real musl interpreter-first execution;
 - PREPARE -> COMMIT -> execute;
@@ -30,190 +40,193 @@ Preserve all of the following:
 - Batch 32D resource-owned process I/O;
 - deterministic fixture/live-console backend separation;
 - explicit live-console input selection independent of argv;
-- live-console build surface through -Dexternal-rv64-live-console-input=true;
+- -Dexternal-rv64-live-console-input=true build surface;
 - no global stdin cursor;
-- no BusyBox/ash/Alpine-specific behavior in neutral Morphic mechanisms.
+- no application-specific behavior in neutral Morphic mechanisms.
 
 CURRENT EXACT FAILURE
 
-The exact real Alpine /bin/sh now reaches execution and exits status 127 after 41 traced syscalls before a persistent interactive round trip.
+The exact real Alpine /bin/sh reaches execution and exits status 127 after 41 traced syscalls before a persistent interactive round trip.
 
-Observed startup pressure includes Linux/RISC-V syscall 29 ioctl with request TIOCGWINSZ (0x5413), plus other startup/metadata calls. Do not assume TIOCGWINSZ is fatal merely because it appears in the trace.
-
-The immediate job is to identify the first causal failure on the status-127 path, implement the smallest general semantic required by the unchanged shell, and retry the same shell.
+Observed startup pressure includes Linux/RISC-V syscall 29 ioctl with TIOCGWINSZ (0x5413) and other startup/metadata calls. TIOCGWINSZ is a lead, not an assumption. Identify the actual causal boundary.
 
 ======================================================================
-MILESTONE 1 — CLASSIFY THE STATUS-127 CAUSE
+LEAP 1 — STATUS 127 -> PERSISTENT INTERACTIVE ALPINE SHELL
 ======================================================================
 
-Bound this diagnostic tightly.
+Goal:
 
-Add or use bounded diagnostics that answer:
-- which syscall/result immediately precedes the shell's fatal path;
-- which ENOSYS or other failures are tolerated;
-- whether TIOCGWINSZ is causal or merely incidental;
-- whether the fatal boundary is ioctl, file metadata, tty identity, process state, or another exact semantic.
+  real Alpine /bin/sh
+      -> survives startup
+      -> waits for live input
+      -> accepts echo morphic
+      -> prints morphic
+      -> accepts another command afterward
 
-Requirements:
-- preserve the real shell unchanged;
-- do not synthesize success;
-- do not broadly implement every unsupported syscall in the trace;
-- do not rewrite old verifiers unless current Alpine evidence requires it;
-- prefer one precise diagnostic over broad tracing changes.
+This leap may require MULTIPLE repairs. Continue through them while they are causally exposed.
 
-Success condition:
-- one exact first causal startup semantic is identified with evidence.
+Execution loop inside this leap:
+1. run the exact live-console Alpine /bin/sh;
+2. capture the earliest failure that is actually causal to exit 127 or shell death;
+3. distinguish tolerated failures from fatal ones;
+4. implement the smallest general compatible semantic in the correct layer;
+5. add a focused proof where practical;
+6. rebuild and rerun the exact same shell immediately;
+7. if the shell advances to another blocker, repeat without stopping.
 
-Then immediately move to Milestone 2.
-
-======================================================================
-MILESTONE 2 — MINIMUM GENERAL REPAIR
-======================================================================
-
-Implement only the semantic proven causal by Milestone 1.
+Possible pressure includes ioctl/TTY behavior, metadata, fd semantics, process state, or another exact Linux compatibility requirement. The shell decides the order.
 
 If TIOCGWINSZ is causal:
-- implement the required Linux compatibility behavior at the Linux ABI edge;
+- implement only the required Linux ABI behavior;
 - use authoritative Linux/RISC-V UAPI definitions;
-- keep Linux ioctl request values and struct layout out of neutral Morphic resource types;
-- model reusable terminal state/capabilities neutrally only if the implementation genuinely needs them;
-- do not return unconditional ioctl success for unrelated requests.
+- keep Linux ioctl numbers and structure layouts at the compatibility edge;
+- keep neutral terminal state/capability concepts separate when genuinely reusable;
+- do not return unconditional success for unrelated ioctl requests.
 
-If another syscall or semantic is causal, apply the same rule:
-- correct layer;
-- smallest reusable mechanism;
-- focused test/proof;
-- no application-specific shortcut.
+Acceptance gate:
+- live fd0 input works;
+- fd1/fd2 output is visible;
+- shell stays alive;
+- `echo morphic` produces `morphic`;
+- a second command succeeds afterward.
 
-Success condition:
-- focused proof passes;
-- the exact same Alpine /bin/sh is rebuilt and rerun immediately.
-
-If the shell advances to a new failure, repeat Milestones 1 and 2 on the new first causal blocker. Do not stop merely because one syscall was repaired.
-
-======================================================================
-MILESTONE 3 — FIRST PERSISTENT INTERACTIVE ALPINE SHELL
-======================================================================
-
-Target:
-- exact real Alpine /bin/sh;
-- live fd0 input;
-- fd1/fd2 visible console output;
-- shell remains alive waiting for input;
-- type: echo morphic
-- observe command output: morphic
-- issue at least one second command successfully afterward.
-
-A prompt is not required to have a particular cosmetic form. The proof is real command/response behavior and continued shell life.
-
-Do not print a fake / #, Alpine banner, or success marker from the kernel/runtime.
-
-When this milestone is reached, record:
+When achieved, record:
 
   ★ FIRST PERSISTENT INTERACTIVE ALPINE SHELL UNDER MORPHIC ★
 
-Then continue immediately while time remains.
+Then immediately begin Leap 2.
 
 ======================================================================
-MILESTONE 4 — READ-ONLY PLAYABILITY
+LEAP 2 — INTERACTIVE SHELL -> READ-ONLY PLAYABILITY
 ======================================================================
 
-Run through the same live shell, in order:
+Through the SAME real shell, run in order:
 
   pwd
   ls /
   cat /etc/alpine-release
 
-For each command:
-- capture the first causal failure;
-- implement only the missing general semantic;
-- add focused proof;
+Do not stop after the first command succeeds.
+
+Within this leap, implement as many causally required general mechanisms as needed to make the whole set work. Pressure may include cwd/path handling, directory enumeration, metadata/stat behavior, namespace reads, fd behavior, exec/lifetime, or related semantics.
+
+For every blocker:
+- identify the first causal missing semantic;
+- implement the minimum general repair;
+- prove it;
 - retry the same command;
-- then continue to the next command.
+- continue through the set.
 
-Likely pressure areas may include cwd/path resolution, directory enumeration, stat/metadata, file reads, fd behavior, or process execution. The observed command decides priority.
-
-Success condition:
-- all three commands work through the real interactive shell;
+Acceptance gate:
+- pwd works;
+- ls / works;
+- cat /etc/alpine-release works;
 - shell remains usable afterward.
 
+Then immediately begin Leap 3.
+
 ======================================================================
-MILESTONE 5 — WRITABLE /tmp + REDIRECTION
+LEAP 3 — READ-ONLY SHELL -> WRITABLE /tmp + REDIRECTION
 ======================================================================
 
-Run:
+Through the same shell, run:
 
   cd /tmp
   echo hello > /tmp/hello
   cat /tmp/hello
 
-Use observed pressure only.
+Push through all causally exposed blockers needed for this bounded leap.
 
-Potential mechanisms include create/open/truncate/write, fd offsets, writable namespace state, cwd, and descriptor redirection. Implement only what the exact command proves necessary.
+Likely pressure may include create/open/truncate/write, writable namespace state, fd offsets, cwd, descriptor replacement/redirection, close behavior, or related semantics. Implement only what the real command path proves necessary, but do not artificially stop after one repair.
 
-Success condition:
-- /tmp/hello is created through the real shell;
-- cat returns hello;
+Acceptance gate:
+- cd /tmp works;
+- /tmp/hello is created by the real shell;
+- redirection writes hello;
+- cat /tmp/hello returns hello;
 - shell remains usable.
 
+Then immediately begin Leap 4.
+
 ======================================================================
-MILESTONE 6 — PIPE
+LEAP 4 — WRITABLE SHELL -> PIPES / PROCESS SEMANTICS -> PLAYABLE ALPINE
 ======================================================================
 
 Run:
 
   echo hello | cat
 
-Use the exact shell pressure to implement only required pipe/process/fd semantics.
+Push through the bounded set of pipe/process/fd requirements directly exposed by this command.
 
-Potential pressure includes pipe creation, read/write endpoints, fd inheritance, close semantics, child lifetime, wait behavior, and EOF propagation. Do not build a broad process subsystem speculatively.
+Possible pressure includes:
+- pipe creation;
+- read/write endpoints;
+- fd inheritance;
+- close/EOF semantics;
+- child execution/lifetime;
+- wait/exit status;
+- scheduler/process interaction needed by the exact pipeline.
 
-Success condition:
-- command outputs hello;
-- shell remains usable afterward.
+Do not speculatively build a broad Unix process subsystem. But if several directly related semantics are required to complete this one pipeline, implement them in the same leap rather than stopping after each individual primitive.
 
-======================================================================
-PLAYABLE ALPINE DEFINITION
-======================================================================
+Acceptance gate:
+- `echo hello | cat` outputs hello;
+- shell remains alive and accepts another command afterward.
 
-PLAYABLE ALPINE may be claimed only when the same real interactive Alpine shell successfully completes:
-
-  echo morphic
-  <a second command>
-  pwd
-  ls /
-  cat /etc/alpine-release
-  cd /tmp
-  echo hello > /tmp/hello
-  cat /tmp/hello
-  echo hello | cat
-
-and remains alive for another command afterward.
-
-When all gates pass, record:
+When all earlier gates also remain true, record:
 
   ★ PLAYABLE ALPINE UNDER MORPHIC ★
 
-Do not begin apk/networking/DNS/TLS before this gate is real.
-
 ======================================================================
-EXECUTION LOOP
+PLAYABLE ALPINE ACCEPTANCE
 ======================================================================
 
-For every blocker:
+PLAYABLE ALPINE is earned when the same real interactive Alpine shell successfully completes:
 
-  exact Alpine failure
-      -> classify one causal semantic
-      -> implement minimum general repair
-      -> focused proof
-      -> retry exact same Alpine shell/command
-      -> advance to next milestone
+  echo morphic
+  <second command>
+  pwd
+  ls /
+  cat /etc/alpine-release
+  cd /tmp
+  echo hello > /tmp/hello
+  cat /tmp/hello
+  echo hello | cat
+  <another command afterward>
 
-Keep iterations small and measurable.
+and preserves:
+- exact Alpine namespace;
+- real BusyBox /bin/sh;
+- real musl interpreter-first execution;
+- PREPARE/COMMIT;
+- W+X=0.
 
-If a diagnostic branch is not producing a concrete causal result, narrow the probe rather than expanding into unrelated subsystems.
+Do not begin apk/networking/DNS/TLS before PLAYABLE ALPINE is genuinely reached.
 
-Do not spend the run cleaning unrelated repository issues, historical verifier mismatches, or general QEMU behavior unless the current exact Alpine path depends on them.
+======================================================================
+PACE / BOUNDED-LEAP RULES
+======================================================================
+
+The run should aggressively advance through the leap ladder.
+
+Preferred behavior:
+- diagnose only enough to identify the next causal repair;
+- implement it;
+- retry immediately;
+- if that exposes the next blocker, continue;
+- cross multiple small implementation boundaries within one leap when they belong to the same acceptance target;
+- cross multiple leaps in one run if progress permits.
+
+Avoid:
+- spending most of the run on one historical verifier;
+- broad QEMU investigation;
+- speculative syscall checklists;
+- unrelated refactors;
+- documentation-first work;
+- stopping after one repair when the next Alpine blocker is already visible;
+- excessive test-suite runs between tiny edits when a focused test + exact Alpine retry gives faster feedback.
+
+If a diagnosis produces no useful causal information after a bounded attempt, change the diagnostic approach rather than expanding scope indefinitely.
 
 ======================================================================
 ARCHITECTURAL CONSTRAINTS
@@ -227,10 +240,11 @@ Do not:
 - weaken PREPARE/COMMIT;
 - weaken W+X=0;
 - reintroduce a global stdin cursor;
-- put Linux ioctl numbers or termios structs into neutral Morphic resources;
-- implement a broad syscall/VFS/process/TTY checklist without observed pressure;
-- replace deterministic regression fixtures with timing-dependent interactive tests;
-- fake a prompt, Alpine banner, or success output.
+- place Linux ioctl numbers or termios structs in neutral Morphic resource APIs;
+- fake a prompt, Alpine banner, command output, or success marker;
+- replace deterministic regression fixtures with timing-dependent interactive tests.
+
+Keep Linux ABI translation at the compatibility edge and reusable mechanisms neutral.
 
 ======================================================================
 REGRESSION FLOOR
@@ -249,13 +263,18 @@ Preserve:
 - deterministic fixture semantics;
 - repository contract/evidence rules.
 
-The known historical active-Sv39 verifier/evidence-model mismatch is not the primary objective of this run. Record it if relevant; do not let it consume the campaign unless current Alpine execution depends on fixing it.
+The known active-Sv39 historical verifier/evidence-model mismatch is not this run's target. Record it if relevant. Do not spend the run fixing it unless the exact current Alpine path depends on it.
 
 ======================================================================
-VALIDATION
+VALIDATION STRATEGY
 ======================================================================
 
-Use focused tests after each mechanism repair.
+During active implementation:
+- prefer focused tests for the mechanism just changed;
+- always rerun the exact Alpine shell/command that exposed the blocker;
+- do not burn large portions of the implementation window repeatedly running the full repository suite after every small repair.
+
+When a coherent leap or major repair is reached, run the relevant stronger checks.
 
 Before final handoff, run the strongest applicable checks that fit the remaining handoff window, prioritizing:
 
@@ -267,43 +286,47 @@ Before final handoff, run the strongest applicable checks that fit the remaining
 
 Regenerate canonical evidence/indexes when source changes require it. Do not hand-edit generated evidence when a canonical generator exists.
 
-The live Alpine execution result is a required test for every repair in this campaign.
-
 ======================================================================
-PERSISTENCE + 30-MINUTE HANDOFF
+PERSISTENCE / MAXIMUM PROGRESS / 30-MINUTE HANDOFF
 ======================================================================
 
-This run has a hard 30-minute useful-work handoff requirement.
+The 30-minute cutoff protects progress. It is NOT a reason to narrow the implementation ambition during the first part of the run.
 
-Do not wait until the end to preserve progress.
+0–20 MINUTES — PUSH
+- work directly on the leap ladder;
+- cross as many causally related blockers as practical;
+- keep exact Alpine retries frequent;
+- make coherent commits whenever a meaningful reusable repair or leap is reached;
+- do not stop merely to prepare a final report.
 
-By approximately 20–22 minutes:
-- commit the strongest coherent implementation/proof achieved so far;
+BY APPROXIMATELY 20–22 MINUTES — FIRST PERSISTENCE CHECKPOINT
+- commit the strongest coherent progress reached so far;
 - push the branch;
 - verify the remote commit if credentials permit;
-- open or update a draft PR if the work is reviewable;
-- ensure important diagnostics are in tracked report/test/code changes rather than only terminal output.
+- open or update a draft PR if reviewable;
+- ensure important diagnostics and proofs are tracked, not only in terminal scrollback.
 
-From approximately 22–25 minutes:
-- continue only bounded work that can reasonably be committed before the cutoff;
-- prefer one more exact Alpine retry or one focused repair over a new broad subsystem experiment.
+22–25 MINUTES — KEEP ADVANCING, BUT BOUNDED
+- continue toward the next leap if the next work is reasonably committable;
+- prefer another exact Alpine repair/retry over broad cleanup;
+- if a new subsystem would clearly exceed the remaining window, leave it as the next causal blocker rather than starting an unbounded implementation.
 
-At approximately 25 minutes:
-- begin handoff preparation;
-- stop initiating broad investigations;
-- run the most important remaining focused checks;
-- update the Batch 32D report with exact milestone status and current blocker.
+AROUND 25 MINUTES — BEGIN HANDOFF PREPARATION
+- preserve current implementation;
+- run the most important focused/aggregate checks that fit;
+- update the Batch 32D report with exact achieved leap(s), failed gate, tests, and next blocker;
+- commit/push again if new useful work landed after the first checkpoint.
 
-At approximately 30 minutes: HARD CUTOFF
+AT APPROXIMATELY 30 MINUTES — HARD CUTOFF
 - stop starting new implementation experiments;
-- commit all coherent useful work;
+- commit every coherent useful change;
 - push all useful commits;
 - open/update the PR when possible;
 - verify branch/commit/PR state;
-- leave the working tree in a reviewable state;
-- state exactly one next causal blocker if PLAYABLE ALPINE is incomplete.
+- leave a reviewable working state;
+- if PLAYABLE ALPINE is incomplete, state exactly ONE next causal blocker and the exact shell/command that exposes it.
 
-A partial run is successful if it leaves a real reusable repair, exact Alpine evidence, and one precise next blocker. Do not sacrifice persisted work trying to force the final milestone in the last minutes.
+A run that reaches only part of a leap is still useful if the implementation is real, persisted, and leaves an exact next blocker. But during the active window, optimize for maximum real progress rather than deliberately choosing tiny slices.
 
 ======================================================================
 REPORTING
@@ -315,21 +338,22 @@ Update:
 
 Record:
 - inherited main SHA;
-- exact Alpine artifact/namespace identities used;
-- each status-127/startup diagnostic result;
-- each causal repair;
-- exact same-shell retry after each repair;
-- live fd0/fd1/fd2 results;
+- exact Alpine artifact/namespace identities;
+- each major causal blocker encountered;
+- repairs implemented;
+- exact Alpine retry after repairs;
+- highest completed leap;
+- partial progress inside the current leap;
+- live fd0/fd1/fd2 result;
 - interactive-shell result;
-- every playability command result;
-- PREPARE/COMMIT status;
-- W+X status;
+- each playability command result;
+- PREPARE/COMMIT and W+X status;
 - focused tests and repository validation;
 - commit/branch/PR state;
-- one precise next blocker if incomplete.
+- one exact next blocker if incomplete.
 
 Update COMMANDS.md only for durable reproduction commands.
-Update README.md only if a real milestone is reached.
+Update README.md only when a real milestone is reached.
 
 FINAL STATUS TABLE
 
@@ -338,22 +362,28 @@ FINAL STATUS TABLE
   real musl interpreter-first                   PASS/FAIL
   PREPARE/COMMIT                                PASS/FAIL
   W+X=0                                         PASS/FAIL
-  status-127 cause classified                   PASS/FAIL
-  first causal startup repair                   PASS/FAIL/NOT NEEDED
-  live fd0 input                                PASS/FAIL
-  fd1/fd2 console output                        PASS/FAIL
-  persistent interactive shell                  PASS/FAIL
-  echo morphic round-trip                       PASS/FAIL
+
+  LEAP 1: status127 -> interactive shell         PASS/PARTIAL/FAIL
+  live fd0 input                                PASS/FAIL/NOT RUN
+  fd1/fd2 console output                        PASS/FAIL/NOT RUN
+  echo morphic                                  PASS/FAIL/NOT RUN
   second command                                PASS/FAIL/NOT RUN
+
+  LEAP 2: read-only playability                  PASS/PARTIAL/FAIL/NOT RUN
   pwd                                           PASS/FAIL/NOT RUN
   ls /                                          PASS/FAIL/NOT RUN
   cat /etc/alpine-release                       PASS/FAIL/NOT RUN
-  writable /tmp                                 PASS/FAIL/NOT RUN
-  redirection                                   PASS/FAIL/NOT RUN
+
+  LEAP 3: writable /tmp + redirection            PASS/PARTIAL/FAIL/NOT RUN
+  cd /tmp                                       PASS/FAIL/NOT RUN
+  echo hello > /tmp/hello                       PASS/FAIL/NOT RUN
   cat /tmp/hello                                PASS/FAIL/NOT RUN
-  pipe                                          PASS/FAIL/NOT RUN
+
+  LEAP 4: pipe/process semantics                 PASS/PARTIAL/FAIL/NOT RUN
+  echo hello | cat                              PASS/FAIL/NOT RUN
+
   PLAYABLE ALPINE                               PASS/FAIL
   repository validation                         PASS/FAIL/NOT RUN
   remote persistence                            PASS/BLOCKED
 
-If PLAYABLE ALPINE is incomplete, state exactly one next causal blocker and the exact command/artifact that exposes it.
+If incomplete, state the highest completed leap, the partial progress in the current leap, and exactly one next causal blocker.
