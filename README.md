@@ -495,6 +495,10 @@ echo still-alive
 
 You can reproduce the current live Morphic/Alpine state from a fresh clone. This is the same exact Alpine namespace and system-QEMU pressure used by the Snowball reports; it gives you a real interactive BusyBox/musl shell rather than a synthetic transcript.
 
+> **Current console-input limitation:** Playable Alpine proves real guest command execution, persistence, external processes, files, and pipelines. It does **not** yet claim a completed guest TTY/termios stack. With the simplest QEMU `-nographic` path, typed characters may not be visibly echoed and some terminal setups may require `Ctrl-J` (LF) rather than Return to submit a line. The acceptance proof is based on observed guest command output, not on visible local keystroke echo.
+
+For the clearest human-facing experience today, use the **QEMU PTY + picocom path** below. It provides visible local typing and maps Return to LF while leaving the guest/runtime semantics unchanged. The local echo is host-side presentation assistance; it is not being claimed as native Morphic TTY echo.
+
 Prerequisites:
 
 - Git
@@ -502,6 +506,25 @@ Prerequisites:
 - Zig **0.14.0**
 - `qemu-system-riscv64`
 - Internet access for the hash-pinned Alpine v3.22.0 RV64 minirootfs download
+- `picocom` for the recommended visible-input console path
+
+On Arch Linux / Garuda Linux, install picocom with:
+
+```sh
+sudo pacman -S picocom
+```
+
+On Debian / Ubuntu:
+
+```sh
+sudo apt install picocom
+```
+
+On Fedora:
+
+```sh
+sudo dnf install picocom
+```
 
 Clone and enter the repository:
 
@@ -546,7 +569,72 @@ zig build install-freestanding-riscv64-morphic-runtime \
   --prefix /tmp/alpine-machine
 ```
 
-Boot the machine:
+### Recommended: visible-input console with QEMU PTY + picocom
+
+Use two terminal windows.
+
+**Terminal 1 — start Morphic and expose its serial console as a host PTY:**
+
+```sh
+qemu-system-riscv64 \
+  -machine virt \
+  -display none \
+  -monitor none \
+  -bios default \
+  -chardev pty,id=morphic \
+  -serial chardev:morphic \
+  -kernel /tmp/alpine-machine/bin/morphic-freestanding-riscv64
+```
+
+QEMU prints the PTY it allocated, for example:
+
+```text
+char device redirected to /dev/pts/1 (label morphic)
+```
+
+Keep Terminal 1 running.
+
+**Terminal 2 — attach picocom to the PTY QEMU printed:**
+
+```sh
+picocom --echo --omap crlf /dev/pts/1
+```
+
+Replace `/dev/pts/1` with the actual `/dev/pts/N` shown by QEMU.
+
+The two important options are:
+
+- `--echo`: display locally what you type, so the shell is not a blind-input experience.
+- `--omap crlf`: map carriage return to line feed so ordinary Return/Enter can submit commands to the current console path.
+
+A successful attachment ends with:
+
+```text
+Terminal ready
+```
+
+At that point, type commands normally. In the tested Konsole + picocom path, typed commands are visible and ordinary Return/Enter submits them. If a different terminal still does not submit a line, `Ctrl-J` remains the fallback.
+
+Conceptually:
+
+```text
+Morphic guest serial console
+          |
+          v
+QEMU PTY (/dev/pts/N)
+          |
+          v
+picocom --echo --omap crlf
+          |
+          v
+visible, human-friendly host terminal
+```
+
+Again, this presentation path does not upgrade the milestone claim: visible input is currently provided by picocom's local echo, while complete native TTY/termios behavior remains future compatibility work.
+
+### Simpler direct QEMU console
+
+If visible local typing is not important, the original one-terminal path remains available:
 
 ```sh
 qemu-system-riscv64 \
@@ -555,6 +643,8 @@ qemu-system-riscv64 \
   -bios default \
   -kernel /tmp/alpine-machine/bin/morphic-freestanding-riscv64
 ```
+
+With this path, typed characters may not appear on screen. Type the command and use Return if it works in your terminal; otherwise use `Ctrl-J` to submit the line.
 
 After Morphic's proof/trace output, use the live Alpine shell. The complete earned sequence is:
 
