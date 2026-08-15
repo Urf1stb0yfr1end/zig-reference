@@ -320,13 +320,25 @@ The goal is not the smallest kernel at any cost. It is the smallest coherent fou
 
 ## Current machine milestone
 
-# ★ READ-ONLY ALPINE UNDER MORPHIC ★ + PERSISTENT CWD + BOUNDED WRITABLE STATE
+# ★ READ-ONLY ALPINE UNDER MORPHIC ★ + PERSISTENT CWD + WRITABLE RUNTIME + REDIRECTION
 
-**Batches 32C through 32I are complete. Morphic now boots the exact Alpine v3.22.0 RV64 namespace, enters the real musl interpreter and BusyBox `/bin/sh`, preserves a persistent interactive shell, executes real external BusyBox applets through bounded clone/exec, enumerates the genuine serialized root namespace, reads real regular-file backing, and maintains bounded per-process current-working-directory state.**
+**Morphic now runs the exact Alpine v3.22.0 RV64 namespace through the real musl interpreter and BusyBox `/bin/sh`, preserves a persistent interactive shell, executes real external BusyBox applets through bounded clone/exec, enumerates the genuine serialized root namespace, reads immutable regular-file backing, maintains bounded per-process current-working-directory state, supports a bounded session-local writable runtime namespace, and has crossed the descriptor-duplication boundary required for real shell redirection.**
 
-Batch 32H earned the read-only Alpine milestone under real system QEMU: genuine `ls /`, real `cat /etc/alpine-release -> 3.22.0`, and a living parent shell. Batch 32I then earned persistent cwd. Batch 32J adds a neutral four-object, 256-byte-per-object session overlay with create, truncate, read-back, checked writes, stable identity, and ordinary resource bindings without modifying Alpine backing. Real ash advances past `openat` creation to its next exact boundary, `fcntl(1,F_DUPFD,10)`, which is not implemented; redirection is therefore not yet claimed.
+The strongest newly earned Batch 32M result is real system-QEMU proof that unchanged Alpine ash completes:
 
-The exact current pressure remains shell redirection. The unchanged command `echo hello > /tmp/hello` now creates the bounded runtime object, then ash requests `fcntl(1,F_DUPFD,10)`. Ownership-correct minimum-descriptor duplication and a sufficient bounded binding table are the next causal repair.
+```text
+cd /tmp
+pwd
+echo hello > /tmp/hello
+```
+
+without the previous `F_DUPFD` or `dup2` failures. The writable object is created and written through ordinary runtime namespace/resource/descriptor machinery. The immediate unchanged `cat /tmp/hello` retry resolves `/bin/cat`, enters the clone/exec path, observes unsupported Linux/RV64 calls `96`, `135`, `135`, and `134`, and then reaches the current exact post-exec store-page-fault boundary:
+
+```text
+ZIGREF_LINUX_EDGE_TRAP cause=000000000000000f sepc=000000008020006e stval=00000000804026f8
+```
+
+So shell redirection is earned; external read-back, pipelines, and Playable Alpine are not yet earned.
 
 ```text
 exact Alpine v3.22.0 RV64 minirootfs       PASS
@@ -349,7 +361,7 @@ clone(220), flags 0x11, null child stack   PASS
 real child execution                       PASS
 bounded parent snapshot/restoration        PASS
 execve(221) replacement                    PASS
-parent shell after external child          PASS: still-alive
+parent shell after external child          PASS
 non-fatal saturating syscall evidence      PASS
 
 openat(56) namespace object binding        PASS
@@ -366,20 +378,105 @@ cwd clone/exec/parent restoration          PASS
 cd /tmp                                    PASS
 pwd -> /tmp                                PASS
 
-writable /tmp runtime layer                CURRENT BLOCKER
-shell redirection                          PENDING
-runtime file read-back                     PENDING
+bounded writable runtime namespace         PASS
+transactional create/truncate              PASS
+F_DUPFD compatibility + ownership          PASS
+dup3(24) target replacement                PASS
+echo hello > /tmp/hello                    PASS
+shell redirection                          EARNED
+
+cat /tmp/hello                             CURRENT BLOCKER
+runtime file read-back via external cat    PENDING
 pipes and multi-process / FD lifetime      PENDING
 ★ PLAYABLE ALPINE ★                         PENDING
+apk local database                         FUTURE
+local .apk install                         FUTURE
+networking / DNS / TLS                     FUTURE
+★ NETWORKED APK ★                           FUTURE
 ```
 
-The Batch 32I proof is runtime evidence, not compile-only inference. Under real QEMU, the shell changed directory to `/tmp`, `pwd` returned `/tmp`, and the immediate next command reached the writable-filesystem frontier rather than an earlier cwd failure. The exact Alpine source namespace remains immutable, and PREPARE/COMMIT plus `W+X=0` remain preserved.
+The Batch 32M proof is runtime evidence, not compile-only inference. The known Batch 32G intermediate-component symlink limitation remains explicitly documented and has not yet been causal to the acceptance path.
 
-The known Batch 32G intermediate-component symlink limitation remains explicitly documented and non-causal to the current acceptance path. Batch 32I also does not claim broad relative-path semantics merely because the exact absolute `cd /tmp` pressure now works.
+See [`docs/reports/AGENTIC_SNOWBALL_BATCH_32M.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32M.md).
 
-This is **read-only Alpine with persistent cwd**, but not yet **playable Alpine**. The remaining canonical gates are bounded writable runtime objects and shell redirection, read-back through a real external `cat`, then a genuine `echo hello | cat` pipeline with coherent process/descriptor lifetime.
+## Roadmap: current frontier -> Playable Alpine -> apk
 
-See [`docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md) and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32I.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32I.md).
+The full pressure-driven roadmap is now maintained in [`docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md`](docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md).
+
+At a glance:
+
+```text
+CURRENT: external cat child-runtime store fault
+        |
+        v
+repair first causal post-exec memory/setup failure
+        |
+        v
+cat /tmp/hello -> hello
+        |
+        v
+pipe creation + endpoint ownership
+        |
+        v
+descriptor inheritance / dup / close / EOF
+        |
+        v
+echo hello | cat -> hello
+        |
+        v
+echo still-alive
+        |
+        v
+★ PLAYABLE ALPINE UNDER MORPHIC ★
+        |
+        v
+start real apk binary
+        |
+        v
+apk local database / metadata reads
+        |
+        v
+filesystem package transactions
+mkdir / unlink / rename / metadata / larger bounded storage
+        |
+        v
+local .apk extraction + install
+        |
+        v
+★ LOCAL APK UNDER MORPHIC ★
+        |
+        v
+sockets + DNS + clocks + entropy
+        |
+        v
+userspace TLS + CA trust + repository transport
+        |
+        v
+apk update
+        |
+        v
+apk add <small-package>
+        |
+        v
+★ NETWORKED APK UNDER MORPHIC ★
+```
+
+The Playable Alpine gate remains deliberately narrow and reproducible. One persistent real shell must complete:
+
+```text
+echo morphic
+echo second
+pwd
+ls /
+cat /etc/alpine-release
+cd /tmp
+echo hello > /tmp/hello
+cat /tmp/hello
+echo hello | cat
+echo still-alive
+```
+
+After that, `apk` becomes a new pressure source rather than a single syscall milestone. Local package work comes before networking so filesystem/database/package-transaction semantics can be isolated from DNS/TCP/TLS. Only after a real local `.apk` can be installed should the campaign add the network substrate required for `apk update` and `apk add` against real Alpine repositories.
 
 ## Experience the current Alpine frontier in your own console
 
@@ -456,10 +553,11 @@ ls /
 cat /etc/alpine-release
 cd /tmp
 pwd
+echo hello > /tmp/hello
 echo still-alive
 ```
 
-The important user-visible results are:
+The important user-visible results include:
 
 ```text
 morphic
@@ -476,16 +574,10 @@ still-alive
 To experience the **current causal frontier**, enter:
 
 ```text
-echo hello > /tmp/hello
+cat /tmp/hello
 ```
 
-Current `main` should reject that write with the read-only filesystem boundary, for example:
-
-```text
-/bin/sh: can't create /tmp/hello: Read-only file system
-```
-
-That failure is intentional evidence of the next missing general mechanism. The active Batch 32J campaign is aimed at replacing that boundary with a bounded writable runtime namespace, then proving `cat /tmp/hello`, then a real `echo hello | cat` pipeline, without faking command output or mutating the source Alpine artifact.
+Current `main` should enter the real external BusyBox `cat` clone/exec path and reproduce the documented child post-exec store-page-fault frontier. That failure is the next causal boundary; it is not evidence that redirection failed. Redirection has already completed successfully.
 
 To leave QEMU's `-nographic` console, use QEMU's terminal escape sequence (`Ctrl-A`, then `X`).
 
@@ -503,13 +595,15 @@ You do **not** have to accept the current architecture as sacred. A strong resul
 
 Some of the next concrete questions are:
 
-- What is the smallest bounded writable runtime namespace that can support real create/truncate/write/read-back behavior without mutating the immutable Alpine source artifact?
-- Which descriptor replacement and lifetime semantics does unchanged ash actually require for `echo hello > /tmp/hello`?
-- Can a newly written runtime object be reopened by a real external BusyBox `cat` through ordinary pathname/resource semantics?
+- What exactly causes the post-exec store page fault in the real external `cat /tmp/hello` child, and which neutral memory/process invariant is missing?
+- Which of the observed unsupported child setup calls are genuinely causal, and which can remain compatibility-edge failures without preventing execution?
+- Can a newly written runtime object be reopened and read by a real external BusyBox `cat` through ordinary pathname/resource semantics?
+- What is the smallest bounded pipe/channel mechanism that gives ash correct endpoint ownership, EOF, duplication, close, and parent-shell liveness?
 - Does `echo hello | cat` force Morphic beyond its current serialized child-first model into multiple simultaneously meaningful process states?
+- What new filesystem transaction semantics does real `apk` require after Playable Alpine, and how much can remain neutral rather than Linux-shaped?
+- Can a local `.apk` install be earned before networking, cleanly separating storage/package semantics from sockets/DNS/TLS?
 - Which Linux behaviors belong at the compatibility edge, and which reveal reusable Morphic mechanisms?
 - How far can the privileged core remain small and understandable while the capability surface grows?
-- Which current design decisions fail under stronger proofs, more hostile workloads, or alternative architectures?
 
 Bring a counterexample. Bring a trace. Bring a weird ELF. Bring a cleaner abstraction. Bring a PR that deletes more complexity than it adds.
 
@@ -534,11 +628,11 @@ Chronology tag:
 
 `time-till-first-static-busybox-shell-229.48-hours-from-repository-start-2026-08-13`
 
-Future major milestones should accumulate the same chronology line by line. The real dynamic-musl, dynamic-BusyBox-shell, first-real-Alpine, persistent-interactive-Alpine, and read-only-Alpine milestones are complete. Batch 32I additionally earns the cwd/chdir step on the direct path to playable Alpine.
+Future major milestones should accumulate the same chronology line by line. The real dynamic-musl, dynamic-BusyBox-shell, first-real-Alpine, persistent-interactive-Alpine, read-only-Alpine, persistent-cwd, bounded-writable-runtime, and shell-redirection milestones are now complete.
 
 ## Active frontier
 
-**Read-only Alpine plus persistent cwd are earned under real QEMU. The exact active blocker is the writable `openat(56)` path required by unchanged `echo hello > /tmp/hello`: the current source namespace remains read-only and no bounded writable runtime object layer exists yet.**
+**The exact active blocker is now the real external `cat /tmp/hello` child-runtime store page fault. Writable `/tmp`, F_DUPFD fallback, dup3-backed descriptor replacement, and `echo hello > /tmp/hello` have all been crossed under real QEMU.**
 
 ```text
 FIRST STATIC BUSYBOX SHELL                complete
@@ -578,13 +672,18 @@ REGULAR-FILE READ + alpine-release        complete
         |
         v
 chdir(49) + NEUTRAL CWD                   complete
-cd /tmp ; pwd -> /tmp
         |
         v
-WRITABLE /tmp RUNTIME STATE               <-- exact current blocker
+WRITABLE /tmp RUNTIME STATE               complete
         |
         v
-SHELL REDIRECTION + READ-BACK              pending
+F_DUPFD + dup3 DESCRIPTOR REPLACEMENT     complete
+        |
+        v
+SHELL REDIRECTION                          complete
+        |
+        v
+EXTERNAL cat /tmp/hello READ-BACK         <-- exact current blocker
         |
         v
 PIPES + PROCESS / FD LIFETIME             pending
@@ -593,55 +692,37 @@ PIPES + PROCESS / FD LIFETIME             pending
 ★ PLAYABLE ALPINE ★
         |
         v
-APK LOCAL DATABASE
+APK LOCAL DATABASE / METADATA
         |
         v
-LOCAL .APK INSTALL
+LOCAL .APK INSTALL TRANSACTION
         |
         v
-NETWORKING / DNS / TLS
+★ LOCAL APK ★
         |
         v
-★ apk add FROM REAL ALPINE REPOSITORIES ★
-```
-
-A concrete playable-Alpine target looks like:
-
-```text
-Alpine Linux
-/ # pwd
-/
-/ # ls /
-bin dev etc lib sbin tmp usr var
-/ # cat /etc/alpine-release
-3.22.0
-/ # cd /tmp
-/tmp # echo hello > /tmp/hello
-/tmp # cat /tmp/hello
-hello
-/tmp # echo hello | cat
-hello
-/tmp # echo still-alive
-still-alive
-/tmp #
+SOCKETS / DNS / CLOCKS / ENTROPY
+        |
+        v
+USERSPACE TLS + CA TRUST
+        |
+        v
+apk update
+        |
+        v
+apk add FROM REAL ALPINE REPOSITORIES
+        |
+        v
+★ NETWORKED APK ★
 ```
 
 Only real pressure should decide what filesystem, pathname, metadata, process, terminal, networking, or compatibility mechanisms are admitted next. The kernel should not grow a speculative Linux subsystem merely because Linux has one.
 
-Completed reports:
+Completed reports now include Batch 32M. See [`docs/reports/`](docs/reports/) for the preserved causal history.
 
-- [`docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32B.md)
-- [`docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md)
-- [`docs/reports/AGENTIC_SNOWBALL_BATCH_32D.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32D.md)
-- [`docs/reports/AGENTIC_SNOWBALL_BATCH_32E.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32E.md)
-- [`docs/reports/AGENTIC_SNOWBALL_BATCH_32F.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32F.md)
-- [`docs/reports/AGENTIC_SNOWBALL_BATCH_32G.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32G.md)
-- [`docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md)
-- [`docs/reports/AGENTIC_SNOWBALL_BATCH_32I.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32I.md)
+Current roadmap:
 
-Current execution plan:
-
-- [`docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32J_WRITABLE_RUNTIME_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt`](docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32J_WRITABLE_RUNTIME_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt)
+- [`docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md`](docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md)
 
 ## Engineering model
 
@@ -659,7 +740,7 @@ observe real failure
 
 ## Documentation
 
-Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md`](docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md), [`docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md`](docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32I.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32I.md).
+Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md`](docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md), [`docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md`](docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), [`docs/reports/AGENTIC_SNOWBALL_BATCH_32M.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32M.md), and [`docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md`](docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md).
 
 ## Validation
 
@@ -726,6 +807,6 @@ The fuller proposal, including Normal/Focus/Appliance modes, resource-policy ide
 
 Alpz is **not Linux**, QuirkM is **not a completed native operating environment**, and Morphic is **not presented as a production kernel platform**.
 
-The project now has real static-musl execution, a proven static Alpine BusyBox shell, successful real dynamic-musl execution through the real userspace interpreter, a proven dynamic Alpine BusyBox shell, **first real Alpine through a complete serialized Alpine v3.22.0 RV64 namespace**, a persistent interactive shell, bounded clone/exec external-command execution, genuine root-directory enumeration through `getdents64(61)`, real immutable regular-file reads including `/etc/alpine-release -> 3.22.0`, and bounded neutral current-working-directory state mapped through Linux/RV64 `chdir(49)`/`getcwd(17)` with real `cd /tmp ; pwd -> /tmp` proof. It has earned the **read-only Alpine** milestone plus the cwd/chdir step under real QEMU pressure. It does **not yet claim** writable runtime filesystem semantics, shell redirection/read-back, pipelines, playable Alpine, broad relative-path semantics, complete component-wise symlink resolution, general Linux compatibility, working `apk add`, production security, production readiness, or completed virtualization.
+The project now has real static-musl execution, a proven static Alpine BusyBox shell, successful real dynamic-musl execution through the real userspace interpreter, a proven dynamic Alpine BusyBox shell, **first real Alpine through a complete serialized Alpine v3.22.0 RV64 namespace**, a persistent interactive shell, bounded clone/exec external-command execution, genuine root-directory enumeration through `getdents64(61)`, real immutable regular-file reads including `/etc/alpine-release -> 3.22.0`, bounded neutral current-working-directory state mapped through Linux/RV64 `chdir(49)`/`getcwd(17)`, a bounded writable session-local runtime namespace, transactional create/truncate behavior, ownership-correct F_DUPFD and dup3-backed descriptor replacement, and real shell redirection with `echo hello > /tmp/hello` proven under QEMU. It has earned the **read-only Alpine** milestone plus persistent cwd, writable runtime state, and redirection. It does **not yet claim** external runtime-file read-back through real `cat`, pipelines, playable Alpine, broad relative-path semantics, complete component-wise symlink resolution, general Linux compatibility, local `.apk` installation, working `apk update` or `apk add`, production security, production readiness, or completed virtualization.
 
 Proof records, exact artifacts, machine traces, validation gates, and current code define what has actually been achieved.
