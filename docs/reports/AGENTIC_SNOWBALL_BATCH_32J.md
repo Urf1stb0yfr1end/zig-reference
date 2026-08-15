@@ -42,3 +42,22 @@ Exact next pressure:
 ```text
 echo hello > /tmp/hello
 ```
+
+## PR #86 focused review repair
+
+- Repair clock began `2026-08-15T03:06:51Z` from head `1266dc8c8118aa22af4264dcdade842523891a6e` on `work`.
+- Runtime reads and writes now authorize against the capabilities owned by the resolved open resource description before guest transfer, byte mutation, or offset commit. Linux/RV64 translates a forbidden access to `EBADF`; `O_RDONLY`, `O_WRONLY`, and `O_RDWR` are covered without pathname policy.
+- Focused proof performs forbidden writes and reads through the access-gated runtime API, verifies `AccessDenied`, unchanged offset, and unchanged bytes, then proves both operations through read/write access.
+- Canonical unit and smoke evidence for all 60 modules was regenerated with `PYTHONDONTWRITEBYTECODE=1 python3 tools/python-environment.py tools/record-validation.py --level all`, followed by canonical index regeneration. `zig build check` passed.
+- `python3 tools/developer-command.py validate-repository` passed all 350 build steps and 248 tests under Zig 0.14.0.
+- The exact Alpine v3.22.0 RV64 namespace was rebuilt and reverified (517 objects; 7,069,903 immutable bytes; hashes unchanged). The freestanding machine was rebuilt and real QEMU printed:
+
+```text
+ZIGREF_BATCH29_PHASE prepare
+ZIGREF_BATCH29_PHASE commit
+ZIGREF_BATCH29_PHASE execute
+/tmp
+/bin/sh: fcntl(1,F_DUPFD,10): Function not implemented
+```
+
+The proof boundary and highest milestone remain unchanged; redirection is not claimed. PREPARE/COMMIT, mapping preflight, `final_wx_leaves=0`, immutable source backing, cwd behavior, and resource ownership remain intact. Final repair head and remote/PR state are recorded in the user-facing handoff after persistence.

@@ -1592,10 +1592,12 @@ const runtime_regular_backend: u32 = 0x102;
 
 fn runtimeRegularRead(reference: ResourceRef, destination: usize, requested: usize) usize {
     const description = syscall_resources.resolve(reference) orelse return negativeErrno(9);
+    const access: bounded_runtime_namespace.Access = .{ .read = description.capabilities.read, .write = description.capabilities.write };
+    access.require(.read) catch return negativeErrno(9);
     const object = description.state >> 32;
     const offset = description.state & 0xffffffff;
     var bytes: [256]u8 = undefined;
-    const amount = external_runtime_namespace.read(object, offset, bytes[0..@min(requested, bytes.len)]) catch return negativeErrno(5);
+    const amount = external_runtime_namespace.readWithAccess(access, object, offset, bytes[0..@min(requested, bytes.len)]) catch |err| return negativeErrno(if (err == error.AccessDenied) 9 else 5);
     copyBytesToUser(destination, bytes[0..amount]) catch return negativeErrno(14);
     syscall_resources.setState(reference, (object << 32) | (offset + amount)) catch return negativeErrno(9);
     return amount;
@@ -1603,6 +1605,8 @@ fn runtimeRegularRead(reference: ResourceRef, destination: usize, requested: usi
 
 fn runtimeRegularWrite(reference: ResourceRef, source_address: usize, requested: usize) usize {
     const description = syscall_resources.resolve(reference) orelse return negativeErrno(9);
+    const access: bounded_runtime_namespace.Access = .{ .read = description.capabilities.read, .write = description.capabilities.write };
+    access.require(.write) catch return negativeErrno(9);
     const object = description.state >> 32;
     const offset = description.state & 0xffffffff;
     const amount = @min(requested, 256 -| offset);
@@ -1613,7 +1617,7 @@ fn runtimeRegularWrite(reference: ResourceRef, source_address: usize, requested:
         const source: [*]const volatile u8 = @ptrFromInt(segment.physical_start.raw());
         for (0..segment.byte_count) |i| bytes[segment.request_offset + i] = source[i];
     }
-    const written = external_runtime_namespace.write(object, offset, bytes[0..amount]) catch return negativeErrno(28);
+    const written = external_runtime_namespace.writeWithAccess(access, object, offset, bytes[0..amount]) catch |err| return negativeErrno(if (err == error.AccessDenied) 9 else 28);
     syscall_resources.setState(reference, (object << 32) | (offset + written)) catch return negativeErrno(9);
     return written;
 }
