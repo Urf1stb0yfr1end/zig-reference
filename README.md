@@ -10,6 +10,32 @@
 
 This repository is not presented as production-ready infrastructure. Its larger purpose is to make operating-system construction itself observable enough that the project can answer questions about kernels, compatibility, software inheritance, AI-assisted engineering, and the cost of building new systems.
 
+## Current milestone
+
+# ★ PLAYABLE ALPINE UNDER MORPHIC ★
+
+**Batch 32Q / PR #93 earned the complete Playable Alpine gate under real QEMU 8.2.2 using the canonical Alpine v3.22.0 RV64 namespace.** The proof now includes a persistent real BusyBox/musl shell, real external child execution, writable runtime state, external file read-back, a bounded real pipe carrying bytes between unchanged Alpine processes, ownership-correct EOF/lifetime behavior across the active child and suspended parent snapshot, and parent-shell survival after the pipeline.
+
+The complete one-shell acceptance proof is:
+
+```text
+echo morphic                 -> morphic
+echo second                  -> second
+pwd                          -> /
+ls /                         -> genuine serialized Alpine root entries
+cat /etc/alpine-release      -> 3.22.0
+cd /tmp                      -> success
+pwd                          -> /tmp
+echo hello > /tmp/hello      -> success
+cat /tmp/hello               -> hello
+echo hello | cat             -> hello
+echo still-alive             -> still-alive
+```
+
+**Playable Alpine is complete. The active causal frontier has moved to the real Alpine package manager: `/sbin/apk --version`, then `apk --help`, followed by local package-database pressure, package filesystem transactions, local `.apk` installation, and only later networking/DNS/TLS for real repositories.**
+
+See [`docs/reports/AGENTIC_SNOWBALL_BATCH_32Q.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32Q.md) and [`docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md`](docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md).
+
 ### Where Morphic sits in the AI-assisted OS landscape
 
 AI-assisted operating-system projects are now interesting enough that the question **“can AI help build a substantial operating system?”** no longer has to remain hypothetical.
@@ -30,7 +56,7 @@ There are already operating-system kernels written in Zig, and there are already
 
 That is deliberately a qualified research-positioning claim, not a declaration that every private, unpublished, or obscure project has been exhaustively ruled out. It also does not claim that Morphic would be the first non-Linux system to run Linux binaries; mature projects in other languages already occupy that broader space.
 
-If Morphic earns the reproducible **★ PLAYABLE ALPINE ★** gate defined below, the project would therefore appear to be a **likely first-of-its-kind milestone in the public Zig operating-system ecosystem**: a Zig-centered, RV64, non-Linux substrate running unchanged real Alpine userspace through compatibility rather than through a Zig-native replacement userland. If real `apk` later crosses the local-install and networked-package gates, that distinction becomes substantially stronger because the inherited Alpine ecosystem itself, rather than only individual binaries, becomes the pressure source.
+Morphic has now earned the reproducible **★ PLAYABLE ALPINE ★** gate defined below. The project therefore appears to have reached a **likely first-of-its-kind milestone in the public Zig operating-system ecosystem**: a Zig-centered, RV64, non-Linux substrate running unchanged real Alpine userspace through compatibility rather than through a Zig-native replacement userland. If real `apk` later crosses the local-install and networked-package gates, that distinction becomes substantially stronger because the inherited Alpine ecosystem itself, rather than only individual binaries, becomes the pressure source.
 
 This claim should remain evidence-bound. If a prior or contemporary public project demonstrating the same combination is found, this section should be corrected and the comparison documented rather than defended rhetorically.
 
@@ -151,8 +177,8 @@ dynamic BusyBox                measured                    measured
 real Alpine                    measured                    measured
 interactive Alpine             measured                    measured
 read-only Alpine               measured                    measured
-playable Alpine                future                      future
-apk                            future                      future
+playable Alpine                measured                    earned
+apk                            future                      current pressure
 Python                         future                      future
 Git                            future                      future
 SQLite                         future                      future
@@ -330,25 +356,11 @@ The goal is not the smallest kernel at any cost. It is the smallest coherent fou
 
 ## Current machine milestone
 
-# ★ READ-ONLY ALPINE UNDER MORPHIC ★ + PERSISTENT CWD + WRITABLE RUNTIME + REDIRECTION
+# ★ PLAYABLE ALPINE UNDER MORPHIC ★
 
-**Morphic now runs the exact Alpine v3.22.0 RV64 namespace through the real musl interpreter and BusyBox `/bin/sh`, preserves a persistent interactive shell, executes real external BusyBox applets through bounded clone/exec, enumerates the genuine serialized root namespace, reads immutable regular-file backing, maintains bounded per-process current-working-directory state, supports a bounded session-local writable runtime namespace, and has crossed the descriptor-duplication boundary required for real shell redirection.**
+**Morphic now runs the exact Alpine v3.22.0 RV64 namespace through the real musl interpreter and BusyBox `/bin/sh`, preserves a persistent interactive shell, executes real external BusyBox applets through bounded clone/exec, enumerates and reads the genuine serialized namespace, maintains bounded per-process current-working-directory state, supports a bounded writable runtime namespace, and now carries real bytes through a bounded pipe between unchanged Alpine processes while preserving descriptor/resource ownership and parent-shell liveness.**
 
-The strongest newly earned Batch 32M result is real system-QEMU proof that unchanged Alpine ash completes:
-
-```text
-cd /tmp
-pwd
-echo hello > /tmp/hello
-```
-
-without the previous `F_DUPFD` or `dup2` failures. The writable object is created and written through ordinary runtime namespace/resource/descriptor machinery. The immediate unchanged `cat /tmp/hello` retry resolves `/bin/cat`, enters the clone/exec path, observes unsupported Linux/RV64 calls `96`, `135`, `135`, and `134`, and then reaches the current exact post-exec store-page-fault boundary:
-
-```text
-ZIGREF_LINUX_EDGE_TRAP cause=000000000000000f sepc=000000008020006e stval=00000000804026f8
-```
-
-So shell redirection is earned; external read-back, pipelines, and Playable Alpine are not yet earned.
+Batch 32Q closed the pipeline gate and the PR #93 ownership follow-up repaired the two subtle lifetime holes exposed during review: writer/endpoint discovery now spans both active child state and the suspended parent snapshot, and dup3 displacement runs the same ownership-aware final-pipe retirement check. The generic dup3 helper remains pipe-independent.
 
 ```text
 exact Alpine v3.22.0 RV64 minirootfs       PASS
@@ -360,87 +372,71 @@ real ld-musl interpreter-first             PASS
 PREPARE -> COMMIT -> execute               PASS
 exec mapping/table-capacity preflight      PASS
 W+X=0                                      PASS
+SUM clear                                  PASS
 
 live keyboard input                        PASS
 real interactive BusyBox /bin/sh           PASS
 echo morphic                               PASS
 persistent second command                  PASS
-initial pwd -> /                            PASS
+pwd -> /                                   PASS
+ls /                                       PASS
+cat /etc/alpine-release -> 3.22.0          PASS
 
-clone(220), flags 0x11, null child stack   PASS
-real child execution                       PASS
-bounded parent snapshot/restoration        PASS
-execve(221) replacement                    PASS
-parent shell after external child          PASS
-non-fatal saturating syscall evidence      PASS
-
-openat(56) namespace object binding        PASS
-getdents64(61) directory enumeration       PASS
-ls /                                       PASS: genuine namespace entries
-regular namespace read + shared offset     PASS
-cat /etc/alpine-release                    PASS: 3.22.0
-★ READ-ONLY ALPINE ★                        EARNED
-
-chdir(49)                                  PASS
-bounded neutral process cwd                PASS
-getcwd(17) from stored cwd                 PASS
-cwd clone/exec/parent restoration          PASS
-cd /tmp                                    PASS
-pwd -> /tmp                                PASS
+clone(220) + real child                    PASS
+execve(221) + real BusyBox applets         PASS
+parent restoration                         PASS
+bounded cwd / chdir / getcwd               PASS
+cd /tmp ; pwd -> /tmp                      PASS
 
 bounded writable runtime namespace         PASS
 transactional create/truncate              PASS
 F_DUPFD compatibility + ownership          PASS
 dup3(24) target replacement                PASS
 echo hello > /tmp/hello                    PASS
-shell redirection                          EARNED
+cat /tmp/hello -> hello                    PASS
 
-cat /tmp/hello                             CURRENT BLOCKER
-runtime file read-back via external cat    PENDING
-pipes and multi-process / FD lifetime      PENDING
-★ PLAYABLE ALPINE ★                         PENDING
-apk local database                         FUTURE
-local .apk install                         FUTURE
-networking / DNS / TLS                     FUTURE
-★ NETWORKED APK ★                           FUTURE
+pipe2(59)                                  PASS
+bounded FIFO pipe bytes                    PASS
+read/write endpoint capabilities           PASS
+clone/exec descriptor inheritance          PASS
+dup/close endpoint lifetime                PASS
+EOF waits for all meaningful writers       PASS
+suspended-parent ownership                 PASS
+dup3 displaced-endpoint retirement         PASS
+echo hello | cat -> hello                  PASS
+echo still-alive                           PASS
+
+★ PLAYABLE ALPINE UNDER MORPHIC ★          EARNED
+
+/sbin/apk --version                        CURRENT PRESSURE
+apk local database / metadata              NEXT
+filesystem package transactions            NEXT
+local .apk extraction + install            FUTURE
+★ LOCAL APK UNDER MORPHIC ★                 FUTURE
+networking / DNS / clocks / entropy        FUTURE
+userspace TLS + CA trust                    FUTURE
+apk update / apk add                        FUTURE
+★ NETWORKED APK UNDER MORPHIC ★             FUTURE
 ```
 
-The Batch 32M proof is runtime evidence, not compile-only inference. The known Batch 32G intermediate-component symlink limitation remains explicitly documented and has not yet been causal to the acceptance path.
+The proof is runtime evidence, not compile-only inference. Known limitations remain explicit: incomplete component-wise symlink semantics, a tiny four-object/256-byte runtime overlay, a serialized single-child execution model, two bounded 4096-byte pipe streams, and deliberately narrow Linux ABI coverage. None invalidates the exact Playable Alpine acceptance proof.
 
-See [`docs/reports/AGENTIC_SNOWBALL_BATCH_32M.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32M.md).
+See [`docs/reports/AGENTIC_SNOWBALL_BATCH_32Q.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32Q.md).
 
-## Roadmap: current frontier -> Playable Alpine -> apk
+## Roadmap: Playable Alpine -> local apk -> networked apk
 
-The full pressure-driven roadmap is now maintained in [`docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md`](docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md).
+The full pressure-driven roadmap is maintained in [`docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md`](docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md).
 
 At a glance:
 
 ```text
-CURRENT: external cat child-runtime store fault
+★ PLAYABLE ALPINE UNDER MORPHIC ★          EARNED
         |
         v
-repair first causal post-exec memory/setup failure
+CURRENT: real /sbin/apk --version pressure
         |
         v
-cat /tmp/hello -> hello
-        |
-        v
-pipe creation + endpoint ownership
-        |
-        v
-descriptor inheritance / dup / close / EOF
-        |
-        v
-echo hello | cat -> hello
-        |
-        v
-echo still-alive
-        |
-        v
-★ PLAYABLE ALPINE UNDER MORPHIC ★
-        |
-        v
-start real apk binary
+apk --help / startup semantics
         |
         v
 apk local database / metadata reads
@@ -451,6 +447,9 @@ mkdir / unlink / rename / metadata / larger bounded storage
         |
         v
 local .apk extraction + install
+        |
+        v
+run an unchanged installed program
         |
         v
 ★ LOCAL APK UNDER MORPHIC ★
@@ -468,10 +467,13 @@ apk update
 apk add <small-package>
         |
         v
+run the newly installed program
+        |
+        v
 ★ NETWORKED APK UNDER MORPHIC ★
 ```
 
-The Playable Alpine gate remains deliberately narrow and reproducible. One persistent real shell must complete:
+The Playable Alpine gate is deliberately narrow and reproducible. One persistent real shell has completed:
 
 ```text
 echo morphic
@@ -480,17 +482,18 @@ pwd
 ls /
 cat /etc/alpine-release
 cd /tmp
+pwd
 echo hello > /tmp/hello
 cat /tmp/hello
 echo hello | cat
 echo still-alive
 ```
 
-After that, `apk` becomes a new pressure source rather than a single syscall milestone. Local package work comes before networking so filesystem/database/package-transaction semantics can be isolated from DNS/TCP/TLS. Only after a real local `.apk` can be installed should the campaign add the network substrate required for `apk update` and `apk add` against real Alpine repositories.
+`apk` is now the pressure source rather than a single syscall milestone. Local package work comes before networking so filesystem/database/package-transaction semantics can be isolated from DNS/TCP/TLS. Only after a real local `.apk` can be installed should the campaign add the network substrate required for `apk update` and `apk add` against real Alpine repositories.
 
-## Experience the current Alpine frontier in your own console
+## Experience Playable Alpine in your own console
 
-You can reproduce the current live Morphic/Alpine state from a fresh clone. This is the same style of exact Alpine namespace and system-QEMU pressure used by the Snowball reports; it gives you a real interactive BusyBox/musl shell rather than a synthetic transcript.
+You can reproduce the current live Morphic/Alpine state from a fresh clone. This is the same exact Alpine namespace and system-QEMU pressure used by the Snowball reports; it gives you a real interactive BusyBox/musl shell rather than a synthetic transcript.
 
 Prerequisites:
 
@@ -553,7 +556,7 @@ qemu-system-riscv64 \
   -kernel /tmp/alpine-machine/bin/morphic-freestanding-riscv64
 ```
 
-After Morphic's proof/trace output, use the live Alpine shell. The currently earned sequence is:
+After Morphic's proof/trace output, use the live Alpine shell. The complete earned sequence is:
 
 ```text
 echo morphic
@@ -564,6 +567,8 @@ cat /etc/alpine-release
 cd /tmp
 pwd
 echo hello > /tmp/hello
+cat /tmp/hello
+echo hello | cat
 echo still-alive
 ```
 
@@ -576,18 +581,20 @@ second
 ...
 3.22.0
 /tmp
+hello
+hello
 still-alive
 ```
 
 `ls /` prints genuine entries from the exact serialized Alpine root namespace, including directories such as `bin`, `dev`, `etc`, `home`, `lib`, `proc`, `tmp`, `usr`, and `var`.
 
-To experience the **current causal frontier**, enter:
+The next causal pressure is deliberately not claimed as working yet:
 
 ```text
-cat /tmp/hello
+/sbin/apk --version
 ```
 
-Current `main` should enter the real external BusyBox `cat` clone/exec path and reproduce the documented child post-exec store-page-fault frontier. That failure is the next causal boundary; it is not evidence that redirection failed. Redirection has already completed successfully.
+That real unchanged binary is the opening gate of the package-manager phase.
 
 To leave QEMU's `-nographic` console, use QEMU's terminal escape sequence (`Ctrl-A`, then `X`).
 
@@ -597,7 +604,7 @@ The canonical command record lives in [`COMMANDS.md`](COMMANDS.md).
 
 This is a good time to join the project.
 
-The interesting problems are no longer hypothetical kernel checklists. Real software is running far enough to expose precise boundaries, and each boundary can be attacked as a falsifiable systems problem.
+The shell milestone is now complete. The next questions concern how much additional neutral mechanism a real package manager and then a package ecosystem actually force into the substrate.
 
 If you work on kernels, Zig, RISC-V, ELF, linkers/loaders, filesystems, process models, verification, virtualization, capability systems, compatibility layers, reproducible systems research, or agent-assisted engineering, there is useful work here now.
 
@@ -605,17 +612,18 @@ You do **not** have to accept the current architecture as sacred. A strong resul
 
 Some of the next concrete questions are:
 
-- What exactly causes the post-exec store page fault in the real external `cat /tmp/hello` child, and which neutral memory/process invariant is missing?
-- Which of the observed unsupported child setup calls are genuinely causal, and which can remain compatibility-edge failures without preventing execution?
-- Can a newly written runtime object be reopened and read by a real external BusyBox `cat` through ordinary pathname/resource semantics?
-- What is the smallest bounded pipe/channel mechanism that gives ash correct endpoint ownership, EOF, duplication, close, and parent-shell liveness?
-- Does `echo hello | cat` force Morphic beyond its current serialized child-first model into multiple simultaneously meaningful process states?
-- What new filesystem transaction semantics does real `apk` require after Playable Alpine, and how much can remain neutral rather than Linux-shaped?
-- Can a local `.apk` install be earned before networking, cleanly separating storage/package semantics from sockets/DNS/TLS?
+- What is the first unchanged runtime boundary exposed by real Alpine `/sbin/apk --version`?
+- Which startup/version/help requirements are genuinely causal, and which Linux calls can remain compatibility-edge failures?
+- How much of Alpine's local package database can be traversed through mechanisms Morphic already has?
+- Which directory, pathname, metadata, rename, unlink, permission, timestamp, or locking semantics become causal for package transactions?
+- How large and general must the bounded writable runtime become before a real local `.apk` can install?
+- Can local installation be earned before networking, cleanly separating package/filesystem semantics from sockets/DNS/TLS?
+- Can an unchanged program installed by real `apk` execute without a Morphic-specific port?
 - Which Linux behaviors belong at the compatibility edge, and which reveal reusable Morphic mechanisms?
+- Does the permanent semantic growth rate begin flattening as `apk` unlocks more unrelated Alpine software?
 - How far can the privileged core remain small and understandable while the capability surface grows?
 
-Bring a counterexample. Bring a trace. Bring a weird ELF. Bring a cleaner abstraction. Bring a PR that deletes more complexity than it adds.
+Bring a counterexample. Bring a trace. Bring a weird package. Bring a cleaner abstraction. Bring a PR that deletes more complexity than it adds.
 
 **The goal is not to protect the current design. The goal is to discover the best system we can build.**
 
@@ -626,23 +634,27 @@ The earliest preserved commit is the reproducible project-time baseline.
 ```text
 Repository baseline / first commit:     2026-08-04 04:32:00 CST
 First static BusyBox shell milestone:   2026-08-13 18:01:04 CST
+Playable Alpine merge milestone:        2026-08-15 15:39:43 CST
 
-FROM REPOSITORY START:                  229.48 hours
-FROM FIRST STATIC BUSYBOX SHELL:          0.00 hours
+TO PLAYABLE ALPINE FROM REPOSITORY START:       275.13 hours
+TO PLAYABLE ALPINE FROM STATIC BUSYBOX SHELL:    45.64 hours
 
-Exact elapsed:
-9 days, 13 hours, 29 minutes, 4 seconds
+Exact elapsed from repository start:
+11 days, 11 hours, 7 minutes, 43 seconds
+
+Exact elapsed from first static BusyBox shell:
+1 day, 21 hours, 38 minutes, 39 seconds
 ```
 
-Chronology tag:
+Milestone tag name:
 
-`time-till-first-static-busybox-shell-229.48-hours-from-repository-start-2026-08-13`
+`morphic-batch32q-playable-alpine-under-morphic`
 
-Future major milestones should accumulate the same chronology line by line. The real dynamic-musl, dynamic-BusyBox-shell, first-real-Alpine, persistent-interactive-Alpine, read-only-Alpine, persistent-cwd, bounded-writable-runtime, and shell-redirection milestones are now complete.
+Future major milestones should accumulate the same chronology line by line. The real dynamic-musl, dynamic-BusyBox-shell, first-real-Alpine, persistent-interactive-Alpine, read-only-Alpine, persistent-cwd, bounded-writable-runtime, shell-redirection, external-read-back, pipe, and Playable-Alpine milestones are now complete.
 
 ## Active frontier
 
-**The exact active blocker is now the real external `cat /tmp/hello` child-runtime store page fault. Writable `/tmp`, F_DUPFD fallback, dup3-backed descriptor replacement, and `echo hello > /tmp/hello` have all been crossed under real QEMU.**
+**The exact active frontier is now the real Alpine `/sbin/apk --version` startup path. Playable Alpine itself is complete and ownership-correct under the bounded Batch 32Q process/pipe model.**
 
 ```text
 FIRST STATIC BUSYBOX SHELL                complete
@@ -690,22 +702,28 @@ WRITABLE /tmp RUNTIME STATE               complete
 F_DUPFD + dup3 DESCRIPTOR REPLACEMENT     complete
         |
         v
-SHELL REDIRECTION                          complete
+SHELL REDIRECTION                         complete
         |
         v
-EXTERNAL cat /tmp/hello READ-BACK         <-- exact current blocker
+EXTERNAL cat /tmp/hello READ-BACK         complete
         |
         v
-PIPES + PROCESS / FD LIFETIME             pending
+pipe2 + BYTE FLOW + EOF/LIFETIME           complete
         |
         v
-★ PLAYABLE ALPINE ★
+★ PLAYABLE ALPINE ★                       complete
         |
         v
-APK LOCAL DATABASE / METADATA
+/sbin/apk --version                       <-- exact current pressure
         |
         v
-LOCAL .APK INSTALL TRANSACTION
+APK LOCAL DATABASE / METADATA             next
+        |
+        v
+FILESYSTEM PACKAGE TRANSACTIONS           next
+        |
+        v
+LOCAL .APK INSTALL TRANSACTION            future
         |
         v
 ★ LOCAL APK ★
@@ -728,7 +746,7 @@ apk add FROM REAL ALPINE REPOSITORIES
 
 Only real pressure should decide what filesystem, pathname, metadata, process, terminal, networking, or compatibility mechanisms are admitted next. The kernel should not grow a speculative Linux subsystem merely because Linux has one.
 
-Completed reports now include Batch 32M. See [`docs/reports/`](docs/reports/) for the preserved causal history.
+Completed reports now include Batch 32Q. See [`docs/reports/`](docs/reports/) for the preserved causal history.
 
 Current roadmap:
 
@@ -750,7 +768,7 @@ observe real failure
 
 ## Documentation
 
-Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md`](docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md), [`docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md`](docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), [`docs/reports/AGENTIC_SNOWBALL_BATCH_32M.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32M.md), and [`docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md`](docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md).
+Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md`](docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md), [`docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md`](docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), [`docs/reports/AGENTIC_SNOWBALL_BATCH_32Q.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32Q.md), and [`docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md`](docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md).
 
 ## Validation
 
