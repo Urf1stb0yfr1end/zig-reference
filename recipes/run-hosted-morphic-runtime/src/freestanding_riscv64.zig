@@ -20,6 +20,7 @@ const bounded_syscall_evidence = @import("bounded_syscall_evidence.zig");
 const bounded_mapping_preflight = @import("bounded_mapping_preflight.zig");
 const linux_rv64_clone_request = @import("linux_rv64_clone_request.zig");
 const runtime_mappings = @import("bounded_runtime_mappings.zig");
+const syscall_read_backend = @import("syscall_read_backend.zig");
 const userspace_elf = @embedFile("userspace-elf-rv64");
 const userspace_elf_data_bss = @embedFile("userspace-elf-rv64-data-bss");
 const userspace_elf_initial_stack = @embedFile("userspace-elf-rv64-initial-stack");
@@ -1281,7 +1282,9 @@ const SyscallBackend = struct {
     pub fn readBytes(_: @This(), operation: morphic_operation.ReadBytes) morphic_operation.Completion {
         const resource = syscall_resources.resolve(resource_tables.referenceFromIdentity(ResourceRef, operation.source)) orelse return .{ .failure = .invalid_resource };
         if (!resource.capabilities.read) return .{ .failure = .operation_not_supported };
-        if (resource.backend == @as(resource_tables.BackendId, @enumFromInt(3))) {
+        const read_plan = syscall_read_backend.plan(@intFromEnum(resource.backend), resource.state, operation.byte_count, syscall_stdin.len);
+        if (read_plan == .unsupported) return .{ .failure = .operation_not_supported };
+        if (read_plan == .live_console) {
             if (operation.byte_count == 0) return .{ .success = 0 };
             const plan = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(@intFromEnum(operation.destination)), 1, .write_to_user, syscall_query) catch return .{ .failure = .invalid_user_memory };
             var byte: usize = std.math.maxInt(usize);
@@ -1290,15 +1293,15 @@ const SyscallBackend = struct {
             destination[0] = @truncate(byte);
             return .{ .success = 1 };
         }
-        const available = syscall_stdin.len - resource.state;
-        const amount = @min(operation.byte_count, available);
+        const fixture = read_plan.deterministic_fixture;
+        const amount = fixture.end - fixture.start;
         if (amount == 0) return .{ .success = 0 };
         const plan = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(@intFromEnum(operation.destination)), amount, .write_to_user, syscall_query) catch return .{ .failure = .invalid_user_memory };
         for (plan.items()) |segment| {
             const destination: [*]volatile u8 = @ptrFromInt(segment.physical_start.raw());
-            for (0..segment.byte_count) |i| destination[i] = syscall_stdin[resource.state + segment.request_offset + i];
+            for (0..segment.byte_count) |i| destination[i] = syscall_stdin[fixture.start + segment.request_offset + i];
         }
-        syscall_resources.setState(resource_tables.referenceFromIdentity(ResourceRef, operation.source), resource.state + amount) catch return .{ .failure = .invalid_resource };
+        syscall_resources.setState(resource_tables.referenceFromIdentity(ResourceRef, operation.source), fixture.end) catch return .{ .failure = .invalid_resource };
         return .{ .success = amount };
     }
     pub fn writeBytes(_: @This(), operation: morphic_operation.WriteBytes) morphic_operation.Completion {
@@ -1576,7 +1579,9 @@ fn externalNamespaceOpenAt(directory: usize, path_address: usize, flags: usize) 
         .regular => @as(u32, 0x101),
         .symlink => unreachable,
     });
-    const reference = syscall_resources.create(.{ .backend = backend, .capabilities = .{ .read = object.kind == .regular }, .state = object.manifest_offset }) catch return negativeErrno(23);
+    // Namespace I/O backends deliberately expose no semantic read capability
+    // until their actual file/directory read operations are implemented.
+    const reference = syscall_resources.create(.{ .backend = backend, .capabilities = .{}, .state = object.manifest_offset }) catch return negativeErrno(23);
     var descriptor: usize = 3;
     while (descriptor < 8 and syscall_bindings.resolve(descriptor) != null) : (descriptor += 1) {}
     if (descriptor == 8) {

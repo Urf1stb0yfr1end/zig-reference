@@ -82,3 +82,15 @@ The next action is to run the already-built exact live-console machine with
 QEMU, submit `ls /`, confirm `ZIGREF_LINUX_OPENAT path=/`, and implement only
 the next syscall exposed by that real trace (expected to concern the opened
 directory, but not assumed until observed).
+
+## PR #83 fail-closed read repair
+
+The review follow-up removes the premature read capability from both namespace
+resource kinds. `SyscallBackend.readBytes()` now classifies backend identity
+before touching deterministic fixture state: only historical backend `0` may
+use `syscall_stdin`, backend `3` remains the live console, and namespace
+directory/regular backends `0x100`/`0x101` return
+`operation_not_supported`. The focused regression supplies a manifest-offset
+state to both namespace backends and proves neither produces a fixture range,
+while preserving the historical deterministic-stdin range behavior. No
+namespace file read, directory enumeration, or new Linux syscall was added.

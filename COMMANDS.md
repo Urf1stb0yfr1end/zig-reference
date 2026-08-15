@@ -566,3 +566,10 @@ introduces no new runnable command.
 ## Batch 32G openat pressure state
 
 Batch 32G keeps the existing Batch 32D live-console build and QEMU command surface. The Linux/RV64 compatibility edge now decodes `openat(56)`, copies an absolute guest path through checked bounded user memory, rejects source-namespace mutation flags, identifies regular versus directory namespace objects, and installs the opened object in the existing bounded generational resource and process-binding tables. The exact namespace-backed live-console machine compiled under Zig 0.14.0. This environment has no `qemu-system-riscv64`, so the unchanged real `ls /` acceptance retry remains unverified; `docs/reports/AGENTIC_SNOWBALL_BATCH_32G.md` records the exact proof boundary. No new runnable command was introduced.
+
+PR #83's correctness follow-up makes namespace backends `0x100` and `0x101`
+fail closed in semantic reads instead of interpreting their manifest identity
+as the historical deterministic-stdin cursor. The focused
+`zig build test-recipe-run-hosted-morphic-runtime` step now regression-tests
+backend classification and preserves deterministic stdin backend `0` plus live
+console backend `3`; no command surface or namespace read semantics were added.
