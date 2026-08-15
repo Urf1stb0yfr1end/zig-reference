@@ -602,6 +602,12 @@ extern var userServiceProbeTemplateEnd: u8;
 export fn userServiceTrapEntry() linksection(".text.user_service_trap") callconv(.naked) void {
     asm volatile (
         \\csrrw sp, sscratch, sp
+        // sscratch now owns the interrupted user sp. Select the trusted stack
+        // from supervisor state rather than trusting the swapped-in value;
+        // this also makes fork-child returns robust against stale scratch CSR
+        // state without enabling SUM.
+        \\la sp, external_trap_stack
+        \\ld sp, 0(sp)
         \\addi sp, sp, -288
         \\sd ra, 8(sp)
         \\sd gp, 24(sp)
@@ -680,11 +686,19 @@ export fn userServiceTrapEntry() linksection(".text.user_service_trap") callconv
         \\ld t4, 232(sp)
         \\ld t5, 240(sp)
         \\ld t6, 248(sp)
-        \\ld t0, 16(sp)
-        \\csrw sscratch, t0
-        \\ld t0, 40(sp)
+        // Rearm the trusted trap-stack handoff directly.  In particular, do
+        // not serialize the user stack through sscratch and depend on a
+        // second swap during return: fork/exec may replace the saved user sp,
+        // while the supervisor trap-stack identity is process-independent.
         \\addi sp, sp, 288
-        \\csrrw sp, sscratch, sp
+        \\la t0, external_trap_stack
+        \\ld t0, 0(t0)
+        \\bnez t0, 1f
+        \\mv t0, sp
+        \\1:
+        \\csrw sscratch, t0
+        \\ld t0, -248(sp)
+        \\ld sp, -272(sp)
         \\sret
         \\2:
         \\ld t1, 256(sp)
@@ -2110,6 +2124,12 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
             if (external_artifact_options.live_console_input and external_fork_parent != null) {
                 write("ZIGREF_LINUX_UNSUPPORTED nr=");
                 writeUsizeHex(frame.x[17]);
+                write(" trap_stack=");
+                writeUsizeHex(external_trap_stack);
+                write(" frame=");
+                writeUsizeHex(@intFromPtr(frame));
+                write(" user_sp=");
+                writeUsizeHex(frame.x[2]);
                 write("\n");
             }
         },
@@ -2434,6 +2454,8 @@ export fn enterUserService(entry: usize, stack_top: usize, trap_stack_top: usize
         \\sd s11, 96(sp)
         \\la t0, service_supervisor_sp
         \\sd sp, 0(t0)
+        \\la t0, external_trap_stack
+        \\sd a2, 0(t0)
         \\csrw sscratch, a2
         \\la t0, userServiceTrapEntry
         \\csrw stvec, t0

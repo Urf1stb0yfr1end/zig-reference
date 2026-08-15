@@ -650,3 +650,11 @@ experiment removed that exact nested trap but was rejected because SUM must
 remain clear; returning success for syscall 134 alone did not advance the
 frontier. See `docs/reports/AGENTIC_SNOWBALL_BATCH_32N.md`. No new runnable
 command or Alpine milestone was introduced.
+
+Batch 32O reused those commands under QEMU 8.2.2. The focused recipe test and
+namespace-backed machine build passed. Real `cat /tmp/hello` proved trusted
+trap-stack frame `0x802c4030` and top `0x802c4150` across child calls
+96/135/135/134 with SUM clear, removing the inherited trap-entry store fault.
+The unchanged command next stops at supervisor load fault `0x80206ace` in
+`RealPageOwner.owns`; external read-back and Playable Alpine remain unearned.
+See `docs/reports/AGENTIC_SNOWBALL_BATCH_32O.md`. No command surface changed.
