@@ -6,8 +6,8 @@
 - Handoff production began at `2026-08-15T11:49:00Z`; final handoff assembly completed at `2026-08-15T12:00:30Z`.
 - Inherited SHA: `b2d7c59bcfd68e597d45af8591f0cd16a877ae51` on branch `work`.
 - Sync failed closed before editing because this checkout has no Git remote and no local `main`; current history already contained PR #87 merge `47b3bb3b142edb4d931a8804d55e15ef98faf6f5` and the Batch 32L request.
-- Batch 32L implementation SHA before this handoff: `af53f56e9935c398a8b17e332a6694ebca7a4657` (`morphic: repair F_DUPFD errno and cross QEMU boundary`).
-- Push is unavailable because `git remote -v` is empty. PR creation therefore cannot reach GitHub from this checkout.
+- Agent-local Batch 32L implementation identifier `af53f56e9935c398a8b17e332a6694ebca7a4657` (`morphic: repair F_DUPFD errno and cross QEMU boundary`) was not persisted as a resolvable GitHub commit and must not be treated as a reproducible history boundary. The persisted implementation history for this run is PR #88 and its GitHub commit ancestry.
+- Push was unavailable in the execution checkout because `git remote -v` was empty. Persistence was subsequently established through GitHub PR #88.
 
 ## Mandatory opening repairs
 
