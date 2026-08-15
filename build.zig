@@ -281,11 +281,13 @@ pub fn build(b: *std.Build) void {
                 .optimize = optimize,
             }) });
             recipe_step.dependOn(&b.addRunArtifact(namespace_lookup_tests).step);
-            const runtime_namespace_tests = b.addTest(.{ .root_module = b.createModule(.{
+            const runtime_namespace_module = b.createModule(.{
                 .root_source_file = b.path("recipes/run-hosted-morphic-runtime/src/bounded_runtime_namespace.zig"),
                 .target = target,
                 .optimize = optimize,
-            }) });
+            });
+            runtime_namespace_module.addImport("bounded-resource-table", findModule("bounded-resource-table", &modules));
+            const runtime_namespace_tests = b.addTest(.{ .root_module = runtime_namespace_module });
             recipe_step.dependOn(&b.addRunArtifact(runtime_namespace_tests).step);
             const executable = b.addExecutable(.{ .name = "run-hosted-morphic-runtime", .root_module = recipe_module });
             const install_riscv64 = b.addInstallArtifact(executable, .{});

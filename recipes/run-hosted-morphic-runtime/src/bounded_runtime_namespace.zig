@@ -1,4 +1,5 @@
 const std = @import("std");
+const resource_tables = @import("bounded-resource-table");
 
 pub const Operation = enum { read, write };
 
@@ -20,6 +21,28 @@ pub const Access = struct {
         if (!self.permits(operation)) return error.AccessDenied;
     }
 };
+
+/// Complete single-threaded runtime-open transaction. Capacity is prepared
+/// before namespace mutation; the proven-free resource and binding slots make
+/// the subsequent ownership commit infallible under caller synchronization.
+pub fn openResource(
+    namespace: anytype,
+    resources: anytype,
+    bindings: anytype,
+    path: []const u8,
+    create: bool,
+    truncate: bool,
+    description: anytype,
+) !usize {
+    const descriptor = bindings.lowestFreeAtOrAbove(3) orelse return error.DescriptorFull;
+    if (!resources.hasCapacity()) return error.ResourceFull;
+    const object = try namespace.openPrepared(path, create, truncate, true, true);
+    var committed = description;
+    committed.state = object << 32;
+    const reference = resources.create(committed) catch unreachable;
+    bindings.bindAt(descriptor, reference) catch unreachable;
+    return descriptor;
+}
 
 /// Session-local regular files. Paths and bytes are owned inline; the verified
 /// source namespace is never modified.
@@ -153,4 +176,63 @@ test "open prepare failures cannot create truncate or leak caller capacity" {
     _ = try runtime.write(created, 0, "ok");
     _ = try runtime.openPrepared("/tmp/new", false, true, true, true);
     try std.testing.expectEqual(@as(usize, 0), try runtime.read(created, 0, &output));
+}
+
+test "runtime open transaction preserves namespace bindings and resource ownership on exhaustion" {
+    const Resources = resource_tables.ResourceTable(2);
+    const Ref = Resources.ResourceRef;
+    const Bindings = resource_tables.BindingTable(Ref, 5);
+    const description: Resources.Description = .{ .backend = @enumFromInt(1), .capabilities = .{ .write = true } };
+    var output: [8]u8 = undefined;
+
+    // Descriptor exhaustion rejects create and truncate before allocating a
+    // resource or retaining any reference.
+    var namespace: RuntimeNamespace(2, 16, 8) = .{};
+    const existing = try namespace.open("/tmp/a", true, false);
+    _ = try namespace.write(existing, 0, "seed");
+    var resources: Resources = .{};
+    const occupied = try resources.create(description);
+    var bindings: Bindings = .{};
+    try bindings.bindAt(3, occupied);
+    try resources.retain(occupied);
+    try bindings.bindAt(4, occupied);
+    const resource_count = resources.count();
+    const references = resources.referenceCount(occupied).?;
+    try std.testing.expectError(error.DescriptorFull, openResource(&namespace, &resources, &bindings, "/tmp/new", true, false, description));
+    try std.testing.expect(namespace.lookup("/tmp/new") == null);
+    try std.testing.expectError(error.DescriptorFull, openResource(&namespace, &resources, &bindings, "/tmp/a", false, true, description));
+    try std.testing.expectEqual(resource_count, resources.count());
+    try std.testing.expectEqual(references, resources.referenceCount(occupied).?);
+    try std.testing.expectEqual(occupied, bindings.resolve(3).?);
+    try std.testing.expectEqual(occupied, bindings.resolve(4).?);
+    try std.testing.expectEqualStrings("seed", output[0..try namespace.read(existing, 0, &output)]);
+
+    // Resource exhaustion rejects the same mutations without changing any
+    // binding; slot three remains free.
+    var full_resources: resource_tables.ResourceTable(1) = .{};
+    const full = try full_resources.create(description);
+    var empty_bindings: resource_tables.BindingTable(@TypeOf(full), 5) = .{};
+    try std.testing.expectError(error.ResourceFull, openResource(&namespace, &full_resources, &empty_bindings, "/tmp/new", true, false, description));
+    try std.testing.expect(namespace.lookup("/tmp/new") == null);
+    try std.testing.expectError(error.ResourceFull, openResource(&namespace, &full_resources, &empty_bindings, "/tmp/a", false, true, description));
+    try std.testing.expectEqual(@as(usize, 1), full_resources.count());
+    try std.testing.expectEqual(@as(usize, 1), full_resources.referenceCount(full).?);
+    try std.testing.expect(empty_bindings.resolve(3) == null);
+    try std.testing.expectEqualStrings("seed", output[0..try namespace.read(existing, 0, &output)]);
+
+    // Each successful open commits one namespace action, one description, and
+    // one binding.
+    var success_namespace: RuntimeNamespace(2, 16, 8) = .{};
+    var success_resources: Resources = .{};
+    var success_bindings: Bindings = .{};
+    const created_fd = try openResource(&success_namespace, &success_resources, &success_bindings, "/tmp/new", true, false, description);
+    try std.testing.expect(success_namespace.lookup("/tmp/new") != null);
+    try std.testing.expectEqual(@as(usize, 1), success_resources.count());
+    try std.testing.expect(success_bindings.resolve(created_fd) != null);
+    const truncate_object = success_namespace.lookup("/tmp/new").?;
+    _ = try success_namespace.write(truncate_object, 0, "seed");
+    const truncate_fd = try openResource(&success_namespace, &success_resources, &success_bindings, "/tmp/new", false, true, description);
+    try std.testing.expectEqual(@as(usize, 2), success_resources.count());
+    try std.testing.expect(success_bindings.resolve(truncate_fd) != null);
+    try std.testing.expectEqual(@as(usize, 0), try success_namespace.read(truncate_object, 0, &output));
 }

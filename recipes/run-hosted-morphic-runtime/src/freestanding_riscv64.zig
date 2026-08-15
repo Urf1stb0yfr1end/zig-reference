@@ -1639,8 +1639,8 @@ fn externalNamespaceOpenAt(directory: usize, path_address: usize, flags: usize) 
     if (runtime_existing != null or create) {
         // O_APPEND fails closed until every write can select EOF atomically.
         if (flags & 0x400 != 0 or flags & ~@as(usize, 0x3 | 0x40 | 0x200 | 0x8000) != 0) return negativeErrno(22);
-        const descriptor = syscall_bindings.lowestFreeAtOrAbove(3) orelse return negativeErrno(24);
-        const object = external_runtime_namespace.openPrepared(path, create, truncate, syscall_resources.hasCapacity(), true) catch |err| return negativeErrno(switch (err) {
+        const capabilities: resource_tables.Capabilities = .{ .read = access != 1, .write = access != 0 };
+        return bounded_runtime_namespace.openResource(&external_runtime_namespace, &syscall_resources, &syscall_bindings, path, create, truncate, ResourceStore.Description{ .backend = @enumFromInt(runtime_regular_backend), .capabilities = capabilities }) catch |err| negativeErrno(switch (err) {
             error.NotFound => 2,
             error.ObjectCapacity, error.ByteCapacity => 28,
             error.InvalidPath, error.PathTooLong => 22,
@@ -1648,10 +1648,6 @@ fn externalNamespaceOpenAt(directory: usize, path_address: usize, flags: usize) 
             error.DescriptorFull => 24,
             error.AccessDenied => 9,
         });
-        const capabilities: resource_tables.Capabilities = .{ .read = access != 1, .write = access != 0 };
-        const reference = syscall_resources.create(.{ .backend = @enumFromInt(runtime_regular_backend), .capabilities = capabilities, .state = object << 32 }) catch return negativeErrno(23);
-        syscall_bindings.bindAt(descriptor, reference) catch shutdown();
-        return descriptor;
     }
     if (access != 0 or truncate) return negativeErrno(30);
     // Linux asm-generic O_NOFOLLOW. Ordinary open follows the final symlink

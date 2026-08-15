@@ -64,3 +64,12 @@ Highest genuinely earned real-runtime milestone remains **read-only Alpine plus 
 Source namespace immutability, bounded runtime state, PREPARE -> COMMIT image replacement, mapping preflight, W+X=0, cwd semantics, resource ownership, and the documented relative-path limitations remain preserved. The `morphic-batch32g-openat-known-symlink-gap` limitation also remains relevant and non-causal.
 
 **EXACTLY ONE NEXT CAUSAL BLOCKER:** real system-QEMU availability is required to retry unchanged `echo hello > /tmp/hello` and determine whether the implemented ownership-correct `F_DUPFD` crosses ash's inherited causal boundary or exposes the next real syscall.
+
+## PR #87 focused review repair
+
+- Repair inherited head: `e841a5a21de837482a421f817c5bd8ab3a0e868e`; branch sync was unavailable because this checkout still has no `origin` remote.
+- The three new bounded-resource-table methods now have complete endpoint contracts. `port.js` was regenerated from canonical `details.json`, followed by canonical port, repository, endpoint, agent-index, and all-module validation-evidence regeneration.
+- Runtime open now uses one testable `openResource` PREPARE -> COMMIT helper for the actual namespace mutation, resource-description creation, and descriptor installation path used by the Linux/RV64 edge.
+- The combined regression fills descriptor capacity and resource capacity independently and proves failed create/truncate preserve object presence/bytes, resource count, binding topology, and reference counts. It also proves successful create and successful truncate each install exactly one new resource description and binding.
+- `zig build check` passed. `python3 tools/developer-command.py validate-repository` passed all 350 build steps and 249 tests under Zig 0.14.0.
+- `qemu-system-riscv64` remains unavailable, so the inherited real-QEMU milestone and exactly one next causal blocker above remain unchanged.

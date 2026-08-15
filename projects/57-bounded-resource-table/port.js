@@ -126,12 +126,24 @@ module.exports = {
         "signature": "count(self: *const Self) usize"
       },
       {
+        "name": "hasCapacity",
+        "signature": "hasCapacity(self: *const Self) bool"
+      },
+      {
         "name": "bindAt",
         "signature": "bindAt(self: *Self, slot: usize, reference: ResourceRef) Error!void"
       },
       {
         "name": "duplicateLowest",
         "signature": "duplicateLowest(self: *Self, source: usize) Error!usize"
+      },
+      {
+        "name": "duplicateLowestAtOrAbove",
+        "signature": "duplicateLowestAtOrAbove(self: *Self, source: usize, minimum: usize) Error!usize"
+      },
+      {
+        "name": "lowestFreeAtOrAbove",
+        "signature": "lowestFreeAtOrAbove(self: *const Self, minimum: usize) ?usize"
       },
       {
         "name": "unbind",
@@ -173,13 +185,19 @@ module.exports = {
         "guaranteesInherited": []
       }
     ],
-    "standardLibrary": [],
+    "standardLibrary": [
+      "std.math.maxInt",
+      "std.testing.expect",
+      "std.testing.expectEqual",
+      "std.testing.expectError"
+    ],
     "external": []
   },
   "zigLanguageFeatures": {
     "used": [],
     "versionSensitive": [
       "@This",
+      "@TypeOf",
       "@as",
       "@enumFromInt",
       "@intFromEnum"
@@ -195,9 +213,33 @@ module.exports = {
             "path": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
             "lines": [],
             "symbols": []
+          },
+          {
+            "path": "projects/57-bounded-resource-table/tests/smoke_test.zig",
+            "lines": [],
+            "symbols": []
           }
         ],
         "baselineBehavior": "Zig 0.14.0 @This behavior as exercised by this module",
+        "portingRisk": "medium",
+        "likelyChangeCategory": "syntax_or_type_semantics",
+        "notes": []
+      },
+      {
+        "name": "@TypeOf",
+        "files": [
+          {
+            "path": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+            "lines": [],
+            "symbols": []
+          },
+          {
+            "path": "projects/57-bounded-resource-table/tests/smoke_test.zig",
+            "lines": [],
+            "symbols": []
+          }
+        ],
+        "baselineBehavior": "Zig 0.14.0 @TypeOf behavior as exercised by this module",
         "portingRisk": "medium",
         "likelyChangeCategory": "syntax_or_type_semantics",
         "notes": []
@@ -207,6 +249,11 @@ module.exports = {
         "files": [
           {
             "path": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+            "lines": [],
+            "symbols": []
+          },
+          {
+            "path": "projects/57-bounded-resource-table/tests/smoke_test.zig",
             "lines": [],
             "symbols": []
           }
@@ -223,9 +270,28 @@ module.exports = {
             "path": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
             "lines": [],
             "symbols": []
+          },
+          {
+            "path": "projects/57-bounded-resource-table/tests/smoke_test.zig",
+            "lines": [],
+            "symbols": []
           }
         ],
         "baselineBehavior": "Zig 0.14.0 @enumFromInt behavior as exercised by this module",
+        "portingRisk": "medium",
+        "likelyChangeCategory": "syntax_or_type_semantics",
+        "notes": []
+      },
+      {
+        "name": "@intFromEnum",
+        "files": [
+          {
+            "path": "projects/57-bounded-resource-table/tests/smoke_test.zig",
+            "lines": [],
+            "symbols": []
+          }
+        ],
+        "baselineBehavior": "Zig 0.14.0 @intFromEnum behavior as exercised by this module",
         "portingRisk": "medium",
         "likelyChangeCategory": "syntax_or_type_semantics",
         "notes": []
@@ -234,12 +300,73 @@ module.exports = {
     "notUsed": []
   },
   "standardLibraryUsage": {
-    "imports": [],
-    "testingApis": [],
+    "imports": [
+      {
+        "path": "std.math.maxInt",
+        "symbols": [
+          "std.math.maxInt"
+        ],
+        "files": [
+          "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
+        ],
+        "purpose": "implementation support",
+        "versionSensitivity": "medium",
+        "knownChanges": [],
+        "migrationNotes": []
+      },
+      {
+        "path": "std.testing.expect",
+        "symbols": [
+          "std.testing.expect"
+        ],
+        "files": [
+          "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+          "projects/57-bounded-resource-table/tests/smoke_test.zig"
+        ],
+        "purpose": "test assertions and test allocation",
+        "versionSensitivity": "medium",
+        "knownChanges": [],
+        "migrationNotes": []
+      },
+      {
+        "path": "std.testing.expectEqual",
+        "symbols": [
+          "std.testing.expectEqual"
+        ],
+        "files": [
+          "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+          "projects/57-bounded-resource-table/tests/smoke_test.zig"
+        ],
+        "purpose": "test assertions and test allocation",
+        "versionSensitivity": "medium",
+        "knownChanges": [],
+        "migrationNotes": []
+      },
+      {
+        "path": "std.testing.expectError",
+        "symbols": [
+          "std.testing.expectError"
+        ],
+        "files": [
+          "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
+        ],
+        "purpose": "test assertions and test allocation",
+        "versionSensitivity": "medium",
+        "knownChanges": [],
+        "migrationNotes": []
+      }
+    ],
+    "testingApis": [
+      "std.testing.expect",
+      "std.testing.expectEqual",
+      "std.testing.expectError"
+    ],
     "allocatorApis": [],
     "ioApis": [],
     "endianApis": [],
-    "mathApis": [],
+    "mathApis": [
+      "std.math.maxInt"
+    ],
     "metadataApis": []
   },
   "buildSystemUsage": {
@@ -247,7 +374,10 @@ module.exports = {
     "smokeTestStep": "smoke-bounded-resource-table",
     "namedModuleImport": "bounded-resource-table",
     "sourcePath": "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
-    "directModuleDependencies": [],
+    "directModuleDependencies": [
+      "generational-handles",
+      "morphic-semantic-operation"
+    ],
     "buildApisUsed": [
       "std.Build.createModule",
       "std.Build.addTest",
@@ -301,8 +431,10 @@ module.exports = {
     "notes": []
   },
   "reflectionAndComptimeUsage": {
-    "reflectionSensitive": false,
-    "builtins": [],
+    "reflectionSensitive": true,
+    "builtins": [
+      "@TypeOf"
+    ],
     "comptimeParameters": [],
     "notes": []
   },
@@ -319,7 +451,11 @@ module.exports = {
     "smokeTests": [
       "projects/57-bounded-resource-table/tests/smoke_test.zig"
     ],
-    "testingApis": [],
+    "testingApis": [
+      "std.testing.expect",
+      "std.testing.expectEqual",
+      "std.testing.expectError"
+    ],
     "semanticCoverage": []
   },
   "knownVersionChanges": [],
@@ -329,13 +465,12 @@ module.exports = {
       "topic": "semantic and build compatibility",
       "reason": "Unknown future Zig releases can change inference, standard-library contracts, or build graph identity.",
       "affectedSymbols": [
-        "BackendId",
         "Capabilities",
+        "BackendId",
         "ResourceTable",
         "BindingTable",
-        "Description",
-        "ResourceRef",
-        "create"
+        "semanticIdentity",
+        "referenceFromIdentity"
       ],
       "affectedFiles": [
         "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
@@ -354,13 +489,12 @@ module.exports = {
       "risk": "Preserve the documented bounded-resource-table public behavior, boundaries, and failure semantics.",
       "consequence": "A syntactically successful port could violate the module contract.",
       "affectedEndpoints": [
-        "BackendId",
         "Capabilities",
+        "BackendId",
         "ResourceTable",
         "BindingTable",
-        "Description",
-        "ResourceRef",
-        "create"
+        "semanticIdentity",
+        "referenceFromIdentity"
       ],
       "detectionTests": [
         "zig build test-bounded-resource-table",
@@ -422,7 +556,9 @@ module.exports = {
     "readFirst": [
       "projects/57-bounded-resource-table/port.js",
       "projects/57-bounded-resource-table/details.json",
-      "projects/57-bounded-resource-table/DETAILS.md"
+      "projects/57-bounded-resource-table/DETAILS.md",
+      "projects/08-generational-handles/port.js",
+      "projects/56-morphic-semantic-operation/port.js"
     ],
     "filesUsuallyNotRequired": [],
     "firstCommands": [
@@ -430,13 +566,31 @@ module.exports = {
       "zig build test-bounded-resource-table"
     ],
     "recommendedPortOrder": [
+      "generational-handles",
+      "morphic-semantic-operation",
       "bounded-resource-table"
     ],
     "searchTerms": [
       "@This",
+      "@TypeOf",
       "@as",
       "@enumFromInt",
-      "@intFromEnum"
+      "@intFromEnum",
+      "std.math.maxInt",
+      "std.testing.expect",
+      "std.testing.expectEqual",
+      "std.testing.expectError"
+    ],
+    "likelyCompilerFailureAreas": [
+      "@This",
+      "@TypeOf",
+      "@as",
+      "@enumFromInt",
+      "@intFromEnum",
+      "std.math.maxInt",
+      "std.testing.expect",
+      "std.testing.expectEqual",
+      "std.testing.expectError"
     ],
     "doNotAssume": [
       "Compilation proves semantic or binary-layout compatibility.",
@@ -450,12 +604,6 @@ module.exports = {
       "Port dependencies first.",
       "Run contract checks, unit tests, and smoke tests.",
       "Record evidence without deleting baseline history."
-    ],
-    "likelyCompilerFailureAreas": [
-      "@This",
-      "@as",
-      "@enumFromInt",
-      "@intFromEnum"
     ]
   },
   "sourceMap": {
@@ -463,7 +611,15 @@ module.exports = {
       {
         "builtin": "@This",
         "files": [
-          "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
+          "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+          "projects/57-bounded-resource-table/tests/smoke_test.zig"
+        ]
+      },
+      {
+        "builtin": "@TypeOf",
+        "files": [
+          "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+          "projects/57-bounded-resource-table/tests/smoke_test.zig"
         ]
       },
       {
@@ -476,24 +632,52 @@ module.exports = {
       {
         "builtin": "@enumFromInt",
         "files": [
-          "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
+          "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+          "projects/57-bounded-resource-table/tests/smoke_test.zig"
         ]
       },
       {
         "builtin": "@intFromEnum",
         "files": [
+          "projects/57-bounded-resource-table/tests/smoke_test.zig"
+        ]
+      }
+    ],
+    "standardLibraryToFiles": [
+      {
+        "api": "std.math.maxInt",
+        "files": [
+          "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
+        ]
+      },
+      {
+        "api": "std.testing.expect",
+        "files": [
+          "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+          "projects/57-bounded-resource-table/tests/smoke_test.zig"
+        ]
+      },
+      {
+        "api": "std.testing.expectEqual",
+        "files": [
+          "projects/57-bounded-resource-table/src/bounded_resource_table.zig",
+          "projects/57-bounded-resource-table/tests/smoke_test.zig"
+        ]
+      },
+      {
+        "api": "std.testing.expectError",
+        "files": [
           "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
         ]
       }
     ],
-    "standardLibraryToFiles": [],
     "symbolsToFiles": [
       {
-        "symbol": "BackendId",
+        "symbol": "Capabilities",
         "file": "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
       },
       {
-        "symbol": "Capabilities",
+        "symbol": "BackendId",
         "file": "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
       },
       {
@@ -505,15 +689,11 @@ module.exports = {
         "file": "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
       },
       {
-        "symbol": "Description",
+        "symbol": "semanticIdentity",
         "file": "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
       },
       {
-        "symbol": "ResourceRef",
-        "file": "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
-      },
-      {
-        "symbol": "create",
+        "symbol": "referenceFromIdentity",
         "file": "projects/57-bounded-resource-table/src/bounded_resource_table.zig"
       }
     ]
