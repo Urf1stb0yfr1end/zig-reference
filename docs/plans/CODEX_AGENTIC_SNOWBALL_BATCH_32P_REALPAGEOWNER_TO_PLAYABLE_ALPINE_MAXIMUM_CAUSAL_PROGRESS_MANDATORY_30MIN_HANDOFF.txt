@@ -1,0 +1,470 @@
+CODEX AGENTIC SNOWBALL — BATCH 32P
+REALPAGEOWNER / PAGE-TABLE CONTEXT -> EXTERNAL READ-BACK -> PIPELINE -> PLAYABLE ALPINE
+MAXIMUM CAUSAL PROGRESS / BOUNDED LEAPS / MANDATORY 30-MINUTE HANDOFF
+
+Repository: thanks-cohn/zig-reference
+Canonical request:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32P_REALPAGEOWNER_TO_PLAYABLE_ALPINE_MAXIMUM_CAUSAL_PROGRESS_MANDATORY_30MIN_HANDOFF.txt
+
+======================================================================
+START
+======================================================================
+
+Start from current main.
+
+Authoring main when this request was created:
+
+e8e163e8269d71f1139e947d947fbe0f9a4ca225
+
+This is the merge commit of PR #91 / Batch 32O.
+
+Do not assume that SHA remains current. Fetch, switch to, and update current main
+first. Record the exact inherited SHA in the handoff.
+
+Before implementation:
+
+1. read AGENTS.md;
+2. read README.md;
+3. read COMMANDS.md;
+4. read docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md;
+5. read docs/reports/AGENTIC_SNOWBALL_BATCH_32N.md;
+6. read docs/reports/AGENTIC_SNOWBALL_BATCH_32O.md;
+7. inspect the Batch 32O trap-stack / sscratch repair in
+   recipes/run-hosted-morphic-runtime/src/freestanding_riscv64.zig;
+8. run:
+
+     python3 tools/query-reference.py agent bootstrap
+     python3 tools/query-reference.py agent doctor
+
+9. read this request completely;
+10. begin a visible 30-minute clock with the first repository command.
+
+======================================================================
+THIS RUN IS NOT A ONE-BUG RUN
+======================================================================
+
+The current RealPageOwner/page-table-context fault is the OPENING GATE, not the
+mission.
+
+The mission is:
+
+  ★ MAKE THE MAXIMUM CAUSALLY JUSTIFIED PROGRESS TOWARD PLAYABLE ALPINE
+    DURING THE FULL USEFUL IMPLEMENTATION WINDOW ★
+
+If the opening blocker takes 5 minutes, spend the remaining implementation time
+on the next real boundary.
+
+If it takes 12 minutes, spend the remaining implementation time on the next real
+boundary.
+
+If external read-back becomes real, immediately attack the pipeline.
+
+If the pipeline becomes real, immediately run the complete Playable Alpine
+acceptance sequence.
+
+DO NOT treat the successful repair of one fault or syscall as the natural end of
+the run.
+
+The run is bounded primarily by TIME, EVIDENCE, and the mandatory handoff — not
+by one error.
+
+Use:
+
+  OBSERVE -> CLASSIFY -> MINIMUM GENERAL REPAIR -> PROVE -> RETRY -> CONTINUE
+
+After every successful repair, rerun the exact failing command immediately. If
+it advances, follow the next directly exposed causal boundary while useful
+implementation time remains.
+
+======================================================================
+PRIMARY GOAL
+======================================================================
+
+Reach:
+
+  ★ PLAYABLE ALPINE UNDER MORPHIC ★
+
+as far as physically possible within this 30-minute bounded run.
+
+Current already-earned user-visible sequence includes:
+
+  echo morphic
+  echo second
+  pwd
+  ls /
+  cat /etc/alpine-release
+  cd /tmp
+  pwd
+  echo hello > /tmp/hello
+
+Batch 32M proved real redirection.
+Batch 32N causally narrowed the child trap failure.
+Batch 32O repaired the trusted trap-stack / sscratch invariant with SUM clear.
+
+The exact current unchanged next pressure is:
+
+  cat /tmp/hello
+
+Batch 32O real QEMU crossed the inherited trap-entry store fault and now reaches:
+
+  ZIGREF_LINUX_EDGE_TRAP cause=000000000000000d sepc=0000000080206ace stval=00000000000000c8
+
+ELF/debug evidence identifies sepc 0x80206ace in RealPageOwner.owns, with a null
+owner/query-context path producing the supervisor load-page fault.
+
+This is the authoritative opening boundary unless current-main reproduction
+shows a different earlier causal failure.
+
+======================================================================
+CURRENT PROVEN FRONTIER — PRESERVE
+======================================================================
+
+Preserve all currently earned behavior, including:
+
+- exact Alpine v3.22.0 RV64 namespace;
+- real BusyBox and real musl interpreter-first execution;
+- persistent interactive shell;
+- live console input;
+- clone(220) / execve(221) external BusyBox execution;
+- retained parent-shell snapshot/restoration;
+- PREPARE -> COMMIT executable replacement;
+- candidate mapping/table-capacity preflight;
+- W+X=0;
+- immutable serialized Alpine source namespace;
+- namespace-backed openat/getdents64/newfstatat/read behavior already earned;
+- genuine ls /;
+- cat /etc/alpine-release -> 3.22.0;
+- bounded cwd and chdir/getcwd behavior;
+- cd /tmp ; pwd -> /tmp;
+- bounded session-local writable runtime namespace;
+- transactional create/truncate behavior;
+- descriptor/resource ownership and access-capability enforcement;
+- F_DUPFD aliasing semantics;
+- dup3 descriptor replacement;
+- real shell redirection: echo hello > /tmp/hello;
+- Batch 32O trusted supervisor trap-stack identity;
+- sscratch rearmed from supervisor-owned trap-stack state;
+- SUM clear preserved across ordinary child returns;
+- old sepc=0x8020006e / stval=0x804026f8 trap-entry store fault eliminated.
+
+Do not weaken these invariants to make the next command pass.
+
+======================================================================
+LEAP 1 — REALPAGEOWNER / PAGE-TABLE QUERY CONTEXT
+======================================================================
+
+Reproduce unchanged:
+
+  cd /tmp
+  pwd
+  echo hello > /tmp/hello
+  cat /tmp/hello
+
+The opening objective is to determine why the child continuation after syscall
+134 reaches RealPageOwner.owns with a null/invalid owner/query context.
+
+Trace the minimum state necessary to answer:
+
+- which object/pointer is null;
+- where its valid value originates during normal external execution;
+- where clone / serialized child continuation loses or fails to restore it;
+- whether this is process snapshot state, page-table owner identity, lookup
+  context, mapping/backend context, or another specific state handoff;
+- whether parent restoration currently masks the same issue elsewhere.
+
+Do not special-case RealPageOwner.owns, address 0xc8, /bin/cat, /tmp/hello, or the
+fault PC.
+
+Repair the general ownership/context invariant.
+
+Required qualities:
+
+- valid page-table ownership/query context must be explicit, bounded, and
+  process/runtime-owned at the correct layer;
+- clone / child continuation must preserve or reconstruct it correctly;
+- parent restoration must retain its existing correctness;
+- failure must remain explicit rather than silently dereferencing null;
+- W+X=0 remains intact;
+- PREPARE -> COMMIT remains intact;
+- SUM remains clear;
+- source namespace remains immutable;
+- add the smallest focused permanent regression that captures the repaired
+  invariant.
+
+Immediately rerun:
+
+  cat /tmp/hello
+
+after the repair.
+
+THE MOMENT THIS FAULT IS CROSSED, CONTINUE. Do not spend the rest of the run
+polishing the repair if focused proof is sufficient and real QEMU has advanced.
+
+======================================================================
+LEAP 2 — EXTERNAL READ-BACK
+======================================================================
+
+Continue unchanged pressure until:
+
+  cat /tmp/hello
+
+prints:
+
+  hello
+
+through a real external BusyBox cat.
+
+If the RealPageOwner repair exposes another child setup, exec, memory, descriptor,
+open, read, exit, wait, or parent-restoration boundary, attack the FIRST real
+causal blocker only and retry immediately.
+
+Do not pre-implement a speculative syscall list.
+
+The read-back gate must arise through ordinary mechanisms:
+
+- real pathname lookup;
+- runtime-over-source namespace semantics;
+- real resource/descriptor binding;
+- actual clone/exec path;
+- runtime regular-file read;
+- checked guest-memory copy;
+- correct offset and EOF semantics;
+- coherent child termination/completion;
+- living original parent shell.
+
+Once it succeeds, immediately run:
+
+  echo still-alive
+
+and then immediately proceed to pipeline pressure.
+
+Do not end the run merely because external read-back is earned.
+
+======================================================================
+LEAP 3 — PIPELINE: MAXIMUM CAUSAL PROGRESS
+======================================================================
+
+Run:
+
+  echo hello | cat
+
+then:
+
+  echo still-alive
+
+Observe the first real boundary and keep moving through directly exposed
+pipeline requirements while useful implementation time remains.
+
+Possible pressure may reveal some subset of:
+
+- pipe/pipe2 Linux/RV64 compatibility decoding;
+- neutral bounded pipe resource state;
+- read/write endpoint capabilities;
+- bounded buffering;
+- descriptor creation and replacement;
+- descriptor inheritance across clone;
+- reference ownership across aliases and children;
+- close semantics;
+- EOF only after all writer references are gone;
+- more than one simultaneously meaningful child state;
+- wait/completion semantics;
+- parent-shell survival after the pipeline.
+
+These are possibilities, not a checklist. Real ash/BusyBox pressure determines
+what is causal.
+
+If one pipeline repair succeeds, rerun the pipeline immediately and continue to
+the next real blocker in the same run.
+
+Do not fake pipeline execution by:
+
+- executing commands inline in the parent;
+- copying expected bytes directly between command-specific paths;
+- command-name special cases;
+- synthetic EOF;
+- fabricated child completion;
+- known-string output injection.
+
+Pipeline behavior must emerge from general resource / descriptor / process
+semantics.
+
+======================================================================
+PLAYABLE ALPINE ACCEPTANCE
+======================================================================
+
+As soon as pipeline pressure succeeds, run the full canonical sequence in ONE
+persistent real Alpine shell:
+
+  echo morphic
+  echo second
+  pwd
+  ls /
+  cat /etc/alpine-release
+  cd /tmp
+  pwd
+  echo hello > /tmp/hello
+  cat /tmp/hello
+  echo hello | cat
+  echo still-alive
+
+Expected semantics:
+
+  echo morphic                    -> morphic
+  echo second                     -> second
+  initial pwd                     -> /
+  ls /                            -> genuine serialized Alpine entries
+  cat /etc/alpine-release         -> 3.22.0
+  cd /tmp                         -> success
+  pwd                             -> /tmp
+  echo hello > /tmp/hello         -> real runtime write
+  cat /tmp/hello                  -> hello
+  echo hello | cat                -> hello through a real pipe
+  echo still-alive                -> still-alive from the original shell
+
+Only this complete one-shell real-QEMU proof earns:
+
+  ★ PLAYABLE ALPINE UNDER MORPHIC ★
+
+If this milestone is earned before the handoff clock, use remaining productive
+time to strengthen regressions, clean persistence, exact reproduction evidence,
+and documentation. Do not begin a broad apk campaign inside Batch 32P; preserve
+a clean Playable Alpine milestone first.
+
+======================================================================
+TIME BUDGET — USE THE WINDOW
+======================================================================
+
+This is intentionally a maximum-progress bounded run.
+
+Approximate schedule:
+
+MINUTE 0–20:
+- reproduce exact current pressure;
+- repair the RealPageOwner/context invariant;
+- immediately continue to external read-back;
+- immediately continue to pipeline pressure when read-back succeeds;
+- cross as many directly observed causal boundaries as evidence and time permit.
+
+MINUTE 20–24:
+- continue implementation if the next repair is small/bounded and can still be
+  proved before handoff;
+- avoid opening large speculative architectural rewrites that cannot be
+  validated and persisted in time.
+
+MINUTE 24–26:
+- begin converging toward final validation and exact QEMU reproduction;
+- finish only bounded work already in hand.
+
+AT APPROXIMATELY MINUTE 26:
+- handoff production becomes PRIMARY work.
+
+AT APPROXIMATELY MINUTE 29:
+- final persistence, commit, report, and branch/PR state become the ONLY
+  priority.
+
+BY APPROXIMATELY MINUTE 30:
+- a complete persisted handoff MUST exist.
+
+Do not continue past the handoff window merely because another fix feels close.
+The next agent must receive a truthful, reproducible frontier.
+
+======================================================================
+MANDATORY HANDOFF
+======================================================================
+
+Create:
+
+  docs/reports/AGENTIC_SNOWBALL_BATCH_32P.md
+
+The handoff must include:
+
+- inherited main SHA;
+- resulting coherent implementation commit SHA(s);
+- exact opening RealPageOwner failure reproduction;
+- exact causal explanation and repair if achieved;
+- every real-QEMU frontier crossed during the run;
+- exact highest user-visible Alpine command sequence earned;
+- focused tests added;
+- validation actually completed;
+- environment/tool failures separately identified;
+- whether external read-back is earned;
+- whether pipeline is earned;
+- whether full Playable Alpine is earned;
+- exactly ONE next causal blocker if Playable Alpine remains incomplete;
+- known inherited limitations still relevant;
+- push / PR state.
+
+Update COMMANDS.md with durable reproduction evidence if the runtime frontier
+moves.
+
+Update README.md if and only if a user-visible milestone or active frontier
+materially changes.
+
+Update docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md to match the actual final causal
+frontier.
+
+Commit coherent work and push/open or update the PR when the environment permits.
+
+======================================================================
+VALIDATION
+======================================================================
+
+Use focused validation repeatedly while implementing, then run the strongest
+feasible relevant gates before handoff, including:
+
+  zig fmt --check build.zig projects recipes conformance
+  zig build test-recipe-run-hosted-morphic-runtime
+  zig build check
+  PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+  python3 tools/developer-command.py validate-repository
+  git diff --check
+
+Use the canonical verified Alpine v3.22.0 namespace and real
+qemu-system-riscv64 pressure recorded in README / COMMANDS.md.
+
+Hosted tests do not substitute for real-QEMU acceptance.
+
+Do not weaken a validation gate to fit the implementation.
+
+======================================================================
+NON-NEGOTIABLES
+======================================================================
+
+- The opening RealPageOwner fault is a first gate, not the whole run.
+- Use the full useful implementation window for Playable Alpine progress.
+- After every successful repair, retry the exact failing real command.
+- Continue immediately to the next real causal boundary when it advances.
+- Real Alpine binaries remain unchanged pressure.
+- No fabricated output.
+- No command-specific behavior.
+- No path-specific behavior.
+- No speculative broad Linux syscall implementation.
+- No weakening SUM-clear policy.
+- No weakening W+X=0.
+- No weakening PREPARE -> COMMIT.
+- No mutation of immutable serialized Alpine backing.
+- Preserve explicit bounded capacities and failure semantics.
+- Linux-specific policy remains at the compatibility edge when not neutral.
+- Mandatory persisted handoff by approximately minute 30.
+
+======================================================================
+DESIRED END STATE
+======================================================================
+
+Best case:
+
+  cat /tmp/hello        -> hello
+  echo hello | cat      -> hello
+  echo still-alive      -> still-alive
+  complete one-shell acceptance sequence
+  ★ PLAYABLE ALPINE UNDER MORPHIC ★
+
+Still-successful bounded result:
+
+  multiple genuinely causal frontiers crossed in one run, with exact QEMU proof,
+  focused permanent regressions, coherent persistence, and one explicit next
+  blocker.
+
+Do not optimize for the number of bugs described.
+Optimize for real unchanged Alpine advancement per bounded run while preserving
+architectural truth and leaving a complete handoff at minute 30.
