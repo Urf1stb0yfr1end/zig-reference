@@ -20,6 +20,7 @@ const bounded_syscall_evidence = @import("bounded_syscall_evidence.zig");
 const bounded_mapping_preflight = @import("bounded_mapping_preflight.zig");
 const linux_rv64_clone_request = @import("linux_rv64_clone_request.zig");
 const linux_rv64_fdupfd = @import("linux_rv64_fdupfd.zig");
+const linux_rv64_dup3 = @import("linux_rv64_dup3.zig");
 const runtime_mappings = @import("bounded_runtime_mappings.zig");
 const syscall_read_backend = @import("syscall_read_backend.zig");
 const bounded_namespace_lookup = @import("bounded_namespace_lookup.zig");
@@ -1492,12 +1493,13 @@ fn externalExecve(frame: *TrapFrame) usize {
     return 0;
 }
 
-const LinuxRequestKind = enum { get_current_directory, change_directory, duplicate, fcntl, close, open_at, get_directory_entries, read, write, write_vector, new_fstatat, program_break, clone, execve, memory_map, terminate, unsupported };
+const LinuxRequestKind = enum { get_current_directory, change_directory, duplicate, duplicate_to, fcntl, close, open_at, get_directory_entries, read, write, write_vector, new_fstatat, program_break, clone, execve, memory_map, terminate, unsupported };
 fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     return switch (number) {
         17 => .get_current_directory,
         49 => .change_directory,
         23 => .duplicate,
+        24 => .duplicate_to,
         25 => .fcntl,
         56 => .open_at,
         57 => .close,
@@ -1515,7 +1517,7 @@ fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     };
 }
 comptime {
-    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(49) != .change_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(25) != .fcntl or decodeLinuxRequestKind(56) != .open_at or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(61) != .get_directory_entries or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(220) != .clone or decodeLinuxRequestKind(221) != .execve or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(49) != .change_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(24) != .duplicate_to or decodeLinuxRequestKind(25) != .fcntl or decodeLinuxRequestKind(56) != .open_at or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(61) != .get_directory_entries or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(220) != .clone or decodeLinuxRequestKind(221) != .execve or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
 }
 
 fn externalChangeDirectory(path_address: usize) usize {
@@ -1784,6 +1786,14 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                 syscall_resources.retain(reference) catch shutdown();
                 frame.x[10] = new_slot;
             } else frame.x[10] = negativeErrno(9);
+        },
+        .duplicate_to => {
+            syscall_semantics[index] = 18;
+            frame.x[10] = linux_rv64_dup3.replace(&syscall_resources, &syscall_bindings, frame.x[10], frame.x[11], frame.x[12], syscall_binding_capacity) catch |err| negativeErrno(switch (err) {
+                error.InvalidSource, error.InvalidTarget => 9,
+                error.SameDescriptor, error.UnsupportedFlags => 22,
+                error.ResourceFull => 23,
+            });
         },
         .fcntl => {
             syscall_semantics[index] = 17;
