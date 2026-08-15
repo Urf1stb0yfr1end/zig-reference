@@ -591,3 +591,17 @@ same bounded namespace resolver. The focused Morphic recipe tests cover ordinary
 final-symlink following, `O_NOFOLLOW`, the sixteen-traversal cycle boundary, and
 root-directory lookup. No new command, namespace mutation/read, directory
 iteration, or Linux syscall surface was introduced.
+
+## Batch 32I bounded current-directory pressure state
+
+Batch 32I retains the existing Alpine namespace acquisition, live-console
+build, and system-QEMU command surface. The Linux/RV64 edge now decodes
+`chdir(49)`, validates an absolute target through the bounded namespace, and
+updates neutral 256-byte process current-directory state. `getcwd(17)` reports
+that state; clone snapshots inherit it, exec preserves it, and parent restore
+recovers it. One real persistent Alpine shell proved `cd /tmp` followed by
+`pwd -> /tmp`. The immediate writable retry, `echo hello > /tmp/hello`, now
+reaches the inherited read-only `openat(56)` policy and reports `Read-only file
+system`; a bounded writable runtime namespace is the one next causal blocker.
+`docs/reports/AGENTIC_SNOWBALL_BATCH_32I.md` records the evidence. No new
+runnable command was introduced.

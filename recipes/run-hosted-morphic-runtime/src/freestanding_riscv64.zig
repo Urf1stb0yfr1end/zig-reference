@@ -22,6 +22,7 @@ const linux_rv64_clone_request = @import("linux_rv64_clone_request.zig");
 const runtime_mappings = @import("bounded_runtime_mappings.zig");
 const syscall_read_backend = @import("syscall_read_backend.zig");
 const bounded_namespace_lookup = @import("bounded_namespace_lookup.zig");
+const bounded_process_cwd = @import("bounded_process_cwd.zig");
 const userspace_elf = @embedFile("userspace-elf-rv64");
 const userspace_elf_data_bss = @embedFile("userspace-elf-rv64-data-bss");
 const userspace_elf_initial_stack = @embedFile("userspace-elf-rv64-initial-stack");
@@ -478,6 +479,9 @@ var external_fork_bindings: ProcessBindings = undefined;
 var external_fork_mappings: ExternalRuntimeMappings = undefined;
 var external_fork_program_break: usize = 0;
 var external_fork_next_backing: usize = 0;
+const ProcessCwd = bounded_process_cwd.CurrentDirectory(256);
+var external_process_cwd: ProcessCwd = .{};
+var external_fork_cwd: ProcessCwd = .{};
 var syscall_output: [64]u8 = .{0} ** 64;
 var syscall_output_len: usize = 0;
 const ResourceStore = resource_tables.ResourceTable(16);
@@ -1144,6 +1148,7 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     syscall_query = .{ .context = &batch26_query_context, .queryFn = Batch26ActiveQuery.query };
     syscall_resources = .{};
     syscall_bindings = .{};
+    external_process_cwd = .{};
     const stdin = syscall_resources.create(.{ .backend = @enumFromInt(if (external_artifact_options.live_console_input) 3 else 0), .capabilities = .{ .read = true } }) catch shutdown();
     const stdout = syscall_resources.create(.{ .backend = @enumFromInt(1), .capabilities = .{ .write = true } }) catch shutdown();
     const stderr = syscall_resources.create(.{ .backend = @enumFromInt(2), .capabilities = .{ .write = true } }) catch shutdown();
@@ -1481,10 +1486,11 @@ fn externalExecve(frame: *TrapFrame) usize {
     return 0;
 }
 
-const LinuxRequestKind = enum { get_current_directory, duplicate, close, open_at, get_directory_entries, read, write, write_vector, new_fstatat, program_break, clone, execve, memory_map, terminate, unsupported };
+const LinuxRequestKind = enum { get_current_directory, change_directory, duplicate, close, open_at, get_directory_entries, read, write, write_vector, new_fstatat, program_break, clone, execve, memory_map, terminate, unsupported };
 fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     return switch (number) {
         17 => .get_current_directory,
+        49 => .change_directory,
         23 => .duplicate,
         56 => .open_at,
         57 => .close,
@@ -1502,7 +1508,19 @@ fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     };
 }
 comptime {
-    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(56) != .open_at or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(61) != .get_directory_entries or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(220) != .clone or decodeLinuxRequestKind(221) != .execve or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(49) != .change_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(56) != .open_at or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(61) != .get_directory_entries or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(220) != .clone or decodeLinuxRequestKind(221) != .execve or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+}
+
+fn externalChangeDirectory(path_address: usize) usize {
+    if (!external_artifact_options.namespace_enabled) return negativeErrno(2);
+    var path_buffer: [256]u8 = undefined;
+    const path_len = copyUserCString(path_address, &path_buffer) catch return negativeErrno(14);
+    const path = path_buffer[0..path_len];
+    if (!std.mem.eql(u8, path, "/") and !validAbsolutePath(path)) return negativeErrno(2);
+    const object = bounded_namespace_lookup.resolve(&external_rv64_namespace_manifest, path, true) catch return negativeErrno(2);
+    if (object.kind != .directory) return negativeErrno(20);
+    external_process_cwd.setAbsolute(path) catch return negativeErrno(36);
+    return 0;
 }
 
 fn namespaceDirectoryEntries(reference: ResourceRef, destination: usize, requested: usize) usize {
@@ -1682,15 +1700,22 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
     switch (decodeLinuxRequestKind(frame.x[17])) {
         .get_current_directory => {
             syscall_semantics[index] = 10;
-            if (frame.x[11] < 2) {
+            const needed = external_process_cwd.path().len + 1;
+            if (frame.x[11] < needed) {
                 frame.x[10] = negativeErrno(34);
             } else {
-                copyBytesToUser(frame.x[10], "/\x00") catch {
+                var cwd: [256]u8 = .{0} ** 256;
+                @memcpy(cwd[0..external_process_cwd.path().len], external_process_cwd.path());
+                copyBytesToUser(frame.x[10], cwd[0..needed]) catch {
                     frame.x[10] = negativeErrno(14);
                     return finishReturningSyscall(frame, index);
                 };
-                frame.x[10] = 2;
+                frame.x[10] = needed;
             }
+        },
+        .change_directory => {
+            syscall_semantics[index] = 16;
+            frame.x[10] = externalChangeDirectory(frame.x[10]);
         },
         .duplicate => {
             syscall_semantics[index] = 4;
@@ -1836,6 +1861,7 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                 external_fork_mappings = external_runtime_mappings;
                 external_fork_program_break = external_program_break;
                 external_fork_next_backing = external_next_backing;
+                external_fork_cwd = external_process_cwd;
                 frame.x[10] = 0;
             }
         },
@@ -1951,6 +1977,7 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                 external_runtime_mappings = external_fork_mappings;
                 external_program_break = external_fork_program_break;
                 external_next_backing = external_fork_next_backing;
+                external_process_cwd = external_fork_cwd;
                 installExternalImage(&external_image, &external_prepared_backing);
                 installExternalImage(&external_interpreter_image, &external_interpreter_backing);
                 var restored_backing_index = external_image.items().len;
