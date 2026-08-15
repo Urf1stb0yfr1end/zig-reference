@@ -41,15 +41,17 @@ echo hello > /tmp/hello                          PASS
 cat /tmp/hello                                   CURRENT BLOCKER
 ```
 
-The immediate unchanged `cat /tmp/hello` path resolves `/bin/cat`, enters the existing clone/exec path, observes unsupported Linux/RV64 calls `96`, `135`, `135`, and `134`, and then reaches a post-exec store page fault:
+The immediate unchanged `cat /tmp/hello` path resolves `/bin/cat`, enters the existing clone/exec path, observes unsupported Linux/RV64 calls `96`, `135`, `135`, and `134`, and after the Batch 32O trap-stack repair reaches a supervisor page-table-owner load fault:
 
 ```text
-ZIGREF_LINUX_EDGE_TRAP cause=000000000000000f sepc=000000008020006e stval=00000000804026f8
+ZIGREF_LINUX_EDGE_TRAP cause=000000000000000d sepc=0000000080206ace stval=00000000000000c8
 ```
 
 Read-back is therefore not yet earned. Pipelines are not yet earned. Playable Alpine is not yet earned.
 
-Batch 32N reproduced this boundary under QEMU 8.2.2 and narrowed it before `execve`: the same fault occurs for `cat /tmp/hello` even when the runtime file was not first created. Calls 96/135/135/134 run with a valid unchanged user-RW stack leaf, while `0x8020006e` is the first `userServiceTrapEntry` frame store. The next repair target is therefore the fork-child trap return/`sscratch` invariant with SUM remaining clear, not speculative signal/TLS syscalls or a writable-ELF mapping.
+Batch 32N reproduced this boundary under QEMU 8.2.2 and narrowed it before `execve`: the same fault occurs for `cat /tmp/hello` even when the runtime file was not first created. Calls 96/135/135/134 run with a valid unchanged user-RW stack leaf, while `0x8020006e` is the first `userServiceTrapEntry` frame store.
+
+Batch 32O rearmed `sscratch` from the supervisor-owned trap-stack identity on every return and made entry select that trusted identity after the mandatory first-instruction user-SP swap. With SUM still clear, the four setup calls now each enter at frame `0x802c4030` with trap-stack top `0x802c4150`; the old `0x8020006e`/`0x804026f8` store fault is gone. Unchanged `cat /tmp/hello` next reaches a supervisor load-page fault at `0x80206ace` (`RealPageOwner.owns`, null owner address `0xc8`). External read-back therefore remains incomplete; preserving the live page-table owner/query context through this fork-child continuation is the next causal target.
 
 ## Phase A — close the external `cat` child-runtime fault
 
