@@ -20,6 +20,8 @@ const bounded_syscall_evidence = @import("bounded_syscall_evidence.zig");
 const bounded_mapping_preflight = @import("bounded_mapping_preflight.zig");
 const linux_rv64_clone_request = @import("linux_rv64_clone_request.zig");
 const runtime_mappings = @import("bounded_runtime_mappings.zig");
+const syscall_read_backend = @import("syscall_read_backend.zig");
+const bounded_namespace_lookup = @import("bounded_namespace_lookup.zig");
 const userspace_elf = @embedFile("userspace-elf-rv64");
 const userspace_elf_data_bss = @embedFile("userspace-elf-rv64-data-bss");
 const userspace_elf_initial_stack = @embedFile("userspace-elf-rv64-initial-stack");
@@ -34,7 +36,7 @@ pub export const external_rv64_interpreter align(frames.PageSize) linksection(".
 pub export const external_rv64_namespace_manifest align(frames.PageSize) linksection(".caller_artifact") = @embedFile("external-rv64-namespace-manifest").*;
 pub export const external_rv64_namespace_data align(frames.PageSize) linksection(".caller_artifact") = @embedFile("external-rv64-namespace-data").*;
 
-const NamespaceFile = struct { bytes: []const u8, symlink: ?[]const u8 = null, traversals: usize = 0 };
+const NamespaceFile = struct { bytes: []const u8, traversals: usize = 0 };
 
 fn jsonUnsignedAfter(source: []const u8, start: usize, key: []const u8) ?usize {
     const relative = std.mem.indexOfPos(u8, source, start, key) orelse return null;
@@ -54,50 +56,14 @@ fn jsonStringAfter(source: []const u8, start: usize, key: []const u8) ?[]const u
     return source[begin..end];
 }
 
-fn namespaceObject(manifest: []const u8, path: []const u8, data: []const u8) ?NamespaceFile {
-    var cursor: usize = 0;
-    while (std.mem.indexOfPos(u8, manifest, cursor, "\"path\":\"")) |at| {
-        const object_end = std.mem.indexOfScalarPos(u8, manifest, at, '}') orelse return null;
-        const found = jsonStringAfter(manifest, at, "\"path\":\"") orelse return null;
-        if (std.mem.eql(u8, found, path)) {
-            const object_begin = std.mem.lastIndexOfScalar(u8, manifest[0..at], '{') orelse return null;
-            const row = manifest[object_begin .. object_end + 1];
-            const kind = jsonStringAfter(row, 0, "\"kind\":\"") orelse return null;
-            if (std.mem.eql(u8, kind, "symlink")) return .{ .bytes = &.{}, .symlink = jsonStringAfter(row, 0, "\"target\":\"") orelse return null };
-            if (!std.mem.eql(u8, kind, "regular")) return null;
-            const offset = jsonUnsignedAfter(row, 0, "\"data_offset\":") orelse return null;
-            const length = jsonUnsignedAfter(row, 0, "\"data_length\":") orelse return null;
-            if (offset > data.len or length > data.len - offset) return null;
-            return .{ .bytes = data[offset .. offset + length] };
-        }
-        cursor = object_end + 1;
-    }
-    return null;
-}
-
 fn validAbsolutePath(path: []const u8) bool {
-    if (path.len < 2 or path[0] != '/' or path[path.len - 1] == '/') return false;
-    var components = std.mem.splitScalar(u8, path[1..], '/');
-    while (components.next()) |component|
-        if (component.len == 0 or std.mem.eql(u8, component, ".") or std.mem.eql(u8, component, "..")) return false;
-    return true;
+    return bounded_namespace_lookup.validAbsolutePath(path);
 }
 
 fn namespaceLookup(manifest: []const u8, guest_path: []const u8, data: []const u8) ?NamespaceFile {
-    if (!validAbsolutePath(guest_path)) return null;
-    var path = guest_path;
-    var traversals: usize = 0;
-    while (true) {
-        const object = namespaceObject(manifest, path, data) orelse return null;
-        const target = object.symlink orelse {
-            var result = object;
-            result.traversals = traversals;
-            return result;
-        };
-        traversals += 1;
-        if (traversals > 16 or !validAbsolutePath(target)) return null;
-        path = target;
-    }
+    const object = bounded_namespace_lookup.resolve(manifest, guest_path, true) catch return null;
+    if (object.kind != .regular or object.data_offset > data.len or object.data_length > data.len - object.data_offset) return null;
+    return .{ .bytes = data[object.data_offset .. object.data_offset + object.data_length], .traversals = object.traversals };
 }
 
 fn namespaceValidate(manifest: []const u8, data: []const u8) bool {
@@ -514,7 +480,7 @@ var external_fork_program_break: usize = 0;
 var external_fork_next_backing: usize = 0;
 var syscall_output: [64]u8 = .{0} ** 64;
 var syscall_output_len: usize = 0;
-const ResourceStore = resource_tables.ResourceTable(4);
+const ResourceStore = resource_tables.ResourceTable(16);
 const ResourceRef = ResourceStore.ResourceRef;
 const ProcessBindings = resource_tables.BindingTable(ResourceRef, 8);
 var syscall_resources: ResourceStore = .{};
@@ -1072,12 +1038,11 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
         const data: []const u8 = &external_rv64_namespace_data;
         if (!namespaceValidate(manifest, data)) shutdown();
         const shell = namespaceLookup(manifest, external_artifact_options.argv0, data) orelse shutdown();
-        if (shell.symlink != null or shell.traversals == 0) shutdown();
+        if (shell.traversals == 0) shutdown();
         bytes = shell.bytes;
         const inspection = elf_load.planDynamic(4, 32, bytes) catch shutdown();
         const interp_path = inspection.interpreterPath() orelse shutdown();
         const interp = namespaceLookup(manifest, interp_path, data) orelse shutdown();
-        if (interp.symlink != null) shutdown();
         interpreter_bytes = interp.bytes;
         write("ZIGREF_BATCH32C_NAMESPACE format=PASS objects=PASS ranges=PASS shell_lookup=PASS symlink_traversals=");
         writeUsizeHex(shell.traversals);
@@ -1261,7 +1226,9 @@ const SyscallBackend = struct {
     pub fn readBytes(_: @This(), operation: morphic_operation.ReadBytes) morphic_operation.Completion {
         const resource = syscall_resources.resolve(resource_tables.referenceFromIdentity(ResourceRef, operation.source)) orelse return .{ .failure = .invalid_resource };
         if (!resource.capabilities.read) return .{ .failure = .operation_not_supported };
-        if (resource.backend == @as(resource_tables.BackendId, @enumFromInt(3))) {
+        const read_plan = syscall_read_backend.plan(@intFromEnum(resource.backend), resource.state, operation.byte_count, syscall_stdin.len);
+        if (read_plan == .unsupported) return .{ .failure = .operation_not_supported };
+        if (read_plan == .live_console) {
             if (operation.byte_count == 0) return .{ .success = 0 };
             const plan = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(@intFromEnum(operation.destination)), 1, .write_to_user, syscall_query) catch return .{ .failure = .invalid_user_memory };
             var byte: usize = std.math.maxInt(usize);
@@ -1270,15 +1237,15 @@ const SyscallBackend = struct {
             destination[0] = @truncate(byte);
             return .{ .success = 1 };
         }
-        const available = syscall_stdin.len - resource.state;
-        const amount = @min(operation.byte_count, available);
+        const fixture = read_plan.deterministic_fixture;
+        const amount = fixture.end - fixture.start;
         if (amount == 0) return .{ .success = 0 };
         const plan = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(@intFromEnum(operation.destination)), amount, .write_to_user, syscall_query) catch return .{ .failure = .invalid_user_memory };
         for (plan.items()) |segment| {
             const destination: [*]volatile u8 = @ptrFromInt(segment.physical_start.raw());
-            for (0..segment.byte_count) |i| destination[i] = syscall_stdin[resource.state + segment.request_offset + i];
+            for (0..segment.byte_count) |i| destination[i] = syscall_stdin[fixture.start + segment.request_offset + i];
         }
-        syscall_resources.setState(resource_tables.referenceFromIdentity(ResourceRef, operation.source), resource.state + amount) catch return .{ .failure = .invalid_resource };
+        syscall_resources.setState(resource_tables.referenceFromIdentity(ResourceRef, operation.source), fixture.end) catch return .{ .failure = .invalid_resource };
         return .{ .success = amount };
     }
     pub fn writeBytes(_: @This(), operation: morphic_operation.WriteBytes) morphic_operation.Completion {
@@ -1514,11 +1481,12 @@ fn externalExecve(frame: *TrapFrame) usize {
     return 0;
 }
 
-const LinuxRequestKind = enum { get_current_directory, duplicate, close, read, write, write_vector, new_fstatat, program_break, clone, execve, memory_map, terminate, unsupported };
+const LinuxRequestKind = enum { get_current_directory, duplicate, close, open_at, read, write, write_vector, new_fstatat, program_break, clone, execve, memory_map, terminate, unsupported };
 fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     return switch (number) {
         17 => .get_current_directory,
         23 => .duplicate,
+        56 => .open_at,
         57 => .close,
         63 => .read,
         64 => .write,
@@ -1533,7 +1501,51 @@ fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     };
 }
 comptime {
-    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(220) != .clone or decodeLinuxRequestKind(221) != .execve or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(56) != .open_at or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(220) != .clone or decodeLinuxRequestKind(221) != .execve or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+}
+
+fn externalNamespaceOpenAt(directory: usize, path_address: usize, flags: usize) usize {
+    // Linux access and creation flags are interpreted only at this edge. This
+    // bounded slice admits read-only opens and rejects mutation of the source
+    // namespace. Relative directory-descriptor traversal remains unimplemented.
+    if (!external_artifact_options.namespace_enabled or directory != negativeErrno(100)) return negativeErrno(9);
+    if (flags & 0x3 != 0 or flags & (0x40 | 0x200 | 0x400) != 0) return negativeErrno(30);
+    var path_buffer: [256]u8 = undefined;
+    const path_len = copyUserCString(path_address, &path_buffer) catch return negativeErrno(14);
+    const path = path_buffer[0..path_len];
+    if (!std.mem.eql(u8, path, "/") and !validAbsolutePath(path)) return negativeErrno(2);
+    // Linux asm-generic O_NOFOLLOW. Ordinary open follows the final symlink
+    // through the same bounded resolver used by executable namespace lookup.
+    const no_follow = flags & 0x20000 != 0;
+    const object = bounded_namespace_lookup.resolve(&external_rv64_namespace_manifest, path, !no_follow) catch |err| return negativeErrno(switch (err) {
+        error.FinalSymlink, error.TraversalLimit => 40,
+        error.InvalidPath, error.NotFound, error.MalformedObject => 2,
+    });
+    // Linux O_DIRECTORY is 0x10000 on asm-generic targets.
+    if (flags & 0x10000 != 0 and object.kind != .directory) return negativeErrno(20);
+    const backend: resource_tables.BackendId = @enumFromInt(switch (object.kind) {
+        .directory => @as(u32, 0x100),
+        .regular => @as(u32, 0x101),
+        .symlink => unreachable, // resolve returns a final symlink only as an error.
+    });
+    // Namespace I/O backends deliberately expose no semantic read capability
+    // until their actual file/directory read operations are implemented.
+    const reference = syscall_resources.create(.{ .backend = backend, .capabilities = .{}, .state = object.manifest_offset }) catch return negativeErrno(23);
+    var descriptor: usize = 3;
+    while (descriptor < 8 and syscall_bindings.resolve(descriptor) != null) : (descriptor += 1) {}
+    if (descriptor == 8) {
+        _ = syscall_resources.release(reference) catch shutdown();
+        return negativeErrno(24);
+    }
+    syscall_bindings.bindAt(descriptor, reference) catch shutdown();
+    if (external_artifact_options.live_console_input) {
+        write("ZIGREF_LINUX_OPENAT path=");
+        write(path);
+        write(" fd=");
+        writeUsizeHex(descriptor);
+        write("\n");
+    }
+    return descriptor;
 }
 
 fn externalNamespaceStat(path_address: usize, destination: usize, flags: usize) usize {
@@ -1637,6 +1649,10 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
             };
             _ = syscall_resources.release(reference) catch shutdown();
             frame.x[10] = 0;
+        },
+        .open_at => {
+            syscall_semantics[index] = 14;
+            frame.x[10] = externalNamespaceOpenAt(frame.x[10], frame.x[11], frame.x[12]);
         },
         .read => blk: {
             syscall_semantics[index] = 6;
