@@ -432,3 +432,16 @@ Each new workload should record:
 - whether the Morphic convergence curve is flattening.
 
 That is where the package manager stops being merely a milestone and becomes the delivery mechanism for the next phase of the Morphic experiment.
+
+## Batch 32P measured frontier
+
+Real QEMU 8.2.2 now proves external runtime-file read-back: the unchanged
+persistent shell creates `/tmp/hello`, a fork/exec child commits real
+`/bin/cat`, prints `hello`, terminates, restores the parent, and the parent
+prints `still-alive`. The page-table query context is supervisor-owned static
+state rather than a borrow from the suspended `freestandingMain` stack frame.
+Pipeline pressure is now causal: `echo hello | cat` reaches unsupported
+Linux/RV64 `pipe2(59)` and ash reports `can't create pipe: Bad file descriptor`.
+The next batch must begin with a bounded neutral pipe resource and the observed
+`pipe2` edge, then immediately retry the unchanged pipeline. Playable Alpine is
+not yet earned.

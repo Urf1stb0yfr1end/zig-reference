@@ -658,3 +658,15 @@ trap-stack frame `0x802c4030` and top `0x802c4150` across child calls
 The unchanged command next stops at supervisor load fault `0x80206ace` in
 `RealPageOwner.owns`; external read-back and Playable Alpine remain unearned.
 See `docs/reports/AGENTIC_SNOWBALL_BATCH_32O.md`. No command surface changed.
+
+## Batch 32P external read-back frontier
+
+Batch 32P reused the Batch 32D artifact-generation, live-console build, and
+system-QEMU commands. The real-QEMU retry proved `cd /tmp`, `pwd -> /tmp`,
+`echo hello > /tmp/hello`, real external BusyBox `cat /tmp/hello -> hello`, and
+`echo still-alive` in one persistent shell after moving the allocator,
+`RealPageOwner`, and Sv39 builder out of the suspended `freestandingMain` stack
+frame into supervisor-owned static lifetime. The immediate unchanged
+`echo hello | cat` retry reaches Linux/RV64 `pipe2(59)` and ash reports
+`can't create pipe: Bad file descriptor`; pipelines and Playable Alpine remain
+unearned. No runnable command surface changed.
