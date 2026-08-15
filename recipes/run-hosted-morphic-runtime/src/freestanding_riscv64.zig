@@ -23,6 +23,7 @@ const runtime_mappings = @import("bounded_runtime_mappings.zig");
 const syscall_read_backend = @import("syscall_read_backend.zig");
 const bounded_namespace_lookup = @import("bounded_namespace_lookup.zig");
 const bounded_process_cwd = @import("bounded_process_cwd.zig");
+const bounded_runtime_namespace = @import("bounded_runtime_namespace.zig");
 const userspace_elf = @embedFile("userspace-elf-rv64");
 const userspace_elf_data_bss = @embedFile("userspace-elf-rv64-data-bss");
 const userspace_elf_initial_stack = @embedFile("userspace-elf-rv64-initial-stack");
@@ -482,6 +483,8 @@ var external_fork_next_backing: usize = 0;
 const ProcessCwd = bounded_process_cwd.CurrentDirectory(256);
 var external_process_cwd: ProcessCwd = .{};
 var external_fork_cwd: ProcessCwd = .{};
+const RuntimeNamespace = bounded_runtime_namespace.RuntimeNamespace(4, 256, 256);
+var external_runtime_namespace: RuntimeNamespace = .{};
 var syscall_output: [64]u8 = .{0} ** 64;
 var syscall_output_len: usize = 0;
 const ResourceStore = resource_tables.ResourceTable(16);
@@ -1149,6 +1152,7 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     syscall_resources = .{};
     syscall_bindings = .{};
     external_process_cwd = .{};
+    external_runtime_namespace = .{};
     const stdin = syscall_resources.create(.{ .backend = @enumFromInt(if (external_artifact_options.live_console_input) 3 else 0), .capabilities = .{ .read = true } }) catch shutdown();
     const stdout = syscall_resources.create(.{ .backend = @enumFromInt(1), .capabilities = .{ .write = true } }) catch shutdown();
     const stderr = syscall_resources.create(.{ .backend = @enumFromInt(2), .capabilities = .{ .write = true } }) catch shutdown();
@@ -1584,16 +1588,68 @@ fn namespaceRegularRead(reference: ResourceRef, destination: usize, requested: u
     return amount;
 }
 
+const runtime_regular_backend: u32 = 0x102;
+
+fn runtimeRegularRead(reference: ResourceRef, destination: usize, requested: usize) usize {
+    const description = syscall_resources.resolve(reference) orelse return negativeErrno(9);
+    const object = description.state >> 32;
+    const offset = description.state & 0xffffffff;
+    var bytes: [256]u8 = undefined;
+    const amount = external_runtime_namespace.read(object, offset, bytes[0..@min(requested, bytes.len)]) catch return negativeErrno(5);
+    copyBytesToUser(destination, bytes[0..amount]) catch return negativeErrno(14);
+    syscall_resources.setState(reference, (object << 32) | (offset + amount)) catch return negativeErrno(9);
+    return amount;
+}
+
+fn runtimeRegularWrite(reference: ResourceRef, source_address: usize, requested: usize) usize {
+    const description = syscall_resources.resolve(reference) orelse return negativeErrno(9);
+    const object = description.state >> 32;
+    const offset = description.state & 0xffffffff;
+    const amount = @min(requested, 256 -| offset);
+    if (amount == 0 and requested != 0) return negativeErrno(28);
+    const plan = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(source_address), amount, .read_from_user, syscall_query) catch return negativeErrno(14);
+    var bytes: [256]u8 = undefined;
+    for (plan.items()) |segment| {
+        const source: [*]const volatile u8 = @ptrFromInt(segment.physical_start.raw());
+        for (0..segment.byte_count) |i| bytes[segment.request_offset + i] = source[i];
+    }
+    const written = external_runtime_namespace.write(object, offset, bytes[0..amount]) catch return negativeErrno(28);
+    syscall_resources.setState(reference, (object << 32) | (offset + written)) catch return negativeErrno(9);
+    return written;
+}
+
 fn externalNamespaceOpenAt(directory: usize, path_address: usize, flags: usize) usize {
     // Linux access and creation flags are interpreted only at this edge. This
     // bounded slice admits read-only opens and rejects mutation of the source
     // namespace. Relative directory-descriptor traversal remains unimplemented.
     if (!external_artifact_options.namespace_enabled or directory != negativeErrno(100)) return negativeErrno(9);
-    if (flags & 0x3 != 0 or flags & (0x40 | 0x200 | 0x400) != 0) return negativeErrno(30);
     var path_buffer: [256]u8 = undefined;
     const path_len = copyUserCString(path_address, &path_buffer) catch return negativeErrno(14);
     const path = path_buffer[0..path_len];
     if (!std.mem.eql(u8, path, "/") and !validAbsolutePath(path)) return negativeErrno(2);
+    const access = flags & 0x3;
+    const create = flags & 0x40 != 0;
+    const truncate = flags & 0x200 != 0;
+    const runtime_existing = external_runtime_namespace.lookup(path);
+    if (runtime_existing != null or create) {
+        if (flags & ~@as(usize, 0x3 | 0x40 | 0x200 | 0x400 | 0x8000) != 0) return negativeErrno(22);
+        const object = external_runtime_namespace.open(path, create, truncate) catch |err| return negativeErrno(switch (err) {
+            error.NotFound => 2,
+            error.ObjectCapacity, error.ByteCapacity => 28,
+            error.InvalidPath, error.PathTooLong => 22,
+        });
+        const capabilities: resource_tables.Capabilities = .{ .read = access != 1, .write = access != 0 };
+        const reference = syscall_resources.create(.{ .backend = @enumFromInt(runtime_regular_backend), .capabilities = capabilities, .state = object << 32 }) catch return negativeErrno(23);
+        var descriptor: usize = 3;
+        while (descriptor < 8 and syscall_bindings.resolve(descriptor) != null) : (descriptor += 1) {}
+        if (descriptor == 8) {
+            _ = syscall_resources.release(reference) catch shutdown();
+            return negativeErrno(24);
+        }
+        syscall_bindings.bindAt(descriptor, reference) catch shutdown();
+        return descriptor;
+    }
+    if (access != 0 or truncate) return negativeErrno(30);
     // Linux asm-generic O_NOFOLLOW. Ordinary open follows the final symlink
     // through the same bounded resolver used by executable namespace lookup.
     const no_follow = flags & 0x20000 != 0;
@@ -1761,6 +1817,10 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                     frame.x[10] = namespaceRegularRead(reference, frame.x[11], frame.x[12]);
                     break :blk;
                 }
+                if (@intFromEnum(description.backend) == runtime_regular_backend) {
+                    frame.x[10] = runtimeRegularRead(reference, frame.x[11], frame.x[12]);
+                    break :blk;
+                }
             }
             request = .{ .read_bytes = .{ .source = resource_tables.semanticIdentity(reference), .destination = @enumFromInt(@as(u64, frame.x[11])), .byte_count = frame.x[12] } };
         },
@@ -1768,6 +1828,10 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
             syscall_semantics[index] = 2;
             const reference = syscall_bindings.resolve(frame.x[10]) orelse {
                 frame.x[10] = negativeErrno(9);
+                break :blk;
+            };
+            if (syscall_resources.resolve(reference)) |description| if (@intFromEnum(description.backend) == runtime_regular_backend) {
+                frame.x[10] = runtimeRegularWrite(reference, frame.x[11], frame.x[12]);
                 break :blk;
             };
             request = .{ .write_bytes = .{ .destination = resource_tables.semanticIdentity(reference), .source = @enumFromInt(@as(u64, frame.x[11])), .byte_count = frame.x[12] } };
