@@ -236,3 +236,7 @@ test "runtime open transaction preserves namespace bindings and resource ownersh
     try std.testing.expect(success_bindings.resolve(truncate_fd) != null);
     try std.testing.expectEqual(@as(usize, 0), try success_namespace.read(truncate_object, 0, &output));
 }
+
+test {
+    _ = @import("linux_rv64_fdupfd.zig");
+}
