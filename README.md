@@ -24,6 +24,16 @@ Those projects help establish that AI-assisted kernel and OS development can pro
 
 This is not a claim that Morphic is superior to SlopOS, VibeOS, Linux, or any other system. It is a statement of research direction. Different projects can be excellent answers to different questions.
 
+### A possible first-of-its-kind Zig milestone
+
+There are already operating-system kernels written in Zig, and there are already non-Linux systems capable of running Linux software. The narrower combination pursued here appears much rarer. **To the best of our current public-source search, we have not found another publicly documented Zig-written, non-Linux RISC-V kernel/substrate that runs an unchanged real Alpine Linux musl/BusyBox userspace through a Linux ABI compatibility edge.**
+
+That is deliberately a qualified research-positioning claim, not a declaration that every private, unpublished, or obscure project has been exhaustively ruled out. It also does not claim that Morphic would be the first non-Linux system to run Linux binaries; mature projects in other languages already occupy that broader space.
+
+If Morphic earns the reproducible **★ PLAYABLE ALPINE ★** gate defined below, the project would therefore appear to be a **likely first-of-its-kind milestone in the public Zig operating-system ecosystem**: a Zig-centered, RV64, non-Linux substrate running unchanged real Alpine userspace through compatibility rather than through a Zig-native replacement userland. If real `apk` later crosses the local-install and networked-package gates, that distinction becomes substantially stronger because the inherited Alpine ecosystem itself, rather than only individual binaries, becomes the pressure source.
+
+This claim should remain evidence-bound. If a prior or contemporary public project demonstrating the same combination is found, this section should be corrected and the comparison documented rather than defended rhetorically.
+
 ### The central Morphic question
 
 The project is organized around a question that can be tested rather than merely advertised:
