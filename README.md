@@ -320,13 +320,13 @@ The goal is not the smallest kernel at any cost. It is the smallest coherent fou
 
 ## Current machine milestone
 
-# ★ READ-ONLY ALPINE UNDER MORPHIC ★
+# ★ READ-ONLY ALPINE UNDER MORPHIC ★ + PERSISTENT CWD
 
-**Batches 32C through 32H are complete. Morphic now boots the exact Alpine v3.22.0 RV64 namespace, enters the real musl interpreter and BusyBox `/bin/sh`, preserves a persistent interactive shell, executes real external BusyBox applets through bounded clone/exec, enumerates the genuine serialized root namespace, and reads real regular-file backing.**
+**Batches 32C through 32I are complete. Morphic now boots the exact Alpine v3.22.0 RV64 namespace, enters the real musl interpreter and BusyBox `/bin/sh`, preserves a persistent interactive shell, executes real external BusyBox applets through bounded clone/exec, enumerates the genuine serialized root namespace, reads real regular-file backing, and maintains bounded per-process current-working-directory state.**
 
-Batch 32H crossed the old `openat(56)` frontier under real system QEMU. The unchanged `ls /` pressure now prints genuine root-directory entries through bounded `getdents64(61)`, and `cat /etc/alpine-release` reads the immutable namespace backing and prints `3.22.0`. The original shell remains alive afterward.
+Batch 32H earned the read-only Alpine milestone under real system QEMU: genuine `ls /`, real `cat /etc/alpine-release -> 3.22.0`, and a living parent shell. Batch 32I then mapped Linux/RV64 `chdir(49)` onto neutral bounded cwd state, made `getcwd(17)` report that state, and preserved cwd across clone, exec, and retained-parent restoration. One persistent real Alpine shell now proves `cd /tmp` followed by `pwd -> /tmp`.
 
-The exact current pressure frontier is now `cd /tmp`: BusyBox ash reaches Linux/RV64 `chdir(49)`, which is not yet implemented. The next work is neutral bounded cwd process state, then writable runtime state/redirection, then pipes and the process/FD lifetime required by a real pipeline.
+The exact current pressure frontier is now shell redirection. The unchanged command `echo hello > /tmp/hello` reaches the inherited read-only `openat(56)` policy and fails with `Read-only file system`. The next required mechanism is a neutral bounded writable runtime namespace plus writable descriptor/resource binding, without mutating the verified Alpine source namespace.
 
 ```text
 exact Alpine v3.22.0 RV64 minirootfs       PASS
@@ -343,7 +343,7 @@ live keyboard input                        PASS
 real interactive BusyBox /bin/sh           PASS
 echo morphic                               PASS
 persistent second command                  PASS
-pwd -> /                                   PASS
+initial pwd -> /                            PASS
 
 clone(220), flags 0x11, null child stack   PASS
 real child execution                       PASS
@@ -359,24 +359,31 @@ regular namespace read + shared offset     PASS
 cat /etc/alpine-release                    PASS: 3.22.0
 ★ READ-ONLY ALPINE ★                        EARNED
 
-chdir(49) + neutral cwd state              CURRENT BLOCKER
-writable /tmp runtime layer                PENDING
+chdir(49)                                  PASS
+bounded neutral process cwd                PASS
+getcwd(17) from stored cwd                 PASS
+cwd clone/exec/parent restoration          PASS
+cd /tmp                                    PASS
+pwd -> /tmp                                PASS
+
+writable /tmp runtime layer                CURRENT BLOCKER
 shell redirection                          PENDING
+runtime file read-back                     PENDING
 pipes and multi-process / FD lifetime      PENDING
 ★ PLAYABLE ALPINE ★                         PENDING
 ```
 
-The Batch 32H proof is runtime evidence, not compile-only inference. Real QEMU pressure produced the Alpine root listing, the real release file contents, and a living shell after both external commands. Descriptor-shared directory cursors and regular-file offsets are backed by the serialized namespace rather than command-specific output.
+The Batch 32I proof is runtime evidence, not compile-only inference. Under real QEMU, the shell changed directory to `/tmp`, `pwd` returned `/tmp`, and the immediate next command reached the writable-filesystem frontier rather than an earlier cwd failure. The exact Alpine source namespace remains immutable, and PREPARE/COMMIT plus `W+X=0` remain preserved.
 
-The known Batch 32G intermediate-component symlink limitation remains explicitly documented and was non-causal to the read-only Alpine acceptance path. It is not being hidden or promoted as complete Linux pathname behavior.
+The known Batch 32G intermediate-component symlink limitation remains explicitly documented and non-causal to the current acceptance path. Batch 32I also does not claim broad relative-path semantics merely because the exact absolute `cd /tmp` pressure now works.
 
-This is now **read-only Alpine**, but not yet **playable Alpine**. The remaining canonical gates are current-working-directory state, bounded writable runtime objects and shell redirection, then a genuine `echo hello | cat` pipeline with coherent process/descriptor lifetime.
+This is **read-only Alpine with persistent cwd**, but not yet **playable Alpine**. The remaining canonical gates are bounded writable runtime objects and shell redirection, read-back through a real external `cat`, then a genuine `echo hello | cat` pipeline with coherent process/descriptor lifetime.
 
-See [`docs/reports/AGENTIC_SNOWBALL_BATCH_32G.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32G.md) and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md).
+See [`docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md) and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32I.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32I.md).
 
-## Try the real Alpine proof in your own console
+## Experience the current Alpine frontier in your own console
 
-You can reproduce the foundational Batch 32C milestone from a fresh clone. This command runs the real Alpine `/bin/sh -c 'echo alpine'` path under Morphic and shows the proven userspace output. Batches 32D through 32H have since advanced the same machine through persistent interaction, bounded child/exec behavior, real root-directory enumeration, and real regular-file reads; the current read-only frontier is summarized above.
+You can reproduce the current live Morphic/Alpine state from a fresh clone. This is the same style of exact Alpine namespace and system-QEMU pressure used by the Snowball reports; it gives you a real interactive BusyBox/musl shell rather than a synthetic transcript.
 
 Prerequisites:
 
@@ -403,30 +410,33 @@ qemu-system-riscv64 --version
 python3 --version
 ```
 
-`zig version` should report `0.14.0`.
+`zig version` must report `0.14.0`.
 
-Generate the complete verified Alpine namespace. The acquisition tool downloads the exact pinned Alpine archive, verifies its SHA-256, rejects unsafe archive relationships, verifies `/bin/sh -> /bin/busybox`, verifies the real musl interpreter and PT_INTERP relationship, and emits the complete deterministic namespace:
+Generate the complete verified Alpine namespace:
 
 ```sh
 rm -rf /tmp/zigref-namespace /tmp/alpine-machine
-python3 tools/pressure-real-rv64-alpine-minirootfs.py \
+
+PYTHONDONTWRITEBYTECODE=1 python3 \
+  tools/pressure-real-rv64-alpine-minirootfs.py \
   --artifact-only \
   --namespace-output-dir /tmp/zigref-namespace
 ```
 
-Build the Morphic RV64 machine with that complete namespace:
+The acquisition tool verifies the pinned Alpine archive, `/bin/sh -> /bin/busybox`, the real musl interpreter, the complete 517-object namespace, and the immutable serialized regular-file backing before the machine is built.
+
+Build Morphic with that exact namespace and live console input:
 
 ```sh
 zig build install-freestanding-riscv64-morphic-runtime \
   -Dexternal-rv64-namespace-manifest=/tmp/zigref-namespace/namespace.json \
   -Dexternal-rv64-namespace-data=/tmp/zigref-namespace/namespace.data \
   -Dexternal-rv64-argv0=/bin/sh \
-  -Dexternal-rv64-argv1=-c \
-  '-Dexternal-rv64-argv2=echo alpine' \
+  -Dexternal-rv64-live-console-input=true \
   --prefix /tmp/alpine-machine
 ```
 
-Run it on the QEMU RISC-V `virt` machine:
+Boot the machine:
 
 ```sh
 qemu-system-riscv64 \
@@ -436,13 +446,48 @@ qemu-system-riscv64 \
   -kernel /tmp/alpine-machine/bin/morphic-freestanding-riscv64
 ```
 
-The machine emits Morphic proof/evidence output, and the decisive Alpine userspace output is:
+After Morphic's proof/trace output, use the live Alpine shell. The currently earned sequence is:
 
 ```text
-alpine
+echo morphic
+echo second
+pwd
+ls /
+cat /etc/alpine-release
+cd /tmp
+pwd
+echo still-alive
 ```
 
-The Batch 32C proof additionally establishes status `0`, real-musl interpreter-first execution, PREPARE -> COMMIT -> execute, and `W+X=0`.
+The important user-visible results are:
+
+```text
+morphic
+second
+/
+...
+3.22.0
+/tmp
+still-alive
+```
+
+`ls /` prints genuine entries from the exact serialized Alpine root namespace, including directories such as `bin`, `dev`, `etc`, `home`, `lib`, `proc`, `tmp`, `usr`, and `var`.
+
+To experience the **current causal frontier**, enter:
+
+```text
+echo hello > /tmp/hello
+```
+
+Current `main` should reject that write with the read-only filesystem boundary, for example:
+
+```text
+/bin/sh: can't create /tmp/hello: Read-only file system
+```
+
+That failure is intentional evidence of the next missing general mechanism. The active Batch 32J campaign is aimed at replacing that boundary with a bounded writable runtime namespace, then proving `cat /tmp/hello`, then a real `echo hello | cat` pipeline, without faking command output or mutating the source Alpine artifact.
+
+To leave QEMU's `-nographic` console, use QEMU's terminal escape sequence (`Ctrl-A`, then `X`).
 
 The canonical command record lives in [`COMMANDS.md`](COMMANDS.md).
 
@@ -458,9 +503,9 @@ You do **not** have to accept the current architecture as sacred. A strong resul
 
 Some of the next concrete questions are:
 
-- What is the smallest neutral cwd/process-state mechanism that lets real ash complete `chdir(49)` and makes `pwd` report `/tmp` coherently across fork and exec?
-- What bounded writable runtime namespace can support real create/truncate/write/read-back behavior without mutating the immutable Alpine source artifact?
+- What is the smallest bounded writable runtime namespace that can support real create/truncate/write/read-back behavior without mutating the immutable Alpine source artifact?
 - Which descriptor replacement and lifetime semantics does unchanged ash actually require for `echo hello > /tmp/hello`?
+- Can a newly written runtime object be reopened by a real external BusyBox `cat` through ordinary pathname/resource semantics?
 - Does `echo hello | cat` force Morphic beyond its current serialized child-first model into multiple simultaneously meaningful process states?
 - Which Linux behaviors belong at the compatibility edge, and which reveal reusable Morphic mechanisms?
 - How far can the privileged core remain small and understandable while the capability surface grows?
@@ -489,11 +534,11 @@ Chronology tag:
 
 `time-till-first-static-busybox-shell-229.48-hours-from-repository-start-2026-08-13`
 
-Future major milestones should accumulate the same chronology line by line. The real dynamic-musl, dynamic-BusyBox-shell, first-real-Alpine, persistent-interactive-Alpine, and read-only-Alpine milestones are complete and can each receive their own accumulated `time-till` chronology entries.
+Future major milestones should accumulate the same chronology line by line. The real dynamic-musl, dynamic-BusyBox-shell, first-real-Alpine, persistent-interactive-Alpine, and read-only-Alpine milestones are complete. Batch 32I additionally earns the cwd/chdir step on the direct path to playable Alpine.
 
 ## Active frontier
 
-**Read-only Alpine is earned under real QEMU. The exact active blocker is Linux/RV64 `chdir(49)` plus neutral bounded cwd process state, exposed by unchanged `cd /tmp`.**
+**Read-only Alpine plus persistent cwd are earned under real QEMU. The exact active blocker is the writable `openat(56)` path required by unchanged `echo hello > /tmp/hello`: the current source namespace remains read-only and no bounded writable runtime object layer exists yet.**
 
 ```text
 FIRST STATIC BUSYBOX SHELL                complete
@@ -532,13 +577,14 @@ REGULAR-FILE READ + alpine-release        complete
 ★ READ-ONLY ALPINE ★                      complete
         |
         v
-chdir(49) + NEUTRAL CWD                   <-- exact current blocker
+chdir(49) + NEUTRAL CWD                   complete
+cd /tmp ; pwd -> /tmp
         |
         v
-WRITABLE /tmp RUNTIME STATE               pending
+WRITABLE /tmp RUNTIME STATE               <-- exact current blocker
         |
         v
-SHELL REDIRECTION                         pending
+SHELL REDIRECTION + READ-BACK              pending
         |
         v
 PIPES + PROCESS / FD LIFETIME             pending
@@ -580,7 +626,7 @@ still-alive
 /tmp #
 ```
 
-Only real pressure should decide what cwd, filesystem, pathname, metadata, process, terminal, networking, or compatibility mechanisms are admitted next. The kernel should not grow a speculative Linux subsystem merely because Linux has one.
+Only real pressure should decide what filesystem, pathname, metadata, process, terminal, networking, or compatibility mechanisms are admitted next. The kernel should not grow a speculative Linux subsystem merely because Linux has one.
 
 Completed reports:
 
@@ -591,10 +637,11 @@ Completed reports:
 - [`docs/reports/AGENTIC_SNOWBALL_BATCH_32F.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32F.md)
 - [`docs/reports/AGENTIC_SNOWBALL_BATCH_32G.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32G.md)
 - [`docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md)
+- [`docs/reports/AGENTIC_SNOWBALL_BATCH_32I.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32I.md)
 
 Current execution plan:
 
-- [`docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32I_READONLY_ALPINE_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt`](docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32I_READONLY_ALPINE_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt)
+- [`docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32J_WRITABLE_RUNTIME_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt`](docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32J_WRITABLE_RUNTIME_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt)
 
 ## Engineering model
 
@@ -612,7 +659,7 @@ observe real failure
 
 ## Documentation
 
-Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md`](docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md), [`docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md`](docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md).
+Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md`](docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md), [`docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md`](docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32I.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32I.md).
 
 ## Validation
 
@@ -632,6 +679,6 @@ Research that proves an existing Morphic or QuirkM idea wrong is useful too. Pre
 
 Alpz is **not Linux**, QuirkM is **not a completed native operating environment**, and Morphic is **not presented as a production kernel platform**.
 
-The project now has real static-musl execution, a proven static Alpine BusyBox shell, successful real dynamic-musl execution through the real userspace interpreter, a proven dynamic Alpine BusyBox shell, **first real Alpine through a complete serialized Alpine v3.22.0 RV64 namespace**, a persistent interactive shell, bounded clone/exec external-command execution, genuine root-directory enumeration through `getdents64(61)`, and real immutable regular-file reads including `/etc/alpine-release -> 3.22.0`. It has therefore earned the **read-only Alpine** milestone under real QEMU pressure. It does **not yet claim** neutral `chdir(49)`/cwd state, writable runtime filesystem semantics, shell redirection, pipelines, playable Alpine, general Linux compatibility, working `apk add`, production security, production readiness, or completed virtualization. The known intermediate-component symlink limitation remains documented.
+The project now has real static-musl execution, a proven static Alpine BusyBox shell, successful real dynamic-musl execution through the real userspace interpreter, a proven dynamic Alpine BusyBox shell, **first real Alpine through a complete serialized Alpine v3.22.0 RV64 namespace**, a persistent interactive shell, bounded clone/exec external-command execution, genuine root-directory enumeration through `getdents64(61)`, real immutable regular-file reads including `/etc/alpine-release -> 3.22.0`, and bounded neutral current-working-directory state mapped through Linux/RV64 `chdir(49)`/`getcwd(17)` with real `cd /tmp ; pwd -> /tmp` proof. It has earned the **read-only Alpine** milestone plus the cwd/chdir step under real QEMU pressure. It does **not yet claim** writable runtime filesystem semantics, shell redirection/read-back, pipelines, playable Alpine, broad relative-path semantics, complete component-wise symlink resolution, general Linux compatibility, working `apk add`, production security, production readiness, or completed virtualization.
 
 Proof records, exact artifacts, machine traces, validation gates, and current code define what has actually been achieved.
