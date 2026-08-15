@@ -1481,13 +1481,14 @@ fn externalExecve(frame: *TrapFrame) usize {
     return 0;
 }
 
-const LinuxRequestKind = enum { get_current_directory, duplicate, close, open_at, read, write, write_vector, new_fstatat, program_break, clone, execve, memory_map, terminate, unsupported };
+const LinuxRequestKind = enum { get_current_directory, duplicate, close, open_at, get_directory_entries, read, write, write_vector, new_fstatat, program_break, clone, execve, memory_map, terminate, unsupported };
 fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     return switch (number) {
         17 => .get_current_directory,
         23 => .duplicate,
         56 => .open_at,
         57 => .close,
+        61 => .get_directory_entries,
         63 => .read,
         64 => .write,
         66 => .write_vector,
@@ -1501,7 +1502,68 @@ fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     };
 }
 comptime {
-    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(56) != .open_at or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(220) != .clone or decodeLinuxRequestKind(221) != .execve or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(56) != .open_at or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(61) != .get_directory_entries or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(220) != .clone or decodeLinuxRequestKind(221) != .execve or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+}
+
+fn namespaceDirectoryEntries(reference: ResourceRef, destination: usize, requested: usize) usize {
+    const description = syscall_resources.resolve(reference) orelse return negativeErrno(9);
+    if (@intFromEnum(description.backend) != syscall_read_backend.namespace_directory) return negativeErrno(20);
+    if (requested == 0) return 0;
+    var output: [4096]u8 = undefined;
+    const limit = @min(requested, output.len);
+    const manifest: []const u8 = &external_rv64_namespace_manifest;
+    const directory_offset = description.state >> 32;
+    var cursor = description.state & 0xffffffff;
+    const directory_end = std.mem.indexOfScalarPos(u8, manifest, directory_offset, '}') orelse return negativeErrno(5);
+    const directory_row = manifest[directory_offset .. directory_end + 1];
+    const directory_path = jsonStringAfter(directory_row, 0, "\"path\":\"") orelse return negativeErrno(5);
+    var used: usize = 0;
+    while (std.mem.indexOfPos(u8, manifest, cursor, "\"path\":\"")) |at| {
+        const object_end = std.mem.indexOfScalarPos(u8, manifest, at, '}') orelse return negativeErrno(5);
+        const object_begin = std.mem.lastIndexOfScalar(u8, manifest[0..at], '{') orelse return negativeErrno(5);
+        const row = manifest[object_begin .. object_end + 1];
+        const path = jsonStringAfter(row, 0, "\"path\":\"") orelse return negativeErrno(5);
+        cursor = object_end + 1;
+        if (std.mem.eql(u8, path, directory_path)) continue;
+        const prefix_len = if (std.mem.eql(u8, directory_path, "/")) 1 else directory_path.len + 1;
+        if (path.len <= prefix_len or !std.mem.startsWith(u8, path, directory_path) or
+            (!std.mem.eql(u8, directory_path, "/") and path[directory_path.len] != '/')) continue;
+        const name = path[prefix_len..];
+        if (std.mem.indexOfScalar(u8, name, '/') != null) continue;
+        const record_len = std.mem.alignForward(usize, 19 + name.len + 1, 8);
+        if (record_len > limit - used) {
+            cursor = object_begin;
+            break;
+        }
+        @memset(output[used .. used + record_len], 0);
+        std.mem.writeInt(u64, output[used..][0..8], object_begin + 1, .little);
+        std.mem.writeInt(i64, output[used..][8..16], @intCast(cursor), .little);
+        std.mem.writeInt(u16, output[used..][16..18], @intCast(record_len), .little);
+        const kind = jsonStringAfter(row, 0, "\"kind\":\"") orelse return negativeErrno(5);
+        output[used + 18] = if (std.mem.eql(u8, kind, "directory")) 4 else if (std.mem.eql(u8, kind, "regular")) 8 else if (std.mem.eql(u8, kind, "symlink")) 10 else return negativeErrno(5);
+        @memcpy(output[used + 19 ..][0..name.len], name);
+        used += record_len;
+    }
+    copyBytesToUser(destination, output[0..used]) catch return negativeErrno(14);
+    syscall_resources.setState(reference, (directory_offset << 32) | cursor) catch return negativeErrno(9);
+    return used;
+}
+
+fn namespaceRegularRead(reference: ResourceRef, destination: usize, requested: usize) usize {
+    const description = syscall_resources.resolve(reference) orelse return negativeErrno(9);
+    if (@intFromEnum(description.backend) != syscall_read_backend.namespace_regular) return negativeErrno(20);
+    const manifest_offset = description.state >> 32;
+    const file_offset = description.state & 0xffffffff;
+    const manifest: []const u8 = &external_rv64_namespace_manifest;
+    const row_end = std.mem.indexOfScalarPos(u8, manifest, manifest_offset, '}') orelse return negativeErrno(5);
+    const row = manifest[manifest_offset .. row_end + 1];
+    const data_offset = jsonUnsignedAfter(row, 0, "\"data_offset\":") orelse return negativeErrno(5);
+    const data_length = jsonUnsignedAfter(row, 0, "\"data_length\":") orelse return negativeErrno(5);
+    if (file_offset > data_length or data_offset > external_rv64_namespace_data.len or data_length > external_rv64_namespace_data.len - data_offset) return negativeErrno(5);
+    const amount = @min(requested, data_length - file_offset);
+    copyBytesToUser(destination, external_rv64_namespace_data[data_offset + file_offset ..][0..amount]) catch return negativeErrno(14);
+    syscall_resources.setState(reference, (manifest_offset << 32) | (file_offset + amount)) catch return negativeErrno(9);
+    return amount;
 }
 
 fn externalNamespaceOpenAt(directory: usize, path_address: usize, flags: usize) usize {
@@ -1530,7 +1592,8 @@ fn externalNamespaceOpenAt(directory: usize, path_address: usize, flags: usize) 
     });
     // Namespace I/O backends deliberately expose no semantic read capability
     // until their actual file/directory read operations are implemented.
-    const reference = syscall_resources.create(.{ .backend = backend, .capabilities = .{}, .state = object.manifest_offset }) catch return negativeErrno(23);
+    if (object.manifest_offset > 0xffffffff) return negativeErrno(75);
+    const reference = syscall_resources.create(.{ .backend = backend, .capabilities = .{}, .state = object.manifest_offset << 32 }) catch return negativeErrno(23);
     var descriptor: usize = 3;
     while (descriptor < 8 and syscall_bindings.resolve(descriptor) != null) : (descriptor += 1) {}
     if (descriptor == 8) {
@@ -1654,12 +1717,26 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
             syscall_semantics[index] = 14;
             frame.x[10] = externalNamespaceOpenAt(frame.x[10], frame.x[11], frame.x[12]);
         },
+        .get_directory_entries => {
+            syscall_semantics[index] = 15;
+            const reference = syscall_bindings.resolve(frame.x[10]) orelse {
+                frame.x[10] = negativeErrno(9);
+                return finishReturningSyscall(frame, index);
+            };
+            frame.x[10] = namespaceDirectoryEntries(reference, frame.x[11], frame.x[12]);
+        },
         .read => blk: {
             syscall_semantics[index] = 6;
             const reference = syscall_bindings.resolve(frame.x[10]) orelse {
                 frame.x[10] = negativeErrno(9);
                 break :blk;
             };
+            if (syscall_resources.resolve(reference)) |description| {
+                if (@intFromEnum(description.backend) == syscall_read_backend.namespace_regular) {
+                    frame.x[10] = namespaceRegularRead(reference, frame.x[11], frame.x[12]);
+                    break :blk;
+                }
+            }
             request = .{ .read_bytes = .{ .source = resource_tables.semanticIdentity(reference), .destination = @enumFromInt(@as(u64, frame.x[11])), .byte_count = frame.x[12] } };
         },
         .write => blk: {

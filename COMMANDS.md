@@ -567,6 +567,18 @@ introduces no new runnable command.
 
 Batch 32G keeps the existing Batch 32D live-console build and QEMU command surface. The Linux/RV64 compatibility edge now decodes `openat(56)`, copies an absolute guest path through checked bounded user memory, rejects source-namespace mutation flags, identifies regular versus directory namespace objects, and installs the opened object in the existing bounded generational resource and process-binding tables. The exact namespace-backed live-console machine compiled under Zig 0.14.0. This environment has no `qemu-system-riscv64`, so the unchanged real `ls /` acceptance retry remains unverified; `docs/reports/AGENTIC_SNOWBALL_BATCH_32G.md` records the exact proof boundary. No new runnable command was introduced.
 
+## Batch 32H read-only Alpine pressure state
+
+Batch 32H used the existing Batch 32D namespace acquisition, live-console build,
+and system-QEMU command surface. Real Alpine pressure proved `openat(56)` and
+added bounded `getdents64(61)` translation from serialized immediate namespace
+children plus descriptor-shared directory cursors. The same persistent shell
+then proved bounded regular-file reads with descriptor-shared offsets and EOF:
+`ls /`, `cat /etc/alpine-release` (`3.22.0`), and `echo still-alive` passed.
+`cd /tmp` now fails with `Function not implemented`; Linux/RV64 `chdir(49)` is
+the one next causal blocker. `docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md` records
+the exact evidence. No new runnable command was introduced.
+
 PR #83's correctness follow-up makes namespace backends `0x100` and `0x101`
 fail closed in semantic reads instead of interpreting their manifest identity
 as the historical deterministic-stdin cursor. The focused
