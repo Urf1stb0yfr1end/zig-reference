@@ -880,6 +880,12 @@
     },
     {
       "kind": "method",
+      "module": "bounded-resource-table",
+      "name": "duplicateLowestAtOrAbove",
+      "signature": "duplicateLowestAtOrAbove(self: *Self, source: usize, minimum: usize) Error!usize"
+    },
+    {
+      "kind": "method",
       "module": "endian-integer-codec",
       "name": "encode",
       "signature": "encode(value: T) [byte_count]u8"
@@ -1081,6 +1087,12 @@
       "module": "riscv-sfence-vma-invalidation",
       "name": "global",
       "signature": "global()"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-resource-table",
+      "name": "hasCapacity",
+      "signature": "hasCapacity(self: *const Self) bool"
     },
     {
       "kind": "method",
@@ -1573,6 +1585,12 @@
       "module": "bounded-filesystem",
       "name": "lookup",
       "signature": "lookup(self: *const Self, start: ObjectId, path: []const u8) Error!ObjectId"
+    },
+    {
+      "kind": "method",
+      "module": "bounded-resource-table",
+      "name": "lowestFreeAtOrAbove",
+      "signature": "lowestFreeAtOrAbove(self: *const Self, minimum: usize) ?usize"
     },
     {
       "kind": "method",

@@ -59,6 +59,9 @@ pub fn ResourceTable(comptime capacity: usize) type {
         pub fn count(self: *const Self) usize {
             return self.storage.count();
         }
+        pub fn hasCapacity(self: *const Self) bool {
+            return self.count() < capacity;
+        }
     };
 }
 
@@ -79,12 +82,21 @@ pub fn BindingTable(comptime ResourceRef: type, comptime capacity: usize) type {
             return self.slots[slot];
         }
         pub fn duplicateLowest(self: *Self, source: usize) Error!usize {
+            return self.duplicateLowestAtOrAbove(source, 0);
+        }
+        pub fn duplicateLowestAtOrAbove(self: *Self, source: usize, minimum: usize) Error!usize {
             const reference = self.resolve(source) orelse return error.InvalidBinding;
-            for (&self.slots, 0..) |*slot, index| if (slot.* == null) {
-                slot.* = reference;
-                return index;
-            };
-            return error.Full;
+            const index = self.lowestFreeAtOrAbove(minimum) orelse return error.Full;
+            self.slots[index] = reference;
+            return index;
+        }
+        pub fn lowestFreeAtOrAbove(self: *const Self, minimum: usize) ?usize {
+            if (minimum >= capacity) return null;
+            for (self.slots[minimum..], minimum..) |slot, index| if (slot == null) return index;
+            return null;
+        }
+        pub fn hasCapacity(self: *const Self) bool {
+            return self.lowestFreeAtOrAbove(0) != null;
         }
         pub fn unbind(self: *Self, slot: usize) Error!ResourceRef {
             const reference = self.resolve(slot) orelse return error.InvalidBinding;
@@ -129,4 +141,15 @@ test "backend state belongs to the resource and is shared by aliases" {
     _ = try bindings.duplicateLowest(0);
     try resources.setState(bindings.resolve(1).?, 8);
     try std.testing.expectEqual(@as(usize, 8), resources.resolve(bindings.resolve(0).?).?.state);
+}
+
+test "minimum duplication selects the lowest eligible slot and fails atomically" {
+    var resources = ResourceTable(1){};
+    const stream = try resources.create(.{ .backend = @enumFromInt(9), .capabilities = .{ .read = true }, .state = 3 });
+    var bindings = BindingTable(@TypeOf(stream), 12){};
+    try bindings.bindAt(1, stream);
+    try bindings.bindAt(10, stream);
+    try std.testing.expectEqual(@as(usize, 11), try bindings.duplicateLowestAtOrAbove(1, 10));
+    try std.testing.expectError(error.Full, bindings.duplicateLowestAtOrAbove(1, 12));
+    try std.testing.expectEqual(@as(usize, 1), resources.referenceCount(stream).?);
 }

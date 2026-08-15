@@ -173,12 +173,24 @@
         "signature": "count(self: *const Self) usize"
       },
       {
+        "name": "hasCapacity",
+        "signature": "hasCapacity(self: *const Self) bool"
+      },
+      {
         "name": "bindAt",
         "signature": "bindAt(self: *Self, slot: usize, reference: ResourceRef) Error!void"
       },
       {
         "name": "duplicateLowest",
         "signature": "duplicateLowest(self: *Self, source: usize) Error!usize"
+      },
+      {
+        "name": "duplicateLowestAtOrAbove",
+        "signature": "duplicateLowestAtOrAbove(self: *Self, source: usize, minimum: usize) Error!usize"
+      },
+      {
+        "name": "lowestFreeAtOrAbove",
+        "signature": "lowestFreeAtOrAbove(self: *const Self, minimum: usize) ?usize"
       },
       {
         "name": "unbind",
@@ -1176,6 +1188,215 @@
         "preconditions": [],
         "postconditions": [
           "The HandleTable contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "hasCapacity",
+        "kind": "method",
+        "signature": "hasCapacity(self: *const Self) bool",
+        "visibility": "public",
+        "summary": "Reports whether the bounded resource table has capacity for one create.",
+        "receiver": {
+          "name": "self",
+          "type": "*const Self",
+          "ownership": "borrowed immutable",
+          "mutation": "does not mutate"
+        },
+        "inputs": [],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "bool",
+            "meaning": "Result of hasCapacity.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The count contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "duplicateLowestAtOrAbove",
+        "kind": "method",
+        "signature": "duplicateLowestAtOrAbove(self: *Self, source: usize, minimum: usize) Error!usize",
+        "visibility": "public",
+        "summary": "Duplicates a binding into the lowest free slot at or above minimum.",
+        "receiver": {
+          "name": "self",
+          "type": "*Self",
+          "ownership": "borrowed mutable",
+          "mutation": "may mutate"
+        },
+        "inputs": [
+          {
+            "name": "source",
+            "type": "usize",
+            "role": "source bound supplied by the caller.",
+            "ownership": "copied scalar/value",
+            "borrowing": "none",
+            "mutability": "immutable",
+            "lifetime": "call duration",
+            "valid_range": "all usize values; values at or above capacity find no slot",
+            "alignment": "type-defined",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [
+              "bounded against table capacity"
+            ],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns null or a documented error"
+          },
+          {
+            "name": "minimum",
+            "type": "usize",
+            "role": "minimum bound supplied by the caller.",
+            "ownership": "copied scalar/value",
+            "borrowing": "none",
+            "mutability": "immutable",
+            "lifetime": "call duration",
+            "valid_range": "all usize values; values at or above capacity find no slot",
+            "alignment": "type-defined",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [
+              "bounded against table capacity"
+            ],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns null or a documented error"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "Error!usize",
+            "meaning": "Result of duplicateLowestAtOrAbove.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The count contract and module invariants hold on success."
+        ],
+        "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
+        "complexity": {
+          "time": "see performance.time_complexity",
+          "space": "see performance.space_complexity"
+        },
+        "invalidates": [],
+        "thread_safety": "caller synchronization required for shared mutable state",
+        "examples": []
+      },
+      {
+        "name": "lowestFreeAtOrAbove",
+        "kind": "method",
+        "signature": "lowestFreeAtOrAbove(self: *const Self, minimum: usize) ?usize",
+        "visibility": "public",
+        "summary": "Returns the lowest free binding slot at or above minimum without mutation.",
+        "receiver": {
+          "name": "self",
+          "type": "*const Self",
+          "ownership": "borrowed immutable",
+          "mutation": "does not mutate"
+        },
+        "inputs": [
+          {
+            "name": "minimum",
+            "type": "usize",
+            "role": "minimum bound supplied by the caller.",
+            "ownership": "copied scalar/value",
+            "borrowing": "none",
+            "mutability": "immutable",
+            "lifetime": "call duration",
+            "valid_range": "all usize values; values at or above capacity find no slot",
+            "alignment": "type-defined",
+            "endianness": "not applicable",
+            "format": "Zig value",
+            "required_invariants": [],
+            "validation_performed": [
+              "bounded against table capacity"
+            ],
+            "accepts_untrusted_input": true,
+            "stored": false,
+            "copied": true,
+            "may_mutate": false,
+            "invalid_input_behavior": "returns null or a documented error"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "result",
+            "type": "?usize",
+            "meaning": "Result of lowestFreeAtOrAbove.",
+            "ownership": "borrowed when the type is a pointer or slice; otherwise copied/value",
+            "borrowed_from": "receiver or input when represented by a pointer or slice",
+            "lifetime": "bounded by the referenced owner for borrowed results; otherwise caller value lifetime",
+            "cleanup_required": false,
+            "cleanup_responsibility": "caller only when the returned type owns resources",
+            "invalidation_conditions": [
+              "owner destruction or documented mutation for borrowed results"
+            ],
+            "aliasing": "type- and operation-defined",
+            "borrows_from_module": false,
+            "borrows_from_input": false,
+            "valid_after_mutation": "only when the operation documentation permits it",
+            "absence_meaning": "documented by optional return types; otherwise not applicable"
+          }
+        ],
+        "errors": [],
+        "preconditions": [],
+        "postconditions": [
+          "The count contract and module invariants hold on success."
         ],
         "failure_atomicity": "documented in failure_behavior; no undocumented guarantee",
         "complexity": {

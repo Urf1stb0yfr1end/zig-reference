@@ -569,6 +569,10 @@ introduces no new runnable command.
 
 Batch 32G keeps the existing Batch 32D live-console build and QEMU command surface. The Linux/RV64 compatibility edge now decodes `openat(56)`, copies an absolute guest path through checked bounded user memory, rejects source-namespace mutation flags, identifies regular versus directory namespace objects, and installs the opened object in the existing bounded generational resource and process-binding tables. The exact namespace-backed live-console machine compiled under Zig 0.14.0. This environment has no `qemu-system-riscv64`, so the unchanged real `ls /` acceptance retry remains unverified; `docs/reports/AGENTIC_SNOWBALL_BATCH_32G.md` records the exact proof boundary. No new runnable command was introduced.
 
+Batch 32K reused the Batch 32D live-console build and QEMU command surface. Focused resource/runtime tests and the exact Alpine v3.22.0 RV64 freestanding build passed after rejecting unsupported `O_APPEND`, making runtime create/truncate preflight resource and descriptor capacity, expanding the bounded binding table to 16 slots, and adding Linux/RV64 `fcntl(25)` `F_DUPFD`. Real QEMU retry was unavailable in the execution environment, so no runtime milestone beyond Batch 32J is claimed. No new runnable command was introduced.
+
+The PR #87 focused review repair regenerated the bounded-resource-table port and complete endpoint contracts, all affected textual indexes, and all 60 unit/smoke evidence records. The combined runtime-open transaction regression now proves namespace, resource-count, binding-topology, and reference-count conservation across descriptor/resource exhaustion. `zig build check` and `python3 tools/developer-command.py validate-repository` passed; the latter completed 350/350 steps and 249/249 tests under Zig 0.14.0. QEMU remained unavailable, so no new Alpine milestone is claimed.
+
 ## Batch 32H read-only Alpine pressure state
 
 Batch 32H used the existing Batch 32D namespace acquisition, live-console build,

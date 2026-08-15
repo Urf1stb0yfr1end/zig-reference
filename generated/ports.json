@@ -408,13 +408,12 @@
       "risks": [
         {
           "affectedEndpoints": [
-            "BackendId",
             "Capabilities",
+            "BackendId",
             "ResourceTable",
             "BindingTable",
-            "Description",
-            "ResourceRef",
-            "create"
+            "semanticIdentity",
+            "referenceFromIdentity"
           ],
           "consequence": "A syntactically successful port could violate the module contract.",
           "detectionTests": [
