@@ -1,0 +1,409 @@
+CODEX AGENTIC SNOWBALL — BATCH 32N
+EXTERNAL CAT POST-EXEC FAULT -> READ-BACK -> PIPES -> PLAYABLE ALPINE
+BOUNDED LEAPS / MAXIMUM USEFUL IMPLEMENTATION / MANDATORY 30-MINUTE HANDOFF
+
+Repository: thanks-cohn/zig-reference
+Canonical request:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32N_EXTERNAL_CAT_FAULT_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt
+
+======================================================================
+START
+======================================================================
+
+Start from current main. Do not assume the authoring SHA remains current.
+Fetch, switch to, and update current main first. Record the exact inherited SHA.
+
+Before implementation:
+
+1. read AGENTS.md;
+2. read README.md, especially the current machine milestone and roadmap;
+3. read COMMANDS.md;
+4. read docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md;
+5. read docs/reports/AGENTIC_SNOWBALL_BATCH_32M.md;
+6. inspect the implementation and tests added through Batch 32M / PR #89;
+7. run:
+
+     python3 tools/query-reference.py agent bootstrap
+     python3 tools/query-reference.py agent doctor
+
+8. read this request completely;
+9. begin a visible 30-minute clock with the first repository command and obey
+   the mandatory handoff rule below.
+
+Do not spend the opening window re-proving already-earned Alpine, musl, BusyBox,
+clone/exec, cwd, writable runtime state, F_DUPFD, dup3, or shell-redirection
+facts unless the exact pressure demonstrates a regression.
+
+======================================================================
+PRIMARY GOAL
+======================================================================
+
+Pursue:
+
+  ★ PLAYABLE ALPINE UNDER MORPHIC ★
+
+as far as physically possible within this bounded run.
+
+The exact current frontier is no longer redirection. Batch 32M earned unchanged:
+
+  cd /tmp
+  pwd
+  echo hello > /tmp/hello
+
+The immediate unchanged successor pressure is:
+
+  cat /tmp/hello
+
+Current evidence resolves the real external BusyBox cat, enters clone/exec,
+observes unsupported Linux/RV64 calls 96, 135, 135, and 134, and then reaches:
+
+  ZIGREF_LINUX_EDGE_TRAP cause=000000000000000f sepc=000000008020006e stval=00000000804026f8
+
+This post-exec store-page fault is the authoritative opening boundary unless a
+fresh current-main reproduction demonstrates a different earlier causal failure.
+
+Use OBSERVE -> CLASSIFY -> MINIMUM GENERAL REPAIR -> PROVE -> RETRY.
+
+After read-back succeeds, continue immediately to:
+
+  echo hello | cat
+  echo still-alive
+
+If those succeed, run the complete canonical Playable Alpine sequence in ONE
+persistent real Alpine shell.
+
+======================================================================
+CURRENT PROVEN FRONTIER — PRESERVE
+======================================================================
+
+Current main has earned and must preserve at minimum:
+
+- exact Alpine v3.22.0 RV64 minirootfs namespace;
+- complete serialized Alpine namespace and immutable source backing;
+- real /bin/sh -> /bin/busybox and real musl interpreter-first execution;
+- persistent interactive shell and live console input;
+- clone(220) / execve(221) real external BusyBox execution;
+- parent snapshot/restoration and shell liveness;
+- PREPARE -> COMMIT image replacement;
+- candidate mapping/table-capacity preflight;
+- W+X=0;
+- openat(56), getdents64(61), regular immutable reads;
+- genuine ls /;
+- cat /etc/alpine-release -> 3.22.0;
+- chdir(49) / getcwd(17), persistent cwd, cd /tmp ; pwd -> /tmp;
+- bounded session-local writable runtime namespace;
+- transactional runtime create/truncate behavior;
+- resource/descriptor ownership and access enforcement;
+- F_DUPFD compatibility with ownership-correct aliasing;
+- dup3(24)-backed shell descriptor replacement;
+- real unchanged echo hello > /tmp/hello;
+- living original shell after the redirection command.
+
+Do not regress or weaken these facts to make the next command pass.
+Do not claim runtime read-back, pipelines, or Playable Alpine until real QEMU
+proves them.
+
+======================================================================
+LEAP 1 — EXTERNAL CAT POST-EXEC STORE FAULT
+======================================================================
+
+Reproduce unchanged in real system QEMU:
+
+  cd /tmp
+  pwd
+  echo hello > /tmp/hello
+  cat /tmp/hello
+
+Capture enough bounded evidence around the cat child transition to explain the
+first causal failure, including where useful:
+
+- clone state;
+- exec candidate construction and commit;
+- interpreter and main-image mappings;
+- writable segment/page permissions;
+- stack state;
+- program-break / anonymous-memory state;
+- TLS/thread-pointer state;
+- child-vs-parent snapshot state;
+- unsupported syscall number, arguments, and returned errno;
+- the page-table/mapping state corresponding to stval 0x804026f8.
+
+The unsupported calls 96 / 135 / 135 / 134 are observations, NOT permission to
+implement four syscalls speculatively. Decode them from the actual Linux/RV64
+ABI and inspect their real arguments and return-path behavior. Determine whether
+one is causal to the store fault or whether musl/BusyBox legally tolerates the
+current failure.
+
+Implement only the first proven causal missing semantic or invariant.
+
+Likely classes to distinguish using evidence include:
+
+- a writable ELF mapping missing or losing write permission;
+- incorrect writable segment extent / zero-fill;
+- broken brk or anonymous-memory state;
+- missing TLS/thread setup;
+- child state contaminated by parent snapshot/restoration assumptions;
+- interpreter/main-image mapping interaction;
+- another exact mechanism exposed by the trace.
+
+Requirements for any repair:
+
+- preserve W+X=0;
+- preserve PREPARE -> COMMIT;
+- preserve mapping/table-capacity preflight;
+- preserve parent-shell state;
+- preserve source namespace immutability;
+- keep Linux-specific syscall policy at the compatibility edge;
+- add focused permanent regression proof for the causal defect;
+- do not special-case cat, /tmp/hello, the fault PC, or the expected output.
+
+Immediately retry the exact unchanged command after each repair:
+
+  cat /tmp/hello
+
+Do not batch speculative compatibility additions before retrying.
+
+======================================================================
+LEAP 2 — EARN REAL RUNTIME READ-BACK
+======================================================================
+
+Acceptance is literal:
+
+  echo hello > /tmp/hello
+  cat /tmp/hello
+
+must produce:
+
+  hello
+
+The second command must be a real external BusyBox cat reopening the runtime
+pathname through ordinary namespace/resource semantics.
+
+This gate must prove the relevant real path through:
+
+- runtime-over-source pathname lookup;
+- descriptor/resource creation;
+- descriptor inheritance across clone/exec as required;
+- runtime regular-file read capability;
+- checked guest-memory copies;
+- shared/open-description offset behavior as applicable;
+- EOF behavior;
+- child exit/completion;
+- restoration of the living original shell.
+
+Then run:
+
+  echo still-alive
+
+and require:
+
+  still-alive
+
+If read-back exposes another exact causal boundary, repair the smallest general
+mechanism and retry immediately.
+
+Once read-back is earned, do not stop merely because the milestone is pleasant.
+Proceed directly to pipeline pressure while useful clock remains.
+
+======================================================================
+LEAP 3 — REAL PIPELINE
+======================================================================
+
+Pressure unchanged:
+
+  echo hello | cat
+
+then:
+
+  echo still-alive
+
+Observe the real first failure. Do not preselect the syscall or process model.
+
+Real pressure may demand some subset of:
+
+- Linux pipe/pipe2 decoding at the compatibility edge;
+- neutral bounded pipe resource(s);
+- separate readable/writable endpoint capabilities;
+- bounded pipe buffering;
+- descriptor installation/replacement;
+- descriptor inheritance across child creation;
+- correct resource-reference ownership;
+- close semantics;
+- EOF only when all writer references are gone;
+- reader/writer progress;
+- wait/completion behavior;
+- coexistence of more than one meaningful child/process state.
+
+If the existing serialized child-first execution model cannot represent the
+real pipeline semantics, evolve the neutral process model only as far as the
+observed shell requires. Do not fake concurrency, pipeline bytes, child exit, or
+command output.
+
+Pipe behavior must emerge from general resource/descriptor/process semantics.
+
+After each causal repair, immediately rerun:
+
+  echo hello | cat
+
+Pipeline gate:
+
+  echo hello | cat      -> hello through a real pipe
+  echo still-alive      -> still-alive from the original shell
+
+======================================================================
+PLAYABLE ALPINE — CANONICAL ACCEPTANCE
+======================================================================
+
+Playable Alpine is earned only if ONE persistent real Alpine shell completes:
+
+  echo morphic
+  echo second
+  pwd
+  ls /
+  cat /etc/alpine-release
+  cd /tmp
+  pwd
+  echo hello > /tmp/hello
+  cat /tmp/hello
+  echo hello | cat
+  echo still-alive
+
+Expected semantic observations:
+
+  echo morphic                    -> morphic
+  echo second                     -> second
+  initial pwd                     -> /
+  ls /                            -> genuine serialized Alpine root entries
+  cat /etc/alpine-release         -> 3.22.0
+  cd /tmp                         -> success
+  pwd                             -> /tmp
+  echo hello > /tmp/hello         -> real bounded runtime write
+  cat /tmp/hello                  -> hello from that runtime object
+  echo hello | cat                -> hello through a real pipe
+  echo still-alive                -> still-alive from original shell
+
+Do not claim the milestone from separate shells, hosted fixtures, compile-only
+proof, synthetic transcripts, command-specific output, or a partial sequence.
+
+If Playable Alpine is earned before the handoff deadline, use remaining useful
+time for focused regressions, canonical reproduction, evidence, documentation,
+and a clean persisted handoff. Do NOT begin apk in Batch 32N unless Playable
+Alpine is completely proved and the remaining work is purely a tiny observation
+that strengthens the handoff; apk is the next campaign and should begin from a
+clean milestone.
+
+======================================================================
+KNOWN INHERITED LIMITATIONS
+======================================================================
+
+Preserve known limitations honestly until real pressure makes them causal.
+In particular, do not silently claim broad component-wise symlink resolution if
+the Batch 32G intermediate-component symlink limitation remains.
+
+Do not enlarge bounded capacities merely to hide an ownership/lifetime bug.
+Capacity increases are acceptable only when the real workload proves the
+existing bound itself is the causal limitation and the new bound remains explicit.
+
+======================================================================
+VALIDATION
+======================================================================
+
+Run the narrowest focused tests during implementation, then before persistence
+run the relevant repository gates, including where applicable:
+
+  zig fmt --check build.zig projects recipes conformance
+  zig build test-recipe-run-hosted-morphic-runtime
+  zig build check
+  python3 tools/developer-command.py validate-repository
+
+Use the exact canonical Alpine namespace/QEMU pressure commands already recorded
+in COMMANDS.md / README.md. Do not replace real system-QEMU proof with hosted
+unit tests.
+
+Record any environment failure separately from implementation failure. Do not
+weaken a repository gate merely to make the run green.
+
+======================================================================
+MANDATORY 30-MINUTE PERSISTENCE / HANDOFF
+======================================================================
+
+This run MUST hand off at approximately minute 30.
+
+Do not continue indefinitely because the next fix appears close.
+At roughly minute 24-25, stop opening large new implementation fronts and begin
+converging the run into a reproducible persisted state.
+
+By approximately minute 30:
+
+1. persist all coherent implementation and tests;
+2. format and run the strongest feasible validation;
+3. rerun the exact real QEMU pressure far enough to identify the highest earned
+   frontier;
+4. create a report:
+
+     docs/reports/AGENTIC_SNOWBALL_BATCH_32N.md
+
+5. update COMMANDS.md with durable reproduction commands/evidence if the
+   frontier changed;
+6. update README.md only to claims actually earned by real evidence;
+7. update docs/roadmaps/PLAYABLE_ALPINE_TO_APK.md if the causal frontier moved;
+8. record exact inherited SHA, resulting commit SHA, tests, QEMU observations,
+   first remaining causal blocker, and known limitations;
+9. commit coherent work and push the branch / open or update the PR as the
+   execution environment permits.
+
+The handoff must make the next fresh agent able to continue without rediscovering
+this run.
+
+If the run fails to repair the opening cat fault, the report must still contain
+the strongest causal narrowing achieved, exact reproduction, rejected
+hypotheses, and the next smallest experiment.
+
+If read-back is earned but pipelines are not, state that exact frontier.
+If pipelines and the full sequence are earned, state explicitly:
+
+  ★ PLAYABLE ALPINE UNDER MORPHIC ★
+
+and preserve the complete real-QEMU transcript/evidence needed to defend it.
+
+======================================================================
+NON-NEGOTIABLES
+======================================================================
+
+- Real Alpine binaries remain the workload.
+- No fabricated shell output.
+- No command-name special cases.
+- No /tmp/hello special cases.
+- No path-specific fake read-back.
+- No fake pipe implemented as known byte transfer.
+- No speculative syscall checklist implementation.
+- No weakening W+X=0.
+- No weakening PREPARE -> COMMIT.
+- No mutation of the serialized Alpine source artifact.
+- Linux ABI details remain at the compatibility edge when they are not neutral
+  Morphic semantics.
+- Preserve boundedness and explicit failure behavior.
+- Prefer one causal general mechanism over broad compatibility surface.
+- Retry the exact failing real command after every repair.
+- Mandatory persisted handoff at approximately 30 minutes.
+
+======================================================================
+END STATE
+======================================================================
+
+Best case for Batch 32N:
+
+  cat /tmp/hello       -> hello
+  echo hello | cat     -> hello
+  echo still-alive     -> still-alive
+  ★ PLAYABLE ALPINE UNDER MORPHIC ★
+
+Acceptable bounded handoff:
+
+  a materially advanced, causally proven frontier with coherent implementation,
+  permanent focused proof, exact QEMU evidence, and one explicit next blocker.
+
+The mission is not to maximize syscall count.
+The mission is to make unchanged real Alpine advance by admitting the smallest
+correct reusable semantics it actually proves necessary, and to leave the next
+agent standing exactly where this run ended.
