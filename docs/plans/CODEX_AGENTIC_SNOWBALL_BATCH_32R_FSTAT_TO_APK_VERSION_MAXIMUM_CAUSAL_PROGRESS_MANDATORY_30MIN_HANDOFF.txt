@@ -1,0 +1,266 @@
+CODEX AGENTIC SNOWBALL — BATCH 32R
+FSTAT(80) -> REAL APK VERSION -> MAXIMUM CAUSAL PROGRESS
+MANDATORY ~30-MINUTE PERSISTED HANDOFF
+
+Repository: thanks-cohn/zig-reference
+Starting branch: main
+Starting frontier: ★ PLAYABLE ALPINE UNDER MORPHIC ★ is already earned.
+
+MISSION
+
+Use the full useful ~30-minute Codex window to make the maximum evidence-backed progress from the first observed real /sbin/apk blocker toward a clean real apk startup/version/help path.
+
+The opening gate is NOT the whole batch. It is only the first known causal pressure.
+
+If fstat(80) is repaired quickly, immediately rerun the exact real /sbin/apk --version pressure. If that advances, diagnose and repair the next directly exposed causal blocker, then rerun again. Continue this observe -> classify -> minimum general repair -> prove -> retry loop for the useful implementation window.
+
+Do not end the run merely because one syscall or one loader failure was repaired. The batch is bounded by time and evidence, not by one bug name.
+
+CURRENT REAL QEMU EVIDENCE
+
+The user reproduced the current Playable Alpine machine and entered:
+
+    /sbin/apk --version
+
+Observed trace, in causal order:
+
+    ZIGREF_LINUX_CLONE flags=0000000000000011 child_stack=0000000000000000
+    ZIGREF_LINUX_UNSUPPORTED nr=0000000000000060
+    ZIGREF_LINUX_UNSUPPORTED nr=0000000000000087
+    ZIGREF_LINUX_UNSUPPORTED nr=0000000000000087
+    ZIGREF_LINUX_UNSUPPORTED nr=0000000000000086
+    ZIGREF_LINUX_EXECVE_COMMIT path=/sbin/apk
+    ZIGREF_LINUX_UNSUPPORTED nr=0000000000000060
+    ZIGREF_LINUX_OPENAT path=/usr/lib/libcrypto.so.3 fd=0000000000000003
+    ZIGREF_LINUX_UNSUPPORTED nr=0000000000000050
+    Error loading shared library libcrypto.so.3: Function not implemented (needed by /sbin/apk)
+    Error loading shared library libz.so.1: No such file or directory (needed by /sbin/apk)
+    ZIGREF_LINUX_OPENAT path=/usr/lib/libapk.so.2.14.9 fd=0000000000000003
+    ZIGREF_LINUX_UNSUPPORTED nr=0000000000000050
+    Error loading shared library libapk.so.2.14.9: Function not implemented (needed by /sbin/apk)
+
+Linux/RV64 syscall 0x50 = 80 decimal = fstat.
+
+The large following relocation-symbol failure list is downstream fallout until the needed shared libraries can actually load. Do not chase those symbols individually.
+
+The previously observed unsupported setup calls include:
+
+    0x60 = 96  = set_tid_address
+    0x86 = 134 = rt_sigaction
+    0x87 = 135 = rt_sigprocmask
+    0xe2 = 226 = mprotect
+
+Their mere appearance does not authorize implementation. The trace proves /sbin/apk reaches EXECVE_COMMIT despite 96/134/135. mprotect may become causal later; only real retry pressure decides.
+
+There is also a pre-apk breadcrumb:
+
+    ZIGREF_LINUX_NEWFSTATAT path=.
+    ls: .: No such file or directory
+    pwd
+    /opt
+
+Do not broaden into relative-dot pathname repair unless the unchanged apk pressure makes it causal during this batch.
+
+OPENING TASK — GENERAL fstat(80)
+
+Implement the smallest general Linux/RV64 fstat compatibility needed for an already-open Morphic resource.
+
+Requirements:
+
+1. Decode syscall 80 at the Linux compatibility edge.
+2. Resolve the supplied fd through the existing descriptor/resource ownership model rather than bypassing it.
+3. Produce a correct guest stat structure for the resource classes that the real loader actually queries.
+4. Reuse existing namespace/runtime metadata semantics where possible rather than introducing a second metadata truth.
+5. Perform checked guest copyout with deterministic errno mapping.
+6. Preserve ownership and offset semantics; fstat must not mutate file position or descriptor topology.
+7. Preserve bounded-resource discipline and failure atomicity.
+8. Do not special-case /sbin/apk, libcrypto, libapk, fd 3, or particular paths.
+9. Add focused permanent tests for successful metadata on relevant open resources and invalid-fd / copyout-failure behavior.
+
+The returned stat fields should be no broader than what current real pressure and existing repository semantics justify, but they must be internally coherent. Do not fabricate inconsistent metadata merely to satisfy musl.
+
+IMMEDIATE RETRY RULE
+
+As soon as the focused fstat repair passes its tests, rebuild the canonical Alpine v3.22.0 RV64 Morphic machine and rerun exactly:
+
+    /sbin/apk --version
+
+Read the new trace before doing anything else.
+
+If fstat was causal, continue into the next real blocker immediately.
+
+LIKELY NEXT PRESSURES — OBSERVATION ONLY
+
+The current trace suggests possible future pressure in these areas, but none is pre-authorized:
+
+- libz.so.1 path/symlink resolution if ENOENT remains after fstat is fixed;
+- mmap/mprotect or shared-object protection finalization;
+- richer stat/access metadata;
+- set_tid_address / signal setup only if a retry proves one causal;
+- complete component-wise symlink resolution if the real library/package layout exposes the inherited Batch 32G gap;
+- process cleanup or loader edge behavior.
+
+Treat these only as a search map. The unchanged real apk retry decides the next mechanism.
+
+If libz.so.1 still fails with ENOENT after fstat works, first prove why. Inspect the exact Alpine namespace object/symlink layout and resolver behavior. If the known intermediate-component symlink gap is causal, repair the general resolver semantics and add a regression. If the artifact truly lacks the object, report that instead. Do not invent a compatibility special case.
+
+If mprotect becomes causal, preserve W+X=0 and existing mapping/table preflight. Do not weaken page-permission invariants to make the loader advance.
+
+MAXIMUM CAUSAL PROGRESS RULE
+
+For the useful implementation window, repeat:
+
+    observe exact unchanged failure
+      -> classify it
+      -> implement the smallest general mechanism
+      -> add focused regression evidence
+      -> rebuild/retry the same real apk command
+      -> continue if it advances
+
+If /sbin/apk --version succeeds before the implementation window is over, immediately pressure:
+
+    /sbin/apk --help
+
+If that succeeds, pressure:
+
+    /sbin/apk info
+
+Continue only through directly exposed causal requirements. Do not begin networking, DNS, TLS, repository fetching, or speculative package-install filesystem work in this batch unless the above local startup/version/help/info ladder itself directly requires a general mechanism that belongs there.
+
+MILESTONE DISCIPLINE
+
+Do not claim ★ LOCAL APK ★ or ★ NETWORKED APK ★ in this batch.
+
+A successful /sbin/apk --version is a meaningful submilestone: real apk starts far enough to report its version.
+
+A successful --help and/or info should be recorded precisely, but package installation remains a separate milestone.
+
+PRESERVE ALL EARNED INVARIANTS
+
+Do not regress:
+
+- exact Alpine v3.22.0 RV64 artifacts and namespace;
+- real musl / BusyBox userspace;
+- immutable source namespace;
+- bounded writable runtime overlay;
+- PREPARE -> COMMIT;
+- mapping/table capacity preflight;
+- W+X=0;
+- SUM clear;
+- checked user memory access;
+- process/FD/resource ownership;
+- parent shell restoration/liveness;
+- clone/exec behavior;
+- F_DUPFD / dup3 ownership;
+- pipe endpoint capabilities and lifetime;
+- ownership-correct EOF across active child + suspended parent snapshot;
+- Playable Alpine full acceptance sequence.
+
+REAL QEMU BASELINE
+
+Use the canonical pinned Alpine namespace and real system QEMU. The existing reproduction flow is approximately:
+
+    rm -rf /tmp/zigref-namespace /tmp/alpine-machine
+
+    PYTHONDONTWRITEBYTECODE=1 python3 \
+      tools/pressure-real-rv64-alpine-minirootfs.py \
+      --artifact-only \
+      --namespace-output-dir /tmp/zigref-namespace
+
+    zig build install-freestanding-riscv64-morphic-runtime \
+      -Dexternal-rv64-namespace-manifest=/tmp/zigref-namespace/namespace.json \
+      -Dexternal-rv64-namespace-data=/tmp/zigref-namespace/namespace.data \
+      -Dexternal-rv64-argv0=/bin/sh \
+      -Dexternal-rv64-live-console-input=true \
+      --prefix /tmp/alpine-machine
+
+Then run real QEMU and execute the unchanged pressure. Automated exact-input harnessing is preferable when available, but preserve the same artifacts and runtime path.
+
+If a human-visible console is needed, the README now documents the QEMU PTY + picocom path. That presentation layer is not part of the guest milestone semantics.
+
+VALIDATION
+
+Run focused tests after each repair and the strongest relevant repository gates before handoff, including as time permits:
+
+    zig fmt --check build.zig projects recipes conformance
+    zig build test-recipe-run-hosted-morphic-runtime
+    zig build check
+    PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+    python3 tools/developer-command.py validate-repository
+    git diff --check
+
+Do not spend the whole batch waiting on redundant validation while real causal pressure remains unexplored. Prioritize focused proof + exact QEMU retry during the implementation window, then converge on broad validation during handoff.
+
+PLAYABLE ALPINE REGRESSION CHECK
+
+Before final handoff, if runtime code changed materially, re-prove the strongest relevant Playable Alpine behavior, ideally the full one-shell acceptance sequence:
+
+    echo morphic
+    echo second
+    pwd
+    ls /
+    cat /etc/alpine-release
+    cd /tmp
+    pwd
+    echo hello > /tmp/hello
+    cat /tmp/hello
+    echo hello | cat
+    echo still-alive
+
+TIME / HANDOFF CONTRACT
+
+Minute 0:
+- Record the visible clock/time budget.
+- Confirm branch/base state.
+- Reproduce or inspect the exact current /sbin/apk --version frontier.
+
+Approximately minutes 0-18:
+- Implement fstat and any directly exposed next causal repairs.
+- After every repair, immediately rerun the exact failing real command.
+- Keep advancing if the failure moves.
+
+Approximately minutes 18-24:
+- Continue bounded causal work if evidence is strong.
+- If /sbin/apk --version succeeds, pressure --help and then info.
+- Begin converging focused tests and real QEMU proof.
+
+Around minute 24-26:
+- Consolidate validation and exact measured frontier.
+- Ensure all meaningful changes are committed.
+
+Around minute 26:
+- Persisted handoff becomes the primary task.
+- Create or update:
+
+    docs/reports/AGENTIC_SNOWBALL_BATCH_32R.md
+
+The report must contain:
+- starting commit / branch;
+- exact opening failure;
+- mechanisms changed and why;
+- focused tests added;
+- exact real QEMU commands/evidence;
+- whether /sbin/apk --version succeeded;
+- whether --help or info were reached;
+- exact remaining first causal blocker if incomplete;
+- unsupported calls observed but proven non-causal or not yet classified;
+- validation results;
+- files/commits produced;
+- one precise next-pressure recommendation.
+
+Around minute 29:
+- Persistence/final assembly is the only priority.
+- Commit the report and any remaining coherent changes.
+- Push the branch / leave the PR-ready state required by the execution environment.
+
+By approximately minute 30:
+- Leave a complete persisted handoff even if another blocker has just appeared.
+- If incomplete, name exactly one next causal blocker from observed evidence. Do not guess a syscall merely because it is nearby in the trace.
+
+ARCHITECTURAL STANDARD
+
+This batch succeeds if it increases the real apk frontier with general reusable mechanism while preserving Morphic's ownership, boundedness, and compatibility-edge discipline.
+
+The ideal outcome is not merely 'fstat implemented.' The ideal outcome is that the available window is used to push the unchanged real Alpine package manager as far as evidence allows, then leave the next agent an exact measured boundary.
+
+Begin.
