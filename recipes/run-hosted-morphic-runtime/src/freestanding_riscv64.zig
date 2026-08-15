@@ -234,6 +234,12 @@ fn RealPageOwner(comptime Allocator: type) type {
 const MachineAllocator = frame_allocators.PhysicalPageFrameAllocator(physical_pool_pages);
 const MachinePageOwner = RealPageOwner(MachineAllocator);
 const MachineBuilder = sv39_builders.Builder(MachinePageOwner);
+// Paging context remains live across every U-mode continuation. Keeping it in
+// supervisor-owned static storage prevents the process boundary from borrowing
+// freestandingMain's suspended stack frame.
+var runtime_allocator: MachineAllocator = undefined;
+var runtime_page_owner: MachinePageOwner = undefined;
+var runtime_builder: MachineBuilder = undefined;
 var batch26_builder: *MachineBuilder = undefined;
 const Batch26MaterializedImage = address_space.MaterializedImage(4);
 var batch26_main_image: Batch26MaterializedImage = .{};
@@ -3750,15 +3756,15 @@ export fn freestandingMain() callconv(.c) noreturn {
         write("ZIGREF_PHYSICAL_MEMORY_FAILURE\n");
         shutdown();
     };
-    var allocator = frame_allocators.PhysicalPageFrameAllocator(physical_pool_pages).initFromRegions(1, &regions) catch {
+    runtime_allocator = MachineAllocator.initFromRegions(1, &regions) catch {
         write("ZIGREF_PHYSICAL_MEMORY_FAILURE\n");
         shutdown();
     };
-    const initial_free = allocator.freeCount();
+    const initial_free = runtime_allocator.freeCount();
     var owned: [physical_pool_pages]frames.PhysicalPageFrameNumber = undefined;
     var sentinels: [physical_pool_pages]usize = undefined;
     for (&owned, 0..) |*slot, index| {
-        slot.* = allocator.allocate() catch {
+        slot.* = runtime_allocator.allocate() catch {
             write("ZIGREF_PHYSICAL_MEMORY_FAILURE\n");
             shutdown();
         };
@@ -3768,20 +3774,20 @@ export fn freestandingMain() callconv(.c) noreturn {
         pointer.* = sentinel;
         sentinels[index] = pointer.*;
     }
-    const exhausted = if (allocator.allocate()) |_| false else |err| err == error.Exhausted;
-    allocator.release(owned[2]) catch {
+    const exhausted = if (runtime_allocator.allocate()) |_| false else |err| err == error.Exhausted;
+    runtime_allocator.release(owned[2]) catch {
         write("ZIGREF_PHYSICAL_MEMORY_FAILURE\n");
         shutdown();
     };
-    const double_free = if (allocator.release(owned[2])) |_| false else |err| err == error.DoubleFree;
+    const double_free = if (runtime_allocator.release(owned[2])) |_| false else |err| err == error.DoubleFree;
     const foreign = frames.PhysicalPageFrameNumber.fromAddress(addresses.PhysicalAddress.init(pool_end)) catch unreachable;
-    const foreign_rejected = if (allocator.release(foreign)) |_| false else |err| err == error.ForeignFrame;
-    const reacquired = allocator.allocate() catch {
+    const foreign_rejected = if (runtime_allocator.release(foreign)) |_| false else |err| err == error.ForeignFrame;
+    const reacquired = runtime_allocator.allocate() catch {
         write("ZIGREF_PHYSICAL_MEMORY_FAILURE\n");
         shutdown();
     };
     const reacquired_matches = reacquired.value == owned[2].value;
-    for (owned) |frame| allocator.release(frame) catch {
+    for (owned) |frame| runtime_allocator.release(frame) catch {
         // The reacquired frame is owned again, so every original frame is now releasable.
         write("ZIGREF_PHYSICAL_MEMORY_FAILURE\n");
         shutdown();
@@ -3824,30 +3830,29 @@ export fn freestandingMain() callconv(.c) noreturn {
     write("\nreacquired_matches=");
     write(if (reacquired_matches) "PASS" else "FAIL");
     write("\nfinal_free=");
-    writeUsizeHex(allocator.freeCount());
+    writeUsizeHex(runtime_allocator.freeCount());
     write("\nfinal_allocated=");
-    writeUsizeHex(allocator.allocatedCount());
+    writeUsizeHex(runtime_allocator.allocatedCount());
     write("\ncomplete=PASS\nZIGREF_PHYSICAL_MEMORY_END\n");
     if (satp != 0 or initial_free != physical_pool_pages or !exhausted or !double_free or
-        !foreign_rejected or !reacquired_matches or allocator.freeCount() != physical_pool_pages or
-        allocator.allocatedCount() != 0)
+        !foreign_rejected or !reacquired_matches or runtime_allocator.freeCount() != physical_pool_pages or
+        runtime_allocator.allocatedCount() != 0)
     {
         write("ZIGREF_PHYSICAL_MEMORY_FAILURE\n");
         shutdown();
     }
     write("ZIGREF_PHYSICAL_MEMORY_RETURNED\n");
     // Batch 16 has returned every frame. Reserve one owned data frame, then
-    // let the generic builder obtain and zero only real page-table frames from
-    // the same allocator. The bounded first address space maps the exact ELF
+    // let the generic runtime_builder obtain and zero only real page-table frames from
+    // the same runtime_allocator. The bounded first address space maps the exact ELF
     // image/pool span with 4 KiB RWX leaves plus one non-identity RW alias.
-    const alias_frame = allocator.allocate() catch {
+    const alias_frame = runtime_allocator.allocate() catch {
         write("ZIGREF_SV39_ACTIVE_FAILURE\n");
         shutdown();
     };
     const alias_physical = (alias_frame.toAddress() catch unreachable).raw();
-    const Allocator = @TypeOf(allocator);
-    var page_owner = RealPageOwner(Allocator){ .allocator = &allocator };
-    var builder = sv39_builders.Builder(@TypeOf(page_owner)).init(&page_owner) catch {
+    runtime_page_owner = .{ .allocator = &runtime_allocator };
+    runtime_builder = MachineBuilder.init(&runtime_page_owner) catch {
         write("ZIGREF_SV39_ACTIVE_FAILURE\n");
         shutdown();
     };
@@ -3865,28 +3870,28 @@ export fn freestandingMain() callconv(.c) noreturn {
     const permissions = sv39_entries.Permissions{ .read = true, .write = true, .execute = true, .accessed = true, .dirty = true };
     var address = mapped_begin;
     while (address < mapped_end) : (address += frames.PageSize) {
-        _ = builder.mapPage(address, address, .page_4k, permissions) catch {
+        _ = runtime_builder.mapPage(address, address, .page_4k, permissions) catch {
             write("ZIGREF_SV39_ACTIVE_FAILURE\n");
             shutdown();
         };
     }
     address = reservation_begin;
     while (address < reservation_end) : (address += frames.PageSize) {
-        _ = builder.mapPage(address, address, .page_4k, .{ .read = true, .write = true, .accessed = true, .dirty = true }) catch shutdown();
+        _ = runtime_builder.mapPage(address, address, .page_4k, .{ .read = true, .write = true, .accessed = true, .dirty = true }) catch shutdown();
     }
     address = caller_artifact_begin;
     while (address < caller_artifact_end) : (address += frames.PageSize) {
-        _ = builder.mapPage(address, address, .page_4k, .{ .read = true, .accessed = true }) catch shutdown();
+        _ = runtime_builder.mapPage(address, address, .page_4k, .{ .read = true, .accessed = true }) catch shutdown();
     }
-    _ = builder.mapPage(sv39_alias, alias_physical, .page_4k, .{ .read = true, .write = true, .accessed = true, .dirty = true }) catch {
+    _ = runtime_builder.mapPage(sv39_alias, alias_physical, .page_4k, .{ .read = true, .write = true, .accessed = true, .dirty = true }) catch {
         write("ZIGREF_SV39_ACTIVE_FAILURE\n");
         shutdown();
     };
-    const alias_query = builder.query(sv39_alias) catch {
+    const alias_query = runtime_builder.query(sv39_alias) catch {
         write("ZIGREF_SV39_ACTIVE_FAILURE\n");
         shutdown();
     };
-    const root_physical = builder.root;
+    const root_physical = runtime_builder.root;
     const satp_after_expected = (@as(usize, 8) << 60) | (root_physical >> 12);
     asm volatile ("csrw satp, %[value]"
         :
@@ -3917,8 +3922,8 @@ export fn freestandingMain() callconv(.c) noreturn {
     write("\nroot_physical=");
     writeUsizeHex(root_physical);
     write("\npage_table_count=");
-    writeUsizeHex(page_owner.page_count);
-    for (page_owner.pages[0..page_owner.page_count], 0..) |page, index| {
+    writeUsizeHex(runtime_page_owner.page_count);
+    for (runtime_page_owner.pages[0..runtime_page_owner.page_count], 0..) |page, index| {
         write("\npage_table=");
         writeUsizeHex(index);
         write(",address=");
@@ -3973,7 +3978,7 @@ export fn freestandingMain() callconv(.c) noreturn {
     var mutation_count: usize = 0;
     address = text_begin;
     while (address < text_end) : (address += frames.PageSize) {
-        _ = builder.protect(address, .page_4k, text_permissions) catch {
+        _ = runtime_builder.protect(address, .page_4k, text_permissions) catch {
             write("ZIGREF_SV39_PERMISSIONS_FAILURE\n");
             shutdown();
         };
@@ -3981,7 +3986,7 @@ export fn freestandingMain() callconv(.c) noreturn {
     }
     address = rodata_begin;
     while (address < rodata_end) : (address += frames.PageSize) {
-        _ = builder.protect(address, .page_4k, rodata_permissions) catch {
+        _ = runtime_builder.protect(address, .page_4k, rodata_permissions) catch {
             write("ZIGREF_SV39_PERMISSIONS_FAILURE\n");
             shutdown();
         };
@@ -3989,13 +3994,13 @@ export fn freestandingMain() callconv(.c) noreturn {
     }
     address = writable_begin;
     while (address < writable_end) : (address += frames.PageSize) {
-        _ = builder.protect(address, .page_4k, writable_permissions) catch {
+        _ = runtime_builder.protect(address, .page_4k, writable_permissions) catch {
             write("ZIGREF_SV39_PERMISSIONS_FAILURE\n");
             shutdown();
         };
         mutation_count += 1;
     }
-    _ = builder.protect(sv39_alias, .page_4k, writable_permissions) catch {
+    _ = runtime_builder.protect(sv39_alias, .page_4k, writable_permissions) catch {
         write("ZIGREF_SV39_PERMISSIONS_FAILURE\n");
         shutdown();
     };
@@ -4049,7 +4054,7 @@ export fn freestandingMain() callconv(.c) noreturn {
     writeUsizeHex((writable_end - text_begin) / frames.PageSize + 1);
     address = text_begin;
     while (address < writable_end) : (address += frames.PageSize) {
-        const leaf = builder.query(address) catch {
+        const leaf = runtime_builder.query(address) catch {
             write("ZIGREF_SV39_PERMISSIONS_FAILURE\n");
             shutdown();
         };
@@ -4062,7 +4067,7 @@ export fn freestandingMain() callconv(.c) noreturn {
         write(",level=");
         writeUsizeHex(@intFromEnum(leaf.level));
     }
-    const alias_leaf = builder.query(sv39_alias) catch {
+    const alias_leaf = runtime_builder.query(sv39_alias) catch {
         write("ZIGREF_SV39_PERMISSIONS_FAILURE\n");
         shutdown();
     };
@@ -4102,12 +4107,12 @@ export fn freestandingMain() callconv(.c) noreturn {
     // Batch 19 consumes exactly two remaining owned data frames.  Both VAs
     // share the alias' existing L0 subtree, so Builder must not allocate a
     // fifth page-table page.
-    const page_tables_before_user = page_owner.page_count;
-    const user_code_frame = allocator.allocate() catch {
+    const page_tables_before_user = runtime_page_owner.page_count;
+    const user_code_frame = runtime_allocator.allocate() catch {
         write("ZIGREF_UMODE_FAILURE\n");
         shutdown();
     };
-    const user_stack_frame = allocator.allocate() catch {
+    const user_stack_frame = runtime_allocator.allocate() catch {
         write("ZIGREF_UMODE_FAILURE\n");
         shutdown();
     };
@@ -4126,15 +4131,15 @@ export fn freestandingMain() callconv(.c) noreturn {
     for (0..template_size) |index| destination[index] = source[index];
     const code_permissions = sv39_entries.Permissions{ .read = true, .execute = true, .user = true, .accessed = true };
     const stack_permissions = sv39_entries.Permissions{ .read = true, .write = true, .user = true, .accessed = true, .dirty = true };
-    _ = builder.mapPage(user_code_va, user_code_pa, .page_4k, code_permissions) catch {
+    _ = runtime_builder.mapPage(user_code_va, user_code_pa, .page_4k, code_permissions) catch {
         write("ZIGREF_UMODE_FAILURE\n");
         shutdown();
     };
-    _ = builder.mapPage(user_stack_va, user_stack_pa, .page_4k, stack_permissions) catch {
+    _ = runtime_builder.mapPage(user_stack_va, user_stack_pa, .page_4k, stack_permissions) catch {
         write("ZIGREF_UMODE_FAILURE\n");
         shutdown();
     };
-    if (page_owner.page_count != page_tables_before_user) {
+    if (runtime_page_owner.page_count != page_tables_before_user) {
         write("ZIGREF_UMODE_FAILURE\n");
         shutdown();
     }
@@ -4180,7 +4185,7 @@ export fn freestandingMain() callconv(.c) noreturn {
     write("\npage_table_count_before=");
     writeUsizeHex(page_tables_before_user);
     write("\npage_table_count_after=");
-    writeUsizeHex(page_owner.page_count);
+    writeUsizeHex(runtime_page_owner.page_count);
     write("\nstvec_before=");
     writeUsizeHex(historical_stvec);
     write("\nuser_stvec=");
@@ -4246,7 +4251,7 @@ export fn freestandingMain() callconv(.c) noreturn {
     writeUsizeHex((writable_end - text_begin) / frames.PageSize + 3);
     address = text_begin;
     while (address < writable_end) : (address += frames.PageSize) {
-        const leaf = builder.query(address) catch {
+        const leaf = runtime_builder.query(address) catch {
             write("ZIGREF_UMODE_FAILURE\n");
             shutdown();
         };
@@ -4260,7 +4265,7 @@ export fn freestandingMain() callconv(.c) noreturn {
         writeUsizeHex(@intFromEnum(leaf.level));
     }
     for ([_]usize{ sv39_alias, user_code_va, user_stack_va }) |va| {
-        const leaf = builder.query(va) catch {
+        const leaf = runtime_builder.query(va) catch {
             write("ZIGREF_UMODE_FAILURE\n");
             shutdown();
         };
@@ -4283,8 +4288,8 @@ export fn freestandingMain() callconv(.c) noreturn {
     write("ZIGREF_UMODE_RETURNED\n");
 
     // Batch 20 deliberately reuses both Batch 19 user frames and every PTE.
-    const service_allocated_before = allocator.allocatedCount();
-    const service_page_tables_before = page_owner.page_count;
+    const service_allocated_before = runtime_allocator.allocatedCount();
+    const service_page_tables_before = runtime_page_owner.page_count;
     const service_begin = @intFromPtr(&userServiceProbeTemplateBegin);
     const service_end = @intFromPtr(&userServiceProbeTemplateEnd);
     const service_ecall = @intFromPtr(&userServiceProbeServiceEcall);
@@ -4318,8 +4323,8 @@ export fn freestandingMain() callconv(.c) noreturn {
     const service_satp_after = asm volatile ("csrr %[value], satp"
         : [value] "=r" (-> usize),
     );
-    const service_allocated_after = allocator.allocatedCount();
-    const service_page_tables_after = page_owner.page_count;
+    const service_allocated_after = runtime_allocator.allocatedCount();
+    const service_page_tables_after = runtime_page_owner.page_count;
     const observed_result: *volatile usize = @ptrFromInt(user_stack_pa + frames.PageSize - 24);
     const observed_post: *volatile usize = @ptrFromInt(user_stack_pa + frames.PageSize - 16);
     write("ZIGREF_ECALL_RETURN_BEGIN\npage_size=");
@@ -4430,7 +4435,7 @@ export fn freestandingMain() callconv(.c) noreturn {
     var final_wx_leaves: usize = 0;
     address = text_begin;
     while (address < writable_end) : (address += frames.PageSize) {
-        const leaf = builder.query(address) catch shutdown();
+        const leaf = runtime_builder.query(address) catch shutdown();
         final_leaf_count += 1;
         final_u_leaves += @intFromBool(leaf.raw_entry & 0x10 != 0);
         final_wx_leaves += @intFromBool(leaf.raw_entry & 0xc == 0xc);
@@ -4444,7 +4449,7 @@ export fn freestandingMain() callconv(.c) noreturn {
         writeUsizeHex(@intFromEnum(leaf.level));
     }
     for ([_]usize{ sv39_alias, user_code_va, user_stack_va }) |va| {
-        const leaf = builder.query(va) catch shutdown();
+        const leaf = runtime_builder.query(va) catch shutdown();
         final_leaf_count += 1;
         final_u_leaves += @intFromBool(leaf.raw_entry & 0x10 != 0);
         final_wx_leaves += @intFromBool(leaf.raw_entry & 0xc == 0xc);
@@ -4474,8 +4479,8 @@ export fn freestandingMain() callconv(.c) noreturn {
 
     // Batch 21B repopulates the existing RX frame, then validates the user's
     // complete range with the reusable planner before touching source bytes.
-    const copy_allocated_before = allocator.allocatedCount();
-    const copy_tables_before = page_owner.page_count;
+    const copy_allocated_before = runtime_allocator.allocatedCount();
+    const copy_tables_before = runtime_page_owner.page_count;
     const copy_satp_before = asm volatile ("csrr %[value], satp"
         : [value] "=r" (-> usize),
     );
@@ -4488,7 +4493,7 @@ export fn freestandingMain() callconv(.c) noreturn {
     for (0..copy_size) |index| destination[index] = copy_source[index];
     asm volatile ("fence.i" ::: "memory");
     const ActiveQuery = struct {
-        active: @TypeOf(&builder),
+        active: @TypeOf(&runtime_builder),
         fn query(raw: *const anyopaque, page: user_transfer.GuestVirtualAddress) ?user_transfer.PageResolution {
             const self: *const @This() = @ptrCast(@alignCast(raw));
             const leaf = self.active.query(page.raw()) catch return null;
@@ -4497,7 +4502,7 @@ export fn freestandingMain() callconv(.c) noreturn {
             return .{ .physical_page_start = user_transfer.PhysicalAddress.init(leaf.physical_address & ~@as(usize, frames.PageSize - 1)), .user = flags & 0x10 != 0, .readable = flags & 0x2 != 0, .writable = flags & 0x4 != 0 };
         }
     };
-    const active_query = ActiveQuery{ .active = &builder };
+    const active_query = ActiveQuery{ .active = &runtime_builder };
     copy_query = .{ .context = &active_query, .queryFn = ActiveQuery.query };
     copy_active = true;
     service_trap_count = 0;
@@ -4539,11 +4544,11 @@ export fn freestandingMain() callconv(.c) noreturn {
     write("\nphysical_allocated_before=");
     writeUsizeHex(copy_allocated_before);
     write("\nphysical_allocated_after=");
-    writeUsizeHex(allocator.allocatedCount());
+    writeUsizeHex(runtime_allocator.allocatedCount());
     write("\npage_table_count_before=");
     writeUsizeHex(copy_tables_before);
     write("\npage_table_count_after=");
-    writeUsizeHex(page_owner.page_count);
+    writeUsizeHex(runtime_page_owner.page_count);
     write("\ntemplate_begin=");
     writeUsizeHex(copy_begin);
     write("\nservice_ecall=");
@@ -4613,7 +4618,7 @@ export fn freestandingMain() callconv(.c) noreturn {
     var copy_final_wx_leaves: usize = 0;
     address = text_begin;
     while (address < writable_end) : (address += frames.PageSize) {
-        const leaf = builder.query(address) catch shutdown();
+        const leaf = runtime_builder.query(address) catch shutdown();
         copy_final_leaf_count += 1;
         copy_final_u_leaves += @intFromBool(leaf.raw_entry & 0x10 != 0);
         copy_final_wx_leaves += @intFromBool(leaf.raw_entry & 0xc == 0xc);
@@ -4627,7 +4632,7 @@ export fn freestandingMain() callconv(.c) noreturn {
         writeUsizeHex(@intFromEnum(leaf.level));
     }
     for ([_]usize{ sv39_alias, user_code_va, user_stack_va }) |va| {
-        const leaf = builder.query(va) catch shutdown();
+        const leaf = runtime_builder.query(va) catch shutdown();
         copy_final_leaf_count += 1;
         copy_final_u_leaves += @intFromBool(leaf.raw_entry & 0x10 != 0);
         copy_final_wx_leaves += @intFromBool(leaf.raw_entry & 0xc == 0xc);
@@ -4647,14 +4652,14 @@ export fn freestandingMain() callconv(.c) noreturn {
     write("\nfinal_leaf_count=");
     writeUsizeHex(copy_final_leaf_count);
     write("\ntranslation_change=none\nsfence_vma=not-required-no-pte-change\nfence_i=local-hart-executed\nsum=observed-zero\ncomplete=PASS\nZIGREF_USER_COPY_IN_END\nZIGREF_USER_COPY_IN_RETURNED\n");
-    if (copy_allocated_before != allocator.allocatedCount() or copy_tables_before != page_owner.page_count or copy_satp_before != copy_satp_after or
+    if (copy_allocated_before != runtime_allocator.allocatedCount() or copy_tables_before != runtime_page_owner.page_count or copy_satp_before != copy_satp_after or
         copy_stvec_after != historical_stvec or copy_sscratch_after != 0 or post_marker.* != 0x21c0 or copy_trap_count != 2 or
         copy_prepared_sepc != user_code_va + @intFromPtr(&userCopyInProbeAfterService) - copy_begin or
         copy_final_leaf_count != final_leaf_count or copy_final_u_leaves != 2 or copy_final_wx_leaves != 0) shutdown();
     // Batch 21C reuses every mapping and frame, then validates complete
     // write-to-user plans before performing physical-segment writes.
-    const out_alloc_before = allocator.allocatedCount();
-    const out_tables_before = page_owner.page_count;
+    const out_alloc_before = runtime_allocator.allocatedCount();
+    const out_tables_before = runtime_page_owner.page_count;
     const out_satp_before = asm volatile ("csrr %[value], satp"
         : [value] "=r" (-> usize),
     );
@@ -4692,8 +4697,8 @@ export fn freestandingMain() callconv(.c) noreturn {
     );
     const out_guard_after_before: *volatile usize = @ptrFromInt(user_stack_pa + frames.PageSize - 64);
     const out_observed: [*]const volatile u8 = @ptrFromInt(user_stack_pa + frames.PageSize - 56);
-    if (copy_out_traps != 4 or copy_out_return_count != 3 or out_alloc_before != allocator.allocatedCount() or
-        out_tables_before != page_owner.page_count or out_satp_before != out_satp_after or out_stvec_after != historical_stvec or
+    if (copy_out_traps != 4 or copy_out_return_count != 3 or out_alloc_before != runtime_allocator.allocatedCount() or
+        out_tables_before != runtime_page_owner.page_count or out_satp_before != out_satp_after or out_stvec_after != historical_stvec or
         out_sscratch_after != 0 or copy_out_guard_before != out_guard_after_before.* or copy_out_guard_after != @as(*volatile usize, @ptrFromInt(user_stack_pa + frames.PageSize - 40)).* or
         copy_out_code_before != copy_out_code_after or copy_out_prefix_before != copy_out_prefix_after) shutdown();
     for (0..16) |i| if (out_observed[i] != copy_out_payload[i]) shutdown();
@@ -4714,11 +4719,11 @@ export fn freestandingMain() callconv(.c) noreturn {
     write("\nphysical_allocated_before=");
     writeUsizeHex(out_alloc_before);
     write("\nphysical_allocated_after=");
-    writeUsizeHex(allocator.allocatedCount());
+    writeUsizeHex(runtime_allocator.allocatedCount());
     write("\npage_table_count_before=");
     writeUsizeHex(out_tables_before);
     write("\npage_table_count_after=");
-    writeUsizeHex(page_owner.page_count);
+    writeUsizeHex(runtime_page_owner.page_count);
     write("\ntemplate_begin=");
     writeUsizeHex(out_begin);
     write("\nservice_ecall=");
@@ -4793,7 +4798,7 @@ export fn freestandingMain() callconv(.c) noreturn {
     var out_wx: usize = 0;
     address = text_begin;
     while (address < writable_end) : (address += frames.PageSize) {
-        const leaf = builder.query(address) catch shutdown();
+        const leaf = runtime_builder.query(address) catch shutdown();
         out_leaf_count += 1;
         out_u += @intFromBool(leaf.raw_entry & 0x10 != 0);
         out_wx += @intFromBool(leaf.raw_entry & 0xc == 0xc);
@@ -4807,7 +4812,7 @@ export fn freestandingMain() callconv(.c) noreturn {
         writeUsizeHex(@intFromEnum(leaf.level));
     }
     for ([_]usize{ sv39_alias, user_code_va, user_stack_va }) |va| {
-        const leaf = builder.query(va) catch shutdown();
+        const leaf = runtime_builder.query(va) catch shutdown();
         out_leaf_count += 1;
         out_u += @intFromBool(leaf.raw_entry & 0x10 != 0);
         out_wx += @intFromBool(leaf.raw_entry & 0xc == 0xc);
@@ -4827,12 +4832,12 @@ export fn freestandingMain() callconv(.c) noreturn {
     write("\nfinal_leaf_count=");
     writeUsizeHex(out_leaf_count);
     write("\ntranslation_change=none\nsfence_vma=not-required-no-pte-change\nfence_i=local-hart-executed\nsum=observed-zero\ncomplete=PASS\nZIGREF_USER_COPY_OUT_END\nZIGREF_USER_COPY_OUT_RETURNED\n");
-    executeUserspaceElf(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
-    executeUserspaceElfDataBss(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
-    executeUserspaceElfInitialStack(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
-    executeLinuxRv64Syscalls(&allocator, &page_owner, &builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
-    if (external_artifact_options.enabled) executeExternalArtifact(&builder, trap_end, historical_stvec);
-    executeBatch26(&builder, user_code_pa, trap_end, historical_stvec);
+    executeUserspaceElf(&runtime_allocator, &runtime_page_owner, &runtime_builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
+    executeUserspaceElfDataBss(&runtime_allocator, &runtime_page_owner, &runtime_builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
+    executeUserspaceElfInitialStack(&runtime_allocator, &runtime_page_owner, &runtime_builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
+    executeLinuxRv64Syscalls(&runtime_allocator, &runtime_page_owner, &runtime_builder, user_code_pa, user_stack_pa, trap_end, historical_stvec, root_physical);
+    if (external_artifact_options.enabled) executeExternalArtifact(&runtime_builder, trap_end, historical_stvec);
+    executeBatch26(&runtime_builder, user_code_pa, trap_end, historical_stvec);
 
     var output: [128]u8 = undefined;
     var trace: [2048]u8 = undefined;
