@@ -1,0 +1,577 @@
+CODEX AGENTIC SNOWBALL — BATCH 32H
+MERGED OPENAT(56) -> REAL LS / -> READ-ONLY -> WRITABLE -> PIPES -> PLAYABLE ALPINE
+BOUNDED LEAPS / MAXIMUM USEFUL IMPLEMENTATION / MANDATORY 30-MINUTE HANDOFF
+
+Repository: thanks-cohn/zig-reference
+Canonical request:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32H_OPENAT56_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt
+
+======================================================================
+START
+======================================================================
+
+Start from current main.
+
+Authoring main when this request was created:
+1687c0aae0bbf6c610694d93e8f8132340f4d65a
+
+Historical marker for the inherited known limitation:
+morphic-batch32g-openat-known-symlink-gap
+
+Do not assume the authoring SHA is still current when the run begins. Fetch,
+switch to, and update current main first. Record the exact inherited main SHA.
+
+Before implementation:
+
+1. read AGENTS.md;
+2. read README.md;
+3. read docs/roadmaps/ALPZ_TO_ALPINE_QEMU_KVM_AND_BEYOND.md;
+4. run:
+
+     python3 tools/query-reference.py agent bootstrap
+     python3 tools/query-reference.py agent doctor
+
+5. read COMMANDS.md;
+6. read docs/reports/AGENTIC_SNOWBALL_BATCH_32G.md;
+7. inspect:
+
+     git show morphic-batch32g-openat-known-symlink-gap
+
+8. read this request completely;
+9. begin a visible 30-minute timer at the first repository command and obey the
+   persistence/handoff clock below.
+
+Do not spend the opening implementation window rediscovering already-proven
+Alpine, musl, BusyBox, clone, execve, PREPARE/COMMIT, descriptor, namespace,
+or trace-capacity facts.
+
+======================================================================
+PRIMARY GOAL
+======================================================================
+
+Reach ★ PLAYABLE ALPINE UNDER MORPHIC ★ as far as physically possible within
+this bounded run.
+
+This is not an openat-only task, not a one-syscall task, and not a one-fix task.
+
+Use the exact real Alpine shell as the pressure source. Begin by running the
+unchanged:
+
+  ls /
+
+against current main under the exact Alpine v3.22 RV64 namespace.
+
+Batch 32G implemented the bounded Linux/RV64 openat(56) edge and namespace-backed
+resource binding, but the Codex environment that produced it lacked
+qemu-system-riscv64. Therefore real-machine confirmation of openat("/") remains
+unearned. The first responsibility of this run is to execute the real pressure,
+observe the exact first causal boundary after current main, and advance from
+evidence rather than expectation.
+
+After every repair:
+- rerun the exact command that exposed the failure immediately;
+- if it advances, implement the next directly exposed causal repair while useful
+  implementation time remains;
+- when a leap passes, continue immediately to the next acceptance command.
+
+The 30-minute limit is a persistence/handoff boundary, not an implementation
+throttle. At approximately 30 minutes the run MUST transition into handoff
+production and delivery. The task is not complete until the complete persisted
+handoff exists, even if PLAYABLE ALPINE remains incomplete.
+
+If PLAYABLE ALPINE is earned earlier, use remaining time for validation,
+documentation, persistence, and the mandatory handoff rather than unrelated
+feature work.
+
+======================================================================
+CURRENT PROVEN FRONTIER
+======================================================================
+
+Inherited main includes:
+
+- exact Alpine v3.22.0 RV64 minirootfs namespace;
+- 517 namespace objects;
+- 7,069,903 regular-file bytes;
+- real /bin/sh -> /bin/busybox;
+- real /lib/ld-musl-riscv64.so.1;
+- real musl interpreter-first execution;
+- persistent interactive Alpine shell;
+- real live input;
+- `echo morphic`;
+- `echo second`;
+- `pwd` -> `/`;
+- PATH/newfstatat lookup for external commands;
+- bounded Linux/RV64 clone(220) for the observed SIGCHLD child shape;
+- isolated retained parent snapshot;
+- bounded child-first execution and parent restoration;
+- parent-shell liveness after child termination;
+- Linux/RV64 execve(221) image replacement;
+- complete candidate-image PREPARE before COMMIT;
+- candidate mapping/table-capacity preflight before COMMIT;
+- W+X=0;
+- inherited resource/binding preservation across exec;
+- real /bin/ls -> /bin/busybox execution advancing past execve;
+- namespace-backed newfstatat("/");
+- Linux/RV64 openat(56) decoding and read-only namespace-backed object binding;
+- fail-closed namespace directory/regular read backends until real semantics
+  exist;
+- final-symlink following for ordinary open;
+- O_NOFOLLOW behavior for a final symlink;
+- bounded sixteen-traversal whole-path symlink protection;
+- green repository validation for the merged Batch 32G implementation.
+
+The highest fully earned runtime milestone remains the inherited execve
+replacement. Batch 32G openat is compiled and validated but real-QEMU `ls /`
+confirmation remains the live proof boundary.
+
+======================================================================
+KNOWN MERGED LIMITATION — PRESERVE THE TRUTH
+======================================================================
+
+Main intentionally contains one documented namespace-resolution limitation from
+Batch 32G.
+
+The current bounded resolver follows a symlink when the complete pathname being
+looked up is itself the symlink, but it does not yet resolve symlinks
+component-by-component inside a longer pathname.
+
+Example known gap:
+
+  /usr/lib -> /lib
+  /lib/example.so exists
+
+  openat(AT_FDCWD, "/usr/lib/example.so", O_RDONLY)
+
+may fail because the resolver first seeks the full manifest path rather than
+walking components, resolving /usr/lib, appending the remaining suffix, and
+continuing.
+
+The authoritative historical marker is:
+
+  git show morphic-batch32g-openat-known-symlink-gap
+
+Rules for this run:
+
+- do not forget or erase this limitation;
+- do not falsely claim complete Linux pathname resolution;
+- do not burn the opening window repairing it merely because it is known;
+- if exact Alpine pressure reaches an intermediate-component symlink and it is
+  causal, repair it generally and add focused regressions;
+- if the current PLAYABLE ALPINE acceptance path does not require it, keep it
+  explicitly listed in the handoff as known technical debt.
+
+A future general repair must preserve:
+- intermediate symlink traversal;
+- suffix continuation after resolution;
+- O_NOFOLLOW applying to the final component;
+- intermediate symlinks still traversed with O_NOFOLLOW;
+- one global bounded traversal budget;
+- ELOOP for cycles/exhaustion;
+- fail-closed malformed targets;
+- root lookup;
+- executable lookup coherence;
+- Linux policy at the compatibility edge.
+
+======================================================================
+OPERATING RULE — OBSERVE -> REPAIR -> PROVE -> RETRY
+======================================================================
+
+For every causal boundary:
+
+1. observe the exact first failure from the unchanged real Alpine command;
+2. classify the missing semantic at the correct layer;
+3. query existing repository capabilities and diagnostics before inventing a
+   new mechanism;
+4. implement the smallest GENERAL repair that advances real software;
+5. add a focused proof where practical;
+6. rerun the exact same Alpine command immediately;
+7. if the command advances to another causal boundary, continue;
+8. cross as many causally connected boundaries as useful within the run.
+
+Do not build a speculative Linux/POSIX syscall checklist.
+
+Linux ABI numbers, flags, layouts, errno translation, and compatibility policy
+belong at the Linux/RV64 edge. Reusable filesystem, resource, process, execution,
+pipe, scheduler, and address-space mechanisms belong in neutral Morphic
+abstractions.
+
+Alpine, BusyBox, ash, and musl are pressure clients. They must not become
+special cases inside neutral mechanisms.
+
+======================================================================
+LEAP 2A — PROVE OPENAT(56) -> REAL DIRECTORY ENUMERATION -> LS /
+======================================================================
+
+Starting command:
+
+  ls /
+
+Immediate objective:
+
+  real Alpine ash
+      -> existing clone
+      -> existing execve image replacement
+      -> real BusyBox ls applet
+      -> existing newfstatat("/")
+      -> merged openat(56) for "/"
+      -> real next observed directory operation
+      -> genuine root-directory entries
+      -> child completion
+      -> restored live parent shell
+
+First run the real machine and verify the Batch 32G trace marker for openat("/")
+or equivalent direct proof.
+
+Do not assume getdents64 is next. If the real trace exposes getdents64, implement
+the minimal neutral directory-enumeration mechanism and Linux edge translation
+required by the exact request. If another semantic appears first, follow the
+trace.
+
+Directory semantics must derive entries from the serialized namespace. Do not
+embed expected root names or fake ls output.
+
+Preserve resource identity and descriptor ownership. Directory enumeration must
+not reinterpret manifest offsets as deterministic stdin state.
+
+Acceptance gate:
+
+  ls /
+
+prints genuine entries from the exact Alpine root namespace, the child exits
+coherently, and then:
+
+  echo still-alive
+
+succeeds in the original shell.
+
+When this passes, immediately begin Leap 2B.
+
+======================================================================
+LEAP 2B — REAL REGULAR-FILE READS -> READ-ONLY ALPINE
+======================================================================
+
+Run through the same real shell:
+
+  pwd
+  ls /
+  cat /etc/alpine-release
+  echo still-alive
+
+The merged namespace regular backend currently fails semantic reads closed.
+Replace that temporary failure only when the real `cat` pressure requires it.
+
+Implement a bounded namespace-file read mechanism using the actual serialized
+regular-file data range and a per-open offset. Keep immutable Alpine source data
+immutable.
+
+Requirements include, as exposed by the trace:
+- descriptor-bound regular-file identity;
+- bounded read offset;
+- checked guest-memory transfer;
+- EOF behavior;
+- close/lifetime coherence;
+- no fallback to deterministic stdin;
+- no application-specific file/output special case.
+
+Acceptance gate:
+
+  pwd                           PASS
+  ls /                          PASS
+  cat /etc/alpine-release       PASS
+  echo still-alive              PASS
+
+When complete, immediately begin Leap 3.
+
+======================================================================
+LEAP 3 — CWD + WRITABLE /tmp + REDIRECTION
+======================================================================
+
+Run, in order:
+
+  cd /tmp
+  pwd
+  echo hello > /tmp/hello
+  cat /tmp/hello
+  echo still-alive
+
+Goal:
+
+Introduce only the neutral runtime state directly required for ordinary writable
+shell use.
+
+Likely pressure may include:
+- cwd as process state;
+- relative pathname resolution;
+- create/open/truncate;
+- writable runtime object creation;
+- per-open offsets;
+- write semantics;
+- descriptor duplication/replacement;
+- close semantics;
+- redirection lifetime.
+
+The exact trace decides the order.
+
+Do not mutate the serialized Alpine source namespace. Runtime writes must live
+in an explicit bounded writable layer/overlay or equivalent neutral mechanism.
+
+Acceptance gate:
+
+  cd /tmp                        PASS
+  pwd -> /tmp                    PASS
+  /tmp/hello exists              PASS
+  redirection writes `hello`     PASS
+  cat /tmp/hello -> hello        PASS
+  shell remains alive            PASS
+
+When complete, immediately begin Leap 4.
+
+======================================================================
+LEAP 4 — PIPE + PROCESS/FD LIFETIME -> PLAYABLE ALPINE
+======================================================================
+
+Run:
+
+  echo hello | cat
+  echo still-alive
+
+Push through the complete bounded mechanism set directly required by this exact
+pipeline.
+
+Possible pressure includes:
+- pipe resource creation;
+- read/write endpoints;
+- descriptor inheritance;
+- dup/descriptor replacement;
+- close semantics;
+- EOF when writer references disappear;
+- multiple simultaneously meaningful process states;
+- scheduler/progress semantics;
+- wait/lifetime;
+- child exit status.
+
+The current serialized child-first model may prove insufficient here. If the
+real pipeline proves that two child lifetimes must coexist meaningfully, evolve
+the process model at the neutral Morphic layer rather than faking pipeline
+execution inside the shell or kernel.
+
+Do not build a broad scheduler or IPC framework beyond what the exact pipeline
+requires.
+
+Acceptance gate:
+
+  echo hello | cat
+
+prints:
+
+  hello
+
+and the same original shell remains usable:
+
+  echo still-alive
+  still-alive
+
+When all earlier gates also remain true, earn:
+
+  ★ PLAYABLE ALPINE UNDER MORPHIC ★
+
+======================================================================
+PLAYABLE ALPINE — CANONICAL ACCEPTANCE
+======================================================================
+
+PLAYABLE ALPINE is earned only when one persistent real Alpine shell completes:
+
+  echo morphic
+  echo second
+  pwd
+  ls /
+  cat /etc/alpine-release
+  cd /tmp
+  echo hello > /tmp/hello
+  cat /tmp/hello
+  echo hello | cat
+  echo still-alive
+
+and still preserves:
+
+- exact Alpine v3.22 namespace identity;
+- real BusyBox and real musl execution;
+- bounded process semantics rather than fake inline execution;
+- PREPARE -> COMMIT;
+- candidate mapping preflight before destructive image replacement;
+- W+X=0;
+- immutable source namespace plus explicit runtime writable state;
+- descriptor/resource ownership;
+- Linux ABI translation at the compatibility boundary;
+- no command-specific fake behavior;
+- a living parent shell after external commands and the pipeline.
+
+Do not begin apk, networking, DNS, TLS, graphical work, SMP, KVM, or unrelated
+expansion before this gate is genuinely earned during this campaign.
+
+======================================================================
+ARCHITECTURAL CONSTRAINTS
+======================================================================
+
+Do NOT:
+
+- special-case Alpine, BusyBox, ash, ls, cat, expected output, expected root
+  entries, package hashes, or acceptance strings inside neutral mechanisms;
+- fake process creation or exec by doing child work in the parent context;
+- bypass the exact Alpine namespace or real musl interpreter;
+- weaken PREPARE/COMMIT atomicity;
+- weaken W+X=0;
+- discard the retained parent state while child execution is active;
+- let namespace resources fall through to deterministic stdin semantics;
+- place Linux-shaped policy into neutral Morphic APIs;
+- build an unobserved syscall checklist;
+- perform a grand rewrite while pressure is advancing;
+- claim a milestone from compile-only evidence when its acceptance requires
+  real QEMU behavior;
+- claim PLAYABLE ALPINE from a partial command sequence;
+- erase or conceal the known intermediate-component symlink limitation;
+- leave generated repository metadata stale after source changes.
+
+Prefer:
+
+- query-first reuse;
+- focused neutral mechanisms;
+- explicit bounded ownership;
+- generation-safe resource references;
+- exact-artifact retries;
+- focused tests during implementation;
+- stronger validation at coherent checkpoints;
+- evidence that can be inherited by a zero-context successor.
+
+======================================================================
+REGRESSION FLOOR
+======================================================================
+
+Preserve all inherited foundations, especially:
+
+- FIRST REAL ALPINE;
+- real dynamic musl;
+- persistent interactive BusyBox ash;
+- resource-owned stdio;
+- bounded clone(220);
+- parent snapshot and restoration;
+- saturating non-fatal syscall evidence;
+- execve(221);
+- exec mapping/table preflight;
+- PREPARE -> COMMIT;
+- W+X=0;
+- newfstatat;
+- Batch 32G openat(56);
+- fail-closed namespace read backend classification;
+- final symlink + O_NOFOLLOW behavior;
+- exact namespace identity and immutable source data.
+
+======================================================================
+VALIDATION STRATEGY — FAST FEEDBACK FIRST
+======================================================================
+
+During active implementation:
+
+- run the most focused relevant tests;
+- rerun the exact real Alpine pressure immediately;
+- avoid repeated full-repository validation between tiny edits;
+- keep moving while the exact command advances.
+
+At coherent checkpoints, run stronger checks.
+
+Before handoff, prioritize the strongest checks that fit the remaining clock:
+
+  zig fmt --check build.zig projects recipes conformance
+  zig build test-recipe-run-hosted-morphic-runtime
+  zig build check
+  PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+  python3 tools/developer-command.py validate-repository
+  git diff --check
+
+Also execute the strongest available real-QEMU acceptance sequence and record
+the exact command/output frontier.
+
+======================================================================
+MANDATORY 30-MINUTE PERSISTENCE + HANDOFF RULE
+======================================================================
+
+This section is mandatory.
+
+At approximately 30 minutes from the first repository command, transition from
+active feature implementation into persistence and handoff production.
+
+The handoff is part of the task deliverable, not optional cleanup.
+
+Before the run ends:
+
+1. make the worktree coherent;
+2. run the strongest focused validation that fits the remaining time;
+3. create/update a tracked report:
+
+     docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md
+
+4. update COMMANDS.md with the earned state and exact next pressure;
+5. regenerate/check repository metadata required by AGENTS.md;
+6. commit all coherent production changes and tracked handoff material;
+7. attempt remote persistence;
+8. create or update a PR when credentials/tooling permit;
+9. record exact inherited SHA, implementation SHA(s), branch, validation, real
+   pressure output, milestone state, and exactly one next causal blocker if
+   PLAYABLE ALPINE remains incomplete;
+10. deliver a concise final handoff message to the user.
+
+If remote persistence is unavailable, record the exact reason and provide the
+local commit SHA and commands required to continue.
+
+Do not use the timer as a reason to leave uncommitted coherent work or omit the
+handoff. Reserve enough of the final minutes to produce the handoff properly.
+
+======================================================================
+HANDOFF REPORT REQUIRED CONTENT
+======================================================================
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md must include:
+
+- inherited current-main SHA;
+- relationship to merge commit
+  1687c0aae0bbf6c610694d93e8f8132340f4d65a;
+- acknowledgement of tag
+  morphic-batch32g-openat-known-symlink-gap;
+- branch;
+- implementation/report commit SHA(s);
+- exact Alpine/BusyBox/musl identities used;
+- exact commands run;
+- exact real-QEMU pressure output;
+- mechanisms added or repaired;
+- focused tests added;
+- validation results;
+- PREPARE/COMMIT and W+X state;
+- known intermediate-component symlink limitation status:
+  repaired, newly causal, or still inherited/non-causal;
+- highest genuinely earned milestone;
+- if incomplete, exactly one next causal blocker;
+- exact next pressure command;
+- remote push/PR state;
+- no inflated capability claims.
+
+======================================================================
+PRODUCTION OUTPUT EXPECTATION
+======================================================================
+
+Use the run for production engineering, not a design essay.
+
+Expected output is as much coherent, tested, persisted advancement toward
+PLAYABLE ALPINE as the exact real software pressure permits within the bounded
+run.
+
+Ideal outcome:
+
+  ★ PLAYABLE ALPINE UNDER MORPHIC ★
+
+Acceptable bounded outcome:
+
+  one or more real pressure boundaries crossed, with production code, focused
+  proof, exact QEMU evidence, coherent commit(s), and a complete mandatory
+  handoff that leaves the next zero-context agent at one precise frontier.
+
+Begin from current main and make the real Alpine system advance.
