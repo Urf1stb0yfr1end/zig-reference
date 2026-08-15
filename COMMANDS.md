@@ -589,6 +589,13 @@ failed at a new child runtime trap, so read-back and pipelines are not claimed.
 `docs/reports/AGENTIC_SNOWBALL_BATCH_32M.md` records the exact evidence. No new
 runnable command was introduced.
 
+PR #89's focused correctness repair orders dup3-specific `EINVAL` validation
+before source-descriptor lookup and adds mixed-invalid precedence regressions.
+The existing focused and complete validation surfaces passed, and the unchanged
+QEMU 8.2.2 pressure re-proved `cd /tmp`, `pwd`, and redirection before
+reproducing the documented `cat /tmp/hello` child store-page-fault frontier. No
+command surface or earned runtime milestone changed.
+
 The PR #87 focused review repair regenerated the bounded-resource-table port and complete endpoint contracts, all affected textual indexes, and all 60 unit/smoke evidence records. The combined runtime-open transaction regression now proves namespace, resource-count, binding-topology, and reference-count conservation across descriptor/resource exhaustion. `zig build check` and `python3 tools/developer-command.py validate-repository` passed; the latter completed 350/350 steps and 249/249 tests under Zig 0.14.0. QEMU remained unavailable, so no new Alpine milestone is claimed.
 
 ## Batch 32H read-only Alpine pressure state

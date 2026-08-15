@@ -22,10 +22,10 @@ pub fn replace(
     flags: usize,
     descriptor_limit: usize,
 ) Error!usize {
-    const source_reference = bindings.resolve(source) orelse return error.InvalidSource;
-    if (target >= descriptor_limit) return error.InvalidTarget;
-    if (source == target) return error.SameDescriptor;
     if (flags != 0) return error.UnsupportedFlags;
+    if (source == target) return error.SameDescriptor;
+    if (target >= descriptor_limit) return error.InvalidTarget;
+    const source_reference = bindings.resolve(source) orelse return error.InvalidSource;
 
     resources.retain(source_reference) catch return error.ResourceFull;
     if (bindings.resolve(target)) |old_reference| {
@@ -53,10 +53,14 @@ test "dup3 rejects invalid arguments and retain failure without mutation" {
     try bindings.bindAt(0, source);
     try bindings.bindAt(1, target);
 
-    try std.testing.expectError(error.InvalidSource, replace(&resources, &bindings, 3, 1, 0, 4));
     try std.testing.expectError(error.InvalidTarget, replace(&resources, &bindings, 0, 4, 0, 4));
     try std.testing.expectError(error.SameDescriptor, replace(&resources, &bindings, 0, 0, 0, 4));
     try std.testing.expectError(error.UnsupportedFlags, replace(&resources, &bindings, 0, 1, 1, 4));
+    // dup3-specific EINVAL conditions take precedence over source lookup.
+    try std.testing.expectError(error.SameDescriptor, replace(&resources, &bindings, 3, 3, 0, 4));
+    try std.testing.expectError(error.UnsupportedFlags, replace(&resources, &bindings, 3, 1, 1, 4));
+    // With valid distinct dup3 arguments, the same unbound source is EBADF.
+    try std.testing.expectError(error.InvalidSource, replace(&resources, &bindings, 3, 1, 0, 4));
     try std.testing.expectEqual(source, bindings.resolve(0).?);
     try std.testing.expectEqual(target, bindings.resolve(1).?);
     try std.testing.expectEqual(@as(?usize, 1), resources.referenceCount(source));

@@ -108,3 +108,23 @@ limitation remain unchanged.
 runtime failure exposed by unchanged `cat /tmp/hello` (the observed post-exec
 store page fault after unsupported Linux/RV64 child setup calls), then rerun
 that unchanged read-back command before attempting the pipeline.
+
+## PR #89 correctness repair
+
+The focused review repair gives dup3-specific `EINVAL` rules their required
+precedence: unsupported flags, then equal source and target, then bounded target
+validation are evaluated before source-descriptor lookup. Mixed-invalid tests
+now prove that an unbound equal descriptor and invalid source with unsupported
+flags both select `EINVAL`, while an invalid source with otherwise valid,
+distinct arguments selects `EBADF`. Retain-before-mutation, replacement,
+same-resource reference accounting, and final-close tests remain unchanged.
+
+After the repair, the focused recipe test, formatting check, `zig build check`,
+command-reference check, diff check, and canonical repository validation all
+passed. Canonical validation again completed 350/350 steps and 249/249 tests
+under Zig 0.14.0. The exact pinned namespace and live-console machine were
+rebuilt and rerun with QEMU 8.2.2. In one unchanged shell, `cd /tmp` succeeded,
+`pwd` printed `/tmp`, and `echo hello > /tmp/hello` returned without error. The
+immediate `cat /tmp/hello` retry reproduced the same `/bin/cat` lookup, clone,
+unsupported calls 96/135/135/134, and store-page-fault line recorded above.
+Thus the earned milestone and exactly one next causal blocker are unchanged.
