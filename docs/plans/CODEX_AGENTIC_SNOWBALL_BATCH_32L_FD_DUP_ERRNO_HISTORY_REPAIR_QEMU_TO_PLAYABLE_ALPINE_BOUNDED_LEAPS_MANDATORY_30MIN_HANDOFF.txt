@@ -1,0 +1,609 @@
+CODEX AGENTIC SNOWBALL — BATCH 32L
+F_DUPFD ABI REPAIR + HANDOFF HISTORY REPAIR -> REAL QEMU -> REDIRECTION -> READ-BACK -> PIPELINE -> PLAYABLE ALPINE
+BOUNDED LEAPS / MAXIMUM USEFUL IMPLEMENTATION / MANDATORY 30-MINUTE HANDOFF
+
+Repository: thanks-cohn/zig-reference
+Canonical request:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32L_FD_DUP_ERRNO_HISTORY_REPAIR_QEMU_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt
+
+======================================================================
+START
+======================================================================
+
+Begin from current main.
+
+Authoring main when this request was created:
+
+  47b3bb3b142edb4d931a8804d55e15ef98faf6f5
+
+That is the merge commit of PR #87, Batch 32K.
+
+Historical marker for the exact accepted Batch 32K boundary:
+
+  morphic-batch32k-fdupfd-known-p2s-qemu-unproven
+
+Batch 32K was intentionally merged with two known follow-up items preserved:
+
+1. Linux/RV64 F_DUPFD currently maps an impossible minimum to EMFILE rather
+   than EINVAL.
+2. docs/reports/AGENTIC_SNOWBALL_BATCH_32K.md contains a stale/nonexistent
+   implementation commit reference (`a39268b`) that is not part of persisted
+   GitHub history.
+
+The merge commit and tag also explicitly record that the new F_DUPFD path is
+compile- and focused-test-proven but has not yet been re-proven by real system
+QEMU against unchanged Alpine ash.
+
+Do not assume the authoring SHA is still current when this run begins. Fetch,
+switch to, and update current main first. Record the exact inherited main SHA.
+
+Before implementation:
+
+1. read AGENTS.md;
+2. read README.md;
+3. read COMMANDS.md;
+4. read docs/reports/AGENTIC_SNOWBALL_BATCH_32K.md;
+5. inspect PR #87 discussion and the Batch 32K historical tag;
+6. read docs/roadmaps/ALPZ_TO_ALPINE_QEMU_KVM_AND_BEYOND.md;
+7. run:
+
+     python3 tools/query-reference.py agent bootstrap
+     python3 tools/query-reference.py agent doctor
+
+8. read this request completely;
+9. begin a visible 30-minute clock with the first repository command and obey
+   the mandatory persistence/handoff schedule below.
+
+Do not spend the opening window re-proving already-earned Alpine, BusyBox,
+musl, clone, execve, namespace reads, cwd, transactional writable-open, or
+resource-ownership facts unless a focused repair or current real pressure
+indicates a regression.
+
+======================================================================
+PRIMARY GOAL
+======================================================================
+
+Reach:
+
+  ★ PLAYABLE ALPINE UNDER MORPHIC ★
+
+as far as physically possible within this bounded run.
+
+Mandatory ordering:
+
+  A. repair BOTH known Batch 32K follow-up items;
+  B. run focused proof and repository validation;
+  C. immediately re-run unchanged real Alpine pressure in system QEMU;
+  D. continue through each directly exposed causal boundary toward redirection,
+     read-back, a real pipeline, and the complete Playable Alpine acceptance;
+  E. persist a complete Batch 32L handoff by approximately minute 30.
+
+The two opening repairs are a gate, not the whole run. Once they are correct and
+focused proof is green, return immediately to real QEMU pressure.
+
+Use:
+
+  OBSERVE -> REPAIR -> PROVE -> RETRY
+
+After each causal repair, rerun the exact real command that exposed it.
+
+======================================================================
+CURRENT EARNED STATE TO PRESERVE
+======================================================================
+
+Current main inherits and must preserve:
+
+- exact Alpine v3.22.0 RV64 minirootfs namespace;
+- 517 serialized namespace objects;
+- 7,069,903 immutable regular-file bytes;
+- real `/bin/sh -> /bin/busybox`;
+- real musl interpreter `/lib/ld-musl-riscv64.so.1`;
+- real musl interpreter-first execution;
+- persistent interactive real BusyBox ash shell;
+- live console input;
+- real external BusyBox command execution;
+- bounded Linux/RV64 clone and execve behavior;
+- retained parent-shell state/restoration;
+- PREPARE -> COMMIT execution-image replacement;
+- mapping/table-capacity preflight before destructive image COMMIT;
+- W+X=0;
+- namespace-backed newfstatat/openat/getdents64/read;
+- real `ls /` from serialized namespace children;
+- real `cat /etc/alpine-release -> 3.22.0`;
+- persistent cwd state and real `cd /tmp`, `pwd -> /tmp`;
+- bounded session-local writable runtime namespace;
+- immutable serialized Alpine source backing;
+- resource-owned runtime read/write capabilities;
+- O_APPEND rejected at the Linux/RV64 edge until true append semantics exist;
+- transactional runtime create/truncate PREPARE -> COMMIT behavior;
+- integrated regression proof covering descriptor/resource exhaustion without
+  namespace mutation or ownership leaks;
+- bounded descriptor-binding capacity of 16;
+- neutral lowest-free-at-or-above descriptor selection;
+- Linux/RV64 fcntl(25) F_DUPFD support retaining the same open resource
+  description and shared state;
+- full repository validation green at the accepted PR #87 head:
+
+     350 / 350 build steps
+     249 / 249 tests
+
+Highest genuinely earned real-runtime state remains:
+
+  ★ READ-ONLY ALPINE UNDER MORPHIC ★
+  + persistent cwd
+  + bounded writable runtime state reached by real ash
+  before successful redirection has been re-proven.
+
+Do not claim successful redirection from focused tests alone.
+Do not claim Playable Alpine until the complete one-shell acceptance sequence
+passes in real system QEMU.
+
+======================================================================
+MANDATORY OPENING REPAIR 1 — F_DUPFD INVALID MINIMUM MUST RETURN EINVAL
+======================================================================
+
+Current Linux/RV64 F_DUPFD handling performs lowest-free-at-or-above selection
+and maps failure to EMFILE.
+
+That incorrectly combines two different cases:
+
+A. an invalid/impossible requested minimum;
+B. a valid requested minimum for which no eligible descriptor is free.
+
+At the Linux/RV64 compatibility edge, repair the distinction.
+
+Required behavior for the current bounded descriptor model:
+
+- an invalid/impossible F_DUPFD minimum must return EINVAL;
+- a valid minimum with no free descriptor at or above it must return EMFILE;
+- an invalid source descriptor remains EBADF;
+- a valid successful request still returns the lowest free descriptor >= the
+  requested minimum;
+- successful duplication retains the SAME open resource description;
+- reference ownership is incremented exactly once;
+- failure leaves binding topology and resource reference counts unchanged.
+
+A negative Linux minimum may arrive sign-extended in the RV64 argument register.
+Validate the Linux argument before the bounded lowest-free search so such values
+cannot be mistaken for ordinary exhaustion.
+
+Keep Linux errno policy at the compatibility edge. Do not teach the neutral
+BindingTable Linux errno meanings.
+
+Focused regression coverage must prove at minimum:
+
+1. invalid/impossible minimum -> EINVAL at the Linux/RV64 edge;
+2. valid minimum with no eligible slot -> EMFILE;
+3. invalid source descriptor -> EBADF;
+4. valid minimum selects lowest eligible free descriptor;
+5. failed cases preserve resource references and bindings;
+6. successful aliases still share resource-owned offset/state and close
+   lifecycle.
+
+Do not hide the distinction by increasing descriptor capacity.
+
+======================================================================
+MANDATORY OPENING REPAIR 2 — CORRECT BATCH 32K PERSISTED HISTORY
+======================================================================
+
+docs/reports/AGENTIC_SNOWBALL_BATCH_32K.md currently names:
+
+  a39268b
+
+as an implementation commit and describes a later persistence commit.
+
+That commit is not part of the persisted PR #87 GitHub history.
+
+Correct the handoff so successor agents can trust and resolve every recorded
+historical reference.
+
+Known persisted Batch 32K history to use as authoritative evidence:
+
+- PR #87 accepted head:
+
+    335e8aa097e0740ff6cdad0b1b15b8a48c3e7247
+
+- PR #87 merge commit:
+
+    47b3bb3b142edb4d931a8804d55e15ef98faf6f5
+
+- historical marker:
+
+    morphic-batch32k-fdupfd-known-p2s-qemu-unproven
+
+Required repair:
+
+- remove or explicitly correct the false `a39268b` persisted-history claim;
+- state the actual persisted PR head and merge boundary;
+- preserve useful clock/testing/runtime facts from the original handoff;
+- distinguish any ephemeral agent-local history from GitHub-persisted history if
+  such distinction is needed;
+- do not rewrite unearned runtime claims;
+- preserve the fact that real QEMU did not re-prove F_DUPFD during Batch 32K.
+
+This is a reproducibility repair. Keep it concise and factual.
+
+======================================================================
+OPENING REPAIR EXIT GATE
+======================================================================
+
+Before pursuing new runtime functionality:
+
+- both opening repairs are complete;
+- focused tests cover the corrected F_DUPFD errno distinction and ownership;
+- the Batch 32K report contains only resolvable persisted-history claims;
+- formatting is clean;
+- relevant module contracts/evidence are regenerated if the source/public
+  surface changes require it;
+- `zig build check` passes;
+- run the canonical broader repository validation if feasible.
+
+Then immediately return to real QEMU.
+
+======================================================================
+REAL QEMU RE-PROOF — UNCHANGED REDIRECTION PRESSURE
+======================================================================
+
+Use the repository-documented exact Alpine v3.22.0 RV64 artifact flow.
+
+Canonical artifact identity remains:
+
+- Alpine archive SHA-256:
+  ae050812fadcde048e9553004d0d037b2b9c0ec6be09f303db95768a2e35551b
+- 517 namespace objects
+- 7,069,903 immutable regular-file bytes
+- BusyBox SHA-256:
+  4567ce8a67afd045a9be46745236cf6fca0347f70871a2492c94c166eada856e
+- musl SHA-256:
+  f65dfa1e845af4d8c57f5274a8abac7a8c150372b014fb413e44f4cc70050de1
+- namespace data SHA-256:
+  7672a8c49fbd75071a6390a55e227927254afe1eabdad969315414332e5b989b
+
+A known-good artifact/build shape is:
+
+  rm -rf /tmp/b32l-ns /tmp/b32l-machine
+
+  PYTHONDONTWRITEBYTECODE=1 python3 \
+    tools/pressure-real-rv64-alpine-minirootfs.py \
+    --artifact-only \
+    --namespace-output-dir /tmp/b32l-ns
+
+  zig build install-freestanding-riscv64-morphic-runtime \
+    -Dexternal-rv64-namespace-manifest=/tmp/b32l-ns/namespace.json \
+    -Dexternal-rv64-namespace-data=/tmp/b32l-ns/namespace.data \
+    -Dexternal-rv64-argv0=/bin/sh \
+    -Dexternal-rv64-live-console-input=true \
+    --prefix /tmp/b32l-machine
+
+  qemu-system-riscv64 \
+    -machine virt \
+    -nographic \
+    -bios default \
+    -kernel /tmp/b32l-machine/bin/morphic-freestanding-riscv64
+
+If repository documentation has changed, use the current canonical equivalent
+and record the exact command actually used.
+
+Inside ONE persistent real Alpine shell, begin with:
+
+  cd /tmp
+  pwd
+  echo hello > /tmp/hello
+
+The inherited real Batch 32J boundary was:
+
+  /bin/sh: fcntl(1,F_DUPFD,10): Function not implemented
+
+Batch 32K now contains an implementation for that request, but it is not yet
+real-QEMU-proven.
+
+Run the unchanged command and observe what real ash does now.
+
+If QEMU is initially unavailable, make a bounded practical attempt to use or
+install the appropriate system-QEMU RISC-V executable if the environment allows
+it. Record exactly what was attempted. Never fabricate runtime evidence.
+
+If real system QEMU remains unavailable after a reasonable bounded attempt,
+keep all runtime milestones unchanged and make QEMU availability the explicit
+proof boundary in the Batch 32L handoff. Do not invent later syscall work from a
+checklist without real pressure.
+
+======================================================================
+LEAP 1 — COMPLETE REAL SHELL REDIRECTION
+======================================================================
+
+Target:
+
+  echo hello > /tmp/hello
+
+If the corrected F_DUPFD path advances, follow the FIRST new real causal
+boundary only.
+
+Possible examples include descriptor replacement, dup3, close behavior,
+open-resource ownership, write/writev routing, metadata, or another directly
+observed shell requirement. These are examples only, not a preselected syscall
+list.
+
+For each real boundary:
+
+- decode Linux/RV64 policy at the compatibility edge;
+- implement the smallest neutral mechanism beneath it;
+- preserve bounded ownership and failure atomicity;
+- add focused proof;
+- rerun the exact redirection command immediately.
+
+No descriptor-number, command-name, pathname, or output special cases.
+
+Redirection is earned only when real ash completes:
+
+  echo hello > /tmp/hello
+
+and the original shell remains alive afterward.
+
+Once this succeeds, immediately continue to read-back.
+
+======================================================================
+LEAP 2 — REAL READ-BACK
+======================================================================
+
+Run:
+
+  cat /tmp/hello
+
+Expected:
+
+  hello
+
+This must be a genuine external BusyBox `cat` reopening `/tmp/hello` through
+ordinary runtime namespace/resource semantics and reading the bytes written by
+the prior redirection.
+
+If it fails, repair only the first causal mechanism exposed by the real trace,
+then retry immediately.
+
+Read-back gate:
+
+  echo hello > /tmp/hello    PASS
+  cat /tmp/hello             -> hello
+  echo still-alive           -> still-alive from the original shell
+
+Once earned, immediately continue to the pipeline.
+
+======================================================================
+LEAP 3 — REAL PIPELINE
+======================================================================
+
+Run:
+
+  echo hello | cat
+
+then:
+
+  echo still-alive
+
+The pipeline must use real BusyBox/ash process and descriptor behavior.
+
+Observe the exact real trace rather than predicting the next syscall.
+
+Likely classes of pressure may include:
+
+- pipe creation at the Linux compatibility edge;
+- neutral bounded pipe resources;
+- read/write endpoint capabilities;
+- descriptor installation/replacement/inheritance;
+- reference-counted endpoint lifetime;
+- EOF when the final writer reference is released;
+- bounded pipe buffering;
+- multiple meaningful child lifetimes;
+- wait/completion semantics;
+- parent-shell survival and restoration.
+
+These are hypotheses only. Implement only what real pressure demonstrates.
+
+Do not fake the pipeline by moving known bytes through command-specific code or
+executing both sides as one special operation.
+
+Pipeline gate:
+
+  echo hello | cat           -> hello through a real pipe
+  echo still-alive           -> still-alive from the original shell
+
+Once earned, run the complete canonical acceptance sequence.
+
+======================================================================
+PLAYABLE ALPINE — CANONICAL ACCEPTANCE
+======================================================================
+
+★ PLAYABLE ALPINE UNDER MORPHIC ★ is earned only when ONE persistent real
+Alpine shell completes this entire sequence:
+
+  echo morphic
+  echo second
+  pwd
+  ls /
+  cat /etc/alpine-release
+  cd /tmp
+  echo hello > /tmp/hello
+  cat /tmp/hello
+  echo hello | cat
+  echo still-alive
+
+Expected semantic observations:
+
+- `echo morphic` -> `morphic`
+- `echo second` -> `second`
+- initial `pwd` -> `/`
+- `ls /` -> genuine serialized Alpine root entries
+- `cat /etc/alpine-release` -> `3.22.0`
+- `cd /tmp` succeeds
+- subsequent cwd is `/tmp`
+- redirection creates/writes the bounded runtime object
+- `cat /tmp/hello` -> `hello`
+- `echo hello | cat` -> `hello` through a genuine pipe path
+- `echo still-alive` comes from the original surviving shell
+
+The complete gate must preserve:
+
+- exact Alpine artifact identity;
+- real BusyBox and musl execution;
+- immutable serialized source plus explicit bounded writable runtime state;
+- corrected O_APPEND fail-closed contract;
+- transactional runtime create/truncate;
+- corrected F_DUPFD errno semantics;
+- descriptor/resource ownership and shared-open-description semantics;
+- PREPARE -> COMMIT exec-image replacement;
+- mapping/table preflight;
+- W+X=0;
+- cwd semantics;
+- bounded process/resource behavior;
+- Linux ABI policy at the compatibility edge;
+- no command/output/path special-case fakery;
+- original shell liveness.
+
+Do not claim Playable Alpine from separate shells, hosted fixtures, compile-only
+proof, or a partial sequence.
+
+If the complete gate is earned with useful implementation time remaining, use
+that time for stronger validation, reproducible evidence, README/COMMANDS
+frontier updates, coherent commits, and handoff quality. Do not branch into apk,
+networking, graphics, desktop work, SMP, or nested QEMU during Batch 32L.
+
+======================================================================
+KNOWN INHERITED LIMITATION
+======================================================================
+
+The Batch 32G intermediate-component pathname symlink limitation remains
+inherited unless real pressure makes it causal.
+
+Historical marker:
+
+  morphic-batch32g-openat-known-symlink-gap
+
+Whole-path/final symlink handling exists in the documented bounded form, but
+full component-by-component intermediate symlink resolution remains unfinished.
+
+If it becomes causal, repair it generally rather than special-casing an Alpine
+path. Otherwise preserve the limitation explicitly for successors.
+
+======================================================================
+VALIDATION AND EVIDENCE
+======================================================================
+
+At minimum run the focused tests touched by this work and:
+
+  zig fmt --check build.zig projects recipes conformance
+  zig build check
+
+Run the canonical full validation when feasible:
+
+  python3 tools/developer-command.py validate-repository
+
+If source/public contracts change, regenerate the corresponding canonical
+contracts, indexes, ports, and validation evidence using repository tooling.
+Do not hand-edit generated evidence when a canonical generator exists.
+
+For every runtime milestone, preserve exact real-QEMU evidence in the report.
+No runtime claim may be stronger than the captured evidence.
+
+======================================================================
+PERSISTENCE / PR
+======================================================================
+
+Keep commits coherent and reviewable.
+
+Push the work and open or update a PR if credentials/tooling permit.
+
+The PR description must distinguish:
+
+- opening correctness repairs;
+- focused/static proof;
+- real-QEMU proof actually obtained;
+- highest genuinely earned Alpine milestone;
+- any remaining known defect;
+- exactly one next causal blocker if Playable Alpine is incomplete.
+
+Do not bury known correctness limitations in prose.
+
+======================================================================
+MANDATORY 30-MINUTE HANDOFF CLOCK
+======================================================================
+
+This is a bounded Snowball run.
+
+Minute 0 through approximately minute 25:
+
+- repair the two inherited Batch 32K items;
+- run focused proof and validation;
+- execute real QEMU as early as practical after the repairs;
+- advance through as many directly observed Playable Alpine boundaries as the
+  real pressure and remaining implementation time permit.
+
+At approximately minute 26:
+
+HANDOFF PRODUCTION BECOMES PRIMARY WORK.
+
+Persist the report even if the larger goal remains incomplete.
+
+At approximately minute 29:
+
+FINAL PERSISTENCE AND HANDOFF ASSEMBLY BECOME THE ONLY PRIORITY.
+
+By approximately minute 30, persist:
+
+  docs/reports/AGENTIC_SNOWBALL_BATCH_32L.md
+
+The handoff must include:
+
+- visible clock start and handoff time;
+- exact inherited main SHA;
+- branch and final head SHA;
+- commits created;
+- push/PR state;
+- F_DUPFD EINVAL-vs-EMFILE repair details and focused proof;
+- Batch 32K history correction details;
+- exact validation commands and results actually completed;
+- exact Alpine artifact identities used;
+- exact QEMU command and relevant console output if QEMU ran;
+- whether real redirection passed;
+- whether real read-back passed;
+- whether the real pipeline passed;
+- whether the full one-shell Playable Alpine sequence passed;
+- highest genuinely earned milestone;
+- known inherited limitations still present;
+- exactly ONE next causal blocker if Playable Alpine remains incomplete.
+
+If QEMU is unavailable, say so explicitly and keep the runtime frontier honest.
+
+A complete persisted handoff is mandatory even when the larger milestone is
+unfinished.
+
+======================================================================
+SUCCESS CONDITION
+======================================================================
+
+Best outcome:
+
+  BOTH Batch 32K follow-up defects repaired
+      +
+  real QEMU re-proof
+      +
+  redirection
+      +
+  read-back
+      +
+  real pipeline
+      +
+  complete one-shell acceptance
+      =
+  ★ PLAYABLE ALPINE UNDER MORPHIC ★
+
+If the full target is not earned, Batch 32L still succeeds as a Snowball run
+when it leaves:
+
+- the inherited correctness defects repaired;
+- validation honest and reproducible;
+- the real runtime frontier advanced as far as evidence permits;
+- exactly one causal blocker identified;
+- a complete persisted handoff for the next zero-context agent.
+
+Begin.
