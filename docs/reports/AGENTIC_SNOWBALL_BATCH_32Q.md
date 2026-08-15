@@ -90,6 +90,35 @@ The next single causal pressure is to run the real Alpine `/sbin/apk --version`
 (then help only after retry) and classify its first unchanged Linux/runtime
 boundary before adding any package-manager facility.
 
-No git remote is configured. Push cannot execute, and a real hosted pull
-request cannot be opened from this checkout; no push or PR success is
-fabricated.
+The original Batch 32Q run had no configured remote. During the PR #93 review
+follow-up, the public `origin` was configured and the existing PR branch was
+fetched; the ownership correction was rebased onto its actual head and
+persisted locally as commit `48b0123`. Push was attempted but could not
+authenticate in this runner (`could not read Username`), so no remote update or
+PR success is fabricated.
+
+## PR #93 ownership review correction
+
+The focused review follow-up repaired two lifetime omissions without changing
+the earned milestone. Endpoint and writer discovery now examines both the
+active child descriptor/resource tables and, while a fork-shaped snapshot is
+live, `external_fork_bindings` with `external_fork_resources`. Consequently a
+suspended parent's writer prevents false EOF, and any suspended endpoint keeps
+the neutral pipe alive. Once the snapshot is no longer meaningful it does not
+extend lifetime.
+
+The generic `linux_rv64_dup3.replace` contract remains pipe-independent. The
+runtime captures the target description before a successful replacement and
+runs the same cross-process pipe-retirement decision afterward, closing the
+orphaned-slot path when the displaced resource was the genuinely final
+endpoint. Focused tests prove suspended-writer EOF protection, suspended-parent
+retention, exactly-once final retirement, dup3 final displacement, active-alias
+retention, suspended-snapshot retention, reference counts, and binding/resource
+conservation.
+
+The canonical Alpine artifact was freshly verified and the namespace-backed
+machine rebuilt under Zig 0.14.0. QEMU 8.2.2 re-proved `echo hello | cat ->
+hello` followed by `echo still-alive -> still-alive`, then a fresh machine
+re-proved every line of the complete one-shell acceptance sequence recorded
+above. Both machines remained live until the intentional host timeout. Thus
+**★ PLAYABLE ALPINE UNDER MORPHIC ★ remains earned with corrected ownership.**

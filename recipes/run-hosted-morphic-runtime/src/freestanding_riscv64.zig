@@ -23,6 +23,7 @@ const linux_rv64_fdupfd = @import("linux_rv64_fdupfd.zig");
 const linux_rv64_dup3 = @import("linux_rv64_dup3.zig");
 const bounded_pipe = @import("bounded_pipe.zig");
 const linux_rv64_pipe2 = @import("linux_rv64_pipe2.zig");
+const linux_rv64_pipe_lifetime = @import("linux_rv64_pipe_lifetime.zig");
 const runtime_mappings = @import("bounded_runtime_mappings.zig");
 const syscall_read_backend = @import("syscall_read_backend.zig");
 const bounded_namespace_lookup = @import("bounded_namespace_lookup.zig");
@@ -1554,22 +1555,11 @@ fn copyPipeDescriptors(destination: usize, descriptors: [2]usize) !void {
 }
 
 fn pipeWriterBound(pipe_id: usize) bool {
-    for (0..syscall_binding_capacity) |descriptor| {
-        const reference = syscall_bindings.resolve(descriptor) orelse continue;
-        const description = syscall_resources.resolve(reference) orelse continue;
-        if (@intFromEnum(description.backend) == linux_rv64_pipe2.write_backend and description.state == pipe_id) return true;
-    }
-    return false;
+    return linux_rv64_pipe_lifetime.owned(&syscall_resources, &syscall_bindings, external_fork_parent != null, &external_fork_resources, &external_fork_bindings, syscall_binding_capacity, pipe_id, .writer);
 }
 
-fn pipeEndpointBound(pipe_id: usize) bool {
-    for (0..syscall_binding_capacity) |descriptor| {
-        const reference = syscall_bindings.resolve(descriptor) orelse continue;
-        const description = syscall_resources.resolve(reference) orelse continue;
-        const backend = @intFromEnum(description.backend);
-        if ((backend == linux_rv64_pipe2.read_backend or backend == linux_rv64_pipe2.write_backend) and description.state == pipe_id) return true;
-    }
-    return false;
+fn retirePipeIfUnowned(pipe_id: usize) void {
+    _ = linux_rv64_pipe_lifetime.retireIfUnowned(&external_pipes, &syscall_resources, &syscall_bindings, external_fork_parent != null, &external_fork_resources, &external_fork_bindings, syscall_binding_capacity, pipe_id);
 }
 
 fn pipeRead(reference: ResourceRef, destination: usize, requested: usize) usize {
@@ -1864,11 +1854,17 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
         },
         .duplicate_to => {
             syscall_semantics[index] = 18;
+            const displaced = if (syscall_bindings.resolve(frame.x[11])) |reference| syscall_resources.resolve(reference) else null;
             frame.x[10] = linux_rv64_dup3.replace(&syscall_resources, &syscall_bindings, frame.x[10], frame.x[11], frame.x[12], syscall_binding_capacity) catch |err| negativeErrno(switch (err) {
                 error.InvalidSource, error.InvalidTarget => 9,
                 error.SameDescriptor, error.UnsupportedFlags => 22,
                 error.ResourceFull => 23,
             });
+            if (@as(isize, @bitCast(frame.x[10])) >= 0) if (displaced) |description| {
+                const backend = @intFromEnum(description.backend);
+                if (backend == linux_rv64_pipe2.read_backend or backend == linux_rv64_pipe2.write_backend)
+                    retirePipeIfUnowned(description.state);
+            };
         },
         .fcntl => {
             syscall_semantics[index] = 17;
@@ -1896,8 +1892,8 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
             _ = syscall_resources.release(reference) catch shutdown();
             if (description) |closed| {
                 const backend = @intFromEnum(closed.backend);
-                if ((backend == linux_rv64_pipe2.read_backend or backend == linux_rv64_pipe2.write_backend) and !pipeEndpointBound(closed.state))
-                    external_pipes.destroy(closed.state);
+                if (backend == linux_rv64_pipe2.read_backend or backend == linux_rv64_pipe2.write_backend)
+                    retirePipeIfUnowned(closed.state);
             }
             frame.x[10] = 0;
         },

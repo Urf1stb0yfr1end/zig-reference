@@ -242,4 +242,5 @@ test {
     _ = @import("linux_rv64_dup3.zig");
     _ = @import("bounded_pipe.zig");
     _ = @import("linux_rv64_pipe2.zig");
+    _ = @import("linux_rv64_pipe_lifetime.zig");
 }
