@@ -35,6 +35,7 @@ pub export const external_rv64_namespace_manifest align(frames.PageSize) linksec
 pub export const external_rv64_namespace_data align(frames.PageSize) linksection(".caller_artifact") = @embedFile("external-rv64-namespace-data").*;
 
 const NamespaceFile = struct { bytes: []const u8, symlink: ?[]const u8 = null, traversals: usize = 0 };
+const NamespaceObject = struct { kind: enum { regular, directory, symlink }, manifest_offset: usize };
 
 fn jsonUnsignedAfter(source: []const u8, start: usize, key: []const u8) ?usize {
     const relative = std.mem.indexOfPos(u8, source, start, key) orelse return null;
@@ -69,6 +70,25 @@ fn namespaceObject(manifest: []const u8, path: []const u8, data: []const u8) ?Na
             const length = jsonUnsignedAfter(row, 0, "\"data_length\":") orelse return null;
             if (offset > data.len or length > data.len - offset) return null;
             return .{ .bytes = data[offset .. offset + length] };
+        }
+        cursor = object_end + 1;
+    }
+    return null;
+}
+
+fn namespaceObjectIdentity(manifest: []const u8, path: []const u8) ?NamespaceObject {
+    var cursor: usize = 0;
+    while (std.mem.indexOfPos(u8, manifest, cursor, "\"path\":\"")) |at| {
+        const object_end = std.mem.indexOfScalarPos(u8, manifest, at, '}') orelse return null;
+        const object_begin = std.mem.lastIndexOfScalar(u8, manifest[0..at], '{') orelse return null;
+        const row = manifest[object_begin .. object_end + 1];
+        const found = jsonStringAfter(row, 0, "\"path\":\"") orelse return null;
+        if (std.mem.eql(u8, found, path)) {
+            const kind = jsonStringAfter(row, 0, "\"kind\":\"") orelse return null;
+            return .{
+                .kind = if (std.mem.eql(u8, kind, "regular")) .regular else if (std.mem.eql(u8, kind, "directory")) .directory else if (std.mem.eql(u8, kind, "symlink")) .symlink else return null,
+                .manifest_offset = object_begin,
+            };
         }
         cursor = object_end + 1;
     }
@@ -514,7 +534,7 @@ var external_fork_program_break: usize = 0;
 var external_fork_next_backing: usize = 0;
 var syscall_output: [64]u8 = .{0} ** 64;
 var syscall_output_len: usize = 0;
-const ResourceStore = resource_tables.ResourceTable(4);
+const ResourceStore = resource_tables.ResourceTable(16);
 const ResourceRef = ResourceStore.ResourceRef;
 const ProcessBindings = resource_tables.BindingTable(ResourceRef, 8);
 var syscall_resources: ResourceStore = .{};
@@ -1514,11 +1534,12 @@ fn externalExecve(frame: *TrapFrame) usize {
     return 0;
 }
 
-const LinuxRequestKind = enum { get_current_directory, duplicate, close, read, write, write_vector, new_fstatat, program_break, clone, execve, memory_map, terminate, unsupported };
+const LinuxRequestKind = enum { get_current_directory, duplicate, close, open_at, read, write, write_vector, new_fstatat, program_break, clone, execve, memory_map, terminate, unsupported };
 fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     return switch (number) {
         17 => .get_current_directory,
         23 => .duplicate,
+        56 => .open_at,
         57 => .close,
         63 => .read,
         64 => .write,
@@ -1533,7 +1554,44 @@ fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     };
 }
 comptime {
-    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(220) != .clone or decodeLinuxRequestKind(221) != .execve or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(56) != .open_at or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(220) != .clone or decodeLinuxRequestKind(221) != .execve or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+}
+
+fn externalNamespaceOpenAt(directory: usize, path_address: usize, flags: usize) usize {
+    // Linux access and creation flags are interpreted only at this edge. This
+    // bounded slice admits read-only opens and rejects mutation of the source
+    // namespace. Relative directory-descriptor traversal remains unimplemented.
+    if (!external_artifact_options.namespace_enabled or directory != negativeErrno(100)) return negativeErrno(9);
+    if (flags & 0x3 != 0 or flags & (0x40 | 0x200 | 0x400) != 0) return negativeErrno(30);
+    var path_buffer: [256]u8 = undefined;
+    const path_len = copyUserCString(path_address, &path_buffer) catch return negativeErrno(14);
+    const path = path_buffer[0..path_len];
+    if (!std.mem.eql(u8, path, "/") and !validAbsolutePath(path)) return negativeErrno(2);
+    const object = namespaceObjectIdentity(&external_rv64_namespace_manifest, path) orelse return negativeErrno(2);
+    // Linux O_DIRECTORY is 0x10000 on asm-generic targets.
+    if (flags & 0x10000 != 0 and object.kind != .directory) return negativeErrno(20);
+    if (object.kind == .symlink) return negativeErrno(40);
+    const backend: resource_tables.BackendId = @enumFromInt(switch (object.kind) {
+        .directory => @as(u32, 0x100),
+        .regular => @as(u32, 0x101),
+        .symlink => unreachable,
+    });
+    const reference = syscall_resources.create(.{ .backend = backend, .capabilities = .{ .read = object.kind == .regular }, .state = object.manifest_offset }) catch return negativeErrno(23);
+    var descriptor: usize = 3;
+    while (descriptor < 8 and syscall_bindings.resolve(descriptor) != null) : (descriptor += 1) {}
+    if (descriptor == 8) {
+        _ = syscall_resources.release(reference) catch shutdown();
+        return negativeErrno(24);
+    }
+    syscall_bindings.bindAt(descriptor, reference) catch shutdown();
+    if (external_artifact_options.live_console_input) {
+        write("ZIGREF_LINUX_OPENAT path=");
+        write(path);
+        write(" fd=");
+        writeUsizeHex(descriptor);
+        write("\n");
+    }
+    return descriptor;
 }
 
 fn externalNamespaceStat(path_address: usize, destination: usize, flags: usize) usize {
@@ -1637,6 +1695,10 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
             };
             _ = syscall_resources.release(reference) catch shutdown();
             frame.x[10] = 0;
+        },
+        .open_at => {
+            syscall_semantics[index] = 14;
+            frame.x[10] = externalNamespaceOpenAt(frame.x[10], frame.x[11], frame.x[12]);
         },
         .read => blk: {
             syscall_semantics[index] = 6;
