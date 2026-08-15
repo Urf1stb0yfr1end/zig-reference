@@ -1,0 +1,628 @@
+CODEX AGENTIC SNOWBALL — BATCH 32K
+KNOWN WRITABLE-STATE REPAIRS -> FD DUPLICATION -> REDIRECTION -> PIPES -> PLAYABLE ALPINE
+BOUNDED LEAPS / MAXIMUM USEFUL IMPLEMENTATION / MANDATORY 30-MINUTE HANDOFF
+
+Repository: thanks-cohn/zig-reference
+Canonical request:
+docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32K_WRITABLE_REPAIR_FD_DUP_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt
+
+======================================================================
+START
+======================================================================
+
+Start from current main.
+
+Authoring main when this request was created:
+8df48924815f09da26ed399e13c4a24542e29c2b
+
+This is the merge commit of PR #86, Batch 32J.
+
+PR #86 was intentionally merged under execution-budget constraint with two
+known correctness defects preserved explicitly for this successor run:
+
+1. runtime O_APPEND is accepted without true append semantics;
+2. runtime create/truncate mutation can occur before resource/descriptor
+   allocation is known to succeed.
+
+The PR conversation contains the explicit merge note describing both defects.
+Treat them as inherited work, not as rediscovery targets.
+
+Historical pathname marker that also remains inherited:
+
+  morphic-batch32g-openat-known-symlink-gap
+
+Do not assume the authoring SHA is still current when this run begins. Fetch,
+switch to, and update current main first. Record the exact inherited main SHA.
+
+Before implementation:
+
+1. read AGENTS.md;
+2. read README.md;
+3. read COMMANDS.md;
+4. read docs/reports/AGENTIC_SNOWBALL_BATCH_32J.md;
+5. read the PR #86 merge note and inherited review findings if available;
+6. read docs/roadmaps/ALPZ_TO_ALPINE_QEMU_KVM_AND_BEYOND.md;
+7. run:
+
+     python3 tools/query-reference.py agent bootstrap
+     python3 tools/query-reference.py agent doctor
+
+8. read this request completely;
+9. begin a visible 30-minute clock with the first repository command and obey
+   the mandatory persistence/handoff clock below.
+
+Do not spend the opening implementation window re-proving already-earned
+Alpine, musl, BusyBox, clone, execve, PREPARE/COMMIT, openat, getdents64,
+regular-file read, cwd, or writable-runtime facts unless a focused repair or the
+first real pressure demonstrates a regression.
+
+======================================================================
+PRIMARY GOAL
+======================================================================
+
+Reach:
+
+  ★ PLAYABLE ALPINE UNDER MORPHIC ★
+
+as far as physically possible within this bounded run.
+
+This run has a mandatory ordering:
+
+  A. repair the two known Batch 32J correctness defects;
+  B. re-prove the unchanged real Alpine redirection pressure;
+  C. continue immediately from the real observed frontier toward full Playable
+     Alpine for the remainder of useful implementation time;
+  D. deliver the complete persisted handoff by approximately minute 30.
+
+The defect repair is the opening gate, not the entire run. Once both repairs are
+correct and focused proof is green, move immediately back to real QEMU pressure
+and pursue the complete acceptance path.
+
+The exact unchanged real pressure inherited from Batch 32J is:
+
+  cd /tmp
+  pwd
+  echo hello > /tmp/hello
+
+Batch 32J real system-QEMU evidence reached:
+
+  /tmp
+  /bin/sh: fcntl(1,F_DUPFD,10): Function not implemented
+
+That frontier remains authoritative unless current-main reproduction shows a
+different first causal boundary.
+
+After redirection becomes real, immediately continue through:
+
+  cat /tmp/hello
+  echo hello | cat
+  echo still-alive
+
+Then run the complete canonical acceptance sequence in ONE persistent real
+Alpine shell.
+
+Use OBSERVE -> REPAIR -> PROVE -> RETRY throughout. After each causal repair,
+rerun the exact command that exposed it immediately. If it advances, work on the
+next directly exposed causal boundary while useful implementation time remains.
+
+======================================================================
+CURRENT PROVEN FRONTIER
+======================================================================
+
+Current main inherits and must preserve:
+
+- exact Alpine v3.22.0 RV64 minirootfs namespace;
+- 517 serialized namespace objects;
+- 7,069,903 immutable regular-file backing bytes;
+- real `/bin/sh -> /bin/busybox`;
+- real `/lib/ld-musl-riscv64.so.1`;
+- real musl interpreter-first execution;
+- persistent interactive real Alpine shell;
+- live console input;
+- real external BusyBox applets through bounded clone/exec;
+- retained-parent snapshot and restoration;
+- Linux/RV64 execve(221) image replacement;
+- complete candidate-image PREPARE before COMMIT;
+- candidate mapping/table-capacity preflight before COMMIT;
+- W+X=0;
+- namespace-backed newfstatat/openat/getdents64/read;
+- genuine `ls /` from serialized namespace children;
+- real `cat /etc/alpine-release -> 3.22.0`;
+- parent-shell liveness after external commands;
+- bounded per-process cwd state;
+- Linux/RV64 chdir(49) and getcwd(17);
+- cwd inheritance/preservation through clone, exec, and parent restoration;
+- real `cd /tmp` followed by `pwd -> /tmp`;
+- neutral bounded session-local writable runtime namespace;
+- four runtime pathname objects, 256 bytes per object in the current bounded
+  implementation;
+- runtime create/truncate/read-back/write mechanisms;
+- runtime-over-source lookup precedence;
+- immutable serialized Alpine source backing;
+- resource-owned read/write capability enforcement;
+- O_RDONLY rejects runtime write with EBADF at the Linux edge;
+- O_WRONLY rejects runtime read with EBADF at the Linux edge;
+- O_RDWR permits both;
+- rejected access does not mutate runtime bytes or incorrectly advance offset;
+- canonical validation evidence regenerated after the Batch 32J repair;
+- local `zig build check` and repository validation recorded green in the Batch
+  32J repair handoff;
+- real QEMU advance from the old EROFS frontier to
+  `fcntl(1,F_DUPFD,10)`.
+
+Highest genuinely earned runtime state:
+
+  ★ READ-ONLY ALPINE UNDER MORPHIC ★
+  + persistent cwd
+  + bounded writable runtime state reached by real ash
+  before descriptor duplication completes redirection.
+
+Do not claim successful redirection yet.
+Do not claim Playable Alpine yet.
+
+======================================================================
+MANDATORY OPENING REPAIR — TWO KNOWN BATCH 32J DEFECTS
+======================================================================
+
+Repair BOTH items before treating the writable runtime layer as a sound base for
+further Playable Alpine progress.
+
+---------------------------------------------------------------------
+REPAIR 1 — O_APPEND MUST BE TRUE OR FAIL CLOSED
+---------------------------------------------------------------------
+
+Current Batch 32J runtime-open flag handling admits Linux/RV64 O_APPEND
+(asm-generic value 0x400), but the runtime resource state begins at offset zero
+and runtimeRegularWrite writes at that stored offset. An existing runtime file
+opened with O_APPEND can therefore overwrite its prefix instead of appending.
+
+Required repair:
+
+Choose the smallest correct general behavior supported by current pressure:
+
+A. implement real append semantics, with append state owned by the open resource
+   description and each write selecting the current runtime-object EOF at the
+   correct semantic moment;
+
+OR
+
+B. reject O_APPEND at the Linux/RV64 compatibility edge until true append
+   semantics are implemented.
+
+Prefer B if real Playable Alpine pressure does not require O_APPEND during this
+run. Do not accept a flag whose semantics are not actually honored.
+
+Focused proof must establish whichever contract is chosen.
+
+If implementing append, prove at minimum:
+
+- existing bytes remain intact;
+- the first append write begins at current EOF;
+- repeated writes append rather than overwrite;
+- aliases sharing one open description remain coherent;
+- capacity failure leaves existing bytes coherent;
+- Linux policy remains at the compatibility edge.
+
+If rejecting append, prove at minimum:
+
+- O_APPEND is rejected deterministically with the chosen Linux errno;
+- the runtime object is not mutated;
+- no resource or descriptor is leaked;
+- ordinary non-append create/truncate behavior remains available.
+
+---------------------------------------------------------------------
+REPAIR 2 — RUNTIME OPEN MUST COMMIT ATOMICALLY
+---------------------------------------------------------------------
+
+Current Batch 32J ordering can call RuntimeNamespace.open(path, create, truncate)
+before resource creation and descriptor binding are known to succeed.
+
+That means a later ENFILE/EMFILE path can leave a newly created runtime object or
+can truncate an existing object even though openat itself failed.
+
+Repair this as a general bounded transaction.
+
+Required semantics:
+
+- before mutating runtime namespace state for create/truncate, prove that the
+  required resource-description capacity and descriptor-binding capacity are
+  available;
+- if existing abstractions expose a clean preflight operation, reuse it;
+- otherwise introduce the smallest neutral reservation/preparation mechanism
+  necessary to preserve PREPARE -> COMMIT behavior;
+- a failed resource allocation must not create or truncate a runtime object;
+- a failed descriptor allocation/binding must not create or truncate a runtime
+  object;
+- capacity rejection must not leak a resource reference;
+- successful open must commit exactly once;
+- existing source-namespace immutability remains untouched;
+- Linux errno translation remains at the Linux/RV64 edge.
+
+Focused regressions must cover at minimum:
+
+1. descriptor table full + O_CREAT => no new runtime object;
+2. descriptor table full + O_TRUNC on an existing runtime object => existing
+   bytes unchanged;
+3. resource table full + O_CREAT => no new runtime object;
+4. resource table full + O_TRUNC => existing bytes unchanged;
+5. successful create/truncate still works after preflight;
+6. no leaked resource count/reference on rejected open.
+
+Do not solve this with pathname-specific rollback or by silently enlarging every
+capacity until the test cannot reach exhaustion. Bounded exhaustion is part of
+the contract.
+
+---------------------------------------------------------------------
+OPENING REPAIR EXIT GATE
+---------------------------------------------------------------------
+
+Before advancing into new runtime functionality:
+
+- both known defects have focused proof;
+- focused Morphic recipe tests pass;
+- formatting is clean;
+- the repaired code preserves source immutability, resource ownership,
+  PREPARE/COMMIT intent, and W+X=0;
+- no known defect from this opening pair is being hidden by the test shape.
+
+Then immediately return to the unchanged real pressure:
+
+  echo hello > /tmp/hello
+
+Do not spend the remainder of the run polishing these repairs if the exit gate is
+already earned. The overall target remains Playable Alpine.
+
+======================================================================
+LEAP 1 — F_DUPFD / DESCRIPTOR CAPACITY / REAL REDIRECTION
+======================================================================
+
+Real Batch 32J pressure exposed:
+
+  fcntl(1,F_DUPFD,10)
+
+Current binding behavior only addresses a small descriptor range and cannot
+satisfy ash's request for the lowest available descriptor >= 10.
+
+Observe current-main behavior after the opening repairs. If F_DUPFD remains the
+first causal boundary, implement the smallest neutral ownership-correct
+descriptor duplication mechanism demanded by the real request.
+
+Required semantics when F_DUPFD is causal:
+
+- Linux/RV64 fcntl decoding remains at the compatibility edge;
+- F_DUPFD duplicates an existing descriptor binding onto the lowest free
+  descriptor number >= the requested minimum;
+- the new descriptor aliases the SAME open resource description rather than
+  cloning independent offset state;
+- resource reference ownership is incremented correctly;
+- closing either descriptor releases only that binding/reference;
+- shared open offset/state remains shared through aliases;
+- invalid source descriptor returns EBADF;
+- impossible minimum or exhausted bounded descriptor space fails explicitly;
+- failed duplication does not leak references or bindings;
+- descriptor capacity is large enough for the observed ash request while still
+  explicitly bounded;
+- do not special-case descriptor 1, minimum 10, ash, or redirection paths in the
+  neutral descriptor mechanism.
+
+Add focused tests for minimum-descriptor selection, alias ownership, shared state,
+close behavior, exhaustion, and failure atomicity where practical.
+
+After repair rerun exactly:
+
+  echo hello > /tmp/hello
+
+If ash next requests another descriptor operation such as replacement/dup/close,
+observe the exact real trace and repair only the smallest general mechanism it
+proves necessary.
+
+Redirection acceptance gate:
+
+  cd /tmp                         PASS
+  pwd                             -> /tmp
+  echo hello > /tmp/hello         PASS
+  echo still-alive                PASS
+
+The file bytes must come from the bounded runtime namespace.
+
+When this gate passes, immediately continue to read-back.
+
+======================================================================
+LEAP 2 — REAL READ-BACK OF WRITTEN STATE
+======================================================================
+
+Run:
+
+  cat /tmp/hello
+
+Expected output:
+
+  hello
+
+This must be a real external BusyBox `cat` process reopening the runtime pathname
+through ordinary namespace/resource semantics and reading the bytes created by
+redirection.
+
+If this exposes relative lookup, metadata, open flags, descriptor lifetime,
+resource routing, offsets, or parent restoration as the next causal boundary,
+repair the smallest general mechanism and retry immediately.
+
+Do not inject expected `hello` bytes, command-name behavior, or path-specific
+read behavior.
+
+Acceptance gate:
+
+  echo hello > /tmp/hello         PASS
+  cat /tmp/hello                  -> hello
+  echo still-alive                -> still-alive
+
+When this passes, immediately continue to the real pipeline.
+
+======================================================================
+LEAP 3 — REAL PIPELINE / FD TOPOLOGY / PROCESS LIFETIME
+======================================================================
+
+Run:
+
+  echo hello | cat
+
+then:
+
+  echo still-alive
+
+Do not assume the next syscall. Observe the exact real QEMU trace.
+
+Possible directly exposed requirements may include:
+
+- Linux pipe creation at the compatibility edge;
+- neutral bounded pipe resources;
+- separate read/write endpoint capabilities;
+- descriptor installation and replacement;
+- inheritance across clone/fork;
+- reference-counted endpoint lifetime;
+- EOF only after all writer references are gone;
+- bounded buffering;
+- reader/writer progress;
+- more than one meaningful child lifetime;
+- wait/completion semantics;
+- parent-shell restoration after the complete pipeline.
+
+The existing serialized child-first process model may become insufficient here.
+If real pressure proves that two child states must coexist meaningfully, evolve
+the neutral Morphic process model only as far as the evidence requires.
+
+Do not fake the pipeline by executing both commands inline in the parent, moving
+known bytes through command-specific code, or fabricating completion.
+
+Pipe behavior must arise from resource ownership and descriptor topology.
+
+After each repair rerun:
+
+  echo hello | cat
+
+immediately.
+
+Pipeline acceptance gate:
+
+  echo hello | cat                -> hello through a real pipe
+  echo still-alive                -> still-alive from the original shell
+
+When this passes, run the complete Playable Alpine sequence.
+
+======================================================================
+PLAYABLE ALPINE — CANONICAL ACCEPTANCE
+======================================================================
+
+PLAYABLE ALPINE is earned only when ONE persistent real Alpine shell completes:
+
+  echo morphic
+  echo second
+  pwd
+  ls /
+  cat /etc/alpine-release
+  cd /tmp
+  echo hello > /tmp/hello
+  cat /tmp/hello
+  echo hello | cat
+  echo still-alive
+
+Expected semantic observations:
+
+  echo morphic                     -> morphic
+  echo second                      -> second
+  initial pwd                      -> /
+  ls /                             -> genuine serialized Alpine root entries
+  cat /etc/alpine-release          -> 3.22.0
+  cd /tmp                          -> success
+  pwd after cd                     -> /tmp
+  echo hello > /tmp/hello          -> real bounded runtime write
+  cat /tmp/hello                   -> hello
+  echo hello | cat                 -> hello through a real pipe
+  echo still-alive                 -> still-alive from the original shell
+
+The complete gate must preserve:
+
+- exact Alpine v3.22.0 RV64 namespace identity;
+- real BusyBox and real musl execution;
+- immutable source namespace plus explicit bounded writable runtime state;
+- corrected O_APPEND contract;
+- transactional runtime open/create/truncate behavior;
+- PREPARE -> COMMIT image replacement;
+- candidate mapping/table preflight;
+- W+X=0;
+- coherent cwd state;
+- descriptor/resource ownership and shared-open-description semantics;
+- bounded process behavior;
+- Linux ABI translation at the compatibility boundary;
+- no command/output/path special-case fakery;
+- a living original shell after external commands and the pipeline.
+
+Do not claim Playable Alpine from separate shells, compile-only evidence, hosted
+fixtures, or a partial acceptance sequence.
+
+If the complete gate is earned with useful clock remaining, spend the remaining
+productive time on stronger validation, reproducible proof, documentation,
+coherent persistence, and handoff quality. Do not branch into apk, networking,
+DNS/TLS, graphics, SMP, KVM, or QEMU-under-Morphic during Batch 32K.
+
+======================================================================
+KNOWN INHERITED LIMITATIONS — PRESERVE THEM UNTIL CAUSAL OR REPAIRED
+======================================================================
+
+1. Batch 32G intermediate-component symlink resolution remains incomplete.
+   Preserve the marker:
+
+     morphic-batch32g-openat-known-symlink-gap
+
+   If real Playable Alpine pressure makes it causal, repair component-wise
+   bounded resolution generally: intermediate symlinks, remaining suffix,
+   correct final-component O_NOFOLLOW behavior, one global traversal budget,
+   ELOOP on cycle/exhaustion, root lookup, executable lookup coherence, and
+   Linux policy only at the edge.
+
+2. Relative-path behavior remains intentionally narrower than complete Linux VFS
+   semantics. If the acceptance path exposes it as causal, derive behavior from
+   neutral cwd state rather than command-specific path rewriting.
+
+Do not allow these inherited limitations to consume the opening window unless
+they become directly causal after the mandatory two Batch 32J repairs.
+
+======================================================================
+OPERATING RULE — OBSERVE -> REPAIR -> PROVE -> RETRY
+======================================================================
+
+For every real causal boundary:
+
+1. observe the exact unchanged Alpine failure;
+2. record syscall/request shape and relevant path/resource/process state;
+3. classify the missing semantic at the correct layer;
+4. query repository capabilities and diagnostics before inventing machinery;
+5. implement the smallest GENERAL repair;
+6. add focused proof where practical;
+7. rerun the exact same Alpine command immediately;
+8. if it advances, continue to the next directly exposed boundary;
+9. cross as many causally connected boundaries as useful before handoff time.
+
+Do not build a speculative Linux syscall checklist.
+
+Linux syscall numbers, flag decoding, errno translation, and ABI layouts belong
+at the Linux/RV64 compatibility edge. Reusable resource ownership, namespace
+transactions, descriptor topology, pipe state, and process lifetime belong in
+neutral Morphic abstractions.
+
+======================================================================
+VALIDATION
+======================================================================
+
+Use the strongest fitting validation the clock permits. At minimum after the
+opening repairs and again before final persistence when source changed, run the
+focused Morphic recipe tests and formatting checks.
+
+Prefer, as time allows:
+
+  zig build test-recipe-run-hosted-morphic-runtime
+  zig fmt --check build.zig projects recipes conformance
+  zig build check
+  PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+  python3 tools/developer-command.py validate-repository
+  git diff --check
+
+If canonical validation evidence becomes stale because source changed, regenerate
+it through the repository-authoritative workflow rather than weakening the gate.
+
+Real system-QEMU output is mandatory for any newly claimed runtime milestone.
+Compile-only evidence is not enough.
+
+======================================================================
+MANDATORY 30-MINUTE PERSISTENCE / HANDOFF CLOCK
+======================================================================
+
+The 30-minute rule is part of the engineering contract.
+
+Approximate schedule:
+
+  minute 0-25:
+    opening correctness repairs, focused proof, real QEMU pressure, and as many
+    genuine Playable Alpine leaps as causally available;
+
+  approximately minute 26:
+    handoff production becomes primary work; begin assembling tracked evidence,
+    exact frontier, commits, validation state, and successor instructions while
+    completing only tightly bounded work that cannot endanger persistence;
+
+  approximately minute 29:
+    final persistence and handoff assembly become the only priority;
+
+  by approximately minute 30:
+    deliver the complete persisted Batch 32K handoff.
+
+The handoff is mandatory whether Playable Alpine is complete or incomplete.
+Do not sacrifice the handoff to one more speculative repair.
+
+Required tracked handoff:
+
+  docs/reports/AGENTIC_SNOWBALL_BATCH_32K.md
+
+Also update:
+
+  COMMANDS.md
+
+and update README.md when the publicly visible earned frontier changes.
+
+The handoff must record:
+
+- visible clock start;
+- exact inherited main SHA;
+- branch and final head SHA;
+- coherent implementation commit(s);
+- push state;
+- PR state or exact reason remote persistence was unavailable;
+- whether O_APPEND was truly implemented or deliberately rejected;
+- exact proof of the chosen O_APPEND contract;
+- exact proof that failed resource/descriptor allocation cannot create or
+  truncate runtime objects;
+- focused test commands/results;
+- full validation commands/results actually completed;
+- exact Alpine namespace identity and hashes when re-acquired;
+- exact QEMU command;
+- exact real QEMU output for the final pressure;
+- highest genuinely earned milestone;
+- whether redirection passed;
+- whether runtime read-back passed;
+- whether the real pipeline passed;
+- whether the full Playable Alpine sequence passed in one shell;
+- all still-relevant known limitations;
+- if Playable Alpine is incomplete, EXACTLY ONE NEXT CAUSAL BLOCKER selected from
+  the final unchanged real pressure, not from speculation.
+
+If remote push/PR creation is unavailable, still commit coherent local work and
+persist the complete report in the repository checkout.
+
+======================================================================
+SUCCESS CONDITIONS
+======================================================================
+
+Best outcome:
+
+  - both inherited Batch 32J defects repaired;
+  - redirection real;
+  - runtime read-back real;
+  - pipeline real;
+  - full one-shell acceptance passes;
+  - ★ PLAYABLE ALPINE UNDER MORPHIC ★ earned;
+  - validation and persisted handoff complete by the handoff boundary.
+
+Intermediate success is still valuable if the run:
+
+  - repairs both known defects correctly;
+  - advances the unchanged real pressure beyond F_DUPFD or another observed
+    frontier;
+  - preserves architectural invariants;
+  - records exact QEMU proof;
+  - leaves exactly one next causal blocker;
+  - persists a complete Batch 32K handoff by approximately minute 30.
+
+The two opening repairs are mandatory. After they are earned, the remainder of
+the run belongs to the Playable Alpine pursuit.
+
+Begin.
