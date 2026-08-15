@@ -240,4 +240,6 @@ test "runtime open transaction preserves namespace bindings and resource ownersh
 test {
     _ = @import("linux_rv64_fdupfd.zig");
     _ = @import("linux_rv64_dup3.zig");
+    _ = @import("bounded_pipe.zig");
+    _ = @import("linux_rv64_pipe2.zig");
 }
