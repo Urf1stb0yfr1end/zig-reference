@@ -49,6 +49,8 @@ ZIGREF_LINUX_EDGE_TRAP cause=000000000000000f sepc=000000008020006e stval=000000
 
 Read-back is therefore not yet earned. Pipelines are not yet earned. Playable Alpine is not yet earned.
 
+Batch 32N reproduced this boundary under QEMU 8.2.2 and narrowed it before `execve`: the same fault occurs for `cat /tmp/hello` even when the runtime file was not first created. Calls 96/135/135/134 run with a valid unchanged user-RW stack leaf, while `0x8020006e` is the first `userServiceTrapEntry` frame store. The next repair target is therefore the fork-child trap return/`sscratch` invariant with SUM remaining clear, not speculative signal/TLS syscalls or a writable-ELF mapping.
+
 ## Phase A — close the external `cat` child-runtime fault
 
 ### A1. Reproduce the exact fault unchanged

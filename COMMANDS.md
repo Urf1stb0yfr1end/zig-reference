@@ -636,3 +636,17 @@ reaches the inherited read-only `openat(56)` policy and reports `Read-only file
 system`; a bounded writable runtime namespace is the one next causal blocker.
 `docs/reports/AGENTIC_SNOWBALL_BATCH_32I.md` records the evidence. No new
 runnable command was introduced.
+
+## Batch 32N external-cat causal narrowing
+
+Batch 32N reused the canonical Alpine artifact acquisition, live-console build,
+and system-QEMU commands. QEMU 8.2.2 reproduced the Batch 32M fault both after
+`echo hello > /tmp/hello` and with `cat /tmp/hello` alone. Linux/RV64 calls
+96/135/135/134 were decoded and observed with a valid unchanged user-RW stack
+leaf. ELF and QEMU interrupt evidence locates `sepc=0x8020006e` at the first
+`userServiceTrapEntry` frame store: the fork child has a trap-stack/`sscratch`
+return invariant defect, not a missing stack mapping. A diagnostic-only SUM
+experiment removed that exact nested trap but was rejected because SUM must
+remain clear; returning success for syscall 134 alone did not advance the
+frontier. See `docs/reports/AGENTIC_SNOWBALL_BATCH_32N.md`. No new runnable
+command or Alpine milestone was introduced.
