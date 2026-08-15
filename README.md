@@ -675,6 +675,24 @@ Research that proves an existing Morphic or QuirkM idea wrong is useful too. Pre
 
 **If this problem space sounds fun, you are invited.** You do not need to wait for the project to become mature, and you do not need permission to explore a different direction. Fork it, test it, break an assumption, improve a mechanism, propose a competing design, or build something larger on top of it.
 
+## Eventually: immediately testable workload challenges
+
+The current focus is compatibility research, semantic compression, and building a reusable systems substrate. A mature Morphic, however, should eventually be able to turn those abstractions into demonstrations that anyone can understand and test immediately.
+
+One long-horizon direction is **workload specialization**: after a real application already runs correctly through ordinary compatibility, ask whether Morphic can temporarily reorganize the machine around that one workload. In the proposed **Appliance Mode**, optional services can be omitted or shut down, reclaimable caches can be surrendered under pressure, unnecessary background work can be reduced, and nearly all RAM and CPU capacity not required for Morphic, the compatibility environment, and necessary devices can be made available to the selected workload.
+
+A particularly concrete challenge is a fixed **16 GiB machine**. The eventual experiment would run the same demanding application on the same hardware under a conventional reference system, Morphic Normal Mode, and Morphic Appliance Mode, then compare measurable results such as available workload memory, platform RAM overhead, background CPU activity, context switches, frame-time distribution, 1%/0.1% lows, I/O latency, and application throughput.
+
+Games are an appealing public pressure ladder because they combine graphics, input, audio, files, timers, threads, networking, memory pressure, and human-visible latency. The path can begin with Doom/Freedoom, advance through real packaged 3D workloads, and eventually reach demanding commercial titles when the required architecture, graphics, and compatibility paths genuinely exist. The point is not that this repository is becoming a gaming OS. The point is that a mature version of the broader vision should be able to survive difficult, recognizable workloads and show its progress in a form people can immediately experience.
+
+There is an important nonclaim here: **RAM cannot replace GPU compute capability.** A title that is fundamentally limited by graphics throughput will remain limited by the available graphics hardware. Morphic cannot turn an incapable GPU into a capable one merely by freeing system memory. What specialization may be able to improve is the surrounding cost of running the workload: how much RAM remains available, how much background CPU and I/O interference exists, whether the machine avoids swapping, whether frame-time spikes are reduced, and how well constrained hardware is utilized. This can matter especially on 8–16 GiB systems and integrated-graphics machines where the GPU shares system memory, but every performance claim must be demonstrated on fixed hardware rather than assumed from architectural simplicity.
+
+The standard should therefore be empirical rather than promotional: same machine, same application build, same graphics settings and resolution, same driver/hardware path where possible, reproducible scenes or traces, and publication of both wins and losses.
+
+If Morphic eventually reaches the point where an ordinary 16 GiB computer can dedicate nearly all of its usable machine budget to one heavy workload while preserving the workload's expected compatibility contract, that would be a compelling demonstration of how far the substrate has come. It would also generalize beyond games to compilers, databases, AI inference, emulators, renderers, scientific programs, and simulations.
+
+The fuller proposal, including Normal/Focus/Appliance modes, resource-policy ideas, benchmark rules, and the game/workload pressure ladder, lives in [`docs/concepts/APPLIANCE_MODE_AND_WORKLOAD_SPECIALIZATION.md`](docs/concepts/APPLIANCE_MODE_AND_WORKLOAD_SPECIALIZATION.md).
+
 ## Scope and nonclaims
 
 Alpz is **not Linux**, QuirkM is **not a completed native operating environment**, and Morphic is **not presented as a production kernel platform**.
