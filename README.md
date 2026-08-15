@@ -679,17 +679,46 @@ Research that proves an existing Morphic or QuirkM idea wrong is useful too. Pre
 
 The current focus is compatibility research, semantic compression, and building a reusable systems substrate. A mature Morphic, however, should eventually be able to turn those abstractions into demonstrations that anyone can understand and test immediately.
 
-One long-horizon direction is **workload specialization**: after a real application already runs correctly through ordinary compatibility, ask whether Morphic can temporarily reorganize the machine around that one workload. In the proposed **Appliance Mode**, optional services can be omitted or shut down, reclaimable caches can be surrendered under pressure, unnecessary background work can be reduced, and nearly all RAM and CPU capacity not required for Morphic, the compatibility environment, and necessary devices can be made available to the selected workload.
+One long-horizon direction is **workload specialization**. General-purpose operating systems are designed to keep many possible activities available at once: services, desktop components, caches, launchers, background jobs, update machinery, networking, logging, and other work can remain alive while one foreground program is running. That is often the right tradeoff for a general-purpose machine. Because Morphic is being built as a new substrate, however, it gives us room to test a deliberately different policy when the user explicitly asks for it:
 
-A particularly concrete challenge is a fixed **16 GiB machine**. The eventual experiment would run the same demanding application on the same hardware under a conventional reference system, Morphic Normal Mode, and Morphic Appliance Mode, then compare measurable results such as available workload memory, platform RAM overhead, background CPU activity, context switches, frame-time distribution, 1%/0.1% lows, I/O latency, and application throughput.
+> **How much of the machine can safely belong to one chosen workload?**
 
-Games are an appealing public pressure ladder because they combine graphics, input, audio, files, timers, threads, networking, memory pressure, and human-visible latency. The path can begin with Doom/Freedoom, advance through real packaged 3D workloads, and eventually reach demanding commercial titles when the required architecture, graphics, and compatibility paths genuinely exist. The point is not that this repository is becoming a gaming OS. The point is that a mature version of the broader vision should be able to survive difficult, recognizable workloads and show its progress in a form people can immediately experience.
+Many computer users have had the ordinary experience of closing browsers, launchers, background applications, and services before starting a demanding game and wondering how much more of the machine could be devoted to the thing they are actually trying to do. Morphic should eventually turn that intuition into a measurable systems experiment rather than a marketing promise.
 
-There is an important nonclaim here: **RAM cannot replace GPU compute capability.** A title that is fundamentally limited by graphics throughput will remain limited by the available graphics hardware. Morphic cannot turn an incapable GPU into a capable one merely by freeing system memory. What specialization may be able to improve is the surrounding cost of running the workload: how much RAM remains available, how much background CPU and I/O interference exists, whether the machine avoids swapping, whether frame-time spikes are reduced, and how well constrained hardware is utilized. This can matter especially on 8–16 GiB systems and integrated-graphics machines where the GPU shares system memory, but every performance claim must be demonstrated on fixed hardware rather than assumed from architectural simplicity.
+In the proposed **Appliance Mode**, after a real application already runs correctly through ordinary compatibility, Morphic could temporarily reorganize the machine around that workload. Optional services could be omitted or shut down, reclaimable caches surrendered under pressure, unnecessary background work reduced, CPU placement and scheduling biased toward the selected process tree, and nearly all RAM and CPU capacity not required for Morphic, the compatibility environment, and necessary devices made available to the workload.
+
+The goal is not literal exclusive ownership. The substrate, page tables, resource metadata, drivers, required libraries, device queues, safety margins, and any compatibility machinery that the application actually needs still consume resources. The research target is simpler and testable: **everything that is not required for correctness should become a candidate to get out of the workload's way.**
+
+A particularly concrete challenge is a fixed **8 or 16 GiB ordinary laptop**, especially a machine with integrated graphics where CPU and GPU share system memory. The eventual experiment would run the same demanding application on the same hardware under a conventional reference system, Morphic Normal Mode, and Morphic Appliance Mode, then compare measurable results such as available workload memory, platform RAM overhead, background CPU activity, context switches, frame-time distribution, 1%/0.1% lows, I/O latency, simulation rate, loading behavior, and application throughput.
+
+Games are an appealing public pressure ladder because they combine graphics, input, audio, files, timers, threads, networking, memory pressure, simulation, and human-visible latency. The early ladder should prove graphical compatibility. The later ladder should deliberately favor **CPU-, memory-, simulation-, JVM/runtime-, and mod-heavy workloads whose graphics can be scaled down**, because those are the cases where resource specialization has the best chance of producing a meaningful result on ordinary hardware.
+
+A candidate progression is:
+
+1. **Freedoom / GZDoom** — first complete game loop and graphics/input proof.
+2. **OpenArena / ioquake3** — mature real-time 3D, audio, input, networking, and timing pressure.
+3. **SuperTuxKart** — broader packaged graphical/media dependency pressure.
+4. **Xonotic** — a substantially richer real-time 3D workload.
+5. **Dwarf Fortress** — simulation pressure with modest graphical requirements.
+6. **Oxygen Not Included** — sustained simulation and memory/CPU pressure on relatively modest graphics.
+7. **RimWorld**, especially large colonies and mod-heavy installs — simulation, allocation, mod/runtime, and long-frame pressure.
+8. **Project Zomboid**, especially large or heavily modded worlds — JVM/runtime, world state, simulation, files, networking, and memory pressure.
+9. **Kerbal Space Program**, especially complex or mod-heavy saves — physics, simulation, asset, CPU, and memory pressure.
+10. **Minecraft: Java Edition**, especially large worlds and heavy modpacks — JVM heap, garbage collection, world streaming, assets, CPU, and memory pressure.
+11. **Factorio: Space Age**, especially large factories/megabases — a flagship simulation/UPS benchmark and strong Appliance Mode candidate.
+12. **Cities: Skylines**, especially asset- and mod-heavy cities — a direct 8/16 GiB memory-pressure and simulation challenge.
+13. **Stellaris**, especially late-game large galaxies — a long-running simulation and scheduling/CPU-pressure challenge.
+14. **A mainstream commercial CPU/memory-heavy title** once the required x86-64, graphics, audio, input, launcher/runtime, Vulkan/OpenGL, and possibly Proton/Wine paths genuinely exist.
+
+These names are workload candidates, not support claims or promises. The exact versions, architectures, legal distribution paths, benchmark scenes, and graphics/runtime requirements must be chosen when each rung is reached. Real pressure may change the order.
+
+There is an important nonclaim here: **RAM cannot replace GPU compute capability.** A title that is fundamentally limited by shader throughput, rasterization, ray tracing, VRAM bandwidth, or another hard graphics bottleneck will remain limited by the available graphics hardware. Morphic cannot turn an incapable GPU into a capable one merely by freeing system memory.
+
+What specialization may be able to improve is the surrounding cost of running the workload: how much RAM remains available, how much shared memory an integrated GPU can access without competing with unnecessary processes, how much background CPU and I/O interference exists, whether the machine avoids swapping, whether frame-time spikes are reduced, whether a larger simulation or modpack fits, and how well constrained hardware is utilized. That is why **maximum playable workload on fixed inexpensive hardware** may ultimately be a more interesting metric than average FPS alone.
 
 The standard should therefore be empirical rather than promotional: same machine, same application build, same graphics settings and resolution, same driver/hardware path where possible, reproducible scenes or traces, and publication of both wins and losses.
 
-If Morphic eventually reaches the point where an ordinary 16 GiB computer can dedicate nearly all of its usable machine budget to one heavy workload while preserving the workload's expected compatibility contract, that would be a compelling demonstration of how far the substrate has come. It would also generalize beyond games to compilers, databases, AI inference, emulators, renderers, scientific programs, and simulations.
+If Morphic eventually reaches the point where an ordinary 8 or 16 GiB laptop can dedicate nearly all of its usable machine budget to one heavy workload while preserving the workload's expected compatibility contract, that would be a compelling demonstration of how far the substrate has come. It would also generalize beyond games to compilers, databases, AI inference, emulators, renderers, scientific programs, and simulations.
 
 The fuller proposal, including Normal/Focus/Appliance modes, resource-policy ideas, benchmark rules, and the game/workload pressure ladder, lives in [`docs/concepts/APPLIANCE_MODE_AND_WORKLOAD_SPECIALIZATION.md`](docs/concepts/APPLIANCE_MODE_AND_WORKLOAD_SPECIALIZATION.md).
 
