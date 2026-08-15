@@ -5,7 +5,7 @@
 - Visible clock start: `2026-08-15T09:59:07Z`.
 - Inherited SHA: `5f8e348d67d5d26fea66bb0db3616784600f5505` on branch `work`. It contains authoring main merge `8df48924815f09da26ed399e13c4a24542e29c2b` plus the Batch 32K request.
 - Sync was attempted first and failed closed: this checkout has no remote named `origin` and no local `main` branch. No inherited work was overwritten.
-- Implementation commit: `a39268b` (`morphic: repair transactional runtime open and add F_DUPFD`). Final head is the following documentation persistence commit containing this report.
+- GitHub-persisted PR #87 head: `335e8aa097e0740ff6cdad0b1b15b8a48c3e7247` (`morphic: complete Batch 32K ownership repair proof`). The persisted merge boundary is `47b3bb3b142edb4d931a8804d55e15ef98faf6f5` (`Merge PR #87: Batch 32K transactional open and F_DUPFD frontier`). The earlier agent-local `a39268b` identifier was not persisted in PR #87 and is not a reproducible history boundary.
 - Push and PR creation are unavailable because `git remote -v` is empty. The successor must configure `origin`, push `work`, and open the PR.
 
 ## Mandatory inherited repairs

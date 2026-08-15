@@ -19,6 +19,7 @@ const external_artifact_options = @import("external-artifact-options");
 const bounded_syscall_evidence = @import("bounded_syscall_evidence.zig");
 const bounded_mapping_preflight = @import("bounded_mapping_preflight.zig");
 const linux_rv64_clone_request = @import("linux_rv64_clone_request.zig");
+const linux_rv64_fdupfd = @import("linux_rv64_fdupfd.zig");
 const runtime_mappings = @import("bounded_runtime_mappings.zig");
 const syscall_read_backend = @import("syscall_read_backend.zig");
 const bounded_namespace_lookup = @import("bounded_namespace_lookup.zig");
@@ -489,7 +490,8 @@ var syscall_output: [64]u8 = .{0} ** 64;
 var syscall_output_len: usize = 0;
 const ResourceStore = resource_tables.ResourceTable(16);
 const ResourceRef = ResourceStore.ResourceRef;
-const ProcessBindings = resource_tables.BindingTable(ResourceRef, 16);
+const syscall_binding_capacity = 16;
+const ProcessBindings = resource_tables.BindingTable(ResourceRef, syscall_binding_capacity);
 var syscall_resources: ResourceStore = .{};
 var syscall_bindings: ProcessBindings = .{};
 const syscall_stdin = "stdin-25b-proof";
@@ -1788,21 +1790,16 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
             // Linux/RV64 F_DUPFD is command zero. Other fcntl policy remains
             // explicitly unsupported at this compatibility edge.
             if (frame.x[11] != 0) {
-                frame.x[10] = negativeErrno(38);
-            } else if (syscall_bindings.resolve(frame.x[10])) |reference| {
-                const destination = syscall_bindings.lowestFreeAtOrAbove(frame.x[12]) orelse {
-                    frame.x[10] = negativeErrno(24);
-                    return finishReturningSyscall(frame, index);
-                };
-                // Retain before binding, so any ownership failure leaves the
-                // descriptor topology unchanged.
-                syscall_resources.retain(reference) catch {
-                    frame.x[10] = negativeErrno(23);
-                    return finishReturningSyscall(frame, index);
-                };
-                syscall_bindings.bindAt(destination, reference) catch shutdown();
-                frame.x[10] = destination;
-            } else frame.x[10] = negativeErrno(9);
+                // Linux reports an unrecognized fcntl command as EINVAL. In
+                // particular, musl uses that result to fall back from an
+                // unsupported F_DUPFD_CLOEXEC request to plain F_DUPFD.
+                frame.x[10] = negativeErrno(22);
+            } else frame.x[10] = linux_rv64_fdupfd.duplicate(&syscall_resources, &syscall_bindings, frame.x[10], frame.x[12], syscall_binding_capacity) catch |err| negativeErrno(switch (err) {
+                error.InvalidSource => 9,
+                error.InvalidMinimum => 22,
+                error.DescriptorFull => 24,
+                error.ResourceFull => 23,
+            });
         },
         .close => {
             syscall_semantics[index] = 5;

@@ -571,6 +571,14 @@ Batch 32G keeps the existing Batch 32D live-console build and QEMU command surfa
 
 Batch 32K reused the Batch 32D live-console build and QEMU command surface. Focused resource/runtime tests and the exact Alpine v3.22.0 RV64 freestanding build passed after rejecting unsupported `O_APPEND`, making runtime create/truncate preflight resource and descriptor capacity, expanding the bounded binding table to 16 slots, and adding Linux/RV64 `fcntl(25)` `F_DUPFD`. Real QEMU retry was unavailable in the execution environment, so no runtime milestone beyond Batch 32J is claimed. No new runnable command was introduced.
 
+Batch 32L reused that command surface and corrected Linux/RV64 `F_DUPFD` so
+invalid bounded minima return `EINVAL`, eligible-slot exhaustion returns
+`EMFILE`, and all failures conserve descriptor bindings and resource references.
+System QEMU 8.2.2 crossed the inherited `F_DUPFD` boundary after unsupported
+`fcntl` commands were correctly reported as `EINVAL`; unchanged redirection
+then reached real ash's unsupported `dup2(10,1)` compatibility boundary. No new
+runnable command was introduced.
+
 The PR #87 focused review repair regenerated the bounded-resource-table port and complete endpoint contracts, all affected textual indexes, and all 60 unit/smoke evidence records. The combined runtime-open transaction regression now proves namespace, resource-count, binding-topology, and reference-count conservation across descriptor/resource exhaustion. `zig build check` and `python3 tools/developer-command.py validate-repository` passed; the latter completed 350/350 steps and 249/249 tests under Zig 0.14.0. QEMU remained unavailable, so no new Alpine milestone is claimed.
 
 ## Batch 32H read-only Alpine pressure state
