@@ -320,13 +320,13 @@ The goal is not the smallest kernel at any cost. It is the smallest coherent fou
 
 ## Current machine milestone
 
-# ★ READ-ONLY ALPINE UNDER MORPHIC ★ + PERSISTENT CWD
+# ★ READ-ONLY ALPINE UNDER MORPHIC ★ + PERSISTENT CWD + BOUNDED WRITABLE STATE
 
 **Batches 32C through 32I are complete. Morphic now boots the exact Alpine v3.22.0 RV64 namespace, enters the real musl interpreter and BusyBox `/bin/sh`, preserves a persistent interactive shell, executes real external BusyBox applets through bounded clone/exec, enumerates the genuine serialized root namespace, reads real regular-file backing, and maintains bounded per-process current-working-directory state.**
 
-Batch 32H earned the read-only Alpine milestone under real system QEMU: genuine `ls /`, real `cat /etc/alpine-release -> 3.22.0`, and a living parent shell. Batch 32I then mapped Linux/RV64 `chdir(49)` onto neutral bounded cwd state, made `getcwd(17)` report that state, and preserved cwd across clone, exec, and retained-parent restoration. One persistent real Alpine shell now proves `cd /tmp` followed by `pwd -> /tmp`.
+Batch 32H earned the read-only Alpine milestone under real system QEMU: genuine `ls /`, real `cat /etc/alpine-release -> 3.22.0`, and a living parent shell. Batch 32I then earned persistent cwd. Batch 32J adds a neutral four-object, 256-byte-per-object session overlay with create, truncate, read-back, checked writes, stable identity, and ordinary resource bindings without modifying Alpine backing. Real ash advances past `openat` creation to its next exact boundary, `fcntl(1,F_DUPFD,10)`, which is not implemented; redirection is therefore not yet claimed.
 
-The exact current pressure frontier is now shell redirection. The unchanged command `echo hello > /tmp/hello` reaches the inherited read-only `openat(56)` policy and fails with `Read-only file system`. The next required mechanism is a neutral bounded writable runtime namespace plus writable descriptor/resource binding, without mutating the verified Alpine source namespace.
+The exact current pressure remains shell redirection. The unchanged command `echo hello > /tmp/hello` now creates the bounded runtime object, then ash requests `fcntl(1,F_DUPFD,10)`. Ownership-correct minimum-descriptor duplication and a sufficient bounded binding table are the next causal repair.
 
 ```text
 exact Alpine v3.22.0 RV64 minirootfs       PASS
