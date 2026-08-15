@@ -139,7 +139,8 @@ static shell                   measured                    measured
 dynamic musl                   measured                    measured
 dynamic BusyBox                measured                    measured
 real Alpine                    measured                    measured
-interactive Alpine             future                      future
+interactive Alpine             measured                    measured
+read-only Alpine               measured                    measured
 playable Alpine                future                      future
 apk                            future                      future
 Python                         future                      future
@@ -319,11 +320,13 @@ The goal is not the smallest kernel at any cost. It is the smallest coherent fou
 
 ## Current machine milestone
 
-# ★ PERSISTENT INTERACTIVE REAL ALPINE SHELL ★
+# ★ READ-ONLY ALPINE UNDER MORPHIC ★
 
-**Batches 32C through 32E are complete. Morphic now boots the exact Alpine v3.22.0 RV64 namespace, enters the real musl interpreter and BusyBox `/bin/sh`, accepts live keyboard input, preserves an interactive shell across commands, and creates a bounded fork-shaped child for external-command pressure.**
+**Batches 32C through 32H are complete. Morphic now boots the exact Alpine v3.22.0 RV64 namespace, enters the real musl interpreter and BusyBox `/bin/sh`, preserves a persistent interactive shell, executes real external BusyBox applets through bounded clone/exec, enumerates the genuine serialized root namespace, and reads real regular-file backing.**
 
-The current proof frontier is no longer shell startup or `clone(220)`. The real child reaches Linux/RV64 `execve(221)` for `/bin/ls`; that syscall is the exact next unsupported boundary.
+Batch 32H crossed the old `openat(56)` frontier under real system QEMU. The unchanged `ls /` pressure now prints genuine root-directory entries through bounded `getdents64(61)`, and `cat /etc/alpine-release` reads the immutable namespace backing and prints `3.22.0`. The original shell remains alive afterward.
+
+The exact current pressure frontier is now `cd /tmp`: BusyBox ash reaches Linux/RV64 `chdir(49)`, which is not yet implemented. The next work is neutral bounded cwd process state, then writable runtime state/redirection, then pipes and the process/FD lifetime required by a real pipeline.
 
 ```text
 exact Alpine v3.22.0 RV64 minirootfs       PASS
@@ -333,6 +336,7 @@ runtime /bin/sh -> /bin/busybox lookup     PASS
 same-namespace real musl PT_INTERP lookup  PASS
 real ld-musl interpreter-first             PASS
 PREPARE -> COMMIT -> execute               PASS
+exec mapping/table-capacity preflight      PASS
 W+X=0                                      PASS
 
 live keyboard input                        PASS
@@ -340,34 +344,39 @@ real interactive BusyBox /bin/sh           PASS
 echo morphic                               PASS
 persistent second command                  PASS
 pwd -> /                                   PASS
-PATH lookup for ls                         PASS
-/bin/ls -> /bin/busybox resolution         PASS
 
 clone(220), flags 0x11, null child stack   PASS
 real child execution                       PASS
 bounded parent snapshot/restoration        PASS
-parent shell after child failure           PASS: still-alive
+execve(221) replacement                    PASS
+parent shell after external child          PASS: still-alive
 non-fatal saturating syscall evidence      PASS
 
-execve(221) replacement                    CURRENT BLOCKER
-ls /                                       PENDING
-cat /etc/alpine-release                    PENDING
-writable /tmp and redirection              PENDING
-pipes and multi-process lifetime           PENDING
+openat(56) namespace object binding        PASS
+getdents64(61) directory enumeration       PASS
+ls /                                       PASS: genuine namespace entries
+regular namespace read + shared offset     PASS
+cat /etc/alpine-release                    PASS: 3.22.0
+★ READ-ONLY ALPINE ★                        EARNED
+
+chdir(49) + neutral cwd state              CURRENT BLOCKER
+writable /tmp runtime layer                PENDING
+shell redirection                          PENDING
+pipes and multi-process / FD lifetime      PENDING
 ★ PLAYABLE ALPINE ★                         PENDING
 ```
 
-The bounded `clone(220)` path does not fake a PID or execute child work inline in the parent. It snapshots the parent, runs a real child first, and restores the isolated parent state after child termination. When the child encountered unsupported `execve(221)`, ash reported `/bin/sh: ls: Function not implemented`; the restored shell then successfully printed `still-alive`.
+The Batch 32H proof is runtime evidence, not compile-only inference. Real QEMU pressure produced the Alpine root listing, the real release file contents, and a living shell after both external commands. Descriptor-shared directory cursors and regular-file offsets are backed by the serialized namespace rather than command-specific output.
 
-The historical 64-entry syscall-evidence ceiling is also non-fatal now: the first window is retained, total/dropped counters expose saturation, and valid semantic execution continues.
+The known Batch 32G intermediate-component symlink limitation remains explicitly documented and was non-causal to the read-only Alpine acceptance path. It is not being hidden or promoted as complete Linux pathname behavior.
 
-This is **interactive Alpine**, but not yet **playable Alpine**. External programs still require bounded namespace-backed execution-image replacement and the later filesystem, descriptor, redirection, pipe, wait, and lifetime semantics proven necessary by unchanged Alpine commands.
+This is now **read-only Alpine**, but not yet **playable Alpine**. The remaining canonical gates are current-working-directory state, bounded writable runtime objects and shell redirection, then a genuine `echo hello | cat` pipeline with coherent process/descriptor lifetime.
 
-See [`docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md), [`docs/reports/AGENTIC_SNOWBALL_BATCH_32D.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32D.md), and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32E.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32E.md).
+See [`docs/reports/AGENTIC_SNOWBALL_BATCH_32G.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32G.md) and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md).
 
 ## Try the real Alpine proof in your own console
 
-You can reproduce the foundational Batch 32C milestone from a fresh clone. This command runs the real Alpine `/bin/sh -c 'echo alpine'` path under Morphic and shows the proven userspace output. Batches 32D and 32E have since advanced the machine to the persistent interactive and bounded-child frontier summarized above.
+You can reproduce the foundational Batch 32C milestone from a fresh clone. This command runs the real Alpine `/bin/sh -c 'echo alpine'` path under Morphic and shows the proven userspace output. Batches 32D through 32H have since advanced the same machine through persistent interaction, bounded child/exec behavior, real root-directory enumeration, and real regular-file reads; the current read-only frontier is summarized above.
 
 Prerequisites:
 
@@ -449,11 +458,12 @@ You do **not** have to accept the current architecture as sacred. A strong resul
 
 Some of the next concrete questions are:
 
-- What is the minimum general execution-image replacement required for the cloned Alpine child to complete its real `execve(221)` request?
-- After real `/bin/ls` executes, what directory, wait, FD-inheritance, pipe, redirection, TTY, and signal semantics does unchanged Alpine pressure actually demand?
+- What is the smallest neutral cwd/process-state mechanism that lets real ash complete `chdir(49)` and makes `pwd` report `/tmp` coherently across fork and exec?
+- What bounded writable runtime namespace can support real create/truncate/write/read-back behavior without mutating the immutable Alpine source artifact?
+- Which descriptor replacement and lifetime semantics does unchanged ash actually require for `echo hello > /tmp/hello`?
+- Does `echo hello | cat` force Morphic beyond its current serialized child-first model into multiple simultaneously meaningful process states?
 - Which Linux behaviors belong at the compatibility edge, and which reveal reusable Morphic mechanisms?
 - How far can the privileged core remain small and understandable while the capability surface grows?
-- Can the same substrate support a cleaner native QuirkM userspace, stronger isolation models, Wasm, or virtualization without inheriting every historical Unix assumption?
 - Which current design decisions fail under stronger proofs, more hostile workloads, or alternative architectures?
 
 Bring a counterexample. Bring a trace. Bring a weird ELF. Bring a cleaner abstraction. Bring a PR that deletes more complexity than it adds.
@@ -479,11 +489,11 @@ Chronology tag:
 
 `time-till-first-static-busybox-shell-229.48-hours-from-repository-start-2026-08-13`
 
-Future major milestones should accumulate the same chronology line by line. The real dynamic-musl, dynamic-BusyBox-shell, and first-real-Alpine milestones are complete and can each receive their own accumulated `time-till` chronology entries.
+Future major milestones should accumulate the same chronology line by line. The real dynamic-musl, dynamic-BusyBox-shell, first-real-Alpine, persistent-interactive-Alpine, and read-only-Alpine milestones are complete and can each receive their own accumulated `time-till` chronology entries.
 
 ## Active frontier
 
-**First real Alpine, persistent interaction, root `pwd`, `/bin/ls` resolution, bounded `clone(220)`, real child entry, parent restoration, and non-fatal trace saturation are complete. The exact active blocker is Linux/RV64 `execve(221)` in the child created for unchanged `ls /`.**
+**Read-only Alpine is earned under real QEMU. The exact active blocker is Linux/RV64 `chdir(49)` plus neutral bounded cwd process state, exposed by unchanged `cd /tmp`.**
 
 ```text
 FIRST STATIC BUSYBOX SHELL                complete
@@ -502,30 +512,36 @@ REAL ALPINE NAMESPACE                     complete
         |
         v
 PERSISTENT INTERACTIVE ALPINE SHELL       complete
-echo morphic / second command / pwd
-        |
-        v
-PATH + /bin/ls RESOLUTION                 complete
         |
         v
 BOUNDED clone(220) + REAL CHILD           complete
-parent restoration + still-alive
         |
         v
-execve(221)                               <-- exact current blocker
+execve(221) + REAL BUSYBOX APPLETS        complete
         |
         v
-REAL ls / + DIRECTORY ENUMERATION         pending
+openat(56) + getdents64(61)               complete
         |
         v
-READ-ONLY PLAYABILITY
-cat /etc/alpine-release
+REAL ls / + DIRECTORY ENUMERATION         complete
         |
         v
-WRITABLE /tmp + REDIRECTION
+REGULAR-FILE READ + alpine-release        complete
         |
         v
-PIPES + PROCESS / FD LIFETIME
+★ READ-ONLY ALPINE ★                      complete
+        |
+        v
+chdir(49) + NEUTRAL CWD                   <-- exact current blocker
+        |
+        v
+WRITABLE /tmp RUNTIME STATE               pending
+        |
+        v
+SHELL REDIRECTION                         pending
+        |
+        v
+PIPES + PROCESS / FD LIFETIME             pending
         |
         v
 ★ PLAYABLE ALPINE ★
@@ -552,17 +568,19 @@ Alpine Linux
 / # ls /
 bin dev etc lib sbin tmp usr var
 / # cat /etc/alpine-release
-3.22...
+3.22.0
 / # cd /tmp
-/tmp # echo morphic > hello
-/tmp # cat hello
-morphic
+/tmp # echo hello > /tmp/hello
+/tmp # cat /tmp/hello
+hello
 /tmp # echo hello | cat
 hello
+/tmp # echo still-alive
+still-alive
 /tmp #
 ```
 
-Only real pressure should decide what filesystem, pathname, metadata, process, terminal, networking, or compatibility mechanisms are admitted next. The kernel should not grow a speculative Linux subsystem merely because Linux has one.
+Only real pressure should decide what cwd, filesystem, pathname, metadata, process, terminal, networking, or compatibility mechanisms are admitted next. The kernel should not grow a speculative Linux subsystem merely because Linux has one.
 
 Completed reports:
 
@@ -570,10 +588,13 @@ Completed reports:
 - [`docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md)
 - [`docs/reports/AGENTIC_SNOWBALL_BATCH_32D.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32D.md)
 - [`docs/reports/AGENTIC_SNOWBALL_BATCH_32E.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32E.md)
+- [`docs/reports/AGENTIC_SNOWBALL_BATCH_32F.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32F.md)
+- [`docs/reports/AGENTIC_SNOWBALL_BATCH_32G.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32G.md)
+- [`docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md)
 
 Current execution plan:
 
-- [`docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32F_EXECVE221_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt`](docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32F_EXECVE221_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt)
+- [`docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32I_READONLY_ALPINE_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt`](docs/plans/CODEX_AGENTIC_SNOWBALL_BATCH_32I_READONLY_ALPINE_TO_PLAYABLE_ALPINE_BOUNDED_LEAPS_MANDATORY_30MIN_HANDOFF.txt)
 
 ## Engineering model
 
@@ -591,7 +612,7 @@ observe real failure
 
 ## Documentation
 
-Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md`](docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md), [`docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md`](docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32C.md).
+Start with [`docs/README.md`](docs/README.md), [`AGENTS.md`](AGENTS.md), [`COMMANDS.md`](COMMANDS.md), [`docs/porting/PORTING.md`](docs/porting/PORTING.md), [`docs/project_vocab.md`](docs/project_vocab.md), [`docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md`](docs/research/MORPHIC_CONVERGENCE_HYPOTHESIS.md), [`docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md`](docs/research/MORPHIC_GENERAL_SYSTEMS_RESEARCH_SUBSTRATE_PROPOSAL.md), [`docs/concepts/QuirkM/`](docs/concepts/QuirkM/), and [`docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md`](docs/reports/AGENTIC_SNOWBALL_BATCH_32H.md).
 
 ## Validation
 
@@ -611,6 +632,6 @@ Research that proves an existing Morphic or QuirkM idea wrong is useful too. Pre
 
 Alpz is **not Linux**, QuirkM is **not a completed native operating environment**, and Morphic is **not presented as a production kernel platform**.
 
-The project now has real static-musl execution, a proven static Alpine BusyBox shell, successful real dynamic-musl execution through the real userspace interpreter, a proven dynamic Alpine BusyBox shell, **first real Alpine through a complete serialized Alpine v3.22.0 RV64 namespace**, a persistent interactive shell, root `pwd`, real `/bin/ls` resolution, and bounded `clone(220)` child/parent-restoration semantics. It does **not yet claim** playable Alpine, successful external-command `execve(221)`, general Linux compatibility, working `apk add`, production security, production readiness, or completed virtualization.
+The project now has real static-musl execution, a proven static Alpine BusyBox shell, successful real dynamic-musl execution through the real userspace interpreter, a proven dynamic Alpine BusyBox shell, **first real Alpine through a complete serialized Alpine v3.22.0 RV64 namespace**, a persistent interactive shell, bounded clone/exec external-command execution, genuine root-directory enumeration through `getdents64(61)`, and real immutable regular-file reads including `/etc/alpine-release -> 3.22.0`. It has therefore earned the **read-only Alpine** milestone under real QEMU pressure. It does **not yet claim** neutral `chdir(49)`/cwd state, writable runtime filesystem semantics, shell redirection, pipelines, playable Alpine, general Linux compatibility, working `apk add`, production security, production readiness, or completed virtualization. The known intermediate-component symlink limitation remains documented.
 
 Proof records, exact artifacts, machine traces, validation gates, and current code define what has actually been achieved.
