@@ -1,0 +1,137 @@
+Work in the existing repository at ~/dev/zig-reference.
+
+Use Zig 0.14.0.
+
+Read AGENTS.md first and follow its zero-context workflow. Run:
+
+python3 tools/query-reference.py agent bootstrap
+python3 tools/query-reference.py agent doctor
+
+Then inspect the smallest relevant canonical contracts, generated views, current Morphic runtime source/tests, COMMANDS.md, the Alpz roadmap, and the persisted Batch 32L handoff at docs/reports/AGENTIC_SNOWBALL_BATCH_32L.md.
+
+# Agentic Snowball Batch 32M — ownership-correct dup2 and unchanged real-Alpine pressure
+
+## Inherited proven frontier
+
+Batch 32L is merged and is the source of truth for the inherited boundary.
+
+The exact real BusyBox/musl/system-QEMU pressure crossed the previous Linux/RV64 F_DUPFD compatibility boundary. Unsupported fcntl commands now return Linux EINVAL so musl can fall back from F_DUPFD_CLOEXEC to F_DUPFD. The unchanged shell then reached the directly observed next boundary:
+
+/bin/sh: dup2(10,1): Function not implemented
+
+Do not re-solve F_DUPFD. Preserve its errno, ownership, failure-atomicity, lowest-free-descriptor, and reference-lifecycle guarantees.
+
+The highest earned state is read-only Alpine plus persistent cwd and bounded writable runtime state, with real ash proven across F_DUPFD up to descriptor replacement. Playable Alpine is NOT yet earned.
+
+## Primary objective
+
+Implement the smallest ownership-correct Linux/RV64 descriptor-replacement behavior required by the directly observed dup2(10,1) pressure, then rerun the exact unchanged real-QEMU shell pressure.
+
+The goal is not to implement a broad POSIX fd subsystem. The goal is to cross exactly the next causal compatibility boundary without weakening existing bounded-state or ownership invariants.
+
+## Required semantics
+
+First identify the actual Linux/RV64 syscall form emitted by the unchanged BusyBox/musl path. Do not assume the syscall number or wrapper if runtime evidence or the existing dispatcher says otherwise.
+
+Implement the narrow dup2-equivalent semantics required by that observed path. The implementation must preserve Linux-visible behavior and the repository's bounded ownership model.
+
+At minimum, prove and test the relevant behavior for:
+
+- invalid source descriptor -> EBADF;
+- valid source and target descriptor replacement;
+- target already bound: release exactly the target's previous owned reference and replace it with the source resource;
+- source resource retained exactly once when a distinct target alias is created;
+- source == target behavior, if reachable through the actual syscall form, follows Linux semantics and does not perturb ownership;
+- replacement is failure-atomic: if the operation cannot commit, descriptor topology and resource reference counts remain unchanged;
+- replacing a target that aliases the same underlying resource remains reference-count correct;
+- final closes release the resource exactly when the last owned descriptor reference disappears;
+- out-of-range or otherwise impossible bounded target descriptors map to the correct Linux-visible failure for the implemented syscall form;
+- no hidden allocation and no expansion of the bounded descriptor/resource model merely to make the test pass.
+
+Do not place Linux errno policy into a neutral generic data structure if a focused Linux/RV64 adapter is the cleaner boundary. Reuse the Batch 32L adapter style or existing canonical primitives when they fit rather than duplicating ownership logic.
+
+## Real pressure requirement
+
+After focused tests and repository validation pass, rerun the same exact Alpine v3.22.0 RV64 artifact/live-console flow documented by Batch 32L. Use the unchanged artifact and unchanged shell command first:
+
+echo hello > /tmp/hello
+
+Do not modify BusyBox, musl, the Alpine rootfs, or the command to evade the observed boundary.
+
+If redirection succeeds, immediately test the next already-planned unchanged observations in causal order:
+
+cat /tmp/hello
+
+echo hello | cat
+
+Stop at the first genuinely new causal blocker. Do not implement the next blocker in the same run unless it is inseparable from correct dup2 semantics or a tiny correctness repair required to make the just-added implementation valid.
+
+Do not claim /tmp/hello read-back, pipelines, or Playable Alpine unless the real QEMU run actually proves them.
+
+## Regression requirements
+
+Add focused regression tests that permanently compress the expensive runtime discovery. Tests should cover ownership and atomicity, not merely syscall return values.
+
+Preserve all previously earned invariants, including:
+
+- immutable serialized backing;
+- bounded writable runtime state;
+- transactional runtime open;
+- descriptor/resource ownership correctness;
+- F_DUPFD behavior from Batch 32L;
+- O_APPEND rejection where still intentionally unsupported;
+- PREPARE -> COMMIT exec replacement;
+- mapping preflight and W+X=0;
+- persistent cwd behavior;
+- documented intermediate-symlink limitation;
+- deterministic/fail-closed repository validation.
+
+Do not broaden scope into pipes, general ioctl support, networking, dynamic allocation, a larger VFS redesign, or unrelated Linux ABI work unless the observed dup2 implementation strictly requires a tiny shared primitive.
+
+## Validation
+
+Run the focused recipe/runtime tests first, then the repository-required checks under Zig 0.14.0. At minimum include the applicable equivalents of:
+
+zig fmt --check build.zig projects recipes conformance
+git diff --check
+zig build test-recipe-run-hosted-morphic-runtime
+zig build check
+PYTHONDONTWRITEBYTECODE=1 python3 tools/check-command-reference.py --check
+python3 tools/developer-command.py validate-repository
+
+Follow AGENTS.md if canonical commands have changed. Preserve nonzero failures; repair the cause rather than bypassing validation.
+
+COMMANDS.md is mandatory maintenance. If no runnable command changes, still record material validation/workflow facts if repository policy requires it. Never claim a command or result that was not actually executed.
+
+## Evidence and handoff
+
+Create docs/reports/AGENTIC_SNOWBALL_BATCH_32M.md.
+
+Record only reproducible, persisted history boundaries. Never describe an agent-local or unpersisted SHA as a GitHub-persisted implementation commit. If a local identifier matters, label it explicitly as unpersisted.
+
+The handoff must state:
+
+- inherited persisted boundary;
+- exact files/behavior changed;
+- focused and aggregate validation actually run;
+- exact Alpine artifact identity used;
+- exact real-QEMU command used;
+- exact shell commands attempted and their observed output;
+- highest honestly earned milestone;
+- EXACTLY ONE NEXT CAUSAL BLOCKER.
+
+If echo hello > /tmp/hello succeeds but cat /tmp/hello fails, that read-back failure is the next blocker. If read-back succeeds but echo hello | cat fails, the pipeline failure is the next blocker. If all three succeed, state that evidence precisely and identify the first next blocker exposed by the canonical progression rather than inventing one.
+
+## Git/GitHub completion
+
+Start from current main and do not overwrite newer work. Keep the change focused.
+
+When implementation and validation are complete, commit the work on a dedicated branch, push it, and open a pull request against main if GitHub access is available. The PR body must distinguish proven behavior from remaining work and include the exact validation and QEMU evidence.
+
+If GitHub mutation is unavailable in the execution environment, leave the completed local commit ready for persistence and state that limitation explicitly. Do not fabricate a PR, tag, commit, or remote state.
+
+## Governing rule
+
+Take the smallest step that exposes the next missing real behavior, then compress that discovery into permanent focused tests.
+
+Success for Batch 32M is not "more Linux ABI." Success is an ownership-correct, failure-atomic descriptor replacement path that crosses the observed dup2(10,1) boundary under unchanged real Alpine/QEMU pressure and honestly stops at the next causal frontier.
