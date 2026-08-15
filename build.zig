@@ -275,6 +275,12 @@ pub fn build(b: *std.Build) void {
             syscall_read_backend_module.addImport("bounded-resource-table", findModule("bounded-resource-table", &modules));
             const syscall_read_backend_tests = b.addTest(.{ .root_module = syscall_read_backend_module });
             recipe_step.dependOn(&b.addRunArtifact(syscall_read_backend_tests).step);
+            const namespace_lookup_tests = b.addTest(.{ .root_module = b.createModule(.{
+                .root_source_file = b.path("recipes/run-hosted-morphic-runtime/src/bounded_namespace_lookup.zig"),
+                .target = target,
+                .optimize = optimize,
+            }) });
+            recipe_step.dependOn(&b.addRunArtifact(namespace_lookup_tests).step);
             const executable = b.addExecutable(.{ .name = "run-hosted-morphic-runtime", .root_module = recipe_module });
             const install_riscv64 = b.addInstallArtifact(executable, .{});
             b.step("install-riscv64-morphic-runtime", "Cross-compile and install the Morphic executable selected by -Dtarget")

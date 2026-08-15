@@ -573,3 +573,9 @@ as the historical deterministic-stdin cursor. The focused
 `zig build test-recipe-run-hosted-morphic-runtime` step now regression-tests
 backend classification and preserves deterministic stdin backend `0` plus live
 console backend `3`; no command surface or namespace read semantics were added.
+
+PR #83's symlink-open repair makes executable lookup and `openat(56)` share the
+same bounded namespace resolver. The focused Morphic recipe tests cover ordinary
+final-symlink following, `O_NOFOLLOW`, the sixteen-traversal cycle boundary, and
+root-directory lookup. No new command, namespace mutation/read, directory
+iteration, or Linux syscall surface was introduced.

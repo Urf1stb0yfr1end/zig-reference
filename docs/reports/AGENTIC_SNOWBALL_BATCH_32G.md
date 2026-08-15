@@ -94,3 +94,17 @@ directory/regular backends `0x100`/`0x101` return
 state to both namespace backends and proves neither produces a fixture range,
 while preserving the historical deterministic-stdin range behavior. No
 namespace file read, directory enumeration, or new Linux syscall was added.
+
+## PR #83 coherent symlink-open repair
+
+The second review follow-up factors bounded namespace object resolution into one
+helper shared by executable lookup and `openat`. Ordinary read-only opens follow
+the final absolute symlink through the existing sixteen-traversal bound;
+Linux/RV64 `O_NOFOLLOW` (`0x20000`) rejects a final symlink with `ELOOP`, and a
+cycle/excessive chain also returns `ELOOP`. Invalid paths, malformed objects,
+and malformed targets fail closed. Resolution returns the target object's kind,
+manifest identity, and checked regular-file backing range, so directory versus
+regular identity is preserved. Focused tests cover ordinary symlink resolution,
+`O_NOFOLLOW`, cyclic traversal, and unchanged root-directory lookup. This repair
+adds neither writable behavior, file reads, directory enumeration, nor another
+syscall.

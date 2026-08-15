@@ -21,6 +21,7 @@ const bounded_mapping_preflight = @import("bounded_mapping_preflight.zig");
 const linux_rv64_clone_request = @import("linux_rv64_clone_request.zig");
 const runtime_mappings = @import("bounded_runtime_mappings.zig");
 const syscall_read_backend = @import("syscall_read_backend.zig");
+const bounded_namespace_lookup = @import("bounded_namespace_lookup.zig");
 const userspace_elf = @embedFile("userspace-elf-rv64");
 const userspace_elf_data_bss = @embedFile("userspace-elf-rv64-data-bss");
 const userspace_elf_initial_stack = @embedFile("userspace-elf-rv64-initial-stack");
@@ -35,8 +36,7 @@ pub export const external_rv64_interpreter align(frames.PageSize) linksection(".
 pub export const external_rv64_namespace_manifest align(frames.PageSize) linksection(".caller_artifact") = @embedFile("external-rv64-namespace-manifest").*;
 pub export const external_rv64_namespace_data align(frames.PageSize) linksection(".caller_artifact") = @embedFile("external-rv64-namespace-data").*;
 
-const NamespaceFile = struct { bytes: []const u8, symlink: ?[]const u8 = null, traversals: usize = 0 };
-const NamespaceObject = struct { kind: enum { regular, directory, symlink }, manifest_offset: usize };
+const NamespaceFile = struct { bytes: []const u8, traversals: usize = 0 };
 
 fn jsonUnsignedAfter(source: []const u8, start: usize, key: []const u8) ?usize {
     const relative = std.mem.indexOfPos(u8, source, start, key) orelse return null;
@@ -56,69 +56,14 @@ fn jsonStringAfter(source: []const u8, start: usize, key: []const u8) ?[]const u
     return source[begin..end];
 }
 
-fn namespaceObject(manifest: []const u8, path: []const u8, data: []const u8) ?NamespaceFile {
-    var cursor: usize = 0;
-    while (std.mem.indexOfPos(u8, manifest, cursor, "\"path\":\"")) |at| {
-        const object_end = std.mem.indexOfScalarPos(u8, manifest, at, '}') orelse return null;
-        const found = jsonStringAfter(manifest, at, "\"path\":\"") orelse return null;
-        if (std.mem.eql(u8, found, path)) {
-            const object_begin = std.mem.lastIndexOfScalar(u8, manifest[0..at], '{') orelse return null;
-            const row = manifest[object_begin .. object_end + 1];
-            const kind = jsonStringAfter(row, 0, "\"kind\":\"") orelse return null;
-            if (std.mem.eql(u8, kind, "symlink")) return .{ .bytes = &.{}, .symlink = jsonStringAfter(row, 0, "\"target\":\"") orelse return null };
-            if (!std.mem.eql(u8, kind, "regular")) return null;
-            const offset = jsonUnsignedAfter(row, 0, "\"data_offset\":") orelse return null;
-            const length = jsonUnsignedAfter(row, 0, "\"data_length\":") orelse return null;
-            if (offset > data.len or length > data.len - offset) return null;
-            return .{ .bytes = data[offset .. offset + length] };
-        }
-        cursor = object_end + 1;
-    }
-    return null;
-}
-
-fn namespaceObjectIdentity(manifest: []const u8, path: []const u8) ?NamespaceObject {
-    var cursor: usize = 0;
-    while (std.mem.indexOfPos(u8, manifest, cursor, "\"path\":\"")) |at| {
-        const object_end = std.mem.indexOfScalarPos(u8, manifest, at, '}') orelse return null;
-        const object_begin = std.mem.lastIndexOfScalar(u8, manifest[0..at], '{') orelse return null;
-        const row = manifest[object_begin .. object_end + 1];
-        const found = jsonStringAfter(row, 0, "\"path\":\"") orelse return null;
-        if (std.mem.eql(u8, found, path)) {
-            const kind = jsonStringAfter(row, 0, "\"kind\":\"") orelse return null;
-            return .{
-                .kind = if (std.mem.eql(u8, kind, "regular")) .regular else if (std.mem.eql(u8, kind, "directory")) .directory else if (std.mem.eql(u8, kind, "symlink")) .symlink else return null,
-                .manifest_offset = object_begin,
-            };
-        }
-        cursor = object_end + 1;
-    }
-    return null;
-}
-
 fn validAbsolutePath(path: []const u8) bool {
-    if (path.len < 2 or path[0] != '/' or path[path.len - 1] == '/') return false;
-    var components = std.mem.splitScalar(u8, path[1..], '/');
-    while (components.next()) |component|
-        if (component.len == 0 or std.mem.eql(u8, component, ".") or std.mem.eql(u8, component, "..")) return false;
-    return true;
+    return bounded_namespace_lookup.validAbsolutePath(path);
 }
 
 fn namespaceLookup(manifest: []const u8, guest_path: []const u8, data: []const u8) ?NamespaceFile {
-    if (!validAbsolutePath(guest_path)) return null;
-    var path = guest_path;
-    var traversals: usize = 0;
-    while (true) {
-        const object = namespaceObject(manifest, path, data) orelse return null;
-        const target = object.symlink orelse {
-            var result = object;
-            result.traversals = traversals;
-            return result;
-        };
-        traversals += 1;
-        if (traversals > 16 or !validAbsolutePath(target)) return null;
-        path = target;
-    }
+    const object = bounded_namespace_lookup.resolve(manifest, guest_path, true) catch return null;
+    if (object.kind != .regular or object.data_offset > data.len or object.data_length > data.len - object.data_offset) return null;
+    return .{ .bytes = data[object.data_offset .. object.data_offset + object.data_length], .traversals = object.traversals };
 }
 
 fn namespaceValidate(manifest: []const u8, data: []const u8) bool {
@@ -1093,12 +1038,11 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
         const data: []const u8 = &external_rv64_namespace_data;
         if (!namespaceValidate(manifest, data)) shutdown();
         const shell = namespaceLookup(manifest, external_artifact_options.argv0, data) orelse shutdown();
-        if (shell.symlink != null or shell.traversals == 0) shutdown();
+        if (shell.traversals == 0) shutdown();
         bytes = shell.bytes;
         const inspection = elf_load.planDynamic(4, 32, bytes) catch shutdown();
         const interp_path = inspection.interpreterPath() orelse shutdown();
         const interp = namespaceLookup(manifest, interp_path, data) orelse shutdown();
-        if (interp.symlink != null) shutdown();
         interpreter_bytes = interp.bytes;
         write("ZIGREF_BATCH32C_NAMESPACE format=PASS objects=PASS ranges=PASS shell_lookup=PASS symlink_traversals=");
         writeUsizeHex(shell.traversals);
@@ -1570,14 +1514,19 @@ fn externalNamespaceOpenAt(directory: usize, path_address: usize, flags: usize) 
     const path_len = copyUserCString(path_address, &path_buffer) catch return negativeErrno(14);
     const path = path_buffer[0..path_len];
     if (!std.mem.eql(u8, path, "/") and !validAbsolutePath(path)) return negativeErrno(2);
-    const object = namespaceObjectIdentity(&external_rv64_namespace_manifest, path) orelse return negativeErrno(2);
+    // Linux asm-generic O_NOFOLLOW. Ordinary open follows the final symlink
+    // through the same bounded resolver used by executable namespace lookup.
+    const no_follow = flags & 0x20000 != 0;
+    const object = bounded_namespace_lookup.resolve(&external_rv64_namespace_manifest, path, !no_follow) catch |err| return negativeErrno(switch (err) {
+        error.FinalSymlink, error.TraversalLimit => 40,
+        error.InvalidPath, error.NotFound, error.MalformedObject => 2,
+    });
     // Linux O_DIRECTORY is 0x10000 on asm-generic targets.
     if (flags & 0x10000 != 0 and object.kind != .directory) return negativeErrno(20);
-    if (object.kind == .symlink) return negativeErrno(40);
     const backend: resource_tables.BackendId = @enumFromInt(switch (object.kind) {
         .directory => @as(u32, 0x100),
         .regular => @as(u32, 0x101),
-        .symlink => unreachable,
+        .symlink => unreachable, // resolve returns a final symlink only as an error.
     });
     // Namespace I/O backends deliberately expose no semantic read capability
     // until their actual file/directory read operations are implemented.
