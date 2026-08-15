@@ -21,6 +21,9 @@ const bounded_mapping_preflight = @import("bounded_mapping_preflight.zig");
 const linux_rv64_clone_request = @import("linux_rv64_clone_request.zig");
 const linux_rv64_fdupfd = @import("linux_rv64_fdupfd.zig");
 const linux_rv64_dup3 = @import("linux_rv64_dup3.zig");
+const bounded_pipe = @import("bounded_pipe.zig");
+const linux_rv64_pipe2 = @import("linux_rv64_pipe2.zig");
+const linux_rv64_pipe_lifetime = @import("linux_rv64_pipe_lifetime.zig");
 const runtime_mappings = @import("bounded_runtime_mappings.zig");
 const syscall_read_backend = @import("syscall_read_backend.zig");
 const bounded_namespace_lookup = @import("bounded_namespace_lookup.zig");
@@ -493,6 +496,8 @@ var external_process_cwd: ProcessCwd = .{};
 var external_fork_cwd: ProcessCwd = .{};
 const RuntimeNamespace = bounded_runtime_namespace.RuntimeNamespace(4, 256, 256);
 var external_runtime_namespace: RuntimeNamespace = .{};
+const PipeStore = bounded_pipe.PipeStore(2, 4096);
+var external_pipes: PipeStore = .{};
 var syscall_output: [64]u8 = .{0} ** 64;
 var syscall_output_len: usize = 0;
 const ResourceStore = resource_tables.ResourceTable(16);
@@ -1176,6 +1181,7 @@ fn executeExternalArtifact(builder: *MachineBuilder, trap_end: usize, historical
     syscall_bindings = .{};
     external_process_cwd = .{};
     external_runtime_namespace = .{};
+    external_pipes = .{};
     const stdin = syscall_resources.create(.{ .backend = @enumFromInt(if (external_artifact_options.live_console_input) 3 else 0), .capabilities = .{ .read = true } }) catch shutdown();
     const stdout = syscall_resources.create(.{ .backend = @enumFromInt(1), .capabilities = .{ .write = true } }) catch shutdown();
     const stderr = syscall_resources.create(.{ .backend = @enumFromInt(2), .capabilities = .{ .write = true } }) catch shutdown();
@@ -1513,7 +1519,7 @@ fn externalExecve(frame: *TrapFrame) usize {
     return 0;
 }
 
-const LinuxRequestKind = enum { get_current_directory, change_directory, duplicate, duplicate_to, fcntl, close, open_at, get_directory_entries, read, write, write_vector, new_fstatat, program_break, clone, execve, memory_map, terminate, unsupported };
+const LinuxRequestKind = enum { get_current_directory, change_directory, duplicate, duplicate_to, fcntl, close, pipe2, open_at, get_directory_entries, read, write, write_vector, new_fstatat, program_break, clone, execve, memory_map, terminate, unsupported };
 fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     return switch (number) {
         17 => .get_current_directory,
@@ -1523,6 +1529,7 @@ fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
         25 => .fcntl,
         56 => .open_at,
         57 => .close,
+        59 => .pipe2,
         61 => .get_directory_entries,
         63 => .read,
         64 => .write,
@@ -1537,7 +1544,45 @@ fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     };
 }
 comptime {
-    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(49) != .change_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(24) != .duplicate_to or decodeLinuxRequestKind(25) != .fcntl or decodeLinuxRequestKind(56) != .open_at or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(61) != .get_directory_entries or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(220) != .clone or decodeLinuxRequestKind(221) != .execve or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(49) != .change_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(24) != .duplicate_to or decodeLinuxRequestKind(25) != .fcntl or decodeLinuxRequestKind(56) != .open_at or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(59) != .pipe2 or decodeLinuxRequestKind(61) != .get_directory_entries or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(220) != .clone or decodeLinuxRequestKind(221) != .execve or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+}
+
+fn copyPipeDescriptors(destination: usize, descriptors: [2]usize) !void {
+    var bytes: [8]u8 = undefined;
+    std.mem.writeInt(u32, bytes[0..4], @intCast(descriptors[0]), .little);
+    std.mem.writeInt(u32, bytes[4..8], @intCast(descriptors[1]), .little);
+    try copyBytesToUser(destination, &bytes);
+}
+
+fn pipeWriterBound(pipe_id: usize) bool {
+    return linux_rv64_pipe_lifetime.owned(&syscall_resources, &syscall_bindings, external_fork_parent != null, &external_fork_resources, &external_fork_bindings, syscall_binding_capacity, pipe_id, .writer);
+}
+
+fn retirePipeIfUnowned(pipe_id: usize) void {
+    _ = linux_rv64_pipe_lifetime.retireIfUnowned(&external_pipes, &syscall_resources, &syscall_bindings, external_fork_parent != null, &external_fork_resources, &external_fork_bindings, syscall_binding_capacity, pipe_id);
+}
+
+fn pipeRead(reference: ResourceRef, destination: usize, requested: usize) usize {
+    const description = syscall_resources.resolve(reference) orelse return negativeErrno(9);
+    if (!description.capabilities.read) return negativeErrno(9);
+    var bytes: [4096]u8 = undefined;
+    const amount = external_pipes.read(description.state, bytes[0..@min(requested, bytes.len)]) catch return negativeErrno(9);
+    if (amount == 0 and pipeWriterBound(description.state)) return negativeErrno(11);
+    copyBytesToUser(destination, bytes[0..amount]) catch return negativeErrno(14);
+    return amount;
+}
+
+fn pipeWrite(reference: ResourceRef, source_address: usize, requested: usize) usize {
+    const description = syscall_resources.resolve(reference) orelse return negativeErrno(9);
+    if (!description.capabilities.write) return negativeErrno(9);
+    const amount = @min(requested, @as(usize, 4096));
+    const plan = user_transfer.TransferPlan(2).plan(user_transfer.GuestVirtualAddress.init(source_address), amount, .read_from_user, syscall_query) catch return negativeErrno(14);
+    var bytes: [4096]u8 = undefined;
+    for (plan.items()) |segment| {
+        const source: [*]const volatile u8 = @ptrFromInt(segment.physical_start.raw());
+        for (0..segment.byte_count) |i| bytes[segment.request_offset + i] = source[i];
+    }
+    return external_pipes.write(description.state, bytes[0..amount]) catch |err| return negativeErrno(if (err == error.WouldBlock) 11 else 9);
 }
 
 fn externalChangeDirectory(path_address: usize) usize {
@@ -1809,11 +1854,17 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
         },
         .duplicate_to => {
             syscall_semantics[index] = 18;
+            const displaced = if (syscall_bindings.resolve(frame.x[11])) |reference| syscall_resources.resolve(reference) else null;
             frame.x[10] = linux_rv64_dup3.replace(&syscall_resources, &syscall_bindings, frame.x[10], frame.x[11], frame.x[12], syscall_binding_capacity) catch |err| negativeErrno(switch (err) {
                 error.InvalidSource, error.InvalidTarget => 9,
                 error.SameDescriptor, error.UnsupportedFlags => 22,
                 error.ResourceFull => 23,
             });
+            if (@as(isize, @bitCast(frame.x[10])) >= 0) if (displaced) |description| {
+                const backend = @intFromEnum(description.backend);
+                if (backend == linux_rv64_pipe2.read_backend or backend == linux_rv64_pipe2.write_backend)
+                    retirePipeIfUnowned(description.state);
+            };
         },
         .fcntl => {
             syscall_semantics[index] = 17;
@@ -1837,7 +1888,26 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                 frame.x[10] = negativeErrno(9);
                 return finishReturningSyscall(frame, index);
             };
+            const description = syscall_resources.resolve(reference);
             _ = syscall_resources.release(reference) catch shutdown();
+            if (description) |closed| {
+                const backend = @intFromEnum(closed.backend);
+                if (backend == linux_rv64_pipe2.read_backend or backend == linux_rv64_pipe2.write_backend)
+                    retirePipeIfUnowned(closed.state);
+            }
+            frame.x[10] = 0;
+        },
+        .pipe2 => {
+            syscall_semantics[index] = 19;
+            _ = linux_rv64_pipe2.create(&external_pipes, &syscall_resources, &syscall_bindings, frame.x[11], frame.x[10], copyPipeDescriptors) catch |err| {
+                frame.x[10] = negativeErrno(switch (err) {
+                    error.UnsupportedFlags => 22,
+                    error.DescriptorFull => 24,
+                    error.ResourceFull, error.PipeFull => 23,
+                    error.CopyOut => 14,
+                });
+                return finishReturningSyscall(frame, index);
+            };
             frame.x[10] = 0;
         },
         .open_at => {
@@ -1867,6 +1937,10 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                     frame.x[10] = runtimeRegularRead(reference, frame.x[11], frame.x[12]);
                     break :blk;
                 }
+                if (@intFromEnum(description.backend) == linux_rv64_pipe2.read_backend) {
+                    frame.x[10] = pipeRead(reference, frame.x[11], frame.x[12]);
+                    break :blk;
+                }
             }
             request = .{ .read_bytes = .{ .source = resource_tables.semanticIdentity(reference), .destination = @enumFromInt(@as(u64, frame.x[11])), .byte_count = frame.x[12] } };
         },
@@ -1878,6 +1952,10 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
             };
             if (syscall_resources.resolve(reference)) |description| if (@intFromEnum(description.backend) == runtime_regular_backend) {
                 frame.x[10] = runtimeRegularWrite(reference, frame.x[11], frame.x[12]);
+                break :blk;
+            };
+            if (syscall_resources.resolve(reference)) |description| if (@intFromEnum(description.backend) == linux_rv64_pipe2.write_backend) {
+                frame.x[10] = pipeWrite(reference, frame.x[11], frame.x[12]);
                 break :blk;
             };
             request = .{ .write_bytes = .{ .destination = resource_tables.semanticIdentity(reference), .source = @enumFromInt(@as(u64, frame.x[11])), .byte_count = frame.x[12] } };
@@ -1902,6 +1980,15 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                 const length = readUserUsize(vector_address + 8) catch {
                     frame.x[10] = negativeErrno(14);
                     break :blk;
+                };
+                if (syscall_resources.resolve(reference)) |description| if (@intFromEnum(description.backend) == linux_rv64_pipe2.write_backend) {
+                    const written = pipeWrite(reference, source, length);
+                    if (@as(isize, @bitCast(written)) < 0) {
+                        frame.x[10] = written;
+                        break :blk;
+                    }
+                    total += written;
+                    continue;
                 };
                 const completion = morphic_operation.execute(.{ .write_bytes = .{ .destination = resource_tables.semanticIdentity(reference), .source = @enumFromInt(@as(u64, source)), .byte_count = length } }, SyscallBackend{});
                 switch (completion) {

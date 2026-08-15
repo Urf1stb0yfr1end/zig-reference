@@ -670,3 +670,22 @@ frame into supervisor-owned static lifetime. The immediate unchanged
 `echo hello | cat` retry reaches Linux/RV64 `pipe2(59)` and ash reports
 `can't create pipe: Bad file descriptor`; pipelines and Playable Alpine remain
 unearned. No runnable command surface changed.
+
+## Batch 32Q Playable Alpine proof
+
+Batch 32Q reused the documented Alpine v3.22.0 namespace-generation,
+live-console build, and `qemu-system-riscv64 -machine virt -nographic -bios
+default -kernel PATH/bin/morphic-freestanding-riscv64` command surface. In one
+fresh QEMU 8.2.2 machine, send the acceptance lines from the Playable Alpine
+roadmap to the persistent console. The run proved `echo morphic`, `echo second`,
+`pwd`, `ls /`, `cat /etc/alpine-release`, writable `/tmp` redirection/read-back,
+`echo hello | cat`, and `echo still-alive`. The QEMU process is intentionally
+bounded externally with `timeout`; exit 124 after the final observed line means
+the still-live interactive machine was terminated by the host, not that guest
+acceptance failed. No new runnable command was introduced.
+
+PR #93's ownership review follow-up keeps this command surface unchanged. It
+rebuilds the same canonical namespace-backed machine and re-proves both the
+focused pipeline/shell-survival pair and the complete one-shell acceptance
+sequence under QEMU 8.2.2 after making EOF and pipe retirement account for the
+suspended parent snapshot and dup3 target displacement.

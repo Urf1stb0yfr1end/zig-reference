@@ -445,3 +445,17 @@ Linux/RV64 `pipe2(59)` and ash reports `can't create pipe: Bad file descriptor`.
 The next batch must begin with a bounded neutral pipe resource and the observed
 `pipe2` edge, then immediately retry the unchanged pipeline. Playable Alpine is
 not yet earned.
+
+## Batch 32Q measured frontier — Playable Alpine earned
+
+The Linux/RV64 edge now translates `pipe2(59)` into a failure-atomic pair of
+capability-separated resources backed by a neutral two-pipe, 4096-byte bounded
+stream store. Ordinary dup3, close, clone snapshot/restore, read, write, and
+writev paths carry the endpoints and bytes; an empty reader returns EOF only
+when no writer endpoint remains bound. Real QEMU 8.2.2 proved the complete
+Phase C sequence in one fresh persistent shell, including real BusyBox `ls` and
+`cat`, runtime-file read-back, `echo hello | cat -> hello`, and the original
+shell's later `echo still-alive`. **★ PLAYABLE ALPINE UNDER MORPHIC ★ is
+earned.** The next pressure campaign begins Phase D with the real `/sbin/apk`
+startup/version/help ladder; it must not infer package-manager compatibility
+from this shell milestone.
