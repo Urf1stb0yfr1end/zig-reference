@@ -489,7 +489,7 @@ var syscall_output: [64]u8 = .{0} ** 64;
 var syscall_output_len: usize = 0;
 const ResourceStore = resource_tables.ResourceTable(16);
 const ResourceRef = ResourceStore.ResourceRef;
-const ProcessBindings = resource_tables.BindingTable(ResourceRef, 8);
+const ProcessBindings = resource_tables.BindingTable(ResourceRef, 16);
 var syscall_resources: ResourceStore = .{};
 var syscall_bindings: ProcessBindings = .{};
 const syscall_stdin = "stdin-25b-proof";
@@ -1490,12 +1490,13 @@ fn externalExecve(frame: *TrapFrame) usize {
     return 0;
 }
 
-const LinuxRequestKind = enum { get_current_directory, change_directory, duplicate, close, open_at, get_directory_entries, read, write, write_vector, new_fstatat, program_break, clone, execve, memory_map, terminate, unsupported };
+const LinuxRequestKind = enum { get_current_directory, change_directory, duplicate, fcntl, close, open_at, get_directory_entries, read, write, write_vector, new_fstatat, program_break, clone, execve, memory_map, terminate, unsupported };
 fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     return switch (number) {
         17 => .get_current_directory,
         49 => .change_directory,
         23 => .duplicate,
+        25 => .fcntl,
         56 => .open_at,
         57 => .close,
         61 => .get_directory_entries,
@@ -1512,7 +1513,7 @@ fn decodeLinuxRequestKind(number: usize) LinuxRequestKind {
     };
 }
 comptime {
-    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(49) != .change_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(56) != .open_at or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(61) != .get_directory_entries or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(220) != .clone or decodeLinuxRequestKind(221) != .execve or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
+    if (decodeLinuxRequestKind(17) != .get_current_directory or decodeLinuxRequestKind(49) != .change_directory or decodeLinuxRequestKind(23) != .duplicate or decodeLinuxRequestKind(25) != .fcntl or decodeLinuxRequestKind(56) != .open_at or decodeLinuxRequestKind(57) != .close or decodeLinuxRequestKind(61) != .get_directory_entries or decodeLinuxRequestKind(63) != .read or decodeLinuxRequestKind(64) != .write or decodeLinuxRequestKind(66) != .write_vector or decodeLinuxRequestKind(79) != .new_fstatat or decodeLinuxRequestKind(214) != .program_break or decodeLinuxRequestKind(220) != .clone or decodeLinuxRequestKind(221) != .execve or decodeLinuxRequestKind(222) != .memory_map or decodeLinuxRequestKind(93) != .terminate or decodeLinuxRequestKind(94) != .terminate or decodeLinuxRequestKind(0x7fff) != .unsupported) @compileError("Linux/RV64 decoder drift");
 }
 
 fn externalChangeDirectory(path_address: usize) usize {
@@ -1636,20 +1637,19 @@ fn externalNamespaceOpenAt(directory: usize, path_address: usize, flags: usize) 
     const truncate = flags & 0x200 != 0;
     const runtime_existing = external_runtime_namespace.lookup(path);
     if (runtime_existing != null or create) {
-        if (flags & ~@as(usize, 0x3 | 0x40 | 0x200 | 0x400 | 0x8000) != 0) return negativeErrno(22);
-        const object = external_runtime_namespace.open(path, create, truncate) catch |err| return negativeErrno(switch (err) {
+        // O_APPEND fails closed until every write can select EOF atomically.
+        if (flags & 0x400 != 0 or flags & ~@as(usize, 0x3 | 0x40 | 0x200 | 0x8000) != 0) return negativeErrno(22);
+        const descriptor = syscall_bindings.lowestFreeAtOrAbove(3) orelse return negativeErrno(24);
+        const object = external_runtime_namespace.openPrepared(path, create, truncate, syscall_resources.hasCapacity(), true) catch |err| return negativeErrno(switch (err) {
             error.NotFound => 2,
             error.ObjectCapacity, error.ByteCapacity => 28,
             error.InvalidPath, error.PathTooLong => 22,
+            error.ResourceFull => 23,
+            error.DescriptorFull => 24,
+            error.AccessDenied => 9,
         });
         const capabilities: resource_tables.Capabilities = .{ .read = access != 1, .write = access != 0 };
         const reference = syscall_resources.create(.{ .backend = @enumFromInt(runtime_regular_backend), .capabilities = capabilities, .state = object << 32 }) catch return negativeErrno(23);
-        var descriptor: usize = 3;
-        while (descriptor < 8 and syscall_bindings.resolve(descriptor) != null) : (descriptor += 1) {}
-        if (descriptor == 8) {
-            _ = syscall_resources.release(reference) catch shutdown();
-            return negativeErrno(24);
-        }
         syscall_bindings.bindAt(descriptor, reference) catch shutdown();
         return descriptor;
     }
@@ -1672,12 +1672,10 @@ fn externalNamespaceOpenAt(directory: usize, path_address: usize, flags: usize) 
     // until their actual file/directory read operations are implemented.
     if (object.manifest_offset > 0xffffffff) return negativeErrno(75);
     const reference = syscall_resources.create(.{ .backend = backend, .capabilities = .{}, .state = object.manifest_offset << 32 }) catch return negativeErrno(23);
-    var descriptor: usize = 3;
-    while (descriptor < 8 and syscall_bindings.resolve(descriptor) != null) : (descriptor += 1) {}
-    if (descriptor == 8) {
+    const descriptor = syscall_bindings.lowestFreeAtOrAbove(3) orelse {
         _ = syscall_resources.release(reference) catch shutdown();
         return negativeErrno(24);
-    }
+    };
     syscall_bindings.bindAt(descriptor, reference) catch shutdown();
     if (external_artifact_options.live_console_input) {
         write("ZIGREF_LINUX_OPENAT path=");
@@ -1787,6 +1785,27 @@ fn recordLinuxRv64Syscall(frame: *TrapFrame) void {
                 };
                 syscall_resources.retain(reference) catch shutdown();
                 frame.x[10] = new_slot;
+            } else frame.x[10] = negativeErrno(9);
+        },
+        .fcntl => {
+            syscall_semantics[index] = 17;
+            // Linux/RV64 F_DUPFD is command zero. Other fcntl policy remains
+            // explicitly unsupported at this compatibility edge.
+            if (frame.x[11] != 0) {
+                frame.x[10] = negativeErrno(38);
+            } else if (syscall_bindings.resolve(frame.x[10])) |reference| {
+                const destination = syscall_bindings.lowestFreeAtOrAbove(frame.x[12]) orelse {
+                    frame.x[10] = negativeErrno(24);
+                    return finishReturningSyscall(frame, index);
+                };
+                // Retain before binding, so any ownership failure leaves the
+                // descriptor topology unchanged.
+                syscall_resources.retain(reference) catch {
+                    frame.x[10] = negativeErrno(23);
+                    return finishReturningSyscall(frame, index);
+                };
+                syscall_bindings.bindAt(destination, reference) catch shutdown();
+                frame.x[10] = destination;
             } else frame.x[10] = negativeErrno(9);
         },
         .close => {

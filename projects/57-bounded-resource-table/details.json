@@ -173,12 +173,24 @@
         "signature": "count(self: *const Self) usize"
       },
       {
+        "name": "hasCapacity",
+        "signature": "hasCapacity(self: *const Self) bool"
+      },
+      {
         "name": "bindAt",
         "signature": "bindAt(self: *Self, slot: usize, reference: ResourceRef) Error!void"
       },
       {
         "name": "duplicateLowest",
         "signature": "duplicateLowest(self: *Self, source: usize) Error!usize"
+      },
+      {
+        "name": "duplicateLowestAtOrAbove",
+        "signature": "duplicateLowestAtOrAbove(self: *Self, source: usize, minimum: usize) Error!usize"
+      },
+      {
+        "name": "lowestFreeAtOrAbove",
+        "signature": "lowestFreeAtOrAbove(self: *const Self, minimum: usize) ?usize"
       },
       {
         "name": "unbind",
